@@ -1,0 +1,45 @@
+scalar Duration
+scalar LabelName
+scalar MapString
+scalar HostPort
+
+enum MatchType {
+    MatchEqual
+    MatchNotEqual
+    MatchRegexp
+    MatchNotRegexp
+}
+
+type Route {
+    receiver: String
+    groupBy: [LabelName]
+    matchers: [Matcher]
+    muteTimeIntervals: [String!]
+    activeTimeIntervals: [String!]
+    continue: Boolean
+    routes: [Route]
+    groupWait: Duration
+    GroupInterval: Duration
+    repeatInterval: Duration
+}
+
+type Matcher {
+    type: MatchType!
+    name: String!
+    value: String!
+}
+
+type Receiver {
+    name: String!
+    emailConfigs: [EmailConfig]
+}
+
+type EmailConfig {
+    smartHost: HostPort!
+    authType: String!
+    authUsername: String!
+    authPassword: String!
+    authSecret: String!
+    authIdentity: String!
+    headers: MapString
+}

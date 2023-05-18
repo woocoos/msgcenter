@@ -1,0 +1,122 @@
+# 全局配置
+global:
+  # email做为通知的基础配置.
+  smtpSmartHost: 'localhost:25'
+  smtpFrom: 'alertmanager@example.org'
+  smtpAuthUsername: 'alertmanager'
+  smtpAuthPassword: 'password'
+
+# 模板文件位置
+templates:
+  - 'testdata/tpl/*.tmpl'
+  - 'testdata/tpl/**/*.tmpl'
+
+# 根路由规则
+route:
+  # 分组合并规则
+  # 将传入警报分组在一起的标签。例如,多个警报进入集群=A和alertname=LatencyHigh将被分成一组.
+
+  # 所有可能的聚合标签，可使用“…”指示所有的标签.
+  groupBy: ['alertname', 'tenant', 'user']
+
+  # 当收到新的警报创建一组新的警报时,等待 'groupWait' 来发送初始通知。
+  # 这样可以确保对于在首次通知后不久开始触发的同一组的多个警报可以批量处理。
+  groupWait: 0
+
+  # 当发送第一个通知时，等待'groupInterval'发送一批通知为该组启动的新警报。
+  groupInterval: 5m
+
+  # 如果警报已经成功发送，等待'repeatInterval'重新发送。
+  repeatInterval: 3h
+
+  # 默认通知接收者。
+  receiver: email
+
+  # 以上所有属性都可以被所有子路由继承，并且可以在每个子路由上重写。
+
+  # 子路由.
+  routes:
+    - matchers:
+        - event="app:approve"
+      receiver: email
+
+      routes:
+        - matchers:
+            - receiver =~"email"
+          receiver: email
+          continue: true
+        - matchers:
+            - receiver =~"webhook"
+          receiver: webhook
+    - matchers:
+        - service="files"
+      receiver: team-Y-mails
+
+      routes:
+        - matchers:
+            - severity="critical"
+          receiver: team-Y-pager
+
+    # This route handles all alerts coming from a database service. If there's
+    # no team to handle it, it defaults to the DB team.
+    - matchers:
+        - service="database"
+      receiver: team-DB-pager
+      # Also group alerts by affected database.
+      groupBy: [alertname, cluster, database]
+      routes:
+        - matchers:
+            - owner="team-X"
+          receiver: team-X-pager
+          continue: true
+        - matchers:
+            - owner="team-Y"
+          receiver: team-Y-pager
+
+
+# Inhibition rules allow to mute a set of alerts given that another alert is
+# firing.
+# We use this to mute any warning-level notifications if the same alert is
+# already critical.
+inhibitRules:
+  - sourceMatchers: [severity="critical"]
+    targetMatchers: [severity="warning"]
+    # Apply inhibition if the alertname is the same.
+    # CAUTION:
+    #   If all label names listed in `equal` are missing
+    #   from both the source and target alerts,
+    #   the inhibition rule will apply!
+    equal: [alertname, cluster, service]
+
+receivers:
+  - name: 'email'
+    emailConfigs:
+      - authPassword:
+        authUsername:
+        from: alertmanager@example.com
+        requireTLS: false
+        smarthost: localhost:1025
+        to: alerts@example.com
+  - name: 'internal'
+    webhookConfigs:
+      - url: "http://127.0.0.1:5001/"
+  - name: 'webhook'
+    webhookConfigs:
+      - url: "http://127.0.0.1:5001/"
+  - name: 'team-X-pager'
+    emailConfigs:
+      - to: 'team-X+alerts-critical@example.org'
+    webhookConfigs:
+      - url: "http://127.0.0.1:5001/"
+
+  - name: 'team-Y-mails'
+    emailConfigs:
+      - to: 'team-Y+alerts@example.org'
+
+  - name: 'team-Y-pager'
+    webhookConfigs:
+      - url: "http://127.0.0.1:5001/"
+
+  - name: 'team-DB-pager'
+    webhookConfigs:
+      - url: "http://127.0.0.1:5001/"

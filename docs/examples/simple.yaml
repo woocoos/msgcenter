@@ -1,0 +1,114 @@
+# 全局配置
+global:
+  # email做为通知的基础配置.
+  smtpSmartHost: 'localhost:25'
+  smtpFrom: 'alertmanager@example.org'
+  smtpAuthUsername: 'alertmanager'
+  smtpAuthPassword: 'password'
+
+# 模板文件位置
+templates:
+  - '/etc/alertmanager/template/*.tmpl'
+
+# 根路由规则
+route:
+  # 分组合并规则
+  # 将传入警报分组在一起的标签。例如,多个警报进入集群=A和alertname=LatencyHigh将被分成一组。
+
+  # 要按所有可能的标签进行聚合，请使用“…”’作为唯一的标签名称。这有效地完全禁用了聚合，通过所有
+  # 警报按原样。这不太可能是你想要的，除非你有一个非常低的警报量或您的上游通知系统执行
+  # 它自己的分组。示例:groupBy:[…]
+  groupBy: ['alertname', 'app', 'user']
+
+  # 当收到新的警报创建一组新的警报时,等待 'groupWait' 来发送初始通知。
+  # 这样可以确保对于在首次通知后不久开始触发的同一组的多个警报可以批量处理。
+  groupWait: 30s
+
+  # 当发送第一个通知时，等待'groupInterval'发送一批通知为该组启动的新警报。
+  groupInterval: 5m
+
+  # 如果警报已经成功发送，等待'repeatInterval'重新发送。
+  repeatInterval: 3h
+
+  # 默认通知接收者。
+  receiver: team-X-mails
+
+  # 以上所有属性都可以被所有子路由继承，并且可以在每个子路由上重写。
+
+  # 子路由.
+  routes:
+    # This routes performs a regular expression match on alert labels to
+    # catch alerts that are related to a list of services.
+    - matchers:
+        - service=~"foo1|foo2|baz"
+      receiver: team-X-mails
+      # The service has a sub-route for critical alerts, any alerts
+      # that do not match, i.e. severity != critical, fall-back to the
+      # parent node and are sent to 'team-X-mails'
+      routes:
+        - matchers:
+            - severity="critical"
+          receiver: team-X-pager
+    - matchers:
+        - service="files"
+      receiver: team-Y-mails
+
+      routes:
+        - matchers:
+            - severity="critical"
+          receiver: team-Y-pager
+
+    # This route handles all alerts coming from a database service. If there's
+    # no team to handle it, it defaults to the DB team.
+    - matchers:
+        - service="database"
+      receiver: team-DB-pager
+      # Also group alerts by affected database.
+      groupBy: [alertname, cluster, database]
+      routes:
+        - matchers:
+            - owner="team-X"
+          receiver: team-X-pager
+          continue: true
+        - matchers:
+            - owner="team-Y"
+          receiver: team-Y-pager
+
+
+# Inhibition rules allow to mute a set of alerts given that another alert is
+# firing.
+# We use this to mute any warning-level notifications if the same alert is
+# already critical.
+inhibitRules:
+  - sourceMatchers: [severity="critical"]
+    targetMatchers: [severity="warning"]
+    # Apply inhibition if the alertname is the same.
+    # CAUTION:
+    #   If all label names listed in `equal` are missing
+    #   from both the source and target alerts,
+    #   the inhibition rule will apply!
+    equal: [alertname, cluster, service]
+
+
+receivers:
+  - name: 'team-X-mails'
+    emailConfigs:
+      - to: 'team-X+alerts@example.org'
+
+  - name: 'team-X-pager'
+    emailConfigs:
+      - to: 'team-X+alerts-critical@example.org'
+    pagerdutyConfigs:
+      - service_key: <team-X-key>
+
+  - name: 'team-Y-mails'
+    emailConfigs:
+      - to: 'team-Y+alerts@example.org'
+
+  - name: 'team-Y-pager'
+    pagerdutyConfigs:
+      - service_key: <team-Y-key>
+
+  - name: 'team-DB-pager'
+    pagerdutyConfigs:
+      - service_key: <team-DB-key>

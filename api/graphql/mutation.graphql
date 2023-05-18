@@ -1,0 +1,58 @@
+type Mutation {
+    # 创建消息类型
+    createMsgType(input: CreateMsgTypeInput!): MsgType!
+    # 更新消息类型
+    updateMsgType(id: ID!,input: UpdateMsgTypeInput!): MsgType!
+    # 删除消息类型
+    deleteMsgType(id: ID!): Boolean!
+    # 创建消息事件
+    createMsgEvent(input: CreateMsgEventInput!): MsgEvent!
+    # 更新消息事件
+    updateMsgEvent(id:ID!,input: UpdateMsgEventInput!): MsgEvent!
+    # 删除消息事件
+    deleteMsgEvent(id: ID!): Boolean!
+    # 启用消息事件
+    enableMsgEvent(id: ID!): MsgEvent!
+    # 创建消息通道
+    createMsgChannel(input: CreateMsgChannelInput!): MsgChannel!
+    # 更新消息通道
+    updateMsgChannel(id: ID!,input: UpdateMsgChannelInput!): MsgChannel!
+    # 删除消息通道
+    deleteMsgChannel(id: ID!): Boolean!
+    # 启用消息通道
+    enableMsgChannel(id: ID!): MsgChannel!
+}
+
+input RouteInput  {
+    receiver: String
+    groupBy: [LabelName]
+    matchers: [MatcherInput]
+    muteTimeIntervals: [String!]
+    activeTimeIntervals: [String!]
+    continue: Boolean
+    routes: [RouteInput]
+    groupWait: Duration
+    GroupInterval: Duration
+    repeatInterval: Duration
+}
+
+input MatcherInput {
+    type: MatchType!
+    name: String!
+    value: String!
+}
+
+input ReceiverInput {
+    name: String!
+    emailConfigs: [EmailConfigInput]
+}
+
+input EmailConfigInput {
+    smartHost: HostPort!
+    authType: String!
+    authUsername: String!
+    authPassword: String!
+    authSecret: String!
+    authIdentity: String!
+    headers: MapString
+}

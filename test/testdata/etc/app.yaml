@@ -1,0 +1,44 @@
+appName: alertmanager
+version: 0.0.1
+development: true
+log:
+  withTraceID: true
+  traceIDKey: "traceId"
+  cores:
+    - level: debug
+      outputPaths:
+        - stdout
+      encoderConfig:
+        timeKey: "@timestamp"
+        messageKey: "message"
+        callerKey: "file"
+  rotate:
+    maxsize: 10
+    maxage: 10
+    maxbackups: 20
+    localtime: true
+
+web:
+  server:
+    addr: 127.0.0.1:10070
+  engine:
+    routerGroups:
+      - alertmanager:
+          basePath: "/api/v2"
+          middlewares:
+            - accessLog:
+            - recovery:
+            - errorHandle:
+
+alertManager:
+  config:
+    file: testdata/etc/alertmanager.yaml
+  storage:
+    path: tmp
+  data:
+    retention: 120h
+    maintenanceInterval: 15m
+  alerts:
+    gcInterval: 30m
+  template:
+    path: testdata/tpl # path for custom template
