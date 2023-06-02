@@ -10,9 +10,9 @@ type Alert struct {
 }
 
 type AlertGroup struct {
-	Alerts   []*GettableAlert `binding:"required"`
-	Labels   LabelSet         `binding:"required"`
-	Receiver Receiver         `binding:"required"`
+	Alerts   []*GettableAlert `binding:"required" json:"alerts"`
+	Labels   LabelSet         `binding:"required" json:"labels"`
+	Receiver Receiver         `binding:"required" json:"receiver"`
 }
 
 type AlertGroups []*AlertGroup
@@ -65,24 +65,24 @@ type GettableSilences []*GettableSilence
 type LabelSet map[string]string
 
 type Matcher struct {
-	IsEqual bool
-	IsRegex bool   `binding:"required"`
-	Name    string `binding:"required"`
-	Value   string `binding:"required"`
+	IsEqual bool   `json:"isEqual,omitempty"`
+	IsRegex bool   `binding:"required" json:"isRegex"`
+	Name    string `binding:"required" json:"name"`
+	Value   string `binding:"required" json:"value"`
 }
 
 type Matchers []*Matcher
 
 type PeerStatus struct {
-	Address string `binding:"required"`
-	Name    string `binding:"required"`
+	Address string `binding:"required" json:"address"`
+	Name    string `binding:"required" json:"name"`
 }
 
 type PostableAlert struct {
 	*Alert      `json:",inline"`
-	Annotations LabelSet
-	EndsAt      time.Time `time_format:"2006-01-02T15:04:05Z07:00"`
-	StartsAt    time.Time `time_format:"2006-01-02T15:04:05Z07:00"`
+	Annotations LabelSet  `json:"annotations,omitempty"`
+	EndsAt      time.Time `time_format:"2006-01-02T15:04:05Z07:00" json:"endsAt,omitempty"`
+	StartsAt    time.Time `time_format:"2006-01-02T15:04:05Z07:00" json:"startsAt,omitempty"`
 }
 
 type PostableAlerts []*PostableAlert
@@ -93,7 +93,7 @@ type PostableSilence struct {
 }
 
 type Receiver struct {
-	Name string `binding:"required"`
+	Name string `binding:"required" json:"name"`
 }
 
 type Silence struct {

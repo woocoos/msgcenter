@@ -1,3 +1,4 @@
+spec: "./api/oas/openapi.yaml"
 target: "./api/oas"
 models:
   UUID:
