@@ -213,9 +213,6 @@ func (mcc *MsgChannelCreate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "MsgChannel.status": %w`, err)}
 		}
 	}
-	if _, ok := mcc.mutation.Receiver(); !ok {
-		return &ValidationError{Name: "receiver", err: errors.New(`ent: missing required field "MsgChannel.receiver"`)}
-	}
 	return nil
 }
 
@@ -455,6 +452,12 @@ func (u *MsgChannelUpsert) UpdateReceiver() *MsgChannelUpsert {
 	return u
 }
 
+// ClearReceiver clears the value of the "receiver" field.
+func (u *MsgChannelUpsert) ClearReceiver() *MsgChannelUpsert {
+	u.SetNull(msgchannel.FieldReceiver)
+	return u
+}
+
 // SetComments sets the "comments" field.
 func (u *MsgChannelUpsert) SetComments(v string) *MsgChannelUpsert {
 	u.Set(msgchannel.FieldComments, v)
@@ -657,6 +660,13 @@ func (u *MsgChannelUpsertOne) SetReceiver(v *profile.Receiver) *MsgChannelUpsert
 func (u *MsgChannelUpsertOne) UpdateReceiver() *MsgChannelUpsertOne {
 	return u.Update(func(s *MsgChannelUpsert) {
 		s.UpdateReceiver()
+	})
+}
+
+// ClearReceiver clears the value of the "receiver" field.
+func (u *MsgChannelUpsertOne) ClearReceiver() *MsgChannelUpsertOne {
+	return u.Update(func(s *MsgChannelUpsert) {
+		s.ClearReceiver()
 	})
 }
 
@@ -1027,6 +1037,13 @@ func (u *MsgChannelUpsertBulk) SetReceiver(v *profile.Receiver) *MsgChannelUpser
 func (u *MsgChannelUpsertBulk) UpdateReceiver() *MsgChannelUpsertBulk {
 	return u.Update(func(s *MsgChannelUpsert) {
 		s.UpdateReceiver()
+	})
+}
+
+// ClearReceiver clears the value of the "receiver" field.
+func (u *MsgChannelUpsertBulk) ClearReceiver() *MsgChannelUpsertBulk {
+	return u.Update(func(s *MsgChannelUpsert) {
+		s.ClearReceiver()
 	})
 }
 

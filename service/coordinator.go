@@ -250,6 +250,24 @@ func (c *Coordinator) addNamedRoute(input []*profile.Route) error {
 	return nil
 }
 
+func (c *Coordinator) RemoveNamedRoute(routeNames []string) error {
+	rs := c.profile.Route.Routes
+	for _, v := range routeNames {
+		if v == "" {
+			continue
+		}
+		nrs := make([]*profile.Route, 0)
+		for _, r := range rs {
+			if r.Name != v {
+				nrs = append(nrs, r)
+			}
+		}
+		rs = nrs
+	}
+	c.profile.Route.Routes = rs
+	return nil
+}
+
 func (c *Coordinator) AddTenantReceiver(input []*profile.Receiver) error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
@@ -293,6 +311,24 @@ func (c *Coordinator) addTenantReceiver(input []*profile.Receiver) error {
 			c.ActiveReceivers[receiver.Name] = 1
 		}
 	}
+	return nil
+}
+
+func (c *Coordinator) RemoveTenantReceiver(receiverNames []string) error {
+	rs := c.profile.Receivers
+	for _, v := range receiverNames {
+		if v == "" {
+			continue
+		}
+		nrs := make([]profile.Receiver, 0)
+		for _, r := range rs {
+			if r.Name != v {
+				nrs = append(nrs, r)
+			}
+		}
+		rs = nrs
+	}
+	c.profile.Receivers = rs
 	return nil
 }
 

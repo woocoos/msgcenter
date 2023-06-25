@@ -13,6 +13,8 @@ type Mutation {
     deleteMsgEvent(id: ID!): Boolean!
     # 启用消息事件
     enableMsgEvent(id: ID!): MsgEvent!
+    # 禁用消息事件
+    disableMsgEvent(id: ID!): MsgEvent!
     # 创建消息通道
     createMsgChannel(input: CreateMsgChannelInput!): MsgChannel!
     # 更新消息通道
@@ -21,6 +23,18 @@ type Mutation {
     deleteMsgChannel(id: ID!): Boolean!
     # 启用消息通道
     enableMsgChannel(id: ID!): MsgChannel!
+    # 禁用消息通道
+    disableMsgChannel(id: ID!): MsgChannel!
+    # 创建消息模板
+    createMsgTemplate(input: CreateMsgTemplateInput!): MsgTemplate!
+    # 更新消息模板
+    updateMsgTemplate(id: ID!, input: UpdateMsgTemplateInput!): MsgTemplate!
+    # 删除消息模板
+    deleteMsgTemplate(id: ID!): Boolean!
+    # 启用消息模板
+    enableMsgTemplate(id: ID!): MsgTemplate!
+    # 禁用消息模板
+    disableMsgTemplate(id: ID!): MsgTemplate!
 }
 
 input RouteInput  {

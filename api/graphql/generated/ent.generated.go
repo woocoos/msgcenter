@@ -26,6 +26,11 @@ import (
 type QueryResolver interface {
 	Node(ctx context.Context, id string) (ent.Noder, error)
 	Nodes(ctx context.Context, ids []string) ([]ent.Noder, error)
+	MsgChannels(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgChannelOrder, where *ent.MsgChannelWhereInput) (*ent.MsgChannelConnection, error)
+	MsgTypes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTypeOrder, where *ent.MsgTypeWhereInput) (*ent.MsgTypeConnection, error)
+	MsgTypeCategories(ctx context.Context, keyword *string) ([]string, error)
+	MsgEvents(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) (*ent.MsgEventConnection, error)
+	MsgTemplates(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) (*ent.MsgTemplateConnection, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -44,6 +49,261 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_msgChannels_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *entgql.Cursor[int]
+	if tmp, ok := rawArgs["after"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["after"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *entgql.Cursor[int]
+	if tmp, ok := rawArgs["before"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["before"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["last"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["last"] = arg3
+	var arg4 *ent.MsgChannelOrder
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+		arg4, err = ec.unmarshalOMsgChannelOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannelOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orderBy"] = arg4
+	var arg5 *ent.MsgChannelWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg5, err = ec.unmarshalOMsgChannelWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannelWhereInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg5
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_msgEvents_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *entgql.Cursor[int]
+	if tmp, ok := rawArgs["after"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["after"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *entgql.Cursor[int]
+	if tmp, ok := rawArgs["before"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["before"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["last"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["last"] = arg3
+	var arg4 *ent.MsgEventOrder
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+		arg4, err = ec.unmarshalOMsgEventOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orderBy"] = arg4
+	var arg5 *ent.MsgEventWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg5, err = ec.unmarshalOMsgEventWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventWhereInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg5
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_msgTemplates_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *entgql.Cursor[int]
+	if tmp, ok := rawArgs["after"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["after"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *entgql.Cursor[int]
+	if tmp, ok := rawArgs["before"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["before"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["last"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["last"] = arg3
+	var arg4 *ent.MsgTemplateOrder
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+		arg4, err = ec.unmarshalOMsgTemplateOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplateOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orderBy"] = arg4
+	var arg5 *ent.MsgTemplateWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg5, err = ec.unmarshalOMsgTemplateWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplateWhereInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg5
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_msgTypeCategories_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["keyword"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("keyword"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["keyword"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_msgTypes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *entgql.Cursor[int]
+	if tmp, ok := rawArgs["after"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["after"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *entgql.Cursor[int]
+	if tmp, ok := rawArgs["before"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["before"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["last"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["last"] = arg3
+	var arg4 *ent.MsgTypeOrder
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+		arg4, err = ec.unmarshalOMsgTypeOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTypeOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orderBy"] = arg4
+	var arg5 *ent.MsgTypeWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg5, err = ec.unmarshalOMsgTypeWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTypeWhereInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg5
 	return args, nil
 }
 
@@ -493,14 +753,11 @@ func (ec *executionContext) _MsgChannel_receiver(ctx context.Context, field grap
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*profile.Receiver)
 	fc.Result = res
-	return ec.marshalNReceiver2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiver(ctx, field.Selections, res)
+	return ec.marshalOReceiver2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiver(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MsgChannel_receiver(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -558,6 +815,260 @@ func (ec *executionContext) fieldContext_MsgChannel_comments(ctx context.Context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgChannelConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.MsgChannelConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgChannelConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.MsgChannelEdge)
+	fc.Result = res
+	return ec.marshalOMsgChannelEdge2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannelEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgChannelConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgChannelConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "node":
+				return ec.fieldContext_MsgChannelEdge_node(ctx, field)
+			case "cursor":
+				return ec.fieldContext_MsgChannelEdge_cursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgChannelEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgChannelConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.MsgChannelConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgChannelConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.PageInfo[int])
+	fc.Result = res
+	return ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgChannelConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgChannelConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgChannelConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.MsgChannelConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgChannelConnection_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgChannelConnection_totalCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgChannelConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgChannelEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.MsgChannelEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgChannelEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgChannel)
+	fc.Result = res
+	return ec.marshalOMsgChannel2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannel(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgChannelEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgChannelEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgChannel_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgChannel_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgChannel_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgChannel_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgChannel_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_MsgChannel_name(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgChannel_tenantID(ctx, field)
+			case "receiverType":
+				return ec.fieldContext_MsgChannel_receiverType(ctx, field)
+			case "status":
+				return ec.fieldContext_MsgChannel_status(ctx, field)
+			case "receiver":
+				return ec.fieldContext_MsgChannel_receiver(ctx, field)
+			case "comments":
+				return ec.fieldContext_MsgChannel_comments(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgChannel", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgChannelEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.MsgChannelEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgChannelEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.Cursor[int])
+	fc.Result = res
+	return ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgChannelEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgChannelEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Cursor does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1210,6 +1721,264 @@ func (ec *executionContext) fieldContext_MsgEvent_customerTemplate(ctx context.C
 				return ec.fieldContext_MsgTemplate_event(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgTemplate", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgEventConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.MsgEventConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgEventConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.MsgEventEdge)
+	fc.Result = res
+	return ec.marshalOMsgEventEdge2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgEventConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgEventConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "node":
+				return ec.fieldContext_MsgEventEdge_node(ctx, field)
+			case "cursor":
+				return ec.fieldContext_MsgEventEdge_cursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgEventEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgEventConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.MsgEventConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgEventConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.PageInfo[int])
+	fc.Result = res
+	return ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgEventConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgEventConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgEventConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.MsgEventConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgEventConnection_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgEventConnection_totalCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgEventConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgEventEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.MsgEventEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgEventEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgEvent)
+	fc.Result = res
+	return ec.marshalOMsgEvent2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEvent(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgEventEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgEventEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgEvent_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgEvent_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgEvent_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgEvent_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgEvent_updatedAt(ctx, field)
+			case "msgTypeID":
+				return ec.fieldContext_MsgEvent_msgTypeID(ctx, field)
+			case "name":
+				return ec.fieldContext_MsgEvent_name(ctx, field)
+			case "status":
+				return ec.fieldContext_MsgEvent_status(ctx, field)
+			case "comments":
+				return ec.fieldContext_MsgEvent_comments(ctx, field)
+			case "route":
+				return ec.fieldContext_MsgEvent_route(ctx, field)
+			case "modes":
+				return ec.fieldContext_MsgEvent_modes(ctx, field)
+			case "msgType":
+				return ec.fieldContext_MsgEvent_msgType(ctx, field)
+			case "customerTemplate":
+				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgEventEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.MsgEventEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgEventEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.Cursor[int])
+	fc.Result = res
+	return ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgEventEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgEventEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Cursor does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2636,6 +3405,282 @@ func (ec *executionContext) fieldContext_MsgTemplate_event(ctx context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _MsgTemplateConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.MsgTemplateConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgTemplateConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.MsgTemplateEdge)
+	fc.Result = res
+	return ec.marshalOMsgTemplateEdge2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplateEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgTemplateConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgTemplateConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "node":
+				return ec.fieldContext_MsgTemplateEdge_node(ctx, field)
+			case "cursor":
+				return ec.fieldContext_MsgTemplateEdge_cursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgTemplateEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgTemplateConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.MsgTemplateConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgTemplateConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.PageInfo[int])
+	fc.Result = res
+	return ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgTemplateConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgTemplateConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgTemplateConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.MsgTemplateConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgTemplateConnection_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgTemplateConnection_totalCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgTemplateConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgTemplateEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.MsgTemplateEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgTemplateEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgTemplate)
+	fc.Result = res
+	return ec.marshalOMsgTemplate2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgTemplateEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgTemplateEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgTemplate_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgTemplate_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgTemplate_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgTemplate_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgTemplate_updatedAt(ctx, field)
+			case "msgTypeID":
+				return ec.fieldContext_MsgTemplate_msgTypeID(ctx, field)
+			case "msgEventID":
+				return ec.fieldContext_MsgTemplate_msgEventID(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgTemplate_tenantID(ctx, field)
+			case "name":
+				return ec.fieldContext_MsgTemplate_name(ctx, field)
+			case "status":
+				return ec.fieldContext_MsgTemplate_status(ctx, field)
+			case "receiverType":
+				return ec.fieldContext_MsgTemplate_receiverType(ctx, field)
+			case "format":
+				return ec.fieldContext_MsgTemplate_format(ctx, field)
+			case "subject":
+				return ec.fieldContext_MsgTemplate_subject(ctx, field)
+			case "from":
+				return ec.fieldContext_MsgTemplate_from(ctx, field)
+			case "to":
+				return ec.fieldContext_MsgTemplate_to(ctx, field)
+			case "cc":
+				return ec.fieldContext_MsgTemplate_cc(ctx, field)
+			case "bcc":
+				return ec.fieldContext_MsgTemplate_bcc(ctx, field)
+			case "body":
+				return ec.fieldContext_MsgTemplate_body(ctx, field)
+			case "tpl":
+				return ec.fieldContext_MsgTemplate_tpl(ctx, field)
+			case "attachments":
+				return ec.fieldContext_MsgTemplate_attachments(ctx, field)
+			case "comments":
+				return ec.fieldContext_MsgTemplate_comments(ctx, field)
+			case "event":
+				return ec.fieldContext_MsgTemplate_event(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgTemplate", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgTemplateEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.MsgTemplateEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgTemplateEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.Cursor[int])
+	fc.Result = res
+	return ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgTemplateEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgTemplateEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MsgType_id(ctx context.Context, field graphql.CollectedField, obj *ent.MsgType) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MsgType_id(ctx, field)
 	if err != nil {
@@ -3275,6 +4320,266 @@ func (ec *executionContext) fieldContext_MsgType_subscribers(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _MsgTypeConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.MsgTypeConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgTypeConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.MsgTypeEdge)
+	fc.Result = res
+	return ec.marshalOMsgTypeEdge2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTypeEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgTypeConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgTypeConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "node":
+				return ec.fieldContext_MsgTypeEdge_node(ctx, field)
+			case "cursor":
+				return ec.fieldContext_MsgTypeEdge_cursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgTypeEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgTypeConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.MsgTypeConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgTypeConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.PageInfo[int])
+	fc.Result = res
+	return ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgTypeConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgTypeConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgTypeConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.MsgTypeConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgTypeConnection_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgTypeConnection_totalCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgTypeConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgTypeEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.MsgTypeEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgTypeEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgType)
+	fc.Result = res
+	return ec.marshalOMsgType2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgTypeEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgTypeEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgType_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgType_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgType_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgType_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgType_updatedAt(ctx, field)
+			case "appID":
+				return ec.fieldContext_MsgType_appID(ctx, field)
+			case "category":
+				return ec.fieldContext_MsgType_category(ctx, field)
+			case "name":
+				return ec.fieldContext_MsgType_name(ctx, field)
+			case "status":
+				return ec.fieldContext_MsgType_status(ctx, field)
+			case "comments":
+				return ec.fieldContext_MsgType_comments(ctx, field)
+			case "canSubs":
+				return ec.fieldContext_MsgType_canSubs(ctx, field)
+			case "canCustom":
+				return ec.fieldContext_MsgType_canCustom(ctx, field)
+			case "events":
+				return ec.fieldContext_MsgType_events(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_MsgType_subscribers(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgType", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgTypeEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.MsgTypeEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgTypeEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.Cursor[int])
+	fc.Result = res
+	return ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgTypeEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgTypeEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field graphql.CollectedField, obj *entgql.PageInfo[int]) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_PageInfo_hasNextPage(ctx, field)
 	if err != nil {
@@ -3552,6 +4857,313 @@ func (ec *executionContext) fieldContext_Query_nodes(ctx context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_msgChannels(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_msgChannels(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().MsgChannels(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.MsgChannelOrder), fc.Args["where"].(*ent.MsgChannelWhereInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgChannelConnection)
+	fc.Result = res
+	return ec.marshalNMsgChannelConnection2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannelConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_msgChannels(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_MsgChannelConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_MsgChannelConnection_pageInfo(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_MsgChannelConnection_totalCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgChannelConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_msgChannels_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_msgTypes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_msgTypes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().MsgTypes(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.MsgTypeOrder), fc.Args["where"].(*ent.MsgTypeWhereInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgTypeConnection)
+	fc.Result = res
+	return ec.marshalNMsgTypeConnection2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTypeConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_msgTypes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_MsgTypeConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_MsgTypeConnection_pageInfo(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_MsgTypeConnection_totalCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgTypeConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_msgTypes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_msgTypeCategories(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_msgTypeCategories(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().MsgTypeCategories(rctx, fc.Args["keyword"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_msgTypeCategories(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_msgTypeCategories_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_msgEvents(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_msgEvents(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().MsgEvents(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.MsgEventOrder), fc.Args["where"].(*ent.MsgEventWhereInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgEventConnection)
+	fc.Result = res
+	return ec.marshalNMsgEventConnection2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_msgEvents(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_MsgEventConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_MsgEventConnection_pageInfo(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_MsgEventConnection_totalCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgEventConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_msgEvents_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_msgTemplates(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_msgTemplates(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().MsgTemplates(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.MsgTemplateOrder), fc.Args["where"].(*ent.MsgTemplateWhereInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgTemplateConnection)
+	fc.Result = res
+	return ec.marshalNMsgTemplateConnection2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplateConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_msgTemplates(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_MsgTemplateConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_MsgTemplateConnection_pageInfo(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_MsgTemplateConnection_totalCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgTemplateConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_msgTemplates_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -3730,7 +5342,7 @@ func (ec *executionContext) unmarshalInputCreateMsgChannelInput(ctx context.Cont
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiver"))
-			data, err := ec.unmarshalNReceiverInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiver(ctx, v)
+			data, err := ec.unmarshalOReceiverInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiver(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3878,7 +5490,7 @@ func (ec *executionContext) unmarshalInputCreateMsgTemplateInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"msgTypeID", "tenantID", "name", "status", "receiverType", "format", "subject", "from", "to", "cc", "bcc", "body", "tpl", "attachments", "comments", "eventID"}
+	fieldsInOrder := [...]string{"msgTypeID", "tenantID", "name", "receiverType", "format", "subject", "from", "to", "cc", "bcc", "body", "tpl", "attachments", "comments", "eventID"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3912,15 +5524,6 @@ func (ec *executionContext) unmarshalInputCreateMsgTemplateInput(ctx context.Con
 				return it, err
 			}
 			it.Name = data
-		case "status":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOMsgTemplateSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Status = data
 		case "receiverType":
 			var err error
 
@@ -9160,7 +10763,7 @@ func (ec *executionContext) unmarshalInputUpdateMsgChannelInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "tenantID", "receiverType", "status", "clearStatus", "receiver", "comments", "clearComments"}
+	fieldsInOrder := [...]string{"name", "tenantID", "receiverType", "receiver", "clearReceiver", "comments", "clearComments"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9194,24 +10797,6 @@ func (ec *executionContext) unmarshalInputUpdateMsgChannelInput(ctx context.Cont
 				return it, err
 			}
 			it.ReceiverType = data
-		case "status":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOMsgChannelSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Status = data
-		case "clearStatus":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearStatus"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ClearStatus = data
 		case "receiver":
 			var err error
 
@@ -9221,6 +10806,15 @@ func (ec *executionContext) unmarshalInputUpdateMsgChannelInput(ctx context.Cont
 				return it, err
 			}
 			it.Receiver = data
+		case "clearReceiver":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearReceiver"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearReceiver = data
 		case "comments":
 			var err error
 
@@ -9252,7 +10846,7 @@ func (ec *executionContext) unmarshalInputUpdateMsgEventInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "status", "clearStatus", "comments", "clearComments", "route", "clearRoute", "modes", "msgTypeID"}
+	fieldsInOrder := [...]string{"name", "comments", "clearComments", "route", "clearRoute", "modes", "msgTypeID"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9268,24 +10862,6 @@ func (ec *executionContext) unmarshalInputUpdateMsgEventInput(ctx context.Contex
 				return it, err
 			}
 			it.Name = data
-		case "status":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOMsgEventSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Status = data
-		case "clearStatus":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearStatus"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ClearStatus = data
 		case "comments":
 			var err error
 
@@ -9418,7 +10994,7 @@ func (ec *executionContext) unmarshalInputUpdateMsgTemplateInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"msgTypeID", "tenantID", "name", "status", "clearStatus", "receiverType", "format", "subject", "clearSubject", "from", "clearFrom", "to", "clearTo", "cc", "clearCc", "bcc", "clearBcc", "body", "clearBody", "tpl", "clearTpl", "attachments", "clearAttachments", "comments", "clearComments", "eventID"}
+	fieldsInOrder := [...]string{"msgTypeID", "tenantID", "name", "receiverType", "format", "subject", "clearSubject", "from", "clearFrom", "to", "clearTo", "cc", "clearCc", "bcc", "clearBcc", "body", "clearBody", "tpl", "clearTpl", "attachments", "clearAttachments", "comments", "clearComments", "eventID"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9452,24 +11028,6 @@ func (ec *executionContext) unmarshalInputUpdateMsgTemplateInput(ctx context.Con
 				return it, err
 			}
 			it.Name = data
-		case "status":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOMsgTemplateSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.Status = data
-		case "clearStatus":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearStatus"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.ClearStatus = data
 		case "receiverType":
 			var err error
 
@@ -9903,13 +11461,81 @@ func (ec *executionContext) _MsgChannel(ctx context.Context, sel ast.SelectionSe
 
 			out.Values[i] = ec._MsgChannel_receiver(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "comments":
 
 			out.Values[i] = ec._MsgChannel_comments(ctx, field, obj)
 
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var msgChannelConnectionImplementors = []string{"MsgChannelConnection"}
+
+func (ec *executionContext) _MsgChannelConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.MsgChannelConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, msgChannelConnectionImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MsgChannelConnection")
+		case "edges":
+
+			out.Values[i] = ec._MsgChannelConnection_edges(ctx, field, obj)
+
+		case "pageInfo":
+
+			out.Values[i] = ec._MsgChannelConnection_pageInfo(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "totalCount":
+
+			out.Values[i] = ec._MsgChannelConnection_totalCount(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var msgChannelEdgeImplementors = []string{"MsgChannelEdge"}
+
+func (ec *executionContext) _MsgChannelEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.MsgChannelEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, msgChannelEdgeImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MsgChannelEdge")
+		case "node":
+
+			out.Values[i] = ec._MsgChannelEdge_node(ctx, field, obj)
+
+		case "cursor":
+
+			out.Values[i] = ec._MsgChannelEdge_cursor(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10030,6 +11656,77 @@ func (ec *executionContext) _MsgEvent(ctx context.Context, sel ast.SelectionSet,
 				return innerFunc(ctx)
 
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var msgEventConnectionImplementors = []string{"MsgEventConnection"}
+
+func (ec *executionContext) _MsgEventConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.MsgEventConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, msgEventConnectionImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MsgEventConnection")
+		case "edges":
+
+			out.Values[i] = ec._MsgEventConnection_edges(ctx, field, obj)
+
+		case "pageInfo":
+
+			out.Values[i] = ec._MsgEventConnection_pageInfo(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "totalCount":
+
+			out.Values[i] = ec._MsgEventConnection_totalCount(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var msgEventEdgeImplementors = []string{"MsgEventEdge"}
+
+func (ec *executionContext) _MsgEventEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.MsgEventEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, msgEventEdgeImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MsgEventEdge")
+		case "node":
+
+			out.Values[i] = ec._MsgEventEdge_node(ctx, field, obj)
+
+		case "cursor":
+
+			out.Values[i] = ec._MsgEventEdge_cursor(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10288,6 +11985,77 @@ func (ec *executionContext) _MsgTemplate(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
+var msgTemplateConnectionImplementors = []string{"MsgTemplateConnection"}
+
+func (ec *executionContext) _MsgTemplateConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.MsgTemplateConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, msgTemplateConnectionImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MsgTemplateConnection")
+		case "edges":
+
+			out.Values[i] = ec._MsgTemplateConnection_edges(ctx, field, obj)
+
+		case "pageInfo":
+
+			out.Values[i] = ec._MsgTemplateConnection_pageInfo(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "totalCount":
+
+			out.Values[i] = ec._MsgTemplateConnection_totalCount(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var msgTemplateEdgeImplementors = []string{"MsgTemplateEdge"}
+
+func (ec *executionContext) _MsgTemplateEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.MsgTemplateEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, msgTemplateEdgeImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MsgTemplateEdge")
+		case "node":
+
+			out.Values[i] = ec._MsgTemplateEdge_node(ctx, field, obj)
+
+		case "cursor":
+
+			out.Values[i] = ec._MsgTemplateEdge_cursor(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var msgTypeImplementors = []string{"MsgType", "Node"}
 
 func (ec *executionContext) _MsgType(ctx context.Context, sel ast.SelectionSet, obj *ent.MsgType) graphql.Marshaler {
@@ -10406,6 +12174,77 @@ func (ec *executionContext) _MsgType(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var msgTypeConnectionImplementors = []string{"MsgTypeConnection"}
+
+func (ec *executionContext) _MsgTypeConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.MsgTypeConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, msgTypeConnectionImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MsgTypeConnection")
+		case "edges":
+
+			out.Values[i] = ec._MsgTypeConnection_edges(ctx, field, obj)
+
+		case "pageInfo":
+
+			out.Values[i] = ec._MsgTypeConnection_pageInfo(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "totalCount":
+
+			out.Values[i] = ec._MsgTypeConnection_totalCount(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var msgTypeEdgeImplementors = []string{"MsgTypeEdge"}
+
+func (ec *executionContext) _MsgTypeEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.MsgTypeEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, msgTypeEdgeImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MsgTypeEdge")
+		case "node":
+
+			out.Values[i] = ec._MsgTypeEdge_node(ctx, field, obj)
+
+		case "cursor":
+
+			out.Values[i] = ec._MsgTypeEdge_cursor(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var pageInfoImplementors = []string{"PageInfo"}
 
 func (ec *executionContext) _PageInfo(ctx context.Context, sel ast.SelectionSet, obj *entgql.PageInfo[int]) graphql.Marshaler {
@@ -10511,6 +12350,121 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "msgChannels":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_msgChannels(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "msgTypes":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_msgTypes(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "msgTypeCategories":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_msgTypeCategories(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "msgEvents":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_msgEvents(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "msgTemplates":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_msgTemplates(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "__type":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -10548,9 +12502,24 @@ func (ec *executionContext) unmarshalNCreateMsgEventInput2githubᚗcomᚋwoocoos
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNCreateMsgTemplateInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐCreateMsgTemplateInput(ctx context.Context, v interface{}) (ent.CreateMsgTemplateInput, error) {
+	res, err := ec.unmarshalInputCreateMsgTemplateInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNCreateMsgTypeInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐCreateMsgTypeInput(ctx context.Context, v interface{}) (ent.CreateMsgTypeInput, error) {
 	res, err := ec.unmarshalInputCreateMsgTypeInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx context.Context, v interface{}) (entgql.Cursor[int], error) {
+	var res entgql.Cursor[int]
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx context.Context, sel ast.SelectionSet, v entgql.Cursor[int]) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalNGID2string(ctx context.Context, v interface{}) (string, error) {
@@ -10614,6 +12583,20 @@ func (ec *executionContext) marshalNMsgChannel2ᚖgithubᚗcomᚋwoocoosᚋmsgce
 	return ec._MsgChannel(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNMsgChannelConnection2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannelConnection(ctx context.Context, sel ast.SelectionSet, v ent.MsgChannelConnection) graphql.Marshaler {
+	return ec._MsgChannelConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMsgChannelConnection2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannelConnection(ctx context.Context, sel ast.SelectionSet, v *ent.MsgChannelConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MsgChannelConnection(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNMsgChannelOrderField2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannelOrderField(ctx context.Context, v interface{}) (*ent.MsgChannelOrderField, error) {
 	var res = new(ent.MsgChannelOrderField)
 	err := res.UnmarshalGQL(v)
@@ -10667,6 +12650,20 @@ func (ec *executionContext) marshalNMsgEvent2ᚖgithubᚗcomᚋwoocoosᚋmsgcent
 		return graphql.Null
 	}
 	return ec._MsgEvent(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMsgEventConnection2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventConnection(ctx context.Context, sel ast.SelectionSet, v ent.MsgEventConnection) graphql.Marshaler {
+	return ec._MsgEventConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMsgEventConnection2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventConnection(ctx context.Context, sel ast.SelectionSet, v *ent.MsgEventConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MsgEventConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNMsgEventOrderField2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventOrderField(ctx context.Context, v interface{}) (*ent.MsgEventOrderField, error) {
@@ -10731,6 +12728,10 @@ func (ec *executionContext) unmarshalNMsgSubscriberWhereInput2ᚖgithubᚗcomᚋ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNMsgTemplate2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplate(ctx context.Context, sel ast.SelectionSet, v ent.MsgTemplate) graphql.Marshaler {
+	return ec._MsgTemplate(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNMsgTemplate2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplate(ctx context.Context, sel ast.SelectionSet, v *ent.MsgTemplate) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -10739,6 +12740,20 @@ func (ec *executionContext) marshalNMsgTemplate2ᚖgithubᚗcomᚋwoocoosᚋmsgc
 		return graphql.Null
 	}
 	return ec._MsgTemplate(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMsgTemplateConnection2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplateConnection(ctx context.Context, sel ast.SelectionSet, v ent.MsgTemplateConnection) graphql.Marshaler {
+	return ec._MsgTemplateConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMsgTemplateConnection2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplateConnection(ctx context.Context, sel ast.SelectionSet, v *ent.MsgTemplateConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MsgTemplateConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNMsgTemplateFormat2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚋmsgtemplateᚐFormat(ctx context.Context, v interface{}) (msgtemplate.Format, error) {
@@ -10804,6 +12819,20 @@ func (ec *executionContext) marshalNMsgType2ᚖgithubᚗcomᚋwoocoosᚋmsgcente
 		return graphql.Null
 	}
 	return ec._MsgType(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMsgTypeConnection2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTypeConnection(ctx context.Context, sel ast.SelectionSet, v ent.MsgTypeConnection) graphql.Marshaler {
+	return ec._MsgTypeConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMsgTypeConnection2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTypeConnection(ctx context.Context, sel ast.SelectionSet, v *ent.MsgTypeConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MsgTypeConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNMsgTypeOrderField2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTypeOrderField(ctx context.Context, v interface{}) (*ent.MsgTypeOrderField, error) {
@@ -10885,6 +12914,10 @@ func (ec *executionContext) marshalNOrderDirection2entgoᚗioᚋcontribᚋentgql
 	return v
 }
 
+func (ec *executionContext) marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx context.Context, sel ast.SelectionSet, v entgql.PageInfo[int]) graphql.Marshaler {
+	return ec._PageInfo(ctx, sel, &v)
+}
+
 func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
 	res, err := graphql.UnmarshalTime(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -10910,6 +12943,11 @@ func (ec *executionContext) unmarshalNUpdateMsgEventInput2githubᚗcomᚋwoocoos
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNUpdateMsgTemplateInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐUpdateMsgTemplateInput(ctx context.Context, v interface{}) (ent.UpdateMsgTemplateInput, error) {
+	res, err := ec.unmarshalInputUpdateMsgTemplateInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNUpdateMsgTypeInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐUpdateMsgTypeInput(ctx context.Context, v interface{}) (ent.UpdateMsgTypeInput, error) {
 	res, err := ec.unmarshalInputUpdateMsgTypeInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -10929,6 +12967,69 @@ func (ec *executionContext) marshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCu
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) marshalOMsgChannel2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannel(ctx context.Context, sel ast.SelectionSet, v *ent.MsgChannel) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MsgChannel(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOMsgChannelEdge2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannelEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.MsgChannelEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOMsgChannelEdge2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannelEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOMsgChannelEdge2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannelEdge(ctx context.Context, sel ast.SelectionSet, v *ent.MsgChannelEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MsgChannelEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOMsgChannelOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannelOrder(ctx context.Context, v interface{}) (*ent.MsgChannelOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputMsgChannelOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOMsgChannelReceiverType2ᚕgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverTypeᚄ(ctx context.Context, v interface{}) ([]profile.ReceiverType, error) {
@@ -11182,6 +13283,69 @@ func (ec *executionContext) marshalOMsgEvent2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgc
 	return ret
 }
 
+func (ec *executionContext) marshalOMsgEvent2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEvent(ctx context.Context, sel ast.SelectionSet, v *ent.MsgEvent) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MsgEvent(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOMsgEventEdge2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.MsgEventEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOMsgEventEdge2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOMsgEventEdge2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventEdge(ctx context.Context, sel ast.SelectionSet, v *ent.MsgEventEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MsgEventEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOMsgEventOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventOrder(ctx context.Context, v interface{}) (*ent.MsgEventOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputMsgEventOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOMsgEventSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
 	var res typex.SimpleStatus
 	err := res.UnmarshalGQL(v)
@@ -11425,6 +13589,61 @@ func (ec *executionContext) marshalOMsgTemplate2ᚕᚖgithubᚗcomᚋwoocoosᚋm
 	return ret
 }
 
+func (ec *executionContext) marshalOMsgTemplate2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplate(ctx context.Context, sel ast.SelectionSet, v *ent.MsgTemplate) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MsgTemplate(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOMsgTemplateEdge2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplateEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.MsgTemplateEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOMsgTemplateEdge2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplateEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOMsgTemplateEdge2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplateEdge(ctx context.Context, sel ast.SelectionSet, v *ent.MsgTemplateEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MsgTemplateEdge(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOMsgTemplateFormat2ᚕgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚋmsgtemplateᚐFormatᚄ(ctx context.Context, v interface{}) ([]msgtemplate.Format, error) {
 	if v == nil {
 		return nil, nil
@@ -11506,6 +13725,14 @@ func (ec *executionContext) marshalOMsgTemplateFormat2ᚖgithubᚗcomᚋwoocoos�
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) unmarshalOMsgTemplateOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplateOrder(ctx context.Context, v interface{}) (*ent.MsgTemplateOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputMsgTemplateOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOMsgTemplateReceiverType2ᚕgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverTypeᚄ(ctx context.Context, v interface{}) ([]profile.ReceiverType, error) {
@@ -11709,6 +13936,69 @@ func (ec *executionContext) unmarshalOMsgTemplateWhereInput2ᚖgithubᚗcomᚋwo
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputMsgTemplateWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOMsgType2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgType(ctx context.Context, sel ast.SelectionSet, v *ent.MsgType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MsgType(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOMsgTypeEdge2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTypeEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.MsgTypeEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOMsgTypeEdge2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTypeEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOMsgTypeEdge2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTypeEdge(ctx context.Context, sel ast.SelectionSet, v *ent.MsgTypeEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MsgTypeEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOMsgTypeOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTypeOrder(ctx context.Context, v interface{}) (*ent.MsgTypeOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputMsgTypeOrder(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

@@ -18,7 +18,7 @@ test/tmp
 cmd/alertmanager/data/
 *.idea/
 .run
-
+*.vscode/
 # Dependency directories (remove the comment below to include it)
 # vendor/
 

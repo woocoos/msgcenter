@@ -19,6 +19,7 @@ type MsgChannel struct {
 func (MsgChannel) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entsql.Annotation{Table: "msg_channel"},
+		entgql.RelayConnection(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 		schemax.TenantField("tenant_id"),
 	}
@@ -39,8 +40,8 @@ func (MsgChannel) Fields() []ent.Field {
 		field.Enum("receiver_type").Comment("支持的消息模式:站内信,app推送,邮件,短信,微信等").
 			GoType(profile.ReceiverType("")),
 		field.Enum("status").GoType(typex.SimpleStatus("")).Default(typex.SimpleStatusInactive.String()).
-			Optional().Comment("状态").Annotations(entgql.Skip(entgql.SkipMutationCreateInput)),
-		field.JSON("receiver", &profile.Receiver{}).Comment("通道配置Json格式"),
+			Optional().Comment("状态").Annotations(entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput)),
+		field.JSON("receiver", &profile.Receiver{}).Optional().Comment("通道配置Json格式"),
 		field.String("comments").Optional().Comment("备注"),
 	}
 }

@@ -6,11 +6,44 @@ package graphql
 
 import (
 	"context"
+	"github.com/woocoos/msgcenter/ent/predicate"
 
+	"entgo.io/contrib/entgql"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
+	"github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
+
+// MsgChannels is the resolver for the msgChannels field.
+func (r *queryResolver) MsgChannels(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgChannelOrder, where *ent.MsgChannelWhereInput) (*ent.MsgChannelConnection, error) {
+	return r.Client.MsgChannel.Query().Paginate(ctx, after, first, before, last, ent.WithMsgChannelOrder(orderBy), ent.WithMsgChannelFilter(where.Filter))
+}
+
+// MsgTypes is the resolver for the msgTypes field.
+func (r *queryResolver) MsgTypes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTypeOrder, where *ent.MsgTypeWhereInput) (*ent.MsgTypeConnection, error) {
+	return r.Client.MsgType.Query().Paginate(ctx, after, first, before, last, ent.WithMsgTypeOrder(orderBy), ent.WithMsgTypeFilter(where.Filter))
+}
+
+// MsgTypeCategories is the resolver for the msgTypeCategories field.
+func (r *queryResolver) MsgTypeCategories(ctx context.Context, keyword *string) ([]string, error) {
+	where := make([]predicate.MsgType, 0)
+	if keyword != nil {
+		where = append(where, msgtype.CategoryContains(*keyword))
+	}
+	return r.Client.MsgType.Query().Where(where...).Select(msgtype.FieldCategory).GroupBy(msgtype.FieldCategory).Strings(ctx)
+}
+
+// MsgEvents is the resolver for the msgEvents field.
+func (r *queryResolver) MsgEvents(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) (*ent.MsgEventConnection, error) {
+	return r.Client.MsgEvent.Query().Paginate(ctx, after, first, before, last, ent.WithMsgEventOrder(orderBy), ent.WithMsgEventFilter(where.Filter))
+}
+
+// MsgTemplates is the resolver for the msgTemplates field.
+func (r *queryResolver) MsgTemplates(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) (*ent.MsgTemplateConnection, error) {
+	return r.Client.MsgTemplate.Query().Paginate(ctx, after, first, before, last, ent.WithMsgTemplateOrder(orderBy), ent.WithMsgTemplateFilter(where.Filter))
+}
 
 // Matchers is the resolver for the matchers field.
 func (r *routeResolver) Matchers(ctx context.Context, obj *profile.Route) ([]*label.Matcher, error) {

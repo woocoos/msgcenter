@@ -20,7 +20,7 @@ var (
 		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "webhook"}},
 		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"active", "inactive", "processing"}, Default: "inactive"},
-		{Name: "receiver", Type: field.TypeJSON},
+		{Name: "receiver", Type: field.TypeJSON, Nullable: true},
 		{Name: "comments", Type: field.TypeString, Nullable: true},
 	}
 	// MsgChannelTable holds the schema information for the "msg_channel" table.
@@ -93,7 +93,7 @@ var (
 		{Name: "msg_type_id", Type: field.TypeInt},
 		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "name", Type: field.TypeString, Size: 45},
-		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"active", "inactive", "processing"}, Default: "active"},
+		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"active", "inactive", "processing"}, Default: "inactive"},
 		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "webhook"}},
 		{Name: "format", Type: field.TypeEnum, Enums: []string{"txt", "html"}},
 		{Name: "subject", Type: field.TypeString, Nullable: true},

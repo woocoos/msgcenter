@@ -6,11 +6,15 @@ package graphql
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	"github.com/woocoos/entco/schemax/typex"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/msgchannel"
+	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
@@ -38,11 +42,22 @@ func (r *mutationResolver) CreateMsgEvent(ctx context.Context, input ent.CreateM
 
 // UpdateMsgEvent is the resolver for the updateMsgEvent field.
 func (r *mutationResolver) UpdateMsgEvent(ctx context.Context, id int, input ent.UpdateMsgEventInput) (*ent.MsgEvent, error) {
+	if input.Route != nil {
+		// route不为空，验证是否符合modes
+		//modes := strings.Split(*input.Modes, ",")
+
+	}
 	return ent.FromContext(ctx).MsgEvent.UpdateOneID(id).SetInput(input).Save(ctx)
 }
 
 // DeleteMsgEvent is the resolver for the deleteMsgEvent field.
 func (r *mutationResolver) DeleteMsgEvent(ctx context.Context, id int) (bool, error) {
+	client := ent.FromContext(ctx)
+	if has, err := client.MsgEvent.Query().Where(msgevent.ID(id), msgevent.StatusEQ(typex.SimpleStatusActive)).Exist(ctx); err != nil {
+		return false, err
+	} else if has {
+		return false, fmt.Errorf("the active status cannot be deleted")
+	}
 	err := ent.FromContext(ctx).MsgEvent.DeleteOneID(id).Exec(ctx)
 	return err == nil, err
 }
@@ -60,6 +75,18 @@ func (r *mutationResolver) EnableMsgEvent(ctx context.Context, id int) (*ent.Msg
 	return event.Update().SetStatus(typex.SimpleStatusActive).Save(ctx)
 }
 
+// DisableMsgEvent is the resolver for the disableMsgEvent field.
+func (r *mutationResolver) DisableMsgEvent(ctx context.Context, id int) (*ent.MsgEvent, error) {
+	event, err := ent.FromContext(ctx).MsgEvent.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if err = r.Coordinator.RemoveNamedRoute([]string{event.Name}); err != nil {
+		return nil, err
+	}
+	return event.Update().SetStatus(typex.SimpleStatusInactive).Save(ctx)
+}
+
 // CreateMsgChannel is the resolver for the createMsgChannel field.
 func (r *mutationResolver) CreateMsgChannel(ctx context.Context, input ent.CreateMsgChannelInput) (*ent.MsgChannel, error) {
 	return ent.FromContext(ctx).MsgChannel.Create().SetInput(input).Save(ctx)
@@ -72,7 +99,13 @@ func (r *mutationResolver) UpdateMsgChannel(ctx context.Context, id int, input e
 
 // DeleteMsgChannel is the resolver for the deleteMsgChannel field.
 func (r *mutationResolver) DeleteMsgChannel(ctx context.Context, id int) (bool, error) {
-	err := ent.FromContext(ctx).MsgChannel.DeleteOneID(id).Exec(ctx)
+	client := ent.FromContext(ctx)
+	if has, err := client.MsgChannel.Query().Where(msgchannel.ID(id), msgchannel.StatusEQ(typex.SimpleStatusActive)).Exist(ctx); err != nil {
+		return false, err
+	} else if has {
+		return false, fmt.Errorf("the active status cannot be deleted")
+	}
+	err := client.MsgChannel.DeleteOneID(id).Exec(ctx)
 	return err == nil, err
 }
 
@@ -87,6 +120,60 @@ func (r *mutationResolver) EnableMsgChannel(ctx context.Context, id int) (*ent.M
 		return nil, err
 	}
 	return channel.Update().SetStatus(typex.SimpleStatusActive).Save(ctx)
+}
+
+// DisableMsgChannel is the resolver for the disableMsgChannel field.
+func (r *mutationResolver) DisableMsgChannel(ctx context.Context, id int) (*ent.MsgChannel, error) {
+	channel, err := ent.FromContext(ctx).MsgChannel.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if err = r.Coordinator.RemoveTenantReceiver([]string{profile.TenantReceiverName(strconv.Itoa(channel.TenantID), channel.Name)}); err != nil {
+		return nil, err
+	}
+	return channel.Update().SetStatus(typex.SimpleStatusInactive).Save(ctx)
+}
+
+// CreateMsgTemplate is the resolver for the createMsgTemplate field.
+func (r *mutationResolver) CreateMsgTemplate(ctx context.Context, input ent.CreateMsgTemplateInput) (*ent.MsgTemplate, error) {
+	return ent.FromContext(ctx).MsgTemplate.Create().SetInput(input).Save(ctx)
+}
+
+// UpdateMsgTemplate is the resolver for the updateMsgTemplate field.
+func (r *mutationResolver) UpdateMsgTemplate(ctx context.Context, id int, input ent.UpdateMsgTemplateInput) (*ent.MsgTemplate, error) {
+	return ent.FromContext(ctx).MsgTemplate.UpdateOneID(id).SetInput(input).Save(ctx)
+}
+
+// DeleteMsgTemplate is the resolver for the deleteMsgTemplate field.
+func (r *mutationResolver) DeleteMsgTemplate(ctx context.Context, id int) (bool, error) {
+	client := ent.FromContext(ctx)
+	if has, err := client.MsgTemplate.Query().Where(msgtemplate.ID(id), msgtemplate.StatusEQ(typex.SimpleStatusActive)).Exist(ctx); err != nil {
+		return false, err
+	} else if has {
+		return false, fmt.Errorf("the active status cannot be deleted")
+	}
+	err := client.MsgTemplate.DeleteOneID(id).Exec(ctx)
+	return err == nil, err
+}
+
+// EnableMsgTemplate is the resolver for the enableMsgTemplate field.
+func (r *mutationResolver) EnableMsgTemplate(ctx context.Context, id int) (*ent.MsgTemplate, error) {
+	temp, err := ent.FromContext(ctx).MsgTemplate.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	// TODO 启用模板时需加载模板
+	return temp.Update().SetStatus(typex.SimpleStatusActive).Save(ctx)
+}
+
+// DisableMsgTemplate is the resolver for the disableMsgTemplate field.
+func (r *mutationResolver) DisableMsgTemplate(ctx context.Context, id int) (*ent.MsgTemplate, error) {
+	temp, err := ent.FromContext(ctx).MsgTemplate.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	// TODO 禁用模板时需移除模板
+	return temp.Update().SetStatus(typex.SimpleStatusInactive).Save(ctx)
 }
 
 // Matchers is the resolver for the matchers field.

@@ -585,9 +585,22 @@ func (m *MsgChannelMutation) OldReceiver(ctx context.Context) (v *profile.Receiv
 	return oldValue.Receiver, nil
 }
 
+// ClearReceiver clears the value of the "receiver" field.
+func (m *MsgChannelMutation) ClearReceiver() {
+	m.receiver = nil
+	m.clearedFields[msgchannel.FieldReceiver] = struct{}{}
+}
+
+// ReceiverCleared returns if the "receiver" field was cleared in this mutation.
+func (m *MsgChannelMutation) ReceiverCleared() bool {
+	_, ok := m.clearedFields[msgchannel.FieldReceiver]
+	return ok
+}
+
 // ResetReceiver resets all changes to the "receiver" field.
 func (m *MsgChannelMutation) ResetReceiver() {
 	m.receiver = nil
+	delete(m.clearedFields, msgchannel.FieldReceiver)
 }
 
 // SetComments sets the "comments" field.
@@ -918,6 +931,9 @@ func (m *MsgChannelMutation) ClearedFields() []string {
 	if m.FieldCleared(msgchannel.FieldStatus) {
 		fields = append(fields, msgchannel.FieldStatus)
 	}
+	if m.FieldCleared(msgchannel.FieldReceiver) {
+		fields = append(fields, msgchannel.FieldReceiver)
+	}
 	if m.FieldCleared(msgchannel.FieldComments) {
 		fields = append(fields, msgchannel.FieldComments)
 	}
@@ -943,6 +959,9 @@ func (m *MsgChannelMutation) ClearField(name string) error {
 		return nil
 	case msgchannel.FieldStatus:
 		m.ClearStatus()
+		return nil
+	case msgchannel.FieldReceiver:
+		m.ClearReceiver()
 		return nil
 	case msgchannel.FieldComments:
 		m.ClearComments()

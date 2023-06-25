@@ -122,7 +122,7 @@ var (
 	NameValidator func(string) error
 )
 
-const DefaultStatus typex.SimpleStatus = "active"
+const DefaultStatus typex.SimpleStatus = "inactive"
 
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s typex.SimpleStatus) error {

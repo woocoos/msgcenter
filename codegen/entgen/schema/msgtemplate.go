@@ -20,6 +20,7 @@ type MsgTemplate struct {
 func (MsgTemplate) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entsql.Annotation{Table: "msg_template"},
+		entgql.RelayConnection(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 		schemax.TenantField("tenant_id"),
 	}
@@ -39,8 +40,8 @@ func (MsgTemplate) Fields() []ent.Field {
 		field.Int("msg_event_id").Comment("消息事件ID"),
 		field.Int("tenant_id").Comment("组织ID"),
 		field.String("name").MaxLen(45).Comment("消息模板名称"),
-		field.Enum("status").GoType(typex.SimpleStatus("")).Default(typex.SimpleStatusActive.String()).
-			Optional().Comment("状态"),
+		field.Enum("status").GoType(typex.SimpleStatus("")).Default(typex.SimpleStatusInactive.String()).
+			Optional().Comment("状态").Annotations(entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput)),
 		field.Enum("receiver_type").Comment("消息模式:站内信,app推送,邮件,短信,微信等").
 			GoType(profile.ReceiverType("")),
 		field.Enum("format").Values("txt", "html").Comment("消息类型:文本,网页,需要结合mod确定支持的格式"),

@@ -41,8 +41,7 @@ type UpdateMsgChannelInput struct {
 	Name          *string
 	TenantID      *int
 	ReceiverType  *profile.ReceiverType
-	ClearStatus   bool
-	Status        *typex.SimpleStatus
+	ClearReceiver bool
 	Receiver      *profile.Receiver
 	ClearComments bool
 	Comments      *string
@@ -59,11 +58,8 @@ func (i *UpdateMsgChannelInput) Mutate(m *MsgChannelMutation) {
 	if v := i.ReceiverType; v != nil {
 		m.SetReceiverType(*v)
 	}
-	if i.ClearStatus {
-		m.ClearStatus()
-	}
-	if v := i.Status; v != nil {
-		m.SetStatus(*v)
+	if i.ClearReceiver {
+		m.ClearReceiver()
 	}
 	if v := i.Receiver; v != nil {
 		m.SetReceiver(v)
@@ -119,8 +115,6 @@ func (c *MsgEventCreate) SetInput(i CreateMsgEventInput) *MsgEventCreate {
 // UpdateMsgEventInput represents a mutation input for updating msgevents.
 type UpdateMsgEventInput struct {
 	Name          *string
-	ClearStatus   bool
-	Status        *typex.SimpleStatus
 	ClearComments bool
 	Comments      *string
 	ClearRoute    bool
@@ -133,12 +127,6 @@ type UpdateMsgEventInput struct {
 func (i *UpdateMsgEventInput) Mutate(m *MsgEventMutation) {
 	if v := i.Name; v != nil {
 		m.SetName(*v)
-	}
-	if i.ClearStatus {
-		m.ClearStatus()
-	}
-	if v := i.Status; v != nil {
-		m.SetStatus(*v)
 	}
 	if i.ClearComments {
 		m.ClearComments()
@@ -241,7 +229,6 @@ type CreateMsgTemplateInput struct {
 	MsgTypeID    int
 	TenantID     int
 	Name         string
-	Status       *typex.SimpleStatus
 	ReceiverType profile.ReceiverType
 	Format       msgtemplate.Format
 	Subject      *string
@@ -261,9 +248,6 @@ func (i *CreateMsgTemplateInput) Mutate(m *MsgTemplateMutation) {
 	m.SetMsgTypeID(i.MsgTypeID)
 	m.SetTenantID(i.TenantID)
 	m.SetName(i.Name)
-	if v := i.Status; v != nil {
-		m.SetStatus(*v)
-	}
 	m.SetReceiverType(i.ReceiverType)
 	m.SetFormat(i.Format)
 	if v := i.Subject; v != nil {
@@ -307,8 +291,6 @@ type UpdateMsgTemplateInput struct {
 	MsgTypeID        *int
 	TenantID         *int
 	Name             *string
-	ClearStatus      bool
-	Status           *typex.SimpleStatus
 	ReceiverType     *profile.ReceiverType
 	Format           *msgtemplate.Format
 	ClearSubject     bool
@@ -342,12 +324,6 @@ func (i *UpdateMsgTemplateInput) Mutate(m *MsgTemplateMutation) {
 	}
 	if v := i.Name; v != nil {
 		m.SetName(*v)
-	}
-	if i.ClearStatus {
-		m.ClearStatus()
-	}
-	if v := i.Status; v != nil {
-		m.SetStatus(*v)
 	}
 	if v := i.ReceiverType; v != nil {
 		m.SetReceiverType(*v)

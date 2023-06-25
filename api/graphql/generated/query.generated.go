@@ -1264,16 +1264,6 @@ func (ec *executionContext) marshalNMatchType2githubᚗcomᚋwoocoosᚋmsgcenter
 	return v
 }
 
-func (ec *executionContext) marshalNReceiver2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiver(ctx context.Context, sel ast.SelectionSet, v *profile.Receiver) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Receiver(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalODuration2ᚖtimeᚐDuration(ctx context.Context, v interface{}) (*time.Duration, error) {
 	if v == nil {
 		return nil, nil
@@ -1443,6 +1433,13 @@ func (ec *executionContext) marshalOMatcher2ᚖgithubᚗcomᚋwoocoosᚋmsgcente
 		return graphql.Null
 	}
 	return ec._Matcher(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOReceiver2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiver(ctx context.Context, sel ast.SelectionSet, v *profile.Receiver) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Receiver(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalORoute2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐRoute(ctx context.Context, sel ast.SelectionSet, v []*profile.Route) graphql.Marshaler {

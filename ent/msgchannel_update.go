@@ -128,6 +128,12 @@ func (mcu *MsgChannelUpdate) SetReceiver(pr *profile.Receiver) *MsgChannelUpdate
 	return mcu
 }
 
+// ClearReceiver clears the value of the "receiver" field.
+func (mcu *MsgChannelUpdate) ClearReceiver() *MsgChannelUpdate {
+	mcu.mutation.ClearReceiver()
+	return mcu
+}
+
 // SetComments sets the "comments" field.
 func (mcu *MsgChannelUpdate) SetComments(s string) *MsgChannelUpdate {
 	mcu.mutation.SetComments(s)
@@ -247,6 +253,9 @@ func (mcu *MsgChannelUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := mcu.mutation.Receiver(); ok {
 		_spec.SetField(msgchannel.FieldReceiver, field.TypeJSON, value)
+	}
+	if mcu.mutation.ReceiverCleared() {
+		_spec.ClearField(msgchannel.FieldReceiver, field.TypeJSON)
 	}
 	if value, ok := mcu.mutation.Comments(); ok {
 		_spec.SetField(msgchannel.FieldComments, field.TypeString, value)
@@ -369,6 +378,12 @@ func (mcuo *MsgChannelUpdateOne) ClearStatus() *MsgChannelUpdateOne {
 // SetReceiver sets the "receiver" field.
 func (mcuo *MsgChannelUpdateOne) SetReceiver(pr *profile.Receiver) *MsgChannelUpdateOne {
 	mcuo.mutation.SetReceiver(pr)
+	return mcuo
+}
+
+// ClearReceiver clears the value of the "receiver" field.
+func (mcuo *MsgChannelUpdateOne) ClearReceiver() *MsgChannelUpdateOne {
+	mcuo.mutation.ClearReceiver()
 	return mcuo
 }
 
@@ -521,6 +536,9 @@ func (mcuo *MsgChannelUpdateOne) sqlSave(ctx context.Context) (_node *MsgChannel
 	}
 	if value, ok := mcuo.mutation.Receiver(); ok {
 		_spec.SetField(msgchannel.FieldReceiver, field.TypeJSON, value)
+	}
+	if mcuo.mutation.ReceiverCleared() {
+		_spec.ClearField(msgchannel.FieldReceiver, field.TypeJSON)
 	}
 	if value, ok := mcuo.mutation.Comments(); ok {
 		_spec.SetField(msgchannel.FieldComments, field.TypeString, value)

@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 
+	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	gqlparser "github.com/vektah/gqlparser/v2"
@@ -70,6 +71,17 @@ type ComplexityRoot struct {
 		UpdatedBy    func(childComplexity int) int
 	}
 
+	MsgChannelConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgChannelEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
 	MsgEvent struct {
 		Comments         func(childComplexity int) int
 		CreatedAt        func(childComplexity int) int
@@ -84,6 +96,17 @@ type ComplexityRoot struct {
 		Status           func(childComplexity int) int
 		UpdatedAt        func(childComplexity int) int
 		UpdatedBy        func(childComplexity int) int
+	}
+
+	MsgEventConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgEventEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
 	}
 
 	MsgSubscriber struct {
@@ -124,6 +147,17 @@ type ComplexityRoot struct {
 		UpdatedBy    func(childComplexity int) int
 	}
 
+	MsgTemplateConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgTemplateEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
 	MsgType struct {
 		AppID       func(childComplexity int) int
 		CanCustom   func(childComplexity int) int
@@ -141,18 +175,36 @@ type ComplexityRoot struct {
 		UpdatedBy   func(childComplexity int) int
 	}
 
+	MsgTypeConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgTypeEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
 	Mutation struct {
-		CreateMsgChannel func(childComplexity int, input ent.CreateMsgChannelInput) int
-		CreateMsgEvent   func(childComplexity int, input ent.CreateMsgEventInput) int
-		CreateMsgType    func(childComplexity int, input ent.CreateMsgTypeInput) int
-		DeleteMsgChannel func(childComplexity int, id int) int
-		DeleteMsgEvent   func(childComplexity int, id int) int
-		DeleteMsgType    func(childComplexity int, id int) int
-		EnableMsgChannel func(childComplexity int, id int) int
-		EnableMsgEvent   func(childComplexity int, id int) int
-		UpdateMsgChannel func(childComplexity int, id int, input ent.UpdateMsgChannelInput) int
-		UpdateMsgEvent   func(childComplexity int, id int, input ent.UpdateMsgEventInput) int
-		UpdateMsgType    func(childComplexity int, id int, input ent.UpdateMsgTypeInput) int
+		CreateMsgChannel   func(childComplexity int, input ent.CreateMsgChannelInput) int
+		CreateMsgEvent     func(childComplexity int, input ent.CreateMsgEventInput) int
+		CreateMsgTemplate  func(childComplexity int, input ent.CreateMsgTemplateInput) int
+		CreateMsgType      func(childComplexity int, input ent.CreateMsgTypeInput) int
+		DeleteMsgChannel   func(childComplexity int, id int) int
+		DeleteMsgEvent     func(childComplexity int, id int) int
+		DeleteMsgTemplate  func(childComplexity int, id int) int
+		DeleteMsgType      func(childComplexity int, id int) int
+		DisableMsgChannel  func(childComplexity int, id int) int
+		DisableMsgEvent    func(childComplexity int, id int) int
+		DisableMsgTemplate func(childComplexity int, id int) int
+		EnableMsgChannel   func(childComplexity int, id int) int
+		EnableMsgEvent     func(childComplexity int, id int) int
+		EnableMsgTemplate  func(childComplexity int, id int) int
+		UpdateMsgChannel   func(childComplexity int, id int, input ent.UpdateMsgChannelInput) int
+		UpdateMsgEvent     func(childComplexity int, id int, input ent.UpdateMsgEventInput) int
+		UpdateMsgTemplate  func(childComplexity int, id int, input ent.UpdateMsgTemplateInput) int
+		UpdateMsgType      func(childComplexity int, id int, input ent.UpdateMsgTypeInput) int
 	}
 
 	PageInfo struct {
@@ -163,8 +215,13 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Node  func(childComplexity int, id string) int
-		Nodes func(childComplexity int, ids []string) int
+		MsgChannels       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgChannelOrder, where *ent.MsgChannelWhereInput) int
+		MsgEvents         func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) int
+		MsgTemplates      func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) int
+		MsgTypeCategories func(childComplexity int, keyword *string) int
+		MsgTypes          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTypeOrder, where *ent.MsgTypeWhereInput) int
+		Node              func(childComplexity int, id string) int
+		Nodes             func(childComplexity int, ids []string) int
 	}
 
 	Receiver struct {
@@ -348,6 +405,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgChannel.UpdatedBy(childComplexity), true
 
+	case "MsgChannelConnection.edges":
+		if e.complexity.MsgChannelConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgChannelConnection.Edges(childComplexity), true
+
+	case "MsgChannelConnection.pageInfo":
+		if e.complexity.MsgChannelConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgChannelConnection.PageInfo(childComplexity), true
+
+	case "MsgChannelConnection.totalCount":
+		if e.complexity.MsgChannelConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgChannelConnection.TotalCount(childComplexity), true
+
+	case "MsgChannelEdge.cursor":
+		if e.complexity.MsgChannelEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgChannelEdge.Cursor(childComplexity), true
+
+	case "MsgChannelEdge.node":
+		if e.complexity.MsgChannelEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgChannelEdge.Node(childComplexity), true
+
 	case "MsgEvent.comments":
 		if e.complexity.MsgEvent.Comments == nil {
 			break
@@ -438,6 +530,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgEvent.UpdatedBy(childComplexity), true
+
+	case "MsgEventConnection.edges":
+		if e.complexity.MsgEventConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgEventConnection.Edges(childComplexity), true
+
+	case "MsgEventConnection.pageInfo":
+		if e.complexity.MsgEventConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgEventConnection.PageInfo(childComplexity), true
+
+	case "MsgEventConnection.totalCount":
+		if e.complexity.MsgEventConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgEventConnection.TotalCount(childComplexity), true
+
+	case "MsgEventEdge.cursor":
+		if e.complexity.MsgEventEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgEventEdge.Cursor(childComplexity), true
+
+	case "MsgEventEdge.node":
+		if e.complexity.MsgEventEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgEventEdge.Node(childComplexity), true
 
 	case "MsgSubscriber.createdAt":
 		if e.complexity.MsgSubscriber.CreatedAt == nil {
@@ -663,6 +790,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgTemplate.UpdatedBy(childComplexity), true
 
+	case "MsgTemplateConnection.edges":
+		if e.complexity.MsgTemplateConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplateConnection.Edges(childComplexity), true
+
+	case "MsgTemplateConnection.pageInfo":
+		if e.complexity.MsgTemplateConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplateConnection.PageInfo(childComplexity), true
+
+	case "MsgTemplateConnection.totalCount":
+		if e.complexity.MsgTemplateConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplateConnection.TotalCount(childComplexity), true
+
+	case "MsgTemplateEdge.cursor":
+		if e.complexity.MsgTemplateEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplateEdge.Cursor(childComplexity), true
+
+	case "MsgTemplateEdge.node":
+		if e.complexity.MsgTemplateEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplateEdge.Node(childComplexity), true
+
 	case "MsgType.appID":
 		if e.complexity.MsgType.AppID == nil {
 			break
@@ -761,6 +923,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgType.UpdatedBy(childComplexity), true
 
+	case "MsgTypeConnection.edges":
+		if e.complexity.MsgTypeConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgTypeConnection.Edges(childComplexity), true
+
+	case "MsgTypeConnection.pageInfo":
+		if e.complexity.MsgTypeConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgTypeConnection.PageInfo(childComplexity), true
+
+	case "MsgTypeConnection.totalCount":
+		if e.complexity.MsgTypeConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgTypeConnection.TotalCount(childComplexity), true
+
+	case "MsgTypeEdge.cursor":
+		if e.complexity.MsgTypeEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgTypeEdge.Cursor(childComplexity), true
+
+	case "MsgTypeEdge.node":
+		if e.complexity.MsgTypeEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgTypeEdge.Node(childComplexity), true
+
 	case "Mutation.createMsgChannel":
 		if e.complexity.Mutation.CreateMsgChannel == nil {
 			break
@@ -784,6 +981,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateMsgEvent(childComplexity, args["input"].(ent.CreateMsgEventInput)), true
+
+	case "Mutation.createMsgTemplate":
+		if e.complexity.Mutation.CreateMsgTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createMsgTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateMsgTemplate(childComplexity, args["input"].(ent.CreateMsgTemplateInput)), true
 
 	case "Mutation.createMsgType":
 		if e.complexity.Mutation.CreateMsgType == nil {
@@ -821,6 +1030,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteMsgEvent(childComplexity, args["id"].(int)), true
 
+	case "Mutation.deleteMsgTemplate":
+		if e.complexity.Mutation.DeleteMsgTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteMsgTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteMsgTemplate(childComplexity, args["id"].(int)), true
+
 	case "Mutation.deleteMsgType":
 		if e.complexity.Mutation.DeleteMsgType == nil {
 			break
@@ -832,6 +1053,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteMsgType(childComplexity, args["id"].(int)), true
+
+	case "Mutation.disableMsgChannel":
+		if e.complexity.Mutation.DisableMsgChannel == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_disableMsgChannel_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DisableMsgChannel(childComplexity, args["id"].(int)), true
+
+	case "Mutation.disableMsgEvent":
+		if e.complexity.Mutation.DisableMsgEvent == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_disableMsgEvent_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DisableMsgEvent(childComplexity, args["id"].(int)), true
+
+	case "Mutation.disableMsgTemplate":
+		if e.complexity.Mutation.DisableMsgTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_disableMsgTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DisableMsgTemplate(childComplexity, args["id"].(int)), true
 
 	case "Mutation.enableMsgChannel":
 		if e.complexity.Mutation.EnableMsgChannel == nil {
@@ -857,6 +1114,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.EnableMsgEvent(childComplexity, args["id"].(int)), true
 
+	case "Mutation.enableMsgTemplate":
+		if e.complexity.Mutation.EnableMsgTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_enableMsgTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.EnableMsgTemplate(childComplexity, args["id"].(int)), true
+
 	case "Mutation.updateMsgChannel":
 		if e.complexity.Mutation.UpdateMsgChannel == nil {
 			break
@@ -880,6 +1149,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateMsgEvent(childComplexity, args["id"].(int), args["input"].(ent.UpdateMsgEventInput)), true
+
+	case "Mutation.updateMsgTemplate":
+		if e.complexity.Mutation.UpdateMsgTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateMsgTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateMsgTemplate(childComplexity, args["id"].(int), args["input"].(ent.UpdateMsgTemplateInput)), true
 
 	case "Mutation.updateMsgType":
 		if e.complexity.Mutation.UpdateMsgType == nil {
@@ -920,6 +1201,66 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PageInfo.StartCursor(childComplexity), true
+
+	case "Query.msgChannels":
+		if e.complexity.Query.MsgChannels == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgChannels_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgChannels(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgChannelOrder), args["where"].(*ent.MsgChannelWhereInput)), true
+
+	case "Query.msgEvents":
+		if e.complexity.Query.MsgEvents == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgEvents_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgEvents(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgEventOrder), args["where"].(*ent.MsgEventWhereInput)), true
+
+	case "Query.msgTemplates":
+		if e.complexity.Query.MsgTemplates == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgTemplates_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgTemplates(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgTemplateOrder), args["where"].(*ent.MsgTemplateWhereInput)), true
+
+	case "Query.msgTypeCategories":
+		if e.complexity.Query.MsgTypeCategories == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgTypeCategories_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgTypeCategories(childComplexity, args["keyword"].(*string)), true
+
+	case "Query.msgTypes":
+		if e.complexity.Query.MsgTypes == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgTypes_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgTypes(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgTypeOrder), args["where"].(*ent.MsgTypeWhereInput)), true
 
 	case "Query.node":
 		if e.complexity.Query.Node == nil {
@@ -1135,7 +1476,7 @@ input CreateMsgChannelInput {
   """支持的消息模式:站内信,app推送,邮件,短信,微信等"""
   receiverType: MsgChannelReceiverType!
   """通道配置Json格式"""
-  receiver: ReceiverInput!
+  receiver: ReceiverInput
   """备注"""
   comments: String
 }
@@ -1178,8 +1519,6 @@ input CreateMsgTemplateInput {
   tenantID: Int!
   """消息模板名称"""
   name: String!
-  """状态"""
-  status: MsgTemplateSimpleStatus
   """消息模式:站内信,app推送,邮件,短信,微信等"""
   receiverType: MsgTemplateReceiverType!
   """消息类型:文本,网页,需要结合mod确定支持的格式"""
@@ -1246,9 +1585,25 @@ type MsgChannel implements Node {
   """状态"""
   status: MsgChannelSimpleStatus
   """通道配置Json格式"""
-  receiver: Receiver!
+  receiver: Receiver
   """备注"""
   comments: String
+}
+"""A connection to a list of items."""
+type MsgChannelConnection {
+  """A list of edges."""
+  edges: [MsgChannelEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type MsgChannelEdge {
+  """The item at the end of the edge."""
+  node: MsgChannel
+  """A cursor for use in pagination."""
+  cursor: Cursor!
 }
 """Ordering options for MsgChannel connections"""
 input MsgChannelOrder {
@@ -1403,6 +1758,22 @@ type MsgEvent implements Node {
   msgType: MsgType!
   """自定义的消息模板"""
   customerTemplate: [MsgTemplate!]
+}
+"""A connection to a list of items."""
+type MsgEventConnection {
+  """A list of edges."""
+  edges: [MsgEventEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type MsgEventEdge {
+  """The item at the end of the edge."""
+  node: MsgEvent
+  """A cursor for use in pagination."""
+  cursor: Cursor!
 }
 """Ordering options for MsgEvent connections"""
 input MsgEventOrder {
@@ -1681,6 +2052,22 @@ type MsgTemplate implements Node {
   comments: String
   event: MsgEvent!
 }
+"""A connection to a list of items."""
+type MsgTemplateConnection {
+  """A list of edges."""
+  edges: [MsgTemplateEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type MsgTemplateEdge {
+  """The item at the end of the edge."""
+  node: MsgTemplate
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
 """MsgTemplateFormat is enum for the field format"""
 enum MsgTemplateFormat @goModel(model: "github.com/woocoos/msgcenter/ent/msgtemplate.Format") {
   txt
@@ -1928,6 +2315,22 @@ type MsgType implements Node {
   """订阅者"""
   subscribers: [MsgSubscriber!]
 }
+"""A connection to a list of items."""
+type MsgTypeConnection {
+  """A list of edges."""
+  edges: [MsgTypeEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type MsgTypeEdge {
+  """The item at the end of the edge."""
+  node: MsgType
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
 """Ordering options for MsgType connections"""
 input MsgTypeOrder {
   """The ordering direction."""
@@ -2119,11 +2522,9 @@ input UpdateMsgChannelInput {
   tenantID: Int
   """支持的消息模式:站内信,app推送,邮件,短信,微信等"""
   receiverType: MsgChannelReceiverType
-  """状态"""
-  status: MsgChannelSimpleStatus
-  clearStatus: Boolean
   """通道配置Json格式"""
   receiver: ReceiverInput
+  clearReceiver: Boolean
   """备注"""
   comments: String
   clearComments: Boolean
@@ -2135,9 +2536,6 @@ Input was generated by ent.
 input UpdateMsgEventInput {
   """消息事件名称,应用内唯一"""
   name: String
-  """状态"""
-  status: MsgEventSimpleStatus
-  clearStatus: Boolean
   """备注"""
   comments: String
   clearComments: Boolean
@@ -2173,9 +2571,6 @@ input UpdateMsgTemplateInput {
   tenantID: Int
   """消息模板名称"""
   name: String
-  """状态"""
-  status: MsgTemplateSimpleStatus
-  clearStatus: Boolean
   """消息模式:站内信,app推送,邮件,短信,微信等"""
   receiverType: MsgTemplateReceiverType
   """消息类型:文本,网页,需要结合mod确定支持的格式"""
@@ -2279,6 +2674,51 @@ type EmailConfig {
     authSecret: String!
     authIdentity: String!
     headers: MapString
+}
+
+extend type Query {
+    # 消息通道列表
+    msgChannels(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgChannelOrder
+        where: MsgChannelWhereInput
+    ): MsgChannelConnection!
+
+    # 消息类型列表
+    msgTypes(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgTypeOrder
+        where: MsgTypeWhereInput
+    ): MsgTypeConnection!
+
+    # 消息类型分类
+    msgTypeCategories(keyword:String): [String!]!
+
+    # 消息事件列表
+    msgEvents(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgEventOrder
+        where: MsgEventWhereInput
+    ): MsgEventConnection!
+
+    # 消息模板列表
+    msgTemplates(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgTemplateOrder
+        where: MsgTemplateWhereInput
+    ): MsgTemplateConnection!
 }`, BuiltIn: false},
 	{Name: "../mutation.graphql", Input: `type Mutation {
     # 创建消息类型
@@ -2295,6 +2735,8 @@ type EmailConfig {
     deleteMsgEvent(id: ID!): Boolean!
     # 启用消息事件
     enableMsgEvent(id: ID!): MsgEvent!
+    # 禁用消息事件
+    disableMsgEvent(id: ID!): MsgEvent!
     # 创建消息通道
     createMsgChannel(input: CreateMsgChannelInput!): MsgChannel!
     # 更新消息通道
@@ -2303,6 +2745,18 @@ type EmailConfig {
     deleteMsgChannel(id: ID!): Boolean!
     # 启用消息通道
     enableMsgChannel(id: ID!): MsgChannel!
+    # 禁用消息通道
+    disableMsgChannel(id: ID!): MsgChannel!
+    # 创建消息模板
+    createMsgTemplate(input: CreateMsgTemplateInput!): MsgTemplate!
+    # 更新消息模板
+    updateMsgTemplate(id: ID!, input: UpdateMsgTemplateInput!): MsgTemplate!
+    # 删除消息模板
+    deleteMsgTemplate(id: ID!): Boolean!
+    # 启用消息模板
+    enableMsgTemplate(id: ID!): MsgTemplate!
+    # 禁用消息模板
+    disableMsgTemplate(id: ID!): MsgTemplate!
 }
 
 input RouteInput  {

@@ -20,6 +20,7 @@ type MsgEvent struct {
 func (MsgEvent) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entsql.Annotation{Table: "msg_event"},
+		entgql.RelayConnection(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 	}
 }
@@ -37,7 +38,7 @@ func (MsgEvent) Fields() []ent.Field {
 		field.Int("msg_type_id").Comment("消息类型ID"),
 		field.String("name").NotEmpty().MaxLen(45).Comment("消息事件名称,应用内唯一"),
 		field.Enum("status").GoType(typex.SimpleStatus("")).Default(typex.SimpleStatusInactive.String()).
-			Optional().Comment("状态").Annotations(entgql.Skip(entgql.SkipMutationCreateInput)),
+			Optional().Comment("状态").Annotations(entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput)),
 		field.String("comments").Optional().Comment("备注").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
 		field.JSON("route", &profile.Route{}).Optional().Comment("消息路由配置"),

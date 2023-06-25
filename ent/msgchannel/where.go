@@ -446,6 +446,16 @@ func StatusNotNil() predicate.MsgChannel {
 	return predicate.MsgChannel(sql.FieldNotNull(FieldStatus))
 }
 
+// ReceiverIsNil applies the IsNil predicate on the "receiver" field.
+func ReceiverIsNil() predicate.MsgChannel {
+	return predicate.MsgChannel(sql.FieldIsNull(FieldReceiver))
+}
+
+// ReceiverNotNil applies the NotNil predicate on the "receiver" field.
+func ReceiverNotNil() predicate.MsgChannel {
+	return predicate.MsgChannel(sql.FieldNotNull(FieldReceiver))
+}
+
 // CommentsEQ applies the EQ predicate on the "comments" field.
 func CommentsEQ(v string) predicate.MsgChannel {
 	return predicate.MsgChannel(sql.FieldEQ(FieldComments, v))

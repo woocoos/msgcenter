@@ -43,3 +43,48 @@ type EmailConfig {
     authIdentity: String!
     headers: MapString
 }
+
+extend type Query {
+    # 消息通道列表
+    msgChannels(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgChannelOrder
+        where: MsgChannelWhereInput
+    ): MsgChannelConnection!
+
+    # 消息类型列表
+    msgTypes(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgTypeOrder
+        where: MsgTypeWhereInput
+    ): MsgTypeConnection!
+
+    # 消息类型分类
+    msgTypeCategories(keyword:String): [String!]!
+
+    # 消息事件列表
+    msgEvents(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgEventOrder
+        where: MsgEventWhereInput
+    ): MsgEventConnection!
+
+    # 消息模板列表
+    msgTemplates(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgTemplateOrder
+        where: MsgTemplateWhereInput
+    ): MsgTemplateConnection!
+}
