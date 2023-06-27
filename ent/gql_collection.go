@@ -380,6 +380,11 @@ func (ms *MsgSubscriberQuery) collectField(ctx context.Context, opCtx *graphql.O
 				selectedFields = append(selectedFields, msgsubscriber.FieldUserID)
 				fieldSeen[msgsubscriber.FieldUserID] = struct{}{}
 			}
+		case "orgRoleID":
+			if _, ok := fieldSeen[msgsubscriber.FieldOrgRoleID]; !ok {
+				selectedFields = append(selectedFields, msgsubscriber.FieldOrgRoleID)
+				fieldSeen[msgsubscriber.FieldOrgRoleID] = struct{}{}
+			}
 		case "exclude":
 			if _, ok := fieldSeen[msgsubscriber.FieldExclude]; !ok {
 				selectedFields = append(selectedFields, msgsubscriber.FieldExclude)

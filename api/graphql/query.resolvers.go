@@ -6,12 +6,12 @@ package graphql
 
 import (
 	"context"
-	"github.com/woocoos/msgcenter/ent/predicate"
 
 	"entgo.io/contrib/entgql"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )

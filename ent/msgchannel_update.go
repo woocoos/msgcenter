@@ -15,6 +15,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/profile"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // MsgChannelUpdate is the builder for updating MsgChannel entities.
@@ -263,6 +265,8 @@ func (mcu *MsgChannelUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if mcu.mutation.CommentsCleared() {
 		_spec.ClearField(msgchannel.FieldComments, field.TypeString)
 	}
+	_spec.Node.Schema = mcu.schemaConfig.MsgChannel
+	ctx = internal.NewSchemaConfigContext(ctx, mcu.schemaConfig)
 	if n, err = sqlgraph.UpdateNodes(ctx, mcu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgchannel.Label}
@@ -546,6 +550,8 @@ func (mcuo *MsgChannelUpdateOne) sqlSave(ctx context.Context) (_node *MsgChannel
 	if mcuo.mutation.CommentsCleared() {
 		_spec.ClearField(msgchannel.FieldComments, field.TypeString)
 	}
+	_spec.Node.Schema = mcuo.schemaConfig.MsgChannel
+	ctx = internal.NewSchemaConfigContext(ctx, mcuo.schemaConfig)
 	_node = &MsgChannel{config: mcuo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

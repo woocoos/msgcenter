@@ -19,6 +19,10 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/orgroleuser"
+	"github.com/woocoos/msgcenter/ent/user"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // Client is the client that holds all ent builders.
@@ -36,6 +40,10 @@ type Client struct {
 	MsgTemplate *MsgTemplateClient
 	// MsgType is the client for interacting with the MsgType builders.
 	MsgType *MsgTypeClient
+	// OrgRoleUser is the client for interacting with the OrgRoleUser builders.
+	OrgRoleUser *OrgRoleUserClient
+	// User is the client for interacting with the User builders.
+	User *UserClient
 	// additional fields for node api
 	tables tables
 }
@@ -56,6 +64,8 @@ func (c *Client) init() {
 	c.MsgSubscriber = NewMsgSubscriberClient(c.config)
 	c.MsgTemplate = NewMsgTemplateClient(c.config)
 	c.MsgType = NewMsgTypeClient(c.config)
+	c.OrgRoleUser = NewOrgRoleUserClient(c.config)
+	c.User = NewUserClient(c.config)
 }
 
 type (
@@ -71,6 +81,8 @@ type (
 		hooks *hooks
 		// interceptors to execute on queries.
 		inters *inters
+		// schemaConfig contains alternative names for all tables.
+		schemaConfig SchemaConfig
 	}
 	// Option function to configure the client.
 	Option func(*config)
@@ -143,6 +155,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		MsgSubscriber: NewMsgSubscriberClient(cfg),
 		MsgTemplate:   NewMsgTemplateClient(cfg),
 		MsgType:       NewMsgTypeClient(cfg),
+		OrgRoleUser:   NewOrgRoleUserClient(cfg),
+		User:          NewUserClient(cfg),
 	}, nil
 }
 
@@ -167,6 +181,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		MsgSubscriber: NewMsgSubscriberClient(cfg),
 		MsgTemplate:   NewMsgTemplateClient(cfg),
 		MsgType:       NewMsgTypeClient(cfg),
+		OrgRoleUser:   NewOrgRoleUserClient(cfg),
+		User:          NewUserClient(cfg),
 	}, nil
 }
 
@@ -195,21 +211,23 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.MsgChannel.Use(hooks...)
-	c.MsgEvent.Use(hooks...)
-	c.MsgSubscriber.Use(hooks...)
-	c.MsgTemplate.Use(hooks...)
-	c.MsgType.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.MsgChannel, c.MsgEvent, c.MsgSubscriber, c.MsgTemplate, c.MsgType,
+		c.OrgRoleUser, c.User,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.MsgChannel.Intercept(interceptors...)
-	c.MsgEvent.Intercept(interceptors...)
-	c.MsgSubscriber.Intercept(interceptors...)
-	c.MsgTemplate.Intercept(interceptors...)
-	c.MsgType.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.MsgChannel, c.MsgEvent, c.MsgSubscriber, c.MsgTemplate, c.MsgType,
+		c.OrgRoleUser, c.User,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -225,6 +243,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.MsgTemplate.mutate(ctx, m)
 	case *MsgTypeMutation:
 		return c.MsgType.mutate(ctx, m)
+	case *OrgRoleUserMutation:
+		return c.OrgRoleUser.mutate(ctx, m)
+	case *UserMutation:
+		return c.User.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -452,6 +474,9 @@ func (c *MsgEventClient) QueryMsgType(me *MsgEvent) *MsgTypeQuery {
 			sqlgraph.To(msgtype.Table, msgtype.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, msgevent.MsgTypeTable, msgevent.MsgTypeColumn),
 		)
+		schemaConfig := me.schemaConfig
+		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgEvent
 		fromV = sqlgraph.Neighbors(me.driver.Dialect(), step)
 		return fromV, nil
 	}
@@ -468,6 +493,9 @@ func (c *MsgEventClient) QueryCustomerTemplate(me *MsgEvent) *MsgTemplateQuery {
 			sqlgraph.To(msgtemplate.Table, msgtemplate.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, msgevent.CustomerTemplateTable, msgevent.CustomerTemplateColumn),
 		)
+		schemaConfig := me.schemaConfig
+		step.To.Schema = schemaConfig.MsgTemplate
+		step.Edge.Schema = schemaConfig.MsgTemplate
 		fromV = sqlgraph.Neighbors(me.driver.Dialect(), step)
 		return fromV, nil
 	}
@@ -603,6 +631,9 @@ func (c *MsgSubscriberClient) QueryMsgType(ms *MsgSubscriber) *MsgTypeQuery {
 			sqlgraph.To(msgtype.Table, msgtype.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, msgsubscriber.MsgTypeTable, msgsubscriber.MsgTypeColumn),
 		)
+		schemaConfig := ms.schemaConfig
+		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgSubscriber
 		fromV = sqlgraph.Neighbors(ms.driver.Dialect(), step)
 		return fromV, nil
 	}
@@ -738,6 +769,9 @@ func (c *MsgTemplateClient) QueryEvent(mt *MsgTemplate) *MsgEventQuery {
 			sqlgraph.To(msgevent.Table, msgevent.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, msgtemplate.EventTable, msgtemplate.EventColumn),
 		)
+		schemaConfig := mt.schemaConfig
+		step.To.Schema = schemaConfig.MsgEvent
+		step.Edge.Schema = schemaConfig.MsgTemplate
 		fromV = sqlgraph.Neighbors(mt.driver.Dialect(), step)
 		return fromV, nil
 	}
@@ -873,6 +907,9 @@ func (c *MsgTypeClient) QueryEvents(mt *MsgType) *MsgEventQuery {
 			sqlgraph.To(msgevent.Table, msgevent.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, msgtype.EventsTable, msgtype.EventsColumn),
 		)
+		schemaConfig := mt.schemaConfig
+		step.To.Schema = schemaConfig.MsgEvent
+		step.Edge.Schema = schemaConfig.MsgEvent
 		fromV = sqlgraph.Neighbors(mt.driver.Dialect(), step)
 		return fromV, nil
 	}
@@ -889,6 +926,9 @@ func (c *MsgTypeClient) QuerySubscribers(mt *MsgType) *MsgSubscriberQuery {
 			sqlgraph.To(msgsubscriber.Table, msgsubscriber.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, msgtype.SubscribersTable, msgtype.SubscribersColumn),
 		)
+		schemaConfig := mt.schemaConfig
+		step.To.Schema = schemaConfig.MsgSubscriber
+		step.Edge.Schema = schemaConfig.MsgSubscriber
 		fromV = sqlgraph.Neighbors(mt.driver.Dialect(), step)
 		return fromV, nil
 	}
@@ -921,12 +961,264 @@ func (c *MsgTypeClient) mutate(ctx context.Context, m *MsgTypeMutation) (Value, 
 	}
 }
 
+// OrgRoleUserClient is a client for the OrgRoleUser schema.
+type OrgRoleUserClient struct {
+	config
+}
+
+// NewOrgRoleUserClient returns a client for the OrgRoleUser from the given config.
+func NewOrgRoleUserClient(c config) *OrgRoleUserClient {
+	return &OrgRoleUserClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `orgroleuser.Hooks(f(g(h())))`.
+func (c *OrgRoleUserClient) Use(hooks ...Hook) {
+	c.hooks.OrgRoleUser = append(c.hooks.OrgRoleUser, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `orgroleuser.Intercept(f(g(h())))`.
+func (c *OrgRoleUserClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OrgRoleUser = append(c.inters.OrgRoleUser, interceptors...)
+}
+
+// Create returns a builder for creating a OrgRoleUser entity.
+func (c *OrgRoleUserClient) Create() *OrgRoleUserCreate {
+	mutation := newOrgRoleUserMutation(c.config, OpCreate)
+	return &OrgRoleUserCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OrgRoleUser entities.
+func (c *OrgRoleUserClient) CreateBulk(builders ...*OrgRoleUserCreate) *OrgRoleUserCreateBulk {
+	return &OrgRoleUserCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OrgRoleUser.
+func (c *OrgRoleUserClient) Update() *OrgRoleUserUpdate {
+	mutation := newOrgRoleUserMutation(c.config, OpUpdate)
+	return &OrgRoleUserUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OrgRoleUserClient) UpdateOne(oru *OrgRoleUser) *OrgRoleUserUpdateOne {
+	mutation := newOrgRoleUserMutation(c.config, OpUpdateOne, withOrgRoleUser(oru))
+	return &OrgRoleUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OrgRoleUserClient) UpdateOneID(id int) *OrgRoleUserUpdateOne {
+	mutation := newOrgRoleUserMutation(c.config, OpUpdateOne, withOrgRoleUserID(id))
+	return &OrgRoleUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OrgRoleUser.
+func (c *OrgRoleUserClient) Delete() *OrgRoleUserDelete {
+	mutation := newOrgRoleUserMutation(c.config, OpDelete)
+	return &OrgRoleUserDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OrgRoleUserClient) DeleteOne(oru *OrgRoleUser) *OrgRoleUserDeleteOne {
+	return c.DeleteOneID(oru.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OrgRoleUserClient) DeleteOneID(id int) *OrgRoleUserDeleteOne {
+	builder := c.Delete().Where(orgroleuser.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OrgRoleUserDeleteOne{builder}
+}
+
+// Query returns a query builder for OrgRoleUser.
+func (c *OrgRoleUserClient) Query() *OrgRoleUserQuery {
+	return &OrgRoleUserQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOrgRoleUser},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OrgRoleUser entity by its id.
+func (c *OrgRoleUserClient) Get(ctx context.Context, id int) (*OrgRoleUser, error) {
+	return c.Query().Where(orgroleuser.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OrgRoleUserClient) GetX(ctx context.Context, id int) *OrgRoleUser {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *OrgRoleUserClient) Hooks() []Hook {
+	hooks := c.hooks.OrgRoleUser
+	return append(hooks[:len(hooks):len(hooks)], orgroleuser.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *OrgRoleUserClient) Interceptors() []Interceptor {
+	return c.inters.OrgRoleUser
+}
+
+func (c *OrgRoleUserClient) mutate(ctx context.Context, m *OrgRoleUserMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OrgRoleUserCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OrgRoleUserUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OrgRoleUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OrgRoleUserDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OrgRoleUser mutation op: %q", m.Op())
+	}
+}
+
+// UserClient is a client for the User schema.
+type UserClient struct {
+	config
+}
+
+// NewUserClient returns a client for the User from the given config.
+func NewUserClient(c config) *UserClient {
+	return &UserClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `user.Hooks(f(g(h())))`.
+func (c *UserClient) Use(hooks ...Hook) {
+	c.hooks.User = append(c.hooks.User, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `user.Intercept(f(g(h())))`.
+func (c *UserClient) Intercept(interceptors ...Interceptor) {
+	c.inters.User = append(c.inters.User, interceptors...)
+}
+
+// Create returns a builder for creating a User entity.
+func (c *UserClient) Create() *UserCreate {
+	mutation := newUserMutation(c.config, OpCreate)
+	return &UserCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of User entities.
+func (c *UserClient) CreateBulk(builders ...*UserCreate) *UserCreateBulk {
+	return &UserCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for User.
+func (c *UserClient) Update() *UserUpdate {
+	mutation := newUserMutation(c.config, OpUpdate)
+	return &UserUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserClient) UpdateOne(u *User) *UserUpdateOne {
+	mutation := newUserMutation(c.config, OpUpdateOne, withUser(u))
+	return &UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserClient) UpdateOneID(id int) *UserUpdateOne {
+	mutation := newUserMutation(c.config, OpUpdateOne, withUserID(id))
+	return &UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for User.
+func (c *UserClient) Delete() *UserDelete {
+	mutation := newUserMutation(c.config, OpDelete)
+	return &UserDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UserClient) DeleteOne(u *User) *UserDeleteOne {
+	return c.DeleteOneID(u.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UserClient) DeleteOneID(id int) *UserDeleteOne {
+	builder := c.Delete().Where(user.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserDeleteOne{builder}
+}
+
+// Query returns a query builder for User.
+func (c *UserClient) Query() *UserQuery {
+	return &UserQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUser},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a User entity by its id.
+func (c *UserClient) Get(ctx context.Context, id int) (*User, error) {
+	return c.Query().Where(user.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserClient) GetX(ctx context.Context, id int) *User {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *UserClient) Hooks() []Hook {
+	hooks := c.hooks.User
+	return append(hooks[:len(hooks):len(hooks)], user.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserClient) Interceptors() []Interceptor {
+	return c.inters.User
+}
+
+func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown User mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		MsgChannel, MsgEvent, MsgSubscriber, MsgTemplate, MsgType []ent.Hook
+		MsgChannel, MsgEvent, MsgSubscriber, MsgTemplate, MsgType, OrgRoleUser,
+		User []ent.Hook
 	}
 	inters struct {
-		MsgChannel, MsgEvent, MsgSubscriber, MsgTemplate, MsgType []ent.Interceptor
+		MsgChannel, MsgEvent, MsgSubscriber, MsgTemplate, MsgType, OrgRoleUser,
+		User []ent.Interceptor
 	}
 )
+
+// SchemaConfig represents alternative schema names for all tables
+// that can be passed at runtime.
+type SchemaConfig = internal.SchemaConfig
+
+// AlternateSchemas allows alternate schema names to be
+// passed into ent operations.
+func AlternateSchema(schemaConfig SchemaConfig) Option {
+	return func(c *config) {
+		c.schemaConfig = schemaConfig
+	}
+}

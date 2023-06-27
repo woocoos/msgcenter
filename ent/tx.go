@@ -22,6 +22,10 @@ type Tx struct {
 	MsgTemplate *MsgTemplateClient
 	// MsgType is the client for interacting with the MsgType builders.
 	MsgType *MsgTypeClient
+	// OrgRoleUser is the client for interacting with the OrgRoleUser builders.
+	OrgRoleUser *OrgRoleUserClient
+	// User is the client for interacting with the User builders.
+	User *UserClient
 
 	// lazily loaded.
 	client     *Client
@@ -158,6 +162,8 @@ func (tx *Tx) init() {
 	tx.MsgSubscriber = NewMsgSubscriberClient(tx.config)
 	tx.MsgTemplate = NewMsgTemplateClient(tx.config)
 	tx.MsgType = NewMsgTypeClient(tx.config)
+	tx.OrgRoleUser = NewOrgRoleUserClient(tx.config)
+	tx.User = NewUserClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

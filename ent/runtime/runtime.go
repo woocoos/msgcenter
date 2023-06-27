@@ -11,6 +11,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/orgroleuser"
+	"github.com/woocoos/msgcenter/ent/user"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -73,7 +75,7 @@ func init() {
 	// msgsubscriber.DefaultCreatedAt holds the default value on creation for the created_at field.
 	msgsubscriber.DefaultCreatedAt = msgsubscriberDescCreatedAt.Default.(func() time.Time)
 	// msgsubscriberDescExclude is the schema descriptor for exclude field.
-	msgsubscriberDescExclude := msgsubscriberFields[3].Descriptor()
+	msgsubscriberDescExclude := msgsubscriberFields[4].Descriptor()
 	// msgsubscriber.DefaultExclude holds the default value on creation for the exclude field.
 	msgsubscriber.DefaultExclude = msgsubscriberDescExclude.Default.(bool)
 	msgtemplateMixin := schema.MsgTemplate{}.Mixin()
@@ -118,6 +120,20 @@ func init() {
 	msgtypeDescCanCustom := msgtypeFields[6].Descriptor()
 	// msgtype.DefaultCanCustom holds the default value on creation for the can_custom field.
 	msgtype.DefaultCanCustom = msgtypeDescCanCustom.Default.(bool)
+	orgroleuserHooks := schema.OrgRoleUser{}.Hooks()
+	orgroleuser.Hooks[0] = orgroleuserHooks[0]
+	userHooks := schema.User{}.Hooks()
+	user.Hooks[0] = userHooks[0]
+	userFields := schema.User{}.Fields()
+	_ = userFields
+	// userDescEmail is the schema descriptor for email field.
+	userDescEmail := userFields[3].Descriptor()
+	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	user.EmailValidator = userDescEmail.Validators[0].(func(string) error)
+	// userDescMobile is the schema descriptor for mobile field.
+	userDescMobile := userFields[4].Descriptor()
+	// user.MobileValidator is a validator for the "mobile" field. It is called by the builders before save.
+	user.MobileValidator = userDescMobile.Validators[0].(func(string) error)
 }
 
 const (

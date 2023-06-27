@@ -1,11 +1,17 @@
 route:
-  groupBy: ["alertname"]
+  groupBy: [...]
+  receiver: "email"
+  # 调试时,可以将以下值调低
   groupWait: 30s
   groupInterval: 5m
   repeatInterval: 1h
-  receiver: "email"
+# 模板文件位置
+templates:
+  - '../../test/testdata/tpl/*.tmpl'
+  - '../../test/testdata/tpl/**/*.tmpl'
+
 receivers:
-  - name: "web.hook"
+  - name: "internal"
     webhookConfigs:
       - url: "http://127.0.0.1:5001/"
   - name: dingtalk-webhook-config

@@ -29,6 +29,8 @@ const (
 	FieldTenantID = "tenant_id"
 	// FieldUserID holds the string denoting the user_id field in the database.
 	FieldUserID = "user_id"
+	// FieldOrgRoleID holds the string denoting the org_role_id field in the database.
+	FieldOrgRoleID = "org_role_id"
 	// FieldExclude holds the string denoting the exclude field in the database.
 	FieldExclude = "exclude"
 	// EdgeMsgType holds the string denoting the msg_type edge name in mutations.
@@ -54,6 +56,7 @@ var Columns = []string{
 	FieldMsgTypeID,
 	FieldTenantID,
 	FieldUserID,
+	FieldOrgRoleID,
 	FieldExclude,
 }
 
@@ -121,6 +124,11 @@ func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
 // ByUserID orders the results by the user_id field.
 func ByUserID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUserID, opts...).ToFunc()
+}
+
+// ByOrgRoleID orders the results by the org_role_id field.
+func ByOrgRoleID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOrgRoleID, opts...).ToFunc()
 }
 
 // ByExclude orders the results by the exclude field.

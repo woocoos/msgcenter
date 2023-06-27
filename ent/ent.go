@@ -17,6 +17,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/orgroleuser"
+	"github.com/woocoos/msgcenter/ent/user"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -82,6 +84,8 @@ func checkColumn(table, column string) error {
 			msgsubscriber.Table: msgsubscriber.ValidColumn,
 			msgtemplate.Table:   msgtemplate.ValidColumn,
 			msgtype.Table:       msgtype.ValidColumn,
+			orgroleuser.Table:   orgroleuser.ValidColumn,
+			user.Table:          user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

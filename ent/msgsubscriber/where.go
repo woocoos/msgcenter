@@ -8,6 +8,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // ID filters vertices based on their ID field.
@@ -88,6 +90,11 @@ func TenantID(v int) predicate.MsgSubscriber {
 // UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
 func UserID(v int) predicate.MsgSubscriber {
 	return predicate.MsgSubscriber(sql.FieldEQ(FieldUserID, v))
+}
+
+// OrgRoleID applies equality check predicate on the "org_role_id" field. It's identical to OrgRoleIDEQ.
+func OrgRoleID(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldEQ(FieldOrgRoleID, v))
 }
 
 // Exclude applies equality check predicate on the "exclude" field. It's identical to ExcludeEQ.
@@ -375,6 +382,66 @@ func UserIDLTE(v int) predicate.MsgSubscriber {
 	return predicate.MsgSubscriber(sql.FieldLTE(FieldUserID, v))
 }
 
+// UserIDIsNil applies the IsNil predicate on the "user_id" field.
+func UserIDIsNil() predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldIsNull(FieldUserID))
+}
+
+// UserIDNotNil applies the NotNil predicate on the "user_id" field.
+func UserIDNotNil() predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldNotNull(FieldUserID))
+}
+
+// OrgRoleIDEQ applies the EQ predicate on the "org_role_id" field.
+func OrgRoleIDEQ(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldEQ(FieldOrgRoleID, v))
+}
+
+// OrgRoleIDNEQ applies the NEQ predicate on the "org_role_id" field.
+func OrgRoleIDNEQ(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldNEQ(FieldOrgRoleID, v))
+}
+
+// OrgRoleIDIn applies the In predicate on the "org_role_id" field.
+func OrgRoleIDIn(vs ...int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldIn(FieldOrgRoleID, vs...))
+}
+
+// OrgRoleIDNotIn applies the NotIn predicate on the "org_role_id" field.
+func OrgRoleIDNotIn(vs ...int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldNotIn(FieldOrgRoleID, vs...))
+}
+
+// OrgRoleIDGT applies the GT predicate on the "org_role_id" field.
+func OrgRoleIDGT(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldGT(FieldOrgRoleID, v))
+}
+
+// OrgRoleIDGTE applies the GTE predicate on the "org_role_id" field.
+func OrgRoleIDGTE(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldGTE(FieldOrgRoleID, v))
+}
+
+// OrgRoleIDLT applies the LT predicate on the "org_role_id" field.
+func OrgRoleIDLT(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldLT(FieldOrgRoleID, v))
+}
+
+// OrgRoleIDLTE applies the LTE predicate on the "org_role_id" field.
+func OrgRoleIDLTE(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldLTE(FieldOrgRoleID, v))
+}
+
+// OrgRoleIDIsNil applies the IsNil predicate on the "org_role_id" field.
+func OrgRoleIDIsNil() predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldIsNull(FieldOrgRoleID))
+}
+
+// OrgRoleIDNotNil applies the NotNil predicate on the "org_role_id" field.
+func OrgRoleIDNotNil() predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldNotNull(FieldOrgRoleID))
+}
+
 // ExcludeEQ applies the EQ predicate on the "exclude" field.
 func ExcludeEQ(v bool) predicate.MsgSubscriber {
 	return predicate.MsgSubscriber(sql.FieldEQ(FieldExclude, v))
@@ -402,6 +469,9 @@ func HasMsgType() predicate.MsgSubscriber {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, MsgTypeTable, MsgTypeColumn),
 		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgSubscriber
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
@@ -410,6 +480,9 @@ func HasMsgType() predicate.MsgSubscriber {
 func HasMsgTypeWith(preds ...predicate.MsgType) predicate.MsgSubscriber {
 	return predicate.MsgSubscriber(func(s *sql.Selector) {
 		step := newMsgTypeStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgSubscriber
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

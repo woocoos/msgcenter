@@ -10,6 +10,8 @@ import (
 	"github.com/woocoos/entco/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/profile"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // ID filters vertices based on their ID field.
@@ -1259,6 +1261,9 @@ func HasEvent() predicate.MsgTemplate {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, EventTable, EventColumn),
 		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgEvent
+		step.Edge.Schema = schemaConfig.MsgTemplate
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
@@ -1267,6 +1272,9 @@ func HasEvent() predicate.MsgTemplate {
 func HasEventWith(preds ...predicate.MsgEvent) predicate.MsgTemplate {
 	return predicate.MsgTemplate(func(s *sql.Selector) {
 		step := newEventStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgEvent
+		step.Edge.Schema = schemaConfig.MsgTemplate
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

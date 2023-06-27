@@ -33,15 +33,16 @@ var logger = log.Component("config")
 // Coordinator helps the Alert Manager collaborate with external components
 type Coordinator struct {
 	configuration *conf.Configuration
-	// Protects profile and subscribers
+	// Protects profile and reloadHooks
 	mutex       sync.RWMutex
 	profile     *profile.Config
-	subscribers []func(*profile.Config) error
+	reloadHooks []func(*profile.Config) error
 
 	ActiveReceivers map[string]int // receiver name -> number of Notifier
 	Template        *template.Template
 
-	db *ent.Client
+	db        *ent.Client
+	Subscribe *UserSubscribe
 }
 
 // NewCoordinator returns a new coordinator with the given configuration for alert manager.
@@ -51,6 +52,7 @@ func NewCoordinator(cnf *conf.Configuration) *Coordinator {
 	c := &Coordinator{
 		configuration:   cnf,
 		ActiveReceivers: make(map[string]int),
+		Subscribe:       &UserSubscribe{},
 	}
 
 	return c
@@ -58,6 +60,7 @@ func NewCoordinator(cnf *conf.Configuration) *Coordinator {
 
 func (c *Coordinator) SetDBClient(db *ent.Client) {
 	c.db = db
+	c.Subscribe.DB = db
 }
 
 func (c *Coordinator) ProfileString() string {
@@ -76,16 +79,16 @@ func (c *Coordinator) ResolveTimeout() time.Duration {
 	return c.profile.Global.ResolveTimeout
 }
 
-// Subscribe subscribes the given Subscribers to configuration changes.
-func (c *Coordinator) Subscribe(ss ...func(*profile.Config) error) {
+// ReloadHooks subscribes the given Subscribers to configuration changes.
+func (c *Coordinator) ReloadHooks(ss ...func(*profile.Config) error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	c.subscribers = append(c.subscribers, ss...)
+	c.reloadHooks = append(c.reloadHooks, ss...)
 }
 
 func (c *Coordinator) notifySubscribers() error {
-	for _, s := range c.subscribers {
+	for _, s := range c.reloadHooks {
 		if err := s(c.profile); err != nil {
 			return err
 		}
@@ -95,7 +98,7 @@ func (c *Coordinator) notifySubscribers() error {
 }
 
 // Reload triggers a configuration reload from file and notifies all
-// configuration change subscribers.
+// configuration change reloadHooks.
 func (c *Coordinator) Reload() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
@@ -131,7 +134,7 @@ func (c *Coordinator) Reload() error {
 	}
 
 	if err := c.notifySubscribers(); err != nil {
-		logger.Error("one or more config change subscribers failed to apply new config", zap.Error(err))
+		logger.Error("one or more config change reloadHooks failed to apply new config", zap.Error(err))
 		metrics.Coordinator.ConfigSuccess.Set(0)
 		return err
 	}
@@ -366,6 +369,9 @@ func md5HashAsMetricValue(data []byte) float64 {
 	return float64(binary.LittleEndian.Uint64(bytes))
 }
 
+// use for email.Email.customTplFunc.
+// 1. Support load template from database
+// 2. Get user info 's email address if exist user id in label. the user info email replace template to address.
 func overrideEmailConfig(basedir string, client *ent.Client) notify.CustomerConfigFunc[profile.EmailConfig] {
 	return func(ctx context.Context, cfg profile.EmailConfig, set label.LabelSet,
 	) (profile.EmailConfig, error) {
@@ -376,7 +382,22 @@ func overrideEmailConfig(basedir string, client *ent.Client) notify.CustomerConf
 			}
 			return cfg, err
 		}
-		cfg.To = data.To
+		if data == nil {
+			return cfg, nil
+		}
+		if uid, ok := set[label.ToUserIDLabel]; ok {
+			id, err := strconv.Atoi(uid)
+			if err != nil {
+				return cfg, err
+			}
+			ui, err := client.User.Get(ctx, id)
+			if err != nil {
+				return cfg, err
+			}
+			cfg.To = ui.Email
+		} else {
+			cfg.To = data.To
+		}
 		cfg.From = data.From
 		cfg.Subject = data.Subject
 		if data.Format == msgtemplate.FormatHTML {
@@ -384,7 +405,7 @@ func overrideEmailConfig(basedir string, client *ent.Client) notify.CustomerConf
 		} else {
 			cfg.Text = data.Body
 		}
-		for k, _ := range cfg.Headers {
+		for k := range cfg.Headers {
 			switch strings.ToLower(k) {
 			case "cc":
 				cfg.Headers[k] = data.Cc
@@ -402,7 +423,7 @@ func overrideEmailConfig(basedir string, client *ent.Client) notify.CustomerConf
 func findTemplate(ctx context.Context, basedir string, client *ent.Client, rt profile.ReceiverType, labels label.LabelSet) (*ent.MsgTemplate, error) {
 	tid, ok := labels[label.TenantLabel]
 	if !ok {
-		return nil, nil
+		return nil, &ent.NotFoundError{}
 	}
 	tenantID, err := strconv.Atoi(tid)
 	if err != nil {
@@ -418,10 +439,12 @@ func findTemplate(ctx context.Context, basedir string, client *ent.Client, rt pr
 	if event == nil {
 		return nil, nil
 	}
-	as := strings.Split(event.Attachments, ",")
-	for i, attacher := range as {
-		as[i] = filepath.Join(basedir, attacher)
+	if event.Attachments != "" {
+		as := strings.Split(event.Attachments, ",")
+		for i, attacher := range as {
+			as[i] = filepath.Join(basedir, attacher)
+		}
+		event.Attachments = strings.Join(as, ",")
 	}
-	event.Attachments = strings.Join(as, ",")
 	return event, nil
 }

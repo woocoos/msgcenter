@@ -266,6 +266,7 @@ func (mec *MsgEventCreate) createSpec() (*MsgEvent, *sqlgraph.CreateSpec) {
 		_node = &MsgEvent{config: mec.config}
 		_spec = sqlgraph.NewCreateSpec(msgevent.Table, sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt))
 	)
+	_spec.Schema = mec.schemaConfig.MsgEvent
 	_spec.OnConflict = mec.conflict
 	if id, ok := mec.mutation.ID(); ok {
 		_node.ID = id
@@ -318,6 +319,7 @@ func (mec *MsgEventCreate) createSpec() (*MsgEvent, *sqlgraph.CreateSpec) {
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mec.schemaConfig.MsgEvent
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -335,6 +337,7 @@ func (mec *MsgEventCreate) createSpec() (*MsgEvent, *sqlgraph.CreateSpec) {
 				IDSpec: sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mec.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}

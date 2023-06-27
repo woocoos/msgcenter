@@ -74,7 +74,7 @@ func main() {
 	}
 
 	configCoordinator.SetDBClient(dbClient)
-	configCoordinator.Subscribe(func(cfg *profile.Config) error {
+	configCoordinator.ReloadHooks(func(cfg *profile.Config) error {
 		// TODO tmpl.ExternalURL = am
 		err := am.Start(configCoordinator, cfg)
 		if err != nil {
@@ -101,11 +101,15 @@ func main() {
 func buildEntClient(cnf *conf.AppConfiguration) *ent.Client {
 	pd := oteldriver.BuildOTELDriver(cnf, "store.msgcenter")
 	pd = ecx.BuildEntCacheDriver(cnf, pd)
+	scfg := ent.AlternateSchema(ent.SchemaConfig{
+		User:        "portal",
+		OrgRoleUser: "portal",
+	})
 	if cnf.Development {
-		dbClient = ent.NewClient(ent.Driver(pd), ent.Debug())
+		dbClient = ent.NewClient(ent.Driver(pd), ent.Debug(), scfg)
 		//casbinClient = casbinent.NewClient(casbinent.Driver(pd), casbinent.Debug())
 	} else {
-		dbClient = ent.NewClient(ent.Driver(pd))
+		dbClient = ent.NewClient(ent.Driver(pd), scfg)
 		//casbinClient = casbinent.NewClient(casbinent.Driver(pd))
 	}
 	return dbClient

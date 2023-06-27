@@ -9,6 +9,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/woocoos/entco/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // ID filters vertices based on their ID field.
@@ -628,6 +630,9 @@ func HasEvents() predicate.MsgType {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, EventsTable, EventsColumn),
 		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgEvent
+		step.Edge.Schema = schemaConfig.MsgEvent
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
@@ -636,6 +641,9 @@ func HasEvents() predicate.MsgType {
 func HasEventsWith(preds ...predicate.MsgEvent) predicate.MsgType {
 	return predicate.MsgType(func(s *sql.Selector) {
 		step := newEventsStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgEvent
+		step.Edge.Schema = schemaConfig.MsgEvent
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -651,6 +659,9 @@ func HasSubscribers() predicate.MsgType {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, SubscribersTable, SubscribersColumn),
 		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgSubscriber
+		step.Edge.Schema = schemaConfig.MsgSubscriber
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
@@ -659,6 +670,9 @@ func HasSubscribers() predicate.MsgType {
 func HasSubscribersWith(preds ...predicate.MsgSubscriber) predicate.MsgType {
 	return predicate.MsgType(func(s *sql.Selector) {
 		step := newSubscribersStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgSubscriber
+		step.Edge.Schema = schemaConfig.MsgSubscriber
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

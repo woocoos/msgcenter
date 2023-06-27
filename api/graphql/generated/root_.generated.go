@@ -116,6 +116,7 @@ type ComplexityRoot struct {
 		ID        func(childComplexity int) int
 		MsgType   func(childComplexity int) int
 		MsgTypeID func(childComplexity int) int
+		OrgRoleID func(childComplexity int) int
 		TenantID  func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 		UpdatedBy func(childComplexity int) int
@@ -607,6 +608,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgSubscriber.MsgTypeID(childComplexity), true
+
+	case "MsgSubscriber.orgRoleID":
+		if e.complexity.MsgSubscriber.OrgRoleID == nil {
+			break
+		}
+
+		return e.complexity.MsgSubscriber.OrgRoleID(childComplexity), true
 
 	case "MsgSubscriber.tenantID":
 		if e.complexity.MsgSubscriber.TenantID == nil {
@@ -1503,7 +1511,9 @@ input CreateMsgSubscriberInput {
   """组织ID"""
   tenantID: Int!
   """用户ID"""
-  userID: Int!
+  userID: Int
+  """用户组ID"""
+  orgRoleID: Int
   """是否排除"""
   exclude: Boolean
   msgTypeID: ID!
@@ -1907,7 +1917,9 @@ type MsgSubscriber implements Node {
   """组织ID"""
   tenantID: Int!
   """用户ID"""
-  userID: Int!
+  userID: Int
+  """用户组ID"""
+  orgRoleID: Int
   """是否排除"""
   exclude: Boolean
   msgType: MsgType!
@@ -2003,6 +2015,19 @@ input MsgSubscriberWhereInput {
   userIDGTE: Int
   userIDLT: Int
   userIDLTE: Int
+  userIDIsNil: Boolean
+  userIDNotNil: Boolean
+  """org_role_id field predicates"""
+  orgRoleID: Int
+  orgRoleIDNEQ: Int
+  orgRoleIDIn: [Int!]
+  orgRoleIDNotIn: [Int!]
+  orgRoleIDGT: Int
+  orgRoleIDGTE: Int
+  orgRoleIDLT: Int
+  orgRoleIDLTE: Int
+  orgRoleIDIsNil: Boolean
+  orgRoleIDNotNil: Boolean
   """exclude field predicates"""
   exclude: Boolean
   excludeNEQ: Boolean
@@ -2555,6 +2580,10 @@ input UpdateMsgSubscriberInput {
   tenantID: Int
   """用户ID"""
   userID: Int
+  clearUserID: Boolean
+  """用户组ID"""
+  orgRoleID: Int
+  clearOrgRoleID: Boolean
   """是否排除"""
   exclude: Boolean
   clearExclude: Boolean

@@ -241,6 +241,7 @@ func (mcc *MsgChannelCreate) createSpec() (*MsgChannel, *sqlgraph.CreateSpec) {
 		_node = &MsgChannel{config: mcc.config}
 		_spec = sqlgraph.NewCreateSpec(msgchannel.Table, sqlgraph.NewFieldSpec(msgchannel.FieldID, field.TypeInt))
 	)
+	_spec.Schema = mcc.schemaConfig.MsgChannel
 	_spec.OnConflict = mcc.conflict
 	if id, ok := mcc.mutation.ID(); ok {
 		_node.ID = id

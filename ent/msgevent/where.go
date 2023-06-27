@@ -9,6 +9,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/woocoos/entco/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // ID filters vertices based on their ID field.
@@ -558,6 +560,9 @@ func HasMsgType() predicate.MsgEvent {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, MsgTypeTable, MsgTypeColumn),
 		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgEvent
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
@@ -566,6 +571,9 @@ func HasMsgType() predicate.MsgEvent {
 func HasMsgTypeWith(preds ...predicate.MsgType) predicate.MsgEvent {
 	return predicate.MsgEvent(func(s *sql.Selector) {
 		step := newMsgTypeStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgEvent
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -581,6 +589,9 @@ func HasCustomerTemplate() predicate.MsgEvent {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, CustomerTemplateTable, CustomerTemplateColumn),
 		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgTemplate
+		step.Edge.Schema = schemaConfig.MsgTemplate
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
@@ -589,6 +600,9 @@ func HasCustomerTemplate() predicate.MsgEvent {
 func HasCustomerTemplateWith(preds ...predicate.MsgTemplate) predicate.MsgEvent {
 	return predicate.MsgEvent(func(s *sql.Selector) {
 		step := newCustomerTemplateStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgTemplate
+		step.Edge.Schema = schemaConfig.MsgTemplate
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

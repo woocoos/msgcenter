@@ -100,6 +100,8 @@ func (am *AlertManager) Start(co *Coordinator, config *profile.Config) error {
 		am.Silencer,
 		timeIntervals,
 		am.NotificationLog,
+		am.Alerts,
+		co.Subscribe,
 	)
 	am.Dispatcher = dispatch.NewDispatcher(am.Alerts, routes, pipeline, am.Marker, timeoutFunc)
 	routes.Apply(am.Cnf)

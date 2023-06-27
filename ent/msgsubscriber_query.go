@@ -13,6 +13,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // MsgSubscriberQuery is the builder for querying MsgSubscriber entities.
@@ -77,6 +79,9 @@ func (msq *MsgSubscriberQuery) QueryMsgType() *MsgTypeQuery {
 			sqlgraph.To(msgtype.Table, msgtype.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, msgsubscriber.MsgTypeTable, msgsubscriber.MsgTypeColumn),
 		)
+		schemaConfig := msq.schemaConfig
+		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgSubscriber
 		fromU = sqlgraph.SetNeighbors(msq.driver.Dialect(), step)
 		return fromU, nil
 	}
@@ -384,6 +389,8 @@ func (msq *MsgSubscriberQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	_spec.Node.Schema = msq.schemaConfig.MsgSubscriber
+	ctx = internal.NewSchemaConfigContext(ctx, msq.schemaConfig)
 	if len(msq.modifiers) > 0 {
 		_spec.Modifiers = msq.modifiers
 	}
@@ -442,6 +449,8 @@ func (msq *MsgSubscriberQuery) loadMsgType(ctx context.Context, query *MsgTypeQu
 
 func (msq *MsgSubscriberQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := msq.querySpec()
+	_spec.Node.Schema = msq.schemaConfig.MsgSubscriber
+	ctx = internal.NewSchemaConfigContext(ctx, msq.schemaConfig)
 	if len(msq.modifiers) > 0 {
 		_spec.Modifiers = msq.modifiers
 	}
@@ -510,6 +519,9 @@ func (msq *MsgSubscriberQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if msq.ctx.Unique != nil && *msq.ctx.Unique {
 		selector.Distinct()
 	}
+	t1.Schema(msq.schemaConfig.MsgSubscriber)
+	ctx = internal.NewSchemaConfigContext(ctx, msq.schemaConfig)
+	selector.WithContext(ctx)
 	for _, p := range msq.predicates {
 		p(selector)
 	}

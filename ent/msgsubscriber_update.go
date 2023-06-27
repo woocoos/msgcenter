@@ -14,6 +14,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // MsgSubscriberUpdate is the builder for updating MsgSubscriber entities.
@@ -102,9 +104,50 @@ func (msu *MsgSubscriberUpdate) SetUserID(i int) *MsgSubscriberUpdate {
 	return msu
 }
 
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (msu *MsgSubscriberUpdate) SetNillableUserID(i *int) *MsgSubscriberUpdate {
+	if i != nil {
+		msu.SetUserID(*i)
+	}
+	return msu
+}
+
 // AddUserID adds i to the "user_id" field.
 func (msu *MsgSubscriberUpdate) AddUserID(i int) *MsgSubscriberUpdate {
 	msu.mutation.AddUserID(i)
+	return msu
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (msu *MsgSubscriberUpdate) ClearUserID() *MsgSubscriberUpdate {
+	msu.mutation.ClearUserID()
+	return msu
+}
+
+// SetOrgRoleID sets the "org_role_id" field.
+func (msu *MsgSubscriberUpdate) SetOrgRoleID(i int) *MsgSubscriberUpdate {
+	msu.mutation.ResetOrgRoleID()
+	msu.mutation.SetOrgRoleID(i)
+	return msu
+}
+
+// SetNillableOrgRoleID sets the "org_role_id" field if the given value is not nil.
+func (msu *MsgSubscriberUpdate) SetNillableOrgRoleID(i *int) *MsgSubscriberUpdate {
+	if i != nil {
+		msu.SetOrgRoleID(*i)
+	}
+	return msu
+}
+
+// AddOrgRoleID adds i to the "org_role_id" field.
+func (msu *MsgSubscriberUpdate) AddOrgRoleID(i int) *MsgSubscriberUpdate {
+	msu.mutation.AddOrgRoleID(i)
+	return msu
+}
+
+// ClearOrgRoleID clears the value of the "org_role_id" field.
+func (msu *MsgSubscriberUpdate) ClearOrgRoleID() *MsgSubscriberUpdate {
+	msu.mutation.ClearOrgRoleID()
 	return msu
 }
 
@@ -218,6 +261,18 @@ func (msu *MsgSubscriberUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if value, ok := msu.mutation.AddedUserID(); ok {
 		_spec.AddField(msgsubscriber.FieldUserID, field.TypeInt, value)
 	}
+	if msu.mutation.UserIDCleared() {
+		_spec.ClearField(msgsubscriber.FieldUserID, field.TypeInt)
+	}
+	if value, ok := msu.mutation.OrgRoleID(); ok {
+		_spec.SetField(msgsubscriber.FieldOrgRoleID, field.TypeInt, value)
+	}
+	if value, ok := msu.mutation.AddedOrgRoleID(); ok {
+		_spec.AddField(msgsubscriber.FieldOrgRoleID, field.TypeInt, value)
+	}
+	if msu.mutation.OrgRoleIDCleared() {
+		_spec.ClearField(msgsubscriber.FieldOrgRoleID, field.TypeInt)
+	}
 	if value, ok := msu.mutation.Exclude(); ok {
 		_spec.SetField(msgsubscriber.FieldExclude, field.TypeBool, value)
 	}
@@ -235,6 +290,7 @@ func (msu *MsgSubscriberUpdate) sqlSave(ctx context.Context) (n int, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = msu.schemaConfig.MsgSubscriber
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := msu.mutation.MsgTypeIDs(); len(nodes) > 0 {
@@ -248,11 +304,14 @@ func (msu *MsgSubscriberUpdate) sqlSave(ctx context.Context) (n int, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = msu.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	_spec.Node.Schema = msu.schemaConfig.MsgSubscriber
+	ctx = internal.NewSchemaConfigContext(ctx, msu.schemaConfig)
 	if n, err = sqlgraph.UpdateNodes(ctx, msu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgsubscriber.Label}
@@ -346,9 +405,50 @@ func (msuo *MsgSubscriberUpdateOne) SetUserID(i int) *MsgSubscriberUpdateOne {
 	return msuo
 }
 
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (msuo *MsgSubscriberUpdateOne) SetNillableUserID(i *int) *MsgSubscriberUpdateOne {
+	if i != nil {
+		msuo.SetUserID(*i)
+	}
+	return msuo
+}
+
 // AddUserID adds i to the "user_id" field.
 func (msuo *MsgSubscriberUpdateOne) AddUserID(i int) *MsgSubscriberUpdateOne {
 	msuo.mutation.AddUserID(i)
+	return msuo
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (msuo *MsgSubscriberUpdateOne) ClearUserID() *MsgSubscriberUpdateOne {
+	msuo.mutation.ClearUserID()
+	return msuo
+}
+
+// SetOrgRoleID sets the "org_role_id" field.
+func (msuo *MsgSubscriberUpdateOne) SetOrgRoleID(i int) *MsgSubscriberUpdateOne {
+	msuo.mutation.ResetOrgRoleID()
+	msuo.mutation.SetOrgRoleID(i)
+	return msuo
+}
+
+// SetNillableOrgRoleID sets the "org_role_id" field if the given value is not nil.
+func (msuo *MsgSubscriberUpdateOne) SetNillableOrgRoleID(i *int) *MsgSubscriberUpdateOne {
+	if i != nil {
+		msuo.SetOrgRoleID(*i)
+	}
+	return msuo
+}
+
+// AddOrgRoleID adds i to the "org_role_id" field.
+func (msuo *MsgSubscriberUpdateOne) AddOrgRoleID(i int) *MsgSubscriberUpdateOne {
+	msuo.mutation.AddOrgRoleID(i)
+	return msuo
+}
+
+// ClearOrgRoleID clears the value of the "org_role_id" field.
+func (msuo *MsgSubscriberUpdateOne) ClearOrgRoleID() *MsgSubscriberUpdateOne {
+	msuo.mutation.ClearOrgRoleID()
 	return msuo
 }
 
@@ -492,6 +592,18 @@ func (msuo *MsgSubscriberUpdateOne) sqlSave(ctx context.Context) (_node *MsgSubs
 	if value, ok := msuo.mutation.AddedUserID(); ok {
 		_spec.AddField(msgsubscriber.FieldUserID, field.TypeInt, value)
 	}
+	if msuo.mutation.UserIDCleared() {
+		_spec.ClearField(msgsubscriber.FieldUserID, field.TypeInt)
+	}
+	if value, ok := msuo.mutation.OrgRoleID(); ok {
+		_spec.SetField(msgsubscriber.FieldOrgRoleID, field.TypeInt, value)
+	}
+	if value, ok := msuo.mutation.AddedOrgRoleID(); ok {
+		_spec.AddField(msgsubscriber.FieldOrgRoleID, field.TypeInt, value)
+	}
+	if msuo.mutation.OrgRoleIDCleared() {
+		_spec.ClearField(msgsubscriber.FieldOrgRoleID, field.TypeInt)
+	}
 	if value, ok := msuo.mutation.Exclude(); ok {
 		_spec.SetField(msgsubscriber.FieldExclude, field.TypeBool, value)
 	}
@@ -509,6 +621,7 @@ func (msuo *MsgSubscriberUpdateOne) sqlSave(ctx context.Context) (_node *MsgSubs
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = msuo.schemaConfig.MsgSubscriber
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := msuo.mutation.MsgTypeIDs(); len(nodes) > 0 {
@@ -522,11 +635,14 @@ func (msuo *MsgSubscriberUpdateOne) sqlSave(ctx context.Context) (_node *MsgSubs
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = msuo.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	_spec.Node.Schema = msuo.schemaConfig.MsgSubscriber
+	ctx = internal.NewSchemaConfigContext(ctx, msuo.schemaConfig)
 	_node = &MsgSubscriber{config: msuo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

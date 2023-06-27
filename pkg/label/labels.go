@@ -13,6 +13,7 @@ import (
 const (
 	AlertNameLabel = "alertname"
 	TenantLabel    = "tenant"
+	ToUserIDLabel  = "user"
 )
 
 type LabelName string

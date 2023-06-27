@@ -1037,14 +1037,28 @@ type MsgSubscriberWhereInput struct {
 	TenantIDLTE   *int  `json:"tenantIDLTE,omitempty"`
 
 	// "user_id" field predicates.
-	UserID      *int  `json:"userID,omitempty"`
-	UserIDNEQ   *int  `json:"userIDNEQ,omitempty"`
-	UserIDIn    []int `json:"userIDIn,omitempty"`
-	UserIDNotIn []int `json:"userIDNotIn,omitempty"`
-	UserIDGT    *int  `json:"userIDGT,omitempty"`
-	UserIDGTE   *int  `json:"userIDGTE,omitempty"`
-	UserIDLT    *int  `json:"userIDLT,omitempty"`
-	UserIDLTE   *int  `json:"userIDLTE,omitempty"`
+	UserID       *int  `json:"userID,omitempty"`
+	UserIDNEQ    *int  `json:"userIDNEQ,omitempty"`
+	UserIDIn     []int `json:"userIDIn,omitempty"`
+	UserIDNotIn  []int `json:"userIDNotIn,omitempty"`
+	UserIDGT     *int  `json:"userIDGT,omitempty"`
+	UserIDGTE    *int  `json:"userIDGTE,omitempty"`
+	UserIDLT     *int  `json:"userIDLT,omitempty"`
+	UserIDLTE    *int  `json:"userIDLTE,omitempty"`
+	UserIDIsNil  bool  `json:"userIDIsNil,omitempty"`
+	UserIDNotNil bool  `json:"userIDNotNil,omitempty"`
+
+	// "org_role_id" field predicates.
+	OrgRoleID       *int  `json:"orgRoleID,omitempty"`
+	OrgRoleIDNEQ    *int  `json:"orgRoleIDNEQ,omitempty"`
+	OrgRoleIDIn     []int `json:"orgRoleIDIn,omitempty"`
+	OrgRoleIDNotIn  []int `json:"orgRoleIDNotIn,omitempty"`
+	OrgRoleIDGT     *int  `json:"orgRoleIDGT,omitempty"`
+	OrgRoleIDGTE    *int  `json:"orgRoleIDGTE,omitempty"`
+	OrgRoleIDLT     *int  `json:"orgRoleIDLT,omitempty"`
+	OrgRoleIDLTE    *int  `json:"orgRoleIDLTE,omitempty"`
+	OrgRoleIDIsNil  bool  `json:"orgRoleIDIsNil,omitempty"`
+	OrgRoleIDNotNil bool  `json:"orgRoleIDNotNil,omitempty"`
 
 	// "exclude" field predicates.
 	Exclude       *bool `json:"exclude,omitempty"`
@@ -1319,6 +1333,42 @@ func (i *MsgSubscriberWhereInput) P() (predicate.MsgSubscriber, error) {
 	}
 	if i.UserIDLTE != nil {
 		predicates = append(predicates, msgsubscriber.UserIDLTE(*i.UserIDLTE))
+	}
+	if i.UserIDIsNil {
+		predicates = append(predicates, msgsubscriber.UserIDIsNil())
+	}
+	if i.UserIDNotNil {
+		predicates = append(predicates, msgsubscriber.UserIDNotNil())
+	}
+	if i.OrgRoleID != nil {
+		predicates = append(predicates, msgsubscriber.OrgRoleIDEQ(*i.OrgRoleID))
+	}
+	if i.OrgRoleIDNEQ != nil {
+		predicates = append(predicates, msgsubscriber.OrgRoleIDNEQ(*i.OrgRoleIDNEQ))
+	}
+	if len(i.OrgRoleIDIn) > 0 {
+		predicates = append(predicates, msgsubscriber.OrgRoleIDIn(i.OrgRoleIDIn...))
+	}
+	if len(i.OrgRoleIDNotIn) > 0 {
+		predicates = append(predicates, msgsubscriber.OrgRoleIDNotIn(i.OrgRoleIDNotIn...))
+	}
+	if i.OrgRoleIDGT != nil {
+		predicates = append(predicates, msgsubscriber.OrgRoleIDGT(*i.OrgRoleIDGT))
+	}
+	if i.OrgRoleIDGTE != nil {
+		predicates = append(predicates, msgsubscriber.OrgRoleIDGTE(*i.OrgRoleIDGTE))
+	}
+	if i.OrgRoleIDLT != nil {
+		predicates = append(predicates, msgsubscriber.OrgRoleIDLT(*i.OrgRoleIDLT))
+	}
+	if i.OrgRoleIDLTE != nil {
+		predicates = append(predicates, msgsubscriber.OrgRoleIDLTE(*i.OrgRoleIDLTE))
+	}
+	if i.OrgRoleIDIsNil {
+		predicates = append(predicates, msgsubscriber.OrgRoleIDIsNil())
+	}
+	if i.OrgRoleIDNotNil {
+		predicates = append(predicates, msgsubscriber.OrgRoleIDNotNil())
 	}
 	if i.Exclude != nil {
 		predicates = append(predicates, msgsubscriber.ExcludeEQ(*i.Exclude))

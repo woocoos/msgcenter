@@ -39,7 +39,9 @@ input CreateMsgSubscriberInput {
   """组织ID"""
   tenantID: Int!
   """用户ID"""
-  userID: Int!
+  userID: Int
+  """用户组ID"""
+  orgRoleID: Int
   """是否排除"""
   exclude: Boolean
   msgTypeID: ID!
@@ -443,7 +445,9 @@ type MsgSubscriber implements Node {
   """组织ID"""
   tenantID: Int!
   """用户ID"""
-  userID: Int!
+  userID: Int
+  """用户组ID"""
+  orgRoleID: Int
   """是否排除"""
   exclude: Boolean
   msgType: MsgType!
@@ -539,6 +543,19 @@ input MsgSubscriberWhereInput {
   userIDGTE: Int
   userIDLT: Int
   userIDLTE: Int
+  userIDIsNil: Boolean
+  userIDNotNil: Boolean
+  """org_role_id field predicates"""
+  orgRoleID: Int
+  orgRoleIDNEQ: Int
+  orgRoleIDIn: [Int!]
+  orgRoleIDNotIn: [Int!]
+  orgRoleIDGT: Int
+  orgRoleIDGTE: Int
+  orgRoleIDLT: Int
+  orgRoleIDLTE: Int
+  orgRoleIDIsNil: Boolean
+  orgRoleIDNotNil: Boolean
   """exclude field predicates"""
   exclude: Boolean
   excludeNEQ: Boolean
@@ -1091,6 +1108,10 @@ input UpdateMsgSubscriberInput {
   tenantID: Int
   """用户ID"""
   userID: Int
+  clearUserID: Boolean
+  """用户组ID"""
+  orgRoleID: Int
+  clearOrgRoleID: Boolean
   """是否排除"""
   exclude: Boolean
   clearExclude: Boolean

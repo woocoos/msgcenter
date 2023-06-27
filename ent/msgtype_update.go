@@ -16,6 +16,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // MsgTypeUpdate is the builder for updating MsgType entities.
@@ -398,6 +400,7 @@ func (mtu *MsgTypeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtu.schemaConfig.MsgEvent
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := mtu.mutation.RemovedEventsIDs(); len(nodes) > 0 && !mtu.mutation.EventsCleared() {
@@ -411,6 +414,7 @@ func (mtu *MsgTypeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtu.schemaConfig.MsgEvent
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -427,6 +431,7 @@ func (mtu *MsgTypeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtu.schemaConfig.MsgEvent
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -443,6 +448,7 @@ func (mtu *MsgTypeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtu.schemaConfig.MsgSubscriber
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := mtu.mutation.RemovedSubscribersIDs(); len(nodes) > 0 && !mtu.mutation.SubscribersCleared() {
@@ -456,6 +462,7 @@ func (mtu *MsgTypeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtu.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -472,11 +479,14 @@ func (mtu *MsgTypeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtu.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	_spec.Node.Schema = mtu.schemaConfig.MsgType
+	ctx = internal.NewSchemaConfigContext(ctx, mtu.schemaConfig)
 	if n, err = sqlgraph.UpdateNodes(ctx, mtu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgtype.Label}
@@ -894,6 +904,7 @@ func (mtuo *MsgTypeUpdateOne) sqlSave(ctx context.Context) (_node *MsgType, err 
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtuo.schemaConfig.MsgEvent
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := mtuo.mutation.RemovedEventsIDs(); len(nodes) > 0 && !mtuo.mutation.EventsCleared() {
@@ -907,6 +918,7 @@ func (mtuo *MsgTypeUpdateOne) sqlSave(ctx context.Context) (_node *MsgType, err 
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtuo.schemaConfig.MsgEvent
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -923,6 +935,7 @@ func (mtuo *MsgTypeUpdateOne) sqlSave(ctx context.Context) (_node *MsgType, err 
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtuo.schemaConfig.MsgEvent
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -939,6 +952,7 @@ func (mtuo *MsgTypeUpdateOne) sqlSave(ctx context.Context) (_node *MsgType, err 
 				IDSpec: sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtuo.schemaConfig.MsgSubscriber
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := mtuo.mutation.RemovedSubscribersIDs(); len(nodes) > 0 && !mtuo.mutation.SubscribersCleared() {
@@ -952,6 +966,7 @@ func (mtuo *MsgTypeUpdateOne) sqlSave(ctx context.Context) (_node *MsgType, err 
 				IDSpec: sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtuo.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -968,11 +983,14 @@ func (mtuo *MsgTypeUpdateOne) sqlSave(ctx context.Context) (_node *MsgType, err 
 				IDSpec: sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtuo.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	_spec.Node.Schema = mtuo.schemaConfig.MsgType
+	ctx = internal.NewSchemaConfigContext(ctx, mtuo.schemaConfig)
 	_node = &MsgType{config: mtuo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

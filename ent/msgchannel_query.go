@@ -12,6 +12,8 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // MsgChannelQuery is the builder for querying MsgChannel entities.
@@ -344,6 +346,8 @@ func (mcq *MsgChannelQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
+	_spec.Node.Schema = mcq.schemaConfig.MsgChannel
+	ctx = internal.NewSchemaConfigContext(ctx, mcq.schemaConfig)
 	if len(mcq.modifiers) > 0 {
 		_spec.Modifiers = mcq.modifiers
 	}
@@ -366,6 +370,8 @@ func (mcq *MsgChannelQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 
 func (mcq *MsgChannelQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := mcq.querySpec()
+	_spec.Node.Schema = mcq.schemaConfig.MsgChannel
+	ctx = internal.NewSchemaConfigContext(ctx, mcq.schemaConfig)
 	if len(mcq.modifiers) > 0 {
 		_spec.Modifiers = mcq.modifiers
 	}
@@ -431,6 +437,9 @@ func (mcq *MsgChannelQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if mcq.ctx.Unique != nil && *mcq.ctx.Unique {
 		selector.Distinct()
 	}
+	t1.Schema(mcq.schemaConfig.MsgChannel)
+	ctx = internal.NewSchemaConfigContext(ctx, mcq.schemaConfig)
+	selector.WithContext(ctx)
 	for _, p := range mcq.predicates {
 		p(selector)
 	}

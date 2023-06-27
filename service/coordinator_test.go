@@ -34,10 +34,10 @@ func TestCoordinatorRegistersMetrics(t *testing.T) {
 	}
 }
 
-func TestCoordinatorNotifiesSubscribers(t *testing.T) {
+func TestCoordinatorNotifiesHooks(t *testing.T) {
 	callBackCalled := false
 	c := NewCoordinator(conf.New(conf.WithLocalPath(test.Path("testdata/alertmanager/conf.good.yml"))))
-	c.Subscribe(func(*profile.Config) error {
+	c.ReloadHooks(func(*profile.Config) error {
 		callBackCalled = true
 		return nil
 	})
@@ -48,15 +48,15 @@ func TestCoordinatorNotifiesSubscribers(t *testing.T) {
 	}
 
 	if !callBackCalled {
-		t.Fatal("expected coordinator.Reload() to call subscribers")
+		t.Fatal("expected coordinator.Reload() to call reloadHooks")
 	}
 }
 
-func TestCoordinatorFailReloadWhenSubscriberFails(t *testing.T) {
+func TestCoordinatorFailReloadWhenHooksFails(t *testing.T) {
 	errMessage := "something happened"
 	c := NewCoordinator(conf.New(conf.WithLocalPath(test.Path("testdata/alertmanager/conf.good.yml"))))
 
-	c.Subscribe(func(*profile.Config) error {
+	c.ReloadHooks(func(*profile.Config) error {
 		return errors.New(errMessage)
 	})
 

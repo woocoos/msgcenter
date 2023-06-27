@@ -394,6 +394,7 @@ func (mtc *MsgTemplateCreate) createSpec() (*MsgTemplate, *sqlgraph.CreateSpec) 
 		_node = &MsgTemplate{config: mtc.config}
 		_spec = sqlgraph.NewCreateSpec(msgtemplate.Table, sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt))
 	)
+	_spec.Schema = mtc.schemaConfig.MsgTemplate
 	_spec.OnConflict = mtc.conflict
 	if id, ok := mtc.mutation.ID(); ok {
 		_node.ID = id
@@ -486,6 +487,7 @@ func (mtc *MsgTemplateCreate) createSpec() (*MsgTemplate, *sqlgraph.CreateSpec) 
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtc.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}

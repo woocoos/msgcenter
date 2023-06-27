@@ -14,6 +14,7 @@ import (
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/provider"
 	"github.com/woocoos/msgcenter/silence"
 	"go.uber.org/zap"
 	"sync"
@@ -238,6 +239,8 @@ func (pb *PipelineBuilder) New(
 	silencer *silence.Silencer,
 	times map[string][]timeinterval.TimeInterval,
 	notificationLog NotificationLog,
+	alerts provider.Alerts,
+	subscriber Subscriber,
 ) RoutingStage {
 	rs := make(RoutingStage, len(receivers))
 
@@ -247,7 +250,7 @@ func (pb *PipelineBuilder) New(
 	ss := NewMuteStage(silencer)
 
 	for name := range receivers {
-		st := createReceiverStage(name, receivers[name], wait, notificationLog)
+		st := createReceiverStage(name, receivers[name], wait, notificationLog, alerts, subscriber)
 		rs[name] = MultiStage{is, tas, tms, ss, st}
 	}
 	return rs
@@ -259,6 +262,8 @@ func createReceiverStage(
 	integrations []Integration,
 	wait func() time.Duration,
 	notificationLog NotificationLog,
+	alerts provider.Alerts,
+	subscriber Subscriber,
 ) Stage {
 	var fs FanoutStage
 	for i := range integrations {
@@ -270,6 +275,7 @@ func createReceiverStage(
 		var s MultiStage
 		s = append(s, NewWaitStage(wait))
 		s = append(s, NewDedupStage(&integrations[i], notificationLog, recv))
+		s = append(s, NewEventSubscribeStage(alerts, subscriber))
 		s = append(s, NewRetryStage(integrations[i], name))
 		s = append(s, NewSetNotifiesStage(notificationLog, recv))
 

@@ -89,6 +89,28 @@ func (msc *MsgSubscriberCreate) SetUserID(i int) *MsgSubscriberCreate {
 	return msc
 }
 
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (msc *MsgSubscriberCreate) SetNillableUserID(i *int) *MsgSubscriberCreate {
+	if i != nil {
+		msc.SetUserID(*i)
+	}
+	return msc
+}
+
+// SetOrgRoleID sets the "org_role_id" field.
+func (msc *MsgSubscriberCreate) SetOrgRoleID(i int) *MsgSubscriberCreate {
+	msc.mutation.SetOrgRoleID(i)
+	return msc
+}
+
+// SetNillableOrgRoleID sets the "org_role_id" field if the given value is not nil.
+func (msc *MsgSubscriberCreate) SetNillableOrgRoleID(i *int) *MsgSubscriberCreate {
+	if i != nil {
+		msc.SetOrgRoleID(*i)
+	}
+	return msc
+}
+
 // SetExclude sets the "exclude" field.
 func (msc *MsgSubscriberCreate) SetExclude(b bool) *MsgSubscriberCreate {
 	msc.mutation.SetExclude(b)
@@ -179,9 +201,6 @@ func (msc *MsgSubscriberCreate) check() error {
 	if _, ok := msc.mutation.TenantID(); !ok {
 		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "MsgSubscriber.tenant_id"`)}
 	}
-	if _, ok := msc.mutation.UserID(); !ok {
-		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "MsgSubscriber.user_id"`)}
-	}
 	if _, ok := msc.mutation.MsgTypeID(); !ok {
 		return &ValidationError{Name: "msg_type", err: errors.New(`ent: missing required edge "MsgSubscriber.msg_type"`)}
 	}
@@ -213,6 +232,7 @@ func (msc *MsgSubscriberCreate) createSpec() (*MsgSubscriber, *sqlgraph.CreateSp
 		_node = &MsgSubscriber{config: msc.config}
 		_spec = sqlgraph.NewCreateSpec(msgsubscriber.Table, sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt))
 	)
+	_spec.Schema = msc.schemaConfig.MsgSubscriber
 	_spec.OnConflict = msc.conflict
 	if id, ok := msc.mutation.ID(); ok {
 		_node.ID = id
@@ -242,6 +262,10 @@ func (msc *MsgSubscriberCreate) createSpec() (*MsgSubscriber, *sqlgraph.CreateSp
 		_spec.SetField(msgsubscriber.FieldUserID, field.TypeInt, value)
 		_node.UserID = value
 	}
+	if value, ok := msc.mutation.OrgRoleID(); ok {
+		_spec.SetField(msgsubscriber.FieldOrgRoleID, field.TypeInt, value)
+		_node.OrgRoleID = value
+	}
 	if value, ok := msc.mutation.Exclude(); ok {
 		_spec.SetField(msgsubscriber.FieldExclude, field.TypeBool, value)
 		_node.Exclude = value
@@ -257,6 +281,7 @@ func (msc *MsgSubscriberCreate) createSpec() (*MsgSubscriber, *sqlgraph.CreateSp
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = msc.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -402,6 +427,36 @@ func (u *MsgSubscriberUpsert) UpdateUserID() *MsgSubscriberUpsert {
 // AddUserID adds v to the "user_id" field.
 func (u *MsgSubscriberUpsert) AddUserID(v int) *MsgSubscriberUpsert {
 	u.Add(msgsubscriber.FieldUserID, v)
+	return u
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (u *MsgSubscriberUpsert) ClearUserID() *MsgSubscriberUpsert {
+	u.SetNull(msgsubscriber.FieldUserID)
+	return u
+}
+
+// SetOrgRoleID sets the "org_role_id" field.
+func (u *MsgSubscriberUpsert) SetOrgRoleID(v int) *MsgSubscriberUpsert {
+	u.Set(msgsubscriber.FieldOrgRoleID, v)
+	return u
+}
+
+// UpdateOrgRoleID sets the "org_role_id" field to the value that was provided on create.
+func (u *MsgSubscriberUpsert) UpdateOrgRoleID() *MsgSubscriberUpsert {
+	u.SetExcluded(msgsubscriber.FieldOrgRoleID)
+	return u
+}
+
+// AddOrgRoleID adds v to the "org_role_id" field.
+func (u *MsgSubscriberUpsert) AddOrgRoleID(v int) *MsgSubscriberUpsert {
+	u.Add(msgsubscriber.FieldOrgRoleID, v)
+	return u
+}
+
+// ClearOrgRoleID clears the value of the "org_role_id" field.
+func (u *MsgSubscriberUpsert) ClearOrgRoleID() *MsgSubscriberUpsert {
+	u.SetNull(msgsubscriber.FieldOrgRoleID)
 	return u
 }
 
@@ -579,6 +634,41 @@ func (u *MsgSubscriberUpsertOne) AddUserID(v int) *MsgSubscriberUpsertOne {
 func (u *MsgSubscriberUpsertOne) UpdateUserID() *MsgSubscriberUpsertOne {
 	return u.Update(func(s *MsgSubscriberUpsert) {
 		s.UpdateUserID()
+	})
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (u *MsgSubscriberUpsertOne) ClearUserID() *MsgSubscriberUpsertOne {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.ClearUserID()
+	})
+}
+
+// SetOrgRoleID sets the "org_role_id" field.
+func (u *MsgSubscriberUpsertOne) SetOrgRoleID(v int) *MsgSubscriberUpsertOne {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.SetOrgRoleID(v)
+	})
+}
+
+// AddOrgRoleID adds v to the "org_role_id" field.
+func (u *MsgSubscriberUpsertOne) AddOrgRoleID(v int) *MsgSubscriberUpsertOne {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.AddOrgRoleID(v)
+	})
+}
+
+// UpdateOrgRoleID sets the "org_role_id" field to the value that was provided on create.
+func (u *MsgSubscriberUpsertOne) UpdateOrgRoleID() *MsgSubscriberUpsertOne {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.UpdateOrgRoleID()
+	})
+}
+
+// ClearOrgRoleID clears the value of the "org_role_id" field.
+func (u *MsgSubscriberUpsertOne) ClearOrgRoleID() *MsgSubscriberUpsertOne {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.ClearOrgRoleID()
 	})
 }
 
@@ -921,6 +1011,41 @@ func (u *MsgSubscriberUpsertBulk) AddUserID(v int) *MsgSubscriberUpsertBulk {
 func (u *MsgSubscriberUpsertBulk) UpdateUserID() *MsgSubscriberUpsertBulk {
 	return u.Update(func(s *MsgSubscriberUpsert) {
 		s.UpdateUserID()
+	})
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (u *MsgSubscriberUpsertBulk) ClearUserID() *MsgSubscriberUpsertBulk {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.ClearUserID()
+	})
+}
+
+// SetOrgRoleID sets the "org_role_id" field.
+func (u *MsgSubscriberUpsertBulk) SetOrgRoleID(v int) *MsgSubscriberUpsertBulk {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.SetOrgRoleID(v)
+	})
+}
+
+// AddOrgRoleID adds v to the "org_role_id" field.
+func (u *MsgSubscriberUpsertBulk) AddOrgRoleID(v int) *MsgSubscriberUpsertBulk {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.AddOrgRoleID(v)
+	})
+}
+
+// UpdateOrgRoleID sets the "org_role_id" field to the value that was provided on create.
+func (u *MsgSubscriberUpsertBulk) UpdateOrgRoleID() *MsgSubscriberUpsertBulk {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.UpdateOrgRoleID()
+	})
+}
+
+// ClearOrgRoleID clears the value of the "org_role_id" field.
+func (u *MsgSubscriberUpsertBulk) ClearOrgRoleID() *MsgSubscriberUpsertBulk {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.ClearOrgRoleID()
 	})
 }
 

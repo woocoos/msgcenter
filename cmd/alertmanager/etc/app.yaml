@@ -51,7 +51,7 @@ web:
 store:
   msgcenter:
     driverName: mysql
-    dsn: "root:@tcp(localhost:3306)/portal?parseTime=true&loc=Local"
+    dsn: "root:@tcp(localhost:3306)/msgcenter?parseTime=true&loc=Local"
 
 entcache:
   level: context
@@ -68,3 +68,5 @@ alertManager:
     maintenanceInterval: 15m
   alerts:
     gcInterval: 30m
+  template:
+    path: ../../test/testdata/tpl # path for custom template

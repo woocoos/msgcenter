@@ -586,6 +586,13 @@ components:
           type: string
     labelSet:
       type: object
+      description: |
+        A set of labels. Labels are key/value pairs that are attached to
+        alerts. Labels are used to specify identifying attributes of alerts,
+        such as their tenant, user , instance, and job.
+        tenant: specific tenant id.
+        user: specific user id. the user is the notify target. Some notification need info from user, such as email address.
+        alertname: the name of alert.it is also the event name.
       additionalProperties:
         type: string
   responses:

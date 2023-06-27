@@ -65,7 +65,8 @@ var (
 		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "tenant_id", Type: field.TypeInt},
-		{Name: "user_id", Type: field.TypeInt},
+		{Name: "user_id", Type: field.TypeInt, Nullable: true},
+		{Name: "org_role_id", Type: field.TypeInt, Nullable: true},
 		{Name: "exclude", Type: field.TypeBool, Nullable: true, Default: false},
 		{Name: "msg_type_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
 	}
@@ -77,7 +78,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "msg_subscriber_msg_type_subscribers",
-				Columns:    []*schema.Column{MsgSubscriberColumns[8]},
+				Columns:    []*schema.Column{MsgSubscriberColumns[9]},
 				RefColumns: []*schema.Column{MsgTypeColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -142,6 +143,34 @@ var (
 		Columns:    MsgTypeColumns,
 		PrimaryKey: []*schema.Column{MsgTypeColumns[0]},
 	}
+	// OrgRoleUserColumns holds the columns for the "org_role_user" table.
+	OrgRoleUserColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "org_role_id", Type: field.TypeInt},
+		{Name: "org_user_id", Type: field.TypeInt},
+		{Name: "org_id", Type: field.TypeInt},
+		{Name: "user_id", Type: field.TypeInt},
+	}
+	// OrgRoleUserTable holds the schema information for the "org_role_user" table.
+	OrgRoleUserTable = &schema.Table{
+		Name:       "org_role_user",
+		Columns:    OrgRoleUserColumns,
+		PrimaryKey: []*schema.Column{OrgRoleUserColumns[0]},
+	}
+	// UserColumns holds the columns for the "user" table.
+	UserColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "principal_name", Type: field.TypeString, Unique: true},
+		{Name: "display_name", Type: field.TypeString},
+		{Name: "email", Type: field.TypeString, Nullable: true, Size: 45},
+		{Name: "mobile", Type: field.TypeString, Nullable: true, Size: 45},
+	}
+	// UserTable holds the schema information for the "user" table.
+	UserTable = &schema.Table{
+		Name:       "user",
+		Columns:    UserColumns,
+		PrimaryKey: []*schema.Column{UserColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		MsgChannelTable,
@@ -149,6 +178,8 @@ var (
 		MsgSubscriberTable,
 		MsgTemplateTable,
 		MsgTypeTable,
+		OrgRoleUserTable,
+		UserTable,
 	}
 )
 
@@ -170,5 +201,11 @@ func init() {
 	}
 	MsgTypeTable.Annotation = &entsql.Annotation{
 		Table: "msg_type",
+	}
+	OrgRoleUserTable.Annotation = &entsql.Annotation{
+		Table: "org_role_user",
+	}
+	UserTable.Annotation = &entsql.Annotation{
+		Table: "user",
 	}
 }
