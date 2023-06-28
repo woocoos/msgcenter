@@ -264,7 +264,7 @@ func (s *serviceSuite) TestPostAlerts() {
 			StartsAt: time.Now(),
 		},
 	}
-	s.Require().NoError(s.Service.PostAlerts(ctx, &oas.PostAlertsRequest{Body: req}))
+	s.Require().NoError(s.Service.PostAlerts(ctx, &oas.PostAlertsRequest{PostableAlerts: req}))
 	time.Sleep(time.Second * 2)
 	mail, err := s.maildev.GetLastEmail()
 	s.Require().NoError(err)
@@ -295,7 +295,7 @@ func (s *serviceSuite) TestPostAlertsWithTenant() {
 			StartsAt: time.Now(),
 		},
 	}
-	s.Require().NoError(s.Service.PostAlerts(ctx, &oas.PostAlertsRequest{Body: req}))
+	s.Require().NoError(s.Service.PostAlerts(ctx, &oas.PostAlertsRequest{PostableAlerts: req}))
 	time.Sleep(time.Second * 3)
 	mail, err := s.maildev.GetLastEmail()
 	s.Require().NoError(err)
@@ -323,7 +323,7 @@ func (s *serviceSuite) TestUserSubscribe() {
 			StartsAt: time.Now(),
 		},
 	}
-	s.Require().NoError(s.Service.PostAlerts(ctx, &oas.PostAlertsRequest{Body: req}))
+	s.Require().NoError(s.Service.PostAlerts(ctx, &oas.PostAlertsRequest{PostableAlerts: req}))
 	time.Sleep(time.Second * 3)
 	mail, err := s.maildev.GetLastEmail()
 	s.Require().NoError(err)

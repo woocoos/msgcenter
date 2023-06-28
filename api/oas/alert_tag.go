@@ -16,5 +16,5 @@ type GetAlertsRequestBody struct {
 }
 
 type PostAlertsRequest struct {
-	Body PostableAlerts
+	PostableAlerts PostableAlerts
 }

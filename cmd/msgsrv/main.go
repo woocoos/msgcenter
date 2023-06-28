@@ -3,7 +3,9 @@ package main
 import (
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/contrib/gql"
 	"github.com/tsingsun/woocoo/pkg/conf"
@@ -92,7 +94,9 @@ func main() {
 	}
 
 	apiSrv := buildWebServer(cnf, api, configCoordinator)
-	app.RegisterServer(am.Alerts.(*mem.Alerts), am.NotificationLog.(*nflog.Log), am.Silences, apiSrv)
+	app.RegisterServer(am.Alerts.(*mem.Alerts), am.NotificationLog.(*nflog.Log), am.Silences, apiSrv,
+		newPromHttp(cnf.Sub("prometheus")),
+	)
 	if err := app.Run(); err != nil {
 		log.Fatal(err)
 	}
@@ -138,4 +142,10 @@ func buildWebServer(cnf *conf.AppConfiguration, ws *server.Service, co *service.
 		log.Fatal(err)
 	}
 	return webSrv
+}
+
+func newPromHttp(cnf *conf.Configuration) woocoo.Server {
+	hd := web.New(web.WithConfiguration(cnf))
+	hd.Router().GET("/metrics", gin.WrapH(promhttp.Handler()))
+	return hd
 }

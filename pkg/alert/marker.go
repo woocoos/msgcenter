@@ -2,6 +2,7 @@ package alert
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/woocoos/msgcenter/metrics"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"sync"
 	"time"
@@ -78,8 +79,9 @@ func NewMarker(r prometheus.Registerer) Marker {
 	m := &memMarker{
 		m: map[label.Fingerprint]*MarkerStatus{},
 	}
-
-	m.registerMetrics(r)
+	metrics.NewMarkerMetrics(r, func(state string) float64 {
+		return float64(m.Count(AlertState(state)))
+	})
 
 	return m
 }
@@ -88,29 +90,6 @@ type memMarker struct {
 	m map[label.Fingerprint]*MarkerStatus
 
 	mtx sync.RWMutex
-}
-
-func (m *memMarker) registerMetrics(r prometheus.Registerer) {
-	newMarkedAlertMetricByState := func(st AlertState) prometheus.GaugeFunc {
-		return prometheus.NewGaugeFunc(
-			prometheus.GaugeOpts{
-				Name:        "alertmanager_marked_alerts",
-				Help:        "How many alerts by state are currently marked in the Alertmanager regardless of their expiry.",
-				ConstLabels: prometheus.Labels{"state": string(st)},
-			},
-			func() float64 {
-				return float64(m.Count(st))
-			},
-		)
-	}
-
-	alertsActive := newMarkedAlertMetricByState(AlertStateActive)
-	alertsSuppressed := newMarkedAlertMetricByState(AlertStateSuppressed)
-	alertStateUnprocessed := newMarkedAlertMetricByState(AlertStateUnprocessed)
-
-	r.MustRegister(alertsActive)
-	r.MustRegister(alertsSuppressed)
-	r.MustRegister(alertStateUnprocessed)
 }
 
 // Count implements Marker.

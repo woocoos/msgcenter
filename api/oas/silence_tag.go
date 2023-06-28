@@ -23,11 +23,11 @@ type GetSilenceRequestUriParams struct {
 }
 
 type GetSilencesRequest struct {
-	Body []string `form:"filter"`
+	Filter []string `form:"filter"`
 }
 
 type PostSilencesRequest struct {
-	Body PostableSilence
+	PostableSilence PostableSilence
 }
 
 type PostSilencesResponse struct {

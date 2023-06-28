@@ -253,7 +253,7 @@ func receiversMatchFilter(receivers []string, filter *regexp.Regexp) bool {
 }
 
 func (s *Service) PostAlerts(c *gin.Context, req *oas.PostAlertsRequest) error {
-	alerts := OpenAPIAlertsToAlerts(req.Body)
+	alerts := OpenAPIAlertsToAlerts(req.PostableAlerts)
 	now := time.Now()
 
 	resolveTimeout := s.Coordinator.ResolveTimeout()
@@ -310,23 +310,63 @@ func removeEmptyLabels(ls label.LabelSet) {
 	}
 }
 
-func (s *Service) DeleteSilence(context *gin.Context, request *oas.DeleteSilenceRequest) error {
-	//TODO implement me
-	panic("implement me")
+func (s *Service) DeleteSilence(c *gin.Context, req *oas.DeleteSilenceRequest) error {
+	if err := s.Silences.Expire(req.UriParams.SilenceID.String()); err != nil {
+		if errors.Is(err, silence.ErrNotFound) {
+			c.Status(http.StatusNotFound)
+			return nil
+		}
+		return err
+	}
+	return nil
 }
 
-func (s *Service) GetSilence(context *gin.Context, request *oas.GetSilenceRequest) (*oas.GettableSilence, error) {
-	//TODO implement me
-	panic("implement me")
+func (s *Service) GetSilence(c *gin.Context, req *oas.GetSilenceRequest) (*oas.GettableSilence, error) {
+	sils, _, err := s.Silences.Query(silence.QIDs(req.UriParams.SilenceID.String()))
+	if err != nil {
+		return nil, err
+	}
+	if len(sils) == 0 {
+		c.Status(http.StatusNotFound)
+		return nil, nil
+	}
+	sil, err := GettableSilenceFromProto(sils[0])
+	if err != nil {
+		return nil, err
+	}
+	return sil, nil
 }
 
-func (s *Service) GetSilences(context *gin.Context, request *oas.GetSilencesRequest) (oas.GettableSilences, error) {
-	//TODO implement me
-	panic("implement me")
+func (s *Service) GetSilences(c *gin.Context, req *oas.GetSilencesRequest) (vals oas.GettableSilences, err error) {
+	var matchers []*label.Matcher
+	for _, matcherStr := range req.Filter {
+		matcher, err := label.ParseMatcher(matcherStr)
+		if err != nil {
+			return nil, err
+		}
+		matchers = append(matchers, matcher)
+	}
+	psils, _, err := s.Silences.Query()
+	if err != nil {
+		return nil, err
+	}
+	vals = make([]*oas.GettableSilence, 0, len(psils))
+	for _, sil := range psils {
+		if !CheckSilenceMatchesFilterLabels(sil, matchers) {
+			continue
+		}
+		val, err := GettableSilenceFromProto(sil)
+		if err != nil {
+			return nil, err
+		}
+		vals = append(vals, val)
+	}
+	SortSilences(vals)
+	return
 }
 
 func (s *Service) PostSilences(c *gin.Context, req *oas.PostSilencesRequest) (res *oas.PostSilencesResponse, err error) {
-	sil, err := PostableSilenceToProto(&req.Body)
+	sil, err := PostableSilenceToProto(&req.PostableSilence)
 	if err != nil {
 		return nil, err
 	}
@@ -449,4 +489,118 @@ func PostableSilenceToProto(s *oas.PostableSilence) (*silencepb.Silence, error) 
 		sil.Matchers = append(sil.Matchers, matcher)
 	}
 	return sil, nil
+}
+
+// GettableSilenceFromProto converts *silencepb.Silence to open_api_models.GettableSilence.
+func GettableSilenceFromProto(s *silencepb.Silence) (*oas.GettableSilence, error) {
+	start := s.StartsAt.AsTime()
+	end := s.EndsAt.AsTime()
+	updated := s.UpdatedAt.AsTime()
+	state := string(alert.CalcSilenceState(start, end))
+	sil := &oas.GettableSilence{
+		Silence: &oas.Silence{
+			StartsAt:  start,
+			EndsAt:    end,
+			Comment:   s.Comment,
+			CreatedBy: s.CreatedBy,
+		},
+		ID:        s.Id,
+		UpdatedAt: updated,
+		Status: oas.SilenceStatus{
+			State: state,
+		},
+	}
+
+	for _, m := range s.Matchers {
+		matcher := &oas.Matcher{
+			Name:  m.Name,
+			Value: m.Pattern,
+		}
+		switch m.Type {
+		case silencepb.Matcher_EQUAL:
+			matcher.IsEqual = true
+			matcher.IsRegex = false
+		case silencepb.Matcher_NOT_EQUAL:
+			matcher.IsEqual = false
+			matcher.IsRegex = true
+		case silencepb.Matcher_REGEXP:
+			matcher.IsEqual = true
+			matcher.IsRegex = true
+		case silencepb.Matcher_NOT_REGEXP:
+			matcher.IsEqual = false
+			matcher.IsRegex = true
+		default:
+			return sil, fmt.Errorf(
+				"unknown matcher type for matcher '%v' in silence '%v'",
+				m.Name,
+				s.Id,
+			)
+		}
+		sil.Matchers = append(sil.Matchers, matcher)
+	}
+
+	return sil, nil
+}
+
+// CheckSilenceMatchesFilterLabels returns true if
+// a given silence matches a list of matchers.
+// A silence matches a filter (list of matchers) if
+// for all matchers in the filter, there exists a matcher in the silence
+// such that their names, types, and values are equivalent.
+func CheckSilenceMatchesFilterLabels(s *silencepb.Silence, matchers []*label.Matcher) bool {
+	for _, matcher := range matchers {
+		found := false
+		for _, m := range s.Matchers {
+			if matcher.Name == m.Name &&
+				(matcher.Type == label.MatchEqual && m.Type == silencepb.Matcher_EQUAL ||
+					matcher.Type == label.MatchRegexp && m.Type == silencepb.Matcher_REGEXP ||
+					matcher.Type == label.MatchNotEqual && m.Type == silencepb.Matcher_NOT_EQUAL ||
+					matcher.Type == label.MatchNotRegexp && m.Type == silencepb.Matcher_NOT_REGEXP) &&
+				matcher.Value == m.Pattern {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+
+	return true
+}
+
+var silenceStateOrder = map[alert.SilenceState]int{
+	alert.SilenceStateActive:  1,
+	alert.SilenceStatePending: 2,
+	alert.SilenceStateExpired: 3,
+}
+
+// SortSilences sorts first according to the state "active, pending, expired"
+// then by end time or start time depending on the state.
+// active silences should show the next to expire first
+// pending silences are ordered based on which one starts next
+// expired are ordered based on which one expired most recently
+func SortSilences(sils oas.GettableSilences) {
+	sort.Slice(sils, func(i, j int) bool {
+		state1 := alert.SilenceState(sils[i].Status.State)
+		state2 := alert.SilenceState(sils[j].Status.State)
+		if state1 != state2 {
+			return silenceStateOrder[state1] < silenceStateOrder[state2]
+		}
+		switch state1 {
+		case alert.SilenceStateActive:
+			endsAt1 := sils[i].Silence.EndsAt
+			endsAt2 := sils[j].Silence.EndsAt
+			return endsAt1.Before(endsAt2)
+		case alert.SilenceStatePending:
+			startsAt1 := sils[i].Silence.StartsAt
+			startsAt2 := sils[j].Silence.StartsAt
+			return startsAt1.Before(startsAt2)
+		case alert.SilenceStateExpired:
+			endsAt1 := sils[i].Silence.EndsAt
+			endsAt2 := sils[j].Silence.EndsAt
+			return endsAt1.After(endsAt2)
+		}
+		return false
+	})
 }

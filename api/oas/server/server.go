@@ -95,7 +95,7 @@ func wrapGetSilence(si oas.SilenceServer) func(c *gin.Context) {
 func wrapGetSilences(si oas.SilenceServer) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req oas.GetSilencesRequest
-		if err := c.ShouldBind(&req.Body); err != nil {
+		if err := c.ShouldBind(&req.Filter); err != nil {
 			handler.AbortWithError(c, http.StatusBadRequest, err)
 			return
 		}
@@ -111,7 +111,7 @@ func wrapGetSilences(si oas.SilenceServer) func(c *gin.Context) {
 func wrapPostSilences(si oas.SilenceServer) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req oas.PostSilencesRequest
-		if err := c.ShouldBind(&req.Body); err != nil {
+		if err := c.ShouldBind(&req.PostableSilence); err != nil {
 			handler.AbortWithError(c, http.StatusBadRequest, err)
 			return
 		}
@@ -147,7 +147,7 @@ func wrapGetAlerts(si oas.AlertServer) func(c *gin.Context) {
 func wrapPostAlerts(si oas.AlertServer) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req oas.PostAlertsRequest
-		if err := c.ShouldBind(&req.Body); err != nil {
+		if err := c.ShouldBind(&req.PostableAlerts); err != nil {
 			handler.AbortWithError(c, http.StatusBadRequest, err)
 			return
 		}

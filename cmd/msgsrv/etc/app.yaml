@@ -1,4 +1,4 @@
-appName: alertmanager
+appName: msgcenter
 version: 0.0.1
 development: true
 log:
@@ -70,3 +70,7 @@ alertManager:
     gcInterval: 30m
   template:
     path: ../../test/testdata/tpl # path for custom template
+
+prometheus:
+  server:
+    addr: 127.0.0.1:9093

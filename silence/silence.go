@@ -11,6 +11,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/log"
+	"github.com/woocoos/msgcenter/metrics"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"go.uber.org/zap"
@@ -179,7 +180,7 @@ type Silences struct {
 
 	clock clock.Clock
 
-	metrics *metrics
+	metrics *metrics.SilencesMetrics
 
 	mtx       sync.RWMutex
 	st        state
@@ -193,104 +194,6 @@ type Silences struct {
 // MaintenanceFunc represents the function to run as part of the periodic maintenance for silences.
 // It returns the size of the snapshot taken or an error if it failed.
 type MaintenanceFunc func() (int64, error)
-
-type metrics struct {
-	gcDuration              prometheus.Summary
-	snapshotDuration        prometheus.Summary
-	snapshotSize            prometheus.Gauge
-	queriesTotal            prometheus.Counter
-	queryErrorsTotal        prometheus.Counter
-	queryDuration           prometheus.Histogram
-	silencesActive          prometheus.GaugeFunc
-	silencesPending         prometheus.GaugeFunc
-	silencesExpired         prometheus.GaugeFunc
-	propagatedMessagesTotal prometheus.Counter
-	maintenanceTotal        prometheus.Counter
-	maintenanceErrorsTotal  prometheus.Counter
-}
-
-func newSilenceMetricByState(s *Silences, st alert.SilenceState) prometheus.GaugeFunc {
-	return prometheus.NewGaugeFunc(
-		prometheus.GaugeOpts{
-			Name:        "alertmanager_silences",
-			Help:        "How many silences by state.",
-			ConstLabels: prometheus.Labels{"state": string(st)},
-		},
-		func() float64 {
-			count, err := s.CountState(st)
-			if err != nil {
-				logger.Error("Counting silences failed", zap.Error(err))
-			}
-			return float64(count)
-		},
-	)
-}
-
-func newMetrics(r prometheus.Registerer, s *Silences) *metrics {
-	m := &metrics{}
-
-	m.gcDuration = prometheus.NewSummary(prometheus.SummaryOpts{
-		Name:       "alertmanager_silences_gc_duration_seconds",
-		Help:       "Duration of the last silence garbage collection cycle.",
-		Objectives: map[float64]float64{},
-	})
-	m.snapshotDuration = prometheus.NewSummary(prometheus.SummaryOpts{
-		Name:       "alertmanager_silences_snapshot_duration_seconds",
-		Help:       "Duration of the last silence snapshot.",
-		Objectives: map[float64]float64{},
-	})
-	m.snapshotSize = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "alertmanager_silences_snapshot_size_bytes",
-		Help: "Size of the last silence snapshot in bytes.",
-	})
-	m.maintenanceTotal = prometheus.NewCounter(prometheus.CounterOpts{
-		Name: "alertmanager_silences_maintenance_total",
-		Help: "How many maintenances were executed for silences.",
-	})
-	m.maintenanceErrorsTotal = prometheus.NewCounter(prometheus.CounterOpts{
-		Name: "alertmanager_silences_maintenance_errors_total",
-		Help: "How many maintenances were executed for silences that failed.",
-	})
-	m.queriesTotal = prometheus.NewCounter(prometheus.CounterOpts{
-		Name: "alertmanager_silences_queries_total",
-		Help: "How many silence queries were received.",
-	})
-	m.queryErrorsTotal = prometheus.NewCounter(prometheus.CounterOpts{
-		Name: "alertmanager_silences_query_errors_total",
-		Help: "How many silence received queries did not succeed.",
-	})
-	m.queryDuration = prometheus.NewHistogram(prometheus.HistogramOpts{
-		Name: "alertmanager_silences_query_duration_seconds",
-		Help: "Duration of silence query evaluation.",
-	})
-	m.propagatedMessagesTotal = prometheus.NewCounter(prometheus.CounterOpts{
-		Name: "alertmanager_silences_gossip_messages_propagated_total",
-		Help: "Number of received gossip messages that have been further gossiped.",
-	})
-	if s != nil {
-		m.silencesActive = newSilenceMetricByState(s, alert.SilenceStateActive)
-		m.silencesPending = newSilenceMetricByState(s, alert.SilenceStatePending)
-		m.silencesExpired = newSilenceMetricByState(s, alert.SilenceStateExpired)
-	}
-
-	if r != nil {
-		r.MustRegister(
-			m.gcDuration,
-			m.snapshotDuration,
-			m.snapshotSize,
-			m.queriesTotal,
-			m.queryErrorsTotal,
-			m.queryDuration,
-			m.silencesActive,
-			m.silencesPending,
-			m.silencesExpired,
-			m.propagatedMessagesTotal,
-			m.maintenanceTotal,
-			m.maintenanceErrorsTotal,
-		)
-	}
-	return m
-}
 
 // Options exposes configuration options for creating a new Silences object.
 // Its zero value is a safe default.
@@ -347,7 +250,13 @@ func New(o Options) (*Silences, error) {
 		st:        state{},
 		stopc:     make(chan struct{}),
 	}
-	s.metrics = newMetrics(o.Metrics, s)
+	s.metrics = metrics.NewSilencesMetrics(o.Metrics, func(state string) float64 {
+		count, err := s.CountState(alert.SilenceState(state))
+		if err != nil {
+			logger.Error("Counting silences failed", zap.Error(err))
+		}
+		return float64(count)
+	})
 
 	if o.Logger == nil {
 		s.Logger = log.Global()
@@ -404,13 +313,13 @@ func (s *Silences) Start(ctx context.Context) error {
 	defer t.Stop()
 
 	runMaintenance := func(do MaintenanceFunc) error {
-		s.metrics.maintenanceTotal.Inc()
+		s.metrics.MaintenanceTotal.Inc()
 		logger.Debug("Running maintenance")
 		start := s.nowUTC()
 		size, err := do()
-		s.metrics.snapshotSize.Set(float64(size))
+		s.metrics.SnapshotSize.Set(float64(size))
 		if err != nil {
-			s.metrics.maintenanceErrorsTotal.Inc()
+			s.metrics.MaintenanceErrorsTotal.Inc()
 			return err
 		}
 		logger.Debug("Maintenance done", zap.Duration("duration", s.clock.Since(start)), zap.Int64("size", size))
@@ -448,7 +357,7 @@ func (s *Silences) Stop(ctx context.Context) error {
 // than the configured retention time ago.
 func (s *Silences) GC() (int, error) {
 	start := time.Now()
-	defer func() { s.metrics.gcDuration.Observe(time.Since(start).Seconds()) }()
+	defer func() { s.metrics.GcDuration.Observe(time.Since(start).Seconds()) }()
 
 	now := s.nowUTC()
 	var n int
@@ -746,19 +655,19 @@ func (s *Silences) QueryOne(params ...QueryParam) (*pb.Silence, error) {
 // Query for silences based on the given query parameters. It returns the
 // resulting silences and the state version the result is based on.
 func (s *Silences) Query(params ...QueryParam) ([]*pb.Silence, int, error) {
-	s.metrics.queriesTotal.Inc()
-	defer prometheus.NewTimer(s.metrics.queryDuration).ObserveDuration()
+	s.metrics.QueriesTotal.Inc()
+	defer prometheus.NewTimer(s.metrics.QueryDuration).ObserveDuration()
 
 	q := &query{}
 	for _, p := range params {
 		if err := p(q); err != nil {
-			s.metrics.queryErrorsTotal.Inc()
+			s.metrics.QueryErrorsTotal.Inc()
 			return nil, s.Version(), err
 		}
 	}
 	sils, version, err := s.query(q, s.nowUTC())
 	if err != nil {
-		s.metrics.queryErrorsTotal.Inc()
+		s.metrics.QueryErrorsTotal.Inc()
 	}
 	return sils, version, err
 }
@@ -843,7 +752,7 @@ func (s *Silences) loadSnapshot(r io.Reader) error {
 // written.
 func (s *Silences) Snapshot(w io.Writer) (int64, error) {
 	start := time.Now()
-	defer func() { s.metrics.snapshotDuration.Observe(time.Since(start).Seconds()) }()
+	defer func() { s.metrics.SnapshotDuration.Observe(time.Since(start).Seconds()) }()
 
 	s.mtx.RLock()
 	defer s.mtx.RUnlock()
