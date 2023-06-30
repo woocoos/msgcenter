@@ -36,6 +36,14 @@ func (ms *MsgSubscriber) MsgType(ctx context.Context) (*MsgType, error) {
 	return result, err
 }
 
+func (ms *MsgSubscriber) User(ctx context.Context) (*User, error) {
+	result, err := ms.Edges.UserOrErr()
+	if IsNotLoaded(err) {
+		result, err = ms.QueryUser().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (mt *MsgTemplate) Event(ctx context.Context) (*MsgEvent, error) {
 	result, err := mt.Edges.EventOrErr()
 	if IsNotLoaded(err) {

@@ -8,13 +8,60 @@ import (
 	"context"
 
 	"entgo.io/contrib/entgql"
+	"github.com/woocoos/entco/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
+
+// SubscriberUsers is the resolver for the subscriberUsers field.
+func (r *msgTypeResolver) SubscriberUsers(ctx context.Context, obj *ent.MsgType) ([]*ent.MsgSubscriber, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.Client.MsgSubscriber.Query().Where(
+		msgsubscriber.MsgTypeID(obj.ID),
+		msgsubscriber.TenantID(tid),
+		msgsubscriber.Exclude(false),
+		msgsubscriber.UserIDNotNil(),
+		msgsubscriber.OrgRoleIDIsNil(),
+	).All(ctx)
+}
+
+// SubscriberRoles is the resolver for the subscriberRoles field.
+func (r *msgTypeResolver) SubscriberRoles(ctx context.Context, obj *ent.MsgType) ([]*ent.MsgSubscriber, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.Client.MsgSubscriber.Query().Where(
+		msgsubscriber.MsgTypeID(obj.ID),
+		msgsubscriber.TenantID(tid),
+		msgsubscriber.Exclude(false),
+		msgsubscriber.UserIDIsNil(),
+		msgsubscriber.OrgRoleIDNotNil(),
+	).All(ctx)
+}
+
+// ExcludeSubscriberUsers is the resolver for the excludeSubscriberUsers field.
+func (r *msgTypeResolver) ExcludeSubscriberUsers(ctx context.Context, obj *ent.MsgType) ([]*ent.MsgSubscriber, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.Client.MsgSubscriber.Query().Where(
+		msgsubscriber.MsgTypeID(obj.ID),
+		msgsubscriber.TenantID(tid),
+		msgsubscriber.Exclude(true),
+		msgsubscriber.UserIDNotNil(),
+		msgsubscriber.OrgRoleIDIsNil(),
+	).All(ctx)
+}
 
 // MsgChannels is the resolver for the msgChannels field.
 func (r *queryResolver) MsgChannels(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgChannelOrder, where *ent.MsgChannelWhereInput) (*ent.MsgChannelConnection, error) {
@@ -27,10 +74,13 @@ func (r *queryResolver) MsgTypes(ctx context.Context, after *entgql.Cursor[int],
 }
 
 // MsgTypeCategories is the resolver for the msgTypeCategories field.
-func (r *queryResolver) MsgTypeCategories(ctx context.Context, keyword *string) ([]string, error) {
+func (r *queryResolver) MsgTypeCategories(ctx context.Context, keyword *string, appID *int) ([]string, error) {
 	where := make([]predicate.MsgType, 0)
 	if keyword != nil {
 		where = append(where, msgtype.CategoryContains(*keyword))
+	}
+	if appID != nil {
+		where = append(where, msgtype.AppID(*appID))
 	}
 	return r.Client.MsgType.Query().Where(where...).Select(msgtype.FieldCategory).GroupBy(msgtype.FieldCategory).Strings(ctx)
 }
@@ -43,6 +93,11 @@ func (r *queryResolver) MsgEvents(ctx context.Context, after *entgql.Cursor[int]
 // MsgTemplates is the resolver for the msgTemplates field.
 func (r *queryResolver) MsgTemplates(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) (*ent.MsgTemplateConnection, error) {
 	return r.Client.MsgTemplate.Query().Paginate(ctx, after, first, before, last, ent.WithMsgTemplateOrder(orderBy), ent.WithMsgTemplateFilter(where.Filter))
+}
+
+// MsgConfig is the resolver for the msgConfig field.
+func (r *queryResolver) MsgConfig(ctx context.Context) (string, error) {
+	return r.Coordinator.ProfileString(), nil
 }
 
 // Matchers is the resolver for the matchers field.

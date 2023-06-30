@@ -163,18 +163,15 @@ func (c *MsgEventUpdateOne) SetInput(i UpdateMsgEventInput) *MsgEventUpdateOne {
 // CreateMsgSubscriberInput represents a mutation input for creating msgsubscribers.
 type CreateMsgSubscriberInput struct {
 	TenantID  int
-	UserID    *int
 	OrgRoleID *int
 	Exclude   *bool
 	MsgTypeID int
+	UserID    *int
 }
 
 // Mutate applies the CreateMsgSubscriberInput on the MsgSubscriberMutation builder.
 func (i *CreateMsgSubscriberInput) Mutate(m *MsgSubscriberMutation) {
 	m.SetTenantID(i.TenantID)
-	if v := i.UserID; v != nil {
-		m.SetUserID(*v)
-	}
 	if v := i.OrgRoleID; v != nil {
 		m.SetOrgRoleID(*v)
 	}
@@ -182,6 +179,9 @@ func (i *CreateMsgSubscriberInput) Mutate(m *MsgSubscriberMutation) {
 		m.SetExclude(*v)
 	}
 	m.SetMsgTypeID(i.MsgTypeID)
+	if v := i.UserID; v != nil {
+		m.SetUserID(*v)
+	}
 }
 
 // SetInput applies the change-set in the CreateMsgSubscriberInput on the MsgSubscriberCreate builder.
@@ -193,25 +193,19 @@ func (c *MsgSubscriberCreate) SetInput(i CreateMsgSubscriberInput) *MsgSubscribe
 // UpdateMsgSubscriberInput represents a mutation input for updating msgsubscribers.
 type UpdateMsgSubscriberInput struct {
 	TenantID       *int
-	ClearUserID    bool
-	UserID         *int
 	ClearOrgRoleID bool
 	OrgRoleID      *int
 	ClearExclude   bool
 	Exclude        *bool
 	MsgTypeID      *int
+	ClearUser      bool
+	UserID         *int
 }
 
 // Mutate applies the UpdateMsgSubscriberInput on the MsgSubscriberMutation builder.
 func (i *UpdateMsgSubscriberInput) Mutate(m *MsgSubscriberMutation) {
 	if v := i.TenantID; v != nil {
 		m.SetTenantID(*v)
-	}
-	if i.ClearUserID {
-		m.ClearUserID()
-	}
-	if v := i.UserID; v != nil {
-		m.SetUserID(*v)
 	}
 	if i.ClearOrgRoleID {
 		m.ClearOrgRoleID()
@@ -227,6 +221,12 @@ func (i *UpdateMsgSubscriberInput) Mutate(m *MsgSubscriberMutation) {
 	}
 	if v := i.MsgTypeID; v != nil {
 		m.SetMsgTypeID(*v)
+	}
+	if i.ClearUser {
+		m.ClearUser()
+	}
+	if v := i.UserID; v != nil {
+		m.SetUserID(*v)
 	}
 }
 

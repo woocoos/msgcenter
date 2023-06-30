@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/user"
 )
 
 // MsgSubscriberCreate is the builder for creating a MsgSubscriber entity.
@@ -134,6 +135,11 @@ func (msc *MsgSubscriberCreate) SetID(i int) *MsgSubscriberCreate {
 // SetMsgType sets the "msg_type" edge to the MsgType entity.
 func (msc *MsgSubscriberCreate) SetMsgType(m *MsgType) *MsgSubscriberCreate {
 	return msc.SetMsgTypeID(m.ID)
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (msc *MsgSubscriberCreate) SetUser(u *User) *MsgSubscriberCreate {
+	return msc.SetUserID(u.ID)
 }
 
 // Mutation returns the MsgSubscriberMutation object of the builder.
@@ -258,10 +264,6 @@ func (msc *MsgSubscriberCreate) createSpec() (*MsgSubscriber, *sqlgraph.CreateSp
 		_spec.SetField(msgsubscriber.FieldTenantID, field.TypeInt, value)
 		_node.TenantID = value
 	}
-	if value, ok := msc.mutation.UserID(); ok {
-		_spec.SetField(msgsubscriber.FieldUserID, field.TypeInt, value)
-		_node.UserID = value
-	}
 	if value, ok := msc.mutation.OrgRoleID(); ok {
 		_spec.SetField(msgsubscriber.FieldOrgRoleID, field.TypeInt, value)
 		_node.OrgRoleID = value
@@ -286,6 +288,24 @@ func (msc *MsgSubscriberCreate) createSpec() (*MsgSubscriber, *sqlgraph.CreateSp
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.MsgTypeID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := msc.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   msgsubscriber.UserTable,
+			Columns: []string{msgsubscriber.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = msc.schemaConfig.MsgSubscriber
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.UserID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -421,12 +441,6 @@ func (u *MsgSubscriberUpsert) SetUserID(v int) *MsgSubscriberUpsert {
 // UpdateUserID sets the "user_id" field to the value that was provided on create.
 func (u *MsgSubscriberUpsert) UpdateUserID() *MsgSubscriberUpsert {
 	u.SetExcluded(msgsubscriber.FieldUserID)
-	return u
-}
-
-// AddUserID adds v to the "user_id" field.
-func (u *MsgSubscriberUpsert) AddUserID(v int) *MsgSubscriberUpsert {
-	u.Add(msgsubscriber.FieldUserID, v)
 	return u
 }
 
@@ -620,13 +634,6 @@ func (u *MsgSubscriberUpsertOne) UpdateTenantID() *MsgSubscriberUpsertOne {
 func (u *MsgSubscriberUpsertOne) SetUserID(v int) *MsgSubscriberUpsertOne {
 	return u.Update(func(s *MsgSubscriberUpsert) {
 		s.SetUserID(v)
-	})
-}
-
-// AddUserID adds v to the "user_id" field.
-func (u *MsgSubscriberUpsertOne) AddUserID(v int) *MsgSubscriberUpsertOne {
-	return u.Update(func(s *MsgSubscriberUpsert) {
-		s.AddUserID(v)
 	})
 }
 
@@ -997,13 +1004,6 @@ func (u *MsgSubscriberUpsertBulk) UpdateTenantID() *MsgSubscriberUpsertBulk {
 func (u *MsgSubscriberUpsertBulk) SetUserID(v int) *MsgSubscriberUpsertBulk {
 	return u.Update(func(s *MsgSubscriberUpsert) {
 		s.SetUserID(v)
-	})
-}
-
-// AddUserID adds v to the "user_id" field.
-func (u *MsgSubscriberUpsertBulk) AddUserID(v int) *MsgSubscriberUpsertBulk {
-	return u.Update(func(s *MsgSubscriberUpsert) {
-		s.AddUserID(v)
 	})
 }
 

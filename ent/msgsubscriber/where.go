@@ -362,26 +362,6 @@ func UserIDNotIn(vs ...int) predicate.MsgSubscriber {
 	return predicate.MsgSubscriber(sql.FieldNotIn(FieldUserID, vs...))
 }
 
-// UserIDGT applies the GT predicate on the "user_id" field.
-func UserIDGT(v int) predicate.MsgSubscriber {
-	return predicate.MsgSubscriber(sql.FieldGT(FieldUserID, v))
-}
-
-// UserIDGTE applies the GTE predicate on the "user_id" field.
-func UserIDGTE(v int) predicate.MsgSubscriber {
-	return predicate.MsgSubscriber(sql.FieldGTE(FieldUserID, v))
-}
-
-// UserIDLT applies the LT predicate on the "user_id" field.
-func UserIDLT(v int) predicate.MsgSubscriber {
-	return predicate.MsgSubscriber(sql.FieldLT(FieldUserID, v))
-}
-
-// UserIDLTE applies the LTE predicate on the "user_id" field.
-func UserIDLTE(v int) predicate.MsgSubscriber {
-	return predicate.MsgSubscriber(sql.FieldLTE(FieldUserID, v))
-}
-
 // UserIDIsNil applies the IsNil predicate on the "user_id" field.
 func UserIDIsNil() predicate.MsgSubscriber {
 	return predicate.MsgSubscriber(sql.FieldIsNull(FieldUserID))
@@ -482,6 +462,35 @@ func HasMsgTypeWith(preds ...predicate.MsgType) predicate.MsgSubscriber {
 		step := newMsgTypeStep()
 		schemaConfig := internal.SchemaConfigFromContext(s.Context())
 		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgSubscriber
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasUser applies the HasEdge predicate on the "user" edge.
+func HasUser() predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, UserTable, UserColumn),
+		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.User
+		step.Edge.Schema = schemaConfig.MsgSubscriber
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
+func HasUserWith(preds ...predicate.User) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(func(s *sql.Selector) {
+		step := newUserStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.User
 		step.Edge.Schema = schemaConfig.MsgSubscriber
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

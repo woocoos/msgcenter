@@ -14,6 +14,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
+	"github.com/woocoos/msgcenter/ent/user"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
@@ -99,7 +100,6 @@ func (msu *MsgSubscriberUpdate) AddTenantID(i int) *MsgSubscriberUpdate {
 
 // SetUserID sets the "user_id" field.
 func (msu *MsgSubscriberUpdate) SetUserID(i int) *MsgSubscriberUpdate {
-	msu.mutation.ResetUserID()
 	msu.mutation.SetUserID(i)
 	return msu
 }
@@ -109,12 +109,6 @@ func (msu *MsgSubscriberUpdate) SetNillableUserID(i *int) *MsgSubscriberUpdate {
 	if i != nil {
 		msu.SetUserID(*i)
 	}
-	return msu
-}
-
-// AddUserID adds i to the "user_id" field.
-func (msu *MsgSubscriberUpdate) AddUserID(i int) *MsgSubscriberUpdate {
-	msu.mutation.AddUserID(i)
 	return msu
 }
 
@@ -176,6 +170,11 @@ func (msu *MsgSubscriberUpdate) SetMsgType(m *MsgType) *MsgSubscriberUpdate {
 	return msu.SetMsgTypeID(m.ID)
 }
 
+// SetUser sets the "user" edge to the User entity.
+func (msu *MsgSubscriberUpdate) SetUser(u *User) *MsgSubscriberUpdate {
+	return msu.SetUserID(u.ID)
+}
+
 // Mutation returns the MsgSubscriberMutation object of the builder.
 func (msu *MsgSubscriberUpdate) Mutation() *MsgSubscriberMutation {
 	return msu.mutation
@@ -184,6 +183,12 @@ func (msu *MsgSubscriberUpdate) Mutation() *MsgSubscriberMutation {
 // ClearMsgType clears the "msg_type" edge to the MsgType entity.
 func (msu *MsgSubscriberUpdate) ClearMsgType() *MsgSubscriberUpdate {
 	msu.mutation.ClearMsgType()
+	return msu
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (msu *MsgSubscriberUpdate) ClearUser() *MsgSubscriberUpdate {
+	msu.mutation.ClearUser()
 	return msu
 }
 
@@ -255,15 +260,6 @@ func (msu *MsgSubscriberUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if value, ok := msu.mutation.AddedTenantID(); ok {
 		_spec.AddField(msgsubscriber.FieldTenantID, field.TypeInt, value)
 	}
-	if value, ok := msu.mutation.UserID(); ok {
-		_spec.SetField(msgsubscriber.FieldUserID, field.TypeInt, value)
-	}
-	if value, ok := msu.mutation.AddedUserID(); ok {
-		_spec.AddField(msgsubscriber.FieldUserID, field.TypeInt, value)
-	}
-	if msu.mutation.UserIDCleared() {
-		_spec.ClearField(msgsubscriber.FieldUserID, field.TypeInt)
-	}
 	if value, ok := msu.mutation.OrgRoleID(); ok {
 		_spec.SetField(msgsubscriber.FieldOrgRoleID, field.TypeInt, value)
 	}
@@ -302,6 +298,37 @@ func (msu *MsgSubscriberUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = msu.schemaConfig.MsgSubscriber
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if msu.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   msgsubscriber.UserTable,
+			Columns: []string{msgsubscriber.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = msu.schemaConfig.MsgSubscriber
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := msu.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   msgsubscriber.UserTable,
+			Columns: []string{msgsubscriber.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		edge.Schema = msu.schemaConfig.MsgSubscriber
@@ -400,7 +427,6 @@ func (msuo *MsgSubscriberUpdateOne) AddTenantID(i int) *MsgSubscriberUpdateOne {
 
 // SetUserID sets the "user_id" field.
 func (msuo *MsgSubscriberUpdateOne) SetUserID(i int) *MsgSubscriberUpdateOne {
-	msuo.mutation.ResetUserID()
 	msuo.mutation.SetUserID(i)
 	return msuo
 }
@@ -410,12 +436,6 @@ func (msuo *MsgSubscriberUpdateOne) SetNillableUserID(i *int) *MsgSubscriberUpda
 	if i != nil {
 		msuo.SetUserID(*i)
 	}
-	return msuo
-}
-
-// AddUserID adds i to the "user_id" field.
-func (msuo *MsgSubscriberUpdateOne) AddUserID(i int) *MsgSubscriberUpdateOne {
-	msuo.mutation.AddUserID(i)
 	return msuo
 }
 
@@ -477,6 +497,11 @@ func (msuo *MsgSubscriberUpdateOne) SetMsgType(m *MsgType) *MsgSubscriberUpdateO
 	return msuo.SetMsgTypeID(m.ID)
 }
 
+// SetUser sets the "user" edge to the User entity.
+func (msuo *MsgSubscriberUpdateOne) SetUser(u *User) *MsgSubscriberUpdateOne {
+	return msuo.SetUserID(u.ID)
+}
+
 // Mutation returns the MsgSubscriberMutation object of the builder.
 func (msuo *MsgSubscriberUpdateOne) Mutation() *MsgSubscriberMutation {
 	return msuo.mutation
@@ -485,6 +510,12 @@ func (msuo *MsgSubscriberUpdateOne) Mutation() *MsgSubscriberMutation {
 // ClearMsgType clears the "msg_type" edge to the MsgType entity.
 func (msuo *MsgSubscriberUpdateOne) ClearMsgType() *MsgSubscriberUpdateOne {
 	msuo.mutation.ClearMsgType()
+	return msuo
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (msuo *MsgSubscriberUpdateOne) ClearUser() *MsgSubscriberUpdateOne {
+	msuo.mutation.ClearUser()
 	return msuo
 }
 
@@ -586,15 +617,6 @@ func (msuo *MsgSubscriberUpdateOne) sqlSave(ctx context.Context) (_node *MsgSubs
 	if value, ok := msuo.mutation.AddedTenantID(); ok {
 		_spec.AddField(msgsubscriber.FieldTenantID, field.TypeInt, value)
 	}
-	if value, ok := msuo.mutation.UserID(); ok {
-		_spec.SetField(msgsubscriber.FieldUserID, field.TypeInt, value)
-	}
-	if value, ok := msuo.mutation.AddedUserID(); ok {
-		_spec.AddField(msgsubscriber.FieldUserID, field.TypeInt, value)
-	}
-	if msuo.mutation.UserIDCleared() {
-		_spec.ClearField(msgsubscriber.FieldUserID, field.TypeInt)
-	}
 	if value, ok := msuo.mutation.OrgRoleID(); ok {
 		_spec.SetField(msgsubscriber.FieldOrgRoleID, field.TypeInt, value)
 	}
@@ -633,6 +655,37 @@ func (msuo *MsgSubscriberUpdateOne) sqlSave(ctx context.Context) (_node *MsgSubs
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = msuo.schemaConfig.MsgSubscriber
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if msuo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   msgsubscriber.UserTable,
+			Columns: []string{msgsubscriber.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = msuo.schemaConfig.MsgSubscriber
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := msuo.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   msgsubscriber.UserTable,
+			Columns: []string{msgsubscriber.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		edge.Schema = msuo.schemaConfig.MsgSubscriber

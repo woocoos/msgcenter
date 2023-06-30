@@ -65,9 +65,9 @@ var (
 		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "tenant_id", Type: field.TypeInt},
-		{Name: "user_id", Type: field.TypeInt, Nullable: true},
 		{Name: "org_role_id", Type: field.TypeInt, Nullable: true},
 		{Name: "exclude", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "user_id", Type: field.TypeInt, Nullable: true},
 		{Name: "msg_type_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
 	}
 	// MsgSubscriberTable holds the schema information for the "msg_subscriber" table.
@@ -76,6 +76,12 @@ var (
 		Columns:    MsgSubscriberColumns,
 		PrimaryKey: []*schema.Column{MsgSubscriberColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "msg_subscriber_user_user",
+				Columns:    []*schema.Column{MsgSubscriberColumns[8]},
+				RefColumns: []*schema.Column{UserColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
 			{
 				Symbol:     "msg_subscriber_msg_type_subscribers",
 				Columns:    []*schema.Column{MsgSubscriberColumns[9]},
@@ -191,7 +197,8 @@ func init() {
 	MsgEventTable.Annotation = &entsql.Annotation{
 		Table: "msg_event",
 	}
-	MsgSubscriberTable.ForeignKeys[0].RefTable = MsgTypeTable
+	MsgSubscriberTable.ForeignKeys[0].RefTable = UserTable
+	MsgSubscriberTable.ForeignKeys[1].RefTable = MsgTypeTable
 	MsgSubscriberTable.Annotation = &entsql.Annotation{
 		Table: "msg_subscriber",
 	}

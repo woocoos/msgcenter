@@ -17,6 +17,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/user"
 )
 
 // GlobalID returns the global identifier for the given MsgChannel node.
@@ -49,6 +50,12 @@ func (mt *MsgType) GlobalID(context.Context) (string, error) {
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
+// GlobalID returns the global identifier for the given User node.
+func (u *User) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("%s:%d", user.Table, u.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
 type ResolvedGlobal struct{ Type, ID string }
 
 func FromGlobalID(s string) (*ResolvedGlobal, error) {
@@ -75,6 +82,8 @@ func GlobalID(tp, id string) (string, error) {
 	case msgtemplate.Table:
 		break
 	case msgtype.Table:
+		break
+	case user.Table:
 		break
 	default:
 		return "", fmt.Errorf("invalid type %q", tp)

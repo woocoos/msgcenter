@@ -1041,10 +1041,6 @@ type MsgSubscriberWhereInput struct {
 	UserIDNEQ    *int  `json:"userIDNEQ,omitempty"`
 	UserIDIn     []int `json:"userIDIn,omitempty"`
 	UserIDNotIn  []int `json:"userIDNotIn,omitempty"`
-	UserIDGT     *int  `json:"userIDGT,omitempty"`
-	UserIDGTE    *int  `json:"userIDGTE,omitempty"`
-	UserIDLT     *int  `json:"userIDLT,omitempty"`
-	UserIDLTE    *int  `json:"userIDLTE,omitempty"`
 	UserIDIsNil  bool  `json:"userIDIsNil,omitempty"`
 	UserIDNotNil bool  `json:"userIDNotNil,omitempty"`
 
@@ -1321,18 +1317,6 @@ func (i *MsgSubscriberWhereInput) P() (predicate.MsgSubscriber, error) {
 	}
 	if len(i.UserIDNotIn) > 0 {
 		predicates = append(predicates, msgsubscriber.UserIDNotIn(i.UserIDNotIn...))
-	}
-	if i.UserIDGT != nil {
-		predicates = append(predicates, msgsubscriber.UserIDGT(*i.UserIDGT))
-	}
-	if i.UserIDGTE != nil {
-		predicates = append(predicates, msgsubscriber.UserIDGTE(*i.UserIDGTE))
-	}
-	if i.UserIDLT != nil {
-		predicates = append(predicates, msgsubscriber.UserIDLT(*i.UserIDLT))
-	}
-	if i.UserIDLTE != nil {
-		predicates = append(predicates, msgsubscriber.UserIDLTE(*i.UserIDLTE))
 	}
 	if i.UserIDIsNil {
 		predicates = append(predicates, msgsubscriber.UserIDIsNil())

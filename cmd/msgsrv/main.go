@@ -14,6 +14,7 @@ import (
 	"github.com/woocoos/entco/ecx"
 	"github.com/woocoos/entco/ecx/oteldriver"
 	"github.com/woocoos/entco/gqlx"
+	"github.com/woocoos/entco/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/api/oas/server"
@@ -123,6 +124,7 @@ func buildWebServer(cnf *conf.AppConfiguration, ws *server.Service, co *service.
 	webSrv := web.New(web.WithConfiguration(cnf.Sub("web")),
 		web.WithGracefulStop(),
 		web.RegisterMiddleware(gql.New()),
+		identity.RegistryTenantIDMiddleware(),
 		//web.RegisterMiddleware(otelweb.NewMiddleware()),
 	)
 	server.RegisterHandlers(webSrv.Router().FindGroup("/api/v2").Group, ws)

@@ -35,6 +35,10 @@ type Mutation {
     enableMsgTemplate(id: ID!): MsgTemplate!
     # 禁用消息模板
     disableMsgTemplate(id: ID!): MsgTemplate!
+    # 消息订阅
+    createMsgSubscriber(inputs: [CreateMsgSubscriberInput!]!): [MsgSubscriber!]!
+    # 删除订阅
+    deleteMsgSubscriber(ids: [ID!]!): Boolean!
 }
 
 input RouteInput  {
@@ -62,6 +66,8 @@ input ReceiverInput {
 }
 
 input EmailConfigInput {
+    to: String!
+    from: String
     smartHost: HostPort!
     authType: String!
     authUsername: String!

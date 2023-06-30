@@ -640,6 +640,25 @@ func (c *MsgSubscriberClient) QueryMsgType(ms *MsgSubscriber) *MsgTypeQuery {
 	return query
 }
 
+// QueryUser queries the user edge of a MsgSubscriber.
+func (c *MsgSubscriberClient) QueryUser(ms *MsgSubscriber) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ms.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msgsubscriber.Table, msgsubscriber.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, msgsubscriber.UserTable, msgsubscriber.UserColumn),
+		)
+		schemaConfig := ms.schemaConfig
+		step.To.Schema = schemaConfig.User
+		step.Edge.Schema = schemaConfig.MsgSubscriber
+		fromV = sqlgraph.Neighbors(ms.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *MsgSubscriberClient) Hooks() []Hook {
 	hooks := c.hooks.MsgSubscriber

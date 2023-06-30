@@ -9,12 +9,15 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/woocoos/entco/pkg/identity"
 	"github.com/woocoos/entco/schemax/typex"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
+	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
@@ -31,7 +34,18 @@ func (r *mutationResolver) UpdateMsgType(ctx context.Context, id int, input ent.
 
 // DeleteMsgType is the resolver for the deleteMsgType field.
 func (r *mutationResolver) DeleteMsgType(ctx context.Context, id int) (bool, error) {
-	err := ent.FromContext(ctx).MsgType.DeleteOneID(id).Exec(ctx)
+	client := ent.FromContext(ctx)
+	if has, err := client.MsgType.Query().Where(msgtype.HasEvents()).Exist(ctx); err != nil {
+		return false, err
+	} else if has {
+		return false, fmt.Errorf("cannot be deleted. msgtype is associated with msgevent")
+	}
+	if has, err := client.MsgType.Query().Where(msgtype.HasSubscribers()).Exist(ctx); err != nil {
+		return false, err
+	} else if has {
+		return false, fmt.Errorf("cannot be deleted, msgtype is subscribed")
+	}
+	err := client.MsgType.DeleteOneID(id).Exec(ctx)
 	return err == nil, err
 }
 
@@ -58,17 +72,25 @@ func (r *mutationResolver) DeleteMsgEvent(ctx context.Context, id int) (bool, er
 	} else if has {
 		return false, fmt.Errorf("the active status cannot be deleted")
 	}
+	if has, err := client.MsgEvent.Query().Where(msgevent.HasCustomerTemplate()).Exist(ctx); err != nil {
+		return false, err
+	} else if has {
+		return false, fmt.Errorf("cannot be deleted. msgevent is associated with msgtemplate")
+	}
 	err := ent.FromContext(ctx).MsgEvent.DeleteOneID(id).Exec(ctx)
 	return err == nil, err
 }
 
 // EnableMsgEvent is the resolver for the enableMsgEvent field.
 func (r *mutationResolver) EnableMsgEvent(ctx context.Context, id int) (*ent.MsgEvent, error) {
-	event, err := ent.FromContext(ctx).MsgEvent.Get(ctx, id)
+	event, err := ent.FromContext(ctx).MsgEvent.Query().Where(msgevent.ID(id)).WithMsgType().Only(ctx)
 	if err != nil {
 		return nil, err
 	}
-	event.Route.Name = event.Name
+	if event.Route == nil {
+		return nil, fmt.Errorf("route cannot nil")
+	}
+	event.Route.Name = profile.AppRouteName(strconv.Itoa(event.Edges.MsgType.AppID), event.Name)
 	if err = r.Coordinator.AddNamedRoute([]*profile.Route{event.Route}); err != nil {
 		return nil, err
 	}
@@ -77,11 +99,11 @@ func (r *mutationResolver) EnableMsgEvent(ctx context.Context, id int) (*ent.Msg
 
 // DisableMsgEvent is the resolver for the disableMsgEvent field.
 func (r *mutationResolver) DisableMsgEvent(ctx context.Context, id int) (*ent.MsgEvent, error) {
-	event, err := ent.FromContext(ctx).MsgEvent.Get(ctx, id)
+	event, err := ent.FromContext(ctx).MsgEvent.Query().Where(msgevent.ID(id)).WithMsgType().Only(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if err = r.Coordinator.RemoveNamedRoute([]string{event.Name}); err != nil {
+	if err = r.Coordinator.RemoveNamedRoute([]string{profile.AppRouteName(strconv.Itoa(event.Edges.MsgType.AppID), event.Name)}); err != nil {
 		return nil, err
 	}
 	return event.Update().SetStatus(typex.SimpleStatusInactive).Save(ctx)
@@ -114,6 +136,9 @@ func (r *mutationResolver) EnableMsgChannel(ctx context.Context, id int) (*ent.M
 	channel, err := ent.FromContext(ctx).MsgChannel.Get(ctx, id)
 	if err != nil {
 		return nil, err
+	}
+	if channel.Receiver == nil {
+		return nil, fmt.Errorf("receiver cannot nil")
 	}
 	channel.Receiver.Name = profile.TenantReceiverName(strconv.Itoa(channel.TenantID), channel.Name)
 	if err = r.Coordinator.AddTenantReceiver([]*profile.Receiver{channel.Receiver}); err != nil {
@@ -174,6 +199,63 @@ func (r *mutationResolver) DisableMsgTemplate(ctx context.Context, id int) (*ent
 	}
 	// TODO 禁用模板时需移除模板
 	return temp.Update().SetStatus(typex.SimpleStatusInactive).Save(ctx)
+}
+
+// CreateMsgSubscriber is the resolver for the createMsgSubscriber field.
+func (r *mutationResolver) CreateMsgSubscriber(ctx context.Context, inputs []*ent.CreateMsgSubscriberInput) ([]*ent.MsgSubscriber, error) {
+	client := ent.FromContext(ctx)
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	mss := make([]*ent.MsgSubscriberCreate, 0)
+	for _, v := range inputs {
+		if v.TenantID != tid {
+			return nil, fmt.Errorf("invalid tenantID")
+		}
+		if v.Exclude != nil && *v.Exclude && v.OrgRoleID != nil {
+			return nil, fmt.Errorf("orgRole cannot exclude")
+		}
+		if (v.UserID == nil && v.OrgRoleID == nil) || (v.UserID != nil && v.OrgRoleID != nil) {
+			return nil, fmt.Errorf("only one of userID and orgRoleID")
+		}
+		// 检查是否已订阅
+		exclude := false
+		if v.Exclude != nil {
+			exclude = *v.Exclude
+		}
+		uid := 0
+		if v.UserID != nil {
+			uid = *v.UserID
+		}
+		orid := 0
+		if v.OrgRoleID != nil {
+			orid = *v.OrgRoleID
+		}
+		has, err := client.MsgSubscriber.Query().Where(
+			msgsubscriber.TenantID(v.TenantID),
+			msgsubscriber.MsgTypeID(v.MsgTypeID),
+			msgsubscriber.ExcludeEQ(exclude),
+			msgsubscriber.Or(msgsubscriber.UserIDEQ(uid), msgsubscriber.OrgRoleIDEQ(orid))).Exist(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if has {
+			return nil, fmt.Errorf("subscription has existed")
+		}
+		mss = append(mss, client.MsgSubscriber.Create().SetInput(*v))
+	}
+	return client.MsgSubscriber.CreateBulk(mss...).Save(ctx)
+}
+
+// DeleteMsgSubscriber is the resolver for the deleteMsgSubscriber field.
+func (r *mutationResolver) DeleteMsgSubscriber(ctx context.Context, ids []int) (bool, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	_, err = ent.FromContext(ctx).MsgSubscriber.Delete().Where(msgsubscriber.IDIn(ids...), msgsubscriber.TenantID(tid)).Exec(ctx)
+	return err == nil, err
 }
 
 // Matchers is the resolver for the matchers field.

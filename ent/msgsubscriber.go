@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/user"
 )
 
 // MsgSubscriber is the model entity for the MsgSubscriber schema.
@@ -46,11 +47,13 @@ type MsgSubscriber struct {
 type MsgSubscriberEdges struct {
 	// MsgType holds the value of the msg_type edge.
 	MsgType *MsgType `json:"msg_type,omitempty"`
+	// User holds the value of the user edge.
+	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [2]map[string]int
 }
 
 // MsgTypeOrErr returns the MsgType value or an error if the edge
@@ -64,6 +67,19 @@ func (e MsgSubscriberEdges) MsgTypeOrErr() (*MsgType, error) {
 		return e.MsgType, nil
 	}
 	return nil, &NotLoadedError{edge: "msg_type"}
+}
+
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MsgSubscriberEdges) UserOrErr() (*User, error) {
+	if e.loadedTypes[1] {
+		if e.User == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
+		return e.User, nil
+	}
+	return nil, &NotLoadedError{edge: "user"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -168,6 +184,11 @@ func (ms *MsgSubscriber) Value(name string) (ent.Value, error) {
 // QueryMsgType queries the "msg_type" edge of the MsgSubscriber entity.
 func (ms *MsgSubscriber) QueryMsgType() *MsgTypeQuery {
 	return NewMsgSubscriberClient(ms.config).QueryMsgType(ms)
+}
+
+// QueryUser queries the "user" edge of the MsgSubscriber entity.
+func (ms *MsgSubscriber) QueryUser() *UserQuery {
+	return NewMsgSubscriberClient(ms.config).QueryUser(ms)
 }
 
 // Update returns a builder for updating this MsgSubscriber.

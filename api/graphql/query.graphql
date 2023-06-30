@@ -35,6 +35,8 @@ type Receiver {
 }
 
 type EmailConfig {
+    to: String!
+    from: String
     smartHost: HostPort!
     authType: String!
     authUsername: String!
@@ -42,6 +44,15 @@ type EmailConfig {
     authSecret: String!
     authIdentity: String!
     headers: MapString
+}
+
+extend type MsgType {
+    # 订阅的用户
+    subscriberUsers:[MsgSubscriber!]!
+    # 订阅的用户组
+    subscriberRoles:[MsgSubscriber!]!
+    # 排除的用户
+    excludeSubscriberUsers:[MsgSubscriber!]!
 }
 
 extend type Query {
@@ -66,7 +77,7 @@ extend type Query {
     ): MsgTypeConnection!
 
     # 消息类型分类
-    msgTypeCategories(keyword:String): [String!]!
+    msgTypeCategories(keyword:String,appID:ID): [String!]!
 
     # 消息事件列表
     msgEvents(
@@ -87,4 +98,7 @@ extend type Query {
         orderBy: MsgTemplateOrder
         where: MsgTemplateWhereInput
     ): MsgTemplateConnection!
+
+    # 消息配置
+    msgConfig:String!
 }

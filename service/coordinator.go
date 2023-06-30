@@ -191,12 +191,13 @@ func (c *Coordinator) loadFromDB() error {
 		receivers[i] = cn.Receiver
 	}
 	// load routes
-	evs, err := c.db.MsgEvent.Query().Where(msgevent.StatusEQ(typex.SimpleStatusActive)).All(context.Background())
+	evs, err := c.db.MsgEvent.Query().Where(msgevent.StatusEQ(typex.SimpleStatusActive)).WithMsgType().All(context.Background())
 	if err != nil {
 		return err
 	}
 	routes := make([]*profile.Route, len(evs))
 	for i, ev := range evs {
+		ev.Route.Name = profile.AppRouteName(strconv.Itoa(ev.Edges.MsgType.AppID), ev.Name)
 		routes[i] = ev.Route
 	}
 	if err = c.addTenantReceiver(receivers); err != nil {
@@ -230,7 +231,7 @@ func (c *Coordinator) addNamedRoute(input []*profile.Route) error {
 	if err != nil {
 		return err
 	}
-	for _, route := range routes {
+	for _, route := range input {
 		index := -1
 		for i, r := range vc.Route.Routes {
 			if r.Name == route.Name {

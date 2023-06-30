@@ -21,7 +21,11 @@ func (r *queryResolver) Nodes(ctx context.Context, ids []string) ([]ent.Noder, e
 	return r.Client.NodersEx(ctx, ids)
 }
 
+// MsgType returns generated.MsgTypeResolver implementation.
+func (r *Resolver) MsgType() generated.MsgTypeResolver { return &msgTypeResolver{r} }
+
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+type msgTypeResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

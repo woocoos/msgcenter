@@ -2198,14 +2198,14 @@ type MsgSubscriberMutation struct {
 	updated_at      *time.Time
 	tenant_id       *int
 	addtenant_id    *int
-	user_id         *int
-	adduser_id      *int
 	org_role_id     *int
 	addorg_role_id  *int
 	exclude         *bool
 	clearedFields   map[string]struct{}
 	msg_type        *int
 	clearedmsg_type bool
+	user            *int
+	cleareduser     bool
 	done            bool
 	oldValue        func(context.Context) (*MsgSubscriber, error)
 	predicates      []predicate.MsgSubscriber
@@ -2620,13 +2620,12 @@ func (m *MsgSubscriberMutation) ResetTenantID() {
 
 // SetUserID sets the "user_id" field.
 func (m *MsgSubscriberMutation) SetUserID(i int) {
-	m.user_id = &i
-	m.adduser_id = nil
+	m.user = &i
 }
 
 // UserID returns the value of the "user_id" field in the mutation.
 func (m *MsgSubscriberMutation) UserID() (r int, exists bool) {
-	v := m.user_id
+	v := m.user
 	if v == nil {
 		return
 	}
@@ -2650,28 +2649,9 @@ func (m *MsgSubscriberMutation) OldUserID(ctx context.Context) (v int, err error
 	return oldValue.UserID, nil
 }
 
-// AddUserID adds i to the "user_id" field.
-func (m *MsgSubscriberMutation) AddUserID(i int) {
-	if m.adduser_id != nil {
-		*m.adduser_id += i
-	} else {
-		m.adduser_id = &i
-	}
-}
-
-// AddedUserID returns the value that was added to the "user_id" field in this mutation.
-func (m *MsgSubscriberMutation) AddedUserID() (r int, exists bool) {
-	v := m.adduser_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearUserID clears the value of the "user_id" field.
 func (m *MsgSubscriberMutation) ClearUserID() {
-	m.user_id = nil
-	m.adduser_id = nil
+	m.user = nil
 	m.clearedFields[msgsubscriber.FieldUserID] = struct{}{}
 }
 
@@ -2683,8 +2663,7 @@ func (m *MsgSubscriberMutation) UserIDCleared() bool {
 
 // ResetUserID resets all changes to the "user_id" field.
 func (m *MsgSubscriberMutation) ResetUserID() {
-	m.user_id = nil
-	m.adduser_id = nil
+	m.user = nil
 	delete(m.clearedFields, msgsubscriber.FieldUserID)
 }
 
@@ -2833,6 +2812,32 @@ func (m *MsgSubscriberMutation) ResetMsgType() {
 	m.clearedmsg_type = false
 }
 
+// ClearUser clears the "user" edge to the User entity.
+func (m *MsgSubscriberMutation) ClearUser() {
+	m.cleareduser = true
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *MsgSubscriberMutation) UserCleared() bool {
+	return m.UserIDCleared() || m.cleareduser
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *MsgSubscriberMutation) UserIDs() (ids []int) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *MsgSubscriberMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+}
+
 // Where appends a list predicates to the MsgSubscriberMutation builder.
 func (m *MsgSubscriberMutation) Where(ps ...predicate.MsgSubscriber) {
 	m.predicates = append(m.predicates, ps...)
@@ -2886,7 +2891,7 @@ func (m *MsgSubscriberMutation) Fields() []string {
 	if m.tenant_id != nil {
 		fields = append(fields, msgsubscriber.FieldTenantID)
 	}
-	if m.user_id != nil {
+	if m.user != nil {
 		fields = append(fields, msgsubscriber.FieldUserID)
 	}
 	if m.org_role_id != nil {
@@ -3037,9 +3042,6 @@ func (m *MsgSubscriberMutation) AddedFields() []string {
 	if m.addtenant_id != nil {
 		fields = append(fields, msgsubscriber.FieldTenantID)
 	}
-	if m.adduser_id != nil {
-		fields = append(fields, msgsubscriber.FieldUserID)
-	}
 	if m.addorg_role_id != nil {
 		fields = append(fields, msgsubscriber.FieldOrgRoleID)
 	}
@@ -3057,8 +3059,6 @@ func (m *MsgSubscriberMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedUpdatedBy()
 	case msgsubscriber.FieldTenantID:
 		return m.AddedTenantID()
-	case msgsubscriber.FieldUserID:
-		return m.AddedUserID()
 	case msgsubscriber.FieldOrgRoleID:
 		return m.AddedOrgRoleID()
 	}
@@ -3090,13 +3090,6 @@ func (m *MsgSubscriberMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddTenantID(v)
-		return nil
-	case msgsubscriber.FieldUserID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUserID(v)
 		return nil
 	case msgsubscriber.FieldOrgRoleID:
 		v, ok := value.(int)
@@ -3198,9 +3191,12 @@ func (m *MsgSubscriberMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MsgSubscriberMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.msg_type != nil {
 		edges = append(edges, msgsubscriber.EdgeMsgType)
+	}
+	if m.user != nil {
+		edges = append(edges, msgsubscriber.EdgeUser)
 	}
 	return edges
 }
@@ -3213,13 +3209,17 @@ func (m *MsgSubscriberMutation) AddedIDs(name string) []ent.Value {
 		if id := m.msg_type; id != nil {
 			return []ent.Value{*id}
 		}
+	case msgsubscriber.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MsgSubscriberMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -3231,9 +3231,12 @@ func (m *MsgSubscriberMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MsgSubscriberMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedmsg_type {
 		edges = append(edges, msgsubscriber.EdgeMsgType)
+	}
+	if m.cleareduser {
+		edges = append(edges, msgsubscriber.EdgeUser)
 	}
 	return edges
 }
@@ -3244,6 +3247,8 @@ func (m *MsgSubscriberMutation) EdgeCleared(name string) bool {
 	switch name {
 	case msgsubscriber.EdgeMsgType:
 		return m.clearedmsg_type
+	case msgsubscriber.EdgeUser:
+		return m.cleareduser
 	}
 	return false
 }
@@ -3255,6 +3260,9 @@ func (m *MsgSubscriberMutation) ClearEdge(name string) error {
 	case msgsubscriber.EdgeMsgType:
 		m.ClearMsgType()
 		return nil
+	case msgsubscriber.EdgeUser:
+		m.ClearUser()
+		return nil
 	}
 	return fmt.Errorf("unknown MsgSubscriber unique edge %s", name)
 }
@@ -3265,6 +3273,9 @@ func (m *MsgSubscriberMutation) ResetEdge(name string) error {
 	switch name {
 	case msgsubscriber.EdgeMsgType:
 		m.ResetMsgType()
+		return nil
+	case msgsubscriber.EdgeUser:
+		m.ResetUser()
 		return nil
 	}
 	return fmt.Errorf("unknown MsgSubscriber edge %s", name)

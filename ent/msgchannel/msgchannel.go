@@ -73,7 +73,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/woocoos/msgcenter/ent/runtime"
 var (
-	Hooks [1]ent.Hook
+	Hooks [2]ent.Hook
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.

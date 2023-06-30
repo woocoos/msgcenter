@@ -68,3 +68,7 @@ type Receiver struct {
 func TenantReceiverName(tid string, ori string) string {
 	return ori + "_" + tid
 }
+
+func AppRouteName(aid string, rname string) string {
+	return rname + "_" + aid
+}

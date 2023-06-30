@@ -14,6 +14,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/user"
 )
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
@@ -344,6 +345,20 @@ func (ms *MsgSubscriberQuery) collectField(ctx context.Context, opCtx *graphql.O
 			if _, ok := fieldSeen[msgsubscriber.FieldMsgTypeID]; !ok {
 				selectedFields = append(selectedFields, msgsubscriber.FieldMsgTypeID)
 				fieldSeen[msgsubscriber.FieldMsgTypeID] = struct{}{}
+			}
+		case "user":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&UserClient{config: ms.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, "User")...); err != nil {
+				return err
+			}
+			ms.withUser = query
+			if _, ok := fieldSeen[msgsubscriber.FieldUserID]; !ok {
+				selectedFields = append(selectedFields, msgsubscriber.FieldUserID)
+				fieldSeen[msgsubscriber.FieldUserID] = struct{}{}
 			}
 		case "createdBy":
 			if _, ok := fieldSeen[msgsubscriber.FieldCreatedBy]; !ok {
@@ -810,6 +825,85 @@ func newMsgTypePaginateArgs(rv map[string]any) *msgtypePaginateArgs {
 	}
 	if v, ok := rv[whereField].(*MsgTypeWhereInput); ok {
 		args.opts = append(args.opts, WithMsgTypeFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (u *UserQuery) CollectFields(ctx context.Context, satisfies ...string) (*UserQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return u, nil
+	}
+	if err := u.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+func (u *UserQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(user.Columns))
+		selectedFields = []string{user.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "principalName":
+			if _, ok := fieldSeen[user.FieldPrincipalName]; !ok {
+				selectedFields = append(selectedFields, user.FieldPrincipalName)
+				fieldSeen[user.FieldPrincipalName] = struct{}{}
+			}
+		case "displayName":
+			if _, ok := fieldSeen[user.FieldDisplayName]; !ok {
+				selectedFields = append(selectedFields, user.FieldDisplayName)
+				fieldSeen[user.FieldDisplayName] = struct{}{}
+			}
+		case "email":
+			if _, ok := fieldSeen[user.FieldEmail]; !ok {
+				selectedFields = append(selectedFields, user.FieldEmail)
+				fieldSeen[user.FieldEmail] = struct{}{}
+			}
+		case "mobile":
+			if _, ok := fieldSeen[user.FieldMobile]; !ok {
+				selectedFields = append(selectedFields, user.FieldMobile)
+				fieldSeen[user.FieldMobile] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		u.Select(selectedFields...)
+	}
+	return nil
+}
+
+type userPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []UserPaginateOption
+}
+
+func newUserPaginateArgs(rv map[string]any) *userPaginateArgs {
+	args := &userPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
 	}
 	return args
 }

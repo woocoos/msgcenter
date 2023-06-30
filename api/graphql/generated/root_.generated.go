@@ -31,6 +31,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	MsgType() MsgTypeResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 	Route() RouteResolver
@@ -47,8 +48,10 @@ type ComplexityRoot struct {
 		AuthSecret   func(childComplexity int) int
 		AuthType     func(childComplexity int) int
 		AuthUsername func(childComplexity int) int
+		From         func(childComplexity int) int
 		Headers      func(childComplexity int) int
 		SmartHost    func(childComplexity int) int
+		To           func(childComplexity int) int
 	}
 
 	Matcher struct {
@@ -120,6 +123,7 @@ type ComplexityRoot struct {
 		TenantID  func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 		UpdatedBy func(childComplexity int) int
+		User      func(childComplexity int) int
 		UserID    func(childComplexity int) int
 	}
 
@@ -160,20 +164,23 @@ type ComplexityRoot struct {
 	}
 
 	MsgType struct {
-		AppID       func(childComplexity int) int
-		CanCustom   func(childComplexity int) int
-		CanSubs     func(childComplexity int) int
-		Category    func(childComplexity int) int
-		Comments    func(childComplexity int) int
-		CreatedAt   func(childComplexity int) int
-		CreatedBy   func(childComplexity int) int
-		Events      func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Name        func(childComplexity int) int
-		Status      func(childComplexity int) int
-		Subscribers func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
-		UpdatedBy   func(childComplexity int) int
+		AppID                  func(childComplexity int) int
+		CanCustom              func(childComplexity int) int
+		CanSubs                func(childComplexity int) int
+		Category               func(childComplexity int) int
+		Comments               func(childComplexity int) int
+		CreatedAt              func(childComplexity int) int
+		CreatedBy              func(childComplexity int) int
+		Events                 func(childComplexity int) int
+		ExcludeSubscriberUsers func(childComplexity int) int
+		ID                     func(childComplexity int) int
+		Name                   func(childComplexity int) int
+		Status                 func(childComplexity int) int
+		SubscriberRoles        func(childComplexity int) int
+		SubscriberUsers        func(childComplexity int) int
+		Subscribers            func(childComplexity int) int
+		UpdatedAt              func(childComplexity int) int
+		UpdatedBy              func(childComplexity int) int
 	}
 
 	MsgTypeConnection struct {
@@ -188,24 +195,26 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateMsgChannel   func(childComplexity int, input ent.CreateMsgChannelInput) int
-		CreateMsgEvent     func(childComplexity int, input ent.CreateMsgEventInput) int
-		CreateMsgTemplate  func(childComplexity int, input ent.CreateMsgTemplateInput) int
-		CreateMsgType      func(childComplexity int, input ent.CreateMsgTypeInput) int
-		DeleteMsgChannel   func(childComplexity int, id int) int
-		DeleteMsgEvent     func(childComplexity int, id int) int
-		DeleteMsgTemplate  func(childComplexity int, id int) int
-		DeleteMsgType      func(childComplexity int, id int) int
-		DisableMsgChannel  func(childComplexity int, id int) int
-		DisableMsgEvent    func(childComplexity int, id int) int
-		DisableMsgTemplate func(childComplexity int, id int) int
-		EnableMsgChannel   func(childComplexity int, id int) int
-		EnableMsgEvent     func(childComplexity int, id int) int
-		EnableMsgTemplate  func(childComplexity int, id int) int
-		UpdateMsgChannel   func(childComplexity int, id int, input ent.UpdateMsgChannelInput) int
-		UpdateMsgEvent     func(childComplexity int, id int, input ent.UpdateMsgEventInput) int
-		UpdateMsgTemplate  func(childComplexity int, id int, input ent.UpdateMsgTemplateInput) int
-		UpdateMsgType      func(childComplexity int, id int, input ent.UpdateMsgTypeInput) int
+		CreateMsgChannel    func(childComplexity int, input ent.CreateMsgChannelInput) int
+		CreateMsgEvent      func(childComplexity int, input ent.CreateMsgEventInput) int
+		CreateMsgSubscriber func(childComplexity int, inputs []*ent.CreateMsgSubscriberInput) int
+		CreateMsgTemplate   func(childComplexity int, input ent.CreateMsgTemplateInput) int
+		CreateMsgType       func(childComplexity int, input ent.CreateMsgTypeInput) int
+		DeleteMsgChannel    func(childComplexity int, id int) int
+		DeleteMsgEvent      func(childComplexity int, id int) int
+		DeleteMsgSubscriber func(childComplexity int, ids []int) int
+		DeleteMsgTemplate   func(childComplexity int, id int) int
+		DeleteMsgType       func(childComplexity int, id int) int
+		DisableMsgChannel   func(childComplexity int, id int) int
+		DisableMsgEvent     func(childComplexity int, id int) int
+		DisableMsgTemplate  func(childComplexity int, id int) int
+		EnableMsgChannel    func(childComplexity int, id int) int
+		EnableMsgEvent      func(childComplexity int, id int) int
+		EnableMsgTemplate   func(childComplexity int, id int) int
+		UpdateMsgChannel    func(childComplexity int, id int, input ent.UpdateMsgChannelInput) int
+		UpdateMsgEvent      func(childComplexity int, id int, input ent.UpdateMsgEventInput) int
+		UpdateMsgTemplate   func(childComplexity int, id int, input ent.UpdateMsgTemplateInput) int
+		UpdateMsgType       func(childComplexity int, id int, input ent.UpdateMsgTypeInput) int
 	}
 
 	PageInfo struct {
@@ -217,9 +226,10 @@ type ComplexityRoot struct {
 
 	Query struct {
 		MsgChannels       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgChannelOrder, where *ent.MsgChannelWhereInput) int
+		MsgConfig         func(childComplexity int) int
 		MsgEvents         func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) int
 		MsgTemplates      func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) int
-		MsgTypeCategories func(childComplexity int, keyword *string) int
+		MsgTypeCategories func(childComplexity int, keyword *string, appID *int) int
 		MsgTypes          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTypeOrder, where *ent.MsgTypeWhereInput) int
 		Node              func(childComplexity int, id string) int
 		Nodes             func(childComplexity int, ids []string) int
@@ -241,6 +251,14 @@ type ComplexityRoot struct {
 		Receiver            func(childComplexity int) int
 		RepeatInterval      func(childComplexity int) int
 		Routes              func(childComplexity int) int
+	}
+
+	User struct {
+		DisplayName   func(childComplexity int) int
+		Email         func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Mobile        func(childComplexity int) int
+		PrincipalName func(childComplexity int) int
 	}
 }
 
@@ -294,6 +312,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.EmailConfig.AuthUsername(childComplexity), true
 
+	case "EmailConfig.from":
+		if e.complexity.EmailConfig.From == nil {
+			break
+		}
+
+		return e.complexity.EmailConfig.From(childComplexity), true
+
 	case "EmailConfig.headers":
 		if e.complexity.EmailConfig.Headers == nil {
 			break
@@ -307,6 +332,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.EmailConfig.SmartHost(childComplexity), true
+
+	case "EmailConfig.to":
+		if e.complexity.EmailConfig.To == nil {
+			break
+		}
+
+		return e.complexity.EmailConfig.To(childComplexity), true
 
 	case "Matcher.name":
 		if e.complexity.Matcher.Name == nil {
@@ -637,6 +669,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgSubscriber.UpdatedBy(childComplexity), true
 
+	case "MsgSubscriber.user":
+		if e.complexity.MsgSubscriber.User == nil {
+			break
+		}
+
+		return e.complexity.MsgSubscriber.User(childComplexity), true
+
 	case "MsgSubscriber.userID":
 		if e.complexity.MsgSubscriber.UserID == nil {
 			break
@@ -889,6 +928,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgType.Events(childComplexity), true
 
+	case "MsgType.excludeSubscriberUsers":
+		if e.complexity.MsgType.ExcludeSubscriberUsers == nil {
+			break
+		}
+
+		return e.complexity.MsgType.ExcludeSubscriberUsers(childComplexity), true
+
 	case "MsgType.id":
 		if e.complexity.MsgType.ID == nil {
 			break
@@ -909,6 +955,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgType.Status(childComplexity), true
+
+	case "MsgType.subscriberRoles":
+		if e.complexity.MsgType.SubscriberRoles == nil {
+			break
+		}
+
+		return e.complexity.MsgType.SubscriberRoles(childComplexity), true
+
+	case "MsgType.subscriberUsers":
+		if e.complexity.MsgType.SubscriberUsers == nil {
+			break
+		}
+
+		return e.complexity.MsgType.SubscriberUsers(childComplexity), true
 
 	case "MsgType.subscribers":
 		if e.complexity.MsgType.Subscribers == nil {
@@ -990,6 +1050,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateMsgEvent(childComplexity, args["input"].(ent.CreateMsgEventInput)), true
 
+	case "Mutation.createMsgSubscriber":
+		if e.complexity.Mutation.CreateMsgSubscriber == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createMsgSubscriber_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateMsgSubscriber(childComplexity, args["inputs"].([]*ent.CreateMsgSubscriberInput)), true
+
 	case "Mutation.createMsgTemplate":
 		if e.complexity.Mutation.CreateMsgTemplate == nil {
 			break
@@ -1037,6 +1109,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteMsgEvent(childComplexity, args["id"].(int)), true
+
+	case "Mutation.deleteMsgSubscriber":
+		if e.complexity.Mutation.DeleteMsgSubscriber == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteMsgSubscriber_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteMsgSubscriber(childComplexity, args["ids"].([]int)), true
 
 	case "Mutation.deleteMsgTemplate":
 		if e.complexity.Mutation.DeleteMsgTemplate == nil {
@@ -1222,6 +1306,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.MsgChannels(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgChannelOrder), args["where"].(*ent.MsgChannelWhereInput)), true
 
+	case "Query.msgConfig":
+		if e.complexity.Query.MsgConfig == nil {
+			break
+		}
+
+		return e.complexity.Query.MsgConfig(childComplexity), true
+
 	case "Query.msgEvents":
 		if e.complexity.Query.MsgEvents == nil {
 			break
@@ -1256,7 +1347,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.MsgTypeCategories(childComplexity, args["keyword"].(*string)), true
+		return e.complexity.Query.MsgTypeCategories(childComplexity, args["keyword"].(*string), args["appID"].(*int)), true
 
 	case "Query.msgTypes":
 		if e.complexity.Query.MsgTypes == nil {
@@ -1377,6 +1468,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Route.Routes(childComplexity), true
+
+	case "User.displayName":
+		if e.complexity.User.DisplayName == nil {
+			break
+		}
+
+		return e.complexity.User.DisplayName(childComplexity), true
+
+	case "User.email":
+		if e.complexity.User.Email == nil {
+			break
+		}
+
+		return e.complexity.User.Email(childComplexity), true
+
+	case "User.id":
+		if e.complexity.User.ID == nil {
+			break
+		}
+
+		return e.complexity.User.ID(childComplexity), true
+
+	case "User.mobile":
+		if e.complexity.User.Mobile == nil {
+			break
+		}
+
+		return e.complexity.User.Mobile(childComplexity), true
+
+	case "User.principalName":
+		if e.complexity.User.PrincipalName == nil {
+			break
+		}
+
+		return e.complexity.User.PrincipalName(childComplexity), true
 
 	}
 	return 0, false
@@ -1510,13 +1636,12 @@ Input was generated by ent.
 input CreateMsgSubscriberInput {
   """组织ID"""
   tenantID: Int!
-  """用户ID"""
-  userID: Int
   """用户组ID"""
   orgRoleID: Int
   """是否排除"""
   exclude: Boolean
   msgTypeID: ID!
+  userID: ID
 }
 """
 CreateMsgTemplateInput is used for create MsgTemplate object.
@@ -1917,12 +2042,13 @@ type MsgSubscriber implements Node {
   """组织ID"""
   tenantID: Int!
   """用户ID"""
-  userID: Int
+  userID: ID
   """用户组ID"""
   orgRoleID: Int
   """是否排除"""
   exclude: Boolean
   msgType: MsgType!
+  user: User
 }
 """Ordering options for MsgSubscriber connections"""
 input MsgSubscriberOrder {
@@ -2007,14 +2133,10 @@ input MsgSubscriberWhereInput {
   tenantIDLT: Int
   tenantIDLTE: Int
   """user_id field predicates"""
-  userID: Int
-  userIDNEQ: Int
-  userIDIn: [Int!]
-  userIDNotIn: [Int!]
-  userIDGT: Int
-  userIDGTE: Int
-  userIDLT: Int
-  userIDLTE: Int
+  userID: ID
+  userIDNEQ: ID
+  userIDIn: [ID!]
+  userIDNotIn: [ID!]
   userIDIsNil: Boolean
   userIDNotNil: Boolean
   """org_role_id field predicates"""
@@ -2578,9 +2700,6 @@ Input was generated by ent.
 input UpdateMsgSubscriberInput {
   """组织ID"""
   tenantID: Int
-  """用户ID"""
-  userID: Int
-  clearUserID: Boolean
   """用户组ID"""
   orgRoleID: Int
   clearOrgRoleID: Boolean
@@ -2588,6 +2707,8 @@ input UpdateMsgSubscriberInput {
   exclude: Boolean
   clearExclude: Boolean
   msgTypeID: ID
+  userID: ID
+  clearUser: Boolean
 }
 """
 UpdateMsgTemplateInput is used for update MsgTemplate object.
@@ -2658,6 +2779,18 @@ input UpdateMsgTypeInput {
   canCustom: Boolean
   clearCanCustom: Boolean
 }
+type User implements Node {
+  """ID"""
+  id: ID!
+  """登陆名称"""
+  principalName: String!
+  """显示名"""
+  displayName: String!
+  """邮箱"""
+  email: String
+  """手机"""
+  mobile: String
+}
 `, BuiltIn: false},
 	{Name: "../query.graphql", Input: `scalar Duration
 scalar LabelName
@@ -2696,6 +2829,8 @@ type Receiver {
 }
 
 type EmailConfig {
+    to: String!
+    from: String
     smartHost: HostPort!
     authType: String!
     authUsername: String!
@@ -2703,6 +2838,15 @@ type EmailConfig {
     authSecret: String!
     authIdentity: String!
     headers: MapString
+}
+
+extend type MsgType {
+    # 订阅的用户
+    subscriberUsers:[MsgSubscriber!]!
+    # 订阅的用户组
+    subscriberRoles:[MsgSubscriber!]!
+    # 排除的用户
+    excludeSubscriberUsers:[MsgSubscriber!]!
 }
 
 extend type Query {
@@ -2727,7 +2871,7 @@ extend type Query {
     ): MsgTypeConnection!
 
     # 消息类型分类
-    msgTypeCategories(keyword:String): [String!]!
+    msgTypeCategories(keyword:String,appID:ID): [String!]!
 
     # 消息事件列表
     msgEvents(
@@ -2748,6 +2892,9 @@ extend type Query {
         orderBy: MsgTemplateOrder
         where: MsgTemplateWhereInput
     ): MsgTemplateConnection!
+
+    # 消息配置
+    msgConfig:String!
 }`, BuiltIn: false},
 	{Name: "../mutation.graphql", Input: `type Mutation {
     # 创建消息类型
@@ -2786,6 +2933,10 @@ extend type Query {
     enableMsgTemplate(id: ID!): MsgTemplate!
     # 禁用消息模板
     disableMsgTemplate(id: ID!): MsgTemplate!
+    # 消息订阅
+    createMsgSubscriber(inputs: [CreateMsgSubscriberInput!]!): [MsgSubscriber!]!
+    # 删除订阅
+    deleteMsgSubscriber(ids: [ID!]!): Boolean!
 }
 
 input RouteInput  {
@@ -2813,6 +2964,8 @@ input ReceiverInput {
 }
 
 input EmailConfigInput {
+    to: String!
+    from: String
     smartHost: HostPort!
     authType: String!
     authUsername: String!

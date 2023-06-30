@@ -35,6 +35,8 @@ const (
 	FieldExclude = "exclude"
 	// EdgeMsgType holds the string denoting the msg_type edge name in mutations.
 	EdgeMsgType = "msg_type"
+	// EdgeUser holds the string denoting the user edge name in mutations.
+	EdgeUser = "user"
 	// Table holds the table name of the msgsubscriber in the database.
 	Table = "msg_subscriber"
 	// MsgTypeTable is the table that holds the msg_type relation/edge.
@@ -44,6 +46,13 @@ const (
 	MsgTypeInverseTable = "msg_type"
 	// MsgTypeColumn is the table column denoting the msg_type relation/edge.
 	MsgTypeColumn = "msg_type_id"
+	// UserTable is the table that holds the user relation/edge.
+	UserTable = "msg_subscriber"
+	// UserInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UserInverseTable = "user"
+	// UserColumn is the table column denoting the user relation/edge.
+	UserColumn = "user_id"
 )
 
 // Columns holds all SQL columns for msgsubscriber fields.
@@ -76,7 +85,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/woocoos/msgcenter/ent/runtime"
 var (
-	Hooks [1]ent.Hook
+	Hooks [2]ent.Hook
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultExclude holds the default value on creation for the "exclude" field.
@@ -142,10 +151,24 @@ func ByMsgTypeField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newMsgTypeStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByUserField orders the results by user field.
+func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newMsgTypeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MsgTypeInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, MsgTypeTable, MsgTypeColumn),
+	)
+}
+func newUserStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, UserTable, UserColumn),
 	)
 }

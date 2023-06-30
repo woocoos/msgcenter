@@ -48,6 +48,7 @@ func (MsgSubscriber) Fields() []ent.Field {
 func (MsgSubscriber) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("msg_type", MsgType.Type).Ref("subscribers").Required().Unique().Field("msg_type_id"),
+		edge.To("user", User.Type).Unique().Field("user_id"),
 	}
 }
 

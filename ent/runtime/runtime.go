@@ -21,7 +21,9 @@ import (
 func init() {
 	msgchannelMixin := schema.MsgChannel{}.Mixin()
 	msgchannelMixinHooks1 := msgchannelMixin[1].Hooks()
+	msgchannelHooks := schema.MsgChannel{}.Hooks()
 	msgchannel.Hooks[0] = msgchannelMixinHooks1[0]
+	msgchannel.Hooks[1] = msgchannelHooks[0]
 	msgchannelMixinFields1 := msgchannelMixin[1].Fields()
 	_ = msgchannelMixinFields1
 	msgchannelFields := schema.MsgChannel{}.Fields()
@@ -36,7 +38,11 @@ func init() {
 	msgchannel.NameValidator = msgchannelDescName.Validators[0].(func(string) error)
 	msgeventMixin := schema.MsgEvent{}.Mixin()
 	msgeventMixinHooks1 := msgeventMixin[1].Hooks()
+	msgeventHooks := schema.MsgEvent{}.Hooks()
 	msgevent.Hooks[0] = msgeventMixinHooks1[0]
+	msgevent.Hooks[1] = msgeventHooks[0]
+	msgevent.Hooks[2] = msgeventHooks[1]
+	msgevent.Hooks[3] = msgeventHooks[2]
 	msgeventMixinFields1 := msgeventMixin[1].Fields()
 	_ = msgeventMixinFields1
 	msgeventFields := schema.MsgEvent{}.Fields()
@@ -53,6 +59,7 @@ func init() {
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),
+			validators[2].(func(string) error),
 		}
 		return func(name string) error {
 			for _, fn := range fns {
@@ -65,7 +72,9 @@ func init() {
 	}()
 	msgsubscriberMixin := schema.MsgSubscriber{}.Mixin()
 	msgsubscriberMixinHooks1 := msgsubscriberMixin[1].Hooks()
+	msgsubscriberHooks := schema.MsgSubscriber{}.Hooks()
 	msgsubscriber.Hooks[0] = msgsubscriberMixinHooks1[0]
+	msgsubscriber.Hooks[1] = msgsubscriberHooks[0]
 	msgsubscriberMixinFields1 := msgsubscriberMixin[1].Fields()
 	_ = msgsubscriberMixinFields1
 	msgsubscriberFields := schema.MsgSubscriber{}.Fields()
