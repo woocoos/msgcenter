@@ -4,6 +4,7 @@ package main
 
 import (
 	"github.com/vektah/gqlparser/v2/ast"
+	"github.com/woocoos/entco/genx/gql"
 	"log"
 	"os"
 
@@ -43,7 +44,9 @@ func main() {
 		FieldHook: constraintFieldHook,
 	}
 
-	err = api.Generate(cfg, api.ReplacePlugin(&p))
+	err = api.Generate(cfg, api.ReplacePlugin(&p),
+		api.AddPlugin(gql.NewResolverPlugin(gql.WithRelayNodeEx())),
+	)
 
 	if err != nil {
 		log.Print(err.Error())

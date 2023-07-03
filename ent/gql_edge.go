@@ -75,3 +75,23 @@ func (mt *MsgType) Subscribers(ctx context.Context) (result []*MsgSubscriber, er
 	}
 	return result, err
 }
+
+func (s *Silence) User(ctx context.Context) (*User, error) {
+	result, err := s.Edges.UserOrErr()
+	if IsNotLoaded(err) {
+		result, err = s.QueryUser().Only(ctx)
+	}
+	return result, err
+}
+
+func (u *User) Silences(ctx context.Context) (result []*Silence, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = u.NamedSilences(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = u.Edges.SilencesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = u.QuerySilences().All(ctx)
+	}
+	return result, err
+}

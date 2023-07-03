@@ -1,5 +1,5 @@
-ariga.io/atlas v0.10.2-0.20230427182402-87a07dfb83bf h1:Tq2DRB39ZHScIwWACjPKLv5oEErv7zv6PBb5RTz5CKA=
-ariga.io/atlas v0.10.2-0.20230427182402-87a07dfb83bf/go.mod h1:+TR129FJZ5Lvzms6dvCeGWh1yR6hMvmXBhug4hrNIGk=
+ariga.io/atlas v0.12.0 h1:jDfjxT3ppKhzqLS26lZv9ni7p9TVNrhy7SQquaF7bPs=
+ariga.io/atlas v0.12.0/go.mod h1:+TR129FJZ5Lvzms6dvCeGWh1yR6hMvmXBhug4hrNIGk=
 ariga.io/entcache v0.1.1-0.20230620164151-0eb723a11c40 h1:k90wgZm8xX1mIp87UQA96rahEVsZYPJTXRgR2nDSekA=
 ariga.io/entcache v0.1.1-0.20230620164151-0eb723a11c40/go.mod h1:SD+eMz5LdYeU21FTrTTYQeoVtUPkGWgrONXAG3FNn1I=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
@@ -216,6 +216,8 @@ github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFR
 github.com/rogpeppe/go-internal v1.10.0 h1:TMyTOH3F/DB16zRVcYyreMH6GnZZrwQVAoYjRBZyWFQ=
 github.com/sergi/go-diff v1.1.0 h1:we8PVUC3FE2uYfodKH/nBHMSetSfHDR6scGdBi+erh0=
 github.com/sergi/go-diff v1.1.0/go.mod h1:STckp+ISIX8hZLjrqAeVduY0gWCT9IjLuqbuNXdaHfM=
+github.com/shopspring/decimal v1.3.1 h1:2Usl1nmF/WZucqkFZhnfFYxxxu8LG21F6nPQBE5gKV8=
+github.com/shopspring/decimal v1.3.1/go.mod h1:DKyhrW/HYNuLGql+MJL6WCR6knT2jwCFRcu2hWCYk4o=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
 github.com/stretchr/objx v0.5.0 h1:1zr/of2m5FGMsad5YfcqgdqdWrIhu+EBEJRhR1U7z/c=
@@ -249,8 +251,8 @@ github.com/vmihailenco/tagparser/v2 v2.0.0 h1:y09buUbR+b5aycVFQs/g70pqKVZNBmxwAh
 github.com/vmihailenco/tagparser/v2 v2.0.0/go.mod h1:Wri+At7QHww0WTrCBeu4J6bNtoV6mEfg5OIWRZA9qds=
 github.com/woocoos/casbin-ent-adapter v0.0.0-20230404005858-cd33f1b0b92e h1:GbxL4wa7cs+l7Bi6L2mjfkFiqDK9t6N2oyOrNp+yV1U=
 github.com/woocoos/casbin-ent-adapter v0.0.0-20230404005858-cd33f1b0b92e/go.mod h1:44V48kYKt7r9gWei7Ld+QaL0qVIBlOWrhkNTVMpnx3I=
-github.com/woocoos/entco v0.0.0-20230622102820-b7f587646300 h1:YfEqAaJjR82zbSwMlryqnfcWeZ6NWnxS4jHCYuNLzJo=
-github.com/woocoos/entco v0.0.0-20230622102820-b7f587646300/go.mod h1:amucT3UcQM96qzCrUAxjZScphzWlU1d4jogTsyitH5Q=
+github.com/woocoos/entco v0.0.0-20230702090420-e7c45fe78ba6 h1:cS0LIUhfgEFPm87lIX3lGcLuwP9OvNgJp7H9YqDGlKI=
+github.com/woocoos/entco v0.0.0-20230702090420-e7c45fe78ba6/go.mod h1:PEjmL1AB1pYLM9jY7f3ltYi5e8u52eC3Db8H1xFmayo=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/gopher-lua v1.1.0 h1:BojcDhfyDWgU2f2TOzYK/g5p2gxMrku8oupLDqlnSqE=

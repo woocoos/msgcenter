@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"errors"
 	"github.com/woocoos/msgcenter/ent/hook"
@@ -53,6 +54,12 @@ func readonlyHook() ent.Hook {
 func (User) Hooks() []ent.Hook {
 	return []ent.Hook{
 		readonlyHook(),
+	}
+}
+
+func (User) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("silences", Silence.Type).Comment("静默"),
 	}
 }
 

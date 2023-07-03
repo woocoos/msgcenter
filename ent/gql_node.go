@@ -19,6 +19,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 	"golang.org/x/sync/semaphore"
 )
@@ -42,6 +43,9 @@ func (n *MsgTemplate) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *MsgType) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *Silence) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *User) IsNode() {}
@@ -156,6 +160,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.MsgType.Query().
 			Where(msgtype.ID(id))
 		query, err := query.CollectFields(ctx, "MsgType")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case silence.Table:
+		query := c.Silence.Query().
+			Where(silence.ID(id))
+		query, err := query.CollectFields(ctx, "Silence")
 		if err != nil {
 			return nil, err
 		}
@@ -317,6 +333,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.MsgType.Query().
 			Where(msgtype.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "MsgType")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case silence.Table:
+		query := c.Silence.Query().
+			Where(silence.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Silence")
 		if err != nil {
 			return nil, err
 		}

@@ -20,5 +20,3 @@ genoas:
 	woco oasgen -c ./codegen/oasgen/config.yaml
 gengql:
 	go run codegen/gqlgen/gqlgen.go
-gengqlall:
-	go run github.com/woocoos/entco/cmd/gqltools

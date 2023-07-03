@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/msgcenter/ent/predicate"
+	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 
 	"github.com/woocoos/msgcenter/ent/internal"
@@ -81,9 +82,45 @@ func (uu *UserUpdate) ClearMobile() *UserUpdate {
 	return uu
 }
 
+// AddSilenceIDs adds the "silences" edge to the Silence entity by IDs.
+func (uu *UserUpdate) AddSilenceIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddSilenceIDs(ids...)
+	return uu
+}
+
+// AddSilences adds the "silences" edges to the Silence entity.
+func (uu *UserUpdate) AddSilences(s ...*Silence) *UserUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uu.AddSilenceIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
+}
+
+// ClearSilences clears all "silences" edges to the Silence entity.
+func (uu *UserUpdate) ClearSilences() *UserUpdate {
+	uu.mutation.ClearSilences()
+	return uu
+}
+
+// RemoveSilenceIDs removes the "silences" edge to Silence entities by IDs.
+func (uu *UserUpdate) RemoveSilenceIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveSilenceIDs(ids...)
+	return uu
+}
+
+// RemoveSilences removes "silences" edges to Silence entities.
+func (uu *UserUpdate) RemoveSilences(s ...*Silence) *UserUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uu.RemoveSilenceIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -157,6 +194,54 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if uu.mutation.MobileCleared() {
 		_spec.ClearField(user.FieldMobile, field.TypeString)
+	}
+	if uu.mutation.SilencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SilencesTable,
+			Columns: []string{user.SilencesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = uu.schemaConfig.Silence
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedSilencesIDs(); len(nodes) > 0 && !uu.mutation.SilencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SilencesTable,
+			Columns: []string{user.SilencesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = uu.schemaConfig.Silence
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.SilencesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SilencesTable,
+			Columns: []string{user.SilencesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = uu.schemaConfig.Silence
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.Node.Schema = uu.schemaConfig.User
 	ctx = internal.NewSchemaConfigContext(ctx, uu.schemaConfig)
@@ -232,9 +317,45 @@ func (uuo *UserUpdateOne) ClearMobile() *UserUpdateOne {
 	return uuo
 }
 
+// AddSilenceIDs adds the "silences" edge to the Silence entity by IDs.
+func (uuo *UserUpdateOne) AddSilenceIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddSilenceIDs(ids...)
+	return uuo
+}
+
+// AddSilences adds the "silences" edges to the Silence entity.
+func (uuo *UserUpdateOne) AddSilences(s ...*Silence) *UserUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uuo.AddSilenceIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
+}
+
+// ClearSilences clears all "silences" edges to the Silence entity.
+func (uuo *UserUpdateOne) ClearSilences() *UserUpdateOne {
+	uuo.mutation.ClearSilences()
+	return uuo
+}
+
+// RemoveSilenceIDs removes the "silences" edge to Silence entities by IDs.
+func (uuo *UserUpdateOne) RemoveSilenceIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveSilenceIDs(ids...)
+	return uuo
+}
+
+// RemoveSilences removes "silences" edges to Silence entities.
+func (uuo *UserUpdateOne) RemoveSilences(s ...*Silence) *UserUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uuo.RemoveSilenceIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -338,6 +459,54 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if uuo.mutation.MobileCleared() {
 		_spec.ClearField(user.FieldMobile, field.TypeString)
+	}
+	if uuo.mutation.SilencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SilencesTable,
+			Columns: []string{user.SilencesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = uuo.schemaConfig.Silence
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedSilencesIDs(); len(nodes) > 0 && !uuo.mutation.SilencesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SilencesTable,
+			Columns: []string{user.SilencesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = uuo.schemaConfig.Silence
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.SilencesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SilencesTable,
+			Columns: []string{user.SilencesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = uuo.schemaConfig.Silence
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.Node.Schema = uuo.schemaConfig.User
 	ctx = internal.NewSchemaConfigContext(ctx, uuo.schemaConfig)

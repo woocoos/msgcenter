@@ -20,6 +20,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
+	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 
 	"github.com/woocoos/msgcenter/ent/internal"
@@ -42,6 +43,8 @@ type Client struct {
 	MsgType *MsgTypeClient
 	// OrgRoleUser is the client for interacting with the OrgRoleUser builders.
 	OrgRoleUser *OrgRoleUserClient
+	// Silence is the client for interacting with the Silence builders.
+	Silence *SilenceClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// additional fields for node api
@@ -65,6 +68,7 @@ func (c *Client) init() {
 	c.MsgTemplate = NewMsgTemplateClient(c.config)
 	c.MsgType = NewMsgTypeClient(c.config)
 	c.OrgRoleUser = NewOrgRoleUserClient(c.config)
+	c.Silence = NewSilenceClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -156,6 +160,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		MsgTemplate:   NewMsgTemplateClient(cfg),
 		MsgType:       NewMsgTypeClient(cfg),
 		OrgRoleUser:   NewOrgRoleUserClient(cfg),
+		Silence:       NewSilenceClient(cfg),
 		User:          NewUserClient(cfg),
 	}, nil
 }
@@ -182,6 +187,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		MsgTemplate:   NewMsgTemplateClient(cfg),
 		MsgType:       NewMsgTypeClient(cfg),
 		OrgRoleUser:   NewOrgRoleUserClient(cfg),
+		Silence:       NewSilenceClient(cfg),
 		User:          NewUserClient(cfg),
 	}, nil
 }
@@ -213,7 +219,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.MsgChannel, c.MsgEvent, c.MsgSubscriber, c.MsgTemplate, c.MsgType,
-		c.OrgRoleUser, c.User,
+		c.OrgRoleUser, c.Silence, c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -224,7 +230,7 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.MsgChannel, c.MsgEvent, c.MsgSubscriber, c.MsgTemplate, c.MsgType,
-		c.OrgRoleUser, c.User,
+		c.OrgRoleUser, c.Silence, c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -245,6 +251,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.MsgType.mutate(ctx, m)
 	case *OrgRoleUserMutation:
 		return c.OrgRoleUser.mutate(ctx, m)
+	case *SilenceMutation:
+		return c.Silence.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	default:
@@ -1099,6 +1107,145 @@ func (c *OrgRoleUserClient) mutate(ctx context.Context, m *OrgRoleUserMutation) 
 	}
 }
 
+// SilenceClient is a client for the Silence schema.
+type SilenceClient struct {
+	config
+}
+
+// NewSilenceClient returns a client for the Silence from the given config.
+func NewSilenceClient(c config) *SilenceClient {
+	return &SilenceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `silence.Hooks(f(g(h())))`.
+func (c *SilenceClient) Use(hooks ...Hook) {
+	c.hooks.Silence = append(c.hooks.Silence, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `silence.Intercept(f(g(h())))`.
+func (c *SilenceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Silence = append(c.inters.Silence, interceptors...)
+}
+
+// Create returns a builder for creating a Silence entity.
+func (c *SilenceClient) Create() *SilenceCreate {
+	mutation := newSilenceMutation(c.config, OpCreate)
+	return &SilenceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Silence entities.
+func (c *SilenceClient) CreateBulk(builders ...*SilenceCreate) *SilenceCreateBulk {
+	return &SilenceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Silence.
+func (c *SilenceClient) Update() *SilenceUpdate {
+	mutation := newSilenceMutation(c.config, OpUpdate)
+	return &SilenceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SilenceClient) UpdateOne(s *Silence) *SilenceUpdateOne {
+	mutation := newSilenceMutation(c.config, OpUpdateOne, withSilence(s))
+	return &SilenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SilenceClient) UpdateOneID(id int) *SilenceUpdateOne {
+	mutation := newSilenceMutation(c.config, OpUpdateOne, withSilenceID(id))
+	return &SilenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Silence.
+func (c *SilenceClient) Delete() *SilenceDelete {
+	mutation := newSilenceMutation(c.config, OpDelete)
+	return &SilenceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SilenceClient) DeleteOne(s *Silence) *SilenceDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SilenceClient) DeleteOneID(id int) *SilenceDeleteOne {
+	builder := c.Delete().Where(silence.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SilenceDeleteOne{builder}
+}
+
+// Query returns a query builder for Silence.
+func (c *SilenceClient) Query() *SilenceQuery {
+	return &SilenceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSilence},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Silence entity by its id.
+func (c *SilenceClient) Get(ctx context.Context, id int) (*Silence, error) {
+	return c.Query().Where(silence.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SilenceClient) GetX(ctx context.Context, id int) *Silence {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a Silence.
+func (c *SilenceClient) QueryUser(s *Silence) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(silence.Table, silence.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, silence.UserTable, silence.UserColumn),
+		)
+		schemaConfig := s.schemaConfig
+		step.To.Schema = schemaConfig.User
+		step.Edge.Schema = schemaConfig.Silence
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SilenceClient) Hooks() []Hook {
+	hooks := c.hooks.Silence
+	return append(hooks[:len(hooks):len(hooks)], silence.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *SilenceClient) Interceptors() []Interceptor {
+	inters := c.inters.Silence
+	return append(inters[:len(inters):len(inters)], silence.Interceptors[:]...)
+}
+
+func (c *SilenceClient) mutate(ctx context.Context, m *SilenceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SilenceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SilenceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SilenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SilenceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Silence mutation op: %q", m.Op())
+	}
+}
+
 // UserClient is a client for the User schema.
 type UserClient struct {
 	config
@@ -1192,6 +1339,25 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 	return obj
 }
 
+// QuerySilences queries the silences edge of a User.
+func (c *UserClient) QuerySilences(u *User) *SilenceQuery {
+	query := (&SilenceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(silence.Table, silence.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.SilencesTable, user.SilencesColumn),
+		)
+		schemaConfig := u.schemaConfig
+		step.To.Schema = schemaConfig.Silence
+		step.Edge.Schema = schemaConfig.Silence
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	hooks := c.hooks.User
@@ -1221,11 +1387,11 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		MsgChannel, MsgEvent, MsgSubscriber, MsgTemplate, MsgType, OrgRoleUser,
+		MsgChannel, MsgEvent, MsgSubscriber, MsgTemplate, MsgType, OrgRoleUser, Silence,
 		User []ent.Hook
 	}
 	inters struct {
-		MsgChannel, MsgEvent, MsgSubscriber, MsgTemplate, MsgType, OrgRoleUser,
+		MsgChannel, MsgEvent, MsgSubscriber, MsgTemplate, MsgType, OrgRoleUser, Silence,
 		User []ent.Interceptor
 	}
 )

@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -11,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/msgcenter/ent/predicate"
+	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 
 	"github.com/woocoos/msgcenter/ent/internal"
@@ -19,12 +21,14 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx        *QueryContext
-	order      []user.OrderOption
-	inters     []Interceptor
-	predicates []predicate.User
-	modifiers  []func(*sql.Selector)
-	loadTotal  []func(context.Context, []*User) error
+	ctx               *QueryContext
+	order             []user.OrderOption
+	inters            []Interceptor
+	predicates        []predicate.User
+	withSilences      *SilenceQuery
+	modifiers         []func(*sql.Selector)
+	loadTotal         []func(context.Context, []*User) error
+	withNamedSilences map[string]*SilenceQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -59,6 +63,31 @@ func (uq *UserQuery) Unique(unique bool) *UserQuery {
 func (uq *UserQuery) Order(o ...user.OrderOption) *UserQuery {
 	uq.order = append(uq.order, o...)
 	return uq
+}
+
+// QuerySilences chains the current query on the "silences" edge.
+func (uq *UserQuery) QuerySilences() *SilenceQuery {
+	query := (&SilenceClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(silence.Table, silence.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.SilencesTable, user.SilencesColumn),
+		)
+		schemaConfig := uq.schemaConfig
+		step.To.Schema = schemaConfig.Silence
+		step.Edge.Schema = schemaConfig.Silence
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first User entity from the query.
@@ -248,15 +277,27 @@ func (uq *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:     uq.config,
-		ctx:        uq.ctx.Clone(),
-		order:      append([]user.OrderOption{}, uq.order...),
-		inters:     append([]Interceptor{}, uq.inters...),
-		predicates: append([]predicate.User{}, uq.predicates...),
+		config:       uq.config,
+		ctx:          uq.ctx.Clone(),
+		order:        append([]user.OrderOption{}, uq.order...),
+		inters:       append([]Interceptor{}, uq.inters...),
+		predicates:   append([]predicate.User{}, uq.predicates...),
+		withSilences: uq.withSilences.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
 	}
+}
+
+// WithSilences tells the query-builder to eager-load the nodes that are connected to
+// the "silences" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithSilences(opts ...func(*SilenceQuery)) *UserQuery {
+	query := (&SilenceClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withSilences = query
+	return uq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -335,8 +376,11 @@ func (uq *UserQuery) prepareQuery(ctx context.Context) error {
 
 func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, error) {
 	var (
-		nodes = []*User{}
-		_spec = uq.querySpec()
+		nodes       = []*User{}
+		_spec       = uq.querySpec()
+		loadedTypes = [1]bool{
+			uq.withSilences != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*User).scanValues(nil, columns)
@@ -344,6 +388,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &User{config: uq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	_spec.Node.Schema = uq.schemaConfig.User
@@ -360,12 +405,57 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := uq.withSilences; query != nil {
+		if err := uq.loadSilences(ctx, query, nodes,
+			func(n *User) { n.Edges.Silences = []*Silence{} },
+			func(n *User, e *Silence) { n.Edges.Silences = append(n.Edges.Silences, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range uq.withNamedSilences {
+		if err := uq.loadSilences(ctx, query, nodes,
+			func(n *User) { n.appendNamedSilences(name) },
+			func(n *User, e *Silence) { n.appendNamedSilences(name, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for i := range uq.loadTotal {
 		if err := uq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
+}
+
+func (uq *UserQuery) loadSilences(ctx context.Context, query *SilenceQuery, nodes []*User, init func(*User), assign func(*User, *Silence)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(silence.FieldCreatedBy)
+	}
+	query.Where(predicate.Silence(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.SilencesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CreatedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "created_by" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (uq *UserQuery) sqlCount(ctx context.Context) (int, error) {
@@ -455,6 +545,20 @@ func (uq *UserQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedSilences tells the query-builder to eager-load the nodes that are connected to the "silences"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithNamedSilences(name string, opts ...func(*SilenceQuery)) *UserQuery {
+	query := (&SilenceClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if uq.withNamedSilences == nil {
+		uq.withNamedSilences = make(map[string]*SilenceQuery)
+	}
+	uq.withNamedSilences[name] = query
+	return uq
 }
 
 // UserGroupBy is the group-by builder for User entities.
