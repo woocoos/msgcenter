@@ -1,0 +1,22 @@
+projects:
+  adminx:
+    schema: "script/__generated__/adminx.graphql"
+    documents:
+      - 'src/services/adminx/**/*.ts'
+      - 'script/__generated__/adminx.graphql'
+    extensions:
+      endpoints:
+        default:
+          url: ${GQLGEN_SCHEMA}
+          headers:
+            Authorization: bearer ${GQLGEN_TOKEN}
+            X-Tenant-ID: ${GQLGEN_TENANT_ID}
+  msgsrv:
+    schema: "script/__generated__/msgsrv.graphql"
+    documents:
+      - 'src/services/msgsrv/**/*.ts'
+      - 'script/__generated__/msgsrv.graphql'
+    extensions:
+      endpoints:
+        default:
+          schema:"../api/graphql/*.graphql"
