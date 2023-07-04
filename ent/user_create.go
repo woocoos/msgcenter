@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 )
 
@@ -65,6 +66,21 @@ func (uc *UserCreate) SetNillableMobile(s *string) *UserCreate {
 func (uc *UserCreate) SetID(i int) *UserCreate {
 	uc.mutation.SetID(i)
 	return uc
+}
+
+// AddSilenceIDs adds the "silences" edge to the Silence entity by IDs.
+func (uc *UserCreate) AddSilenceIDs(ids ...int) *UserCreate {
+	uc.mutation.AddSilenceIDs(ids...)
+	return uc
+}
+
+// AddSilences adds the "silences" edges to the Silence entity.
+func (uc *UserCreate) AddSilences(s ...*Silence) *UserCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return uc.AddSilenceIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -166,6 +182,23 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Mobile(); ok {
 		_spec.SetField(user.FieldMobile, field.TypeString, value)
 		_node.Mobile = value
+	}
+	if nodes := uc.mutation.SilencesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SilencesTable,
+			Columns: []string{user.SilencesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = uc.schemaConfig.Silence
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

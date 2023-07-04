@@ -14,6 +14,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 )
 
@@ -830,6 +831,149 @@ func newMsgTypePaginateArgs(rv map[string]any) *msgtypePaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (s *SilenceQuery) CollectFields(ctx context.Context, satisfies ...string) (*SilenceQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return s, nil
+	}
+	if err := s.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+func (s *SilenceQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(silence.Columns))
+		selectedFields = []string{silence.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "user":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&UserClient{config: s.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, "User")...); err != nil {
+				return err
+			}
+			s.withUser = query
+			if _, ok := fieldSeen[silence.FieldCreatedBy]; !ok {
+				selectedFields = append(selectedFields, silence.FieldCreatedBy)
+				fieldSeen[silence.FieldCreatedBy] = struct{}{}
+			}
+		case "createdBy":
+			if _, ok := fieldSeen[silence.FieldCreatedBy]; !ok {
+				selectedFields = append(selectedFields, silence.FieldCreatedBy)
+				fieldSeen[silence.FieldCreatedBy] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[silence.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, silence.FieldCreatedAt)
+				fieldSeen[silence.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedBy":
+			if _, ok := fieldSeen[silence.FieldUpdatedBy]; !ok {
+				selectedFields = append(selectedFields, silence.FieldUpdatedBy)
+				fieldSeen[silence.FieldUpdatedBy] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[silence.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, silence.FieldUpdatedAt)
+				fieldSeen[silence.FieldUpdatedAt] = struct{}{}
+			}
+		case "deletedAt":
+			if _, ok := fieldSeen[silence.FieldDeletedAt]; !ok {
+				selectedFields = append(selectedFields, silence.FieldDeletedAt)
+				fieldSeen[silence.FieldDeletedAt] = struct{}{}
+			}
+		case "matchers":
+			if _, ok := fieldSeen[silence.FieldMatchers]; !ok {
+				selectedFields = append(selectedFields, silence.FieldMatchers)
+				fieldSeen[silence.FieldMatchers] = struct{}{}
+			}
+		case "startsAt":
+			if _, ok := fieldSeen[silence.FieldStartsAt]; !ok {
+				selectedFields = append(selectedFields, silence.FieldStartsAt)
+				fieldSeen[silence.FieldStartsAt] = struct{}{}
+			}
+		case "endsAt":
+			if _, ok := fieldSeen[silence.FieldEndsAt]; !ok {
+				selectedFields = append(selectedFields, silence.FieldEndsAt)
+				fieldSeen[silence.FieldEndsAt] = struct{}{}
+			}
+		case "comments":
+			if _, ok := fieldSeen[silence.FieldComments]; !ok {
+				selectedFields = append(selectedFields, silence.FieldComments)
+				fieldSeen[silence.FieldComments] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		s.Select(selectedFields...)
+	}
+	return nil
+}
+
+type silencePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []SilencePaginateOption
+}
+
+func newSilencePaginateArgs(rv map[string]any) *silencePaginateArgs {
+	args := &silencePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &SilenceOrder{Field: &SilenceOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithSilenceOrder(order))
+			}
+		case *SilenceOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithSilenceOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*SilenceWhereInput); ok {
+		args.opts = append(args.opts, WithSilenceFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (u *UserQuery) CollectFields(ctx context.Context, satisfies ...string) (*UserQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
@@ -850,6 +994,18 @@ func (u *UserQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "silences":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&SilenceClient{config: u.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, "Silence")...); err != nil {
+				return err
+			}
+			u.WithNamedSilences(alias, func(wq *SilenceQuery) {
+				*wq = *query
+			})
 		case "principalName":
 			if _, ok := fieldSeen[user.FieldPrincipalName]; !ok {
 				selectedFields = append(selectedFields, user.FieldPrincipalName)

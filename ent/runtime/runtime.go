@@ -12,6 +12,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
+	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 )
 
@@ -131,6 +132,21 @@ func init() {
 	msgtype.DefaultCanCustom = msgtypeDescCanCustom.Default.(bool)
 	orgroleuserHooks := schema.OrgRoleUser{}.Hooks()
 	orgroleuser.Hooks[0] = orgroleuserHooks[0]
+	silenceMixin := schema.Silence{}.Mixin()
+	silenceMixinHooks1 := silenceMixin[1].Hooks()
+	silenceMixinHooks2 := silenceMixin[2].Hooks()
+	silence.Hooks[0] = silenceMixinHooks1[0]
+	silence.Hooks[1] = silenceMixinHooks2[0]
+	silenceMixinInters2 := silenceMixin[2].Interceptors()
+	silence.Interceptors[0] = silenceMixinInters2[0]
+	silenceMixinFields1 := silenceMixin[1].Fields()
+	_ = silenceMixinFields1
+	silenceFields := schema.Silence{}.Fields()
+	_ = silenceFields
+	// silenceDescCreatedAt is the schema descriptor for created_at field.
+	silenceDescCreatedAt := silenceMixinFields1[1].Descriptor()
+	// silence.DefaultCreatedAt holds the default value on creation for the created_at field.
+	silence.DefaultCreatedAt = silenceDescCreatedAt.Default.(func() time.Time)
 	userHooks := schema.User{}.Hooks()
 	user.Hooks[0] = userHooks[0]
 	userFields := schema.User{}.Fields()

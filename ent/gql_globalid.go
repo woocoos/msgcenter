@@ -17,6 +17,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 )
 
@@ -47,6 +48,12 @@ func (mt *MsgTemplate) GlobalID(context.Context) (string, error) {
 // GlobalID returns the global identifier for the given MsgType node.
 func (mt *MsgType) GlobalID(context.Context) (string, error) {
 	id := fmt.Sprintf("%s:%d", msgtype.Table, mt.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
+// GlobalID returns the global identifier for the given Silence node.
+func (s *Silence) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("%s:%d", silence.Table, s.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
@@ -82,6 +89,8 @@ func GlobalID(tp, id string) (string, error) {
 	case msgtemplate.Table:
 		break
 	case msgtype.Table:
+		break
+	case silence.Table:
 		break
 	case user.Table:
 		break

@@ -3,6 +3,7 @@
 package main
 
 import (
+	atlas "ariga.io/atlas/sql/schema"
 	"context"
 	"entgo.io/ent/dialect/sql/schema"
 	"flag"
@@ -32,18 +33,27 @@ func main() {
 		migrate.WithDropIndex(true),
 		migrate.WithDropColumn(true),
 		migrate.WithForeignKeys(false),
-		schema.WithHooks(func(creator schema.Creator) schema.Creator {
-			return schema.CreateFunc(func(ctx context.Context, table ...*schema.Table) error {
-				var rt []*schema.Table
-				for _, t := range table {
-					if t.Name == "user" || t.Name == "org_role_user" {
-					} else {
-						rt = append(rt, t)
+		// Hook into Atlas Diff process.
+		schema.WithDiffHook(func(next schema.Differ) schema.Differ {
+			return schema.DiffFunc(func(current, desired *atlas.Schema) ([]atlas.Change, error) {
+				var dt []*atlas.Table
+				for i, table := range desired.Tables {
+					if !(table.Name == "user" || table.Name == "org_role_user") {
+						dt = append(dt, desired.Tables[i])
 					}
 				}
-				return creator.Create(ctx, rt...)
+				desired.Tables = dt
+				// Before calculating changes.
+				changes, err := next.Diff(current, desired)
+				if err != nil {
+					return nil, err
+				}
+				// After diff, you can filter
+				// changes or return new ones.
+				return changes, nil
 			})
-		}))
+		}),
+	)
 	if err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}

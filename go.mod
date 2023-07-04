@@ -23,7 +23,7 @@ require (
 	github.com/tsingsun/woocoo v0.3.1-0.20230625020618-99b3d687fca5
 	github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230625020618-99b3d687fca5
 	github.com/vektah/gqlparser/v2 v2.5.1
-	github.com/woocoos/entco v0.0.0-20230622102820-b7f587646300
+	github.com/woocoos/entco v0.0.0-20230702090420-e7c45fe78ba6
 	go.uber.org/zap v1.24.0
 	golang.org/x/sync v0.3.0
 	golang.org/x/text v0.9.0
@@ -31,7 +31,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.10.2-0.20230427182402-87a07dfb83bf // indirect
+	ariga.io/atlas v0.12.0 // indirect
 	ariga.io/entcache v0.1.1-0.20230620164151-0eb723a11c40 // indirect
 	github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible // indirect
 	github.com/XSAM/otelsql v0.23.0 // indirect
@@ -90,6 +90,7 @@ require (
 	github.com/prometheus/common v0.43.0 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/redis/go-redis/v9 v9.0.5 // indirect
+	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect

@@ -4,7 +4,10 @@ package user
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // ID filters vertices based on their ID field.
@@ -350,6 +353,35 @@ func MobileEqualFold(v string) predicate.User {
 // MobileContainsFold applies the ContainsFold predicate on the "mobile" field.
 func MobileContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldMobile, v))
+}
+
+// HasSilences applies the HasEdge predicate on the "silences" edge.
+func HasSilences() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, SilencesTable, SilencesColumn),
+		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.Silence
+		step.Edge.Schema = schemaConfig.Silence
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSilencesWith applies the HasEdge predicate on the "silences" edge with a given conditions (other predicates).
+func HasSilencesWith(preds ...predicate.Silence) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newSilencesStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.Silence
+		step.Edge.Schema = schemaConfig.Silence
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

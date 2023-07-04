@@ -5,6 +5,7 @@ package user
 import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -20,8 +21,17 @@ const (
 	FieldEmail = "email"
 	// FieldMobile holds the string denoting the mobile field in the database.
 	FieldMobile = "mobile"
+	// EdgeSilences holds the string denoting the silences edge name in mutations.
+	EdgeSilences = "silences"
 	// Table holds the table name of the user in the database.
 	Table = "user"
+	// SilencesTable is the table that holds the silences relation/edge.
+	SilencesTable = "msg_silence"
+	// SilencesInverseTable is the table name for the Silence entity.
+	// It exists in this package in order to avoid circular dependency with the "silence" package.
+	SilencesInverseTable = "msg_silence"
+	// SilencesColumn is the table column denoting the silences relation/edge.
+	SilencesColumn = "created_by"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -82,4 +92,25 @@ func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 // ByMobile orders the results by the mobile field.
 func ByMobile(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMobile, opts...).ToFunc()
+}
+
+// BySilencesCount orders the results by silences count.
+func BySilencesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSilencesStep(), opts...)
+	}
+}
+
+// BySilences orders the results by silences terms.
+func BySilences(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSilencesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newSilencesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SilencesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SilencesTable, SilencesColumn),
+	)
 }

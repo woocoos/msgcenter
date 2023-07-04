@@ -24,6 +24,8 @@ type Tx struct {
 	MsgType *MsgTypeClient
 	// OrgRoleUser is the client for interacting with the OrgRoleUser builders.
 	OrgRoleUser *OrgRoleUserClient
+	// Silence is the client for interacting with the Silence builders.
+	Silence *SilenceClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -163,6 +165,7 @@ func (tx *Tx) init() {
 	tx.MsgTemplate = NewMsgTemplateClient(tx.config)
 	tx.MsgType = NewMsgTypeClient(tx.config)
 	tx.OrgRoleUser = NewOrgRoleUserClient(tx.config)
+	tx.Silence = NewSilenceClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

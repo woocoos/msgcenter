@@ -18,6 +18,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
+	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 )
 
@@ -85,6 +86,7 @@ func checkColumn(table, column string) error {
 			msgtemplate.Table:   msgtemplate.ValidColumn,
 			msgtype.Table:       msgtype.ValidColumn,
 			orgroleuser.Table:   orgroleuser.ValidColumn,
+			silence.Table:       silence.ValidColumn,
 			user.Table:          user.ValidColumn,
 		})
 	})

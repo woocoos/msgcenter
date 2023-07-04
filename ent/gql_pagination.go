@@ -21,6 +21,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 )
 
@@ -1606,6 +1607,307 @@ func (mt *MsgType) ToEdge(order *MsgTypeOrder) *MsgTypeEdge {
 	return &MsgTypeEdge{
 		Node:   mt,
 		Cursor: order.Field.toCursor(mt),
+	}
+}
+
+// SilenceEdge is the edge representation of Silence.
+type SilenceEdge struct {
+	Node   *Silence `json:"node"`
+	Cursor Cursor   `json:"cursor"`
+}
+
+// SilenceConnection is the connection containing edges to Silence.
+type SilenceConnection struct {
+	Edges      []*SilenceEdge `json:"edges"`
+	PageInfo   PageInfo       `json:"pageInfo"`
+	TotalCount int            `json:"totalCount"`
+}
+
+func (c *SilenceConnection) build(nodes []*Silence, pager *silencePager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *Silence
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *Silence {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *Silence {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*SilenceEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &SilenceEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// SilencePaginateOption enables pagination customization.
+type SilencePaginateOption func(*silencePager) error
+
+// WithSilenceOrder configures pagination ordering.
+func WithSilenceOrder(order *SilenceOrder) SilencePaginateOption {
+	if order == nil {
+		order = DefaultSilenceOrder
+	}
+	o := *order
+	return func(pager *silencePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultSilenceOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithSilenceFilter configures pagination filter.
+func WithSilenceFilter(filter func(*SilenceQuery) (*SilenceQuery, error)) SilencePaginateOption {
+	return func(pager *silencePager) error {
+		if filter == nil {
+			return errors.New("SilenceQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type silencePager struct {
+	reverse bool
+	order   *SilenceOrder
+	filter  func(*SilenceQuery) (*SilenceQuery, error)
+}
+
+func newSilencePager(opts []SilencePaginateOption, reverse bool) (*silencePager, error) {
+	pager := &silencePager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultSilenceOrder
+	}
+	return pager, nil
+}
+
+func (p *silencePager) applyFilter(query *SilenceQuery) (*SilenceQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *silencePager) toCursor(s *Silence) Cursor {
+	return p.order.Field.toCursor(s)
+}
+
+func (p *silencePager) applyCursors(query *SilenceQuery, after, before *Cursor) (*SilenceQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultSilenceOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *silencePager) applyOrder(query *SilenceQuery) *SilenceQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultSilenceOrder.Field {
+		query = query.Order(DefaultSilenceOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *silencePager) orderExpr(query *SilenceQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultSilenceOrder.Field {
+			b.Comma().Ident(DefaultSilenceOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to Silence.
+func (s *SilenceQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...SilencePaginateOption,
+) (*SilenceConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newSilencePager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if s, err = pager.applyFilter(s); err != nil {
+		return nil, err
+	}
+	conn := &SilenceConnection{Edges: []*SilenceEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = s.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if s, err = pager.applyCursors(s, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		s.Limit(limit)
+	}
+	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
+		if first != nil {
+			s.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
+		}
+		if last != nil {
+			s.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
+		}
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := s.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	s = pager.applyOrder(s)
+	nodes, err := s.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// SilenceOrderFieldCreatedAt orders Silence by created_at.
+	SilenceOrderFieldCreatedAt = &SilenceOrderField{
+		Value: func(s *Silence) (ent.Value, error) {
+			return s.CreatedAt, nil
+		},
+		column: silence.FieldCreatedAt,
+		toTerm: silence.ByCreatedAt,
+		toCursor: func(s *Silence) Cursor {
+			return Cursor{
+				ID:    s.ID,
+				Value: s.CreatedAt,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f SilenceOrderField) String() string {
+	var str string
+	switch f.column {
+	case SilenceOrderFieldCreatedAt.column:
+		str = "createdAt"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f SilenceOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *SilenceOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("SilenceOrderField %T must be a string", v)
+	}
+	switch str {
+	case "createdAt":
+		*f = *SilenceOrderFieldCreatedAt
+	default:
+		return fmt.Errorf("%s is not a valid SilenceOrderField", str)
+	}
+	return nil
+}
+
+// SilenceOrderField defines the ordering field of Silence.
+type SilenceOrderField struct {
+	// Value extracts the ordering value from the given Silence.
+	Value    func(*Silence) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) silence.OrderOption
+	toCursor func(*Silence) Cursor
+}
+
+// SilenceOrder defines the ordering of Silence.
+type SilenceOrder struct {
+	Direction OrderDirection     `json:"direction"`
+	Field     *SilenceOrderField `json:"field"`
+}
+
+// DefaultSilenceOrder is the default ordering of Silence.
+var DefaultSilenceOrder = &SilenceOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &SilenceOrderField{
+		Value: func(s *Silence) (ent.Value, error) {
+			return s.ID, nil
+		},
+		column: silence.FieldID,
+		toTerm: silence.ByID,
+		toCursor: func(s *Silence) Cursor {
+			return Cursor{ID: s.ID}
+		},
+	},
+}
+
+// ToEdge converts Silence into SilenceEdge.
+func (s *Silence) ToEdge(order *SilenceOrder) *SilenceEdge {
+	if order == nil {
+		order = DefaultSilenceOrder
+	}
+	return &SilenceEdge{
+		Node:   s,
+		Cursor: order.Field.toCursor(s),
 	}
 }
 

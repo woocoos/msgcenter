@@ -13,6 +13,7 @@ type SchemaConfig struct {
 	MsgTemplate   string // MsgTemplate table.
 	MsgType       string // MsgType table.
 	OrgRoleUser   string // OrgRoleUser table.
+	Silence       string // Silence table.
 	User          string // User table.
 }
 
