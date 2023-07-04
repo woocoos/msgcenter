@@ -7,6 +7,8 @@ import Auth from '@/components/Auth';
 import { MsgType, MsgTypeSimpleStatus, MsgTypeWhereInput } from '@/__generated__/msgsrv/graphql';
 import { EnumMsgTypeStatus, delMsgType, getMsgTypeList } from '@/services/msgsrv/type';
 import InputApp from '@/components/Adminx/App/input';
+import { cacheApp, updateCacheAppListByIds } from '@/services/adminx/org/app';
+import Create from './components/create';
 
 
 export default () => {
@@ -22,7 +24,7 @@ export default () => {
           return <InputApp />
         },
         render: (text, record) => {
-          return record.appID;
+          return record.appID ? cacheApp[record.appID]?.name || record.appID : '-';
         },
       },
       { title: t('category'), dataIndex: 'category', width: 120 },
@@ -111,6 +113,7 @@ export default () => {
       });
       if (result?.totalCount) {
         table.data = result.edges?.map(item => item?.node) as MsgType[]
+        await updateCacheAppListByIds(table.data.map(item => item.appID || ''))
         table.total = result.totalCount;
       }
       setSelectedRowKeys([]);
@@ -183,6 +186,16 @@ export default () => {
           type: 'checkbox',
         }}
       />
+      <Create
+        open={modal.open}
+        title={modal.title}
+        id={modal.id}
+        onClose={(isSuccess) => {
+          if (isSuccess) {
+            proTableRef.current?.reload();
+          }
+          setModal({ open: false, title: modal.title, id: '' });
+        }} />
     </PageContainer>
   );
 };

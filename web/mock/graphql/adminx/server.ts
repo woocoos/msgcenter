@@ -107,11 +107,15 @@ const schemaWithMocks = addMocksToSchema({
       ],
       orgRecycleUsers: relayStylePaginationMock(store),
       globalID: (_, { type, id }) => btoa(`${type}:${id}`),
+      nodes: (_, args) => {
+        return args.ids.map(gid => {
+          const { type, id } = parseGid(gid);
+          return store.get(type, id)
+        })
+      },
       node: (root, args, context, info) => {
-        const decoded = Buffer.from(args.id, 'base64').toString()
-        const [type, did] = decoded?.split(':', 2)
-        const nType = type.split('_').map(t => t.slice(0, 1).toUpperCase() + t.slice(1)).join('')
-        return store.get(nType, did)
+        const { type, id } = parseGid(args.id);
+        return store.get(type, id)
       }
     },
     Mutation: {
@@ -123,6 +127,19 @@ const schemaWithMocks = addMocksToSchema({
   }
 })
 
+/**
+ * 解析gid
+ * @param gid
+ * @returns
+ */
+function parseGid(gid: string) {
+  const decoded = Buffer.from(gid, 'base64').toString()
+  const [type, did] = decoded?.split(':', 2)
+  const nType = type.split('_').map(t => t.slice(0, 1).toUpperCase() + t.slice(1)).join('')
+  return {
+    type: nType,
+    id: did,
+  }
+}
 
 export default mockServer(schemaWithMocks, mocks, preserveResolvers)
-

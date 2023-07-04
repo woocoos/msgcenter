@@ -115,6 +115,11 @@ export default {
     // 详情
 
     // 必填
+    please_enter_app: '请输入应用',
+    please_enter_category: '请输入分类',
+    please_enter_name: '请输入名称',
+    please_enter_status: '请输入状态',
+    please_enter_description: '请输入描述',
 
     // 添加
 

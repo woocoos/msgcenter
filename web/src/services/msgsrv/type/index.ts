@@ -92,7 +92,7 @@ export async function createMsgType(input: CreateMsgTypeInput) {
     input
   })
   if (result.data?.createMsgType.id) {
-    return result.data.createMsgType.id
+    return result.data.createMsgType
   }
   return null
 }
@@ -108,7 +108,7 @@ export async function updateMsgType(msgTypeId: string, input: UpdateMsgTypeInput
     input,
   })
   if (result.data?.updateMsgType.id) {
-    return result.data.updateMsgType.id
+    return result.data.updateMsgType
   }
   return null
 }

@@ -1,9 +1,9 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
-import { addMocksToSchema, createMockStore, mockServer, relayStylePaginationMock } from '@graphql-tools/mock';
+import { Ref, addMocksToSchema, createMockStore, mockServer, relayStylePaginationMock } from '@graphql-tools/mock';
 import { readFileSync } from "fs";
 import { join } from "path";
 import * as casual from "casual";
-import { initStoreData } from "./store";
+import { addListTemp, delListTemp, initStoreData, listTemp } from "./store";
 
 const preserveResolvers = true
 const typeDefs = readFileSync(join(process.cwd(), 'script', '__generated__', "msgsrv.graphql"), 'utf-8');
@@ -31,18 +31,58 @@ const schemaWithMocks = addMocksToSchema({
       msgEvents: relayStylePaginationMock(store),
       msgTemplates: relayStylePaginationMock(store),
       msgTypes: relayStylePaginationMock(store),
+      nodes: (_, args) => {
+        return args.ids.map(gid => {
+          const { type, id } = parseGid(gid);
+          return store.get(type, id)
+        })
+      },
       node: (root, args, context, info) => {
-        const decoded = Buffer.from(args.id, 'base64').toString()
-        const [type, did] = decoded?.split(':', 2)
-        const nType = type.split('_').map(t => t.slice(0, 1).toUpperCase() + t.slice(1)).join('')
-        return store.get(nType, did)
+        const { type, id } = parseGid(args.id)
+        return store.get(type, id)
       }
     },
     Mutation: {
+      createMsgType(_, { input }) {
+        input.id = `${Date.now()}`;
+        store.set('MsgType', input.id, input)
+        return addListTemp(
+          store,
+          store.get('Query', 'ROOT', 'msgTypes') as Ref,
+          store.get('MsgType', input.id) as Ref
+        );
+      },
+      updateMsgType(_, { id, input }) {
+        store.set('MsgType', id, input)
+        return store.get('MsgType', id)
+      },
+      deleteMsgType(_, { id }) {
+        delListTemp(
+          store,
+          store.get('Query', 'ROOT', 'msgTypes') as Ref,
+          id,
+        )
+        return true;
+      }
     }
   }
 })
 
+
+/**
+ * 解析gid
+ * @param gid
+ * @returns
+ */
+function parseGid(gid: string) {
+  const decoded = Buffer.from(gid, 'base64').toString()
+  const [type, did] = decoded?.split(':', 2)
+  const nType = type.split('_').map(t => t.slice(0, 1).toUpperCase() + t.slice(1)).join('')
+  return {
+    type: nType,
+    id: did,
+  }
+}
 
 export default mockServer(schemaWithMocks, mocks, preserveResolvers)
 

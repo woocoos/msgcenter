@@ -113,12 +113,17 @@ export default {
     // 详情
     // account_detail: 'Account details',
     // 必填提示
+    please_enter_app: 'Please enter application',
+    please_enter_category: 'Please enter category',
+    please_enter_name: 'Please enter name',
+    please_enter_status: 'Please enter status',
+    please_enter_description: 'Please enter description',
     // required_app: 'Required application',
-    // please_enter_principal_name: 'Please enter your login name',
 
     // 添加
     // add: 'Append',
     // add_resources: 'Add resource',
+
 
 
 
