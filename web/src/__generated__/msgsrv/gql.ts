@@ -21,8 +21,22 @@ const documents = {
     "mutation delMsgChannel($id:ID!){\n deleteMsgChannel(id:$id)\n}": types.DelMsgChannelDocument,
     "mutation enableMsgChannel($id:ID!){\n enableMsgChannel(id:$id){id}\n}": types.EnableMsgChannelDocument,
     "mutation disableMsgChannel($id:ID!){\n disableMsgChannel(id:$id){id}\n}": types.DisableMsgChannelDocument,
-    "query msgTypeList($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,appID,status,category,status,canSubs,canCustom,createdAt\n      }\n    }\n  }\n}": types.MsgTypeListDocument,
-    "query msgTypeInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgType{\n      id,name,comments,appID,status,category,status,canSubs,canCustom,createdAt\n    }\n  }\n}": types.MsgTypeInfoDocument,
+    "query msgEventList($first: Int,$orderBy:MsgEventOrder,$where:MsgEventWhereInput){\n  msgEvents(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,status,createdAt,msgTypeID,modes\n        msgType{\n          id,category,appID,name\n        }\n      }\n    }\n  }\n}": types.MsgEventListDocument,
+    "query MsgEventInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes\n      msgType{\n        id,category,appID,name\n      }\n    }\n  }\n}": types.MsgEventInfoDocument,
+    "mutation createMsgEvent($input: CreateMsgEventInput!){\n  createMsgEvent(input: $input){id}\n}": types.CreateMsgEventDocument,
+    "mutation updateMsgEvent($id:ID!,$input: UpdateMsgEventInput!){\n  updateMsgEvent(id:$id,input: $input){id}\n}": types.UpdateMsgEventDocument,
+    "mutation delMsgEvent($id:ID!){\n  deleteMsgEvent(id:$id)\n}": types.DelMsgEventDocument,
+    "mutation enableMsgEvent($id:ID!){\n  enableMsgEvent(id:$id){id}\n}": types.EnableMsgEventDocument,
+    "mutation disableMsgEvent($id:ID!){\n  disableMsgEvent(id:$id){id}\n}": types.DisableMsgEventDocument,
+    "query msgTemplateList($first: Int,$orderBy:MsgTemplateOrder,$where:MsgTemplateWhereInput){\n  msgTemplates(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n        receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n      }\n    }\n  }\n}": types.MsgTemplateListDocument,
+    "query MsgTemplateInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgTemplate{\n      id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n      receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n    }\n  }\n}": types.MsgTemplateInfoDocument,
+    "mutation createMsgTemplate($input: CreateMsgTemplateInput!){\n  createMsgTemplate(input: $input){id}\n}": types.CreateMsgTemplateDocument,
+    "mutation updateMsgTemplate($id:ID!,$input: UpdateMsgTemplateInput!){\n  updateMsgTemplate(id:$id,input: $input){id}\n}": types.UpdateMsgTemplateDocument,
+    "mutation delMsgTemplate($id:ID!){\n  deleteMsgTemplate(id:$id)\n}": types.DelMsgTemplateDocument,
+    "mutation enableMsgTemplate($id:ID!){\n  enableMsgTemplate(id:$id){id}\n}": types.EnableMsgTemplateDocument,
+    "mutation disableMsgTemplate($id:ID!){\n  disableMsgTemplate(id:$id){id}\n}": types.DisableMsgTemplateDocument,
+    "query msgTypeList($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n      }\n    }\n  }\n}": types.MsgTypeListDocument,
+    "query msgTypeInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgType{\n      id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n    }\n  }\n}": types.MsgTypeInfoDocument,
     "mutation createMsgType($input: CreateMsgTypeInput!){\n  createMsgType(input: $input){id}\n}": types.CreateMsgTypeDocument,
     "mutation updateMsgType($id:ID!,$input: UpdateMsgTypeInput!){\n  updateMsgType(id:$id,input: $input){id}\n}": types.UpdateMsgTypeDocument,
     "mutation delMsgType($id:ID!){\n  deleteMsgType(id:$id)\n}": types.DelMsgTypeDocument,
@@ -77,11 +91,67 @@ export function gql(source: "mutation disableMsgChannel($id:ID!){\n disableMsgCh
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query msgTypeList($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,appID,status,category,status,canSubs,canCustom,createdAt\n      }\n    }\n  }\n}"): (typeof documents)["query msgTypeList($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,appID,status,category,status,canSubs,canCustom,createdAt\n      }\n    }\n  }\n}"];
+export function gql(source: "query msgEventList($first: Int,$orderBy:MsgEventOrder,$where:MsgEventWhereInput){\n  msgEvents(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,status,createdAt,msgTypeID,modes\n        msgType{\n          id,category,appID,name\n        }\n      }\n    }\n  }\n}"): (typeof documents)["query msgEventList($first: Int,$orderBy:MsgEventOrder,$where:MsgEventWhereInput){\n  msgEvents(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,status,createdAt,msgTypeID,modes\n        msgType{\n          id,category,appID,name\n        }\n      }\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query msgTypeInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgType{\n      id,name,comments,appID,status,category,status,canSubs,canCustom,createdAt\n    }\n  }\n}"): (typeof documents)["query msgTypeInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgType{\n      id,name,comments,appID,status,category,status,canSubs,canCustom,createdAt\n    }\n  }\n}"];
+export function gql(source: "query MsgEventInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes\n      msgType{\n        id,category,appID,name\n      }\n    }\n  }\n}"): (typeof documents)["query MsgEventInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes\n      msgType{\n        id,category,appID,name\n      }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createMsgEvent($input: CreateMsgEventInput!){\n  createMsgEvent(input: $input){id}\n}"): (typeof documents)["mutation createMsgEvent($input: CreateMsgEventInput!){\n  createMsgEvent(input: $input){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation updateMsgEvent($id:ID!,$input: UpdateMsgEventInput!){\n  updateMsgEvent(id:$id,input: $input){id}\n}"): (typeof documents)["mutation updateMsgEvent($id:ID!,$input: UpdateMsgEventInput!){\n  updateMsgEvent(id:$id,input: $input){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation delMsgEvent($id:ID!){\n  deleteMsgEvent(id:$id)\n}"): (typeof documents)["mutation delMsgEvent($id:ID!){\n  deleteMsgEvent(id:$id)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation enableMsgEvent($id:ID!){\n  enableMsgEvent(id:$id){id}\n}"): (typeof documents)["mutation enableMsgEvent($id:ID!){\n  enableMsgEvent(id:$id){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation disableMsgEvent($id:ID!){\n  disableMsgEvent(id:$id){id}\n}"): (typeof documents)["mutation disableMsgEvent($id:ID!){\n  disableMsgEvent(id:$id){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query msgTemplateList($first: Int,$orderBy:MsgTemplateOrder,$where:MsgTemplateWhereInput){\n  msgTemplates(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n        receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n      }\n    }\n  }\n}"): (typeof documents)["query msgTemplateList($first: Int,$orderBy:MsgTemplateOrder,$where:MsgTemplateWhereInput){\n  msgTemplates(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n        receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n      }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query MsgTemplateInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgTemplate{\n      id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n      receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n    }\n  }\n}"): (typeof documents)["query MsgTemplateInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgTemplate{\n      id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n      receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createMsgTemplate($input: CreateMsgTemplateInput!){\n  createMsgTemplate(input: $input){id}\n}"): (typeof documents)["mutation createMsgTemplate($input: CreateMsgTemplateInput!){\n  createMsgTemplate(input: $input){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation updateMsgTemplate($id:ID!,$input: UpdateMsgTemplateInput!){\n  updateMsgTemplate(id:$id,input: $input){id}\n}"): (typeof documents)["mutation updateMsgTemplate($id:ID!,$input: UpdateMsgTemplateInput!){\n  updateMsgTemplate(id:$id,input: $input){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation delMsgTemplate($id:ID!){\n  deleteMsgTemplate(id:$id)\n}"): (typeof documents)["mutation delMsgTemplate($id:ID!){\n  deleteMsgTemplate(id:$id)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation enableMsgTemplate($id:ID!){\n  enableMsgTemplate(id:$id){id}\n}"): (typeof documents)["mutation enableMsgTemplate($id:ID!){\n  enableMsgTemplate(id:$id){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation disableMsgTemplate($id:ID!){\n  disableMsgTemplate(id:$id){id}\n}"): (typeof documents)["mutation disableMsgTemplate($id:ID!){\n  disableMsgTemplate(id:$id){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query msgTypeList($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n      }\n    }\n  }\n}"): (typeof documents)["query msgTypeList($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n      }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query msgTypeInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgType{\n      id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n    }\n  }\n}"): (typeof documents)["query msgTypeInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgType{\n      id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -4,11 +4,10 @@ import { useRef, useState } from 'react';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { MsgType, MsgTypeSimpleStatus, MsgTypeWhereInput } from '@/__generated__/msgsrv/graphql';
-import { EnumMsgTypeStatus, delMsgType, getMsgTypeList } from '@/services/msgsrv/type';
-import InputApp from '@/components/Adminx/App/input';
+import { MsgEvent, MsgEventSimpleStatus, MsgEventWhereInput } from '@/__generated__/msgsrv/graphql';
+import { EnumMsgEventStatus, delMsgEvent, disableMsgEvent, enableMsgEvent, getMsgEventList } from '@/services/msgsrv/event';
 import Create from './components/create';
-import { cacheApp, updateCacheAppListByIds } from '@/services/adminx/app/indtx';
+import { Link } from '@ice/runtime';
 
 
 export default () => {
@@ -16,41 +15,31 @@ export default () => {
     { t } = useTranslation(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
-    columns: ProColumns<MsgType>[] = [
+    columns: ProColumns<MsgEvent>[] = [
       // 有需要排序配置  sorter: true
       {
-        title: t('app'), dataIndex: 'app', width: 120,
-        renderFormItem() {
-          return <InputApp />
-        },
-        render: (text, record) => {
-          return record.appID ? cacheApp[record.appID]?.name || record.appID : '-';
-        },
-      },
-      { title: t('category'), dataIndex: 'category', width: 120 },
-      { title: t('name'), dataIndex: 'name', width: 120 },
-      {
-        title: t('open_subscription'),
-        dataIndex: 'canSubs',
-        width: 120,
-        search: false,
-        render: (text, record) => {
-          return record.canSubs ? t('yes') : t('no');
+        title: t('msg_type_category'), dataIndex: 'msgTypeCategory', width: 120,
+        render(text, record) {
+          return record.msgType.category
         },
       },
       {
-        title: t('open_custom'),
-        dataIndex: 'canCustom',
-        width: 120,
-        search: false,
-        render: (text, record) => {
-          return record.canCustom ? t('yes') : t('no');
+        title: t('msg_type_name'), dataIndex: 'msgTypeName', width: 120,
+        render(text, record) {
+          return record.msgType.name
+        },
+      },
+      { title: t('msg_event_name'), dataIndex: 'name', width: 120 },
+      {
+        title: t('way_receiving'), dataIndex: 'modes', width: 120, search: false,
+        render(text, record) {
+          return record.modes.split(',').join('、')
         },
       },
       {
         title: t('status'), dataIndex: 'status', width: 120, search: false,
         filters: true,
-        valueEnum: EnumMsgTypeStatus,
+        valueEnum: EnumMsgEventStatus,
       },
       { title: t('description'), dataIndex: 'comments', width: 120, search: false },
       {
@@ -59,31 +48,48 @@ export default () => {
         fixed: 'right',
         align: 'center',
         search: false,
-        width: 120,
+        width: 160,
         render: (text, record) => {
           return (<Space>
-            <Auth authKey="updateMsgType">
+            <Auth authKey="updateMsgEvent">
               <a
                 key="editor"
                 onClick={() => {
                   setModal({
-                    open: true, title: `${t('edit')}:${record.name}`, id: record.id
+                    open: true, title: `${t('edit')}:${record.name}`, id: record.id, scene: 'editor'
                   });
                 }}
               >
                 {t('edit')}
               </a>
             </Auth>
-            <Auth authKey="deleteMsgType">
+            <Link
+              key="template"
+              to={`/msg/template?id=${record.id}`}
+            >
+              {t('template')}
+            </Link>
+            <Auth authKey="deleteMsgEvent">
               <a key="delete" onClick={() => onDel(record)}>
                 {t('delete')}
               </a>
             </Auth>
+            {
+              record.status === MsgEventSimpleStatus.Active ? <Auth authKey="disableMsgEvent">
+                <a key="disable" style={{ color: '#ff0000' }} onClick={() => onClickStatus(record)}>
+                  {t('disable')}
+                </a>
+              </Auth> : <Auth authKey="enableMsgEvent">
+                <a key="enable" onClick={() => onClickStatus(record)}>
+                  {t('enable')}
+                </a>
+              </Auth>
+            }
           </Space>);
         },
       },
     ],
-    [dataSource, setDataSource] = useState<MsgType[]>([]),
+    [dataSource, setDataSource] = useState<MsgEvent[]>([]),
     // 选中处理
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
     // 弹出层处理
@@ -91,41 +97,44 @@ export default () => {
       open: boolean;
       title: string;
       id: string;
+      scene: 'editor';
     }>({
       open: false,
       title: '',
       id: '',
+      scene: 'editor'
     });
 
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as MsgType[], success: true, total: 0 },
-        where: MsgTypeWhereInput = {};
-      where.appID = params.app?.id;
-      where.category = params.category;
+      const table = { data: [] as MsgEvent[], success: true, total: 0 },
+        where: MsgEventWhereInput = {};
       where.nameContains = params.name;
-      where.statusIn = filter.status as MsgTypeSimpleStatus[]
-      const result = await getMsgTypeList({
+      where.hasMsgTypeWith = [{
+        nameContains: params.msgTypeName,
+        categoryContains: params.msgTypeCategory,
+      }];
+      where.statusIn = filter.status as MsgEventSimpleStatus[]
+      const result = await getMsgEventList({
         current: params.current,
         pageSize: params.pageSize,
         where,
       });
       if (result?.totalCount) {
-        table.data = result.edges?.map(item => item?.node) as MsgType[]
-        await updateCacheAppListByIds(table.data.map(item => item.appID || ''))
+        table.data = result.edges?.map(item => item?.node) as MsgEvent[]
         table.total = result.totalCount;
       }
       setSelectedRowKeys([]);
       setDataSource(table.data);
       return table;
     },
-    onDel = (record: MsgType) => {
+    onDel = (record: MsgEvent) => {
       Modal.confirm({
         title: t('delete'),
         content: `${t('confirm_delete')}：${record.name}`,
         onOk: async (close) => {
-          const result = await delMsgType(record.id);
+          const result = await delMsgEvent(record.id);
           if (result === true) {
             if (dataSource.length === 1) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
@@ -137,18 +146,31 @@ export default () => {
           }
         },
       });
+    },
+    onClickStatus = (record: MsgEvent) => {
+      Modal.confirm({
+        title: record.status === MsgEventSimpleStatus.Active ? t('disable') : t('enable'),
+        content: `${record.status === MsgEventSimpleStatus.Active ? t('disable') : t('enable')}：${record.name}`,
+        onOk: async (close) => {
+          const result = record.status === MsgEventSimpleStatus.Active ? await disableMsgEvent(record.id) : await enableMsgEvent(record.id);
+          if (result?.id) {
+            proTableRef.current?.reload();
+            close();
+          }
+        },
+      });
     };
 
 
   return (
     <PageContainer
       header={{
-        title: t('msg_type'),
+        title: t('msg_event'),
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
             { title: t('msg_center') },
-            { title: t('msg_type') },
+            { title: t('msg_event') },
           ],
         },
       }}
@@ -162,17 +184,17 @@ export default () => {
         }}
         rowKey={'id'}
         toolbar={{
-          title: t('msg_type_list'),
+          title: t('msg_event_list'),
           actions: [
-            <Auth authKey="createMsgType">
+            <Auth authKey="createMsgEvent">
               <Button
                 key="created"
                 type="primary"
                 onClick={() => {
-                  setModal({ open: true, title: t('create_msg_type'), id: '' });
+                  setModal({ open: true, title: t('create_msg_event'), id: '', scene: 'editor' });
                 }}
               >
-                {t('create_msg_type')}
+                {t('create_msg_event')}
               </Button>
             </Auth>,
           ],
@@ -187,6 +209,7 @@ export default () => {
         }}
       />
       <Create
+        x-if={modal.scene === 'editor'}
         open={modal.open}
         title={modal.title}
         id={modal.id}
@@ -194,8 +217,9 @@ export default () => {
           if (isSuccess) {
             proTableRef.current?.reload();
           }
-          setModal({ open: false, title: modal.title, id: '' });
-        }} />
+          setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
+        }}
+      />
     </PageContainer>
   );
 };

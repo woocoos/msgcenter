@@ -1,21 +1,17 @@
-import { App } from '@/__generated__/adminx/graphql';
-import { MsgType, MsgTypeSimpleStatus } from '@/__generated__/msgsrv/graphql';
-import InputApp from '@/components/Adminx/App/input';
+import { MsgEvent, MsgType } from '@/__generated__/msgsrv/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { cacheApp } from '@/services/adminx/app/indtx';
-import { EnumMsgTypeStatus, createMsgType, getMsgTypeInfo, updateMsgType } from '@/services/msgsrv/type';
+import { createMsgEvent, getMsgEventInfo, updateMsgEvent } from '@/services/msgsrv/event';
 import { updateFormat } from '@/util';
-import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormSwitch } from '@ant-design/pro-components';
+import { DrawerForm, ProFormCheckbox, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import InputMsgType from '../../type/components/input';
+import { EnumMsgTemplateReceiverType } from '@/services/msgsrv/template';
 
 type ProFormData = {
-  app?: App;
-  category: string;
+  msgType?: MsgType;
   name: string;
-  canSubs: boolean;
-  canCustom: boolean;
-  status: MsgTypeSimpleStatus;
+  modes: string[];
   comments?: string | null;
 };
 
@@ -26,7 +22,7 @@ export default (props: {
   onClose: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
-    [info, setInfo] = useState<MsgType>(),
+    [info, setInfo] = useState<MsgEvent>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
@@ -43,23 +39,17 @@ export default (props: {
       setSaveLoading(false);
       setSaveDisabled(true);
       const initData: ProFormData = {
-        category: '',
         name: '',
-        canSubs: false,
-        canCustom: false,
-        status: MsgTypeSimpleStatus.Active
+        modes: [],
       }
       if (props.id) {
-        const result = await getMsgTypeInfo(props.id);
+        const result = await getMsgEventInfo(props.id);
         if (result?.id) {
-          setInfo(result as MsgType);
-          initData.app = result.appID ? cacheApp[result.appID] : undefined;
-          initData.category = result.category;
+          setInfo(result as MsgEvent);
+          initData.msgType = result.msgType as MsgType || undefined;
           initData.name = result.name;
+          initData.modes = result.modes.split(',');
           initData.comments = result.comments;
-          initData.canSubs = !!result.canSubs;
-          initData.canCustom = !!result.canCustom;
-          initData.status = result.status || MsgTypeSimpleStatus.Active;
         }
       }
       return initData;
@@ -70,23 +60,17 @@ export default (props: {
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
       const result = props.id
-        ? await updateMsgType(props.id, updateFormat({
-          category: values.category,
+        ? await updateMsgEvent(props.id, updateFormat({
+          modes: values.modes.join(','),
+          msgTypeID: values.msgType?.id || '',
           name: values.name,
-          appID: values.app?.id ? Number(values.app.id) : undefined,
-          canCustom: values.canCustom,
-          canSubs: values.canSubs,
           comments: values.comments,
-          status: values.status,
         }, info || {}))
-        : await createMsgType({
-          category: values.category,
+        : await createMsgEvent({
+          modes: values.modes.join(','),
+          msgTypeID: values.msgType?.id || '',
           name: values.name,
-          appID: values.app?.id ? Number(values.app.id) : undefined,
-          canCustom: values.canCustom,
-          canSubs: values.canSubs,
           comments: values.comments,
-          status: values.status,
         });
       if (result?.id) {
         setSaveDisabled(true);
@@ -121,41 +105,26 @@ export default (props: {
       onOpenChange={onOpenChange}
     >
       <ProFormText
-        name="app"
-        label={t('app')}
-        rules={[
-          { required: true, message: `${t('please_enter_app')}` },
-        ]}>
-        <InputApp />
-      </ProFormText>
-      <ProFormText
-        name="category"
-        label={t('category')}
-        rules={[
-          { required: true, message: `${t('please_enter_category')}` },
-        ]}
-      />
-      <ProFormText
         name="name"
         label={t('name')}
         rules={[
           { required: true, message: `${t('please_enter_name')}` },
         ]}
       />
-      <ProFormSwitch
-        name="canSubs"
-        label={t('open_subscription')}
-      />
-      <ProFormSwitch
-        name="canCustom"
-        label={t('open_custom')}
-      />
-      <ProFormSelect
-        name="status"
-        label={t('status')}
-        valueEnum={EnumMsgTypeStatus}
+      <ProFormText
+        name="msgType"
+        label={t('msg_type')}
         rules={[
-          { required: true, message: `${t('please_enter_status')}` },
+          { required: true, message: `${t('please_enter_msg_type')}` },
+        ]}>
+        <InputMsgType />
+      </ProFormText>
+      <ProFormCheckbox.Group
+        name="modes"
+        label={t('way_receiving')}
+        valueEnum={EnumMsgTemplateReceiverType}
+        rules={[
+          { required: true, message: `${t('please_enter_way_receiving')}` },
         ]}
       />
       <ProFormTextArea

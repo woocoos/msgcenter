@@ -87,6 +87,8 @@ export default {
     category: '分类',
     org: '组织',
     configuration: '配置',
+    template: '模板',
+    subject: '标题',
 
     // 多个字符组成
     confirm_copy: '确定是否复制',
@@ -103,24 +105,44 @@ export default {
     click_search_app: '点击搜索应用',
     search_org: '搜索组织',
     click_search_org: '点击搜索组织',
+    search_msg_type: '搜索消息类型',
+    click_search_msg_type: '点击搜索消息类型',
     manage_account: '管理账户',
 
     msg_center: '消息中心',
     msg_type: '消息类型',
     msg_channel: '消息通道',
+    msg_event: '消息事件',
+    msg_template: '消息模板',
     open_subscription: '开放订阅',
     open_custom: '开放定制',
+    msg_type_category: '消息类型分类',
+    msg_type_name: '消息类型名称',
+    way_receiving: '接受方式',
+    msg_event_name: '消息事件名称',
+    msg_temp_cc: '抄送',
+    msg_temp_bcc: '密送',
+    msg_temp_to: '收件人',
+    msg_temp_from: '发件人',
+    msg_temp_format: '正文',
+    msg_temp_format_tip: '正文可包含go template的模板语法',
 
     // 创建
     create_msg_type: '创建消息类型',
     create_msg_channel: '创建消息通道',
+    create_msg_event: '创建消息事件',
+    create_msg_template: '创建消息模板',
     // 修改
     amend_msg_type: '修改消息类型',
     amend_msg_channle: '修改消息通道',
     amend_msg_channel_config: '修改消息通道配置',
+    amend_msg_event: '修改消息事件',
+    amend_msg_template: '修改消息模板',
     // 列表
     msg_type_list: '消息类型列表',
     msg_channel_list: '消息通道列表',
+    msg_event_list: '消息事件列表',
+    msg_template_list: '消息模板列表',
 
     // 详情
 
@@ -132,6 +154,10 @@ export default {
     please_enter_name: '请输入名称',
     please_enter_status: '请输入状态',
     please_enter_description: '请输入描述',
+    please_enter_msg_type: '请输入消息类型',
+    please_enter_way_receiving: '请输入接受方式',
+    please_enter_subject: '请输入标题',
+    please_enter_msg_temp_format: '请选择正文',
 
     // 添加
 

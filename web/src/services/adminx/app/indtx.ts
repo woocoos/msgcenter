@@ -1,7 +1,7 @@
-import { gql } from '@/__generated__/adminx';
-import { gid } from '@/util';
-import { pagingRequest, queryRequest } from '../';
-import { App, AppOrder, AppWhereInput } from '@/__generated__/adminx/graphql';
+import { gql } from "@/__generated__/adminx";
+import { App, AppOrder, AppWhereInput } from "@/__generated__/adminx/graphql";
+import { pagingRequest, queryRequest } from "..";
+import { gid } from "@/util";
 
 export const EnumAppKind = {
   web: { text: 'web' },
@@ -11,22 +11,18 @@ export const EnumAppKind = {
 
 export const cacheApp: Record<string, App> = {}
 
-const queryOrgAppList = gql(/* GraphQL */`query orgAppList($gid: GID!,$first: Int,$orderBy:AppOrder,$where:AppWhereInput){
-  node(id:$gid){
-    ... on Org{
-      id
-      apps(first:$first,orderBy: $orderBy,where: $where){
-        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-        edges{
-          cursor,node{
-            id,name,code,kind,redirectURI,appKey,appSecret,scopes,
-            tokenValidity,refreshTokenValidity,logo,comments,status,createdAt
-          }
-        }
+const queryAppList = gql(/* GraphQL */`query appList($first: Int,$orderBy:AppOrder,$where:AppWhereInput){
+  apps(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,
+        refreshTokenValidity,logo,comments,status,createdAt
       }
     }
   }
 }`);
+
 
 const queryAppIdList = gql(/* GraphQL */`query appIdList($ids:[GID!]!){
   nodes(ids: $ids){
@@ -36,36 +32,36 @@ const queryAppIdList = gql(/* GraphQL */`query appIdList($ids:[GID!]!){
   }
 }`)
 
+
 /**
- * 组织下的应用
- * @param orgId
+ * 获取应用信息
  * @param params
  * @param filter
  * @param sort
  * @returns
  */
-export async function getOrgAppList(
-  orgId: string,
+export async function getAppList(
   gather: {
     current?: number;
     pageSize?: number;
     where?: AppWhereInput;
     orderBy?: AppOrder;
-  }) {
+  },
+) {
   const
     result = await pagingRequest(
-      queryOrgAppList, {
-      gid: gid('org', orgId),
+      queryAppList, {
       first: gather.pageSize || 20,
       where: gather.where,
       orderBy: gather.orderBy,
     }, gather.current || 1);
 
-  if (result.data?.node?.__typename === 'Org') {
-    return result.data.node.apps;
+  if (result.data?.apps) {
+    return result.data.apps;
   }
   return null;
 }
+
 
 /**
  * 缓存app值

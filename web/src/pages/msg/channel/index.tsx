@@ -189,7 +189,7 @@ export default () => {
         toolbar={{
           title: t('msg_channel_list'),
           actions: [
-            <Auth authKey="createMsgType">
+            <Auth authKey="createMsgChannel">
               <Button
                 key="created"
                 type="primary"

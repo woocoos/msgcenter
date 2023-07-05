@@ -144,13 +144,13 @@ export async function createMsgChannel(input: CreateMsgChannelInput) {
 
 /**
  * 更新消息通道
- * @param id
+ * @param msgChannelId
  * @param input
  * @returns
  */
-export async function updateMsgChannel(id: string, input: UpdateMsgChannelInput) {
+export async function updateMsgChannel(msgChannelId: string, input: UpdateMsgChannelInput) {
   const result = await mutationRequest(mutationUpdateMsgChannel, {
-    id,
+    id: msgChannelId,
     input,
   })
   if (result.data?.updateMsgChannel.id) {
@@ -161,12 +161,12 @@ export async function updateMsgChannel(id: string, input: UpdateMsgChannelInput)
 
 /**
  * 禁用消息通道
- * @param id
+ * @param msgChannelId
  * @returns
  */
-export async function disableMsgChannel(id: string) {
+export async function disableMsgChannel(msgChannelId: string) {
   const result = await mutationRequest(mutationDisableMsgChannel, {
-    id,
+    id: msgChannelId,
   })
   if (result.data?.disableMsgChannel.id) {
     return result.data.disableMsgChannel
@@ -176,12 +176,12 @@ export async function disableMsgChannel(id: string) {
 
 /**
  * 启用消息通道
- * @param id
+ * @param msgChannelId
  * @returns
  */
-export async function enableMsgChannel(id: string) {
+export async function enableMsgChannel(msgChannelId: string) {
   const result = await mutationRequest(mutationEnableMsgChannel, {
-    id,
+    id: msgChannelId,
   })
   if (result.data?.enableMsgChannel.id) {
     return result.data.enableMsgChannel
@@ -191,12 +191,12 @@ export async function enableMsgChannel(id: string) {
 
 /**
  * 启用消息通道
- * @param id
+ * @param msgChannelId
  * @returns
  */
-export async function delMsgChannel(id: string) {
+export async function delMsgChannel(msgChannelId: string) {
   const result = await mutationRequest(mutationDelMsgChannel, {
-    id,
+    id: msgChannelId,
   })
   if (result.data?.deleteMsgChannel) {
     return result.data.deleteMsgChannel

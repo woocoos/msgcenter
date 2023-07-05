@@ -64,7 +64,7 @@ export const initStoreData = (store: IMockStore) => {
     store.get('MsgChannel', 1),
   ]))
   store.set('Query', 'ROOT', 'msgEvents', listTemp([
-
+    store.get('MsgEvent', 1),
   ]))
   store.set('Query', 'ROOT', 'msgTemplates', listTemp([
 
@@ -77,13 +77,23 @@ export const initStoreData = (store: IMockStore) => {
 
   // MsgChannel
   store.set('MsgChannel', 1, {
-    id: 1, name: 'msgChannel1',
+    id: 1, name: 'msgChannel1'
   })
-
 
   // MsgType
   store.set('MsgType', 1, {
-    id: 1, name: 'MsgType1', appID: 1
+    id: 1, name: 'MsgType1', appID: 1, category: 'categoryNmae'
   })
+
+  // MsgEvent
+  store.set('MsgEvent', 1, {
+    id: 1, name: 'MsgEvent1', modes: 'email,webhook', msgType: store.get('MsgType', 1), msgTypeID: 1
+  })
+
+
+  // MsgTemplate
+  // store.set('MsgTemplate', 1, {
+  //   id: 1, name: 'MsgTemplate1', receiverType: 'emial'
+  // })
 
 }

@@ -14,7 +14,7 @@ const queryMsgTypeList = gql(/* GraphQL */`query msgTypeList($first: Int,$orderB
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
-        id,name,comments,appID,status,category,status,canSubs,canCustom,createdAt
+        id,name,comments,appID,status,category,canSubs,canCustom,createdAt
       }
     }
   }
@@ -25,7 +25,7 @@ const queryMsgTypeInfo = gql(/* GraphQL */`query msgTypeInfo($gid:GID!){
   node(id: $gid){
     id
     ... on MsgType{
-      id,name,comments,appID,status,category,status,canSubs,canCustom,createdAt
+      id,name,comments,appID,status,category,canSubs,canCustom,createdAt
     }
   }
 }`);
@@ -99,6 +99,7 @@ export async function createMsgType(input: CreateMsgTypeInput) {
 
 /**
  * 更新消息类型
+ * @param msgTypeId
  * @param input
  * @returns
  */
@@ -115,7 +116,7 @@ export async function updateMsgType(msgTypeId: string, input: UpdateMsgTypeInput
 
 /**
  * 删除消息类型
- * @param input
+ * @param msgTypeId
  * @returns
  */
 export async function delMsgType(msgTypeId: string) {

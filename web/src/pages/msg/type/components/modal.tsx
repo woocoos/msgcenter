@@ -4,67 +4,54 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
-import defaultApp from '@/assets/images/default-app.png';
-import { App, AppKind, AppWhereInput } from '@/__generated__/adminx/graphql';
-import { formatArrayFilesRaw } from '@/services/files';
-import { EnumAppKind, getAppList } from '@/services/adminx/app/indtx';
+import { MsgType, MsgTypeWhereInput } from '@/__generated__/msgsrv/graphql';
+import InputApp from '@/components/Adminx/App/input';
+import { cacheApp, updateCacheAppListByIds } from '@/services/adminx/app/indtx';
+import { getMsgTypeList } from '@/services/msgsrv/type';
 
 export default (props: {
   open: boolean;
   isMultiple?: boolean;
   title: string;
   tableTitle?: string;
-  onClose: (selectData?: App[]) => void;
+  onClose: (selectData?: MsgType[]) => void;
 }) => {
   const { t } = useTranslation(),
-    columns: ProColumns<App>[] = [
+    columns: ProColumns<MsgType>[] = [
       // 有需要排序配置  sorter: true
       {
-        title: t('name'),
-        dataIndex: 'name',
-        width: 120,
-        search: {
-          transform: (value) => ({ nameContains: value || undefined }),
+        title: t('app'), dataIndex: 'app', width: 120,
+        renderFormItem() {
+          return <InputApp />
+        },
+        render: (text, record) => {
+          return record.appID ? cacheApp[record.appID]?.name || record.appID : '-';
         },
       },
-      {
-        title: t('code'),
-        dataIndex: 'code',
-        width: 120,
-        search: {
-          transform: (value) => ({ codeContains: value || undefined }),
-        },
-      },
-      {
-        title: t('type'),
-        dataIndex: 'kind',
-        filters: true,
-        search: false,
-        width: 100,
-        valueEnum: EnumAppKind,
-      },
-      { title: t('description'), dataIndex: 'comments', width: 160, search: false },
+      { title: t('category'), dataIndex: 'category', width: 120 },
+      { title: t('name'), dataIndex: 'name', width: 120 },
+      { title: t('description'), dataIndex: 'comments', width: 120, search: false },
     ],
-    [dataSource, setDataSource] = useState<App[]>([]),
+    [dataSource, setDataSource] = useState<MsgType[]>([]),
     // 选中处理
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as App[], success: true, total: 0 },
-        where: AppWhereInput = {};
-      where.nameContains = params.nameContains;
-      where.codeContains = params.codeContains;
-      where.kindIn = filter.kind as AppKind[];
+      const table = { data: [] as MsgType[], success: true, total: 0 },
+        where: MsgTypeWhereInput = {};
+      where.appID = params.app?.id;
+      where.category = params.category;
+      where.nameContains = params.name;
 
-      const result = await getAppList({
+      const result = await getMsgTypeList({
         current: params.current,
         pageSize: params.pageSize,
         where,
       });
       if (result?.totalCount) {
-        table.data = result.edges?.map(item => item?.node) as App[];
-        table.data = await formatArrayFilesRaw(table.data, "logo", defaultApp)
+        table.data = result.edges?.map(item => item?.node) as MsgType[];
+        await updateCacheAppListByIds(table.data.map(item => item.appID || ''))
         table.total = result.totalCount;
       }
       setSelectedRowKeys([]);

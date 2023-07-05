@@ -6,7 +6,9 @@ import * as casual from "casual";
 import { addListTemp, delListTemp, initStoreData, listTemp } from "./store";
 
 const preserveResolvers = true
+
 const typeDefs = readFileSync(join(process.cwd(), 'script', '__generated__', "msgsrv.graphql"), 'utf-8');
+
 const schema = makeExecutableSchema({ typeDefs });
 
 const mocks = {
@@ -46,6 +48,80 @@ const schemaWithMocks = addMocksToSchema({
       }
     },
     Mutation: {
+      createMsgTemplate(_, { input }) {
+        input.id = `${Date.now()}`;
+        if (input.eventID) {
+          input.msgEventID = input.eventID
+          input.event = store.get('MsgEvent', input.eventID)
+          delete input.eventID;
+        }
+        store.set('MsgTemplate', input.id, input)
+        return addListTemp(
+          store,
+          store.get('Query', 'ROOT', 'msgTemplates') as Ref,
+          store.get('MsgTemplate', input.id) as Ref
+        );
+      },
+      updateMsgTemplate(_, { id, input }) {
+        if (input.eventID) {
+          input.msgEventID = input.eventID
+          input.event = store.get('MsgEvent', input.eventID)
+          delete input.eventID;
+        }
+        store.set('MsgTemplate', id, input)
+        return store.get('MsgTemplate', id)
+      },
+      deleteMsgTemplate(_, { id }) {
+        delListTemp(
+          store,
+          store.get('Query', 'ROOT', 'msgTemplates') as Ref,
+          id,
+        )
+        return true;
+      },
+      enableMsgTemplate(_, { id }) {
+        store.set('MsgTemplate', id, "status", 'active')
+        return store.get('MsgTemplate', id)
+      },
+      disableMsgTemplate(_, { id }) {
+        store.set('MsgTemplate', id, "status", 'inactive')
+        return store.get('MsgTemplate', id)
+      },
+      createMsgEvent(_, { input }) {
+        input.id = `${Date.now()}`;
+        if (input.msgTypeID) {
+          input.msgType = store.get('MsgType', input.msgTypeID)
+        }
+        store.set('MsgEvent', input.id, input)
+        return addListTemp(
+          store,
+          store.get('Query', 'ROOT', 'msgEvents') as Ref,
+          store.get('MsgEvent', input.id) as Ref
+        );
+      },
+      updateMsgEvent(_, { id, input }) {
+        if (input.msgTypeID) {
+          input.msgType = store.get('MsgType', input.msgTypeID)
+        }
+        store.set('MsgEvent', id, input)
+        return store.get('MsgEvent', id)
+      },
+      deleteMsgEvent(_, { id }) {
+        delListTemp(
+          store,
+          store.get('Query', 'ROOT', 'msgEvents') as Ref,
+          id,
+        )
+        return true;
+      },
+      enableMsgEvent(_, { id }) {
+        store.set('MsgEvent', id, "status", 'active')
+        return store.get('MsgEvent', id)
+      },
+      disableMsgEvent(_, { id }) {
+        store.set('MsgEvent', id, "status", 'inactive')
+        return store.get('MsgEvent', id)
+      },
       createMsgChannel(_, { input }) {
         input.id = `${Date.now()}`;
         store.set('MsgChannel', input.id, input)
