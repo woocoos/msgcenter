@@ -1,17 +1,15 @@
 import { gid } from '@/util';
 import { pagingRequest, queryRequest } from '../';
 import { gql } from '@/__generated__/adminx';
-import { OrderDirection, Org, OrgKind, OrgOrder, OrgOrderField, OrgWhereInput } from '@/__generated__/adminx/graphql';
+import { OrderDirection, Org, OrgOrder, OrgOrderField, OrgWhereInput } from '@/__generated__/adminx/graphql';
 
 export const EnumOrgStatus = {
   active: { text: '活跃', status: 'success' },
   inactive: { text: '失活', status: 'default' },
   processing: { text: '处理中', status: 'warning' },
-},
-  EnumOrgKind = {
-    root: { text: '组织' },
-    org: { text: '部门' },
-  };
+};
+
+export const cacheOrg: Record<string, Org> = {}
 
 const queryOrgList = gql(/* GraphQL */`query orgList($first: Int,$orderBy:OrgOrder,$where:OrgWhereInput){
   organizations(first:$first,orderBy: $orderBy,where: $where){
@@ -26,15 +24,13 @@ const queryOrgList = gql(/* GraphQL */`query orgList($first: Int,$orderBy:OrgOrd
   }
 }`);
 
-const queryOrgInfo = gql(/* GraphQL */`query orgInfo($gid:GID!){
-  node(id: $gid){
+const queryOrgIdList = gql(/* GraphQL */`query orgIdList($ids:[GID!]!){
+  nodes(ids: $ids){
     ... on Org{
-      id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
-      domain,code,name,profile,status,path,displaySort,countryCode,timezone,
-      owner { id,displayName }
+      id,code,name
     }
   }
-}`);
+}`)
 
 
 /**
@@ -64,43 +60,24 @@ export async function getOrgList(gather: {
   return null;
 }
 
-/**
- * 通过path获取整个组织树结构
- * @param orgId
- * @returns
- */
-export async function getOrgPathList(orgId: string, kind: OrgKind) {
-  const topOrg = await getOrgInfo(orgId),
-    orgList: Org[] = [];
-  if (topOrg?.id) {
-    orgList.push(topOrg as Org);
-    const result = await getOrgList({
-      pageSize: 9999,
-      where: {
-        pathHasPrefix: `${topOrg.path}/`,
-        kind: kind,
-      },
-    });
-    if (result?.totalCount) {
-      orgList.push(...(result.edges?.map(item => item?.node) as Org[] || []));
-    }
-  }
-  return orgList;
-}
+
 
 
 /**
- * 获取组织信息
- * @param orgId
- * @returns
+ * 缓存org值
+ * @param ids
  */
-export async function getOrgInfo(orgId: string) {
-  const
-    result = await queryRequest(queryOrgInfo, {
-      gid: gid('org', orgId),
-    });
-  if (result.data?.node?.__typename === 'Org') {
-    return result.data.node;
+export async function updateCacheOrgListByIds(ids: (string | number)[]) {
+  const cacheIds = Object.keys(cacheOrg)
+  const newCacheIds = ids.filter(id => !cacheIds.includes(`${id}`))
+  if (newCacheIds.length) {
+    const result = await queryRequest(queryOrgIdList, {
+      ids: newCacheIds.map(id => gid('org', id))
+    })
+    result.data?.nodes?.forEach(item => {
+      if (item?.__typename === 'Org') {
+        cacheOrg[item.id] = item as Org
+      }
+    })
   }
-  return null;
 }

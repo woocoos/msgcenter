@@ -85,6 +85,8 @@ export default {
     404: '找不到方法',
     500: '服务端系统异常',
     category: '分类',
+    org: '组织',
+    configuration: '配置',
 
     // 多个字符组成
     confirm_copy: '确定是否复制',
@@ -99,24 +101,34 @@ export default {
     page_404_title: '您访问的页面不存在',
     search_app: '搜索应用',
     click_search_app: '点击搜索应用',
+    search_org: '搜索组织',
+    click_search_org: '点击搜索组织',
+    manage_account: '管理账户',
 
     msg_center: '消息中心',
     msg_type: '消息类型',
+    msg_channel: '消息通道',
     open_subscription: '开放订阅',
     open_custom: '开放定制',
 
     // 创建
     create_msg_type: '创建消息类型',
+    create_msg_channel: '创建消息通道',
     // 修改
     amend_msg_type: '修改消息类型',
+    amend_msg_channle: '修改消息通道',
+    amend_msg_channel_config: '修改消息通道配置',
     // 列表
     msg_type_list: '消息类型列表',
+    msg_channel_list: '消息通道列表',
 
     // 详情
 
     // 必填
+    please_enter_org: '请输入组织',
     please_enter_app: '请输入应用',
     please_enter_category: '请输入分类',
+    please_enter_type: '请输入类型',
     please_enter_name: '请输入名称',
     please_enter_status: '请输入状态',
     please_enter_description: '请输入描述',

@@ -61,7 +61,7 @@ export const delListTemp = (store: IMockStore, ref: Ref, key: string) => {
 export const initStoreData = (store: IMockStore) => {
   // -------------root------------------------
   store.set('Query', 'ROOT', 'msgChannels', listTemp([
-
+    store.get('MsgChannel', 1),
   ]))
   store.set('Query', 'ROOT', 'msgEvents', listTemp([
 
@@ -77,7 +77,7 @@ export const initStoreData = (store: IMockStore) => {
 
   // MsgChannel
   store.set('MsgChannel', 1, {
-    id: 1, name: 'msgChannel1'
+    id: 1, name: 'msgChannel1',
   })
 
 

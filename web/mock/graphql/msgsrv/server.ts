@@ -8,11 +8,14 @@ import { addListTemp, delListTemp, initStoreData, listTemp } from "./store";
 const preserveResolvers = true
 const typeDefs = readFileSync(join(process.cwd(), 'script', '__generated__', "msgsrv.graphql"), 'utf-8');
 const schema = makeExecutableSchema({ typeDefs });
+
 const mocks = {
   ID: () => casual.integer(1, 1000000000),
   Time: () => casual.date('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
   Cursor: () => casual._string(),
   GID: () => casual._string(),
+  MapString: () => { },
+  HostPort: () => casual._string(),
   Query: {},
   Mutation: {},
 }
@@ -43,6 +46,35 @@ const schemaWithMocks = addMocksToSchema({
       }
     },
     Mutation: {
+      createMsgChannel(_, { input }) {
+        input.id = `${Date.now()}`;
+        store.set('MsgChannel', input.id, input)
+        return addListTemp(
+          store,
+          store.get('Query', 'ROOT', 'msgChannels') as Ref,
+          store.get('MsgChannel', input.id) as Ref
+        );
+      },
+      updateMsgChannel(_, { id, input }) {
+        store.set('MsgChannel', id, input)
+        return store.get('MsgChannel', id)
+      },
+      deleteMsgChannel(_, { id }) {
+        delListTemp(
+          store,
+          store.get('Query', 'ROOT', 'msgChannels') as Ref,
+          id,
+        )
+        return true;
+      },
+      enableMsgChannel(_, { id }) {
+        store.set('MsgChannel', id, "status", 'active')
+        return store.get('MsgChannel', id)
+      },
+      disableMsgChannel(_, { id }) {
+        store.set('MsgChannel', id, "status", 'inactive')
+        return store.get('MsgChannel', id)
+      },
       createMsgType(_, { input }) {
         input.id = `${Date.now()}`;
         store.set('MsgType', input.id, input)
@@ -68,7 +100,6 @@ const schemaWithMocks = addMocksToSchema({
   }
 })
 
-
 /**
  * 解析gid
  * @param gid
@@ -85,4 +116,3 @@ function parseGid(gid: string) {
 }
 
 export default mockServer(schemaWithMocks, mocks, preserveResolvers)
-

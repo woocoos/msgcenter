@@ -85,6 +85,8 @@ export default {
     404: "Can't find a way",
     500: 'The server system is abnormal',
     category: 'category',
+    org: 'organization',
+    configuration: 'config',
 
     // 多个字符组成
     confirm_copy: 'confirm copy',
@@ -98,18 +100,24 @@ export default {
     page_404_title: 'The page you are looking for does not exist',
     search_app: 'Search application',
     click_search_app: 'Click search app',
+    manage_account: 'Administrative account',
 
     msg_center: 'Message center',
     msg_type: 'Message type',
+    msg_channel: 'Message channel',
     open_subscription: 'Open subscription',
     open_custom: 'Open customization',
 
     // 创建
     create_msg_type: 'Create message type',
+    create_msg_channel: 'Create message channel',
     // 修改
-    amend_msg_type: 'Modify type list',
+    amend_msg_type: 'Modify message type',
+    amend_msg_channel: 'Modify message channel',
+    amend_msg_channel_config: 'Modify message channel config',
     // 列表
     msg_type_list: 'Message type list',
+    msg_channel_list: 'Message channel list',
     // 详情
     // account_detail: 'Account details',
     // 必填提示
