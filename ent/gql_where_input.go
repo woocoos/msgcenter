@@ -15,6 +15,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/ent/silence"
+	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
 
@@ -2795,17 +2796,15 @@ type SilenceWhereInput struct {
 	UpdatedAtIsNil  bool        `json:"updatedAtIsNil,omitempty"`
 	UpdatedAtNotNil bool        `json:"updatedAtNotNil,omitempty"`
 
-	// "deleted_at" field predicates.
-	DeletedAt       *time.Time  `json:"deletedAt,omitempty"`
-	DeletedAtNEQ    *time.Time  `json:"deletedAtNEQ,omitempty"`
-	DeletedAtIn     []time.Time `json:"deletedAtIn,omitempty"`
-	DeletedAtNotIn  []time.Time `json:"deletedAtNotIn,omitempty"`
-	DeletedAtGT     *time.Time  `json:"deletedAtGT,omitempty"`
-	DeletedAtGTE    *time.Time  `json:"deletedAtGTE,omitempty"`
-	DeletedAtLT     *time.Time  `json:"deletedAtLT,omitempty"`
-	DeletedAtLTE    *time.Time  `json:"deletedAtLTE,omitempty"`
-	DeletedAtIsNil  bool        `json:"deletedAtIsNil,omitempty"`
-	DeletedAtNotNil bool        `json:"deletedAtNotNil,omitempty"`
+	// "tenant_id" field predicates.
+	TenantID      *int  `json:"tenantID,omitempty"`
+	TenantIDNEQ   *int  `json:"tenantIDNEQ,omitempty"`
+	TenantIDIn    []int `json:"tenantIDIn,omitempty"`
+	TenantIDNotIn []int `json:"tenantIDNotIn,omitempty"`
+	TenantIDGT    *int  `json:"tenantIDGT,omitempty"`
+	TenantIDGTE   *int  `json:"tenantIDGTE,omitempty"`
+	TenantIDLT    *int  `json:"tenantIDLT,omitempty"`
+	TenantIDLTE   *int  `json:"tenantIDLTE,omitempty"`
 
 	// "starts_at" field predicates.
 	StartsAt      *time.Time  `json:"startsAt,omitempty"`
@@ -2826,6 +2825,12 @@ type SilenceWhereInput struct {
 	EndsAtGTE   *time.Time  `json:"endsAtGTE,omitempty"`
 	EndsAtLT    *time.Time  `json:"endsAtLT,omitempty"`
 	EndsAtLTE   *time.Time  `json:"endsAtLTE,omitempty"`
+
+	// "state" field predicates.
+	State      *alert.SilenceState  `json:"state,omitempty"`
+	StateNEQ   *alert.SilenceState  `json:"stateNEQ,omitempty"`
+	StateIn    []alert.SilenceState `json:"stateIn,omitempty"`
+	StateNotIn []alert.SilenceState `json:"stateNotIn,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -3019,35 +3024,29 @@ func (i *SilenceWhereInput) P() (predicate.Silence, error) {
 	if i.UpdatedAtNotNil {
 		predicates = append(predicates, silence.UpdatedAtNotNil())
 	}
-	if i.DeletedAt != nil {
-		predicates = append(predicates, silence.DeletedAtEQ(*i.DeletedAt))
+	if i.TenantID != nil {
+		predicates = append(predicates, silence.TenantIDEQ(*i.TenantID))
 	}
-	if i.DeletedAtNEQ != nil {
-		predicates = append(predicates, silence.DeletedAtNEQ(*i.DeletedAtNEQ))
+	if i.TenantIDNEQ != nil {
+		predicates = append(predicates, silence.TenantIDNEQ(*i.TenantIDNEQ))
 	}
-	if len(i.DeletedAtIn) > 0 {
-		predicates = append(predicates, silence.DeletedAtIn(i.DeletedAtIn...))
+	if len(i.TenantIDIn) > 0 {
+		predicates = append(predicates, silence.TenantIDIn(i.TenantIDIn...))
 	}
-	if len(i.DeletedAtNotIn) > 0 {
-		predicates = append(predicates, silence.DeletedAtNotIn(i.DeletedAtNotIn...))
+	if len(i.TenantIDNotIn) > 0 {
+		predicates = append(predicates, silence.TenantIDNotIn(i.TenantIDNotIn...))
 	}
-	if i.DeletedAtGT != nil {
-		predicates = append(predicates, silence.DeletedAtGT(*i.DeletedAtGT))
+	if i.TenantIDGT != nil {
+		predicates = append(predicates, silence.TenantIDGT(*i.TenantIDGT))
 	}
-	if i.DeletedAtGTE != nil {
-		predicates = append(predicates, silence.DeletedAtGTE(*i.DeletedAtGTE))
+	if i.TenantIDGTE != nil {
+		predicates = append(predicates, silence.TenantIDGTE(*i.TenantIDGTE))
 	}
-	if i.DeletedAtLT != nil {
-		predicates = append(predicates, silence.DeletedAtLT(*i.DeletedAtLT))
+	if i.TenantIDLT != nil {
+		predicates = append(predicates, silence.TenantIDLT(*i.TenantIDLT))
 	}
-	if i.DeletedAtLTE != nil {
-		predicates = append(predicates, silence.DeletedAtLTE(*i.DeletedAtLTE))
-	}
-	if i.DeletedAtIsNil {
-		predicates = append(predicates, silence.DeletedAtIsNil())
-	}
-	if i.DeletedAtNotNil {
-		predicates = append(predicates, silence.DeletedAtNotNil())
+	if i.TenantIDLTE != nil {
+		predicates = append(predicates, silence.TenantIDLTE(*i.TenantIDLTE))
 	}
 	if i.StartsAt != nil {
 		predicates = append(predicates, silence.StartsAtEQ(*i.StartsAt))
@@ -3096,6 +3095,18 @@ func (i *SilenceWhereInput) P() (predicate.Silence, error) {
 	}
 	if i.EndsAtLTE != nil {
 		predicates = append(predicates, silence.EndsAtLTE(*i.EndsAtLTE))
+	}
+	if i.State != nil {
+		predicates = append(predicates, silence.StateEQ(*i.State))
+	}
+	if i.StateNEQ != nil {
+		predicates = append(predicates, silence.StateNEQ(*i.StateNEQ))
+	}
+	if len(i.StateIn) > 0 {
+		predicates = append(predicates, silence.StateIn(i.StateIn...))
+	}
+	if len(i.StateNotIn) > 0 {
+		predicates = append(predicates, silence.StateNotIn(i.StateNotIn...))
 	}
 
 	switch len(predicates) {

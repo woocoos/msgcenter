@@ -10,6 +10,7 @@ import (
 	"github.com/woocoos/entco/schemax"
 	gen "github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/intercept"
+	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 )
 
@@ -29,21 +30,23 @@ func (Silence) Annotations() []schema.Annotation {
 
 func (Silence) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		schemax.IntID{},
+		schemax.SnowFlakeID{},
 		schemax.AuditMixin{},
-		schemax.NewSoftDeleteMixin[intercept.Query, *gen.Client](intercept.NewQuery),
+		schemax.NewTenantMixin[intercept.Query, *gen.Client](intercept.NewQuery),
 	}
 }
 
 // Fields of the Silence.
 func (Silence) Fields() []ent.Field {
 	return []ent.Field{
-		field.JSON("matchers", []label.Matcher{}).Optional().Comment("应用ID").
+		field.JSON("matchers", []*label.Matcher{}).Optional().Comment("应用ID").
 			Annotations(entgql.Skip(entgql.SkipWhereInput)),
 		field.Time("starts_at").Comment("开始时间"),
 		field.Time("ends_at").Comment("结束时间"),
 		field.String("comments").Optional().Comment("备注").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
+		field.Enum("state").GoType(alert.SilenceState("")).
+			Default(alert.SilenceStateActive.String()).Comment("状态"),
 	}
 }
 
@@ -51,6 +54,7 @@ func (Silence) Fields() []ent.Field {
 func (Silence) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("user", User.Type).Ref("silences").Comment("创建人").Unique().
-			Required().Immutable().Field("created_by"),
+			Required().Immutable().Field("created_by").
+			Annotations(entgql.Skip(entgql.SkipMutationCreateInput)),
 	}
 }

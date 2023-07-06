@@ -128,6 +128,7 @@ func nameHook() ent.Hook {
 	}, hook.HasFields("name"))
 }
 
+// 站内信是一种特殊的webhoook.
 func modesHook() ent.Hook {
 	return hook.If(func(next ent.Mutator) ent.Mutator {
 		return hook.MsgEventFunc(func(ctx context.Context, m *gen.MsgEventMutation) (gen.Value, error) {
@@ -137,14 +138,14 @@ func modesHook() ent.Hook {
 			}
 			rts := strings.Split(modes, ",")
 			rtvs := profile.ReceiverType("").Values()
-			rtvMap := make(map[string]string)
-			for _, rtv := range rtvs {
-				rtvMap[rtv] = rtv
-			}
+		check:
 			for _, rt := range rts {
-				if rtvMap[rt] != rt {
-					return nil, fmt.Errorf("invalid modes")
+				for _, rtv := range rtvs {
+					if rt == rtv {
+						break check
+					}
 				}
+				return nil, fmt.Errorf("invalid modes %s", rt)
 			}
 			return next.Mutate(ctx, m)
 		})
@@ -194,15 +195,20 @@ func routeHook() ent.Hook {
 }
 
 func checkReceiverName(routes []*profile.Route, receiverTypes []string) error {
-	for _, rt := range receiverTypes {
-		for _, r := range routes {
-			if !strings.HasPrefix(r.Receiver, rt) {
-				return fmt.Errorf("invalid receiver")
+	for _, r := range routes {
+		found := false
+		for _, rt := range receiverTypes {
+			if strings.HasPrefix(r.Receiver, rt) {
+				found = true
+				break
 			}
-			if r.Routes != nil {
-				if err := checkReceiverName(r.Routes, receiverTypes); err != nil {
-					return err
-				}
+		}
+		if !found {
+			return fmt.Errorf("invalid receiver %s", r.Receiver)
+		}
+		if r.Routes != nil {
+			if err := checkReceiverName(r.Routes, receiverTypes); err != nil {
+				return err
 			}
 		}
 	}

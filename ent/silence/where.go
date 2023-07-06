@@ -8,6 +8,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/woocoos/msgcenter/ent/predicate"
+	"github.com/woocoos/msgcenter/pkg/alert"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
@@ -77,9 +78,9 @@ func UpdatedAt(v time.Time) predicate.Silence {
 	return predicate.Silence(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
-func DeletedAt(v time.Time) predicate.Silence {
-	return predicate.Silence(sql.FieldEQ(FieldDeletedAt, v))
+// TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
+func TenantID(v int) predicate.Silence {
+	return predicate.Silence(sql.FieldEQ(FieldTenantID, v))
 }
 
 // StartsAt applies equality check predicate on the "starts_at" field. It's identical to StartsAtEQ.
@@ -257,54 +258,44 @@ func UpdatedAtNotNil() predicate.Silence {
 	return predicate.Silence(sql.FieldNotNull(FieldUpdatedAt))
 }
 
-// DeletedAtEQ applies the EQ predicate on the "deleted_at" field.
-func DeletedAtEQ(v time.Time) predicate.Silence {
-	return predicate.Silence(sql.FieldEQ(FieldDeletedAt, v))
+// TenantIDEQ applies the EQ predicate on the "tenant_id" field.
+func TenantIDEQ(v int) predicate.Silence {
+	return predicate.Silence(sql.FieldEQ(FieldTenantID, v))
 }
 
-// DeletedAtNEQ applies the NEQ predicate on the "deleted_at" field.
-func DeletedAtNEQ(v time.Time) predicate.Silence {
-	return predicate.Silence(sql.FieldNEQ(FieldDeletedAt, v))
+// TenantIDNEQ applies the NEQ predicate on the "tenant_id" field.
+func TenantIDNEQ(v int) predicate.Silence {
+	return predicate.Silence(sql.FieldNEQ(FieldTenantID, v))
 }
 
-// DeletedAtIn applies the In predicate on the "deleted_at" field.
-func DeletedAtIn(vs ...time.Time) predicate.Silence {
-	return predicate.Silence(sql.FieldIn(FieldDeletedAt, vs...))
+// TenantIDIn applies the In predicate on the "tenant_id" field.
+func TenantIDIn(vs ...int) predicate.Silence {
+	return predicate.Silence(sql.FieldIn(FieldTenantID, vs...))
 }
 
-// DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
-func DeletedAtNotIn(vs ...time.Time) predicate.Silence {
-	return predicate.Silence(sql.FieldNotIn(FieldDeletedAt, vs...))
+// TenantIDNotIn applies the NotIn predicate on the "tenant_id" field.
+func TenantIDNotIn(vs ...int) predicate.Silence {
+	return predicate.Silence(sql.FieldNotIn(FieldTenantID, vs...))
 }
 
-// DeletedAtGT applies the GT predicate on the "deleted_at" field.
-func DeletedAtGT(v time.Time) predicate.Silence {
-	return predicate.Silence(sql.FieldGT(FieldDeletedAt, v))
+// TenantIDGT applies the GT predicate on the "tenant_id" field.
+func TenantIDGT(v int) predicate.Silence {
+	return predicate.Silence(sql.FieldGT(FieldTenantID, v))
 }
 
-// DeletedAtGTE applies the GTE predicate on the "deleted_at" field.
-func DeletedAtGTE(v time.Time) predicate.Silence {
-	return predicate.Silence(sql.FieldGTE(FieldDeletedAt, v))
+// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
+func TenantIDGTE(v int) predicate.Silence {
+	return predicate.Silence(sql.FieldGTE(FieldTenantID, v))
 }
 
-// DeletedAtLT applies the LT predicate on the "deleted_at" field.
-func DeletedAtLT(v time.Time) predicate.Silence {
-	return predicate.Silence(sql.FieldLT(FieldDeletedAt, v))
+// TenantIDLT applies the LT predicate on the "tenant_id" field.
+func TenantIDLT(v int) predicate.Silence {
+	return predicate.Silence(sql.FieldLT(FieldTenantID, v))
 }
 
-// DeletedAtLTE applies the LTE predicate on the "deleted_at" field.
-func DeletedAtLTE(v time.Time) predicate.Silence {
-	return predicate.Silence(sql.FieldLTE(FieldDeletedAt, v))
-}
-
-// DeletedAtIsNil applies the IsNil predicate on the "deleted_at" field.
-func DeletedAtIsNil() predicate.Silence {
-	return predicate.Silence(sql.FieldIsNull(FieldDeletedAt))
-}
-
-// DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
-func DeletedAtNotNil() predicate.Silence {
-	return predicate.Silence(sql.FieldNotNull(FieldDeletedAt))
+// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
+func TenantIDLTE(v int) predicate.Silence {
+	return predicate.Silence(sql.FieldLTE(FieldTenantID, v))
 }
 
 // MatchersIsNil applies the IsNil predicate on the "matchers" field.
@@ -472,6 +463,36 @@ func CommentsContainsFold(v string) predicate.Silence {
 	return predicate.Silence(sql.FieldContainsFold(FieldComments, v))
 }
 
+// StateEQ applies the EQ predicate on the "state" field.
+func StateEQ(v alert.SilenceState) predicate.Silence {
+	vc := v
+	return predicate.Silence(sql.FieldEQ(FieldState, vc))
+}
+
+// StateNEQ applies the NEQ predicate on the "state" field.
+func StateNEQ(v alert.SilenceState) predicate.Silence {
+	vc := v
+	return predicate.Silence(sql.FieldNEQ(FieldState, vc))
+}
+
+// StateIn applies the In predicate on the "state" field.
+func StateIn(vs ...alert.SilenceState) predicate.Silence {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Silence(sql.FieldIn(FieldState, v...))
+}
+
+// StateNotIn applies the NotIn predicate on the "state" field.
+func StateNotIn(vs ...alert.SilenceState) predicate.Silence {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Silence(sql.FieldNotIn(FieldState, v...))
+}
+
 // HasUser applies the HasEdge predicate on the "user" edge.
 func HasUser() predicate.Silence {
 	return predicate.Silence(func(s *sql.Selector) {
@@ -503,32 +524,15 @@ func HasUserWith(preds ...predicate.User) predicate.Silence {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Silence) predicate.Silence {
-	return predicate.Silence(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Silence(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.Silence) predicate.Silence {
-	return predicate.Silence(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.Silence(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.Silence) predicate.Silence {
-	return predicate.Silence(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.Silence(sql.NotPredicates(p))
 }

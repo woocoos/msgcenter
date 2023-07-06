@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
+	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 )
 
@@ -28,16 +29,18 @@ type Silence struct {
 	UpdatedBy int `json:"updated_by,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// DeletedAt holds the value of the "deleted_at" field.
-	DeletedAt time.Time `json:"deleted_at,omitempty"`
+	// TenantID holds the value of the "tenant_id" field.
+	TenantID int `json:"tenant_id,omitempty"`
 	// 应用ID
-	Matchers []label.Matcher `json:"matchers,omitempty"`
+	Matchers []*label.Matcher `json:"matchers,omitempty"`
 	// 开始时间
 	StartsAt time.Time `json:"starts_at,omitempty"`
 	// 结束时间
 	EndsAt time.Time `json:"ends_at,omitempty"`
 	// 备注
 	Comments string `json:"comments,omitempty"`
+	// 状态
+	State alert.SilenceState `json:"state,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SilenceQuery when eager-loading is set.
 	Edges        SilenceEdges `json:"edges"`
@@ -75,11 +78,11 @@ func (*Silence) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case silence.FieldMatchers:
 			values[i] = new([]byte)
-		case silence.FieldID, silence.FieldCreatedBy, silence.FieldUpdatedBy:
+		case silence.FieldID, silence.FieldCreatedBy, silence.FieldUpdatedBy, silence.FieldTenantID:
 			values[i] = new(sql.NullInt64)
-		case silence.FieldComments:
+		case silence.FieldComments, silence.FieldState:
 			values[i] = new(sql.NullString)
-		case silence.FieldCreatedAt, silence.FieldUpdatedAt, silence.FieldDeletedAt, silence.FieldStartsAt, silence.FieldEndsAt:
+		case silence.FieldCreatedAt, silence.FieldUpdatedAt, silence.FieldStartsAt, silence.FieldEndsAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -126,11 +129,11 @@ func (s *Silence) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.UpdatedAt = value.Time
 			}
-		case silence.FieldDeletedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+		case silence.FieldTenantID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
 			} else if value.Valid {
-				s.DeletedAt = value.Time
+				s.TenantID = int(value.Int64)
 			}
 		case silence.FieldMatchers:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -157,6 +160,12 @@ func (s *Silence) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field comments", values[i])
 			} else if value.Valid {
 				s.Comments = value.String
+			}
+		case silence.FieldState:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field state", values[i])
+			} else if value.Valid {
+				s.State = alert.SilenceState(value.String)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -211,8 +220,8 @@ func (s *Silence) String() string {
 	builder.WriteString("updated_at=")
 	builder.WriteString(s.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("deleted_at=")
-	builder.WriteString(s.DeletedAt.Format(time.ANSIC))
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", s.TenantID))
 	builder.WriteString(", ")
 	builder.WriteString("matchers=")
 	builder.WriteString(fmt.Sprintf("%v", s.Matchers))
@@ -225,6 +234,9 @@ func (s *Silence) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("comments=")
 	builder.WriteString(s.Comments)
+	builder.WriteString(", ")
+	builder.WriteString("state=")
+	builder.WriteString(fmt.Sprintf("%v", s.State))
 	builder.WriteByte(')')
 	return builder.String()
 }

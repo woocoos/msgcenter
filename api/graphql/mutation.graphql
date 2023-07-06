@@ -39,6 +39,12 @@ type Mutation {
     createMsgSubscriber(inputs: [CreateMsgSubscriberInput!]!): [MsgSubscriber!]!
     # 删除订阅
     deleteMsgSubscriber(ids: [ID!]!): Boolean!
+    # 创建静默
+    createSilence(input: CreateSilenceInput!): Silence!
+    # 更新静默
+    updateSilence(id: ID!, input: UpdateSilenceInput!): Silence!
+    # 删除静默
+    deleteSilence(id: ID!): Boolean!
 }
 
 input RouteInput  {

@@ -15,8 +15,7 @@ test-db:
 genent:
 	go run codegen/entgen/entc.go
 genoas:
-	#go run codegen/oasgen/oasgen.go
-	# go install github.com/tsingsun/woocoo/cmd/woco
+	# go install github.com/tsingsun/woocoo/cmd/woco@main
 	woco oasgen -c ./codegen/oasgen/config.yaml
 gengql:
 	go run codegen/gqlgen/gqlgen.go

@@ -4,13 +4,13 @@ go 1.20
 
 require (
 	entgo.io/contrib v0.4.5
-	entgo.io/ent v0.12.3
+	entgo.io/ent v0.12.4-0.20230702151415-1ec75238037c
 	github.com/99designs/gqlgen v0.17.31
 	github.com/benbjohnson/clock v1.3.0
 	github.com/cenkalti/backoff/v4 v4.2.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-sql-driver/mysql v1.7.0
-	github.com/google/uuid v1.3.0
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/hashicorp/go-multierror v1.1.1
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/knadh/koanf/parsers/json v0.1.0
@@ -23,7 +23,7 @@ require (
 	github.com/tsingsun/woocoo v0.3.1-0.20230625020618-99b3d687fca5
 	github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230625020618-99b3d687fca5
 	github.com/vektah/gqlparser/v2 v2.5.1
-	github.com/woocoos/entco v0.0.0-20230702090420-e7c45fe78ba6
+	github.com/woocoos/entco v0.0.0-20230705101224-5ba8d6ba4d50
 	go.uber.org/zap v1.24.0
 	golang.org/x/sync v0.3.0
 	golang.org/x/text v0.9.0
@@ -31,7 +31,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.12.0 // indirect
+	ariga.io/atlas v0.12.1-0.20230620155259-b8e83e5e8ad6 // indirect
 	ariga.io/entcache v0.1.1-0.20230620164151-0eb723a11c40 // indirect
 	github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible // indirect
 	github.com/XSAM/otelsql v0.23.0 // indirect
@@ -58,10 +58,10 @@ require (
 	github.com/go-playground/validator/v10 v10.14.0 // indirect
 	github.com/go-test/deep v1.0.8 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.1 // indirect

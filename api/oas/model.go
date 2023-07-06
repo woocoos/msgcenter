@@ -19,7 +19,7 @@ type AlertGroups []*AlertGroup
 
 type AlertStatus struct {
 	InhibitedBy []string `binding:"required" json:"inhibitedBy"`
-	SilencedBy  []string `binding:"required" json:"silencedBy"`
+	SilencedBy  []int    `binding:"required" json:"silencedBy"`
 	State       string   `binding:"required" json:"state"`
 }
 
@@ -55,7 +55,7 @@ type GettableAlerts []*GettableAlert
 
 type GettableSilence struct {
 	*Silence  `json:",inline"`
-	ID        string        `binding:"required" json:"id"`
+	ID        int           `binding:"required" json:"id"`
 	Status    SilenceStatus `binding:"required" json:"status"`
 	UpdatedAt time.Time     `time_format:"2006-01-02T15:04:05Z07:00" binding:"required" json:"updatedAt"`
 }
@@ -89,7 +89,7 @@ type PostableAlerts []*PostableAlert
 
 type PostableSilence struct {
 	*Silence `json:",inline"`
-	ID       string `json:"id,omitempty"`
+	ID       int `json:"id,omitempty"`
 }
 
 type Receiver struct {
@@ -98,10 +98,11 @@ type Receiver struct {
 
 type Silence struct {
 	Comment   string    `binding:"required" json:"comment"`
-	CreatedBy string    `binding:"required" json:"createdBy"`
+	CreatedBy int       `binding:"required" json:"createdBy"`
 	EndsAt    time.Time `time_format:"2006-01-02T15:04:05Z07:00" binding:"gt,required" json:"endsAt"`
 	Matchers  Matchers  `binding:"min=1,omitempty" json:"matchers"`
 	StartsAt  time.Time `time_format:"2006-01-02T15:04:05Z07:00" binding:"ltfield=EndsAt,required" json:"startsAt"`
+	TenantID  int       `binding:"required" json:"tenantID"`
 }
 
 type SilenceStatus struct {

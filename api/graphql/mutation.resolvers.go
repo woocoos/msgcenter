@@ -258,6 +258,46 @@ func (r *mutationResolver) DeleteMsgSubscriber(ctx context.Context, ids []int) (
 	return err == nil, err
 }
 
+// CreateSilence is the resolver for the createSilence field.
+func (r *mutationResolver) CreateSilence(ctx context.Context, input ent.CreateSilenceInput) (*ent.Silence, error) {
+	sil, err := ent.FromContext(ctx).Silence.Create().SetInput(input).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+	_, err = r.Silences.Set(sil)
+	return sil, err
+}
+
+// UpdateSilence is the resolver for the updateSilence field.
+func (r *mutationResolver) UpdateSilence(ctx context.Context, id int, input ent.UpdateSilenceInput) (*ent.Silence, error) {
+	client := ent.FromContext(ctx)
+	sil, err := client.Silence.UpdateOneID(id).SetInput(input).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err = r.Silences.Set(sil)
+	if err != nil {
+		return nil, err
+	}
+	if sil.ID == id {
+		return sil, nil
+	}
+	mu := client.Silence.UpdateOne(sil).Mutation()
+	mu.SetOp(ent.OpCreate)
+	v, err := client.Mutate(ctx, mu)
+	return v.(*ent.Silence), err
+}
+
+// DeleteSilence is the resolver for the deleteSilence field.
+func (r *mutationResolver) DeleteSilence(ctx context.Context, id int) (bool, error) {
+	err := ent.FromContext(ctx).Silence.DeleteOneID(id).Exec(ctx)
+	if err != nil {
+		return false, err
+	}
+	err = r.Silences.Expire(id)
+	return err == nil, err
+}
+
 // Matchers is the resolver for the matchers field.
 func (r *routeInputResolver) Matchers(ctx context.Context, obj *profile.Route, data []*label.Matcher) error {
 	obj.Matchers = data

@@ -21,6 +21,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
+	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
@@ -7002,12 +7003,14 @@ type SilenceMutation struct {
 	updated_by     *int
 	addupdated_by  *int
 	updated_at     *time.Time
-	deleted_at     *time.Time
-	matchers       *[]label.Matcher
-	appendmatchers []label.Matcher
+	tenant_id      *int
+	addtenant_id   *int
+	matchers       *[]*label.Matcher
+	appendmatchers []*label.Matcher
 	starts_at      *time.Time
 	ends_at        *time.Time
 	comments       *string
+	state          *alert.SilenceState
 	clearedFields  map[string]struct{}
 	user           *int
 	cleareduser    bool
@@ -7311,63 +7314,70 @@ func (m *SilenceMutation) ResetUpdatedAt() {
 	delete(m.clearedFields, silence.FieldUpdatedAt)
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (m *SilenceMutation) SetDeletedAt(t time.Time) {
-	m.deleted_at = &t
+// SetTenantID sets the "tenant_id" field.
+func (m *SilenceMutation) SetTenantID(i int) {
+	m.tenant_id = &i
+	m.addtenant_id = nil
 }
 
-// DeletedAt returns the value of the "deleted_at" field in the mutation.
-func (m *SilenceMutation) DeletedAt() (r time.Time, exists bool) {
-	v := m.deleted_at
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *SilenceMutation) TenantID() (r int, exists bool) {
+	v := m.tenant_id
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldDeletedAt returns the old "deleted_at" field's value of the Silence entity.
+// OldTenantID returns the old "tenant_id" field's value of the Silence entity.
 // If the Silence object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SilenceMutation) OldDeletedAt(ctx context.Context) (v time.Time, err error) {
+func (m *SilenceMutation) OldTenantID(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
 	}
-	return oldValue.DeletedAt, nil
+	return oldValue.TenantID, nil
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (m *SilenceMutation) ClearDeletedAt() {
-	m.deleted_at = nil
-	m.clearedFields[silence.FieldDeletedAt] = struct{}{}
+// AddTenantID adds i to the "tenant_id" field.
+func (m *SilenceMutation) AddTenantID(i int) {
+	if m.addtenant_id != nil {
+		*m.addtenant_id += i
+	} else {
+		m.addtenant_id = &i
+	}
 }
 
-// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
-func (m *SilenceMutation) DeletedAtCleared() bool {
-	_, ok := m.clearedFields[silence.FieldDeletedAt]
-	return ok
+// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
+func (m *SilenceMutation) AddedTenantID() (r int, exists bool) {
+	v := m.addtenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
 }
 
-// ResetDeletedAt resets all changes to the "deleted_at" field.
-func (m *SilenceMutation) ResetDeletedAt() {
-	m.deleted_at = nil
-	delete(m.clearedFields, silence.FieldDeletedAt)
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *SilenceMutation) ResetTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
 }
 
 // SetMatchers sets the "matchers" field.
-func (m *SilenceMutation) SetMatchers(l []label.Matcher) {
+func (m *SilenceMutation) SetMatchers(l []*label.Matcher) {
 	m.matchers = &l
 	m.appendmatchers = nil
 }
 
 // Matchers returns the value of the "matchers" field in the mutation.
-func (m *SilenceMutation) Matchers() (r []label.Matcher, exists bool) {
+func (m *SilenceMutation) Matchers() (r []*label.Matcher, exists bool) {
 	v := m.matchers
 	if v == nil {
 		return
@@ -7378,7 +7388,7 @@ func (m *SilenceMutation) Matchers() (r []label.Matcher, exists bool) {
 // OldMatchers returns the old "matchers" field's value of the Silence entity.
 // If the Silence object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SilenceMutation) OldMatchers(ctx context.Context) (v []label.Matcher, err error) {
+func (m *SilenceMutation) OldMatchers(ctx context.Context) (v []*label.Matcher, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldMatchers is only allowed on UpdateOne operations")
 	}
@@ -7393,12 +7403,12 @@ func (m *SilenceMutation) OldMatchers(ctx context.Context) (v []label.Matcher, e
 }
 
 // AppendMatchers adds l to the "matchers" field.
-func (m *SilenceMutation) AppendMatchers(l []label.Matcher) {
+func (m *SilenceMutation) AppendMatchers(l []*label.Matcher) {
 	m.appendmatchers = append(m.appendmatchers, l...)
 }
 
 // AppendedMatchers returns the list of values that were appended to the "matchers" field in this mutation.
-func (m *SilenceMutation) AppendedMatchers() ([]label.Matcher, bool) {
+func (m *SilenceMutation) AppendedMatchers() ([]*label.Matcher, bool) {
 	if len(m.appendmatchers) == 0 {
 		return nil, false
 	}
@@ -7546,6 +7556,42 @@ func (m *SilenceMutation) ResetComments() {
 	delete(m.clearedFields, silence.FieldComments)
 }
 
+// SetState sets the "state" field.
+func (m *SilenceMutation) SetState(as alert.SilenceState) {
+	m.state = &as
+}
+
+// State returns the value of the "state" field in the mutation.
+func (m *SilenceMutation) State() (r alert.SilenceState, exists bool) {
+	v := m.state
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldState returns the old "state" field's value of the Silence entity.
+// If the Silence object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SilenceMutation) OldState(ctx context.Context) (v alert.SilenceState, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldState is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldState requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldState: %w", err)
+	}
+	return oldValue.State, nil
+}
+
+// ResetState resets all changes to the "state" field.
+func (m *SilenceMutation) ResetState() {
+	m.state = nil
+}
+
 // SetUserID sets the "user" edge to the User entity by id.
 func (m *SilenceMutation) SetUserID(id int) {
 	m.user = &id
@@ -7619,7 +7665,7 @@ func (m *SilenceMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SilenceMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.user != nil {
 		fields = append(fields, silence.FieldCreatedBy)
 	}
@@ -7632,8 +7678,8 @@ func (m *SilenceMutation) Fields() []string {
 	if m.updated_at != nil {
 		fields = append(fields, silence.FieldUpdatedAt)
 	}
-	if m.deleted_at != nil {
-		fields = append(fields, silence.FieldDeletedAt)
+	if m.tenant_id != nil {
+		fields = append(fields, silence.FieldTenantID)
 	}
 	if m.matchers != nil {
 		fields = append(fields, silence.FieldMatchers)
@@ -7646,6 +7692,9 @@ func (m *SilenceMutation) Fields() []string {
 	}
 	if m.comments != nil {
 		fields = append(fields, silence.FieldComments)
+	}
+	if m.state != nil {
+		fields = append(fields, silence.FieldState)
 	}
 	return fields
 }
@@ -7663,8 +7712,8 @@ func (m *SilenceMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedBy()
 	case silence.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case silence.FieldDeletedAt:
-		return m.DeletedAt()
+	case silence.FieldTenantID:
+		return m.TenantID()
 	case silence.FieldMatchers:
 		return m.Matchers()
 	case silence.FieldStartsAt:
@@ -7673,6 +7722,8 @@ func (m *SilenceMutation) Field(name string) (ent.Value, bool) {
 		return m.EndsAt()
 	case silence.FieldComments:
 		return m.Comments()
+	case silence.FieldState:
+		return m.State()
 	}
 	return nil, false
 }
@@ -7690,8 +7741,8 @@ func (m *SilenceMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldUpdatedBy(ctx)
 	case silence.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case silence.FieldDeletedAt:
-		return m.OldDeletedAt(ctx)
+	case silence.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case silence.FieldMatchers:
 		return m.OldMatchers(ctx)
 	case silence.FieldStartsAt:
@@ -7700,6 +7751,8 @@ func (m *SilenceMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldEndsAt(ctx)
 	case silence.FieldComments:
 		return m.OldComments(ctx)
+	case silence.FieldState:
+		return m.OldState(ctx)
 	}
 	return nil, fmt.Errorf("unknown Silence field %s", name)
 }
@@ -7737,15 +7790,15 @@ func (m *SilenceMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUpdatedAt(v)
 		return nil
-	case silence.FieldDeletedAt:
-		v, ok := value.(time.Time)
+	case silence.FieldTenantID:
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetDeletedAt(v)
+		m.SetTenantID(v)
 		return nil
 	case silence.FieldMatchers:
-		v, ok := value.([]label.Matcher)
+		v, ok := value.([]*label.Matcher)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -7772,6 +7825,13 @@ func (m *SilenceMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetComments(v)
 		return nil
+	case silence.FieldState:
+		v, ok := value.(alert.SilenceState)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetState(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Silence field %s", name)
 }
@@ -7783,6 +7843,9 @@ func (m *SilenceMutation) AddedFields() []string {
 	if m.addupdated_by != nil {
 		fields = append(fields, silence.FieldUpdatedBy)
 	}
+	if m.addtenant_id != nil {
+		fields = append(fields, silence.FieldTenantID)
+	}
 	return fields
 }
 
@@ -7793,6 +7856,8 @@ func (m *SilenceMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case silence.FieldUpdatedBy:
 		return m.AddedUpdatedBy()
+	case silence.FieldTenantID:
+		return m.AddedTenantID()
 	}
 	return nil, false
 }
@@ -7809,6 +7874,13 @@ func (m *SilenceMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddUpdatedBy(v)
 		return nil
+	case silence.FieldTenantID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTenantID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Silence numeric field %s", name)
 }
@@ -7822,9 +7894,6 @@ func (m *SilenceMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(silence.FieldUpdatedAt) {
 		fields = append(fields, silence.FieldUpdatedAt)
-	}
-	if m.FieldCleared(silence.FieldDeletedAt) {
-		fields = append(fields, silence.FieldDeletedAt)
 	}
 	if m.FieldCleared(silence.FieldMatchers) {
 		fields = append(fields, silence.FieldMatchers)
@@ -7852,9 +7921,6 @@ func (m *SilenceMutation) ClearField(name string) error {
 	case silence.FieldUpdatedAt:
 		m.ClearUpdatedAt()
 		return nil
-	case silence.FieldDeletedAt:
-		m.ClearDeletedAt()
-		return nil
 	case silence.FieldMatchers:
 		m.ClearMatchers()
 		return nil
@@ -7881,8 +7947,8 @@ func (m *SilenceMutation) ResetField(name string) error {
 	case silence.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
-	case silence.FieldDeletedAt:
-		m.ResetDeletedAt()
+	case silence.FieldTenantID:
+		m.ResetTenantID()
 		return nil
 	case silence.FieldMatchers:
 		m.ResetMatchers()
@@ -7895,6 +7961,9 @@ func (m *SilenceMutation) ResetField(name string) error {
 		return nil
 	case silence.FieldComments:
 		m.ResetComments()
+		return nil
+	case silence.FieldState:
+		m.ResetState()
 		return nil
 	}
 	return fmt.Errorf("unknown Silence field %s", name)

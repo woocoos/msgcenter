@@ -306,7 +306,6 @@ func NewMarkerMetrics(r prometheus.Registerer, gfunc func(state string) float64)
 type SilencesMetrics struct {
 	GcDuration              prometheus.Summary
 	SnapshotDuration        prometheus.Summary
-	SnapshotSize            prometheus.Gauge
 	QueriesTotal            prometheus.Counter
 	QueryErrorsTotal        prometheus.Counter
 	QueryDuration           prometheus.Histogram
@@ -329,10 +328,6 @@ func NewSilencesMetrics(r prometheus.Registerer, sfunc func(state string) float6
 		Name:       "msgcenter_silences_snapshot_duration_seconds",
 		Help:       "Duration of the last silence snapshot.",
 		Objectives: map[float64]float64{},
-	})
-	m.SnapshotSize = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "msgcenter_silences_snapshot_size_bytes",
-		Help: "Size of the last silence snapshot in bytes.",
 	})
 	m.MaintenanceTotal = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: "msgcenter_silences_maintenance_total",
@@ -378,7 +373,6 @@ func NewSilencesMetrics(r prometheus.Registerer, sfunc func(state string) float6
 		r.MustRegister(
 			m.GcDuration,
 			m.SnapshotDuration,
-			m.SnapshotSize,
 			m.QueriesTotal,
 			m.QueryErrorsTotal,
 			m.QueryDuration,

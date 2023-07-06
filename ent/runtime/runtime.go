@@ -139,6 +139,8 @@ func init() {
 	silence.Hooks[1] = silenceMixinHooks2[0]
 	silenceMixinInters2 := silenceMixin[2].Interceptors()
 	silence.Interceptors[0] = silenceMixinInters2[0]
+	silenceMixinFields0 := silenceMixin[0].Fields()
+	_ = silenceMixinFields0
 	silenceMixinFields1 := silenceMixin[1].Fields()
 	_ = silenceMixinFields1
 	silenceFields := schema.Silence{}.Fields()
@@ -147,6 +149,10 @@ func init() {
 	silenceDescCreatedAt := silenceMixinFields1[1].Descriptor()
 	// silence.DefaultCreatedAt holds the default value on creation for the created_at field.
 	silence.DefaultCreatedAt = silenceDescCreatedAt.Default.(func() time.Time)
+	// silenceDescID is the schema descriptor for id field.
+	silenceDescID := silenceMixinFields0[0].Descriptor()
+	// silence.DefaultID holds the default value on creation for the id field.
+	silence.DefaultID = silenceDescID.Default.(func() int)
 	userHooks := schema.User{}.Hooks()
 	user.Hooks[0] = userHooks[0]
 	userFields := schema.User{}.Fields()
@@ -162,6 +168,6 @@ func init() {
 }
 
 const (
-	Version = "v0.12.3"                                         // Version of ent codegen.
-	Sum     = "h1:N5lO2EOrHpCH5HYfiMOCHYbo+oh5M8GjT0/cx5x6xkk=" // Sum of ent codegen.
+	Version = "v0.12.4-0.20230702151415-1ec75238037c"           // Version of ent codegen.
+	Sum     = "h1:63w0ILLHBEPwyeMO4en09BA8GLUwCwNfI+3C3MamOhY=" // Sum of ent codegen.
 )

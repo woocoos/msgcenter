@@ -3,11 +3,14 @@
 package silence
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/woocoos/msgcenter/pkg/alert"
 )
 
 const (
@@ -23,8 +26,8 @@ const (
 	FieldUpdatedBy = "updated_by"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
-	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
-	FieldDeletedAt = "deleted_at"
+	// FieldTenantID holds the string denoting the tenant_id field in the database.
+	FieldTenantID = "tenant_id"
 	// FieldMatchers holds the string denoting the matchers field in the database.
 	FieldMatchers = "matchers"
 	// FieldStartsAt holds the string denoting the starts_at field in the database.
@@ -33,6 +36,8 @@ const (
 	FieldEndsAt = "ends_at"
 	// FieldComments holds the string denoting the comments field in the database.
 	FieldComments = "comments"
+	// FieldState holds the string denoting the state field in the database.
+	FieldState = "state"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// Table holds the table name of the silence in the database.
@@ -53,11 +58,12 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedBy,
 	FieldUpdatedAt,
-	FieldDeletedAt,
+	FieldTenantID,
 	FieldMatchers,
 	FieldStartsAt,
 	FieldEndsAt,
 	FieldComments,
+	FieldState,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -80,7 +86,21 @@ var (
 	Interceptors [1]ent.Interceptor
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() int
 )
+
+const DefaultState alert.SilenceState = "active"
+
+// StateValidator is a validator for the "state" field enum values. It is called by the builders before save.
+func StateValidator(s alert.SilenceState) error {
+	switch s.String() {
+	case "expired", "active", "pending":
+		return nil
+	default:
+		return fmt.Errorf("silence: invalid enum value for state field: %q", s)
+	}
+}
 
 // OrderOption defines the ordering options for the Silence queries.
 type OrderOption func(*sql.Selector)
@@ -110,9 +130,9 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// ByDeletedAt orders the results by the deleted_at field.
-func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
+// ByTenantID orders the results by the tenant_id field.
+func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
 // ByStartsAt orders the results by the starts_at field.
@@ -130,6 +150,11 @@ func ByComments(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldComments, opts...).ToFunc()
 }
 
+// ByState orders the results by the state field.
+func ByState(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldState, opts...).ToFunc()
+}
+
 // ByUserField orders the results by user field.
 func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -143,3 +168,10 @@ func newUserStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
 	)
 }
+
+var (
+	// alert.SilenceState must implement graphql.Marshaler.
+	_ graphql.Marshaler = (*alert.SilenceState)(nil)
+	// alert.SilenceState must implement graphql.Unmarshaler.
+	_ graphql.Unmarshaler = (*alert.SilenceState)(nil)
+)

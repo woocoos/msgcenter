@@ -137,7 +137,7 @@ func StatusValidator(s typex.SimpleStatus) error {
 // ReceiverTypeValidator is a validator for the "receiver_type" field enum values. It is called by the builders before save.
 func ReceiverTypeValidator(rt profile.ReceiverType) error {
 	switch rt.String() {
-	case "email", "webhook":
+	case "email", "internal", "webhook":
 		return nil
 	default:
 		return fmt.Errorf("msgtemplate: invalid enum value for receiver_type field: %q", rt)
