@@ -20,3 +20,7 @@ projects:
       endpoints:
         default:
           schema:"../api/graphql/*.graphql"
+  main:
+    schema: "../api/graphql/*.graphql"
+    documents:
+      - '../api/graphql/*.graphql'
