@@ -59,14 +59,19 @@ export async function delFiles(fileId: string) {
 /**
  * 获取数据
  * @param fileId
+ * @param type
  * @returns
  */
-export async function getFilesRaw(fileId: string) {
+export async function getFilesRaw(fileId: string, type?: 'url') {
   const result = await request.get(`${baseURL}/files/${fileId}/raw`, {
     responseType: "blob",
   })
   if (typeof result === 'object' && result.constructor.name === 'Blob') {
-    return URL.createObjectURL(result);
+    if (type === 'url') {
+      return URL.createObjectURL(result);
+    } else {
+      return result as Blob
+    }
   }
   return null;
 }

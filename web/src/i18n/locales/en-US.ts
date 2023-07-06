@@ -89,6 +89,7 @@ export default {
     configuration: 'config',
     template: 'template',
     subject: 'subject',
+    attachments: 'attachments',
 
     // 多个字符组成
     confirm_copy: 'confirm copy',
@@ -105,6 +106,11 @@ export default {
     search_msg_type: 'Search message type',
     click_search_msg_type: 'Click search message type',
     manage_account: 'Administrative account',
+    upload_file: 'Upload file',
+    'upload_file_accept_{{accept}}': 'Supported extension: {{accept}}',
+    'file_accept_err_{{accept}}': 'File extensions are not supported:{{accept}}',
+    temp_viewer: 'Template preview',
+    temp_down: 'Template download',
 
     msg_center: 'Message center',
     msg_type: 'Message type',
@@ -123,6 +129,8 @@ export default {
     msg_temp_from: 'addresser',
     msg_temp_format: 'Main body',
     msg_temp_format_tip: 'The body can contain the template syntax for go template',
+    attachments_tip: 'Attachments are fixed documents, and variables in attachments are not supported for the time being',
+    click_drag_upload: 'Click or drag the file to upload',
 
     // 创建
     create_msg_type: 'Create message type',

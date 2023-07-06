@@ -2,16 +2,16 @@ import { getFilesRaw, updateFiles } from "@/services/files";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import { Upload, message } from "antd"
 import { RcFile } from "antd/es/upload";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-
 
 export default (props: {
   directory?: string;
   value?: string;
   maxSize?: number;
   accept?: string;
-  onChange?: (value: string) => void;
+  children?: ReactNode;
+  onChange?: (value?: string) => void;
 }) => {
   const { t } = useTranslation(),
     [loading, setLoading] = useState(false),
@@ -30,7 +30,7 @@ export default (props: {
         return (fileSize / (1024 * 1024 * 1024)).toFixed(2) + 'GB';
       }
     },
-    beforeUpload = (file: RcFile) => {
+    beforeUpload = async (file: RcFile) => {
       let isTrue = true;
       const maxSize = props.maxSize || 1024 * 5000
 
@@ -39,7 +39,7 @@ export default (props: {
         message.error(t('file_size_<_{{str}}', { str: formatFileSize(maxSize) }));
       }
       if (isTrue) {
-        updateFile(file)
+        await updateFile(file)
       }
       return false
     },
@@ -50,7 +50,7 @@ export default (props: {
       setLoading(true)
       const result = await updateFiles({
         key,
-        bucket: "adminx-ui",
+        bucket: "adminx-msg",
         file: file,
       })
       if (result) {
@@ -60,8 +60,8 @@ export default (props: {
     },
     getFile = async () => {
       if (props.value) {
-        const result = await getFilesRaw(props.value)
-        if (result) {
+        const result = await getFilesRaw(props.value, 'url')
+        if (typeof result === 'string') {
           setImgsrc(result)
         }
       }
@@ -73,7 +73,7 @@ export default (props: {
 
   return <Upload
     accept={props.accept}
-    listType="picture-card"
+    listType='picture-card'
     showUploadList={false}
     beforeUpload={beforeUpload}
   >

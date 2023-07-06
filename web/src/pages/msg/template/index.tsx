@@ -57,7 +57,10 @@ export default () => {
                 key="editor"
                 onClick={() => {
                   setModal({
-                    open: true, title: `${t('edit')}:${record.name}`, id: record.id
+                    open: true,
+                    title: `${t('edit')}:${record.name}`,
+                    id: record.id,
+                    receiverType: record.receiverType,
                   });
                 }}
               >
@@ -234,7 +237,7 @@ export default () => {
             if (isSuccess) {
               proTableRef.current?.reload();
             }
-            setModal({ open: false, title: modal.title, id: '' });
+            setModal({ open: false, title: modal.title, id: '', receiverType: modal.receiverType });
           }}
           msgEvent={msgEventInfo}
           receiverType={modal.receiverType || MsgTemplateReceiverType.Email}

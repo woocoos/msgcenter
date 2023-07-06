@@ -89,6 +89,7 @@ export default {
     configuration: '配置',
     template: '模板',
     subject: '标题',
+    attachments: '附件',
 
     // 多个字符组成
     confirm_copy: '确定是否复制',
@@ -108,6 +109,11 @@ export default {
     search_msg_type: '搜索消息类型',
     click_search_msg_type: '点击搜索消息类型',
     manage_account: '管理账户',
+    upload_file: '上传文件',
+    'upload_file_accept_{{accept}}': '支持扩展名：{{accept}}',
+    'file_accept_err_{{accept}}': '不支持文件扩展名：{{accept}}',
+    temp_viewer: '模板预览',
+    temp_down: '模板下载',
 
     msg_center: '消息中心',
     msg_type: '消息类型',
@@ -126,6 +132,8 @@ export default {
     msg_temp_from: '发件人',
     msg_temp_format: '正文',
     msg_temp_format_tip: '正文可包含go template的模板语法',
+    attachments_tip: '附件为固定文档，暂时不支持附件中的变量',
+    click_drag_upload: '点击或拖拽文件上传',
 
     // 创建
     create_msg_type: '创建消息类型',

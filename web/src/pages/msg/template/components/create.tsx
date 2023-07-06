@@ -1,12 +1,15 @@
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { updateFormat } from '@/util';
-import { DrawerForm, ProFormRadio, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { useState } from 'react';
+import { DrawerForm, ProFormInstance, ProFormRadio, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Org } from '@/__generated__/adminx/graphql';
 import { MsgEvent, MsgTemplate, MsgTemplateFormat, MsgTemplateReceiverType } from '@/__generated__/msgsrv/graphql';
 import { EnumMsgTemplateFormat, createMsgTemplate, getMsgTemplateInfo, updateMsgTemplate } from '@/services/msgsrv/template';
 import InputOrg from '@/components/Adminx/Org/input';
+import TempBtnUpload from '@/components/UploadFiles/tempBtn';
+import { cacheOrg } from '@/services/adminx/org';
+import Multiple from '@/components/UploadFiles/multiple';
 
 type ProFormData = {
   org?: Org;
@@ -20,7 +23,7 @@ type ProFormData = {
   format: MsgTemplateFormat;
   body?: string;
   tpl?: string;
-  attachments?: string;
+  attachments?: string[];
 };
 
 export default (props: {
@@ -32,6 +35,7 @@ export default (props: {
   onClose: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
+    formRef = useRef<ProFormInstance>(),
     [info, setInfo] = useState<MsgTemplate>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
@@ -51,12 +55,24 @@ export default (props: {
       const initData: ProFormData = {
         name: '',
         subject: '',
-        format: MsgTemplateFormat.Html,
+        format: MsgTemplateFormat.Txt,
       }
       if (props.id) {
         const result = await getMsgTemplateInfo(props.id);
         if (result?.id) {
           setInfo(result as MsgTemplate);
+          initData.org = cacheOrg[result.tenantID];
+          initData.name = result.name;
+          initData.subject = result.subject || '';
+          initData.format = result.format;
+          initData.comments = result.comments || undefined;
+          initData.from = result.from || undefined;
+          initData.to = result.to || undefined;
+          initData.cc = result.cc || undefined;
+          initData.bcc = result.bcc || undefined;
+          initData.body = result.body || undefined;
+          initData.tpl = result.tpl || undefined;
+          initData.attachments = result.attachments?.split(',') || undefined;
         }
       }
       return initData;
@@ -80,7 +96,7 @@ export default (props: {
         bcc: values.bcc,
         body: values.body,
         tpl: values.tpl,
-        attachments: values.attachments,
+        attachments: values.attachments ? values.attachments.join(',') : undefined,
         comments: values.comments,
       }
 
@@ -118,6 +134,7 @@ export default (props: {
       onValuesChange={onValuesChange}
       onFinish={onFinish}
       onOpenChange={onOpenChange}
+      formRef={formRef}
     >
       <ProFormText
         name="org"
@@ -177,7 +194,21 @@ export default (props: {
       />
       <ProFormTextArea
         name="body"
+        fieldProps={{
+          rows: 6,
+        }}
       />
+      <ProFormText name="tpl">
+        <TempBtnUpload accept=".html,.txt" />
+      </ProFormText>
+      <ProFormText
+        x-if={props.receiverType === MsgTemplateReceiverType.Email}
+        name="attachments"
+        label={t('attachments')}
+        tooltip={t('attachments_tip')}
+      >
+        <Multiple accept=".doc,.docx,.jpg,.jpeg,.png,.pdf" />
+      </ProFormText>
     </DrawerForm>
   );
 };
