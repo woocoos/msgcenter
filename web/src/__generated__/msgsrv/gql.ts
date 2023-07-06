@@ -40,6 +40,10 @@ const documents = {
     "mutation createMsgType($input: CreateMsgTypeInput!){\n  createMsgType(input: $input){id}\n}": types.CreateMsgTypeDocument,
     "mutation updateMsgType($id:ID!,$input: UpdateMsgTypeInput!){\n  updateMsgType(id:$id,input: $input){id}\n}": types.UpdateMsgTypeDocument,
     "mutation delMsgType($id:ID!){\n  deleteMsgType(id:$id)\n}": types.DelMsgTypeDocument,
+    "query msgTypeCategory($keyword:String,$appID:ID){\n  msgTypeCategories(keyword: $keyword,appID:$appID)\n}": types.MsgTypeCategoryDocument,
+    "query msgTypeListAndSub($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,category,\n        subscriberUsers{\n          id,tenantID,msgTypeID,userID\n        },\n        subscriberRoles{\n          id,tenantID,msgTypeID,orgRoleID\n        },\n        excludeSubscriberUsers{\n          id,tenantID,msgTypeID,userID\n        }\n      }\n    }\n  }\n}": types.MsgTypeListAndSubDocument,
+    "mutation createMsgSubscriber($inputs: [CreateMsgSubscriberInput!]!){\n  createMsgSubscriber(inputs: $inputs){id}\n}": types.CreateMsgSubscriberDocument,
+    "mutation deleteMsgSubscriber($ids: [ID!]!){\n  deleteMsgSubscriber(ids: $ids)\n}": types.DeleteMsgSubscriberDocument,
 };
 
 /**
@@ -164,6 +168,22 @@ export function gql(source: "mutation updateMsgType($id:ID!,$input: UpdateMsgTyp
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation delMsgType($id:ID!){\n  deleteMsgType(id:$id)\n}"): (typeof documents)["mutation delMsgType($id:ID!){\n  deleteMsgType(id:$id)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query msgTypeCategory($keyword:String,$appID:ID){\n  msgTypeCategories(keyword: $keyword,appID:$appID)\n}"): (typeof documents)["query msgTypeCategory($keyword:String,$appID:ID){\n  msgTypeCategories(keyword: $keyword,appID:$appID)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query msgTypeListAndSub($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,category,\n        subscriberUsers{\n          id,tenantID,msgTypeID,userID\n        },\n        subscriberRoles{\n          id,tenantID,msgTypeID,orgRoleID\n        },\n        excludeSubscriberUsers{\n          id,tenantID,msgTypeID,userID\n        }\n      }\n    }\n  }\n}"): (typeof documents)["query msgTypeListAndSub($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,category,\n        subscriberUsers{\n          id,tenantID,msgTypeID,userID\n        },\n        subscriberRoles{\n          id,tenantID,msgTypeID,orgRoleID\n        },\n        excludeSubscriberUsers{\n          id,tenantID,msgTypeID,userID\n        }\n      }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createMsgSubscriber($inputs: [CreateMsgSubscriberInput!]!){\n  createMsgSubscriber(inputs: $inputs){id}\n}"): (typeof documents)["mutation createMsgSubscriber($inputs: [CreateMsgSubscriberInput!]!){\n  createMsgSubscriber(inputs: $inputs){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation deleteMsgSubscriber($ids: [ID!]!){\n  deleteMsgSubscriber(ids: $ids)\n}"): (typeof documents)["mutation deleteMsgSubscriber($ids: [ID!]!){\n  deleteMsgSubscriber(ids: $ids)\n}"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

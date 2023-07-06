@@ -78,7 +78,7 @@ export const authConfig = defineAuthConfig(async (appData) => {
     initialAuth = {};
   // 判断路由权限
   if (basis.token) {
-    const ups = await userPermissions({}, {
+    const ups = await userPermissions({
       Authorization: `Bearer ${basis.token}`,
       'X-Tenant-ID': basis.tenantId,
     });

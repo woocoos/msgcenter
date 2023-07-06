@@ -1,5 +1,5 @@
 import { gql } from "@/__generated__/msgsrv";
-import { CreateMsgTypeInput, MsgTypeOrder, MsgTypeWhereInput, UpdateMsgTypeInput } from "@/__generated__/msgsrv/graphql";
+import { CreateMsgSubscriberInput, CreateMsgTypeInput, MsgTypeOrder, MsgTypeWhereInput, UpdateMsgTypeInput } from "@/__generated__/msgsrv/graphql";
 import { mutationRequest, pagingRequest, queryRequest } from "..";
 import { gid } from "@/util";
 
@@ -41,6 +41,40 @@ const mutationUpdateMsgType = gql(/* GraphQL */`mutation updateMsgType($id:ID!,$
 const mutationDelMsgType = gql(/* GraphQL */`mutation delMsgType($id:ID!){
   deleteMsgType(id:$id)
 }`);
+
+const queryMsgTypeCategory = gql(/* GraphQL */`query msgTypeCategory($keyword:String,$appID:ID){
+  msgTypeCategories(keyword: $keyword,appID:$appID)
+}`);
+
+const queryMsgTypeListAndSub = gql(/* GraphQL */`query msgTypeListAndSub($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){
+  msgTypes(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,name,category,
+        subscriberUsers{
+          id,tenantID,msgTypeID,userID
+        },
+        subscriberRoles{
+          id,tenantID,msgTypeID,orgRoleID
+        },
+        excludeSubscriberUsers{
+          id,tenantID,msgTypeID,userID
+        }
+      }
+    }
+  }
+}`);
+
+const mutationCreateSub = gql(/* GraphQL */`mutation createMsgSubscriber($inputs: [CreateMsgSubscriberInput!]!){
+  createMsgSubscriber(inputs: $inputs){id}
+}`);
+
+const mutationDelSub = gql(/* GraphQL */`mutation deleteMsgSubscriber($ids: [ID!]!){
+  deleteMsgSubscriber(ids: $ids)
+}`);
+
+
 
 /**
  * 消息类型列表
@@ -125,6 +159,83 @@ export async function delMsgType(msgTypeId: string) {
   })
   if (result.data?.deleteMsgType) {
     return result.data.deleteMsgType
+  }
+  return null
+}
+
+
+
+/**
+ * 获取消息类型分类列表
+ * @param keyword
+ * @param appID
+ * @returns
+ */
+export async function getMsgTypeCategoryList(keyword?: string, appId?: string) {
+  const result = await queryRequest(queryMsgTypeCategory, {
+    keyword,
+    appID: appId,
+  })
+  if (result.data?.msgTypeCategories) {
+    return result.data.msgTypeCategories
+  }
+  return null
+}
+
+
+/**
+ * 消息类型列表包含订阅信息
+ * @param gather
+ * @returns
+ */
+export async function getMsgTypeListAndSub(
+  gather: {
+    current?: number;
+    pageSize?: number;
+    where?: MsgTypeWhereInput;
+    orderBy?: MsgTypeOrder;
+  }) {
+  const result = await pagingRequest(
+    queryMsgTypeListAndSub, {
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy,
+  }, gather.current || 1);
+
+  if (result.data?.msgTypes) {
+    return result.data.msgTypes;
+  }
+  return null;
+}
+
+
+
+/**
+ * 创建订阅
+ * @param inputs
+ * @returns
+ */
+export async function createSub(inputs: CreateMsgSubscriberInput[]) {
+  const result = await mutationRequest(mutationCreateSub, {
+    inputs,
+  })
+  if (result.data?.createMsgSubscriber) {
+    return result.data.createMsgSubscriber
+  }
+  return null
+}
+
+/**
+ * 移除订阅
+ * @param ids
+ * @returns
+ */
+export async function delSub(ids: string[]) {
+  const result = await mutationRequest(mutationDelSub, {
+    ids,
+  })
+  if (result.data?.deleteMsgSubscriber) {
+    return result.data.deleteMsgSubscriber
   }
   return null
 }
