@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
+	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 )
 
@@ -72,22 +73,14 @@ func (sc *SilenceCreate) SetNillableUpdatedAt(t *time.Time) *SilenceCreate {
 	return sc
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (sc *SilenceCreate) SetDeletedAt(t time.Time) *SilenceCreate {
-	sc.mutation.SetDeletedAt(t)
-	return sc
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (sc *SilenceCreate) SetNillableDeletedAt(t *time.Time) *SilenceCreate {
-	if t != nil {
-		sc.SetDeletedAt(*t)
-	}
+// SetTenantID sets the "tenant_id" field.
+func (sc *SilenceCreate) SetTenantID(i int) *SilenceCreate {
+	sc.mutation.SetTenantID(i)
 	return sc
 }
 
 // SetMatchers sets the "matchers" field.
-func (sc *SilenceCreate) SetMatchers(l []label.Matcher) *SilenceCreate {
+func (sc *SilenceCreate) SetMatchers(l []*label.Matcher) *SilenceCreate {
 	sc.mutation.SetMatchers(l)
 	return sc
 }
@@ -118,9 +111,31 @@ func (sc *SilenceCreate) SetNillableComments(s *string) *SilenceCreate {
 	return sc
 }
 
+// SetState sets the "state" field.
+func (sc *SilenceCreate) SetState(as alert.SilenceState) *SilenceCreate {
+	sc.mutation.SetState(as)
+	return sc
+}
+
+// SetNillableState sets the "state" field if the given value is not nil.
+func (sc *SilenceCreate) SetNillableState(as *alert.SilenceState) *SilenceCreate {
+	if as != nil {
+		sc.SetState(*as)
+	}
+	return sc
+}
+
 // SetID sets the "id" field.
 func (sc *SilenceCreate) SetID(i int) *SilenceCreate {
 	sc.mutation.SetID(i)
+	return sc
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (sc *SilenceCreate) SetNillableID(i *int) *SilenceCreate {
+	if i != nil {
+		sc.SetID(*i)
+	}
 	return sc
 }
 
@@ -179,6 +194,17 @@ func (sc *SilenceCreate) defaults() error {
 		v := silence.DefaultCreatedAt()
 		sc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := sc.mutation.State(); !ok {
+		v := silence.DefaultState
+		sc.mutation.SetState(v)
+	}
+	if _, ok := sc.mutation.ID(); !ok {
+		if silence.DefaultID == nil {
+			return fmt.Errorf("ent: uninitialized silence.DefaultID (forgotten import ent/runtime?)")
+		}
+		v := silence.DefaultID()
+		sc.mutation.SetID(v)
+	}
 	return nil
 }
 
@@ -190,11 +216,22 @@ func (sc *SilenceCreate) check() error {
 	if _, ok := sc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Silence.created_at"`)}
 	}
+	if _, ok := sc.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "Silence.tenant_id"`)}
+	}
 	if _, ok := sc.mutation.StartsAt(); !ok {
 		return &ValidationError{Name: "starts_at", err: errors.New(`ent: missing required field "Silence.starts_at"`)}
 	}
 	if _, ok := sc.mutation.EndsAt(); !ok {
 		return &ValidationError{Name: "ends_at", err: errors.New(`ent: missing required field "Silence.ends_at"`)}
+	}
+	if _, ok := sc.mutation.State(); !ok {
+		return &ValidationError{Name: "state", err: errors.New(`ent: missing required field "Silence.state"`)}
+	}
+	if v, ok := sc.mutation.State(); ok {
+		if err := silence.StateValidator(v); err != nil {
+			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "Silence.state": %w`, err)}
+		}
 	}
 	if _, ok := sc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Silence.user"`)}
@@ -245,9 +282,9 @@ func (sc *SilenceCreate) createSpec() (*Silence, *sqlgraph.CreateSpec) {
 		_spec.SetField(silence.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := sc.mutation.DeletedAt(); ok {
-		_spec.SetField(silence.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = value
+	if value, ok := sc.mutation.TenantID(); ok {
+		_spec.SetField(silence.FieldTenantID, field.TypeInt, value)
+		_node.TenantID = value
 	}
 	if value, ok := sc.mutation.Matchers(); ok {
 		_spec.SetField(silence.FieldMatchers, field.TypeJSON, value)
@@ -264,6 +301,10 @@ func (sc *SilenceCreate) createSpec() (*Silence, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.Comments(); ok {
 		_spec.SetField(silence.FieldComments, field.TypeString, value)
 		_node.Comments = value
+	}
+	if value, ok := sc.mutation.State(); ok {
+		_spec.SetField(silence.FieldState, field.TypeEnum, value)
+		_node.State = value
 	}
 	if nodes := sc.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -377,26 +418,8 @@ func (u *SilenceUpsert) ClearUpdatedAt() *SilenceUpsert {
 	return u
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (u *SilenceUpsert) SetDeletedAt(v time.Time) *SilenceUpsert {
-	u.Set(silence.FieldDeletedAt, v)
-	return u
-}
-
-// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
-func (u *SilenceUpsert) UpdateDeletedAt() *SilenceUpsert {
-	u.SetExcluded(silence.FieldDeletedAt)
-	return u
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (u *SilenceUpsert) ClearDeletedAt() *SilenceUpsert {
-	u.SetNull(silence.FieldDeletedAt)
-	return u
-}
-
 // SetMatchers sets the "matchers" field.
-func (u *SilenceUpsert) SetMatchers(v []label.Matcher) *SilenceUpsert {
+func (u *SilenceUpsert) SetMatchers(v []*label.Matcher) *SilenceUpsert {
 	u.Set(silence.FieldMatchers, v)
 	return u
 }
@@ -455,6 +478,18 @@ func (u *SilenceUpsert) ClearComments() *SilenceUpsert {
 	return u
 }
 
+// SetState sets the "state" field.
+func (u *SilenceUpsert) SetState(v alert.SilenceState) *SilenceUpsert {
+	u.Set(silence.FieldState, v)
+	return u
+}
+
+// UpdateState sets the "state" field to the value that was provided on create.
+func (u *SilenceUpsert) UpdateState() *SilenceUpsert {
+	u.SetExcluded(silence.FieldState)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -477,6 +512,9 @@ func (u *SilenceUpsertOne) UpdateNewValues() *SilenceUpsertOne {
 		}
 		if _, exists := u.create.mutation.CreatedAt(); exists {
 			s.SetIgnore(silence.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(silence.FieldTenantID)
 		}
 	}))
 	return u
@@ -558,29 +596,8 @@ func (u *SilenceUpsertOne) ClearUpdatedAt() *SilenceUpsertOne {
 	})
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (u *SilenceUpsertOne) SetDeletedAt(v time.Time) *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
-		s.SetDeletedAt(v)
-	})
-}
-
-// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
-func (u *SilenceUpsertOne) UpdateDeletedAt() *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
-		s.UpdateDeletedAt()
-	})
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (u *SilenceUpsertOne) ClearDeletedAt() *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
-		s.ClearDeletedAt()
-	})
-}
-
 // SetMatchers sets the "matchers" field.
-func (u *SilenceUpsertOne) SetMatchers(v []label.Matcher) *SilenceUpsertOne {
+func (u *SilenceUpsertOne) SetMatchers(v []*label.Matcher) *SilenceUpsertOne {
 	return u.Update(func(s *SilenceUpsert) {
 		s.SetMatchers(v)
 	})
@@ -646,6 +663,20 @@ func (u *SilenceUpsertOne) UpdateComments() *SilenceUpsertOne {
 func (u *SilenceUpsertOne) ClearComments() *SilenceUpsertOne {
 	return u.Update(func(s *SilenceUpsert) {
 		s.ClearComments()
+	})
+}
+
+// SetState sets the "state" field.
+func (u *SilenceUpsertOne) SetState(v alert.SilenceState) *SilenceUpsertOne {
+	return u.Update(func(s *SilenceUpsert) {
+		s.SetState(v)
+	})
+}
+
+// UpdateState sets the "state" field to the value that was provided on create.
+func (u *SilenceUpsertOne) UpdateState() *SilenceUpsertOne {
+	return u.Update(func(s *SilenceUpsert) {
+		s.UpdateState()
 	})
 }
 
@@ -833,6 +864,9 @@ func (u *SilenceUpsertBulk) UpdateNewValues() *SilenceUpsertBulk {
 			if _, exists := b.mutation.CreatedAt(); exists {
 				s.SetIgnore(silence.FieldCreatedAt)
 			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(silence.FieldTenantID)
+			}
 		}
 	}))
 	return u
@@ -914,29 +948,8 @@ func (u *SilenceUpsertBulk) ClearUpdatedAt() *SilenceUpsertBulk {
 	})
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (u *SilenceUpsertBulk) SetDeletedAt(v time.Time) *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
-		s.SetDeletedAt(v)
-	})
-}
-
-// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
-func (u *SilenceUpsertBulk) UpdateDeletedAt() *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
-		s.UpdateDeletedAt()
-	})
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (u *SilenceUpsertBulk) ClearDeletedAt() *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
-		s.ClearDeletedAt()
-	})
-}
-
 // SetMatchers sets the "matchers" field.
-func (u *SilenceUpsertBulk) SetMatchers(v []label.Matcher) *SilenceUpsertBulk {
+func (u *SilenceUpsertBulk) SetMatchers(v []*label.Matcher) *SilenceUpsertBulk {
 	return u.Update(func(s *SilenceUpsert) {
 		s.SetMatchers(v)
 	})
@@ -1002,6 +1015,20 @@ func (u *SilenceUpsertBulk) UpdateComments() *SilenceUpsertBulk {
 func (u *SilenceUpsertBulk) ClearComments() *SilenceUpsertBulk {
 	return u.Update(func(s *SilenceUpsert) {
 		s.ClearComments()
+	})
+}
+
+// SetState sets the "state" field.
+func (u *SilenceUpsertBulk) SetState(v alert.SilenceState) *SilenceUpsertBulk {
+	return u.Update(func(s *SilenceUpsert) {
+		s.SetState(v)
+	})
+}
+
+// UpdateState sets the "state" field to the value that was provided on create.
+func (u *SilenceUpsertBulk) UpdateState() *SilenceUpsertBulk {
+	return u.Update(func(s *SilenceUpsert) {
+		s.UpdateState()
 	})
 }
 

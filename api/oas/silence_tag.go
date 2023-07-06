@@ -2,16 +2,12 @@
 
 package oas
 
-import (
-	"github.com/google/uuid"
-)
-
 type DeleteSilenceRequest struct {
 	UriParams DeleteSilenceRequestUriParams
 }
 
 type DeleteSilenceRequestUriParams struct {
-	SilenceID uuid.UUID `binding:"required" uri:"silenceID"`
+	SilenceID int `binding:"required" uri:"silenceID"`
 }
 
 type GetSilenceRequest struct {
@@ -19,7 +15,7 @@ type GetSilenceRequest struct {
 }
 
 type GetSilenceRequestUriParams struct {
-	SilenceID uuid.UUID `binding:"required" uri:"silenceID"`
+	SilenceID int `binding:"required" uri:"silenceID"`
 }
 
 type GetSilencesRequest struct {
@@ -31,5 +27,5 @@ type PostSilencesRequest struct {
 }
 
 type PostSilencesResponse struct {
-	SilenceID string `json:"silenceID,omitempty"`
+	SilenceID int `json:"silenceID,omitempty"`
 }

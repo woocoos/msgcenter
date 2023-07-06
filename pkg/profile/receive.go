@@ -14,8 +14,9 @@ type ReceiverConfigs interface {
 type ReceiverType string
 
 const (
-	ReceiverEmail   ReceiverType = "email"
-	ReceiverWebhook ReceiverType = "webhook"
+	ReceiverEmail    ReceiverType = "email"
+	ReceiverInternal ReceiverType = "internal"
+	ReceiverWebhook  ReceiverType = "webhook"
 )
 
 func (r ReceiverType) String() string {
@@ -25,6 +26,7 @@ func (r ReceiverType) String() string {
 func (r ReceiverType) Values() []string {
 	return []string{
 		ReceiverEmail.String(),
+		ReceiverInternal.String(),
 		ReceiverWebhook.String(),
 	}
 }
@@ -49,7 +51,7 @@ func (r *ReceiverType) UnmarshalGQL(val interface{}) error {
 
 func ReceiverTypeValidator(input ReceiverType) error {
 	switch input {
-	case ReceiverEmail, ReceiverWebhook:
+	case ReceiverEmail, ReceiverInternal, ReceiverWebhook:
 		return nil
 	default:
 		return fmt.Errorf("invalid enum value for receiver field: %q", input)
@@ -61,8 +63,9 @@ type Receiver struct {
 	// A unique identifier for this receiver.
 	Name string `yaml:"name" json:"name"`
 
-	EmailConfigs   []*EmailConfig   `yaml:"emailConfigs,omitempty" json:"emailConfigs,omitempty"`
-	WebhookConfigs []*WebhookConfig `yaml:"webhookConfigs,omitempty" json:"webhookConfigs,omitempty"`
+	EmailConfigs    []*EmailConfig   `yaml:"emailConfigs,omitempty" json:"emailConfigs,omitempty"`
+	InternalConfigs []*WebhookConfig `yaml:"internalConfigs,omitempty" json:"internalConfigs,omitempty"`
+	WebhookConfigs  []*WebhookConfig `yaml:"webhookConfigs,omitempty" json:"webhookConfigs,omitempty"`
 }
 
 func TenantReceiverName(tid string, ori string) string {

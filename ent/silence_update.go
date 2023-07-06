@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/ent/silence"
+	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 
 	"github.com/woocoos/msgcenter/ent/internal"
@@ -79,34 +80,14 @@ func (su *SilenceUpdate) ClearUpdatedAt() *SilenceUpdate {
 	return su
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (su *SilenceUpdate) SetDeletedAt(t time.Time) *SilenceUpdate {
-	su.mutation.SetDeletedAt(t)
-	return su
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (su *SilenceUpdate) SetNillableDeletedAt(t *time.Time) *SilenceUpdate {
-	if t != nil {
-		su.SetDeletedAt(*t)
-	}
-	return su
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (su *SilenceUpdate) ClearDeletedAt() *SilenceUpdate {
-	su.mutation.ClearDeletedAt()
-	return su
-}
-
 // SetMatchers sets the "matchers" field.
-func (su *SilenceUpdate) SetMatchers(l []label.Matcher) *SilenceUpdate {
+func (su *SilenceUpdate) SetMatchers(l []*label.Matcher) *SilenceUpdate {
 	su.mutation.SetMatchers(l)
 	return su
 }
 
 // AppendMatchers appends l to the "matchers" field.
-func (su *SilenceUpdate) AppendMatchers(l []label.Matcher) *SilenceUpdate {
+func (su *SilenceUpdate) AppendMatchers(l []*label.Matcher) *SilenceUpdate {
 	su.mutation.AppendMatchers(l)
 	return su
 }
@@ -149,6 +130,20 @@ func (su *SilenceUpdate) ClearComments() *SilenceUpdate {
 	return su
 }
 
+// SetState sets the "state" field.
+func (su *SilenceUpdate) SetState(as alert.SilenceState) *SilenceUpdate {
+	su.mutation.SetState(as)
+	return su
+}
+
+// SetNillableState sets the "state" field if the given value is not nil.
+func (su *SilenceUpdate) SetNillableState(as *alert.SilenceState) *SilenceUpdate {
+	if as != nil {
+		su.SetState(*as)
+	}
+	return su
+}
+
 // Mutation returns the SilenceMutation object of the builder.
 func (su *SilenceUpdate) Mutation() *SilenceMutation {
 	return su.mutation
@@ -183,6 +178,11 @@ func (su *SilenceUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (su *SilenceUpdate) check() error {
+	if v, ok := su.mutation.State(); ok {
+		if err := silence.StateValidator(v); err != nil {
+			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "Silence.state": %w`, err)}
+		}
+	}
 	if _, ok := su.mutation.UserID(); su.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Silence.user"`)
 	}
@@ -216,12 +216,6 @@ func (su *SilenceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if su.mutation.UpdatedAtCleared() {
 		_spec.ClearField(silence.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := su.mutation.DeletedAt(); ok {
-		_spec.SetField(silence.FieldDeletedAt, field.TypeTime, value)
-	}
-	if su.mutation.DeletedAtCleared() {
-		_spec.ClearField(silence.FieldDeletedAt, field.TypeTime)
-	}
 	if value, ok := su.mutation.Matchers(); ok {
 		_spec.SetField(silence.FieldMatchers, field.TypeJSON, value)
 	}
@@ -244,6 +238,9 @@ func (su *SilenceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.CommentsCleared() {
 		_spec.ClearField(silence.FieldComments, field.TypeString)
+	}
+	if value, ok := su.mutation.State(); ok {
+		_spec.SetField(silence.FieldState, field.TypeEnum, value)
 	}
 	_spec.Node.Schema = su.schemaConfig.Silence
 	ctx = internal.NewSchemaConfigContext(ctx, su.schemaConfig)
@@ -314,34 +311,14 @@ func (suo *SilenceUpdateOne) ClearUpdatedAt() *SilenceUpdateOne {
 	return suo
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (suo *SilenceUpdateOne) SetDeletedAt(t time.Time) *SilenceUpdateOne {
-	suo.mutation.SetDeletedAt(t)
-	return suo
-}
-
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (suo *SilenceUpdateOne) SetNillableDeletedAt(t *time.Time) *SilenceUpdateOne {
-	if t != nil {
-		suo.SetDeletedAt(*t)
-	}
-	return suo
-}
-
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (suo *SilenceUpdateOne) ClearDeletedAt() *SilenceUpdateOne {
-	suo.mutation.ClearDeletedAt()
-	return suo
-}
-
 // SetMatchers sets the "matchers" field.
-func (suo *SilenceUpdateOne) SetMatchers(l []label.Matcher) *SilenceUpdateOne {
+func (suo *SilenceUpdateOne) SetMatchers(l []*label.Matcher) *SilenceUpdateOne {
 	suo.mutation.SetMatchers(l)
 	return suo
 }
 
 // AppendMatchers appends l to the "matchers" field.
-func (suo *SilenceUpdateOne) AppendMatchers(l []label.Matcher) *SilenceUpdateOne {
+func (suo *SilenceUpdateOne) AppendMatchers(l []*label.Matcher) *SilenceUpdateOne {
 	suo.mutation.AppendMatchers(l)
 	return suo
 }
@@ -381,6 +358,20 @@ func (suo *SilenceUpdateOne) SetNillableComments(s *string) *SilenceUpdateOne {
 // ClearComments clears the value of the "comments" field.
 func (suo *SilenceUpdateOne) ClearComments() *SilenceUpdateOne {
 	suo.mutation.ClearComments()
+	return suo
+}
+
+// SetState sets the "state" field.
+func (suo *SilenceUpdateOne) SetState(as alert.SilenceState) *SilenceUpdateOne {
+	suo.mutation.SetState(as)
+	return suo
+}
+
+// SetNillableState sets the "state" field if the given value is not nil.
+func (suo *SilenceUpdateOne) SetNillableState(as *alert.SilenceState) *SilenceUpdateOne {
+	if as != nil {
+		suo.SetState(*as)
+	}
 	return suo
 }
 
@@ -431,6 +422,11 @@ func (suo *SilenceUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (suo *SilenceUpdateOne) check() error {
+	if v, ok := suo.mutation.State(); ok {
+		if err := silence.StateValidator(v); err != nil {
+			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "Silence.state": %w`, err)}
+		}
+	}
 	if _, ok := suo.mutation.UserID(); suo.mutation.UserCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Silence.user"`)
 	}
@@ -481,12 +477,6 @@ func (suo *SilenceUpdateOne) sqlSave(ctx context.Context) (_node *Silence, err e
 	if suo.mutation.UpdatedAtCleared() {
 		_spec.ClearField(silence.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := suo.mutation.DeletedAt(); ok {
-		_spec.SetField(silence.FieldDeletedAt, field.TypeTime, value)
-	}
-	if suo.mutation.DeletedAtCleared() {
-		_spec.ClearField(silence.FieldDeletedAt, field.TypeTime)
-	}
 	if value, ok := suo.mutation.Matchers(); ok {
 		_spec.SetField(silence.FieldMatchers, field.TypeJSON, value)
 	}
@@ -509,6 +499,9 @@ func (suo *SilenceUpdateOne) sqlSave(ctx context.Context) (_node *Silence, err e
 	}
 	if suo.mutation.CommentsCleared() {
 		_spec.ClearField(silence.FieldComments, field.TypeString)
+	}
+	if value, ok := suo.mutation.State(); ok {
+		_spec.SetField(silence.FieldState, field.TypeEnum, value)
 	}
 	_spec.Node.Schema = suo.schemaConfig.Silence
 	ctx = internal.NewSchemaConfigContext(ctx, suo.schemaConfig)

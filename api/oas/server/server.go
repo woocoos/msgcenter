@@ -95,7 +95,7 @@ func wrapGetSilence(si oas.SilenceServer) func(c *gin.Context) {
 func wrapGetSilences(si oas.SilenceServer) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req oas.GetSilencesRequest
-		if err := c.ShouldBind(&req.Filter); err != nil {
+		if err := c.ShouldBind(&req); err != nil {
 			handler.AbortWithError(c, http.StatusBadRequest, err)
 			return
 		}

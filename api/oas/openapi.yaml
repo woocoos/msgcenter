@@ -97,7 +97,7 @@ paths:
                 type: object
                 properties:
                   silenceID:
-                    type: string
+                    type: integer
         400:
           description: Bad request
           content:
@@ -123,8 +123,7 @@ paths:
           description: ID of the silence to get
           required: true
           schema:
-            type: string
-            format: uuid
+            type: integer
       responses:
         200:
           description: Get silence response
@@ -152,8 +151,7 @@ paths:
           description: ID of the silence to get
           required: true
           schema:
-            type: string
-            format: uuid
+            type: integer
       responses:
         200:
           description: Delete silence response
@@ -399,6 +397,7 @@ components:
         - endsAt
         - matchers
         - startsAt
+        - tenantID
       type: object
       properties:
         matchers:
@@ -412,9 +411,11 @@ components:
           format: date-time
           x-go-tag-validator: "gt"
         createdBy:
-          type: string
+          type: integer
         comment:
           type: string
+        tenantID:
+          type: integer
     gettableSilence:
       allOf:
         - required:
@@ -424,7 +425,7 @@ components:
           type: object
           properties:
             id:
-              type: string
+              type: integer
             status:
               $ref: '#/components/schemas/silenceStatus'
             updatedAt:
@@ -436,7 +437,7 @@ components:
         - type: object
           properties:
             id:
-              type: string
+              type: integer
         - $ref: '#/components/schemas/silence'
     silenceStatus:
       required:
@@ -572,7 +573,7 @@ components:
         silencedBy:
           type: array
           items:
-            type: string
+            type: integer
         inhibitedBy:
           type: array
           items:

@@ -885,10 +885,10 @@ func (s *SilenceQuery) collectField(ctx context.Context, opCtx *graphql.Operatio
 				selectedFields = append(selectedFields, silence.FieldUpdatedAt)
 				fieldSeen[silence.FieldUpdatedAt] = struct{}{}
 			}
-		case "deletedAt":
-			if _, ok := fieldSeen[silence.FieldDeletedAt]; !ok {
-				selectedFields = append(selectedFields, silence.FieldDeletedAt)
-				fieldSeen[silence.FieldDeletedAt] = struct{}{}
+		case "tenantID":
+			if _, ok := fieldSeen[silence.FieldTenantID]; !ok {
+				selectedFields = append(selectedFields, silence.FieldTenantID)
+				fieldSeen[silence.FieldTenantID] = struct{}{}
 			}
 		case "matchers":
 			if _, ok := fieldSeen[silence.FieldMatchers]; !ok {
@@ -909,6 +909,11 @@ func (s *SilenceQuery) collectField(ctx context.Context, opCtx *graphql.Operatio
 			if _, ok := fieldSeen[silence.FieldComments]; !ok {
 				selectedFields = append(selectedFields, silence.FieldComments)
 				fieldSeen[silence.FieldComments] = struct{}{}
+			}
+		case "state":
+			if _, ok := fieldSeen[silence.FieldState]; !ok {
+				selectedFields = append(selectedFields, silence.FieldState)
+				fieldSeen[silence.FieldState] = struct{}{}
 			}
 		case "id":
 		case "__typename":

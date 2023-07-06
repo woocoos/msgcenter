@@ -16,7 +16,6 @@ import (
 	"github.com/woocoos/entco/gqlx"
 	"github.com/woocoos/entco/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql"
-	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/api/oas/server"
 	"github.com/woocoos/msgcenter/dispatch"
 	"github.com/woocoos/msgcenter/ent"
@@ -56,6 +55,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer am.Stop()
+	am.Silences.Options.Db = dbClient
 
 	metrics.BuildGlobal(prometheus.DefaultRegisterer)
 	configCoordinator := service.NewCoordinator(alertManagerCnf)
@@ -94,7 +94,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	apiSrv := buildWebServer(cnf, api, configCoordinator)
+	apiSrv := buildWebServer(cnf, api, cfgopts)
 	app.RegisterServer(am.Alerts.(*mem.Alerts), am.NotificationLog.(*nflog.Log), am.Silences, apiSrv,
 		newPromHttp(cnf.Sub("prometheus")),
 	)
@@ -120,7 +120,7 @@ func buildEntClient(cnf *conf.AppConfiguration) *ent.Client {
 	return dbClient
 }
 
-func buildWebServer(cnf *conf.AppConfiguration, ws *server.Service, co *service.Coordinator) *web.Server {
+func buildWebServer(cnf *conf.AppConfiguration, ws *server.Service, amopt *server.Options) *web.Server {
 	webSrv := web.New(web.WithConfiguration(cnf.Sub("web")),
 		web.WithGracefulStop(),
 		web.RegisterMiddleware(gql.New()),
@@ -129,13 +129,13 @@ func buildWebServer(cnf *conf.AppConfiguration, ws *server.Service, co *service.
 	)
 	server.RegisterHandlers(webSrv.Router().FindGroup("/api/v2").Group, ws)
 	//gql
-	gqlsrv := handler.NewDefaultServer(generated.NewExecutableSchema(
-		generated.Config{
-			Resolvers: &graphql.Resolver{
-				Client:      dbClient,
-				Coordinator: co,
-			},
-		}))
+	gqlsrv := handler.NewDefaultServer(
+		graphql.NewSchema(
+			graphql.WithClient(dbClient),
+			graphql.WithCoordinator(amopt.Coordinator),
+			graphql.WithSilences(amopt.Silences),
+		),
+	)
 	gqlsrv.AroundResponses(gqlx.ContextCache())
 	gqlsrv.AroundResponses(gqlx.SimplePagination())
 	// mutation事务

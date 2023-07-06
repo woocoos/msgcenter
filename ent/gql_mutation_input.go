@@ -7,6 +7,7 @@ import (
 
 	"github.com/woocoos/entco/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
+	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
@@ -531,15 +532,17 @@ func (c *MsgTypeUpdateOne) SetInput(i UpdateMsgTypeInput) *MsgTypeUpdateOne {
 
 // CreateSilenceInput represents a mutation input for creating silences.
 type CreateSilenceInput struct {
-	Matchers []label.Matcher
+	TenantID int
+	Matchers []*label.Matcher
 	StartsAt time.Time
 	EndsAt   time.Time
 	Comments *string
-	UserID   int
+	State    *alert.SilenceState
 }
 
 // Mutate applies the CreateSilenceInput on the SilenceMutation builder.
 func (i *CreateSilenceInput) Mutate(m *SilenceMutation) {
+	m.SetTenantID(i.TenantID)
 	if v := i.Matchers; v != nil {
 		m.SetMatchers(v)
 	}
@@ -548,7 +551,9 @@ func (i *CreateSilenceInput) Mutate(m *SilenceMutation) {
 	if v := i.Comments; v != nil {
 		m.SetComments(*v)
 	}
-	m.SetUserID(i.UserID)
+	if v := i.State; v != nil {
+		m.SetState(*v)
+	}
 }
 
 // SetInput applies the change-set in the CreateSilenceInput on the SilenceCreate builder.
@@ -560,12 +565,13 @@ func (c *SilenceCreate) SetInput(i CreateSilenceInput) *SilenceCreate {
 // UpdateSilenceInput represents a mutation input for updating silences.
 type UpdateSilenceInput struct {
 	ClearMatchers  bool
-	Matchers       []label.Matcher
-	AppendMatchers []label.Matcher
+	Matchers       []*label.Matcher
+	AppendMatchers []*label.Matcher
 	StartsAt       *time.Time
 	EndsAt         *time.Time
 	ClearComments  bool
 	Comments       *string
+	State          *alert.SilenceState
 }
 
 // Mutate applies the UpdateSilenceInput on the SilenceMutation builder.
@@ -590,6 +596,9 @@ func (i *UpdateSilenceInput) Mutate(m *SilenceMutation) {
 	}
 	if v := i.Comments; v != nil {
 		m.SetComments(*v)
+	}
+	if v := i.State; v != nil {
+		m.SetState(*v)
 	}
 }
 

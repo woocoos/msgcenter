@@ -18,7 +18,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString, Size: 45},
 		{Name: "tenant_id", Type: field.TypeInt},
-		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "webhook"}},
+		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "internal", "webhook"}},
 		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"active", "inactive", "processing"}, Default: "inactive"},
 		{Name: "receiver", Type: field.TypeJSON, Nullable: true},
 		{Name: "comments", Type: field.TypeString, Nullable: true},
@@ -101,7 +101,7 @@ var (
 		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "name", Type: field.TypeString, Size: 45},
 		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"active", "inactive", "processing"}, Default: "inactive"},
-		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "webhook"}},
+		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "internal", "webhook"}},
 		{Name: "format", Type: field.TypeEnum, Enums: []string{"txt", "html"}},
 		{Name: "subject", Type: field.TypeString, Nullable: true},
 		{Name: "from", Type: field.TypeString, Nullable: true},
@@ -165,15 +165,16 @@ var (
 	}
 	// MsgSilenceColumns holds the columns for the "msg_silence" table.
 	MsgSilenceColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
 		{Name: "matchers", Type: field.TypeJSON, Nullable: true},
 		{Name: "starts_at", Type: field.TypeTime},
 		{Name: "ends_at", Type: field.TypeTime},
 		{Name: "comments", Type: field.TypeString, Nullable: true},
+		{Name: "state", Type: field.TypeEnum, Enums: []string{"expired", "active", "pending"}, Default: "active"},
 		{Name: "created_by", Type: field.TypeInt},
 	}
 	// MsgSilenceTable holds the schema information for the "msg_silence" table.
@@ -184,7 +185,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "msg_silence_user_silences",
-				Columns:    []*schema.Column{MsgSilenceColumns[9]},
+				Columns:    []*schema.Column{MsgSilenceColumns[10]},
 				RefColumns: []*schema.Column{UserColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

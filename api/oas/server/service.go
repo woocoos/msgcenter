@@ -9,13 +9,12 @@ import (
 	"github.com/tsingsun/woocoo/web/handler"
 	"github.com/woocoos/msgcenter/api/oas"
 	"github.com/woocoos/msgcenter/dispatch"
+	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/metrics"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/silence"
-	"github.com/woocoos/msgcenter/silence/silencepb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"net/http"
 	"regexp"
 	"runtime"
@@ -311,7 +310,7 @@ func removeEmptyLabels(ls label.LabelSet) {
 }
 
 func (s *Service) DeleteSilence(c *gin.Context, req *oas.DeleteSilenceRequest) error {
-	if err := s.Silences.Expire(req.UriParams.SilenceID.String()); err != nil {
+	if err := s.Silences.Expire(req.UriParams.SilenceID); err != nil {
 		if errors.Is(err, silence.ErrNotFound) {
 			c.Status(http.StatusNotFound)
 			return nil
@@ -322,7 +321,7 @@ func (s *Service) DeleteSilence(c *gin.Context, req *oas.DeleteSilenceRequest) e
 }
 
 func (s *Service) GetSilence(c *gin.Context, req *oas.GetSilenceRequest) (*oas.GettableSilence, error) {
-	sils, _, err := s.Silences.Query(silence.QIDs(req.UriParams.SilenceID.String()))
+	sils, _, err := s.Silences.Query(silence.QIDs(req.UriParams.SilenceID))
 	if err != nil {
 		return nil, err
 	}
@@ -366,7 +365,7 @@ func (s *Service) GetSilences(c *gin.Context, req *oas.GetSilencesRequest) (vals
 }
 
 func (s *Service) PostSilences(c *gin.Context, req *oas.PostSilencesRequest) (res *oas.PostSilencesResponse, err error) {
-	sil, err := PostableSilenceToProto(&req.PostableSilence)
+	sil, err := PostableSilenceToEnt(&req.PostableSilence)
 	if err != nil {
 		return nil, err
 	}
@@ -410,15 +409,6 @@ func AlertToOpenAPIAlert(alert *alert.Alert, status alert.MarkerStatus, receiver
 			InhibitedBy: status.InhibitedBy,
 		},
 	}
-
-	if aa.Status.SilencedBy == nil {
-		aa.Status.SilencedBy = []string{}
-	}
-
-	if aa.Status.InhibitedBy == nil {
-		aa.Status.InhibitedBy = []string{}
-	}
-
 	return aa
 }
 
@@ -459,32 +449,20 @@ func APILabelSetToModelLabelSet(apiLabelSet oas.LabelSet) label.LabelSet {
 	return modelLabelSet
 }
 
-// PostableSilenceToProto converts *open_api_models.PostableSilenc to *silencepb.Silence.
-func PostableSilenceToProto(s *oas.PostableSilence) (*silencepb.Silence, error) {
-	sil := &silencepb.Silence{
-		Id:        s.ID,
-		StartsAt:  timestamppb.New(s.StartsAt),
-		EndsAt:    timestamppb.New(s.EndsAt),
-		Comment:   s.Comment,
+// PostableSilenceToEnt converts *open_api_models.PostableSilenc to *silencepb.Silence.
+func PostableSilenceToEnt(s *oas.PostableSilence) (*ent.Silence, error) {
+	sil := &ent.Silence{
+		ID:        s.ID,
+		StartsAt:  s.StartsAt,
+		EndsAt:    s.EndsAt,
+		Comments:  s.Comment,
 		CreatedBy: s.CreatedBy,
+		TenantID:  s.TenantID,
 	}
 	for _, m := range s.Matchers {
-		matcher := &silencepb.Matcher{
-			Name:    m.Name,
-			Pattern: m.Value,
-		}
-		isEqual := m.IsEqual
-		isRegex := m.IsRegex
-
-		switch {
-		case isEqual && !isRegex:
-			matcher.Type = silencepb.Matcher_EQUAL
-		case !isEqual && !isRegex:
-			matcher.Type = silencepb.Matcher_NOT_EQUAL
-		case isEqual && isRegex:
-			matcher.Type = silencepb.Matcher_REGEXP
-		case !isEqual && isRegex:
-			matcher.Type = silencepb.Matcher_NOT_REGEXP
+		matcher, err := label.NewMatcher(label.MatchEqual, m.Name, m.Value)
+		if err != nil {
+			return nil, err
 		}
 		sil.Matchers = append(sil.Matchers, matcher)
 	}
@@ -492,19 +470,19 @@ func PostableSilenceToProto(s *oas.PostableSilence) (*silencepb.Silence, error) 
 }
 
 // GettableSilenceFromProto converts *silencepb.Silence to open_api_models.GettableSilence.
-func GettableSilenceFromProto(s *silencepb.Silence) (*oas.GettableSilence, error) {
-	start := s.StartsAt.AsTime()
-	end := s.EndsAt.AsTime()
-	updated := s.UpdatedAt.AsTime()
+func GettableSilenceFromProto(s *ent.Silence) (*oas.GettableSilence, error) {
+	start := s.StartsAt
+	end := s.EndsAt
+	updated := s.UpdatedAt
 	state := string(alert.CalcSilenceState(start, end))
 	sil := &oas.GettableSilence{
 		Silence: &oas.Silence{
 			StartsAt:  start,
 			EndsAt:    end,
-			Comment:   s.Comment,
+			Comment:   s.Comments,
 			CreatedBy: s.CreatedBy,
 		},
-		ID:        s.Id,
+		ID:        s.ID,
 		UpdatedAt: updated,
 		Status: oas.SilenceStatus{
 			State: state,
@@ -514,26 +492,26 @@ func GettableSilenceFromProto(s *silencepb.Silence) (*oas.GettableSilence, error
 	for _, m := range s.Matchers {
 		matcher := &oas.Matcher{
 			Name:  m.Name,
-			Value: m.Pattern,
+			Value: m.Value,
 		}
 		switch m.Type {
-		case silencepb.Matcher_EQUAL:
+		case label.MatchEqual:
 			matcher.IsEqual = true
 			matcher.IsRegex = false
-		case silencepb.Matcher_NOT_EQUAL:
+		case label.MatchNotEqual:
 			matcher.IsEqual = false
 			matcher.IsRegex = true
-		case silencepb.Matcher_REGEXP:
+		case label.MatchRegexp:
 			matcher.IsEqual = true
 			matcher.IsRegex = true
-		case silencepb.Matcher_NOT_REGEXP:
+		case label.MatchNotRegexp:
 			matcher.IsEqual = false
 			matcher.IsRegex = true
 		default:
 			return sil, fmt.Errorf(
 				"unknown matcher type for matcher '%v' in silence '%v'",
 				m.Name,
-				s.Id,
+				s.ID,
 			)
 		}
 		sil.Matchers = append(sil.Matchers, matcher)
@@ -547,16 +525,16 @@ func GettableSilenceFromProto(s *silencepb.Silence) (*oas.GettableSilence, error
 // A silence matches a filter (list of matchers) if
 // for all matchers in the filter, there exists a matcher in the silence
 // such that their names, types, and values are equivalent.
-func CheckSilenceMatchesFilterLabels(s *silencepb.Silence, matchers []*label.Matcher) bool {
+func CheckSilenceMatchesFilterLabels(s *ent.Silence, matchers []*label.Matcher) bool {
 	for _, matcher := range matchers {
 		found := false
 		for _, m := range s.Matchers {
 			if matcher.Name == m.Name &&
-				(matcher.Type == label.MatchEqual && m.Type == silencepb.Matcher_EQUAL ||
-					matcher.Type == label.MatchRegexp && m.Type == silencepb.Matcher_REGEXP ||
-					matcher.Type == label.MatchNotEqual && m.Type == silencepb.Matcher_NOT_EQUAL ||
-					matcher.Type == label.MatchNotRegexp && m.Type == silencepb.Matcher_NOT_REGEXP) &&
-				matcher.Value == m.Pattern {
+				(matcher.Type == label.MatchEqual && m.Type == label.MatchEqual ||
+					matcher.Type == label.MatchRegexp && m.Type == label.MatchRegexp ||
+					matcher.Type == label.MatchNotEqual && m.Type == label.MatchNotEqual ||
+					matcher.Type == label.MatchNotRegexp && m.Type == label.MatchNotRegexp) &&
+				matcher.Value == m.Value {
 				found = true
 				break
 			}
