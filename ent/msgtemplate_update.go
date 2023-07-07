@@ -290,6 +290,33 @@ func (mtu *MsgTemplateUpdate) ClearTpl() *MsgTemplateUpdate {
 	return mtu
 }
 
+// SetTplFileID sets the "tpl_file_id" field.
+func (mtu *MsgTemplateUpdate) SetTplFileID(i int) *MsgTemplateUpdate {
+	mtu.mutation.ResetTplFileID()
+	mtu.mutation.SetTplFileID(i)
+	return mtu
+}
+
+// SetNillableTplFileID sets the "tpl_file_id" field if the given value is not nil.
+func (mtu *MsgTemplateUpdate) SetNillableTplFileID(i *int) *MsgTemplateUpdate {
+	if i != nil {
+		mtu.SetTplFileID(*i)
+	}
+	return mtu
+}
+
+// AddTplFileID adds i to the "tpl_file_id" field.
+func (mtu *MsgTemplateUpdate) AddTplFileID(i int) *MsgTemplateUpdate {
+	mtu.mutation.AddTplFileID(i)
+	return mtu
+}
+
+// ClearTplFileID clears the value of the "tpl_file_id" field.
+func (mtu *MsgTemplateUpdate) ClearTplFileID() *MsgTemplateUpdate {
+	mtu.mutation.ClearTplFileID()
+	return mtu
+}
+
 // SetAttachments sets the "attachments" field.
 func (mtu *MsgTemplateUpdate) SetAttachments(s string) *MsgTemplateUpdate {
 	mtu.mutation.SetAttachments(s)
@@ -307,6 +334,26 @@ func (mtu *MsgTemplateUpdate) SetNillableAttachments(s *string) *MsgTemplateUpda
 // ClearAttachments clears the value of the "attachments" field.
 func (mtu *MsgTemplateUpdate) ClearAttachments() *MsgTemplateUpdate {
 	mtu.mutation.ClearAttachments()
+	return mtu
+}
+
+// SetAttachmentsFileIds sets the "attachments_file_ids" field.
+func (mtu *MsgTemplateUpdate) SetAttachmentsFileIds(s string) *MsgTemplateUpdate {
+	mtu.mutation.SetAttachmentsFileIds(s)
+	return mtu
+}
+
+// SetNillableAttachmentsFileIds sets the "attachments_file_ids" field if the given value is not nil.
+func (mtu *MsgTemplateUpdate) SetNillableAttachmentsFileIds(s *string) *MsgTemplateUpdate {
+	if s != nil {
+		mtu.SetAttachmentsFileIds(*s)
+	}
+	return mtu
+}
+
+// ClearAttachmentsFileIds clears the value of the "attachments_file_ids" field.
+func (mtu *MsgTemplateUpdate) ClearAttachmentsFileIds() *MsgTemplateUpdate {
+	mtu.mutation.ClearAttachmentsFileIds()
 	return mtu
 }
 
@@ -503,11 +550,26 @@ func (mtu *MsgTemplateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if mtu.mutation.TplCleared() {
 		_spec.ClearField(msgtemplate.FieldTpl, field.TypeString)
 	}
+	if value, ok := mtu.mutation.TplFileID(); ok {
+		_spec.SetField(msgtemplate.FieldTplFileID, field.TypeInt, value)
+	}
+	if value, ok := mtu.mutation.AddedTplFileID(); ok {
+		_spec.AddField(msgtemplate.FieldTplFileID, field.TypeInt, value)
+	}
+	if mtu.mutation.TplFileIDCleared() {
+		_spec.ClearField(msgtemplate.FieldTplFileID, field.TypeInt)
+	}
 	if value, ok := mtu.mutation.Attachments(); ok {
 		_spec.SetField(msgtemplate.FieldAttachments, field.TypeString, value)
 	}
 	if mtu.mutation.AttachmentsCleared() {
 		_spec.ClearField(msgtemplate.FieldAttachments, field.TypeString)
+	}
+	if value, ok := mtu.mutation.AttachmentsFileIds(); ok {
+		_spec.SetField(msgtemplate.FieldAttachmentsFileIds, field.TypeString, value)
+	}
+	if mtu.mutation.AttachmentsFileIdsCleared() {
+		_spec.ClearField(msgtemplate.FieldAttachmentsFileIds, field.TypeString)
 	}
 	if value, ok := mtu.mutation.Comments(); ok {
 		_spec.SetField(msgtemplate.FieldComments, field.TypeString, value)
@@ -825,6 +887,33 @@ func (mtuo *MsgTemplateUpdateOne) ClearTpl() *MsgTemplateUpdateOne {
 	return mtuo
 }
 
+// SetTplFileID sets the "tpl_file_id" field.
+func (mtuo *MsgTemplateUpdateOne) SetTplFileID(i int) *MsgTemplateUpdateOne {
+	mtuo.mutation.ResetTplFileID()
+	mtuo.mutation.SetTplFileID(i)
+	return mtuo
+}
+
+// SetNillableTplFileID sets the "tpl_file_id" field if the given value is not nil.
+func (mtuo *MsgTemplateUpdateOne) SetNillableTplFileID(i *int) *MsgTemplateUpdateOne {
+	if i != nil {
+		mtuo.SetTplFileID(*i)
+	}
+	return mtuo
+}
+
+// AddTplFileID adds i to the "tpl_file_id" field.
+func (mtuo *MsgTemplateUpdateOne) AddTplFileID(i int) *MsgTemplateUpdateOne {
+	mtuo.mutation.AddTplFileID(i)
+	return mtuo
+}
+
+// ClearTplFileID clears the value of the "tpl_file_id" field.
+func (mtuo *MsgTemplateUpdateOne) ClearTplFileID() *MsgTemplateUpdateOne {
+	mtuo.mutation.ClearTplFileID()
+	return mtuo
+}
+
 // SetAttachments sets the "attachments" field.
 func (mtuo *MsgTemplateUpdateOne) SetAttachments(s string) *MsgTemplateUpdateOne {
 	mtuo.mutation.SetAttachments(s)
@@ -842,6 +931,26 @@ func (mtuo *MsgTemplateUpdateOne) SetNillableAttachments(s *string) *MsgTemplate
 // ClearAttachments clears the value of the "attachments" field.
 func (mtuo *MsgTemplateUpdateOne) ClearAttachments() *MsgTemplateUpdateOne {
 	mtuo.mutation.ClearAttachments()
+	return mtuo
+}
+
+// SetAttachmentsFileIds sets the "attachments_file_ids" field.
+func (mtuo *MsgTemplateUpdateOne) SetAttachmentsFileIds(s string) *MsgTemplateUpdateOne {
+	mtuo.mutation.SetAttachmentsFileIds(s)
+	return mtuo
+}
+
+// SetNillableAttachmentsFileIds sets the "attachments_file_ids" field if the given value is not nil.
+func (mtuo *MsgTemplateUpdateOne) SetNillableAttachmentsFileIds(s *string) *MsgTemplateUpdateOne {
+	if s != nil {
+		mtuo.SetAttachmentsFileIds(*s)
+	}
+	return mtuo
+}
+
+// ClearAttachmentsFileIds clears the value of the "attachments_file_ids" field.
+func (mtuo *MsgTemplateUpdateOne) ClearAttachmentsFileIds() *MsgTemplateUpdateOne {
+	mtuo.mutation.ClearAttachmentsFileIds()
 	return mtuo
 }
 
@@ -1068,11 +1177,26 @@ func (mtuo *MsgTemplateUpdateOne) sqlSave(ctx context.Context) (_node *MsgTempla
 	if mtuo.mutation.TplCleared() {
 		_spec.ClearField(msgtemplate.FieldTpl, field.TypeString)
 	}
+	if value, ok := mtuo.mutation.TplFileID(); ok {
+		_spec.SetField(msgtemplate.FieldTplFileID, field.TypeInt, value)
+	}
+	if value, ok := mtuo.mutation.AddedTplFileID(); ok {
+		_spec.AddField(msgtemplate.FieldTplFileID, field.TypeInt, value)
+	}
+	if mtuo.mutation.TplFileIDCleared() {
+		_spec.ClearField(msgtemplate.FieldTplFileID, field.TypeInt)
+	}
 	if value, ok := mtuo.mutation.Attachments(); ok {
 		_spec.SetField(msgtemplate.FieldAttachments, field.TypeString, value)
 	}
 	if mtuo.mutation.AttachmentsCleared() {
 		_spec.ClearField(msgtemplate.FieldAttachments, field.TypeString)
+	}
+	if value, ok := mtuo.mutation.AttachmentsFileIds(); ok {
+		_spec.SetField(msgtemplate.FieldAttachmentsFileIds, field.TypeString, value)
+	}
+	if mtuo.mutation.AttachmentsFileIdsCleared() {
+		_spec.ClearField(msgtemplate.FieldAttachmentsFileIds, field.TypeString)
 	}
 	if value, ok := mtuo.mutation.Comments(); ok {
 		_spec.SetField(msgtemplate.FieldComments, field.TypeString, value)

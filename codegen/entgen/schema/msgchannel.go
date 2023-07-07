@@ -42,7 +42,7 @@ func (MsgChannel) Mixin() []ent.Mixin {
 func (MsgChannel) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").MaxLen(45).Comment("消息通道名称"),
-		field.Int("tenant_id").Comment("组织ID"),
+		field.Int("tenant_id").Comment("组织ID").Annotations(entgql.Type("ID")),
 		field.Enum("receiver_type").Comment("支持的消息模式:站内信,app推送,邮件,短信,微信等").
 			GoType(profile.ReceiverType("")),
 		field.Enum("status").GoType(typex.SimpleStatus("")).Default(typex.SimpleStatusInactive.String()).

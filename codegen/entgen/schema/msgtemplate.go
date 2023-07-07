@@ -38,7 +38,7 @@ func (MsgTemplate) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("msg_type_id").Comment("应用消息类型ID"),
 		field.Int("msg_event_id").Comment("消息事件ID"),
-		field.Int("tenant_id").Comment("组织ID"),
+		field.Int("tenant_id").Comment("组织ID").Annotations(entgql.Type("ID")),
 		field.String("name").MaxLen(45).Comment("消息模板名称"),
 		field.Enum("status").GoType(typex.SimpleStatus("")).Default(typex.SimpleStatusInactive.String()).
 			Optional().Comment("状态").Annotations(entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput)),
@@ -54,7 +54,11 @@ func (MsgTemplate) Fields() []ent.Field {
 			entgql.Skip(entgql.SkipWhereInput)),
 		field.Text("tpl").Optional().Comment("模板地址").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
+		field.Int("tpl_file_id").Optional().Comment("模板地址").Annotations(
+			entgql.Skip(entgql.SkipWhereInput), entgql.Type("ID")),
 		field.Text("attachments").Optional().Comment("附件地址,多个附件用逗号分隔").Annotations(
+			entgql.Skip(entgql.SkipWhereInput)),
+		field.String("attachments_file_ids").Optional().Comment("附件地址,多个附件用逗号分隔").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
 		field.String("comments").Optional().Comment("备注").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),

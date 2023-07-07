@@ -37,9 +37,9 @@ func (MsgSubscriber) Mixin() []ent.Mixin {
 func (MsgSubscriber) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("msg_type_id").Comment("应用消息类型ID"),
-		field.Int("tenant_id").Comment("组织ID"),
+		field.Int("tenant_id").Comment("组织ID").Annotations(entgql.Type("ID")),
 		field.Int("user_id").Optional().Comment("用户ID"),
-		field.Int("org_role_id").Optional().Comment("用户组ID"),
+		field.Int("org_role_id").Optional().Comment("用户组ID").Annotations(entgql.Type("ID")),
 		field.Bool("exclude").Optional().Default(false).Comment("是否排除"),
 	}
 }

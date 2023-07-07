@@ -1521,8 +1521,12 @@ func (ec *executionContext) fieldContext_Mutation_createMsgTemplate(ctx context.
 				return ec.fieldContext_MsgTemplate_body(ctx, field)
 			case "tpl":
 				return ec.fieldContext_MsgTemplate_tpl(ctx, field)
+			case "tplFileID":
+				return ec.fieldContext_MsgTemplate_tplFileID(ctx, field)
 			case "attachments":
 				return ec.fieldContext_MsgTemplate_attachments(ctx, field)
+			case "attachmentsFileIds":
+				return ec.fieldContext_MsgTemplate_attachmentsFileIds(ctx, field)
 			case "comments":
 				return ec.fieldContext_MsgTemplate_comments(ctx, field)
 			case "event":
@@ -1622,8 +1626,12 @@ func (ec *executionContext) fieldContext_Mutation_updateMsgTemplate(ctx context.
 				return ec.fieldContext_MsgTemplate_body(ctx, field)
 			case "tpl":
 				return ec.fieldContext_MsgTemplate_tpl(ctx, field)
+			case "tplFileID":
+				return ec.fieldContext_MsgTemplate_tplFileID(ctx, field)
 			case "attachments":
 				return ec.fieldContext_MsgTemplate_attachments(ctx, field)
+			case "attachmentsFileIds":
+				return ec.fieldContext_MsgTemplate_attachmentsFileIds(ctx, field)
 			case "comments":
 				return ec.fieldContext_MsgTemplate_comments(ctx, field)
 			case "event":
@@ -1778,8 +1786,12 @@ func (ec *executionContext) fieldContext_Mutation_enableMsgTemplate(ctx context.
 				return ec.fieldContext_MsgTemplate_body(ctx, field)
 			case "tpl":
 				return ec.fieldContext_MsgTemplate_tpl(ctx, field)
+			case "tplFileID":
+				return ec.fieldContext_MsgTemplate_tplFileID(ctx, field)
 			case "attachments":
 				return ec.fieldContext_MsgTemplate_attachments(ctx, field)
+			case "attachmentsFileIds":
+				return ec.fieldContext_MsgTemplate_attachmentsFileIds(ctx, field)
 			case "comments":
 				return ec.fieldContext_MsgTemplate_comments(ctx, field)
 			case "event":
@@ -1879,8 +1891,12 @@ func (ec *executionContext) fieldContext_Mutation_disableMsgTemplate(ctx context
 				return ec.fieldContext_MsgTemplate_body(ctx, field)
 			case "tpl":
 				return ec.fieldContext_MsgTemplate_tpl(ctx, field)
+			case "tplFileID":
+				return ec.fieldContext_MsgTemplate_tplFileID(ctx, field)
 			case "attachments":
 				return ec.fieldContext_MsgTemplate_attachments(ctx, field)
+			case "attachmentsFileIds":
+				return ec.fieldContext_MsgTemplate_attachmentsFileIds(ctx, field)
 			case "comments":
 				return ec.fieldContext_MsgTemplate_comments(ctx, field)
 			case "event":

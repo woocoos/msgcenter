@@ -34,7 +34,7 @@ func (MsgType) Mixin() []ent.Mixin {
 // Fields of the MsgType.
 func (MsgType) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("app_id").Optional().Comment("应用ID"),
+		field.Int("app_id").Optional().Comment("应用ID").Annotations(entgql.Type("ID")),
 		field.String("category").MaxLen(20).Comment("消息类型分类"),
 		field.String("name").MaxLen(45).Comment("消息类型名称,应用内唯一"),
 		field.Enum("status").GoType(typex.SimpleStatus("")).Default(typex.SimpleStatusActive.String()).

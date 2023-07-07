@@ -120,17 +120,10 @@ func (c *Coordinator) Reload() error {
 	}
 	logger.Info("completed loading configuration file", zap.String("file", configFilePath))
 
-	if tmpl, err := template.New(); err != nil {
-		return fmt.Errorf("failed to parse templates %w", err)
-	} else {
-		c.Template = tmpl
-		for _, ptn := range c.profile.Templates {
-			if _, err := c.Template.ParseGlob(c.configuration.Abs(ptn)); err != nil {
-				logger.Error("Error loading template file", zap.Error(err))
-				metrics.Coordinator.ConfigSuccess.Set(0)
-				return err
-			}
-		}
+	if err := c.loadTemplates(); err != nil {
+		logger.Error("Error loading template file", zap.Error(err))
+		metrics.Coordinator.ConfigSuccess.Set(0)
+		return err
 	}
 
 	if err := c.notifySubscribers(); err != nil {
@@ -160,6 +153,25 @@ func (c *Coordinator) WalkReceivers(visit func(receiver profile.Receiver) error)
 		}
 		if err := visit(rcv); err != nil {
 			return err
+		}
+	}
+	return nil
+}
+
+func (c *Coordinator) LoadTemplates() error {
+	return c.loadTemplates()
+}
+
+// loadTemplates loading template files
+func (c *Coordinator) loadTemplates() error {
+	if tmpl, err := template.New(); err != nil {
+		return fmt.Errorf("failed to parse templates %w", err)
+	} else {
+		c.Template = tmpl
+		for _, ptn := range c.profile.Templates {
+			if _, err := c.Template.ParseGlob(c.configuration.Abs(ptn)); err != nil {
+				return err
+			}
 		}
 	}
 	return nil

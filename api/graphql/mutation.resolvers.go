@@ -56,11 +56,6 @@ func (r *mutationResolver) CreateMsgEvent(ctx context.Context, input ent.CreateM
 
 // UpdateMsgEvent is the resolver for the updateMsgEvent field.
 func (r *mutationResolver) UpdateMsgEvent(ctx context.Context, id int, input ent.UpdateMsgEventInput) (*ent.MsgEvent, error) {
-	if input.Route != nil {
-		// route不为空，验证是否符合modes
-		//modes := strings.Split(*input.Modes, ",")
-
-	}
 	return ent.FromContext(ctx).MsgEvent.UpdateOneID(id).SetInput(input).Save(ctx)
 }
 
@@ -187,7 +182,11 @@ func (r *mutationResolver) EnableMsgTemplate(ctx context.Context, id int) (*ent.
 	if err != nil {
 		return nil, err
 	}
-	// TODO 启用模板时需加载模板
+	// 重新加载模板
+	//err = r.Coordinator.LoadTemplates()
+	//if err != nil {
+	//	return nil, err
+	//}
 	return temp.Update().SetStatus(typex.SimpleStatusActive).Save(ctx)
 }
 
@@ -197,7 +196,11 @@ func (r *mutationResolver) DisableMsgTemplate(ctx context.Context, id int) (*ent
 	if err != nil {
 		return nil, err
 	}
-	// TODO 禁用模板时需移除模板
+	// 重新加载模板
+	//err = r.Coordinator.LoadTemplates()
+	//if err != nil {
+	//	return nil, err
+	//}
 	return temp.Update().SetStatus(typex.SimpleStatusInactive).Save(ctx)
 }
 

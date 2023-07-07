@@ -110,7 +110,9 @@ var (
 		{Name: "bcc", Type: field.TypeString, Nullable: true},
 		{Name: "body", Type: field.TypeString, Nullable: true},
 		{Name: "tpl", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "tpl_file_id", Type: field.TypeInt, Nullable: true},
 		{Name: "attachments", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "attachments_file_ids", Type: field.TypeString, Nullable: true},
 		{Name: "comments", Type: field.TypeString, Nullable: true},
 		{Name: "msg_event_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
 	}
@@ -122,7 +124,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "msg_template_msg_event_customer_template",
-				Columns:    []*schema.Column{MsgTemplateColumns[20]},
+				Columns:    []*schema.Column{MsgTemplateColumns[22]},
 				RefColumns: []*schema.Column{MsgEventColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
