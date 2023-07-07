@@ -66,6 +66,24 @@ const queryMsgTypeListAndSub = gql(/* GraphQL */`query msgTypeListAndSub($first:
   }
 }`);
 
+const queryMsgTypeAndSubInfo = gql(/* GraphQL */`query msgTypeAndSubInfo($gid:GID!){
+  node(id: $gid){
+    id
+    ... on MsgType{
+      id,name,appID,category,
+      subscriberUsers{
+        id,tenantID,msgTypeID,userID
+      },
+      subscriberRoles{
+        id,tenantID,msgTypeID,orgRoleID
+      },
+      excludeSubscriberUsers{
+        id,tenantID,msgTypeID,userID
+      }
+    }
+  }
+}`);
+
 const mutationCreateSub = gql(/* GraphQL */`mutation createMsgSubscriber($inputs: [CreateMsgSubscriberInput!]!){
   createMsgSubscriber(inputs: $inputs){id}
 }`);
@@ -209,6 +227,20 @@ export async function getMsgTypeListAndSub(
 }
 
 
+/**
+ * 消息类型详情
+ * @param msgTypeId
+ * @returns
+ */
+export async function getMsgTypeAndSubInfo(msgTypeId: string) {
+  const result = await queryRequest(queryMsgTypeAndSubInfo, {
+    gid: gid('msg_type', msgTypeId)
+  })
+  if (result.data?.node?.__typename === 'MsgType') {
+    return result.data.node
+  }
+  return null
+}
 
 /**
  * 创建订阅

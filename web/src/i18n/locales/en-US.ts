@@ -84,6 +84,7 @@ export default {
     403: 'No access rights',
     404: "Can't find a way",
     500: 'The server system is abnormal',
+    settings: 'Settings',
     category: 'category',
     org: 'organization',
     configuration: 'config',
@@ -117,6 +118,7 @@ export default {
     msg_channel: 'Message channel',
     msg_event: 'Message event',
     msg_template: 'Message template',
+    msg_subscription: 'Message subscription',
     open_subscription: 'Open subscription',
     open_custom: 'Open customization',
     msg_type_category: 'Message type classification',
@@ -131,6 +133,10 @@ export default {
     msg_temp_format_tip: 'The body can contain the template syntax for go template',
     attachments_tip: 'Attachments are fixed documents, and variables in attachments are not supported for the time being',
     click_drag_upload: 'Click or drag the file to upload',
+    receiving_user: 'Receiving user',
+    receiving_user_group: 'Receiving user group',
+    exclude_user: 'Exclude user',
+    receiving_subject: 'Receiving subject',
 
     // 创建
     create_msg_type: 'Create message type',
@@ -147,9 +153,10 @@ export default {
     msg_type_list: 'Message type list',
     msg_channel_list: 'Message channel list',
     msg_event_list: 'Message event list',
-    msg_template_list: 'Message event template',
+    msg_template_list: 'Message event template list',
+    msg_subscription_list: 'Message subscription list',
     // 详情
-    // account_detail: 'Account details',
+
     // 必填提示
     please_enter_app: 'Please enter application',
     please_enter_category: 'Please enter category',
@@ -160,10 +167,10 @@ export default {
     please_enter_way_receiving: 'Please enter way of receiving',
     please_enter_subject: 'Please enter the title',
     please_enter_msg_temp_format: 'Please select text',
+    please_enter_msg_type_category: 'Please enter message type classification',
 
     // 添加
-    // add: 'Append',
-    // add_resources: 'Add resource',
+
 
 
 

@@ -84,6 +84,7 @@ export default {
     403: '无访问权限',
     404: '找不到方法',
     500: '服务端系统异常',
+    settings: '设置',
     category: '分类',
     org: '组织',
     configuration: '配置',
@@ -120,6 +121,7 @@ export default {
     msg_channel: '消息通道',
     msg_event: '消息事件',
     msg_template: '消息模板',
+    msg_subscription: '消息订阅',
     open_subscription: '开放订阅',
     open_custom: '开放定制',
     msg_type_category: '消息类型分类',
@@ -134,6 +136,10 @@ export default {
     msg_temp_format_tip: '正文可包含go template的模板语法',
     attachments_tip: '附件为固定文档，暂时不支持附件中的变量',
     click_drag_upload: '点击或拖拽文件上传',
+    receiving_user: '接收用户',
+    receiving_user_group: '接收用户组',
+    exclude_user: '排除用户',
+    receiving_subject: '接受主体',
 
     // 创建
     create_msg_type: '创建消息类型',
@@ -151,7 +157,7 @@ export default {
     msg_channel_list: '消息通道列表',
     msg_event_list: '消息事件列表',
     msg_template_list: '消息模板列表',
-
+    msg_subscription_list: '消息订阅列表',
     // 详情
 
     // 必填
@@ -166,6 +172,7 @@ export default {
     please_enter_way_receiving: '请输入接受方式',
     please_enter_subject: '请输入标题',
     please_enter_msg_temp_format: '请选择正文',
+    please_enter_msg_type_category: '请输入消息类型分类',
 
     // 添加
 

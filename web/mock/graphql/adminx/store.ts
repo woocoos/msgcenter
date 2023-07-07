@@ -30,10 +30,21 @@ export const initStoreData = (store: IMockStore) => {
   ]))
   store.set('Query', 'ROOT', 'users', listTemp([
     store.get('User', 1),
+    store.get('User', 2),
+    store.get('User', 3),
+    store.get('User', 4),
+    store.get('User', 5),
+    store.get('User', 6),
+    store.get('User', 7),
   ]))
   store.set('Query', 'ROOT', 'orgGroups', listTemp([
     store.get('OrgRole', 1),
     store.get('OrgRole', 2),
+    store.get('OrgRole', 4),
+    store.get('OrgRole', 5),
+    store.get('OrgRole', 6),
+    store.get('OrgRole', 7),
+    store.get('OrgRole', 8),
   ]))
   store.set('Query', 'ROOT', 'orgRoles', listTemp([
     store.get('OrgRole', 3),
@@ -53,11 +64,18 @@ export const initStoreData = (store: IMockStore) => {
   ]))
   // -------------root-end------------------------
 
+
   // Org
   store.set('Org', 1, {
     id: 1, name: 'woocoo', code: 'woocoo', domain: 'woocoo', parentID: 0, kind: 'root', ownerID: 1, owner: store.get('User', 1),
     users: listTemp([
-      store.get('User', 1)
+      store.get('User', 1),
+      store.get('User', 2),
+      store.get('User', 3),
+      store.get('User', 4),
+      store.get('User', 5),
+      store.get('User', 6),
+      store.get('User', 7),
     ]),
     apps: listTemp([
       store.get('App', 1)
@@ -83,6 +101,11 @@ export const initStoreData = (store: IMockStore) => {
   store.set('OrgRole', 1, { id: 1, name: 'org1group1', kind: 'group', orgID: 1 })
   store.set('OrgRole', 2, { id: 2, name: 'org1group2', kind: 'group', orgID: 1 })
   store.set('OrgRole', 3, { id: 3, name: 'org1role3', kind: 'role', orgID: 1 })
+  store.set('OrgRole', 4, { id: 4, name: 'org1group4', kind: 'group', orgID: 1 })
+  store.set('OrgRole', 5, { id: 5, name: 'org1group5', kind: 'group', orgID: 1 })
+  store.set('OrgRole', 6, { id: 6, name: 'org1group6', kind: 'group', orgID: 1 })
+  store.set('OrgRole', 7, { id: 7, name: 'org1group7', kind: 'group', orgID: 1 })
+  store.set('OrgRole', 8, { id: 8, name: 'org1group8', kind: 'group', orgID: 1 })
 
   // OrgPolicy
   store.set('OrgPolicy', 1, { id: 1, name: 'org1Policy1' })
@@ -91,6 +114,24 @@ export const initStoreData = (store: IMockStore) => {
   store.set('User', 1, {
     id: 1, displayName: 'admin', userType: "account", email: "admin@woocoo.com",
     loginProfile: { mfaEnabled: false }
+  })
+  store.set('User', 2, {
+    id: 2, displayName: 'user2', userType: "account", email: "user2@woocoo.com",
+  })
+  store.set('User', 3, {
+    id: 3, displayName: 'user3', email: "user3@woocoo.com",
+  })
+  store.set('User', 4, {
+    id: 4, displayName: 'user4', email: "user4@woocoo.com",
+  })
+  store.set('User', 5, {
+    id: 5, displayName: 'user5', email: "user5@woocoo.com",
+  })
+  store.set('User', 6, {
+    id: 6, displayName: 'user6', email: "user6@woocoo.com",
+  })
+  store.set('User', 7, {
+    id: 7, displayName: 'user7', email: "user7@woocoo.com",
   })
 
   // app

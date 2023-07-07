@@ -8,6 +8,7 @@ import { updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormSwitch } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import InputCategory from './inputCategory';
 
 type ProFormData = {
   app?: App;
@@ -134,7 +135,9 @@ export default (props: {
         rules={[
           { required: true, message: `${t('please_enter_category')}` },
         ]}
-      />
+      >
+        <InputCategory />
+      </ProFormText>
       <ProFormText
         name="name"
         label={t('name')}

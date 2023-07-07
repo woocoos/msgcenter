@@ -12,7 +12,7 @@ const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$first: 
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
-            id,displayName,
+            id,displayName,email
           }
         }
       }

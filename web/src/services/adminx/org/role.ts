@@ -10,7 +10,7 @@ const queryOrgGroupList = gql(/* GraphQL */`query orgGroupList($first: Int,$orde
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
-        id,orgID,kind,name
+        id,orgID,kind,name,comments
       }
     }
   }

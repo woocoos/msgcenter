@@ -3,7 +3,7 @@ import { Ref, addMocksToSchema, createMockStore, mockServer, relayStylePaginatio
 import { readFileSync } from "fs";
 import { join } from "path";
 import * as casual from "casual";
-import { addListTemp, delListTemp, initStoreData, listTemp } from "./store";
+import { addList, addListTemp, delList, delListTemp, initStoreData, listTemp } from "./store";
 
 const preserveResolvers = true
 
@@ -36,6 +36,9 @@ const schemaWithMocks = addMocksToSchema({
       msgEvents: relayStylePaginationMock(store),
       msgTemplates: relayStylePaginationMock(store),
       msgTypes: relayStylePaginationMock(store),
+      msgTypeCategories: () => {
+        return ['故障消息', '业务消息', '客户交易'];
+      },
       nodes: (_, args) => {
         return args.ids.map(gid => {
           const { type, id } = parseGid(gid);
@@ -48,6 +51,71 @@ const schemaWithMocks = addMocksToSchema({
       }
     },
     Mutation: {
+      createMsgSubscriber(_, { inputs }) {
+        const ids: string[] = [];
+        inputs.forEach((input, index) => {
+          input.id = `${Date.now()}-${index}`;
+          ids.push(input.id);
+          store.set('MsgSubscriber', input.id, input);
+          if (input.userID && !input.exclude) {
+            addList(
+              store,
+              store.get('MsgType', input.msgTypeID) as Ref,
+              'subscriberUsers',
+              store.get('MsgSubscriber', input.id) as Ref,
+            )
+          } else if (input.userID && input.exclude) {
+            addList(
+              store,
+              store.get('MsgType', input.msgTypeID) as Ref,
+              'excludeSubscriberUsers',
+              store.get('MsgSubscriber', input.id) as Ref,
+            )
+          } else if (input.orgRoleID && !input.exclude) {
+            addList(
+              store,
+              store.get('MsgType', input.msgTypeID) as Ref,
+              'subscriberRoles',
+              store.get('MsgSubscriber', input.id) as Ref,
+            )
+          }
+        })
+
+        return ids.map(id => store.get('MsgSubscriber', id));
+      },
+      deleteMsgSubscriber(_, { ids }) {
+        ids.forEach(id => {
+          const msgSub = store.get('MsgSubscriber', id) as Ref,
+            msgTypeId = store.get(msgSub, 'msgTypeID') as string,
+            exclude = store.get(msgSub, 'exclude'),
+            orgRoleId = store.get(msgSub, 'orgRoleID'),
+            userId = store.get(msgSub, 'userID');
+
+          if (userId && !exclude) {
+            delList(
+              store,
+              store.get('MsgType', msgTypeId) as Ref,
+              'subscriberUsers',
+              msgSub.$ref.key,
+            )
+          } else if (userId && exclude) {
+            delList(
+              store,
+              store.get('MsgType', msgTypeId) as Ref,
+              'excludeSubscriberUsers',
+              msgSub.$ref.key,
+            )
+          } else if (orgRoleId && !exclude) {
+            delList(
+              store,
+              store.get('MsgType', msgTypeId) as Ref,
+              'subscriberRoles',
+              msgSub.$ref.key,
+            )
+          }
+        })
+        return true;
+      },
       createMsgTemplate(_, { input }) {
         input.id = `${Date.now()}`;
         if (input.eventID) {

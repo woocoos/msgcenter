@@ -43,6 +43,19 @@ export const addListTemp = (store: IMockStore, ref: Ref, addData: Ref) => {
 }
 
 /**
+ * 普通列表添加
+ * @param store
+ * @param ref
+ * @param field
+ * @param addData
+ */
+export const addList = (store: IMockStore, ref: Ref, field: string, addData: Ref) => {
+  const refs = store.get(ref, field) as Ref[]
+  refs.push(addData);
+  store.set(ref, field, refs);
+}
+
+/**
  * 移除时列表一起移除
  * @param store
  * @param ref
@@ -53,6 +66,19 @@ export const delListTemp = (store: IMockStore, ref: Ref, key: string) => {
   const updateEdgesRef = edgesRef.filter(itemRef => itemRef.$ref.key.indexOf(key) === -1)
   store.set(ref, 'edges', updateEdgesRef)
   store.set(ref, 'totalCount', updateEdgesRef.length)
+}
+
+/**
+ * 普通列表移除
+ * @param store
+ * @param ref
+ * @param field
+ * @param key
+ */
+export const delList = (store: IMockStore, ref: Ref, field: string, key: string) => {
+  const refs = store.get(ref, field) as Ref[]
+  const updateRefs = refs.filter(itemRef => itemRef.$ref.key != key)
+  store.set(ref, field, updateRefs);
 }
 
 /**
@@ -71,6 +97,8 @@ export const initStoreData = (store: IMockStore) => {
   ]))
   store.set('Query', 'ROOT', 'msgTypes', listTemp([
     store.get('MsgType', 1),
+    store.get('MsgType', 2),
+    store.get('MsgType', 3),
   ]))
 
   // -------------root-end------------------------
@@ -82,7 +110,22 @@ export const initStoreData = (store: IMockStore) => {
 
   // MsgType
   store.set('MsgType', 1, {
-    id: 1, name: 'MsgType1', appID: 1, category: 'categoryNmae'
+    id: 1, name: 'MsgType1', appID: 1, category: '故障消息',
+    subscriberUsers: [
+      store.get('MsgSubscriber', 1)
+    ],
+    subscriberRoles: [
+      store.get('MsgSubscriber', 3)
+    ],
+    excludeSubscriberUsers: [
+      store.get('MsgSubscriber', 2)
+    ],
+  })
+  store.set('MsgType', 2, {
+    id: 2, name: 'MsgType2', appID: 1, category: '故障消息'
+  })
+  store.set('MsgType', 3, {
+    id: 3, name: 'MsgType2', appID: 1, category: '业务消息'
   })
 
   // MsgEvent
@@ -91,9 +134,16 @@ export const initStoreData = (store: IMockStore) => {
   })
 
 
-  // MsgTemplate
-  // store.set('MsgTemplate', 1, {
-  //   id: 1, name: 'MsgTemplate1', receiverType: 'emial'
-  // })
+
+  // MsgSubscriber
+  store.set('MsgSubscriber', 1, {
+    id: 1, tenantID: 1, msgTypeID: 1, userID: 1, exclude: false,
+  })
+  store.set('MsgSubscriber', 2, {
+    id: 2, tenantID: 1, msgTypeID: 1, userID: 2, exclude: true,
+  })
+  store.set('MsgSubscriber', 3, {
+    id: 3, tenantID: 1, msgTypeID: 1, orgRoleID: 1, exclude: false,
+  })
 
 }

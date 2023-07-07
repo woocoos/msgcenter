@@ -9,6 +9,7 @@ import { EnumMsgTypeStatus, delMsgType, getMsgTypeList } from '@/services/msgsrv
 import InputApp from '@/components/Adminx/App/input';
 import Create from './components/create';
 import { cacheApp, updateCacheAppListByIds } from '@/services/adminx/app/indtx';
+import InputCategory from './components/inputCategory';
 
 
 export default () => {
@@ -27,7 +28,12 @@ export default () => {
           return record.appID ? cacheApp[record.appID]?.name || record.appID : '-';
         },
       },
-      { title: t('category'), dataIndex: 'category', width: 120 },
+      {
+        title: t('category'), dataIndex: 'category', width: 120,
+        renderFormItem() {
+          return <InputCategory />
+        },
+      },
       { title: t('name'), dataIndex: 'name', width: 120 },
       {
         title: t('open_subscription'),
