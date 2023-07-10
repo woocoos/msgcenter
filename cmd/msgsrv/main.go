@@ -1,10 +1,10 @@
 package main
 
 import (
+	"context"
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/gin-gonic/gin"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/contrib/gql"
@@ -50,14 +50,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	am, err := service.DefaultAlertManager(alertManagerCnf)
+	am, err := service.DefaultAlertManager(alertManagerCnf, service.WithClient(dbClient))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer am.Stop()
-	am.Silences.Options.Db = dbClient
 
-	metrics.BuildGlobal(prometheus.DefaultRegisterer)
+	metrics.BuildGlobal()
 	configCoordinator := service.NewCoordinator(alertManagerCnf)
 
 	cfgopts := &server.Options{
@@ -65,7 +64,6 @@ func main() {
 		Alerts:      am.Alerts,
 		Silences:    am.Silences,
 		StatusFunc:  am.Marker.Status,
-		Registry:    prometheus.DefaultRegisterer,
 		GroupFunc: func(routeFilter func(*dispatch.Route) bool, alertFilter func(*alert.Alert, time.Time) bool) (
 			dispatch.AlertGroups, map[label.Fingerprint][]string) {
 			return am.Dispatcher.Groups(routeFilter, alertFilter)
@@ -95,9 +93,13 @@ func main() {
 	}
 
 	apiSrv := buildWebServer(cnf, api, cfgopts)
-	app.RegisterServer(am.Alerts.(*mem.Alerts), am.NotificationLog.(*nflog.Log), am.Silences, apiSrv,
+	app.RegisterServer(am.Alerts.(*mem.Alerts), am.NotificationLog.(*nflog.Log), am.Peer, am.Silences, apiSrv,
 		newPromHttp(cnf.Sub("prometheus")),
 	)
+	// join before service run
+	if err = am.Peer.Join(context.Background()); err != nil {
+		log.Fatal(err)
+	}
 	if err := app.Run(); err != nil {
 		log.Fatal(err)
 	}

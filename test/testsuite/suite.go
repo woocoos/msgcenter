@@ -3,7 +3,6 @@ package testsuite
 import (
 	"context"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/suite"
 	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/pkg/conf"
@@ -50,10 +49,10 @@ func (o *BaseSuite) Setup() error {
 	initDatabase(context.Background(), o.Client)
 
 	// alert
-	metrics.BuildGlobal(prometheus.DefaultRegisterer)
+	metrics.BuildGlobal()
 
 	alertManagerCnf := o.Cnf.Sub("alertManager")
-	o.AlertManager, err = service.DefaultAlertManager(alertManagerCnf)
+	o.AlertManager, err = service.DefaultAlertManager(alertManagerCnf, service.WithClient(o.Client))
 	o.Require().NoError(err)
 	o.ConfigCoordinator = service.NewCoordinator(alertManagerCnf)
 	o.ConfigCoordinator.SetDBClient(o.Client)

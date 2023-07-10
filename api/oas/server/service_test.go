@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/suite"
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/tsingsun/woocoo/web"
@@ -82,7 +81,6 @@ func (s *serviceSuite) SetupSuite() {
 			Alerts:      s.AlertManager.Alerts,
 			Silences:    s.AlertManager.Silences,
 			StatusFunc:  s.AlertManager.Marker.Status,
-			Registry:    prometheus.DefaultRegisterer,
 			GroupFunc:   s.AlertManager.Dispatcher.Groups,
 		})
 	s.Require().NoError(err)

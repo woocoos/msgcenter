@@ -3,9 +3,11 @@ package service
 import (
 	"context"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/tsingsun/members"
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/gds/timeinterval"
 	"github.com/woocoos/msgcenter/dispatch"
+	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/inhibit"
 	"github.com/woocoos/msgcenter/nflog"
 	"github.com/woocoos/msgcenter/notify"
@@ -21,6 +23,20 @@ import (
 // to a notification pipeline.
 const NotifyMinTimeout = 10 * time.Second
 
+type AmOption func(*AlertManager)
+
+func WithClient(client *ent.Client) AmOption {
+	return func(am *AlertManager) {
+		am.client = client
+	}
+}
+
+func WithPeer(p *members.Peer) AmOption {
+	return func(am *AlertManager) {
+		am.Peer = p
+	}
+}
+
 type AlertManager struct {
 	Cnf             *conf.Configuration
 	NotificationLog notify.NotificationLog
@@ -30,17 +46,29 @@ type AlertManager struct {
 	Dispatcher      *dispatch.Dispatcher
 	Inhibitor       *inhibit.Inhibitor
 	Silencer        *silence.Silencer
+
+	client *ent.Client
+	Peer   *members.Peer
 }
 
-func DefaultAlertManager(cnf *conf.Configuration) (am *AlertManager, err error) {
+func DefaultAlertManager(cnf *conf.Configuration, opts ...AmOption) (am *AlertManager, err error) {
 	am = &AlertManager{Cnf: cnf}
+	for _, opt := range opts {
+		opt(am)
+	}
+	if err = am.Members(); err != nil {
+		return nil, err
+	}
 	am.NotificationLog, err = nflog.NewFromConfiguration(cnf)
 	if err != nil {
 		return nil, err
 	}
-	am.Silences, err = silence.NewFromConfiguration(cnf)
+	am.Silences, err = silence.NewFromConfiguration(cnf, silence.WithDataLoader(SilencesDataLoad(am.client)))
 	if err != nil {
 		return nil, err
+	}
+	if am.Peer != nil {
+		am.Silences.Spreader, err = am.Peer.AddShard(am.Silences)
 	}
 	am.Marker = alert.NewMarker(prometheus.DefaultRegisterer)
 	am.Alerts, err = mem.NewAlerts(context.Background(), am.Marker,
@@ -115,4 +143,19 @@ func (am *AlertManager) Start(co *Coordinator, config *profile.Config) error {
 func (am *AlertManager) Stop() {
 	am.Dispatcher.Stop()
 	am.Inhibitor.Stop(context.Background())
+}
+
+func (am *AlertManager) Members() error {
+	if !am.Cnf.IsSet("cluster") {
+		return nil
+	}
+	cnf := am.Cnf.Sub("cluster")
+	peer, err := members.NewPeer(members.WithConfiguration(cnf))
+	if err != nil {
+		return err
+	}
+
+	am.Peer = peer
+
+	return nil
 }

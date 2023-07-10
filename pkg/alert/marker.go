@@ -82,9 +82,11 @@ func NewMarker(r prometheus.Registerer) Marker {
 	m := &memMarker{
 		m: map[label.Fingerprint]*MarkerStatus{},
 	}
-	metrics.NewMarkerMetrics(r, func(state string) float64 {
-		return float64(m.Count(AlertState(state)))
-	})
+	if metrics.Marker == nil {
+		metrics.Marker = metrics.NewMarkerMetrics(r, func(state string) float64 {
+			return float64(m.Count(AlertState(state)))
+		})
+	}
 
 	return m
 }

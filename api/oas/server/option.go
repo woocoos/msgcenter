@@ -2,7 +2,6 @@ package server
 
 import (
 	"errors"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/woocoos/msgcenter/dispatch"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
@@ -21,9 +20,6 @@ type Options struct {
 	// StatusFunc is used be the API to retrieve the AlertStatus of an
 	// alert. Mandatory.
 	StatusFunc func(label.Fingerprint) alert.MarkerStatus
-	// Registry is used to register Prometheus metrics. If nil, no metrics
-	// registration will happen.
-	Registry prometheus.Registerer
 	// GroupFunc returns a list of alert groups. The alerts are grouped
 	// according to the current active configuration. Alerts returned are
 	// filtered by the arguments provided to the function.

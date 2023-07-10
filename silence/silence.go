@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/benbjohnson/clock"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/tsingsun/members"
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/log"
+	"github.com/vmihailenco/msgpack/v4"
 	"github.com/woocoos/entco/pkg/snowflake"
 	"github.com/woocoos/msgcenter/ent"
-	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/metrics"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
@@ -23,7 +23,10 @@ import (
 	"unicode/utf8"
 )
 
-var logger = log.Component("silence")
+var (
+	logger               = log.Component("silence")
+	_      members.Shard = (*Silences)(nil)
+)
 
 var (
 	// ErrNotFound is returned if a silence was not found.
@@ -158,17 +161,10 @@ func (s *Silencer) Mutes(lset label.LabelSet) bool {
 type Silences struct {
 	Options
 
-	clock clock.Clock
-
-	metrics *metrics.SilencesMetrics
-
-	mtx       sync.RWMutex
-	st        state
-	version   int // Increments whenever silences are added.
-	broadcast func([]byte)
-	mc        matcherCache
-
-	stopc chan struct{}
+	mtx     sync.RWMutex
+	st      state
+	version int // Increments whenever silences are added.
+	mc      matcherCache
 }
 
 // MaintenanceFunc represents the function to run as part of the periodic maintenance for silences.
@@ -176,9 +172,12 @@ type MaintenanceFunc func() error
 
 type Option func(*Options)
 
-func WithDB(db *ent.Client) Option {
+// WithDataLoader sets the data loader function for the silences.
+// if not set, the silences will use the memory to store silences.
+// in distributed mode, this should be set to use the sync data.
+func WithDataLoader(fn func(ids ...int) ([]*ent.Silence, error)) Option {
 	return func(o *Options) {
-		o.Db = db
+		o.DataLoader = fn
 	}
 }
 
@@ -189,12 +188,11 @@ type Options struct {
 	// garbage collected after the given duration after they ended.
 	Retention time.Duration
 
-	Metrics prometheus.Registerer
-
 	MaintenanceInterval time.Duration
 	MaintenanceFunc     MaintenanceFunc
 
-	Db *ent.Client
+	DataLoader func(ids ...int) ([]*ent.Silence, error)
+	Spreader   members.Spreader
 }
 
 func (o *Options) validate() error {
@@ -209,7 +207,6 @@ func (o *Options) validate() error {
 func NewFromConfiguration(cfg *conf.Configuration, opts ...Option) (*Silences, error) {
 	silenceOpts := Options{
 		Retention:           cfg.Duration("data.retention"),
-		Metrics:             prometheus.DefaultRegisterer,
 		MaintenanceInterval: cfg.Duration("data.maintenanceInterval"),
 	}
 	for _, opt := range opts {
@@ -224,20 +221,20 @@ func New(o Options) (*Silences, error) {
 		return nil, err
 	}
 	s := &Silences{
-		Options:   o,
-		clock:     clock.New(),
-		mc:        matcherCache{},
-		broadcast: func([]byte) {},
-		st:        state{},
-		stopc:     make(chan struct{}),
+		Options: o,
+		mc:      matcherCache{},
+		st:      state{},
 	}
-	s.metrics = metrics.NewSilencesMetrics(o.Metrics, func(state string) float64 {
-		count, err := s.CountState(alert.SilenceState(state))
-		if err != nil {
-			logger.Error("Counting silences failed", zap.Error(err))
-		}
-		return float64(count)
-	})
+
+	if metrics.Silences == nil {
+		metrics.Silences = metrics.NewSilencesMetrics(func(state string) float64 {
+			count, err := s.CountState(alert.SilenceState(state))
+			if err != nil {
+				logger.Error("Counting silences failed", zap.Error(err))
+			}
+			return float64(count)
+		})
+	}
 
 	if s.MaintenanceFunc == nil {
 		s.MaintenanceFunc = func() error {
@@ -248,39 +245,55 @@ func New(o Options) (*Silences, error) {
 			return nil
 		}
 	}
-	if s.Db != nil {
-		if err := s.loadDatabase(); err != nil {
+	if s.DataLoader != nil {
+		if err := s.loadData(); err != nil {
 			return nil, err
 		}
 	}
 	return s, nil
 }
 
+func (s *Silences) Name() string {
+	return "silences"
+}
+
+func (s *Silences) MarshalBinary() ([]byte, error) {
+	s.mtx.RLock()
+	defer s.mtx.RUnlock()
+	return s.st.MarshalBinary()
+}
+
+func (s *Silences) Merge(b []byte) error {
+	s.mtx.Lock()
+	defer s.mtx.Unlock()
+	return s.st.Merge(b)
+}
+
 func (s *Silences) nowUTC() time.Time {
-	return s.clock.Now().UTC()
+	return time.Now().UTC()
 }
 
 func (s *Silences) Start(ctx context.Context) error {
-	t := s.clock.Ticker(s.MaintenanceInterval)
+	t := time.NewTicker(s.MaintenanceInterval)
 	defer t.Stop()
 
 	runMaintenance := func(do MaintenanceFunc) error {
-		s.metrics.MaintenanceTotal.Inc()
+		metrics.Silences.MaintenanceTotal.Inc()
 		logger.Debug("Running maintenance")
 		start := s.nowUTC()
 		err := do()
 		if err != nil {
-			s.metrics.MaintenanceErrorsTotal.Inc()
+			metrics.Silences.MaintenanceErrorsTotal.Inc()
 			return err
 		}
-		logger.Debug("Maintenance done", zap.Duration("duration", s.clock.Since(start)))
+		logger.Debug("Maintenance done", zap.Duration("duration", time.Since(start)))
 		return nil
 	}
 
 Loop:
 	for {
 		select {
-		case <-s.stopc:
+		case <-ctx.Done():
 			break Loop
 		case <-t.C:
 			if err := runMaintenance(s.MaintenanceFunc); err != nil {
@@ -296,7 +309,6 @@ Loop:
 }
 
 func (s *Silences) Stop(ctx context.Context) error {
-	close(s.stopc)
 	return nil
 }
 
@@ -304,7 +316,7 @@ func (s *Silences) Stop(ctx context.Context) error {
 // than the configured retention time ago.
 func (s *Silences) GC() (int, error) {
 	start := time.Now()
-	defer func() { s.metrics.GcDuration.Observe(time.Since(start).Seconds()) }()
+	defer func() { metrics.Silences.GcDuration.Observe(time.Since(start).Seconds()) }()
 
 	now := s.nowUTC()
 	var n int
@@ -410,9 +422,16 @@ func (s *Silences) setSilence(sil *ent.Silence, now time.Time) error {
 	if err := validateSilence(sil); err != nil {
 		return fmt.Errorf("silence invalid %w", err)
 	}
-	sil.EndsAt = s.clock.Now().Add(s.Retention)
+	sil.EndsAt = time.Now().Add(s.Retention)
 	if s.st.merge(sil, now) {
 		s.version++
+	}
+	b, err := s.st.marshalBinary(sil)
+	if err != nil {
+		return err
+	}
+	if s.Spreader != nil {
+		return s.Spreader.Broadcast(b)
 	}
 	return nil
 }
@@ -584,19 +603,19 @@ func (s *Silences) QueryOne(params ...QueryParam) (*ent.Silence, error) {
 // Query for silences based on the given query parameters. It returns the
 // resulting silences and the state version the result is based on.
 func (s *Silences) Query(params ...QueryParam) ([]*ent.Silence, int, error) {
-	s.metrics.QueriesTotal.Inc()
-	defer prometheus.NewTimer(s.metrics.QueryDuration).ObserveDuration()
+	metrics.Silences.QueriesTotal.Inc()
+	defer prometheus.NewTimer(metrics.Silences.QueryDuration).ObserveDuration()
 
 	q := &query{}
 	for _, p := range params {
 		if err := p(q); err != nil {
-			s.metrics.QueryErrorsTotal.Inc()
+			metrics.Silences.QueryErrorsTotal.Inc()
 			return nil, s.Version(), err
 		}
 	}
 	sils, version, err := s.query(q, s.nowUTC())
 	if err != nil {
-		s.metrics.QueryErrorsTotal.Inc()
+		metrics.Silences.QueryErrorsTotal.Inc()
 	}
 	return sils, version, err
 }
@@ -659,13 +678,9 @@ func (s *Silences) query(q *query, now time.Time) ([]*ent.Silence, int, error) {
 	return resf, s.version, nil
 }
 
-// loadSnapshot loads a snapshot generated by Snapshot() into the state.
-// Any previous state is wiped.
-func (s *Silences) loadDatabase() error {
-	datas, err := s.Db.Silence.Query().Where(
-		silence.EndsAtGT(s.nowUTC()),
-		silence.StateNotIn(alert.SilenceStateExpired),
-	).All(context.Background())
+// loadSnapshot loads all silences data from DataLoader
+func (s *Silences) loadData() error {
+	datas, err := s.DataLoader()
 	if err != nil {
 		return err
 	}
@@ -695,4 +710,28 @@ func (s state) merge(e *ent.Silence, now time.Time) bool {
 		return true
 	}
 	return false
+}
+
+func (s state) Merge(bs []byte) error {
+	var msg []*ent.Silence
+	if err := msgpack.Unmarshal(bs, &msg); err != nil {
+		return err
+	}
+	for _, e := range msg {
+		s.merge(e, time.Now())
+	}
+	return nil
+}
+
+func (s state) MarshalBinary() ([]byte, error) {
+	var msg []*ent.Silence
+
+	for _, e := range s {
+		msg = append(msg, e)
+	}
+	return msgpack.Marshal(msg)
+}
+
+func (s state) marshalBinary(e *ent.Silence) ([]byte, error) {
+	return msgpack.Marshal([]*ent.Silence{e})
 }

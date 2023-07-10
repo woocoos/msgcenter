@@ -67,7 +67,7 @@ func NewService(opts *Options) (*Service, error) {
 	s := &Service{
 		Options: opts,
 		uptime:  time.Now(),
-		m:       metrics.NewAlerts("v2", opts.Registry),
+		m:       metrics.NewAlerts("v2"),
 	}
 	return s, nil
 }

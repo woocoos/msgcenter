@@ -57,6 +57,14 @@ entcache:
   level: context
 
 alertManager:
+  # 集群配置,如无配置表示单机模式
+  cluster:
+    options:
+      # 指定集群中的节点,可以是服务名或者IP
+      known: ["localhost"]
+    memberList:
+      bindAddr: 0.0.0.0
+      bindPort: 7946
   config:
     # 如果指定租户，则只能访问指定租户的配置
     tenants: [1,2,3]

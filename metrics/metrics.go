@@ -8,14 +8,14 @@ var (
 	Dispatcher  *DispatcherMetrics
 	Notify      *NotifyMetrics
 	Coordinator *CoordinatorMetrics
+	Registerer  = prometheus.DefaultRegisterer
+	Silences    *SilencesMetrics
+	Marker      *MarkerMetrics
 )
 
 // BuildGlobal build default metrics
-func BuildGlobal(registerer prometheus.Registerer) {
-	if registerer == nil {
-		registerer = prometheus.DefaultRegisterer
-	}
-	Dispatcher = NewDispatcherMetrics(false, registerer)
+func BuildGlobal() {
+	Dispatcher = NewDispatcherMetrics(false, Registerer)
 	Notify = NewNotifyMetrics([]string{"other", "clientError", "serverError"}, prometheus.DefaultRegisterer)
 	Coordinator = NewCoordinatorMetrics(prometheus.DefaultRegisterer)
 }
@@ -28,7 +28,7 @@ type Alerts struct {
 }
 
 // NewAlerts returns an *Alerts struct for the given API version.
-func NewAlerts(version string, r prometheus.Registerer) *Alerts {
+func NewAlerts(version string) *Alerts {
 	numReceivedAlerts := prometheus.NewCounterVec(prometheus.CounterOpts{
 		Name:        "msgcenter_alerts_received_total",
 		Help:        "The total number of received alerts.",
@@ -39,9 +39,7 @@ func NewAlerts(version string, r prometheus.Registerer) *Alerts {
 		Help:        "The total number of received alerts that were invalid.",
 		ConstLabels: prometheus.Labels{"version": version},
 	})
-	if r != nil {
-		r.MustRegister(numReceivedAlerts, numInvalidAlerts)
-	}
+	Registerer.MustRegister(numReceivedAlerts, numInvalidAlerts)
 	return &Alerts{
 		firing:   numReceivedAlerts.WithLabelValues("firing"),
 		resolved: numReceivedAlerts.WithLabelValues("resolved"),
@@ -317,7 +315,7 @@ type SilencesMetrics struct {
 	MaintenanceErrorsTotal  prometheus.Counter
 }
 
-func NewSilencesMetrics(r prometheus.Registerer, sfunc func(state string) float64) *SilencesMetrics {
+func NewSilencesMetrics(sfunc func(state string) float64) *SilencesMetrics {
 	m := &SilencesMetrics{}
 	m.GcDuration = prometheus.NewSummary(prometheus.SummaryOpts{
 		Name:       "msgcenter_silences_gc_duration_seconds",
@@ -369,20 +367,18 @@ func NewSilencesMetrics(r prometheus.Registerer, sfunc func(state string) float6
 	m.silencesPending = newSilenceMetricByState("pending", sfunc)
 	m.silencesExpired = newSilenceMetricByState("expired", sfunc)
 
-	if r != nil {
-		r.MustRegister(
-			m.GcDuration,
-			m.SnapshotDuration,
-			m.QueriesTotal,
-			m.QueryErrorsTotal,
-			m.QueryDuration,
-			m.silencesActive,
-			m.silencesPending,
-			m.silencesExpired,
-			m.propagatedMessagesTotal,
-			m.MaintenanceTotal,
-			m.MaintenanceErrorsTotal,
-		)
-	}
+	Registerer.MustRegister(
+		m.GcDuration,
+		m.SnapshotDuration,
+		m.QueriesTotal,
+		m.QueryErrorsTotal,
+		m.QueryDuration,
+		m.silencesActive,
+		m.silencesPending,
+		m.silencesExpired,
+		m.propagatedMessagesTotal,
+		m.MaintenanceTotal,
+		m.MaintenanceErrorsTotal,
+	)
 	return m
 }
