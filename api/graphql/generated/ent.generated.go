@@ -25,6 +25,9 @@ import (
 
 // region    ************************** generated!.gotpl **************************
 
+type MsgEventResolver interface {
+	RouteStr(ctx context.Context, obj *ent.MsgEvent) (string, error)
+}
 type MsgTypeResolver interface {
 	SubscriberUsers(ctx context.Context, obj *ent.MsgType) ([]*ent.MsgSubscriber, error)
 	SubscriberRoles(ctx context.Context, obj *ent.MsgType) ([]*ent.MsgSubscriber, error)
@@ -38,7 +41,7 @@ type QueryResolver interface {
 	MsgTypeCategories(ctx context.Context, keyword *string, appID *int) ([]string, error)
 	MsgEvents(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) (*ent.MsgEventConnection, error)
 	MsgTemplates(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) (*ent.MsgTemplateConnection, error)
-	MsgConfig(ctx context.Context) (string, error)
+	Silences(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SilenceOrder, where *ent.SilenceWhereInput) (*ent.SilenceConnection, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -351,6 +354,66 @@ func (ec *executionContext) field_Query_nodes_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["ids"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_silences_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *entgql.Cursor[int]
+	if tmp, ok := rawArgs["after"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["after"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *entgql.Cursor[int]
+	if tmp, ok := rawArgs["before"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["before"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["last"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["last"] = arg3
+	var arg4 *ent.SilenceOrder
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+		arg4, err = ec.unmarshalOSilenceOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilenceOrder(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orderBy"] = arg4
+	var arg5 *ent.SilenceWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg5, err = ec.unmarshalOSilenceWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilenceWhereInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg5
 	return args, nil
 }
 
@@ -1753,6 +1816,50 @@ func (ec *executionContext) fieldContext_MsgEvent_customerTemplate(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _MsgEvent_routeStr(ctx context.Context, field graphql.CollectedField, obj *ent.MsgEvent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgEvent_routeStr(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.MsgEvent().RouteStr(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgEvent_routeStr(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgEvent",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MsgEventConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.MsgEventConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MsgEventConnection_edges(ctx, field)
 	if err != nil {
@@ -1960,6 +2067,8 @@ func (ec *executionContext) fieldContext_MsgEventEdge_node(ctx context.Context, 
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
+			case "routeStr":
+				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -3606,6 +3715,8 @@ func (ec *executionContext) fieldContext_MsgTemplate_event(ctx context.Context, 
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
+			case "routeStr":
+				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -4462,6 +4573,8 @@ func (ec *executionContext) fieldContext_MsgType_events(ctx context.Context, fie
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
+			case "routeStr":
+				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -5596,8 +5709,8 @@ func (ec *executionContext) fieldContext_Query_msgTemplates(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_msgConfig(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_msgConfig(ctx, field)
+func (ec *executionContext) _Query_silences(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_silences(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5610,7 +5723,7 @@ func (ec *executionContext) _Query_msgConfig(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().MsgConfig(rctx)
+		return ec.resolvers.Query().Silences(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.SilenceOrder), fc.Args["where"].(*ent.SilenceWhereInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5622,20 +5735,39 @@ func (ec *executionContext) _Query_msgConfig(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*ent.SilenceConnection)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNSilenceConnection2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilenceConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_msgConfig(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_silences(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_SilenceConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_SilenceConnection_pageInfo(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_SilenceConnection_totalCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type SilenceConnection", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_silences_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -14264,6 +14396,42 @@ func (ec *executionContext) _MsgEvent(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "routeStr":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MsgEvent_routeStr(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -15294,7 +15462,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "msgConfig":
+		case "silences":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -15303,7 +15471,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_msgConfig(ctx, field)
+				res = ec._Query_silences(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -16146,6 +16314,20 @@ func (ec *executionContext) marshalNSilence2ᚖgithubᚗcomᚋwoocoosᚋmsgcente
 		return graphql.Null
 	}
 	return ec._Silence(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNSilenceConnection2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilenceConnection(ctx context.Context, sel ast.SelectionSet, v ent.SilenceConnection) graphql.Marshaler {
+	return ec._SilenceConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSilenceConnection2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilenceConnection(ctx context.Context, sel ast.SelectionSet, v *ent.SilenceConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._SilenceConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNSilenceOrderField2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilenceOrderField(ctx context.Context, v interface{}) (*ent.SilenceOrderField, error) {
@@ -17506,6 +17688,14 @@ func (ec *executionContext) marshalOSilenceEdge2ᚖgithubᚗcomᚋwoocoosᚋmsgc
 		return graphql.Null
 	}
 	return ec._SilenceEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOSilenceOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilenceOrder(ctx context.Context, v interface{}) (*ent.SilenceOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputSilenceOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOSilenceSilenceState2ᚕgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋalertᚐSilenceStateᚄ(ctx context.Context, v interface{}) ([]alert.SilenceState, error) {

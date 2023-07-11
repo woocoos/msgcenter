@@ -173,6 +173,7 @@ func (r *mutationResolver) DeleteMsgTemplate(ctx context.Context, id int) (bool,
 		return false, fmt.Errorf("the active status cannot be deleted")
 	}
 	err := client.MsgTemplate.DeleteOneID(id).Exec(ctx)
+	// TODO 还需同步删除模板文件
 	return err == nil, err
 }
 

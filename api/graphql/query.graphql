@@ -4,9 +4,13 @@ scalar MapString
 scalar HostPort
 
 enum MatchType {
+    # =
     MatchEqual
+    # !=
     MatchNotEqual
+    # =~
     MatchRegexp
+    # !~
     MatchNotRegexp
 }
 
@@ -55,6 +59,10 @@ extend type MsgType {
     excludeSubscriberUsers:[MsgSubscriber!]!
 }
 
+extend type MsgEvent {
+    routeStr: String!
+}
+
 extend type Query {
     # 消息通道列表
     msgChannels(
@@ -99,6 +107,13 @@ extend type Query {
         where: MsgTemplateWhereInput
     ): MsgTemplateConnection!
 
-    # 消息配置
-    msgConfig:String!
+    # 静默消息
+    silences(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: SilenceOrder
+        where: SilenceWhereInput
+    ):SilenceConnection!
 }

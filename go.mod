@@ -20,9 +20,11 @@ require (
 	github.com/matttproud/golang_protobuf_extensions v1.0.4
 	github.com/prometheus/client_golang v1.11.1
 	github.com/stretchr/testify v1.8.3
+	github.com/tsingsun/members v0.0.0-20230710091051-5766137a0396
 	github.com/tsingsun/woocoo v0.3.1-0.20230710030305-2fae153355b0
 	github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230706082952-8c3654ddbca6
 	github.com/vektah/gqlparser/v2 v2.5.4
+	github.com/vmihailenco/msgpack/v4 v4.3.12
 	github.com/woocoos/entco v0.0.0-20230706084622-005132298767
 	go.uber.org/zap v1.24.0
 	golang.org/x/sync v0.3.0
@@ -99,10 +101,10 @@ require (
 	github.com/redis/go-redis/v9 v9.0.5 // indirect
 	github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
-	github.com/tsingsun/members v0.0.0-20230710091051-5766137a0396 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
+	github.com/vmihailenco/tagparser v0.1.2 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/woocoos/casbin-ent-adapter v0.0.0-20230404005858-cd33f1b0b92e // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
@@ -118,6 +120,7 @@ require (
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/tools v0.9.3 // indirect
+	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

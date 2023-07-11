@@ -32,6 +32,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	MsgEvent() MsgEventResolver
 	MsgType() MsgTypeResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
@@ -97,6 +98,7 @@ type ComplexityRoot struct {
 		MsgTypeID        func(childComplexity int) int
 		Name             func(childComplexity int) int
 		Route            func(childComplexity int) int
+		RouteStr         func(childComplexity int) int
 		Status           func(childComplexity int) int
 		UpdatedAt        func(childComplexity int) int
 		UpdatedBy        func(childComplexity int) int
@@ -232,13 +234,13 @@ type ComplexityRoot struct {
 
 	Query struct {
 		MsgChannels       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgChannelOrder, where *ent.MsgChannelWhereInput) int
-		MsgConfig         func(childComplexity int) int
 		MsgEvents         func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) int
 		MsgTemplates      func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) int
 		MsgTypeCategories func(childComplexity int, keyword *string, appID *int) int
 		MsgTypes          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTypeOrder, where *ent.MsgTypeWhereInput) int
 		Node              func(childComplexity int, id string) int
 		Nodes             func(childComplexity int, ids []string) int
+		Silences          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SilenceOrder, where *ent.SilenceWhereInput) int
 	}
 
 	Receiver struct {
@@ -575,6 +577,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgEvent.Route(childComplexity), true
+
+	case "MsgEvent.routeStr":
+		if e.complexity.MsgEvent.RouteStr == nil {
+			break
+		}
+
+		return e.complexity.MsgEvent.RouteStr(childComplexity), true
 
 	case "MsgEvent.status":
 		if e.complexity.MsgEvent.Status == nil {
@@ -1389,13 +1398,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.MsgChannels(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgChannelOrder), args["where"].(*ent.MsgChannelWhereInput)), true
 
-	case "Query.msgConfig":
-		if e.complexity.Query.MsgConfig == nil {
-			break
-		}
-
-		return e.complexity.Query.MsgConfig(childComplexity), true
-
 	case "Query.msgEvents":
 		if e.complexity.Query.MsgEvents == nil {
 			break
@@ -1467,6 +1469,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Nodes(childComplexity, args["ids"].([]string)), true
+
+	case "Query.silences":
+		if e.complexity.Query.Silences == nil {
+			break
+		}
+
+		args, err := ec.field_Query_silences_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Silences(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.SilenceOrder), args["where"].(*ent.SilenceWhereInput)), true
 
 	case "Receiver.emailConfigs":
 		if e.complexity.Receiver.EmailConfigs == nil {
@@ -3241,9 +3255,13 @@ scalar MapString
 scalar HostPort
 
 enum MatchType {
+    # =
     MatchEqual
+    # !=
     MatchNotEqual
+    # =~
     MatchRegexp
+    # !~
     MatchNotRegexp
 }
 
@@ -3292,6 +3310,10 @@ extend type MsgType {
     excludeSubscriberUsers:[MsgSubscriber!]!
 }
 
+extend type MsgEvent {
+    routeStr: String!
+}
+
 extend type Query {
     # 消息通道列表
     msgChannels(
@@ -3336,8 +3358,15 @@ extend type Query {
         where: MsgTemplateWhereInput
     ): MsgTemplateConnection!
 
-    # 消息配置
-    msgConfig:String!
+    # 静默消息
+    silences(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: SilenceOrder
+        where: SilenceWhereInput
+    ):SilenceConnection!
 }`, BuiltIn: false},
 	{Name: "../mutation.graphql", Input: `type Mutation {
     # 创建消息类型

@@ -21,11 +21,15 @@ func (r *queryResolver) Nodes(ctx context.Context, ids []string) ([]ent.Noder, e
 	return r.Client.NodersEx(ctx, ids)
 }
 
+// MsgEvent returns generated.MsgEventResolver implementation.
+func (r *Resolver) MsgEvent() generated.MsgEventResolver { return &msgEventResolver{r} }
+
 // MsgType returns generated.MsgTypeResolver implementation.
 func (r *Resolver) MsgType() generated.MsgTypeResolver { return &msgTypeResolver{r} }
 
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+type msgEventResolver struct{ *Resolver }
 type msgTypeResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

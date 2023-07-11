@@ -6,6 +6,7 @@ package graphql
 
 import (
 	"context"
+	"encoding/json"
 
 	"entgo.io/contrib/entgql"
 	"github.com/woocoos/entco/pkg/identity"
@@ -17,6 +18,25 @@ import (
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
+
+// RouteStr is the resolver for the routeStr field.
+func (r *msgEventResolver) RouteStr(ctx context.Context, obj *ent.MsgEvent) (string, error) {
+	rs, err := json.Marshal(obj.Route)
+	if err != nil {
+		return "", err
+	}
+	route := profile.Route{}
+	err = json.Unmarshal(rs, &route)
+	if err != nil {
+		return "", err
+	}
+	route.Name = ""
+	rs, err = json.Marshal(route)
+	if err != nil {
+		return "", err
+	}
+	return string(rs), nil
+}
 
 // SubscriberUsers is the resolver for the subscriberUsers field.
 func (r *msgTypeResolver) SubscriberUsers(ctx context.Context, obj *ent.MsgType) ([]*ent.MsgSubscriber, error) {
@@ -95,9 +115,11 @@ func (r *queryResolver) MsgTemplates(ctx context.Context, after *entgql.Cursor[i
 	return r.Client.MsgTemplate.Query().Paginate(ctx, after, first, before, last, ent.WithMsgTemplateOrder(orderBy), ent.WithMsgTemplateFilter(where.Filter))
 }
 
-// MsgConfig is the resolver for the msgConfig field.
-func (r *queryResolver) MsgConfig(ctx context.Context) (string, error) {
-	return r.Coordinator.ProfileString(), nil
+// Silences is the resolver for the silences field.
+func (r *queryResolver) Silences(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SilenceOrder, where *ent.SilenceWhereInput) (*ent.SilenceConnection, error) {
+	return r.Client.Silence.Query().Paginate(ctx, after, first, before, last,
+		ent.WithSilenceOrder(orderBy),
+		ent.WithSilenceFilter(where.Filter))
 }
 
 // Matchers is the resolver for the matchers field.

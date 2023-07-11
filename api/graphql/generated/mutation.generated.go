@@ -752,6 +752,8 @@ func (ec *executionContext) fieldContext_Mutation_createMsgEvent(ctx context.Con
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
+			case "routeStr":
+				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -835,6 +837,8 @@ func (ec *executionContext) fieldContext_Mutation_updateMsgEvent(ctx context.Con
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
+			case "routeStr":
+				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -973,6 +977,8 @@ func (ec *executionContext) fieldContext_Mutation_enableMsgEvent(ctx context.Con
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
+			case "routeStr":
+				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -1056,6 +1062,8 @@ func (ec *executionContext) fieldContext_Mutation_disableMsgEvent(ctx context.Co
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
+			case "routeStr":
+				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
