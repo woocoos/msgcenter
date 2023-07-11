@@ -1,5 +1,5 @@
 import store from '@/store';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { userMenuList } from './menuConfig';
 import AvatarDropdown from '@/components/Header/AvatarDropdown';
 import I18nDropdown from '@/components/Header/I18nDropdown';
@@ -14,10 +14,22 @@ import LeavePrompt, { Link } from '@/components/LeavePrompt';
 import { AliveScope } from 'react-activation';
 import TenantDropdown from '@/components/Header/TenantDropdown';
 import { monitorKeyChange } from '@/pkg/localStore';
+import { getFilesRaw } from '@/services/files';
 
 export default () => {
   const [basisState, basisDispatcher] = store.useModel('basis'),
-    { token } = useToken();
+    { token } = useToken(),
+    [avatar, setAvatar] = useState<string>();
+
+  useEffect(() => {
+    if (basisState.user?.avatarFileId) {
+      getFilesRaw(basisState.user?.avatarFileId, 'url').then(result => {
+        if (typeof result === 'string') {
+          setAvatar(result);
+        }
+      })
+    }
+  }, [basisState.user]);
 
   useEffect(() => {
     i18n.changeLanguage(basisState.locale);
@@ -79,7 +91,7 @@ export default () => {
           <I18nDropdown />
           <TenantDropdown />
           <AvatarDropdown
-            avatar={defaultAvatar}
+            avatar={avatar || defaultAvatar}
             name={basisState.user?.displayName || ''}
           />
           <DarkMode />

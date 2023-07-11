@@ -87,7 +87,7 @@ export async function getFilesRaw(fileId: string, type?: 'url') {
 export async function formatArrayFilesRaw<T>(arr: T[], key: string, defaultValue?: any) {
   return await Promise.all(arr.map(async (item) => {
     if (item[key]) {
-      item[key] = await getFilesRaw(item[key])
+      item[key] = await getFilesRaw(item[key], 'url')
     } else {
       item[key] = defaultValue
     }

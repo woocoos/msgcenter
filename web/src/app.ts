@@ -26,6 +26,10 @@ if (process.env.ICE_CORE_MODE === 'development') {
   // 无登录项目增加前端缓存内容 方便开发和展示
   setItem('token', process.env.ICE_TOKEN)
   setItem('tenantId', process.env.ICE_TENANT_ID)
+  setItem('user', {
+    id: 1,
+    displayName: 'admin',
+  })
 }
 
 // App config, see https://v3.ice.work/docs/guide/basic/app
@@ -40,6 +44,7 @@ export default defineAppConfig(() => ({
 export const dataLoader = defineDataLoader(async () => {
   let locale = getItem<string>('locale'),
     token = getItem<string>('token'),
+    refreshToken = getItem<string>('refreshToken'),
     darkMode = getItem<string>('darkMode'),
     compactMode = getItem<string>('compactMode'),
     tenantId = getItem<string>('tenantId'),
@@ -64,6 +69,7 @@ export const dataLoader = defineDataLoader(async () => {
     basis: {
       locale,
       token,
+      refreshToken,
       darkMode,
       compactMode,
       tenantId,
