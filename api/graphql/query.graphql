@@ -4,13 +4,13 @@ scalar MapString
 scalar HostPort
 
 enum MatchType {
-    # =
+    """ = """
     MatchEqual
-    # !=
+    """ != """
     MatchNotEqual
-    # =~
+    """ =~ """
     MatchRegexp
-    # !~
+    """ !~ """
     MatchNotRegexp
 }
 
@@ -50,21 +50,26 @@ type EmailConfig {
     headers: MapString
 }
 
+enum RouteStrType {
+    Json
+    Yaml
+}
+
 extend type MsgType {
-    # 订阅的用户
+    """ 订阅的用户 """
     subscriberUsers:[MsgSubscriber!]!
-    # 订阅的用户组
+    """ 订阅的用户组 """
     subscriberRoles:[MsgSubscriber!]!
-    # 排除的用户
+    """ 排除的用户 """
     excludeSubscriberUsers:[MsgSubscriber!]!
 }
 
 extend type MsgEvent {
-    routeStr: String!
+    routeStr(type: RouteStrType!): String!
 }
 
 extend type Query {
-    # 消息通道列表
+    """ 消息通道列表 """
     msgChannels(
         after: Cursor
         first: Int
@@ -74,7 +79,7 @@ extend type Query {
         where: MsgChannelWhereInput
     ): MsgChannelConnection!
 
-    # 消息类型列表
+    """ 消息类型列表 """
     msgTypes(
         after: Cursor
         first: Int
@@ -84,10 +89,10 @@ extend type Query {
         where: MsgTypeWhereInput
     ): MsgTypeConnection!
 
-    # 消息类型分类
+    """ 消息类型分类 """
     msgTypeCategories(keyword:String,appID:ID): [String!]!
 
-    # 消息事件列表
+    """ 消息事件列表 """
     msgEvents(
         after: Cursor
         first: Int
@@ -97,7 +102,7 @@ extend type Query {
         where: MsgEventWhereInput
     ): MsgEventConnection!
 
-    # 消息模板列表
+    """ 消息模板列表 """
     msgTemplates(
         after: Cursor
         first: Int
@@ -107,7 +112,7 @@ extend type Query {
         where: MsgTemplateWhereInput
     ): MsgTemplateConnection!
 
-    # 静默消息
+    """ 静默消息 """
     silences(
         after: Cursor
         first: Int

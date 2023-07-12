@@ -16,6 +16,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/pkg/alert"
@@ -26,7 +27,7 @@ import (
 // region    ************************** generated!.gotpl **************************
 
 type MsgEventResolver interface {
-	RouteStr(ctx context.Context, obj *ent.MsgEvent) (string, error)
+	RouteStr(ctx context.Context, obj *ent.MsgEvent, typeArg model.RouteStrType) (string, error)
 }
 type MsgTypeResolver interface {
 	SubscriberUsers(ctx context.Context, obj *ent.MsgType) ([]*ent.MsgSubscriber, error)
@@ -47,6 +48,21 @@ type QueryResolver interface {
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_MsgEvent_routeStr_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.RouteStrType
+	if tmp, ok := rawArgs["type"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+		arg0, err = ec.unmarshalNRouteStrType2githubᚗcomᚋwoocoosᚋmsgcenterᚋapiᚋgraphqlᚋmodelᚐRouteStrType(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["type"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -1830,7 +1846,7 @@ func (ec *executionContext) _MsgEvent_routeStr(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.MsgEvent().RouteStr(rctx, obj)
+		return ec.resolvers.MsgEvent().RouteStr(rctx, obj, fc.Args["type"].(model.RouteStrType))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1856,6 +1872,17 @@ func (ec *executionContext) fieldContext_MsgEvent_routeStr(ctx context.Context, 
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_MsgEvent_routeStr_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }

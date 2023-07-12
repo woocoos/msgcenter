@@ -13,6 +13,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/introspection"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
+	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
 )
 
@@ -98,7 +99,7 @@ type ComplexityRoot struct {
 		MsgTypeID        func(childComplexity int) int
 		Name             func(childComplexity int) int
 		Route            func(childComplexity int) int
-		RouteStr         func(childComplexity int) int
+		RouteStr         func(childComplexity int, typeArg model.RouteStrType) int
 		Status           func(childComplexity int) int
 		UpdatedAt        func(childComplexity int) int
 		UpdatedBy        func(childComplexity int) int
@@ -583,7 +584,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.MsgEvent.RouteStr(childComplexity), true
+		args, err := ec.field_MsgEvent_routeStr_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.MsgEvent.RouteStr(childComplexity, args["type"].(model.RouteStrType)), true
 
 	case "MsgEvent.status":
 		if e.complexity.MsgEvent.Status == nil {
@@ -3255,13 +3261,13 @@ scalar MapString
 scalar HostPort
 
 enum MatchType {
-    # =
+    """ = """
     MatchEqual
-    # !=
+    """ != """
     MatchNotEqual
-    # =~
+    """ =~ """
     MatchRegexp
-    # !~
+    """ !~ """
     MatchNotRegexp
 }
 
@@ -3301,21 +3307,26 @@ type EmailConfig {
     headers: MapString
 }
 
+enum RouteStrType {
+    Json
+    Yaml
+}
+
 extend type MsgType {
-    # 订阅的用户
+    """ 订阅的用户 """
     subscriberUsers:[MsgSubscriber!]!
-    # 订阅的用户组
+    """ 订阅的用户组 """
     subscriberRoles:[MsgSubscriber!]!
-    # 排除的用户
+    """ 排除的用户 """
     excludeSubscriberUsers:[MsgSubscriber!]!
 }
 
 extend type MsgEvent {
-    routeStr: String!
+    routeStr(type: RouteStrType!): String!
 }
 
 extend type Query {
-    # 消息通道列表
+    """ 消息通道列表 """
     msgChannels(
         after: Cursor
         first: Int
@@ -3325,7 +3336,7 @@ extend type Query {
         where: MsgChannelWhereInput
     ): MsgChannelConnection!
 
-    # 消息类型列表
+    """ 消息类型列表 """
     msgTypes(
         after: Cursor
         first: Int
@@ -3335,10 +3346,10 @@ extend type Query {
         where: MsgTypeWhereInput
     ): MsgTypeConnection!
 
-    # 消息类型分类
+    """ 消息类型分类 """
     msgTypeCategories(keyword:String,appID:ID): [String!]!
 
-    # 消息事件列表
+    """ 消息事件列表 """
     msgEvents(
         after: Cursor
         first: Int
@@ -3348,7 +3359,7 @@ extend type Query {
         where: MsgEventWhereInput
     ): MsgEventConnection!
 
-    # 消息模板列表
+    """ 消息模板列表 """
     msgTemplates(
         after: Cursor
         first: Int
@@ -3358,7 +3369,7 @@ extend type Query {
         where: MsgTemplateWhereInput
     ): MsgTemplateConnection!
 
-    # 静默消息
+    """ 静默消息 """
     silences(
         after: Cursor
         first: Int
@@ -3369,51 +3380,51 @@ extend type Query {
     ):SilenceConnection!
 }`, BuiltIn: false},
 	{Name: "../mutation.graphql", Input: `type Mutation {
-    # 创建消息类型
+    """ 创建消息类型 """
     createMsgType(input: CreateMsgTypeInput!): MsgType!
-    # 更新消息类型
+    """ 更新消息类型 """
     updateMsgType(id: ID!,input: UpdateMsgTypeInput!): MsgType!
-    # 删除消息类型
+    """ 删除消息类型 """
     deleteMsgType(id: ID!): Boolean!
-    # 创建消息事件
+    """ 创建消息事件 """
     createMsgEvent(input: CreateMsgEventInput!): MsgEvent!
-    # 更新消息事件
+    """ 更新消息事件 """
     updateMsgEvent(id:ID!,input: UpdateMsgEventInput!): MsgEvent!
-    # 删除消息事件
+    """ 删除消息事件 """
     deleteMsgEvent(id: ID!): Boolean!
-    # 启用消息事件
+    """ 启用消息事件 """
     enableMsgEvent(id: ID!): MsgEvent!
-    # 禁用消息事件
+    """ 禁用消息事件 """
     disableMsgEvent(id: ID!): MsgEvent!
-    # 创建消息通道
+    """ 创建消息通道 """
     createMsgChannel(input: CreateMsgChannelInput!): MsgChannel!
-    # 更新消息通道
+    """ 更新消息通道 """
     updateMsgChannel(id: ID!,input: UpdateMsgChannelInput!): MsgChannel!
-    # 删除消息通道
+    """ 删除消息通道 """
     deleteMsgChannel(id: ID!): Boolean!
-    # 启用消息通道
+    """ 启用消息通道 """
     enableMsgChannel(id: ID!): MsgChannel!
-    # 禁用消息通道
+    """ 禁用消息通道 """
     disableMsgChannel(id: ID!): MsgChannel!
-    # 创建消息模板
+    """ 创建消息模板 """
     createMsgTemplate(input: CreateMsgTemplateInput!): MsgTemplate!
-    # 更新消息模板
+    """ 更新消息模板 """
     updateMsgTemplate(id: ID!, input: UpdateMsgTemplateInput!): MsgTemplate!
-    # 删除消息模板
+    """ 删除消息模板 """
     deleteMsgTemplate(id: ID!): Boolean!
-    # 启用消息模板
+    """ 启用消息模板 """
     enableMsgTemplate(id: ID!): MsgTemplate!
-    # 禁用消息模板
+    """ 禁用消息模板 """
     disableMsgTemplate(id: ID!): MsgTemplate!
-    # 消息订阅
+    """ 消息订阅 """
     createMsgSubscriber(inputs: [CreateMsgSubscriberInput!]!): [MsgSubscriber!]!
-    # 删除订阅
+    """ 删除订阅 """
     deleteMsgSubscriber(ids: [ID!]!): Boolean!
-    # 创建静默
+    """ 创建静默 """
     createSilence(input: CreateSilenceInput!): Silence!
-    # 更新静默
+    """ 更新静默 """
     updateSilence(id: ID!, input: UpdateSilenceInput!): Silence!
-    # 删除静默
+    """ 删除静默 """
     deleteSilence(id: ID!): Boolean!
 }
 

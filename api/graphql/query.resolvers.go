@@ -7,10 +7,13 @@ package graphql
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"gopkg.in/yaml.v2"
 
 	"entgo.io/contrib/entgql"
 	"github.com/woocoos/entco/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
+	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -20,7 +23,7 @@ import (
 )
 
 // RouteStr is the resolver for the routeStr field.
-func (r *msgEventResolver) RouteStr(ctx context.Context, obj *ent.MsgEvent) (string, error) {
+func (r *msgEventResolver) RouteStr(ctx context.Context, obj *ent.MsgEvent, typeArg model.RouteStrType) (string, error) {
 	rs, err := json.Marshal(obj.Route)
 	if err != nil {
 		return "", err
@@ -31,7 +34,13 @@ func (r *msgEventResolver) RouteStr(ctx context.Context, obj *ent.MsgEvent) (str
 		return "", err
 	}
 	route.Name = ""
-	rs, err = json.Marshal(route)
+	if typeArg == model.RouteStrTypeJSON {
+		rs, err = json.Marshal(route)
+	} else if typeArg == model.RouteStrTypeYaml {
+		rs, err = yaml.Marshal(route)
+	} else {
+		return "", fmt.Errorf("invalid type")
+	}
 	if err != nil {
 		return "", err
 	}

@@ -14,6 +14,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
@@ -1384,6 +1385,16 @@ func (ec *executionContext) unmarshalNMatchType2githubᚗcomᚋwoocoosᚋmsgcent
 }
 
 func (ec *executionContext) marshalNMatchType2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐMatchType(ctx context.Context, sel ast.SelectionSet, v label.MatchType) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNRouteStrType2githubᚗcomᚋwoocoosᚋmsgcenterᚋapiᚋgraphqlᚋmodelᚐRouteStrType(ctx context.Context, v interface{}) (model.RouteStrType, error) {
+	var res model.RouteStrType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNRouteStrType2githubᚗcomᚋwoocoosᚋmsgcenterᚋapiᚋgraphqlᚋmodelᚐRouteStrType(ctx context.Context, sel ast.SelectionSet, v model.RouteStrType) graphql.Marshaler {
 	return v
 }
 

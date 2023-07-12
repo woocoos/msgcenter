@@ -1,49 +1,49 @@
 type Mutation {
-    # 创建消息类型
+    """ 创建消息类型 """
     createMsgType(input: CreateMsgTypeInput!): MsgType!
-    # 更新消息类型
+    """ 更新消息类型 """
     updateMsgType(id: ID!,input: UpdateMsgTypeInput!): MsgType!
-    # 删除消息类型
+    """ 删除消息类型 """
     deleteMsgType(id: ID!): Boolean!
-    # 创建消息事件
+    """ 创建消息事件 """
     createMsgEvent(input: CreateMsgEventInput!): MsgEvent!
-    # 更新消息事件
+    """ 更新消息事件 """
     updateMsgEvent(id:ID!,input: UpdateMsgEventInput!): MsgEvent!
-    # 删除消息事件
+    """ 删除消息事件 """
     deleteMsgEvent(id: ID!): Boolean!
-    # 启用消息事件
+    """ 启用消息事件 """
     enableMsgEvent(id: ID!): MsgEvent!
-    # 禁用消息事件
+    """ 禁用消息事件 """
     disableMsgEvent(id: ID!): MsgEvent!
-    # 创建消息通道
+    """ 创建消息通道 """
     createMsgChannel(input: CreateMsgChannelInput!): MsgChannel!
-    # 更新消息通道
+    """ 更新消息通道 """
     updateMsgChannel(id: ID!,input: UpdateMsgChannelInput!): MsgChannel!
-    # 删除消息通道
+    """ 删除消息通道 """
     deleteMsgChannel(id: ID!): Boolean!
-    # 启用消息通道
+    """ 启用消息通道 """
     enableMsgChannel(id: ID!): MsgChannel!
-    # 禁用消息通道
+    """ 禁用消息通道 """
     disableMsgChannel(id: ID!): MsgChannel!
-    # 创建消息模板
+    """ 创建消息模板 """
     createMsgTemplate(input: CreateMsgTemplateInput!): MsgTemplate!
-    # 更新消息模板
+    """ 更新消息模板 """
     updateMsgTemplate(id: ID!, input: UpdateMsgTemplateInput!): MsgTemplate!
-    # 删除消息模板
+    """ 删除消息模板 """
     deleteMsgTemplate(id: ID!): Boolean!
-    # 启用消息模板
+    """ 启用消息模板 """
     enableMsgTemplate(id: ID!): MsgTemplate!
-    # 禁用消息模板
+    """ 禁用消息模板 """
     disableMsgTemplate(id: ID!): MsgTemplate!
-    # 消息订阅
+    """ 消息订阅 """
     createMsgSubscriber(inputs: [CreateMsgSubscriberInput!]!): [MsgSubscriber!]!
-    # 删除订阅
+    """ 删除订阅 """
     deleteMsgSubscriber(ids: [ID!]!): Boolean!
-    # 创建静默
+    """ 创建静默 """
     createSilence(input: CreateSilenceInput!): Silence!
-    # 更新静默
+    """ 更新静默 """
     updateSilence(id: ID!, input: UpdateSilenceInput!): Silence!
-    # 删除静默
+    """ 删除静默 """
     deleteSilence(id: ID!): Boolean!
 }
 
