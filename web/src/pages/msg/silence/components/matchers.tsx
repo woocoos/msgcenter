@@ -50,7 +50,11 @@ export default (props: {
             e.preventDefault()
           }}
         >
-          {toMatcherString(item)}
+          <a onClick={() => {
+            setModal({ open: true, title: `${t(`amend`)}:${toMatcherString(item)}`, data: { ...item } })
+          }}>
+            {toMatcherString(item)}
+          </a>
         </Tag>
       })}
 
@@ -63,6 +67,7 @@ export default (props: {
     <MatchersForm
       open={modal.open}
       title={modal.title}
+      data={modal.data}
       onClose={(data) => {
         if (data) {
           const values = [...props.value || []]
