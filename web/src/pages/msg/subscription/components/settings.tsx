@@ -127,7 +127,7 @@ export default (props: {
           const inputs = addKeys.map(key => {
             const data: CreateMsgSubscriberInput = {
               msgTypeID: info.id,
-              tenantID: Number(basisState.tenantId),
+              tenantID: basisState.tenantId,
             }
             if (subject === 'user') {
               data.userID = key
@@ -136,7 +136,7 @@ export default (props: {
               data.userID = key
               data.exclude = true
             } else if (subject === 'orgRole') {
-              data.orgRoleID = Number(key)
+              data.orgRoleID = key
               data.exclude = false
             }
             return data;

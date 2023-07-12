@@ -88,7 +88,7 @@ export default (props: {
         msgTypeID: Number(props.msgEvent.msgTypeID),
         name: values.name,
         receiverType: props.receiverType,
-        tenantID: values.org?.id ? Number(values.org.id) : 0,
+        tenantID: values.org?.id ? values.org.id : "",
         subject: values.subject,
         from: values.from,
         to: values.to,

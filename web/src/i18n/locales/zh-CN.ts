@@ -80,6 +80,9 @@ export default {
     validity: '有效期',
     authentication: '验证身份',
     back: '返回',
+    active: '活跃',
+    inactive: '失活',
+    processing: '处理中',
     401: '登录过期',
     403: '无访问权限',
     404: '找不到方法',
@@ -115,6 +118,9 @@ export default {
     'file_accept_err_{{accept}}': '不支持文件扩展名：{{accept}}',
     temp_viewer: '模板预览',
     temp_down: '模板下载',
+    starts_at: '开始时间',
+    end_at: '结束时间',
+    effective_time: '生效时间',
 
     msg_center: '消息中心',
     msg_type: '消息类型',
@@ -122,6 +128,8 @@ export default {
     msg_event: '消息事件',
     msg_template: '消息模板',
     msg_subscription: '消息订阅',
+    silence_msg: '静默消息',
+    match_msg: '匹配消息',
     open_subscription: '开放订阅',
     open_custom: '开放定制',
     msg_type_category: '消息类型分类',
@@ -140,16 +148,21 @@ export default {
     receiving_user_group: '接收用户组',
     exclude_user: '排除用户',
     receiving_subject: '接受主体',
+    match_type: '匹配类型',
+    match_name: '匹配名称',
+    match_value: '匹配值',
 
     // 创建
     create_msg_type: '创建消息类型',
     create_msg_channel: '创建消息通道',
     create_msg_event: '创建消息事件',
     create_msg_template: '创建消息模板',
+    create_silence_msg: '创建静默消息',
     // 修改
     amend_msg_type: '修改消息类型',
     amend_msg_channle: '修改消息通道',
     amend_msg_channel_config: '修改消息通道配置',
+    amend_msg_event_config: '修改消息事件配置',
     amend_msg_event: '修改消息事件',
     amend_msg_template: '修改消息模板',
     // 列表
@@ -158,6 +171,7 @@ export default {
     msg_event_list: '消息事件列表',
     msg_template_list: '消息模板列表',
     msg_subscription_list: '消息订阅列表',
+    silence_msg_list: '静默消息列表',
     // 详情
 
     // 必填
@@ -172,12 +186,16 @@ export default {
     please_enter_way_receiving: '请输入接受方式',
     please_enter_subject: '请输入标题',
     please_enter_msg_temp_format: '请选择正文',
+    please_enter_effective_time: '请选择生效时间',
+    please_enter_match_msg: '请输入匹配消息',
     please_enter_msg_type_category: '请输入消息类型分类',
-
+    please_enter_match_type: '请输入匹配类型',
+    please_enter_match_name: '请输入匹配名称',
+    please_enter_match_value: '请输入匹配值',
     // 添加
+    add: "添加",
 
 
-    // "": "",
     // "": "",
     // "": "",
   },

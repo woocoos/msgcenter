@@ -36,6 +36,7 @@ const schemaWithMocks = addMocksToSchema({
       msgEvents: relayStylePaginationMock(store),
       msgTemplates: relayStylePaginationMock(store),
       msgTypes: relayStylePaginationMock(store),
+      silences: relayStylePaginationMock(store),
       msgTypeCategories: () => {
         return ['故障消息', '业务消息', '客户交易'];
       },
@@ -51,6 +52,27 @@ const schemaWithMocks = addMocksToSchema({
       }
     },
     Mutation: {
+      createSilence(_, { input }) {
+        input.id = `${Date.now()}`;
+        store.set('Silence', input.id, input)
+        return addListTemp(
+          store,
+          store.get('Query', 'ROOT', 'silences') as Ref,
+          store.get('Silence', input.id) as Ref
+        );
+      },
+      updateSilence(_, { id, input }) {
+        store.set('Silence', id, input)
+        return store.get('Silence', id)
+      },
+      deleteSilence(_, { id }) {
+        delListTemp(
+          store,
+          store.get('Query', 'ROOT', 'silences') as Ref,
+          id,
+        )
+        return true;
+      },
       createMsgSubscriber(_, { inputs }) {
         const ids: string[] = [];
         inputs.forEach((input, index) => {
@@ -171,6 +193,10 @@ const schemaWithMocks = addMocksToSchema({
         if (input.msgTypeID) {
           input.msgType = store.get('MsgType', input.msgTypeID)
         }
+        if (input.route) {
+          input.routeStr = JSON.stringify(routeStr(input.route));
+        }
+
         store.set('MsgEvent', id, input)
         return store.get('MsgEvent', id)
       },
@@ -256,6 +282,71 @@ function parseGid(gid: string) {
   return {
     type: nType,
     id: did,
+  }
+}
+
+function routeStr(route) {
+  const nRoute = { ...route };
+  if (route.matchers) {
+    nRoute.matchers = route.matchers?.map(item => {
+      if (item.type == 'MatchEqual') {
+        return `${item.name}="${item.value}"`
+      } else if (item.type == 'MatchNotEqual') {
+        return `${item.name}!="${item.value}"`
+      } else if (item.type == 'MatchRegexp') {
+        return `${item.name}=~"${item.value}"`
+      } else if (item.type == 'MatchNotRegexp') {
+        return `${item.name}!~"${item.value}"`
+      }
+    })
+  }
+  if (route.routes) {
+    nRoute.routes = route.routes.map(item => routeStr(item));
+  }
+  return nRoute
+}
+
+/**
+ * 消息事件配置编辑时候的模板
+ * @returns
+ */
+function routeEditTemp() {
+  return {
+    "receiver": "email",
+    "matchers": [
+      {
+        "name": "app",
+        "type": "MatchEqual",
+        "value": "1"
+      }, {
+        "name": "alertname",
+        "type": "MatchEqual",
+        "value": "AlterPassword"
+      }
+    ],
+    "routes": [
+      {
+        "receiver": "email",
+        "matchers": [
+          {
+            "name": "receiver",
+            "type": "MatchRegexp",
+            "value": "email"
+          }
+        ],
+        "continue": true
+      },
+      {
+        "receiver": "internal",
+        "matchers": [
+          {
+            "name": "receiver",
+            "type": "MatchRegexp",
+            "value": "internal"
+          }
+        ]
+      }
+    ]
   }
 }
 

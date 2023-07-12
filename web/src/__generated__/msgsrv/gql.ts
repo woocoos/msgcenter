@@ -23,11 +23,17 @@ const documents = {
     "mutation disableMsgChannel($id:ID!){\n disableMsgChannel(id:$id){id}\n}": types.DisableMsgChannelDocument,
     "query msgEventList($first: Int,$orderBy:MsgEventOrder,$where:MsgEventWhereInput){\n  msgEvents(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,status,createdAt,msgTypeID,modes\n        msgType{\n          id,category,appID,name\n        }\n      }\n    }\n  }\n}": types.MsgEventListDocument,
     "query MsgEventInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes\n      msgType{\n        id,category,appID,name\n      }\n    }\n  }\n}": types.MsgEventInfoDocument,
+    "query MsgEventInfoRoute($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes,routeStr\n    }\n  }\n}\n": types.MsgEventInfoRouteDocument,
     "mutation createMsgEvent($input: CreateMsgEventInput!){\n  createMsgEvent(input: $input){id}\n}": types.CreateMsgEventDocument,
     "mutation updateMsgEvent($id:ID!,$input: UpdateMsgEventInput!){\n  updateMsgEvent(id:$id,input: $input){id}\n}": types.UpdateMsgEventDocument,
     "mutation delMsgEvent($id:ID!){\n  deleteMsgEvent(id:$id)\n}": types.DelMsgEventDocument,
     "mutation enableMsgEvent($id:ID!){\n  enableMsgEvent(id:$id){id}\n}": types.EnableMsgEventDocument,
     "mutation disableMsgEvent($id:ID!){\n  disableMsgEvent(id:$id){id}\n}": types.DisableMsgEventDocument,
+    "query silenceList($first: Int,$orderBy:SilenceOrder,$where:SilenceWhereInput){\n  silences(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,tenantID,comments,createdAt,startsAt,endsAt,state,\n        matchers{\n          type,name,value\n        }\n\n      }\n    }\n  }\n}": types.SilenceListDocument,
+    "query SilenceInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on Silence{\n      id,tenantID,startsAt,endsAt,comments,state\n      matchers{\n        type,name,value\n      }\n    }\n  }\n}": types.SilenceInfoDocument,
+    "mutation createSilence($input: CreateSilenceInput!){\n  createSilence(input: $input){id}\n}": types.CreateSilenceDocument,
+    "mutation updateSilence($id:ID!,$input: UpdateSilenceInput!){\n  updateSilence(id:$id,input: $input){id}\n}": types.UpdateSilenceDocument,
+    "mutation delSilence($id:ID!){\n  deleteSilence(id:$id)\n}": types.DelSilenceDocument,
     "query msgTemplateList($first: Int,$orderBy:MsgTemplateOrder,$where:MsgTemplateWhereInput){\n  msgTemplates(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n        receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n      }\n    }\n  }\n}": types.MsgTemplateListDocument,
     "query MsgTemplateInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgTemplate{\n      id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n      receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n    }\n  }\n}": types.MsgTemplateInfoDocument,
     "mutation createMsgTemplate($input: CreateMsgTemplateInput!){\n  createMsgTemplate(input: $input){id}\n}": types.CreateMsgTemplateDocument,
@@ -104,6 +110,10 @@ export function gql(source: "query MsgEventInfo($gid:GID!){\n  node(id: $gid){\n
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "query MsgEventInfoRoute($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes,routeStr\n    }\n  }\n}\n"): (typeof documents)["query MsgEventInfoRoute($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes,routeStr\n    }\n  }\n}\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "mutation createMsgEvent($input: CreateMsgEventInput!){\n  createMsgEvent(input: $input){id}\n}"): (typeof documents)["mutation createMsgEvent($input: CreateMsgEventInput!){\n  createMsgEvent(input: $input){id}\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -121,6 +131,26 @@ export function gql(source: "mutation enableMsgEvent($id:ID!){\n  enableMsgEvent
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation disableMsgEvent($id:ID!){\n  disableMsgEvent(id:$id){id}\n}"): (typeof documents)["mutation disableMsgEvent($id:ID!){\n  disableMsgEvent(id:$id){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query silenceList($first: Int,$orderBy:SilenceOrder,$where:SilenceWhereInput){\n  silences(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,tenantID,comments,createdAt,startsAt,endsAt,state,\n        matchers{\n          type,name,value\n        }\n\n      }\n    }\n  }\n}"): (typeof documents)["query silenceList($first: Int,$orderBy:SilenceOrder,$where:SilenceWhereInput){\n  silences(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,tenantID,comments,createdAt,startsAt,endsAt,state,\n        matchers{\n          type,name,value\n        }\n\n      }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query SilenceInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on Silence{\n      id,tenantID,startsAt,endsAt,comments,state\n      matchers{\n        type,name,value\n      }\n    }\n  }\n}"): (typeof documents)["query SilenceInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on Silence{\n      id,tenantID,startsAt,endsAt,comments,state\n      matchers{\n        type,name,value\n      }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createSilence($input: CreateSilenceInput!){\n  createSilence(input: $input){id}\n}"): (typeof documents)["mutation createSilence($input: CreateSilenceInput!){\n  createSilence(input: $input){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation updateSilence($id:ID!,$input: UpdateSilenceInput!){\n  updateSilence(id:$id,input: $input){id}\n}"): (typeof documents)["mutation updateSilence($id:ID!,$input: UpdateSilenceInput!){\n  updateSilence(id:$id,input: $input){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation delSilence($id:ID!){\n  deleteSilence(id:$id)\n}"): (typeof documents)["mutation delSilence($id:ID!){\n  deleteSilence(id:$id)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -4,9 +4,9 @@ import { mutationRequest, pagingRequest, queryRequest } from "..";
 import { gid } from "@/util";
 
 export const EnumMsgEventStatus = {
-  active: { text: '活跃', status: 'success' },
-  inactive: { text: '失活', status: 'default' },
-  processing: { text: '处理中', status: 'warning' },
+  active: { text: 'active', status: 'success' },
+  inactive: { text: 'inactive', status: 'default' },
+  processing: { text: 'processing', status: 'warning' },
 };
 
 const queryMsgEventList = gql(/* GraphQL */`query msgEventList($first: Int,$orderBy:MsgEventOrder,$where:MsgEventWhereInput){
@@ -35,6 +35,16 @@ const queryMsgEventInfo = gql(/* GraphQL */`query MsgEventInfo($gid:GID!){
     }
   }
 }`);
+
+const queryMsgEventInfoRoute = gql(/* GraphQL */`query MsgEventInfoRoute($gid:GID!){
+  node(id: $gid){
+    id
+    ... on MsgEvent{
+      id,name,comments,status,createdAt,msgTypeID,modes,routeStr
+    }
+  }
+}
+`);
 
 const mutationCreateMsgEvent = gql(/* GraphQL */`mutation createMsgEvent($input: CreateMsgEventInput!){
   createMsgEvent(input: $input){id}
@@ -89,6 +99,21 @@ export async function getMsgEventList(
  */
 export async function getMsgEventInfo(msgEventId: string) {
   const result = await queryRequest(queryMsgEventInfo, {
+    gid: gid('msg_event', msgEventId)
+  })
+  if (result.data?.node?.__typename === 'MsgEvent') {
+    return result.data.node
+  }
+  return null
+}
+
+/**
+ * 消息事件详情
+ * @param msgEventId
+ * @returns
+ */
+export async function getMsgEventInfoRoute(msgEventId: string) {
+  const result = await queryRequest(queryMsgEventInfoRoute, {
     gid: gid('msg_event', msgEventId)
   })
   if (result.data?.node?.__typename === 'MsgEvent') {

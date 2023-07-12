@@ -93,12 +93,13 @@ export const initStoreData = (store: IMockStore) => {
     store.get('MsgEvent', 1),
   ]))
   store.set('Query', 'ROOT', 'msgTemplates', listTemp([
-
   ]))
   store.set('Query', 'ROOT', 'msgTypes', listTemp([
     store.get('MsgType', 1),
     store.get('MsgType', 2),
     store.get('MsgType', 3),
+  ]))
+  store.set('Query', 'ROOT', 'silences', listTemp([
   ]))
 
   // -------------root-end------------------------
@@ -130,7 +131,7 @@ export const initStoreData = (store: IMockStore) => {
 
   // MsgEvent
   store.set('MsgEvent', 1, {
-    id: 1, name: 'MsgEvent1', modes: 'email,webhook', msgType: store.get('MsgType', 1), msgTypeID: 1
+    id: 1, name: 'MsgEvent1', modes: 'email,webhook', msgType: store.get('MsgType', 1), msgTypeID: 1,
   })
 
 

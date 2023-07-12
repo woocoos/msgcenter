@@ -1,29 +1,31 @@
-import { Org } from '@/__generated__/adminx/graphql';
-import { MsgChannel, MsgChannelReceiverType } from '@/__generated__/msgsrv/graphql';
-import InputOrg from '@/components/Adminx/Org/input';
+import { MatcherInput, Silence } from '@/__generated__/msgsrv/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { cacheOrg } from '@/services/adminx/org';
-import { EnumMsgChannelReceiverType, createMsgChannel, getMsgChannelInfo, updateMsgChannel } from '@/services/msgsrv/channel';
 import { updateFormat } from '@/util';
-import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
+import { DrawerForm, ProFormDateTimeRangePicker, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Org } from '@/__generated__/adminx/graphql';
+import { createSilence, getSilenceInfo, updateSilence } from '@/services/msgsrv/silence';
+import { cacheOrg } from '@/services/adminx/org';
+import InputOrg from '@/components/Adminx/Org/input';
+import Matchers from './matchers';
 
 type ProFormData = {
   org?: Org;
-  name: string;
-  receiverType?: MsgChannelReceiverType;
-  comments?: string | null;
+  rangeAt?: [string, string];
+  matchers: MatcherInput[];
+  comments?: string;
 };
 
 export default (props: {
   open: boolean;
   title?: string;
   id?: string | null;
+  isCopy?: boolean;
   onClose: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
-    [info, setInfo] = useState<MsgChannel>(),
+    [info, setInfo] = useState<Silence>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
@@ -40,16 +42,24 @@ export default (props: {
       setSaveLoading(false);
       setSaveDisabled(true);
       const initData: ProFormData = {
-        name: '',
+        matchers: []
       }
       if (props.id) {
-        const result = await getMsgChannelInfo(props.id);
+        const result = await getSilenceInfo(props.id);
         if (result?.id) {
-          setInfo(result as MsgChannel);
-          initData.org = result.tenantID ? cacheOrg[result.tenantID] : undefined;
-          initData.name = result.name;
-          initData.comments = result.comments;
-          initData.receiverType = result.receiverType;
+          setInfo(result as Silence);
+          result.matchers?.forEach(item => {
+            if (item) {
+              initData.matchers.push({
+                name: item?.name,
+                type: item?.type,
+                value: item?.value,
+              })
+            }
+          });
+          initData.org = cacheOrg[result.tenantID];
+          initData.rangeAt = [result.startsAt, result.endsAt];
+          initData.comments = result.comments || undefined;
         }
       }
       return initData;
@@ -59,19 +69,17 @@ export default (props: {
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      const result = props.id
-        ? await updateMsgChannel(props.id, updateFormat({
-          name: values.name,
-          tenantID: values.org?.id ? values.org?.id : '',
-          receiverType: values.receiverType || MsgChannelReceiverType.Email,
-          comments: values.comments,
-        }, info || {}))
-        : await createMsgChannel({
-          name: values.name,
-          tenantID: values.org?.id ? values.org?.id : '',
-          receiverType: values.receiverType || MsgChannelReceiverType.Email,
-          comments: values.comments,
-        });
+      const input = {
+        tenantID: values.org?.id ? Number(values.org.id) : 0,
+        startsAt: values.rangeAt?.[0],
+        endsAt: values.rangeAt?.[1],
+        comments: values.comments,
+        matchers: values.matchers,
+      };
+
+      const result = props.id && !props.isCopy
+        ? await updateSilence(props.id, updateFormat(input, info || {}))
+        : await createSilence(input);
       if (result?.id) {
         setSaveDisabled(true);
         props.onClose(true);
@@ -112,21 +120,24 @@ export default (props: {
         ]}>
         <InputOrg />
       </ProFormText>
+      <ProFormDateTimeRangePicker
+        name="rangeAt"
+        label={t('effective_time')}
+        fieldProps={{
+          style: { width: '100%' }
+        }}
+        rules={[
+          { required: true, message: `${t('please_enter_effective_time')}` },
+        ]}
+      />
       <ProFormText
-        name="name"
-        label={t('name')}
+        name="matchers"
+        label={t('match_msg')}
         rules={[
-          { required: true, message: `${t('please_enter_name')}` },
-        ]}
-      />
-      <ProFormSelect
-        name="receiverType"
-        label={t('type')}
-        valueEnum={EnumMsgChannelReceiverType}
-        rules={[
-          { required: true, message: `${t('please_enter_status')}` },
-        ]}
-      />
+          { required: true, message: `${t('please_enter_match_msg')}` },
+        ]}>
+        <Matchers />
+      </ProFormText>
       <ProFormTextArea
         name="comments"
         label={t('description')}

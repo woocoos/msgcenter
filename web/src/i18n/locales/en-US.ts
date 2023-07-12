@@ -84,6 +84,9 @@ export default {
     403: 'No access rights',
     404: "Can't find a way",
     500: 'The server system is abnormal',
+    active: 'active',
+    inactive: 'inactive',
+    processing: 'processing',
     settings: 'Settings',
     category: 'category',
     org: 'organization',
@@ -112,6 +115,9 @@ export default {
     'file_accept_err_{{accept}}': 'File extensions are not supported:{{accept}}',
     temp_viewer: 'Template preview',
     temp_down: 'Template download',
+    starts_at: 'Start time',
+    end_at: 'End time',
+    effective_time: 'Effective time',
 
     msg_center: 'Message center',
     msg_type: 'Message type',
@@ -119,6 +125,8 @@ export default {
     msg_event: 'Message event',
     msg_template: 'Message template',
     msg_subscription: 'Message subscription',
+    silence_msg: 'Silent message',
+    match_msg: 'Matching message',
     open_subscription: 'Open subscription',
     open_custom: 'Open customization',
     msg_type_category: 'Message type classification',
@@ -137,16 +145,21 @@ export default {
     receiving_user_group: 'Receiving user group',
     exclude_user: 'Exclude user',
     receiving_subject: 'Receiving subject',
+    match_type: 'Matching type',
+    match_name: 'Matching name',
+    match_value: 'Matching value',
 
     // 创建
     create_msg_type: 'Create message type',
     create_msg_channel: 'Create message channel',
     create_msg_event: 'Create message event',
     create_msg_template: 'Create message template',
+    create_silence_msg: 'Create silent message',
     // 修改
     amend_msg_type: 'Modify message type',
     amend_msg_channel: 'Modify message channel',
     amend_msg_channel_config: 'Modify message channel config',
+    amend_msg_event_config: 'Modify message event config',
     amend_msg_event: 'Modify message event',
     amend_msg_template: 'Modify message template',
     // 列表
@@ -155,6 +168,7 @@ export default {
     msg_event_list: 'Message event list',
     msg_template_list: 'Message event template list',
     msg_subscription_list: 'Message subscription list',
+    silence_msg_list: 'Silent message list',
     // 详情
 
     // 必填提示
@@ -167,10 +181,14 @@ export default {
     please_enter_way_receiving: 'Please enter way of receiving',
     please_enter_subject: 'Please enter the title',
     please_enter_msg_temp_format: 'Please select text',
+    please_enter_effective_time: 'Please select effective time',
+    please_enter_match_msg: 'Please select matching message',
     please_enter_msg_type_category: 'Please enter message type classification',
-
+    please_enter_match_type: 'Please enter matching type',
+    please_enter_match_name: 'Please enter matching name',
+    please_enter_match_value: 'Please enter matching value',
     // 添加
-
+    add: "Add",
 
 
 

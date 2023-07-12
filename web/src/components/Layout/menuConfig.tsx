@@ -15,6 +15,7 @@ const asideMenuConfig: MenuDataItem[] = [
       { name: '消息事件', path: '/msg/event' },
       { name: '消息通道', path: '/msg/channel' },
       { name: '消息订阅', path: '/msg/subscription' },
+      { name: '静默消息', path: '/msg/silence' },
     ]
   },
 ];

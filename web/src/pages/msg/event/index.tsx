@@ -8,6 +8,7 @@ import { MsgEvent, MsgEventSimpleStatus, MsgEventWhereInput } from '@/__generate
 import { EnumMsgEventStatus, delMsgEvent, disableMsgEvent, enableMsgEvent, getMsgEventList } from '@/services/msgsrv/event';
 import Create from './components/create';
 import { Link } from '@ice/runtime';
+import Config from './components/config';
 
 
 export default () => {
@@ -48,7 +49,7 @@ export default () => {
         fixed: 'right',
         align: 'center',
         search: false,
-        width: 160,
+        width: 190,
         render: (text, record) => {
           return (<Space>
             <Auth authKey="updateMsgEvent">
@@ -69,6 +70,18 @@ export default () => {
             >
               {t('template')}
             </Link>
+            <Auth authKey="updateMsgEvent">
+              <a
+                key="config"
+                onClick={() => {
+                  setModal({
+                    open: true, title: `${t('amend_msg_event_config')}:${record.name}`, id: record.id, scene: 'config'
+                  });
+                }}
+              >
+                {t('configuration')}
+              </a>
+            </Auth>
             <Auth authKey="deleteMsgEvent">
               <a key="delete" onClick={() => onDel(record)}>
                 {t('delete')}
@@ -97,7 +110,7 @@ export default () => {
       open: boolean;
       title: string;
       id: string;
-      scene: 'editor';
+      scene: 'editor' | 'config';
     }>({
       open: false,
       title: '',
@@ -210,6 +223,18 @@ export default () => {
       />
       <Create
         x-if={modal.scene === 'editor'}
+        open={modal.open}
+        title={modal.title}
+        id={modal.id}
+        onClose={(isSuccess) => {
+          if (isSuccess) {
+            proTableRef.current?.reload();
+          }
+          setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
+        }}
+      />
+      <Config
+        x-if={modal.scene === 'config'}
         open={modal.open}
         title={modal.title}
         id={modal.id}

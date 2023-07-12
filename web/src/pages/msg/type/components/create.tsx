@@ -74,7 +74,7 @@ export default (props: {
         ? await updateMsgType(props.id, updateFormat({
           category: values.category,
           name: values.name,
-          appID: values.app?.id ? Number(values.app.id) : undefined,
+          appID: values.app?.id ? values.app.id : undefined,
           canCustom: values.canCustom,
           canSubs: values.canSubs,
           comments: values.comments,
@@ -83,7 +83,7 @@ export default (props: {
         : await createMsgType({
           category: values.category,
           name: values.name,
-          appID: values.app?.id ? Number(values.app.id) : undefined,
+          appID: values.app?.id ? values.app.id : undefined,
           canCustom: values.canCustom,
           canSubs: values.canSubs,
           comments: values.comments,

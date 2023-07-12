@@ -4,12 +4,11 @@ import { useRef, useState } from 'react';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { MsgChannel, MsgChannelReceiverType, MsgChannelSimpleStatus, MsgChannelWhereInput } from '@/__generated__/msgsrv/graphql';
-import { EnumMsgChannelReceiverType, EnumMsgChannelStatus, delMsgChannel, disableMsgChannel, enableMsgChannel, getMsgChannelList } from '@/services/msgsrv/channel';
 import { cacheOrg, updateCacheOrgListByIds } from '@/services/adminx/org';
 import Create from './components/create';
 import InputOrg from '@/components/Adminx/Org/input';
-import Config from './components/config';
+import { Silence, SilenceSilenceState, SilenceWhereInput } from '@/__generated__/msgsrv/graphql';
+import { EnumSilenceMatchType, EnumSilenceStatus, delSilence, getSilenceList } from '@/services/msgsrv/silence';
 
 
 export default () => {
@@ -17,7 +16,7 @@ export default () => {
     { t } = useTranslation(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
-    columns: ProColumns<MsgChannel>[] = [
+    columns: ProColumns<Silence>[] = [
       // 有需要排序配置  sorter: true
       {
         title: t('org'), dataIndex: 'org', width: 120,
@@ -28,16 +27,23 @@ export default () => {
           return record.tenantID ? cacheOrg[record.tenantID]?.name || record.tenantID : '-';
         },
       },
-      { title: t('name'), dataIndex: 'name', width: 120 },
+      { title: t('starts_at'), dataIndex: 'startsAt', valueType: "dateTime", width: 120 },
+      { title: t('end_at'), dataIndex: 'endsAt', valueType: 'dateTime', width: 120 },
       {
-        title: t('type'), dataIndex: 'receiverType', width: 120, search: false,
-        filters: true, valueEnum: EnumMsgChannelReceiverType
+        title: t('match_msg'), dataIndex: 'matchers', width: 120, search: false,
+        render: (text, record) => {
+          return record.matchers?.map(item => {
+            if (item) {
+              return `${item.name}${EnumSilenceMatchType[item.type].text}"${item.value}"`;
+            }
+            return '';
+          }).join(',') || '-';
+        }
       },
-
       {
-        title: t('status'), dataIndex: 'status', width: 120, search: false,
+        title: t('status'), dataIndex: 'state', width: 120, search: false,
         filters: true,
-        valueEnum: EnumMsgChannelStatus,
+        valueEnum: EnumSilenceStatus,
       },
       { title: t('description'), dataIndex: 'comments', width: 120, search: false },
       {
@@ -46,54 +52,43 @@ export default () => {
         fixed: 'right',
         align: 'center',
         search: false,
-        width: 190,
+        width: 120,
         render: (text, record) => {
           return (<Space>
-            <Auth authKey="updateMsgChannel">
+            <Auth authKey="updateSilence">
               <a
                 key="editor"
                 onClick={() => {
                   setModal({
-                    open: true, title: `${t('edit')}:${record.name}`, id: record.id, scene: 'editor'
+                    open: true, title: `${t('edit')}:${record.id}`, id: record.id, scene: 'editor'
                   });
                 }}
               >
                 {t('edit')}
               </a>
             </Auth>
-            <Auth authKey="updateMsgChannel">
+            <Auth authKey="createSilence">
               <a
-                key="config"
+                key="editor"
                 onClick={() => {
                   setModal({
-                    open: true, title: `${t('amend_msg_channel_config')}:${record.name}`, id: record.id, scene: 'config'
+                    open: true, title: `${t('copy')}:${record.id}`, id: record.id, scene: 'copy'
                   });
                 }}
               >
-                {t('configuration')}
+                {t('copy')}
               </a>
             </Auth>
-            <Auth authKey="deleteMsgChannel">
+            <Auth authKey="deleteSilence">
               <a key="delete" onClick={() => onDel(record)}>
                 {t('delete')}
               </a>
             </Auth>
-            {
-              record.status === MsgChannelSimpleStatus.Active ? <Auth authKey="disableMsgChannel">
-                <a key="disable" style={{ color: '#ff0000' }} onClick={() => onClickStatus(record)}>
-                  {t('disable')}
-                </a>
-              </Auth> : <Auth authKey="enableMsgChannel">
-                <a key="enable" onClick={() => onClickStatus(record)}>
-                  {t('enable')}
-                </a>
-              </Auth>
-            }
           </Space>);
         },
       },
     ],
-    [dataSource, setDataSource] = useState<MsgChannel[]>([]),
+    [dataSource, setDataSource] = useState<Silence[]>([]),
     // 选中处理
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
     // 弹出层处理
@@ -101,7 +96,7 @@ export default () => {
       open: boolean;
       title: string;
       id: string;
-      scene: 'editor' | 'config';
+      scene: 'editor' | 'copy';
     }>({
       open: false,
       title: '',
@@ -112,19 +107,19 @@ export default () => {
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as MsgChannel[], success: true, total: 0 },
-        where: MsgChannelWhereInput = {};
+      const table = { data: [] as Silence[], success: true, total: 0 },
+        where: SilenceWhereInput = {};
       where.tenantID = params.org?.id;
-      where.nameContains = params.name;
-      where.receiverTypeIn = filter.receiverType as MsgChannelReceiverType[];
-      where.statusIn = filter.status as MsgChannelSimpleStatus[]
-      const result = await getMsgChannelList({
+      where.startsAt = params.startsAt
+      where.endsAt = params.endsAt
+      where.stateIn = filter.status as SilenceSilenceState[]
+      const result = await getSilenceList({
         current: params.current,
         pageSize: params.pageSize,
         where,
       });
       if (result?.totalCount) {
-        table.data = result.edges?.map(item => item?.node) as MsgChannel[]
+        table.data = result.edges?.map(item => item?.node) as Silence[]
         await updateCacheOrgListByIds(table.data.map(item => item.tenantID || ''))
         table.total = result.totalCount;
       }
@@ -132,12 +127,12 @@ export default () => {
       setDataSource(table.data);
       return table;
     },
-    onDel = (record: MsgChannel) => {
+    onDel = (record: Silence) => {
       Modal.confirm({
         title: t('delete'),
-        content: `${t('confirm_delete')}：${record.name}`,
+        content: `${t('confirm_delete')}：${record.id}`,
         onOk: async (close) => {
-          const result = await delMsgChannel(record.id);
+          const result = await delSilence(record.id);
           if (result === true) {
             if (dataSource.length === 1) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
@@ -149,31 +144,18 @@ export default () => {
           }
         },
       });
-    },
-    onClickStatus = (record: MsgChannel) => {
-      Modal.confirm({
-        title: record.status === MsgChannelSimpleStatus.Active ? t('disable') : t('enable'),
-        content: `${record.status === MsgChannelSimpleStatus.Active ? t('disable') : t('enable')}：${record.name}`,
-        onOk: async (close) => {
-          const result = record.status === MsgChannelSimpleStatus.Active ? await disableMsgChannel(record.id) : await enableMsgChannel(record.id);
-          if (result?.id) {
-            proTableRef.current?.reload();
-            close();
-          }
-        },
-      });
     };
 
 
   return (
     <PageContainer
       header={{
-        title: t('msg_channel'),
+        title: t('silence_msg'),
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
             { title: t('msg_center') },
-            { title: t('msg_channel') },
+            { title: t('silence_msg') },
           ],
         },
       }}
@@ -187,17 +169,17 @@ export default () => {
         }}
         rowKey={'id'}
         toolbar={{
-          title: t('msg_channel_list'),
+          title: t('silence_msg_list'),
           actions: [
-            <Auth authKey="createMsgChannel">
+            <Auth authKey="createSilence">
               <Button
                 key="created"
                 type="primary"
                 onClick={() => {
-                  setModal({ open: true, title: t('create_msg_channel'), id: '', scene: 'editor' });
+                  setModal({ open: true, title: t('create_silence_msg'), id: '', scene: 'editor' });
                 }}
               >
-                {t('create_msg_channel')}
+                {t('create_silence_msg')}
               </Button>
             </Auth>,
           ],
@@ -212,22 +194,10 @@ export default () => {
         }}
       />
       <Create
-        x-if={modal.scene === 'editor'}
         open={modal.open}
         title={modal.title}
         id={modal.id}
-        onClose={(isSuccess) => {
-          if (isSuccess) {
-            proTableRef.current?.reload();
-          }
-          setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
-        }}
-      />
-      <Config
-        x-if={modal.scene === 'config'}
-        open={modal.open}
-        title={modal.title}
-        id={modal.id}
+        isCopy={modal.scene === 'copy'}
         onClose={(isSuccess) => {
           if (isSuccess) {
             proTableRef.current?.reload();
