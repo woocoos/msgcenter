@@ -7,10 +7,8 @@ package graphql
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"gopkg.in/yaml.v2"
-
 	"entgo.io/contrib/entgql"
+	"fmt"
 	"github.com/woocoos/entco/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/api/graphql/model"
@@ -20,6 +18,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
+	"gopkg.in/yaml.v3"
 )
 
 // RouteStr is the resolver for the routeStr field.
