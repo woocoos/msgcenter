@@ -27,6 +27,7 @@ require (
 	go.uber.org/zap v1.24.0
 	golang.org/x/sync v0.3.0
 	golang.org/x/text v0.9.0
+	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
