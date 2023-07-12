@@ -10,34 +10,20 @@ import (
 var (
 	// DefaultWebhookConfig defines default values for Webhook configurations.
 	DefaultWebhookConfig = WebhookConfig{
-		NotifierConfig: NotifierConfig{
-			VSendResolved: true,
-		},
+		SendResolved: true,
 	}
 	// DefaultEmailConfig defines default values for Email configurations.
 	DefaultEmailConfig = EmailConfig{
-		NotifierConfig: NotifierConfig{
-			VSendResolved: false,
-		},
-		HTML:    `{{ template "email.default.html" . }}`,
-		Text:    ``,
-		Subject: `{{ template "email.default.subject" . }}`,
+		SendResolved: false,
+		HTML:         `{{ template "email.default.html" . }}`,
+		Text:         ``,
+		Subject:      `{{ template "email.default.subject" . }}`,
 	}
 )
 
-// NotifierConfig contains base options common across all notifier configurations.
-type NotifierConfig struct {
-	VSendResolved bool `yaml:"sendResolved" json:"sendResolved"`
-}
-
-func (nc *NotifierConfig) SendResolved() bool {
-	return nc.VSendResolved
-}
-
 // EmailConfig configures notifications via mail.
 type EmailConfig struct {
-	NotifierConfig `yaml:",inline" json:",inline"`
-
+	SendResolved bool `yaml:"sendResolved" json:"sendResolved"`
 	// Email address to notify.
 	// To 一般采用模板的方式接收动态参数
 	To           string            `yaml:"to,omitempty" json:"to,omitempty"`
@@ -97,9 +83,8 @@ func (ec *EmailConfig) Validate() error {
 
 // WebhookConfig configures notifications via a generic webhook.
 type WebhookConfig struct {
-	NotifierConfig `yaml:",inline" json:",inline"`
-
-	HTTPConfig *httpx.ClientConfig `yaml:"httpConfig,omitempty" json:"httpConfig,omitempty"`
+	SendResolved bool                `yaml:"sendResolved" json:"sendResolved"`
+	HTTPConfig   *httpx.ClientConfig `yaml:"httpConfig,omitempty" json:"httpConfig,omitempty"`
 
 	// URL to send POST request to.
 	URL *URL `yaml:"url" json:"url"`
@@ -129,9 +114,7 @@ func (c *WebhookConfig) Validate() error {
 
 func (c *WebhookConfig) UnmarshalJSON(data []byte) error {
 	*c = WebhookConfig{
-		NotifierConfig: NotifierConfig{
-			VSendResolved: true,
-		},
+		SendResolved: true,
 	}
 	p, err := NewJsonParse(data)
 	if err != nil {

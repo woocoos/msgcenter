@@ -7,8 +7,6 @@ package graphql
 import (
 	"context"
 	"fmt"
-	"strconv"
-
 	"github.com/woocoos/entco/pkg/identity"
 	"github.com/woocoos/entco/schemax/typex"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
@@ -20,6 +18,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/silence"
+	"strconv"
 )
 
 // CreateMsgType is the resolver for the createMsgType field.
@@ -268,7 +268,14 @@ func (r *mutationResolver) CreateSilence(ctx context.Context, input ent.CreateSi
 	if err != nil {
 		return nil, err
 	}
-	_, err = r.Silences.Set(sil)
+	_, err = r.Silences.Set(&silence.Entry{
+		ID:        sil.ID,
+		UpdatedAt: sil.UpdatedAt,
+		Matchers:  sil.Matchers,
+		StartsAt:  sil.StartsAt,
+		EndsAt:    sil.EndsAt,
+		State:     sil.State,
+	})
 	return sil, err
 }
 
@@ -279,7 +286,14 @@ func (r *mutationResolver) UpdateSilence(ctx context.Context, id int, input ent.
 	if err != nil {
 		return nil, err
 	}
-	id, err = r.Silences.Set(sil)
+	id, err = r.Silences.Set(&silence.Entry{
+		ID:        sil.ID,
+		UpdatedAt: sil.UpdatedAt,
+		Matchers:  sil.Matchers,
+		StartsAt:  sil.StartsAt,
+		EndsAt:    sil.EndsAt,
+		State:     sil.State,
+	})
 	if err != nil {
 		return nil, err
 	}

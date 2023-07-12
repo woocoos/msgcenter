@@ -14,11 +14,14 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/nlog"
+	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
@@ -31,6 +34,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// MsgAlert is the client for interacting with the MsgAlert builders.
+	MsgAlert *MsgAlertClient
 	// MsgChannel is the client for interacting with the MsgChannel builders.
 	MsgChannel *MsgChannelClient
 	// MsgEvent is the client for interacting with the MsgEvent builders.
@@ -41,6 +46,10 @@ type Client struct {
 	MsgTemplate *MsgTemplateClient
 	// MsgType is the client for interacting with the MsgType builders.
 	MsgType *MsgTypeClient
+	// Nlog is the client for interacting with the Nlog builders.
+	Nlog *NlogClient
+	// NlogAlert is the client for interacting with the NlogAlert builders.
+	NlogAlert *NlogAlertClient
 	// OrgRoleUser is the client for interacting with the OrgRoleUser builders.
 	OrgRoleUser *OrgRoleUserClient
 	// Silence is the client for interacting with the Silence builders.
@@ -62,11 +71,14 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.MsgAlert = NewMsgAlertClient(c.config)
 	c.MsgChannel = NewMsgChannelClient(c.config)
 	c.MsgEvent = NewMsgEventClient(c.config)
 	c.MsgSubscriber = NewMsgSubscriberClient(c.config)
 	c.MsgTemplate = NewMsgTemplateClient(c.config)
 	c.MsgType = NewMsgTypeClient(c.config)
+	c.Nlog = NewNlogClient(c.config)
+	c.NlogAlert = NewNlogAlertClient(c.config)
 	c.OrgRoleUser = NewOrgRoleUserClient(c.config)
 	c.Silence = NewSilenceClient(c.config)
 	c.User = NewUserClient(c.config)
@@ -154,11 +166,14 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:           ctx,
 		config:        cfg,
+		MsgAlert:      NewMsgAlertClient(cfg),
 		MsgChannel:    NewMsgChannelClient(cfg),
 		MsgEvent:      NewMsgEventClient(cfg),
 		MsgSubscriber: NewMsgSubscriberClient(cfg),
 		MsgTemplate:   NewMsgTemplateClient(cfg),
 		MsgType:       NewMsgTypeClient(cfg),
+		Nlog:          NewNlogClient(cfg),
+		NlogAlert:     NewNlogAlertClient(cfg),
 		OrgRoleUser:   NewOrgRoleUserClient(cfg),
 		Silence:       NewSilenceClient(cfg),
 		User:          NewUserClient(cfg),
@@ -181,11 +196,14 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:           ctx,
 		config:        cfg,
+		MsgAlert:      NewMsgAlertClient(cfg),
 		MsgChannel:    NewMsgChannelClient(cfg),
 		MsgEvent:      NewMsgEventClient(cfg),
 		MsgSubscriber: NewMsgSubscriberClient(cfg),
 		MsgTemplate:   NewMsgTemplateClient(cfg),
 		MsgType:       NewMsgTypeClient(cfg),
+		Nlog:          NewNlogClient(cfg),
+		NlogAlert:     NewNlogAlertClient(cfg),
 		OrgRoleUser:   NewOrgRoleUserClient(cfg),
 		Silence:       NewSilenceClient(cfg),
 		User:          NewUserClient(cfg),
@@ -195,7 +213,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		MsgChannel.
+//		MsgAlert.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -218,8 +236,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.MsgChannel, c.MsgEvent, c.MsgSubscriber, c.MsgTemplate, c.MsgType,
-		c.OrgRoleUser, c.Silence, c.User,
+		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgSubscriber, c.MsgTemplate, c.MsgType,
+		c.Nlog, c.NlogAlert, c.OrgRoleUser, c.Silence, c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -229,8 +247,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.MsgChannel, c.MsgEvent, c.MsgSubscriber, c.MsgTemplate, c.MsgType,
-		c.OrgRoleUser, c.Silence, c.User,
+		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgSubscriber, c.MsgTemplate, c.MsgType,
+		c.Nlog, c.NlogAlert, c.OrgRoleUser, c.Silence, c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -239,6 +257,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *MsgAlertMutation:
+		return c.MsgAlert.mutate(ctx, m)
 	case *MsgChannelMutation:
 		return c.MsgChannel.mutate(ctx, m)
 	case *MsgEventMutation:
@@ -249,6 +269,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.MsgTemplate.mutate(ctx, m)
 	case *MsgTypeMutation:
 		return c.MsgType.mutate(ctx, m)
+	case *NlogMutation:
+		return c.Nlog.mutate(ctx, m)
+	case *NlogAlertMutation:
+		return c.NlogAlert.mutate(ctx, m)
 	case *OrgRoleUserMutation:
 		return c.OrgRoleUser.mutate(ctx, m)
 	case *SilenceMutation:
@@ -257,6 +281,164 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.User.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// MsgAlertClient is a client for the MsgAlert schema.
+type MsgAlertClient struct {
+	config
+}
+
+// NewMsgAlertClient returns a client for the MsgAlert from the given config.
+func NewMsgAlertClient(c config) *MsgAlertClient {
+	return &MsgAlertClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `msgalert.Hooks(f(g(h())))`.
+func (c *MsgAlertClient) Use(hooks ...Hook) {
+	c.hooks.MsgAlert = append(c.hooks.MsgAlert, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `msgalert.Intercept(f(g(h())))`.
+func (c *MsgAlertClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MsgAlert = append(c.inters.MsgAlert, interceptors...)
+}
+
+// Create returns a builder for creating a MsgAlert entity.
+func (c *MsgAlertClient) Create() *MsgAlertCreate {
+	mutation := newMsgAlertMutation(c.config, OpCreate)
+	return &MsgAlertCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MsgAlert entities.
+func (c *MsgAlertClient) CreateBulk(builders ...*MsgAlertCreate) *MsgAlertCreateBulk {
+	return &MsgAlertCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MsgAlert.
+func (c *MsgAlertClient) Update() *MsgAlertUpdate {
+	mutation := newMsgAlertMutation(c.config, OpUpdate)
+	return &MsgAlertUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MsgAlertClient) UpdateOne(ma *MsgAlert) *MsgAlertUpdateOne {
+	mutation := newMsgAlertMutation(c.config, OpUpdateOne, withMsgAlert(ma))
+	return &MsgAlertUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MsgAlertClient) UpdateOneID(id int) *MsgAlertUpdateOne {
+	mutation := newMsgAlertMutation(c.config, OpUpdateOne, withMsgAlertID(id))
+	return &MsgAlertUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MsgAlert.
+func (c *MsgAlertClient) Delete() *MsgAlertDelete {
+	mutation := newMsgAlertMutation(c.config, OpDelete)
+	return &MsgAlertDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MsgAlertClient) DeleteOne(ma *MsgAlert) *MsgAlertDeleteOne {
+	return c.DeleteOneID(ma.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MsgAlertClient) DeleteOneID(id int) *MsgAlertDeleteOne {
+	builder := c.Delete().Where(msgalert.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MsgAlertDeleteOne{builder}
+}
+
+// Query returns a query builder for MsgAlert.
+func (c *MsgAlertClient) Query() *MsgAlertQuery {
+	return &MsgAlertQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMsgAlert},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MsgAlert entity by its id.
+func (c *MsgAlertClient) Get(ctx context.Context, id int) (*MsgAlert, error) {
+	return c.Query().Where(msgalert.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MsgAlertClient) GetX(ctx context.Context, id int) *MsgAlert {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryNlog queries the nlog edge of a MsgAlert.
+func (c *MsgAlertClient) QueryNlog(ma *MsgAlert) *NlogQuery {
+	query := (&NlogClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ma.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msgalert.Table, msgalert.FieldID, id),
+			sqlgraph.To(nlog.Table, nlog.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, msgalert.NlogTable, msgalert.NlogPrimaryKey...),
+		)
+		schemaConfig := ma.schemaConfig
+		step.To.Schema = schemaConfig.Nlog
+		step.Edge.Schema = schemaConfig.NlogAlert
+		fromV = sqlgraph.Neighbors(ma.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryNlogAlerts queries the nlog_alerts edge of a MsgAlert.
+func (c *MsgAlertClient) QueryNlogAlerts(ma *MsgAlert) *NlogAlertQuery {
+	query := (&NlogAlertClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ma.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msgalert.Table, msgalert.FieldID, id),
+			sqlgraph.To(nlogalert.Table, nlogalert.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, msgalert.NlogAlertsTable, msgalert.NlogAlertsColumn),
+		)
+		schemaConfig := ma.schemaConfig
+		step.To.Schema = schemaConfig.NlogAlert
+		step.Edge.Schema = schemaConfig.NlogAlert
+		fromV = sqlgraph.Neighbors(ma.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *MsgAlertClient) Hooks() []Hook {
+	hooks := c.hooks.MsgAlert
+	return append(hooks[:len(hooks):len(hooks)], msgalert.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *MsgAlertClient) Interceptors() []Interceptor {
+	inters := c.inters.MsgAlert
+	return append(inters[:len(inters):len(inters)], msgalert.Interceptors[:]...)
+}
+
+func (c *MsgAlertClient) mutate(ctx context.Context, m *MsgAlertMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MsgAlertCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MsgAlertUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MsgAlertUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MsgAlertDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MsgAlert mutation op: %q", m.Op())
 	}
 }
 
@@ -988,6 +1170,320 @@ func (c *MsgTypeClient) mutate(ctx context.Context, m *MsgTypeMutation) (Value, 
 	}
 }
 
+// NlogClient is a client for the Nlog schema.
+type NlogClient struct {
+	config
+}
+
+// NewNlogClient returns a client for the Nlog from the given config.
+func NewNlogClient(c config) *NlogClient {
+	return &NlogClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `nlog.Hooks(f(g(h())))`.
+func (c *NlogClient) Use(hooks ...Hook) {
+	c.hooks.Nlog = append(c.hooks.Nlog, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `nlog.Intercept(f(g(h())))`.
+func (c *NlogClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Nlog = append(c.inters.Nlog, interceptors...)
+}
+
+// Create returns a builder for creating a Nlog entity.
+func (c *NlogClient) Create() *NlogCreate {
+	mutation := newNlogMutation(c.config, OpCreate)
+	return &NlogCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Nlog entities.
+func (c *NlogClient) CreateBulk(builders ...*NlogCreate) *NlogCreateBulk {
+	return &NlogCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Nlog.
+func (c *NlogClient) Update() *NlogUpdate {
+	mutation := newNlogMutation(c.config, OpUpdate)
+	return &NlogUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *NlogClient) UpdateOne(n *Nlog) *NlogUpdateOne {
+	mutation := newNlogMutation(c.config, OpUpdateOne, withNlog(n))
+	return &NlogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *NlogClient) UpdateOneID(id int) *NlogUpdateOne {
+	mutation := newNlogMutation(c.config, OpUpdateOne, withNlogID(id))
+	return &NlogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Nlog.
+func (c *NlogClient) Delete() *NlogDelete {
+	mutation := newNlogMutation(c.config, OpDelete)
+	return &NlogDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *NlogClient) DeleteOne(n *Nlog) *NlogDeleteOne {
+	return c.DeleteOneID(n.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *NlogClient) DeleteOneID(id int) *NlogDeleteOne {
+	builder := c.Delete().Where(nlog.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &NlogDeleteOne{builder}
+}
+
+// Query returns a query builder for Nlog.
+func (c *NlogClient) Query() *NlogQuery {
+	return &NlogQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeNlog},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Nlog entity by its id.
+func (c *NlogClient) Get(ctx context.Context, id int) (*Nlog, error) {
+	return c.Query().Where(nlog.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *NlogClient) GetX(ctx context.Context, id int) *Nlog {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAlerts queries the alerts edge of a Nlog.
+func (c *NlogClient) QueryAlerts(n *Nlog) *MsgAlertQuery {
+	query := (&MsgAlertClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(nlog.Table, nlog.FieldID, id),
+			sqlgraph.To(msgalert.Table, msgalert.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, nlog.AlertsTable, nlog.AlertsPrimaryKey...),
+		)
+		schemaConfig := n.schemaConfig
+		step.To.Schema = schemaConfig.MsgAlert
+		step.Edge.Schema = schemaConfig.NlogAlert
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryNlogAlert queries the nlog_alert edge of a Nlog.
+func (c *NlogClient) QueryNlogAlert(n *Nlog) *NlogAlertQuery {
+	query := (&NlogAlertClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(nlog.Table, nlog.FieldID, id),
+			sqlgraph.To(nlogalert.Table, nlogalert.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, nlog.NlogAlertTable, nlog.NlogAlertColumn),
+		)
+		schemaConfig := n.schemaConfig
+		step.To.Schema = schemaConfig.NlogAlert
+		step.Edge.Schema = schemaConfig.NlogAlert
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *NlogClient) Hooks() []Hook {
+	hooks := c.hooks.Nlog
+	return append(hooks[:len(hooks):len(hooks)], nlog.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *NlogClient) Interceptors() []Interceptor {
+	inters := c.inters.Nlog
+	return append(inters[:len(inters):len(inters)], nlog.Interceptors[:]...)
+}
+
+func (c *NlogClient) mutate(ctx context.Context, m *NlogMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&NlogCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&NlogUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&NlogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&NlogDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Nlog mutation op: %q", m.Op())
+	}
+}
+
+// NlogAlertClient is a client for the NlogAlert schema.
+type NlogAlertClient struct {
+	config
+}
+
+// NewNlogAlertClient returns a client for the NlogAlert from the given config.
+func NewNlogAlertClient(c config) *NlogAlertClient {
+	return &NlogAlertClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `nlogalert.Hooks(f(g(h())))`.
+func (c *NlogAlertClient) Use(hooks ...Hook) {
+	c.hooks.NlogAlert = append(c.hooks.NlogAlert, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `nlogalert.Intercept(f(g(h())))`.
+func (c *NlogAlertClient) Intercept(interceptors ...Interceptor) {
+	c.inters.NlogAlert = append(c.inters.NlogAlert, interceptors...)
+}
+
+// Create returns a builder for creating a NlogAlert entity.
+func (c *NlogAlertClient) Create() *NlogAlertCreate {
+	mutation := newNlogAlertMutation(c.config, OpCreate)
+	return &NlogAlertCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of NlogAlert entities.
+func (c *NlogAlertClient) CreateBulk(builders ...*NlogAlertCreate) *NlogAlertCreateBulk {
+	return &NlogAlertCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for NlogAlert.
+func (c *NlogAlertClient) Update() *NlogAlertUpdate {
+	mutation := newNlogAlertMutation(c.config, OpUpdate)
+	return &NlogAlertUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *NlogAlertClient) UpdateOne(na *NlogAlert) *NlogAlertUpdateOne {
+	mutation := newNlogAlertMutation(c.config, OpUpdateOne, withNlogAlert(na))
+	return &NlogAlertUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *NlogAlertClient) UpdateOneID(id int) *NlogAlertUpdateOne {
+	mutation := newNlogAlertMutation(c.config, OpUpdateOne, withNlogAlertID(id))
+	return &NlogAlertUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for NlogAlert.
+func (c *NlogAlertClient) Delete() *NlogAlertDelete {
+	mutation := newNlogAlertMutation(c.config, OpDelete)
+	return &NlogAlertDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *NlogAlertClient) DeleteOne(na *NlogAlert) *NlogAlertDeleteOne {
+	return c.DeleteOneID(na.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *NlogAlertClient) DeleteOneID(id int) *NlogAlertDeleteOne {
+	builder := c.Delete().Where(nlogalert.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &NlogAlertDeleteOne{builder}
+}
+
+// Query returns a query builder for NlogAlert.
+func (c *NlogAlertClient) Query() *NlogAlertQuery {
+	return &NlogAlertQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeNlogAlert},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a NlogAlert entity by its id.
+func (c *NlogAlertClient) Get(ctx context.Context, id int) (*NlogAlert, error) {
+	return c.Query().Where(nlogalert.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *NlogAlertClient) GetX(ctx context.Context, id int) *NlogAlert {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryNlog queries the nlog edge of a NlogAlert.
+func (c *NlogAlertClient) QueryNlog(na *NlogAlert) *NlogQuery {
+	query := (&NlogClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := na.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(nlogalert.Table, nlogalert.FieldID, id),
+			sqlgraph.To(nlog.Table, nlog.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, nlogalert.NlogTable, nlogalert.NlogColumn),
+		)
+		schemaConfig := na.schemaConfig
+		step.To.Schema = schemaConfig.Nlog
+		step.Edge.Schema = schemaConfig.NlogAlert
+		fromV = sqlgraph.Neighbors(na.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAlert queries the alert edge of a NlogAlert.
+func (c *NlogAlertClient) QueryAlert(na *NlogAlert) *MsgAlertQuery {
+	query := (&MsgAlertClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := na.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(nlogalert.Table, nlogalert.FieldID, id),
+			sqlgraph.To(msgalert.Table, msgalert.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, nlogalert.AlertTable, nlogalert.AlertColumn),
+		)
+		schemaConfig := na.schemaConfig
+		step.To.Schema = schemaConfig.MsgAlert
+		step.Edge.Schema = schemaConfig.NlogAlert
+		fromV = sqlgraph.Neighbors(na.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *NlogAlertClient) Hooks() []Hook {
+	return c.hooks.NlogAlert
+}
+
+// Interceptors returns the client interceptors.
+func (c *NlogAlertClient) Interceptors() []Interceptor {
+	return c.inters.NlogAlert
+}
+
+func (c *NlogAlertClient) mutate(ctx context.Context, m *NlogAlertMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&NlogAlertCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&NlogAlertUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&NlogAlertUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&NlogAlertDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown NlogAlert mutation op: %q", m.Op())
+	}
+}
+
 // OrgRoleUserClient is a client for the OrgRoleUser schema.
 type OrgRoleUserClient struct {
 	config
@@ -1387,12 +1883,12 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		MsgChannel, MsgEvent, MsgSubscriber, MsgTemplate, MsgType, OrgRoleUser, Silence,
-		User []ent.Hook
+		MsgAlert, MsgChannel, MsgEvent, MsgSubscriber, MsgTemplate, MsgType, Nlog,
+		NlogAlert, OrgRoleUser, Silence, User []ent.Hook
 	}
 	inters struct {
-		MsgChannel, MsgEvent, MsgSubscriber, MsgTemplate, MsgType, OrgRoleUser, Silence,
-		User []ent.Interceptor
+		MsgAlert, MsgChannel, MsgEvent, MsgSubscriber, MsgTemplate, MsgType, Nlog,
+		NlogAlert, OrgRoleUser, Silence, User []ent.Interceptor
 	}
 )
 

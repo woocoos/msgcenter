@@ -16,11 +16,14 @@ import (
 	"github.com/99designs/gqlgen/graphql/errcode"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"github.com/woocoos/entco/pkg/pagination"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/nlog"
+	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 )
@@ -103,6 +106,309 @@ func paginateLimit(first, last *int) int {
 		limit = *last + 1
 	}
 	return limit
+}
+
+// MsgAlertEdge is the edge representation of MsgAlert.
+type MsgAlertEdge struct {
+	Node   *MsgAlert `json:"node"`
+	Cursor Cursor    `json:"cursor"`
+}
+
+// MsgAlertConnection is the connection containing edges to MsgAlert.
+type MsgAlertConnection struct {
+	Edges      []*MsgAlertEdge `json:"edges"`
+	PageInfo   PageInfo        `json:"pageInfo"`
+	TotalCount int             `json:"totalCount"`
+}
+
+func (c *MsgAlertConnection) build(nodes []*MsgAlert, pager *msgalertPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *MsgAlert
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *MsgAlert {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *MsgAlert {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*MsgAlertEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &MsgAlertEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// MsgAlertPaginateOption enables pagination customization.
+type MsgAlertPaginateOption func(*msgalertPager) error
+
+// WithMsgAlertOrder configures pagination ordering.
+func WithMsgAlertOrder(order *MsgAlertOrder) MsgAlertPaginateOption {
+	if order == nil {
+		order = DefaultMsgAlertOrder
+	}
+	o := *order
+	return func(pager *msgalertPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultMsgAlertOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithMsgAlertFilter configures pagination filter.
+func WithMsgAlertFilter(filter func(*MsgAlertQuery) (*MsgAlertQuery, error)) MsgAlertPaginateOption {
+	return func(pager *msgalertPager) error {
+		if filter == nil {
+			return errors.New("MsgAlertQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type msgalertPager struct {
+	reverse bool
+	order   *MsgAlertOrder
+	filter  func(*MsgAlertQuery) (*MsgAlertQuery, error)
+}
+
+func newMsgAlertPager(opts []MsgAlertPaginateOption, reverse bool) (*msgalertPager, error) {
+	pager := &msgalertPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultMsgAlertOrder
+	}
+	return pager, nil
+}
+
+func (p *msgalertPager) applyFilter(query *MsgAlertQuery) (*MsgAlertQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *msgalertPager) toCursor(ma *MsgAlert) Cursor {
+	return p.order.Field.toCursor(ma)
+}
+
+func (p *msgalertPager) applyCursors(query *MsgAlertQuery, after, before *Cursor) (*MsgAlertQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultMsgAlertOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *msgalertPager) applyOrder(query *MsgAlertQuery) *MsgAlertQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultMsgAlertOrder.Field {
+		query = query.Order(DefaultMsgAlertOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *msgalertPager) orderExpr(query *MsgAlertQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultMsgAlertOrder.Field {
+			b.Comma().Ident(DefaultMsgAlertOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to MsgAlert.
+func (ma *MsgAlertQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...MsgAlertPaginateOption,
+) (*MsgAlertConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newMsgAlertPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if ma, err = pager.applyFilter(ma); err != nil {
+		return nil, err
+	}
+	conn := &MsgAlertConnection{Edges: []*MsgAlertEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := ma.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if ma, err = pager.applyCursors(ma, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		ma.Limit(limit)
+	}
+	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
+		if first != nil {
+			ma.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
+		}
+		if last != nil {
+			ma.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
+		}
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := ma.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	ma = pager.applyOrder(ma)
+	nodes, err := ma.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// MsgAlertOrderFieldCreatedAt orders MsgAlert by created_at.
+	MsgAlertOrderFieldCreatedAt = &MsgAlertOrderField{
+		Value: func(ma *MsgAlert) (ent.Value, error) {
+			return ma.CreatedAt, nil
+		},
+		column: msgalert.FieldCreatedAt,
+		toTerm: msgalert.ByCreatedAt,
+		toCursor: func(ma *MsgAlert) Cursor {
+			return Cursor{
+				ID:    ma.ID,
+				Value: ma.CreatedAt,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f MsgAlertOrderField) String() string {
+	var str string
+	switch f.column {
+	case MsgAlertOrderFieldCreatedAt.column:
+		str = "createdAt"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f MsgAlertOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *MsgAlertOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("MsgAlertOrderField %T must be a string", v)
+	}
+	switch str {
+	case "createdAt":
+		*f = *MsgAlertOrderFieldCreatedAt
+	default:
+		return fmt.Errorf("%s is not a valid MsgAlertOrderField", str)
+	}
+	return nil
+}
+
+// MsgAlertOrderField defines the ordering field of MsgAlert.
+type MsgAlertOrderField struct {
+	// Value extracts the ordering value from the given MsgAlert.
+	Value    func(*MsgAlert) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) msgalert.OrderOption
+	toCursor func(*MsgAlert) Cursor
+}
+
+// MsgAlertOrder defines the ordering of MsgAlert.
+type MsgAlertOrder struct {
+	Direction OrderDirection      `json:"direction"`
+	Field     *MsgAlertOrderField `json:"field"`
+}
+
+// DefaultMsgAlertOrder is the default ordering of MsgAlert.
+var DefaultMsgAlertOrder = &MsgAlertOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &MsgAlertOrderField{
+		Value: func(ma *MsgAlert) (ent.Value, error) {
+			return ma.ID, nil
+		},
+		column: msgalert.FieldID,
+		toTerm: msgalert.ByID,
+		toCursor: func(ma *MsgAlert) Cursor {
+			return Cursor{ID: ma.ID}
+		},
+	},
+}
+
+// ToEdge converts MsgAlert into MsgAlertEdge.
+func (ma *MsgAlert) ToEdge(order *MsgAlertOrder) *MsgAlertEdge {
+	if order == nil {
+		order = DefaultMsgAlertOrder
+	}
+	return &MsgAlertEdge{
+		Node:   ma,
+		Cursor: order.Field.toCursor(ma),
+	}
 }
 
 // MsgChannelEdge is the edge representation of MsgChannel.
@@ -280,7 +586,9 @@ func (mc *MsgChannelQuery) Paginate(
 	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
 		hasPagination := after != nil || first != nil || before != nil || last != nil
 		if hasPagination || ignoredEdges {
-			if conn.TotalCount, err = mc.Clone().Count(ctx); err != nil {
+			c := mc.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
 				return nil, err
 			}
 			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
@@ -581,7 +889,9 @@ func (me *MsgEventQuery) Paginate(
 	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
 		hasPagination := after != nil || first != nil || before != nil || last != nil
 		if hasPagination || ignoredEdges {
-			if conn.TotalCount, err = me.Clone().Count(ctx); err != nil {
+			c := me.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
 				return nil, err
 			}
 			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
@@ -882,7 +1192,9 @@ func (ms *MsgSubscriberQuery) Paginate(
 	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
 		hasPagination := after != nil || first != nil || before != nil || last != nil
 		if hasPagination || ignoredEdges {
-			if conn.TotalCount, err = ms.Clone().Count(ctx); err != nil {
+			c := ms.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
 				return nil, err
 			}
 			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
@@ -1183,7 +1495,9 @@ func (mt *MsgTemplateQuery) Paginate(
 	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
 		hasPagination := after != nil || first != nil || before != nil || last != nil
 		if hasPagination || ignoredEdges {
-			if conn.TotalCount, err = mt.Clone().Count(ctx); err != nil {
+			c := mt.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
 				return nil, err
 			}
 			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
@@ -1484,7 +1798,9 @@ func (mt *MsgTypeQuery) Paginate(
 	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
 		hasPagination := after != nil || first != nil || before != nil || last != nil
 		if hasPagination || ignoredEdges {
-			if conn.TotalCount, err = mt.Clone().Count(ctx); err != nil {
+			c := mt.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
 				return nil, err
 			}
 			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
@@ -1607,6 +1923,612 @@ func (mt *MsgType) ToEdge(order *MsgTypeOrder) *MsgTypeEdge {
 	return &MsgTypeEdge{
 		Node:   mt,
 		Cursor: order.Field.toCursor(mt),
+	}
+}
+
+// NlogEdge is the edge representation of Nlog.
+type NlogEdge struct {
+	Node   *Nlog  `json:"node"`
+	Cursor Cursor `json:"cursor"`
+}
+
+// NlogConnection is the connection containing edges to Nlog.
+type NlogConnection struct {
+	Edges      []*NlogEdge `json:"edges"`
+	PageInfo   PageInfo    `json:"pageInfo"`
+	TotalCount int         `json:"totalCount"`
+}
+
+func (c *NlogConnection) build(nodes []*Nlog, pager *nlogPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *Nlog
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *Nlog {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *Nlog {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*NlogEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &NlogEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// NlogPaginateOption enables pagination customization.
+type NlogPaginateOption func(*nlogPager) error
+
+// WithNlogOrder configures pagination ordering.
+func WithNlogOrder(order *NlogOrder) NlogPaginateOption {
+	if order == nil {
+		order = DefaultNlogOrder
+	}
+	o := *order
+	return func(pager *nlogPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultNlogOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithNlogFilter configures pagination filter.
+func WithNlogFilter(filter func(*NlogQuery) (*NlogQuery, error)) NlogPaginateOption {
+	return func(pager *nlogPager) error {
+		if filter == nil {
+			return errors.New("NlogQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type nlogPager struct {
+	reverse bool
+	order   *NlogOrder
+	filter  func(*NlogQuery) (*NlogQuery, error)
+}
+
+func newNlogPager(opts []NlogPaginateOption, reverse bool) (*nlogPager, error) {
+	pager := &nlogPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultNlogOrder
+	}
+	return pager, nil
+}
+
+func (p *nlogPager) applyFilter(query *NlogQuery) (*NlogQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *nlogPager) toCursor(n *Nlog) Cursor {
+	return p.order.Field.toCursor(n)
+}
+
+func (p *nlogPager) applyCursors(query *NlogQuery, after, before *Cursor) (*NlogQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultNlogOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *nlogPager) applyOrder(query *NlogQuery) *NlogQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultNlogOrder.Field {
+		query = query.Order(DefaultNlogOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *nlogPager) orderExpr(query *NlogQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultNlogOrder.Field {
+			b.Comma().Ident(DefaultNlogOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to Nlog.
+func (n *NlogQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...NlogPaginateOption,
+) (*NlogConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newNlogPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if n, err = pager.applyFilter(n); err != nil {
+		return nil, err
+	}
+	conn := &NlogConnection{Edges: []*NlogEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := n.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if n, err = pager.applyCursors(n, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		n.Limit(limit)
+	}
+	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
+		if first != nil {
+			n.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
+		}
+		if last != nil {
+			n.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
+		}
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := n.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	n = pager.applyOrder(n)
+	nodes, err := n.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// NlogOrderFieldCreatedAt orders Nlog by created_at.
+	NlogOrderFieldCreatedAt = &NlogOrderField{
+		Value: func(n *Nlog) (ent.Value, error) {
+			return n.CreatedAt, nil
+		},
+		column: nlog.FieldCreatedAt,
+		toTerm: nlog.ByCreatedAt,
+		toCursor: func(n *Nlog) Cursor {
+			return Cursor{
+				ID:    n.ID,
+				Value: n.CreatedAt,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f NlogOrderField) String() string {
+	var str string
+	switch f.column {
+	case NlogOrderFieldCreatedAt.column:
+		str = "createdAt"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f NlogOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *NlogOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("NlogOrderField %T must be a string", v)
+	}
+	switch str {
+	case "createdAt":
+		*f = *NlogOrderFieldCreatedAt
+	default:
+		return fmt.Errorf("%s is not a valid NlogOrderField", str)
+	}
+	return nil
+}
+
+// NlogOrderField defines the ordering field of Nlog.
+type NlogOrderField struct {
+	// Value extracts the ordering value from the given Nlog.
+	Value    func(*Nlog) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) nlog.OrderOption
+	toCursor func(*Nlog) Cursor
+}
+
+// NlogOrder defines the ordering of Nlog.
+type NlogOrder struct {
+	Direction OrderDirection  `json:"direction"`
+	Field     *NlogOrderField `json:"field"`
+}
+
+// DefaultNlogOrder is the default ordering of Nlog.
+var DefaultNlogOrder = &NlogOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &NlogOrderField{
+		Value: func(n *Nlog) (ent.Value, error) {
+			return n.ID, nil
+		},
+		column: nlog.FieldID,
+		toTerm: nlog.ByID,
+		toCursor: func(n *Nlog) Cursor {
+			return Cursor{ID: n.ID}
+		},
+	},
+}
+
+// ToEdge converts Nlog into NlogEdge.
+func (n *Nlog) ToEdge(order *NlogOrder) *NlogEdge {
+	if order == nil {
+		order = DefaultNlogOrder
+	}
+	return &NlogEdge{
+		Node:   n,
+		Cursor: order.Field.toCursor(n),
+	}
+}
+
+// NlogAlertEdge is the edge representation of NlogAlert.
+type NlogAlertEdge struct {
+	Node   *NlogAlert `json:"node"`
+	Cursor Cursor     `json:"cursor"`
+}
+
+// NlogAlertConnection is the connection containing edges to NlogAlert.
+type NlogAlertConnection struct {
+	Edges      []*NlogAlertEdge `json:"edges"`
+	PageInfo   PageInfo         `json:"pageInfo"`
+	TotalCount int              `json:"totalCount"`
+}
+
+func (c *NlogAlertConnection) build(nodes []*NlogAlert, pager *nlogalertPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *NlogAlert
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *NlogAlert {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *NlogAlert {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*NlogAlertEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &NlogAlertEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// NlogAlertPaginateOption enables pagination customization.
+type NlogAlertPaginateOption func(*nlogalertPager) error
+
+// WithNlogAlertOrder configures pagination ordering.
+func WithNlogAlertOrder(order *NlogAlertOrder) NlogAlertPaginateOption {
+	if order == nil {
+		order = DefaultNlogAlertOrder
+	}
+	o := *order
+	return func(pager *nlogalertPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultNlogAlertOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithNlogAlertFilter configures pagination filter.
+func WithNlogAlertFilter(filter func(*NlogAlertQuery) (*NlogAlertQuery, error)) NlogAlertPaginateOption {
+	return func(pager *nlogalertPager) error {
+		if filter == nil {
+			return errors.New("NlogAlertQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type nlogalertPager struct {
+	reverse bool
+	order   *NlogAlertOrder
+	filter  func(*NlogAlertQuery) (*NlogAlertQuery, error)
+}
+
+func newNlogAlertPager(opts []NlogAlertPaginateOption, reverse bool) (*nlogalertPager, error) {
+	pager := &nlogalertPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultNlogAlertOrder
+	}
+	return pager, nil
+}
+
+func (p *nlogalertPager) applyFilter(query *NlogAlertQuery) (*NlogAlertQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *nlogalertPager) toCursor(na *NlogAlert) Cursor {
+	return p.order.Field.toCursor(na)
+}
+
+func (p *nlogalertPager) applyCursors(query *NlogAlertQuery, after, before *Cursor) (*NlogAlertQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultNlogAlertOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *nlogalertPager) applyOrder(query *NlogAlertQuery) *NlogAlertQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultNlogAlertOrder.Field {
+		query = query.Order(DefaultNlogAlertOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *nlogalertPager) orderExpr(query *NlogAlertQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultNlogAlertOrder.Field {
+			b.Comma().Ident(DefaultNlogAlertOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to NlogAlert.
+func (na *NlogAlertQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...NlogAlertPaginateOption,
+) (*NlogAlertConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newNlogAlertPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if na, err = pager.applyFilter(na); err != nil {
+		return nil, err
+	}
+	conn := &NlogAlertConnection{Edges: []*NlogAlertEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := na.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if na, err = pager.applyCursors(na, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		na.Limit(limit)
+	}
+	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
+		if first != nil {
+			na.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
+		}
+		if last != nil {
+			na.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
+		}
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := na.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	na = pager.applyOrder(na)
+	nodes, err := na.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// NlogAlertOrderFieldCreatedAt orders NlogAlert by created_at.
+	NlogAlertOrderFieldCreatedAt = &NlogAlertOrderField{
+		Value: func(na *NlogAlert) (ent.Value, error) {
+			return na.CreatedAt, nil
+		},
+		column: nlogalert.FieldCreatedAt,
+		toTerm: nlogalert.ByCreatedAt,
+		toCursor: func(na *NlogAlert) Cursor {
+			return Cursor{
+				ID:    na.ID,
+				Value: na.CreatedAt,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f NlogAlertOrderField) String() string {
+	var str string
+	switch f.column {
+	case NlogAlertOrderFieldCreatedAt.column:
+		str = "createdAt"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f NlogAlertOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *NlogAlertOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("NlogAlertOrderField %T must be a string", v)
+	}
+	switch str {
+	case "createdAt":
+		*f = *NlogAlertOrderFieldCreatedAt
+	default:
+		return fmt.Errorf("%s is not a valid NlogAlertOrderField", str)
+	}
+	return nil
+}
+
+// NlogAlertOrderField defines the ordering field of NlogAlert.
+type NlogAlertOrderField struct {
+	// Value extracts the ordering value from the given NlogAlert.
+	Value    func(*NlogAlert) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) nlogalert.OrderOption
+	toCursor func(*NlogAlert) Cursor
+}
+
+// NlogAlertOrder defines the ordering of NlogAlert.
+type NlogAlertOrder struct {
+	Direction OrderDirection       `json:"direction"`
+	Field     *NlogAlertOrderField `json:"field"`
+}
+
+// DefaultNlogAlertOrder is the default ordering of NlogAlert.
+var DefaultNlogAlertOrder = &NlogAlertOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &NlogAlertOrderField{
+		Value: func(na *NlogAlert) (ent.Value, error) {
+			return na.ID, nil
+		},
+		column: nlogalert.FieldID,
+		toTerm: nlogalert.ByID,
+		toCursor: func(na *NlogAlert) Cursor {
+			return Cursor{ID: na.ID}
+		},
+	},
+}
+
+// ToEdge converts NlogAlert into NlogAlertEdge.
+func (na *NlogAlert) ToEdge(order *NlogAlertOrder) *NlogAlertEdge {
+	if order == nil {
+		order = DefaultNlogAlertOrder
+	}
+	return &NlogAlertEdge{
+		Node:   na,
+		Cursor: order.Field.toCursor(na),
 	}
 }
 
@@ -1785,7 +2707,9 @@ func (s *SilenceQuery) Paginate(
 	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
 		hasPagination := after != nil || first != nil || before != nil || last != nil
 		if hasPagination || ignoredEdges {
-			if conn.TotalCount, err = s.Clone().Count(ctx); err != nil {
+			c := s.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
 				return nil, err
 			}
 			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
@@ -2086,7 +3010,9 @@ func (u *UserQuery) Paginate(
 	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
 		hasPagination := after != nil || first != nil || before != nil || last != nil
 		if hasPagination || ignoredEdges {
-			if conn.TotalCount, err = u.Clone().Count(ctx); err != nil {
+			c := u.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
 				return nil, err
 			}
 			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0

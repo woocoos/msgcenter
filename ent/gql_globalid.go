@@ -12,14 +12,23 @@ import (
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/hashicorp/go-multierror"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/nlog"
+	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 )
+
+// GlobalID returns the global identifier for the given MsgAlert node.
+func (ma *MsgAlert) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("%s:%d", msgalert.Table, ma.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
 
 // GlobalID returns the global identifier for the given MsgChannel node.
 func (mc *MsgChannel) GlobalID(context.Context) (string, error) {
@@ -48,6 +57,18 @@ func (mt *MsgTemplate) GlobalID(context.Context) (string, error) {
 // GlobalID returns the global identifier for the given MsgType node.
 func (mt *MsgType) GlobalID(context.Context) (string, error) {
 	id := fmt.Sprintf("%s:%d", msgtype.Table, mt.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
+// GlobalID returns the global identifier for the given Nlog node.
+func (n *Nlog) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("%s:%d", nlog.Table, n.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
+// GlobalID returns the global identifier for the given NlogAlert node.
+func (na *NlogAlert) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("%s:%d", nlogalert.Table, na.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
@@ -80,6 +101,8 @@ func FromGlobalID(s string) (*ResolvedGlobal, error) {
 // GlobalID returns the global identifier for the given type and id.
 func GlobalID(tp, id string) (string, error) {
 	switch tp {
+	case msgalert.Table:
+		break
 	case msgchannel.Table:
 		break
 	case msgevent.Table:
@@ -89,6 +112,10 @@ func GlobalID(tp, id string) (string, error) {
 	case msgtemplate.Table:
 		break
 	case msgtype.Table:
+		break
+	case nlog.Table:
+		break
+	case nlogalert.Table:
 		break
 	case silence.Table:
 		break

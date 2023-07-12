@@ -8,6 +8,30 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
+func (ma *MsgAlert) Nlog(ctx context.Context) (result []*Nlog, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = ma.NamedNlog(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = ma.Edges.NlogOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = ma.QueryNlog().All(ctx)
+	}
+	return result, err
+}
+
+func (ma *MsgAlert) NlogAlerts(ctx context.Context) (result []*NlogAlert, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = ma.NamedNlogAlerts(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = ma.Edges.NlogAlertsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = ma.QueryNlogAlerts().All(ctx)
+	}
+	return result, err
+}
+
 func (me *MsgEvent) MsgType(ctx context.Context) (*MsgType, error) {
 	result, err := me.Edges.MsgTypeOrErr()
 	if IsNotLoaded(err) {
@@ -72,6 +96,46 @@ func (mt *MsgType) Subscribers(ctx context.Context) (result []*MsgSubscriber, er
 	}
 	if IsNotLoaded(err) {
 		result, err = mt.QuerySubscribers().All(ctx)
+	}
+	return result, err
+}
+
+func (n *Nlog) Alerts(ctx context.Context) (result []*MsgAlert, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = n.NamedAlerts(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = n.Edges.AlertsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = n.QueryAlerts().All(ctx)
+	}
+	return result, err
+}
+
+func (n *Nlog) NlogAlert(ctx context.Context) (result []*NlogAlert, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = n.NamedNlogAlert(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = n.Edges.NlogAlertOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = n.QueryNlogAlert().All(ctx)
+	}
+	return result, err
+}
+
+func (na *NlogAlert) Nlog(ctx context.Context) (*Nlog, error) {
+	result, err := na.Edges.NlogOrErr()
+	if IsNotLoaded(err) {
+		result, err = na.QueryNlog().Only(ctx)
+	}
+	return result, err
+}
+
+func (na *NlogAlert) Alert(ctx context.Context) (*MsgAlert, error) {
+	result, err := na.Edges.AlertOrErr()
+	if IsNotLoaded(err) {
+		result, err = na.QueryAlert().Only(ctx)
 	}
 	return result, err
 }

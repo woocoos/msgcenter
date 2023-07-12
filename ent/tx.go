@@ -12,6 +12,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// MsgAlert is the client for interacting with the MsgAlert builders.
+	MsgAlert *MsgAlertClient
 	// MsgChannel is the client for interacting with the MsgChannel builders.
 	MsgChannel *MsgChannelClient
 	// MsgEvent is the client for interacting with the MsgEvent builders.
@@ -22,6 +24,10 @@ type Tx struct {
 	MsgTemplate *MsgTemplateClient
 	// MsgType is the client for interacting with the MsgType builders.
 	MsgType *MsgTypeClient
+	// Nlog is the client for interacting with the Nlog builders.
+	Nlog *NlogClient
+	// NlogAlert is the client for interacting with the NlogAlert builders.
+	NlogAlert *NlogAlertClient
 	// OrgRoleUser is the client for interacting with the OrgRoleUser builders.
 	OrgRoleUser *OrgRoleUserClient
 	// Silence is the client for interacting with the Silence builders.
@@ -159,11 +165,14 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.MsgAlert = NewMsgAlertClient(tx.config)
 	tx.MsgChannel = NewMsgChannelClient(tx.config)
 	tx.MsgEvent = NewMsgEventClient(tx.config)
 	tx.MsgSubscriber = NewMsgSubscriberClient(tx.config)
 	tx.MsgTemplate = NewMsgTemplateClient(tx.config)
 	tx.MsgType = NewMsgTypeClient(tx.config)
+	tx.Nlog = NewNlogClient(tx.config)
+	tx.NlogAlert = NewNlogAlertClient(tx.config)
 	tx.OrgRoleUser = NewOrgRoleUserClient(tx.config)
 	tx.Silence = NewSilenceClient(tx.config)
 	tx.User = NewUserClient(tx.config)
@@ -176,7 +185,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: MsgChannel.QueryXXX(), the query will be executed
+// applies a query, for example: MsgAlert.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

@@ -5,12 +5,13 @@ import (
 )
 
 var (
+	Registerer  = prometheus.DefaultRegisterer
 	Dispatcher  *DispatcherMetrics
 	Notify      *NotifyMetrics
 	Coordinator *CoordinatorMetrics
-	Registerer  = prometheus.DefaultRegisterer
 	Silences    *SilencesMetrics
 	Marker      *MarkerMetrics
+	Nflog       *NflogMetrics
 )
 
 // BuildGlobal build default metrics
@@ -205,7 +206,6 @@ func NewDispatcherMetrics(registerLimitMetrics bool, r prometheus.Registerer) *D
 type NflogMetrics struct {
 	GCDuration              prometheus.Summary
 	SnapshotDuration        prometheus.Summary
-	SnapshotSize            prometheus.Gauge
 	QueriesTotal            prometheus.Counter
 	QueryErrorsTotal        prometheus.Counter
 	QueryDuration           prometheus.Histogram
@@ -214,22 +214,13 @@ type NflogMetrics struct {
 	MaintenanceErrorsTotal  prometheus.Counter
 }
 
-func NewNflogMetrics(r prometheus.Registerer) *NflogMetrics {
+func NewNflogMetrics() *NflogMetrics {
 	m := &NflogMetrics{}
 
 	m.GCDuration = prometheus.NewSummary(prometheus.SummaryOpts{
 		Name:       "msgcenter_nflog_gc_duration_seconds",
 		Help:       "Duration of the last notification log garbage collection cycle.",
 		Objectives: map[float64]float64{},
-	})
-	m.SnapshotDuration = prometheus.NewSummary(prometheus.SummaryOpts{
-		Name:       "msgcenter_nflog_snapshot_duration_seconds",
-		Help:       "Duration of the last notification log snapshot.",
-		Objectives: map[float64]float64{},
-	})
-	m.SnapshotSize = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "msgcenter_nflog_snapshot_size_bytes",
-		Help: "Size of the last notification log snapshot in bytes.",
 	})
 	m.MaintenanceTotal = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: "msgcenter_nflog_maintenance_total",
@@ -256,19 +247,15 @@ func NewNflogMetrics(r prometheus.Registerer) *NflogMetrics {
 		Help: "Number of received gossip messages that have been further gossiped.",
 	})
 
-	if r != nil {
-		r.MustRegister(
-			m.GCDuration,
-			m.SnapshotDuration,
-			m.SnapshotSize,
-			m.QueriesTotal,
-			m.QueryErrorsTotal,
-			m.QueryDuration,
-			m.PropagatedMessagesTotal,
-			m.MaintenanceTotal,
-			m.MaintenanceErrorsTotal,
-		)
-	}
+	Registerer.MustRegister(
+		m.GCDuration,
+		m.QueriesTotal,
+		m.QueryErrorsTotal,
+		m.QueryDuration,
+		m.PropagatedMessagesTotal,
+		m.MaintenanceTotal,
+		m.MaintenanceErrorsTotal,
+	)
 	return m
 }
 

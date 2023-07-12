@@ -149,9 +149,9 @@ func (s *serviceSuite) TestPostAlertsWithTenant() {
 		{
 			Alert: &oas.Alert{
 				Labels: map[string]string{
-					"receiver":  "email|webhook",
-					"alertname": "noSubscribe",
-					"tenant":    "1",
+					"receiver":        "email|webhook",
+					"alertname":       "noSubscribe",
+					label.TenantLabel: "1",
 				},
 			},
 			Annotations: map[string]string{

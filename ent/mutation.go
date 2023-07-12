@@ -12,11 +12,14 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/nlog"
+	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/ent/silence"
@@ -35,15 +38,1181 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
+	TypeMsgAlert      = "MsgAlert"
 	TypeMsgChannel    = "MsgChannel"
 	TypeMsgEvent      = "MsgEvent"
 	TypeMsgSubscriber = "MsgSubscriber"
 	TypeMsgTemplate   = "MsgTemplate"
 	TypeMsgType       = "MsgType"
+	TypeNlog          = "Nlog"
+	TypeNlogAlert     = "NlogAlert"
 	TypeOrgRoleUser   = "OrgRoleUser"
 	TypeSilence       = "Silence"
 	TypeUser          = "User"
 )
+
+// MsgAlertMutation represents an operation that mutates the MsgAlert nodes in the graph.
+type MsgAlertMutation struct {
+	config
+	op                 Op
+	typ                string
+	id                 *int
+	tenant_id          *int
+	addtenant_id       *int
+	labels             **label.LabelSet
+	annotations        **label.LabelSet
+	starts_at          *time.Time
+	ends_at            *time.Time
+	url                *string
+	timeout            *bool
+	fingerprint        *string
+	created_at         *time.Time
+	updated_at         *time.Time
+	deleted            *bool
+	clearedFields      map[string]struct{}
+	nlog               map[int]struct{}
+	removednlog        map[int]struct{}
+	clearednlog        bool
+	nlog_alerts        map[int]struct{}
+	removednlog_alerts map[int]struct{}
+	clearednlog_alerts bool
+	done               bool
+	oldValue           func(context.Context) (*MsgAlert, error)
+	predicates         []predicate.MsgAlert
+}
+
+var _ ent.Mutation = (*MsgAlertMutation)(nil)
+
+// msgalertOption allows management of the mutation configuration using functional options.
+type msgalertOption func(*MsgAlertMutation)
+
+// newMsgAlertMutation creates new mutation for the MsgAlert entity.
+func newMsgAlertMutation(c config, op Op, opts ...msgalertOption) *MsgAlertMutation {
+	m := &MsgAlertMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeMsgAlert,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withMsgAlertID sets the ID field of the mutation.
+func withMsgAlertID(id int) msgalertOption {
+	return func(m *MsgAlertMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *MsgAlert
+		)
+		m.oldValue = func(ctx context.Context) (*MsgAlert, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().MsgAlert.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withMsgAlert sets the old MsgAlert of the mutation.
+func withMsgAlert(node *MsgAlert) msgalertOption {
+	return func(m *MsgAlertMutation) {
+		m.oldValue = func(context.Context) (*MsgAlert, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m MsgAlertMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m MsgAlertMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of MsgAlert entities.
+func (m *MsgAlertMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *MsgAlertMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *MsgAlertMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().MsgAlert.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *MsgAlertMutation) SetTenantID(i int) {
+	m.tenant_id = &i
+	m.addtenant_id = nil
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *MsgAlertMutation) TenantID() (r int, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the MsgAlert entity.
+// If the MsgAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgAlertMutation) OldTenantID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// AddTenantID adds i to the "tenant_id" field.
+func (m *MsgAlertMutation) AddTenantID(i int) {
+	if m.addtenant_id != nil {
+		*m.addtenant_id += i
+	} else {
+		m.addtenant_id = &i
+	}
+}
+
+// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
+func (m *MsgAlertMutation) AddedTenantID() (r int, exists bool) {
+	v := m.addtenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *MsgAlertMutation) ResetTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+}
+
+// SetLabels sets the "labels" field.
+func (m *MsgAlertMutation) SetLabels(ls *label.LabelSet) {
+	m.labels = &ls
+}
+
+// Labels returns the value of the "labels" field in the mutation.
+func (m *MsgAlertMutation) Labels() (r *label.LabelSet, exists bool) {
+	v := m.labels
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLabels returns the old "labels" field's value of the MsgAlert entity.
+// If the MsgAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgAlertMutation) OldLabels(ctx context.Context) (v *label.LabelSet, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLabels is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLabels requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLabels: %w", err)
+	}
+	return oldValue.Labels, nil
+}
+
+// ClearLabels clears the value of the "labels" field.
+func (m *MsgAlertMutation) ClearLabels() {
+	m.labels = nil
+	m.clearedFields[msgalert.FieldLabels] = struct{}{}
+}
+
+// LabelsCleared returns if the "labels" field was cleared in this mutation.
+func (m *MsgAlertMutation) LabelsCleared() bool {
+	_, ok := m.clearedFields[msgalert.FieldLabels]
+	return ok
+}
+
+// ResetLabels resets all changes to the "labels" field.
+func (m *MsgAlertMutation) ResetLabels() {
+	m.labels = nil
+	delete(m.clearedFields, msgalert.FieldLabels)
+}
+
+// SetAnnotations sets the "annotations" field.
+func (m *MsgAlertMutation) SetAnnotations(ls *label.LabelSet) {
+	m.annotations = &ls
+}
+
+// Annotations returns the value of the "annotations" field in the mutation.
+func (m *MsgAlertMutation) Annotations() (r *label.LabelSet, exists bool) {
+	v := m.annotations
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAnnotations returns the old "annotations" field's value of the MsgAlert entity.
+// If the MsgAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgAlertMutation) OldAnnotations(ctx context.Context) (v *label.LabelSet, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAnnotations is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAnnotations requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAnnotations: %w", err)
+	}
+	return oldValue.Annotations, nil
+}
+
+// ClearAnnotations clears the value of the "annotations" field.
+func (m *MsgAlertMutation) ClearAnnotations() {
+	m.annotations = nil
+	m.clearedFields[msgalert.FieldAnnotations] = struct{}{}
+}
+
+// AnnotationsCleared returns if the "annotations" field was cleared in this mutation.
+func (m *MsgAlertMutation) AnnotationsCleared() bool {
+	_, ok := m.clearedFields[msgalert.FieldAnnotations]
+	return ok
+}
+
+// ResetAnnotations resets all changes to the "annotations" field.
+func (m *MsgAlertMutation) ResetAnnotations() {
+	m.annotations = nil
+	delete(m.clearedFields, msgalert.FieldAnnotations)
+}
+
+// SetStartsAt sets the "starts_at" field.
+func (m *MsgAlertMutation) SetStartsAt(t time.Time) {
+	m.starts_at = &t
+}
+
+// StartsAt returns the value of the "starts_at" field in the mutation.
+func (m *MsgAlertMutation) StartsAt() (r time.Time, exists bool) {
+	v := m.starts_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStartsAt returns the old "starts_at" field's value of the MsgAlert entity.
+// If the MsgAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgAlertMutation) OldStartsAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStartsAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStartsAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStartsAt: %w", err)
+	}
+	return oldValue.StartsAt, nil
+}
+
+// ResetStartsAt resets all changes to the "starts_at" field.
+func (m *MsgAlertMutation) ResetStartsAt() {
+	m.starts_at = nil
+}
+
+// SetEndsAt sets the "ends_at" field.
+func (m *MsgAlertMutation) SetEndsAt(t time.Time) {
+	m.ends_at = &t
+}
+
+// EndsAt returns the value of the "ends_at" field in the mutation.
+func (m *MsgAlertMutation) EndsAt() (r time.Time, exists bool) {
+	v := m.ends_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndsAt returns the old "ends_at" field's value of the MsgAlert entity.
+// If the MsgAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgAlertMutation) OldEndsAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndsAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndsAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndsAt: %w", err)
+	}
+	return oldValue.EndsAt, nil
+}
+
+// ResetEndsAt resets all changes to the "ends_at" field.
+func (m *MsgAlertMutation) ResetEndsAt() {
+	m.ends_at = nil
+}
+
+// SetURL sets the "url" field.
+func (m *MsgAlertMutation) SetURL(s string) {
+	m.url = &s
+}
+
+// URL returns the value of the "url" field in the mutation.
+func (m *MsgAlertMutation) URL() (r string, exists bool) {
+	v := m.url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldURL returns the old "url" field's value of the MsgAlert entity.
+// If the MsgAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgAlertMutation) OldURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldURL: %w", err)
+	}
+	return oldValue.URL, nil
+}
+
+// ClearURL clears the value of the "url" field.
+func (m *MsgAlertMutation) ClearURL() {
+	m.url = nil
+	m.clearedFields[msgalert.FieldURL] = struct{}{}
+}
+
+// URLCleared returns if the "url" field was cleared in this mutation.
+func (m *MsgAlertMutation) URLCleared() bool {
+	_, ok := m.clearedFields[msgalert.FieldURL]
+	return ok
+}
+
+// ResetURL resets all changes to the "url" field.
+func (m *MsgAlertMutation) ResetURL() {
+	m.url = nil
+	delete(m.clearedFields, msgalert.FieldURL)
+}
+
+// SetTimeout sets the "timeout" field.
+func (m *MsgAlertMutation) SetTimeout(b bool) {
+	m.timeout = &b
+}
+
+// Timeout returns the value of the "timeout" field in the mutation.
+func (m *MsgAlertMutation) Timeout() (r bool, exists bool) {
+	v := m.timeout
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTimeout returns the old "timeout" field's value of the MsgAlert entity.
+// If the MsgAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgAlertMutation) OldTimeout(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTimeout is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTimeout requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTimeout: %w", err)
+	}
+	return oldValue.Timeout, nil
+}
+
+// ResetTimeout resets all changes to the "timeout" field.
+func (m *MsgAlertMutation) ResetTimeout() {
+	m.timeout = nil
+}
+
+// SetFingerprint sets the "fingerprint" field.
+func (m *MsgAlertMutation) SetFingerprint(s string) {
+	m.fingerprint = &s
+}
+
+// Fingerprint returns the value of the "fingerprint" field in the mutation.
+func (m *MsgAlertMutation) Fingerprint() (r string, exists bool) {
+	v := m.fingerprint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFingerprint returns the old "fingerprint" field's value of the MsgAlert entity.
+// If the MsgAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgAlertMutation) OldFingerprint(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFingerprint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFingerprint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFingerprint: %w", err)
+	}
+	return oldValue.Fingerprint, nil
+}
+
+// ResetFingerprint resets all changes to the "fingerprint" field.
+func (m *MsgAlertMutation) ResetFingerprint() {
+	m.fingerprint = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *MsgAlertMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *MsgAlertMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the MsgAlert entity.
+// If the MsgAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgAlertMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *MsgAlertMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *MsgAlertMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *MsgAlertMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the MsgAlert entity.
+// If the MsgAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgAlertMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (m *MsgAlertMutation) ClearUpdatedAt() {
+	m.updated_at = nil
+	m.clearedFields[msgalert.FieldUpdatedAt] = struct{}{}
+}
+
+// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
+func (m *MsgAlertMutation) UpdatedAtCleared() bool {
+	_, ok := m.clearedFields[msgalert.FieldUpdatedAt]
+	return ok
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *MsgAlertMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	delete(m.clearedFields, msgalert.FieldUpdatedAt)
+}
+
+// SetDeleted sets the "deleted" field.
+func (m *MsgAlertMutation) SetDeleted(b bool) {
+	m.deleted = &b
+}
+
+// Deleted returns the value of the "deleted" field in the mutation.
+func (m *MsgAlertMutation) Deleted() (r bool, exists bool) {
+	v := m.deleted
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleted returns the old "deleted" field's value of the MsgAlert entity.
+// If the MsgAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgAlertMutation) OldDeleted(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleted is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleted requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleted: %w", err)
+	}
+	return oldValue.Deleted, nil
+}
+
+// ResetDeleted resets all changes to the "deleted" field.
+func (m *MsgAlertMutation) ResetDeleted() {
+	m.deleted = nil
+}
+
+// AddNlogIDs adds the "nlog" edge to the Nlog entity by ids.
+func (m *MsgAlertMutation) AddNlogIDs(ids ...int) {
+	if m.nlog == nil {
+		m.nlog = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.nlog[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNlog clears the "nlog" edge to the Nlog entity.
+func (m *MsgAlertMutation) ClearNlog() {
+	m.clearednlog = true
+}
+
+// NlogCleared reports if the "nlog" edge to the Nlog entity was cleared.
+func (m *MsgAlertMutation) NlogCleared() bool {
+	return m.clearednlog
+}
+
+// RemoveNlogIDs removes the "nlog" edge to the Nlog entity by IDs.
+func (m *MsgAlertMutation) RemoveNlogIDs(ids ...int) {
+	if m.removednlog == nil {
+		m.removednlog = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.nlog, ids[i])
+		m.removednlog[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNlog returns the removed IDs of the "nlog" edge to the Nlog entity.
+func (m *MsgAlertMutation) RemovedNlogIDs() (ids []int) {
+	for id := range m.removednlog {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NlogIDs returns the "nlog" edge IDs in the mutation.
+func (m *MsgAlertMutation) NlogIDs() (ids []int) {
+	for id := range m.nlog {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNlog resets all changes to the "nlog" edge.
+func (m *MsgAlertMutation) ResetNlog() {
+	m.nlog = nil
+	m.clearednlog = false
+	m.removednlog = nil
+}
+
+// AddNlogAlertIDs adds the "nlog_alerts" edge to the NlogAlert entity by ids.
+func (m *MsgAlertMutation) AddNlogAlertIDs(ids ...int) {
+	if m.nlog_alerts == nil {
+		m.nlog_alerts = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.nlog_alerts[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNlogAlerts clears the "nlog_alerts" edge to the NlogAlert entity.
+func (m *MsgAlertMutation) ClearNlogAlerts() {
+	m.clearednlog_alerts = true
+}
+
+// NlogAlertsCleared reports if the "nlog_alerts" edge to the NlogAlert entity was cleared.
+func (m *MsgAlertMutation) NlogAlertsCleared() bool {
+	return m.clearednlog_alerts
+}
+
+// RemoveNlogAlertIDs removes the "nlog_alerts" edge to the NlogAlert entity by IDs.
+func (m *MsgAlertMutation) RemoveNlogAlertIDs(ids ...int) {
+	if m.removednlog_alerts == nil {
+		m.removednlog_alerts = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.nlog_alerts, ids[i])
+		m.removednlog_alerts[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNlogAlerts returns the removed IDs of the "nlog_alerts" edge to the NlogAlert entity.
+func (m *MsgAlertMutation) RemovedNlogAlertsIDs() (ids []int) {
+	for id := range m.removednlog_alerts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NlogAlertsIDs returns the "nlog_alerts" edge IDs in the mutation.
+func (m *MsgAlertMutation) NlogAlertsIDs() (ids []int) {
+	for id := range m.nlog_alerts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNlogAlerts resets all changes to the "nlog_alerts" edge.
+func (m *MsgAlertMutation) ResetNlogAlerts() {
+	m.nlog_alerts = nil
+	m.clearednlog_alerts = false
+	m.removednlog_alerts = nil
+}
+
+// Where appends a list predicates to the MsgAlertMutation builder.
+func (m *MsgAlertMutation) Where(ps ...predicate.MsgAlert) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the MsgAlertMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *MsgAlertMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.MsgAlert, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *MsgAlertMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *MsgAlertMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (MsgAlert).
+func (m *MsgAlertMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *MsgAlertMutation) Fields() []string {
+	fields := make([]string, 0, 11)
+	if m.tenant_id != nil {
+		fields = append(fields, msgalert.FieldTenantID)
+	}
+	if m.labels != nil {
+		fields = append(fields, msgalert.FieldLabels)
+	}
+	if m.annotations != nil {
+		fields = append(fields, msgalert.FieldAnnotations)
+	}
+	if m.starts_at != nil {
+		fields = append(fields, msgalert.FieldStartsAt)
+	}
+	if m.ends_at != nil {
+		fields = append(fields, msgalert.FieldEndsAt)
+	}
+	if m.url != nil {
+		fields = append(fields, msgalert.FieldURL)
+	}
+	if m.timeout != nil {
+		fields = append(fields, msgalert.FieldTimeout)
+	}
+	if m.fingerprint != nil {
+		fields = append(fields, msgalert.FieldFingerprint)
+	}
+	if m.created_at != nil {
+		fields = append(fields, msgalert.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, msgalert.FieldUpdatedAt)
+	}
+	if m.deleted != nil {
+		fields = append(fields, msgalert.FieldDeleted)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *MsgAlertMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case msgalert.FieldTenantID:
+		return m.TenantID()
+	case msgalert.FieldLabels:
+		return m.Labels()
+	case msgalert.FieldAnnotations:
+		return m.Annotations()
+	case msgalert.FieldStartsAt:
+		return m.StartsAt()
+	case msgalert.FieldEndsAt:
+		return m.EndsAt()
+	case msgalert.FieldURL:
+		return m.URL()
+	case msgalert.FieldTimeout:
+		return m.Timeout()
+	case msgalert.FieldFingerprint:
+		return m.Fingerprint()
+	case msgalert.FieldCreatedAt:
+		return m.CreatedAt()
+	case msgalert.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case msgalert.FieldDeleted:
+		return m.Deleted()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *MsgAlertMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case msgalert.FieldTenantID:
+		return m.OldTenantID(ctx)
+	case msgalert.FieldLabels:
+		return m.OldLabels(ctx)
+	case msgalert.FieldAnnotations:
+		return m.OldAnnotations(ctx)
+	case msgalert.FieldStartsAt:
+		return m.OldStartsAt(ctx)
+	case msgalert.FieldEndsAt:
+		return m.OldEndsAt(ctx)
+	case msgalert.FieldURL:
+		return m.OldURL(ctx)
+	case msgalert.FieldTimeout:
+		return m.OldTimeout(ctx)
+	case msgalert.FieldFingerprint:
+		return m.OldFingerprint(ctx)
+	case msgalert.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case msgalert.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case msgalert.FieldDeleted:
+		return m.OldDeleted(ctx)
+	}
+	return nil, fmt.Errorf("unknown MsgAlert field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MsgAlertMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case msgalert.FieldTenantID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
+	case msgalert.FieldLabels:
+		v, ok := value.(*label.LabelSet)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLabels(v)
+		return nil
+	case msgalert.FieldAnnotations:
+		v, ok := value.(*label.LabelSet)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAnnotations(v)
+		return nil
+	case msgalert.FieldStartsAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStartsAt(v)
+		return nil
+	case msgalert.FieldEndsAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndsAt(v)
+		return nil
+	case msgalert.FieldURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetURL(v)
+		return nil
+	case msgalert.FieldTimeout:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTimeout(v)
+		return nil
+	case msgalert.FieldFingerprint:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFingerprint(v)
+		return nil
+	case msgalert.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case msgalert.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case msgalert.FieldDeleted:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleted(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MsgAlert field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *MsgAlertMutation) AddedFields() []string {
+	var fields []string
+	if m.addtenant_id != nil {
+		fields = append(fields, msgalert.FieldTenantID)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *MsgAlertMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case msgalert.FieldTenantID:
+		return m.AddedTenantID()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MsgAlertMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case msgalert.FieldTenantID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTenantID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MsgAlert numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *MsgAlertMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(msgalert.FieldLabels) {
+		fields = append(fields, msgalert.FieldLabels)
+	}
+	if m.FieldCleared(msgalert.FieldAnnotations) {
+		fields = append(fields, msgalert.FieldAnnotations)
+	}
+	if m.FieldCleared(msgalert.FieldURL) {
+		fields = append(fields, msgalert.FieldURL)
+	}
+	if m.FieldCleared(msgalert.FieldUpdatedAt) {
+		fields = append(fields, msgalert.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *MsgAlertMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *MsgAlertMutation) ClearField(name string) error {
+	switch name {
+	case msgalert.FieldLabels:
+		m.ClearLabels()
+		return nil
+	case msgalert.FieldAnnotations:
+		m.ClearAnnotations()
+		return nil
+	case msgalert.FieldURL:
+		m.ClearURL()
+		return nil
+	case msgalert.FieldUpdatedAt:
+		m.ClearUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown MsgAlert nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *MsgAlertMutation) ResetField(name string) error {
+	switch name {
+	case msgalert.FieldTenantID:
+		m.ResetTenantID()
+		return nil
+	case msgalert.FieldLabels:
+		m.ResetLabels()
+		return nil
+	case msgalert.FieldAnnotations:
+		m.ResetAnnotations()
+		return nil
+	case msgalert.FieldStartsAt:
+		m.ResetStartsAt()
+		return nil
+	case msgalert.FieldEndsAt:
+		m.ResetEndsAt()
+		return nil
+	case msgalert.FieldURL:
+		m.ResetURL()
+		return nil
+	case msgalert.FieldTimeout:
+		m.ResetTimeout()
+		return nil
+	case msgalert.FieldFingerprint:
+		m.ResetFingerprint()
+		return nil
+	case msgalert.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case msgalert.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case msgalert.FieldDeleted:
+		m.ResetDeleted()
+		return nil
+	}
+	return fmt.Errorf("unknown MsgAlert field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *MsgAlertMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.nlog != nil {
+		edges = append(edges, msgalert.EdgeNlog)
+	}
+	if m.nlog_alerts != nil {
+		edges = append(edges, msgalert.EdgeNlogAlerts)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *MsgAlertMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case msgalert.EdgeNlog:
+		ids := make([]ent.Value, 0, len(m.nlog))
+		for id := range m.nlog {
+			ids = append(ids, id)
+		}
+		return ids
+	case msgalert.EdgeNlogAlerts:
+		ids := make([]ent.Value, 0, len(m.nlog_alerts))
+		for id := range m.nlog_alerts {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *MsgAlertMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removednlog != nil {
+		edges = append(edges, msgalert.EdgeNlog)
+	}
+	if m.removednlog_alerts != nil {
+		edges = append(edges, msgalert.EdgeNlogAlerts)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *MsgAlertMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case msgalert.EdgeNlog:
+		ids := make([]ent.Value, 0, len(m.removednlog))
+		for id := range m.removednlog {
+			ids = append(ids, id)
+		}
+		return ids
+	case msgalert.EdgeNlogAlerts:
+		ids := make([]ent.Value, 0, len(m.removednlog_alerts))
+		for id := range m.removednlog_alerts {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *MsgAlertMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearednlog {
+		edges = append(edges, msgalert.EdgeNlog)
+	}
+	if m.clearednlog_alerts {
+		edges = append(edges, msgalert.EdgeNlogAlerts)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *MsgAlertMutation) EdgeCleared(name string) bool {
+	switch name {
+	case msgalert.EdgeNlog:
+		return m.clearednlog
+	case msgalert.EdgeNlogAlerts:
+		return m.clearednlog_alerts
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *MsgAlertMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown MsgAlert unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *MsgAlertMutation) ResetEdge(name string) error {
+	switch name {
+	case msgalert.EdgeNlog:
+		m.ResetNlog()
+		return nil
+	case msgalert.EdgeNlogAlerts:
+		m.ResetNlogAlerts()
+		return nil
+	}
+	return fmt.Errorf("unknown MsgAlert edge %s", name)
+}
 
 // MsgChannelMutation represents an operation that mutates the MsgChannel nodes in the graph.
 type MsgChannelMutation struct {
@@ -6542,6 +7711,1626 @@ func (m *MsgTypeMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown MsgType edge %s", name)
+}
+
+// NlogMutation represents an operation that mutates the Nlog nodes in the graph.
+type NlogMutation struct {
+	config
+	op                Op
+	typ               string
+	id                *int
+	tenant_id         *int
+	addtenant_id      *int
+	group_key         *string
+	receiver          *string
+	receiver_type     *profile.ReceiverType
+	idx               *int
+	addidx            *int
+	send_at           *time.Time
+	created_at        *time.Time
+	updated_at        *time.Time
+	expires_at        *time.Time
+	clearedFields     map[string]struct{}
+	alerts            map[int]struct{}
+	removedalerts     map[int]struct{}
+	clearedalerts     bool
+	nlog_alert        map[int]struct{}
+	removednlog_alert map[int]struct{}
+	clearednlog_alert bool
+	done              bool
+	oldValue          func(context.Context) (*Nlog, error)
+	predicates        []predicate.Nlog
+}
+
+var _ ent.Mutation = (*NlogMutation)(nil)
+
+// nlogOption allows management of the mutation configuration using functional options.
+type nlogOption func(*NlogMutation)
+
+// newNlogMutation creates new mutation for the Nlog entity.
+func newNlogMutation(c config, op Op, opts ...nlogOption) *NlogMutation {
+	m := &NlogMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeNlog,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withNlogID sets the ID field of the mutation.
+func withNlogID(id int) nlogOption {
+	return func(m *NlogMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Nlog
+		)
+		m.oldValue = func(ctx context.Context) (*Nlog, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Nlog.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withNlog sets the old Nlog of the mutation.
+func withNlog(node *Nlog) nlogOption {
+	return func(m *NlogMutation) {
+		m.oldValue = func(context.Context) (*Nlog, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m NlogMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m NlogMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Nlog entities.
+func (m *NlogMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *NlogMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *NlogMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Nlog.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *NlogMutation) SetTenantID(i int) {
+	m.tenant_id = &i
+	m.addtenant_id = nil
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *NlogMutation) TenantID() (r int, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the Nlog entity.
+// If the Nlog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NlogMutation) OldTenantID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// AddTenantID adds i to the "tenant_id" field.
+func (m *NlogMutation) AddTenantID(i int) {
+	if m.addtenant_id != nil {
+		*m.addtenant_id += i
+	} else {
+		m.addtenant_id = &i
+	}
+}
+
+// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
+func (m *NlogMutation) AddedTenantID() (r int, exists bool) {
+	v := m.addtenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *NlogMutation) ResetTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+}
+
+// SetGroupKey sets the "group_key" field.
+func (m *NlogMutation) SetGroupKey(s string) {
+	m.group_key = &s
+}
+
+// GroupKey returns the value of the "group_key" field in the mutation.
+func (m *NlogMutation) GroupKey() (r string, exists bool) {
+	v := m.group_key
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGroupKey returns the old "group_key" field's value of the Nlog entity.
+// If the Nlog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NlogMutation) OldGroupKey(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGroupKey is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGroupKey requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGroupKey: %w", err)
+	}
+	return oldValue.GroupKey, nil
+}
+
+// ResetGroupKey resets all changes to the "group_key" field.
+func (m *NlogMutation) ResetGroupKey() {
+	m.group_key = nil
+}
+
+// SetReceiver sets the "receiver" field.
+func (m *NlogMutation) SetReceiver(s string) {
+	m.receiver = &s
+}
+
+// Receiver returns the value of the "receiver" field in the mutation.
+func (m *NlogMutation) Receiver() (r string, exists bool) {
+	v := m.receiver
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReceiver returns the old "receiver" field's value of the Nlog entity.
+// If the Nlog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NlogMutation) OldReceiver(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReceiver is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReceiver requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReceiver: %w", err)
+	}
+	return oldValue.Receiver, nil
+}
+
+// ResetReceiver resets all changes to the "receiver" field.
+func (m *NlogMutation) ResetReceiver() {
+	m.receiver = nil
+}
+
+// SetReceiverType sets the "receiver_type" field.
+func (m *NlogMutation) SetReceiverType(pt profile.ReceiverType) {
+	m.receiver_type = &pt
+}
+
+// ReceiverType returns the value of the "receiver_type" field in the mutation.
+func (m *NlogMutation) ReceiverType() (r profile.ReceiverType, exists bool) {
+	v := m.receiver_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReceiverType returns the old "receiver_type" field's value of the Nlog entity.
+// If the Nlog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NlogMutation) OldReceiverType(ctx context.Context) (v profile.ReceiverType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReceiverType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReceiverType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReceiverType: %w", err)
+	}
+	return oldValue.ReceiverType, nil
+}
+
+// ResetReceiverType resets all changes to the "receiver_type" field.
+func (m *NlogMutation) ResetReceiverType() {
+	m.receiver_type = nil
+}
+
+// SetIdx sets the "idx" field.
+func (m *NlogMutation) SetIdx(i int) {
+	m.idx = &i
+	m.addidx = nil
+}
+
+// Idx returns the value of the "idx" field in the mutation.
+func (m *NlogMutation) Idx() (r int, exists bool) {
+	v := m.idx
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIdx returns the old "idx" field's value of the Nlog entity.
+// If the Nlog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NlogMutation) OldIdx(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIdx is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIdx requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIdx: %w", err)
+	}
+	return oldValue.Idx, nil
+}
+
+// AddIdx adds i to the "idx" field.
+func (m *NlogMutation) AddIdx(i int) {
+	if m.addidx != nil {
+		*m.addidx += i
+	} else {
+		m.addidx = &i
+	}
+}
+
+// AddedIdx returns the value that was added to the "idx" field in this mutation.
+func (m *NlogMutation) AddedIdx() (r int, exists bool) {
+	v := m.addidx
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetIdx resets all changes to the "idx" field.
+func (m *NlogMutation) ResetIdx() {
+	m.idx = nil
+	m.addidx = nil
+}
+
+// SetSendAt sets the "send_at" field.
+func (m *NlogMutation) SetSendAt(t time.Time) {
+	m.send_at = &t
+}
+
+// SendAt returns the value of the "send_at" field in the mutation.
+func (m *NlogMutation) SendAt() (r time.Time, exists bool) {
+	v := m.send_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSendAt returns the old "send_at" field's value of the Nlog entity.
+// If the Nlog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NlogMutation) OldSendAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSendAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSendAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSendAt: %w", err)
+	}
+	return oldValue.SendAt, nil
+}
+
+// ResetSendAt resets all changes to the "send_at" field.
+func (m *NlogMutation) ResetSendAt() {
+	m.send_at = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *NlogMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *NlogMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Nlog entity.
+// If the Nlog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NlogMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *NlogMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *NlogMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *NlogMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Nlog entity.
+// If the Nlog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NlogMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (m *NlogMutation) ClearUpdatedAt() {
+	m.updated_at = nil
+	m.clearedFields[nlog.FieldUpdatedAt] = struct{}{}
+}
+
+// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
+func (m *NlogMutation) UpdatedAtCleared() bool {
+	_, ok := m.clearedFields[nlog.FieldUpdatedAt]
+	return ok
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *NlogMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	delete(m.clearedFields, nlog.FieldUpdatedAt)
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (m *NlogMutation) SetExpiresAt(t time.Time) {
+	m.expires_at = &t
+}
+
+// ExpiresAt returns the value of the "expires_at" field in the mutation.
+func (m *NlogMutation) ExpiresAt() (r time.Time, exists bool) {
+	v := m.expires_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExpiresAt returns the old "expires_at" field's value of the Nlog entity.
+// If the Nlog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NlogMutation) OldExpiresAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExpiresAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExpiresAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExpiresAt: %w", err)
+	}
+	return oldValue.ExpiresAt, nil
+}
+
+// ResetExpiresAt resets all changes to the "expires_at" field.
+func (m *NlogMutation) ResetExpiresAt() {
+	m.expires_at = nil
+}
+
+// AddAlertIDs adds the "alerts" edge to the MsgAlert entity by ids.
+func (m *NlogMutation) AddAlertIDs(ids ...int) {
+	if m.alerts == nil {
+		m.alerts = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.alerts[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAlerts clears the "alerts" edge to the MsgAlert entity.
+func (m *NlogMutation) ClearAlerts() {
+	m.clearedalerts = true
+}
+
+// AlertsCleared reports if the "alerts" edge to the MsgAlert entity was cleared.
+func (m *NlogMutation) AlertsCleared() bool {
+	return m.clearedalerts
+}
+
+// RemoveAlertIDs removes the "alerts" edge to the MsgAlert entity by IDs.
+func (m *NlogMutation) RemoveAlertIDs(ids ...int) {
+	if m.removedalerts == nil {
+		m.removedalerts = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.alerts, ids[i])
+		m.removedalerts[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAlerts returns the removed IDs of the "alerts" edge to the MsgAlert entity.
+func (m *NlogMutation) RemovedAlertsIDs() (ids []int) {
+	for id := range m.removedalerts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AlertsIDs returns the "alerts" edge IDs in the mutation.
+func (m *NlogMutation) AlertsIDs() (ids []int) {
+	for id := range m.alerts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAlerts resets all changes to the "alerts" edge.
+func (m *NlogMutation) ResetAlerts() {
+	m.alerts = nil
+	m.clearedalerts = false
+	m.removedalerts = nil
+}
+
+// AddNlogAlertIDs adds the "nlog_alert" edge to the NlogAlert entity by ids.
+func (m *NlogMutation) AddNlogAlertIDs(ids ...int) {
+	if m.nlog_alert == nil {
+		m.nlog_alert = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.nlog_alert[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNlogAlert clears the "nlog_alert" edge to the NlogAlert entity.
+func (m *NlogMutation) ClearNlogAlert() {
+	m.clearednlog_alert = true
+}
+
+// NlogAlertCleared reports if the "nlog_alert" edge to the NlogAlert entity was cleared.
+func (m *NlogMutation) NlogAlertCleared() bool {
+	return m.clearednlog_alert
+}
+
+// RemoveNlogAlertIDs removes the "nlog_alert" edge to the NlogAlert entity by IDs.
+func (m *NlogMutation) RemoveNlogAlertIDs(ids ...int) {
+	if m.removednlog_alert == nil {
+		m.removednlog_alert = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.nlog_alert, ids[i])
+		m.removednlog_alert[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNlogAlert returns the removed IDs of the "nlog_alert" edge to the NlogAlert entity.
+func (m *NlogMutation) RemovedNlogAlertIDs() (ids []int) {
+	for id := range m.removednlog_alert {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NlogAlertIDs returns the "nlog_alert" edge IDs in the mutation.
+func (m *NlogMutation) NlogAlertIDs() (ids []int) {
+	for id := range m.nlog_alert {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNlogAlert resets all changes to the "nlog_alert" edge.
+func (m *NlogMutation) ResetNlogAlert() {
+	m.nlog_alert = nil
+	m.clearednlog_alert = false
+	m.removednlog_alert = nil
+}
+
+// Where appends a list predicates to the NlogMutation builder.
+func (m *NlogMutation) Where(ps ...predicate.Nlog) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the NlogMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *NlogMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Nlog, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *NlogMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *NlogMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Nlog).
+func (m *NlogMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *NlogMutation) Fields() []string {
+	fields := make([]string, 0, 9)
+	if m.tenant_id != nil {
+		fields = append(fields, nlog.FieldTenantID)
+	}
+	if m.group_key != nil {
+		fields = append(fields, nlog.FieldGroupKey)
+	}
+	if m.receiver != nil {
+		fields = append(fields, nlog.FieldReceiver)
+	}
+	if m.receiver_type != nil {
+		fields = append(fields, nlog.FieldReceiverType)
+	}
+	if m.idx != nil {
+		fields = append(fields, nlog.FieldIdx)
+	}
+	if m.send_at != nil {
+		fields = append(fields, nlog.FieldSendAt)
+	}
+	if m.created_at != nil {
+		fields = append(fields, nlog.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, nlog.FieldUpdatedAt)
+	}
+	if m.expires_at != nil {
+		fields = append(fields, nlog.FieldExpiresAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *NlogMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case nlog.FieldTenantID:
+		return m.TenantID()
+	case nlog.FieldGroupKey:
+		return m.GroupKey()
+	case nlog.FieldReceiver:
+		return m.Receiver()
+	case nlog.FieldReceiverType:
+		return m.ReceiverType()
+	case nlog.FieldIdx:
+		return m.Idx()
+	case nlog.FieldSendAt:
+		return m.SendAt()
+	case nlog.FieldCreatedAt:
+		return m.CreatedAt()
+	case nlog.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case nlog.FieldExpiresAt:
+		return m.ExpiresAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *NlogMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case nlog.FieldTenantID:
+		return m.OldTenantID(ctx)
+	case nlog.FieldGroupKey:
+		return m.OldGroupKey(ctx)
+	case nlog.FieldReceiver:
+		return m.OldReceiver(ctx)
+	case nlog.FieldReceiverType:
+		return m.OldReceiverType(ctx)
+	case nlog.FieldIdx:
+		return m.OldIdx(ctx)
+	case nlog.FieldSendAt:
+		return m.OldSendAt(ctx)
+	case nlog.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case nlog.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case nlog.FieldExpiresAt:
+		return m.OldExpiresAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown Nlog field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *NlogMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case nlog.FieldTenantID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
+	case nlog.FieldGroupKey:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGroupKey(v)
+		return nil
+	case nlog.FieldReceiver:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReceiver(v)
+		return nil
+	case nlog.FieldReceiverType:
+		v, ok := value.(profile.ReceiverType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReceiverType(v)
+		return nil
+	case nlog.FieldIdx:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIdx(v)
+		return nil
+	case nlog.FieldSendAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSendAt(v)
+		return nil
+	case nlog.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case nlog.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case nlog.FieldExpiresAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExpiresAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Nlog field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *NlogMutation) AddedFields() []string {
+	var fields []string
+	if m.addtenant_id != nil {
+		fields = append(fields, nlog.FieldTenantID)
+	}
+	if m.addidx != nil {
+		fields = append(fields, nlog.FieldIdx)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *NlogMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case nlog.FieldTenantID:
+		return m.AddedTenantID()
+	case nlog.FieldIdx:
+		return m.AddedIdx()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *NlogMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case nlog.FieldTenantID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTenantID(v)
+		return nil
+	case nlog.FieldIdx:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddIdx(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Nlog numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *NlogMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(nlog.FieldUpdatedAt) {
+		fields = append(fields, nlog.FieldUpdatedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *NlogMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *NlogMutation) ClearField(name string) error {
+	switch name {
+	case nlog.FieldUpdatedAt:
+		m.ClearUpdatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Nlog nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *NlogMutation) ResetField(name string) error {
+	switch name {
+	case nlog.FieldTenantID:
+		m.ResetTenantID()
+		return nil
+	case nlog.FieldGroupKey:
+		m.ResetGroupKey()
+		return nil
+	case nlog.FieldReceiver:
+		m.ResetReceiver()
+		return nil
+	case nlog.FieldReceiverType:
+		m.ResetReceiverType()
+		return nil
+	case nlog.FieldIdx:
+		m.ResetIdx()
+		return nil
+	case nlog.FieldSendAt:
+		m.ResetSendAt()
+		return nil
+	case nlog.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case nlog.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case nlog.FieldExpiresAt:
+		m.ResetExpiresAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Nlog field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *NlogMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.alerts != nil {
+		edges = append(edges, nlog.EdgeAlerts)
+	}
+	if m.nlog_alert != nil {
+		edges = append(edges, nlog.EdgeNlogAlert)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *NlogMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case nlog.EdgeAlerts:
+		ids := make([]ent.Value, 0, len(m.alerts))
+		for id := range m.alerts {
+			ids = append(ids, id)
+		}
+		return ids
+	case nlog.EdgeNlogAlert:
+		ids := make([]ent.Value, 0, len(m.nlog_alert))
+		for id := range m.nlog_alert {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *NlogMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removedalerts != nil {
+		edges = append(edges, nlog.EdgeAlerts)
+	}
+	if m.removednlog_alert != nil {
+		edges = append(edges, nlog.EdgeNlogAlert)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *NlogMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case nlog.EdgeAlerts:
+		ids := make([]ent.Value, 0, len(m.removedalerts))
+		for id := range m.removedalerts {
+			ids = append(ids, id)
+		}
+		return ids
+	case nlog.EdgeNlogAlert:
+		ids := make([]ent.Value, 0, len(m.removednlog_alert))
+		for id := range m.removednlog_alert {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *NlogMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedalerts {
+		edges = append(edges, nlog.EdgeAlerts)
+	}
+	if m.clearednlog_alert {
+		edges = append(edges, nlog.EdgeNlogAlert)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *NlogMutation) EdgeCleared(name string) bool {
+	switch name {
+	case nlog.EdgeAlerts:
+		return m.clearedalerts
+	case nlog.EdgeNlogAlert:
+		return m.clearednlog_alert
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *NlogMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Nlog unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *NlogMutation) ResetEdge(name string) error {
+	switch name {
+	case nlog.EdgeAlerts:
+		m.ResetAlerts()
+		return nil
+	case nlog.EdgeNlogAlert:
+		m.ResetNlogAlert()
+		return nil
+	}
+	return fmt.Errorf("unknown Nlog edge %s", name)
+}
+
+// NlogAlertMutation represents an operation that mutates the NlogAlert nodes in the graph.
+type NlogAlertMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	state         *nlogalert.State
+	created_at    *time.Time
+	clearedFields map[string]struct{}
+	nlog          *int
+	clearednlog   bool
+	alert         *int
+	clearedalert  bool
+	done          bool
+	oldValue      func(context.Context) (*NlogAlert, error)
+	predicates    []predicate.NlogAlert
+}
+
+var _ ent.Mutation = (*NlogAlertMutation)(nil)
+
+// nlogalertOption allows management of the mutation configuration using functional options.
+type nlogalertOption func(*NlogAlertMutation)
+
+// newNlogAlertMutation creates new mutation for the NlogAlert entity.
+func newNlogAlertMutation(c config, op Op, opts ...nlogalertOption) *NlogAlertMutation {
+	m := &NlogAlertMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeNlogAlert,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withNlogAlertID sets the ID field of the mutation.
+func withNlogAlertID(id int) nlogalertOption {
+	return func(m *NlogAlertMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *NlogAlert
+		)
+		m.oldValue = func(ctx context.Context) (*NlogAlert, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().NlogAlert.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withNlogAlert sets the old NlogAlert of the mutation.
+func withNlogAlert(node *NlogAlert) nlogalertOption {
+	return func(m *NlogAlertMutation) {
+		m.oldValue = func(context.Context) (*NlogAlert, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m NlogAlertMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m NlogAlertMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *NlogAlertMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *NlogAlertMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().NlogAlert.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetNlogID sets the "nlog_id" field.
+func (m *NlogAlertMutation) SetNlogID(i int) {
+	m.nlog = &i
+}
+
+// NlogID returns the value of the "nlog_id" field in the mutation.
+func (m *NlogAlertMutation) NlogID() (r int, exists bool) {
+	v := m.nlog
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNlogID returns the old "nlog_id" field's value of the NlogAlert entity.
+// If the NlogAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NlogAlertMutation) OldNlogID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNlogID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNlogID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNlogID: %w", err)
+	}
+	return oldValue.NlogID, nil
+}
+
+// ResetNlogID resets all changes to the "nlog_id" field.
+func (m *NlogAlertMutation) ResetNlogID() {
+	m.nlog = nil
+}
+
+// SetAlertID sets the "alert_id" field.
+func (m *NlogAlertMutation) SetAlertID(i int) {
+	m.alert = &i
+}
+
+// AlertID returns the value of the "alert_id" field in the mutation.
+func (m *NlogAlertMutation) AlertID() (r int, exists bool) {
+	v := m.alert
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAlertID returns the old "alert_id" field's value of the NlogAlert entity.
+// If the NlogAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NlogAlertMutation) OldAlertID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAlertID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAlertID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAlertID: %w", err)
+	}
+	return oldValue.AlertID, nil
+}
+
+// ResetAlertID resets all changes to the "alert_id" field.
+func (m *NlogAlertMutation) ResetAlertID() {
+	m.alert = nil
+}
+
+// SetState sets the "state" field.
+func (m *NlogAlertMutation) SetState(n nlogalert.State) {
+	m.state = &n
+}
+
+// State returns the value of the "state" field in the mutation.
+func (m *NlogAlertMutation) State() (r nlogalert.State, exists bool) {
+	v := m.state
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldState returns the old "state" field's value of the NlogAlert entity.
+// If the NlogAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NlogAlertMutation) OldState(ctx context.Context) (v nlogalert.State, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldState is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldState requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldState: %w", err)
+	}
+	return oldValue.State, nil
+}
+
+// ResetState resets all changes to the "state" field.
+func (m *NlogAlertMutation) ResetState() {
+	m.state = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *NlogAlertMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *NlogAlertMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the NlogAlert entity.
+// If the NlogAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NlogAlertMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *NlogAlertMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// ClearNlog clears the "nlog" edge to the Nlog entity.
+func (m *NlogAlertMutation) ClearNlog() {
+	m.clearednlog = true
+}
+
+// NlogCleared reports if the "nlog" edge to the Nlog entity was cleared.
+func (m *NlogAlertMutation) NlogCleared() bool {
+	return m.clearednlog
+}
+
+// NlogIDs returns the "nlog" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// NlogID instead. It exists only for internal usage by the builders.
+func (m *NlogAlertMutation) NlogIDs() (ids []int) {
+	if id := m.nlog; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetNlog resets all changes to the "nlog" edge.
+func (m *NlogAlertMutation) ResetNlog() {
+	m.nlog = nil
+	m.clearednlog = false
+}
+
+// ClearAlert clears the "alert" edge to the MsgAlert entity.
+func (m *NlogAlertMutation) ClearAlert() {
+	m.clearedalert = true
+}
+
+// AlertCleared reports if the "alert" edge to the MsgAlert entity was cleared.
+func (m *NlogAlertMutation) AlertCleared() bool {
+	return m.clearedalert
+}
+
+// AlertIDs returns the "alert" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AlertID instead. It exists only for internal usage by the builders.
+func (m *NlogAlertMutation) AlertIDs() (ids []int) {
+	if id := m.alert; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAlert resets all changes to the "alert" edge.
+func (m *NlogAlertMutation) ResetAlert() {
+	m.alert = nil
+	m.clearedalert = false
+}
+
+// Where appends a list predicates to the NlogAlertMutation builder.
+func (m *NlogAlertMutation) Where(ps ...predicate.NlogAlert) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the NlogAlertMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *NlogAlertMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.NlogAlert, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *NlogAlertMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *NlogAlertMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (NlogAlert).
+func (m *NlogAlertMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *NlogAlertMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.nlog != nil {
+		fields = append(fields, nlogalert.FieldNlogID)
+	}
+	if m.alert != nil {
+		fields = append(fields, nlogalert.FieldAlertID)
+	}
+	if m.state != nil {
+		fields = append(fields, nlogalert.FieldState)
+	}
+	if m.created_at != nil {
+		fields = append(fields, nlogalert.FieldCreatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *NlogAlertMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case nlogalert.FieldNlogID:
+		return m.NlogID()
+	case nlogalert.FieldAlertID:
+		return m.AlertID()
+	case nlogalert.FieldState:
+		return m.State()
+	case nlogalert.FieldCreatedAt:
+		return m.CreatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *NlogAlertMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case nlogalert.FieldNlogID:
+		return m.OldNlogID(ctx)
+	case nlogalert.FieldAlertID:
+		return m.OldAlertID(ctx)
+	case nlogalert.FieldState:
+		return m.OldState(ctx)
+	case nlogalert.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown NlogAlert field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *NlogAlertMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case nlogalert.FieldNlogID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNlogID(v)
+		return nil
+	case nlogalert.FieldAlertID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAlertID(v)
+		return nil
+	case nlogalert.FieldState:
+		v, ok := value.(nlogalert.State)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetState(v)
+		return nil
+	case nlogalert.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown NlogAlert field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *NlogAlertMutation) AddedFields() []string {
+	var fields []string
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *NlogAlertMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *NlogAlertMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown NlogAlert numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *NlogAlertMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *NlogAlertMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *NlogAlertMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown NlogAlert nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *NlogAlertMutation) ResetField(name string) error {
+	switch name {
+	case nlogalert.FieldNlogID:
+		m.ResetNlogID()
+		return nil
+	case nlogalert.FieldAlertID:
+		m.ResetAlertID()
+		return nil
+	case nlogalert.FieldState:
+		m.ResetState()
+		return nil
+	case nlogalert.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown NlogAlert field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *NlogAlertMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.nlog != nil {
+		edges = append(edges, nlogalert.EdgeNlog)
+	}
+	if m.alert != nil {
+		edges = append(edges, nlogalert.EdgeAlert)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *NlogAlertMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case nlogalert.EdgeNlog:
+		if id := m.nlog; id != nil {
+			return []ent.Value{*id}
+		}
+	case nlogalert.EdgeAlert:
+		if id := m.alert; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *NlogAlertMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *NlogAlertMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *NlogAlertMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearednlog {
+		edges = append(edges, nlogalert.EdgeNlog)
+	}
+	if m.clearedalert {
+		edges = append(edges, nlogalert.EdgeAlert)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *NlogAlertMutation) EdgeCleared(name string) bool {
+	switch name {
+	case nlogalert.EdgeNlog:
+		return m.clearednlog
+	case nlogalert.EdgeAlert:
+		return m.clearedalert
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *NlogAlertMutation) ClearEdge(name string) error {
+	switch name {
+	case nlogalert.EdgeNlog:
+		m.ClearNlog()
+		return nil
+	case nlogalert.EdgeAlert:
+		m.ClearAlert()
+		return nil
+	}
+	return fmt.Errorf("unknown NlogAlert unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *NlogAlertMutation) ResetEdge(name string) error {
+	switch name {
+	case nlogalert.EdgeNlog:
+		m.ResetNlog()
+		return nil
+	case nlogalert.EdgeAlert:
+		m.ResetAlert()
+		return nil
+	}
+	return fmt.Errorf("unknown NlogAlert edge %s", name)
 }
 
 // OrgRoleUserMutation represents an operation that mutates the OrgRoleUser nodes in the graph.

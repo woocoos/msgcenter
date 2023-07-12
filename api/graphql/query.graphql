@@ -1,6 +1,10 @@
+""" time duration: RFCXXX duration string, e.g. 1h30m """
 scalar Duration
+""" utf8 string """
 scalar LabelName
+""" map[string]string JSON Raw """
 scalar MapString
+""" host:port """
 scalar HostPort
 
 enum MatchType {

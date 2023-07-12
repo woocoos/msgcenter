@@ -9,14 +9,180 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/woocoos/entco/pkg/pagination"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/nlog"
+	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 )
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (ma *MsgAlertQuery) CollectFields(ctx context.Context, satisfies ...string) (*MsgAlertQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return ma, nil
+	}
+	if err := ma.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return ma, nil
+}
+
+func (ma *MsgAlertQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(msgalert.Columns))
+		selectedFields = []string{msgalert.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "nlog":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&NlogClient{config: ma.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, nlogImplementors)...); err != nil {
+				return err
+			}
+			ma.WithNamedNlog(alias, func(wq *NlogQuery) {
+				*wq = *query
+			})
+		case "nlogAlerts":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&NlogAlertClient{config: ma.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, nlogalertImplementors)...); err != nil {
+				return err
+			}
+			ma.WithNamedNlogAlerts(alias, func(wq *NlogAlertQuery) {
+				*wq = *query
+			})
+		case "tenantID":
+			if _, ok := fieldSeen[msgalert.FieldTenantID]; !ok {
+				selectedFields = append(selectedFields, msgalert.FieldTenantID)
+				fieldSeen[msgalert.FieldTenantID] = struct{}{}
+			}
+		case "labels":
+			if _, ok := fieldSeen[msgalert.FieldLabels]; !ok {
+				selectedFields = append(selectedFields, msgalert.FieldLabels)
+				fieldSeen[msgalert.FieldLabels] = struct{}{}
+			}
+		case "annotations":
+			if _, ok := fieldSeen[msgalert.FieldAnnotations]; !ok {
+				selectedFields = append(selectedFields, msgalert.FieldAnnotations)
+				fieldSeen[msgalert.FieldAnnotations] = struct{}{}
+			}
+		case "startsAt":
+			if _, ok := fieldSeen[msgalert.FieldStartsAt]; !ok {
+				selectedFields = append(selectedFields, msgalert.FieldStartsAt)
+				fieldSeen[msgalert.FieldStartsAt] = struct{}{}
+			}
+		case "endsAt":
+			if _, ok := fieldSeen[msgalert.FieldEndsAt]; !ok {
+				selectedFields = append(selectedFields, msgalert.FieldEndsAt)
+				fieldSeen[msgalert.FieldEndsAt] = struct{}{}
+			}
+		case "url":
+			if _, ok := fieldSeen[msgalert.FieldURL]; !ok {
+				selectedFields = append(selectedFields, msgalert.FieldURL)
+				fieldSeen[msgalert.FieldURL] = struct{}{}
+			}
+		case "timeout":
+			if _, ok := fieldSeen[msgalert.FieldTimeout]; !ok {
+				selectedFields = append(selectedFields, msgalert.FieldTimeout)
+				fieldSeen[msgalert.FieldTimeout] = struct{}{}
+			}
+		case "fingerprint":
+			if _, ok := fieldSeen[msgalert.FieldFingerprint]; !ok {
+				selectedFields = append(selectedFields, msgalert.FieldFingerprint)
+				fieldSeen[msgalert.FieldFingerprint] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[msgalert.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, msgalert.FieldCreatedAt)
+				fieldSeen[msgalert.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[msgalert.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, msgalert.FieldUpdatedAt)
+				fieldSeen[msgalert.FieldUpdatedAt] = struct{}{}
+			}
+		case "deleted":
+			if _, ok := fieldSeen[msgalert.FieldDeleted]; !ok {
+				selectedFields = append(selectedFields, msgalert.FieldDeleted)
+				fieldSeen[msgalert.FieldDeleted] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		ma.Select(selectedFields...)
+	}
+	return nil
+}
+
+type msgalertPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []MsgAlertPaginateOption
+}
+
+func newMsgAlertPaginateArgs(rv map[string]any) *msgalertPaginateArgs {
+	args := &msgalertPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &MsgAlertOrder{Field: &MsgAlertOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithMsgAlertOrder(order))
+			}
+		case *MsgAlertOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithMsgAlertOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*MsgAlertWhereInput); ok {
+		args.opts = append(args.opts, WithMsgAlertFilter(v.Filter))
+	}
+	return args
+}
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (mc *MsgChannelQuery) CollectFields(ctx context.Context, satisfies ...string) (*MsgChannelQuery, error) {
@@ -179,7 +345,7 @@ func (me *MsgEventQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				path  = append(path, alias)
 				query = (&MsgTypeClient{config: me.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, "MsgType")...); err != nil {
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgtypeImplementors)...); err != nil {
 				return err
 			}
 			me.withMsgType = query
@@ -193,7 +359,7 @@ func (me *MsgEventQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				path  = append(path, alias)
 				query = (&MsgTemplateClient{config: me.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, "MsgTemplate")...); err != nil {
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgtemplateImplementors)...); err != nil {
 				return err
 			}
 			me.WithNamedCustomerTemplate(alias, func(wq *MsgTemplateQuery) {
@@ -339,7 +505,7 @@ func (ms *MsgSubscriberQuery) collectField(ctx context.Context, opCtx *graphql.O
 				path  = append(path, alias)
 				query = (&MsgTypeClient{config: ms.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, "MsgType")...); err != nil {
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgtypeImplementors)...); err != nil {
 				return err
 			}
 			ms.withMsgType = query
@@ -353,7 +519,7 @@ func (ms *MsgSubscriberQuery) collectField(ctx context.Context, opCtx *graphql.O
 				path  = append(path, alias)
 				query = (&UserClient{config: ms.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, "User")...); err != nil {
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
 				return err
 			}
 			ms.withUser = query
@@ -496,7 +662,7 @@ func (mt *MsgTemplateQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 				path  = append(path, alias)
 				query = (&MsgEventClient{config: mt.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, "MsgEvent")...); err != nil {
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgeventImplementors)...); err != nil {
 				return err
 			}
 			mt.withEvent = query
@@ -704,7 +870,7 @@ func (mt *MsgTypeQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 				path  = append(path, alias)
 				query = (&MsgEventClient{config: mt.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, "MsgEvent")...); err != nil {
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgeventImplementors)...); err != nil {
 				return err
 			}
 			mt.WithNamedEvents(alias, func(wq *MsgEventQuery) {
@@ -716,7 +882,7 @@ func (mt *MsgTypeQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 				path  = append(path, alias)
 				query = (&MsgSubscriberClient{config: mt.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, "MsgSubscriber")...); err != nil {
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgsubscriberImplementors)...); err != nil {
 				return err
 			}
 			mt.WithNamedSubscribers(alias, func(wq *MsgSubscriberQuery) {
@@ -841,6 +1007,291 @@ func newMsgTypePaginateArgs(rv map[string]any) *msgtypePaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (n *NlogQuery) CollectFields(ctx context.Context, satisfies ...string) (*NlogQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return n, nil
+	}
+	if err := n.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return n, nil
+}
+
+func (n *NlogQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(nlog.Columns))
+		selectedFields = []string{nlog.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "alerts":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&MsgAlertClient{config: n.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgalertImplementors)...); err != nil {
+				return err
+			}
+			n.WithNamedAlerts(alias, func(wq *MsgAlertQuery) {
+				*wq = *query
+			})
+		case "nlogAlert":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&NlogAlertClient{config: n.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, nlogalertImplementors)...); err != nil {
+				return err
+			}
+			n.WithNamedNlogAlert(alias, func(wq *NlogAlertQuery) {
+				*wq = *query
+			})
+		case "tenantID":
+			if _, ok := fieldSeen[nlog.FieldTenantID]; !ok {
+				selectedFields = append(selectedFields, nlog.FieldTenantID)
+				fieldSeen[nlog.FieldTenantID] = struct{}{}
+			}
+		case "groupKey":
+			if _, ok := fieldSeen[nlog.FieldGroupKey]; !ok {
+				selectedFields = append(selectedFields, nlog.FieldGroupKey)
+				fieldSeen[nlog.FieldGroupKey] = struct{}{}
+			}
+		case "receiver":
+			if _, ok := fieldSeen[nlog.FieldReceiver]; !ok {
+				selectedFields = append(selectedFields, nlog.FieldReceiver)
+				fieldSeen[nlog.FieldReceiver] = struct{}{}
+			}
+		case "receiverType":
+			if _, ok := fieldSeen[nlog.FieldReceiverType]; !ok {
+				selectedFields = append(selectedFields, nlog.FieldReceiverType)
+				fieldSeen[nlog.FieldReceiverType] = struct{}{}
+			}
+		case "idx":
+			if _, ok := fieldSeen[nlog.FieldIdx]; !ok {
+				selectedFields = append(selectedFields, nlog.FieldIdx)
+				fieldSeen[nlog.FieldIdx] = struct{}{}
+			}
+		case "sendAt":
+			if _, ok := fieldSeen[nlog.FieldSendAt]; !ok {
+				selectedFields = append(selectedFields, nlog.FieldSendAt)
+				fieldSeen[nlog.FieldSendAt] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[nlog.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, nlog.FieldCreatedAt)
+				fieldSeen[nlog.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[nlog.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, nlog.FieldUpdatedAt)
+				fieldSeen[nlog.FieldUpdatedAt] = struct{}{}
+			}
+		case "expiresAt":
+			if _, ok := fieldSeen[nlog.FieldExpiresAt]; !ok {
+				selectedFields = append(selectedFields, nlog.FieldExpiresAt)
+				fieldSeen[nlog.FieldExpiresAt] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		n.Select(selectedFields...)
+	}
+	return nil
+}
+
+type nlogPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []NlogPaginateOption
+}
+
+func newNlogPaginateArgs(rv map[string]any) *nlogPaginateArgs {
+	args := &nlogPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &NlogOrder{Field: &NlogOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithNlogOrder(order))
+			}
+		case *NlogOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithNlogOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*NlogWhereInput); ok {
+		args.opts = append(args.opts, WithNlogFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (na *NlogAlertQuery) CollectFields(ctx context.Context, satisfies ...string) (*NlogAlertQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return na, nil
+	}
+	if err := na.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return na, nil
+}
+
+func (na *NlogAlertQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(nlogalert.Columns))
+		selectedFields = []string{nlogalert.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "nlog":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&NlogClient{config: na.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, nlogImplementors)...); err != nil {
+				return err
+			}
+			na.withNlog = query
+			if _, ok := fieldSeen[nlogalert.FieldNlogID]; !ok {
+				selectedFields = append(selectedFields, nlogalert.FieldNlogID)
+				fieldSeen[nlogalert.FieldNlogID] = struct{}{}
+			}
+		case "alert":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&MsgAlertClient{config: na.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgalertImplementors)...); err != nil {
+				return err
+			}
+			na.withAlert = query
+			if _, ok := fieldSeen[nlogalert.FieldAlertID]; !ok {
+				selectedFields = append(selectedFields, nlogalert.FieldAlertID)
+				fieldSeen[nlogalert.FieldAlertID] = struct{}{}
+			}
+		case "nlogID":
+			if _, ok := fieldSeen[nlogalert.FieldNlogID]; !ok {
+				selectedFields = append(selectedFields, nlogalert.FieldNlogID)
+				fieldSeen[nlogalert.FieldNlogID] = struct{}{}
+			}
+		case "alertID":
+			if _, ok := fieldSeen[nlogalert.FieldAlertID]; !ok {
+				selectedFields = append(selectedFields, nlogalert.FieldAlertID)
+				fieldSeen[nlogalert.FieldAlertID] = struct{}{}
+			}
+		case "state":
+			if _, ok := fieldSeen[nlogalert.FieldState]; !ok {
+				selectedFields = append(selectedFields, nlogalert.FieldState)
+				fieldSeen[nlogalert.FieldState] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[nlogalert.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, nlogalert.FieldCreatedAt)
+				fieldSeen[nlogalert.FieldCreatedAt] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		na.Select(selectedFields...)
+	}
+	return nil
+}
+
+type nlogalertPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []NlogAlertPaginateOption
+}
+
+func newNlogAlertPaginateArgs(rv map[string]any) *nlogalertPaginateArgs {
+	args := &nlogalertPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &NlogAlertOrder{Field: &NlogAlertOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithNlogAlertOrder(order))
+			}
+		case *NlogAlertOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithNlogAlertOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*NlogAlertWhereInput); ok {
+		args.opts = append(args.opts, WithNlogAlertFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (s *SilenceQuery) CollectFields(ctx context.Context, satisfies ...string) (*SilenceQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
@@ -867,7 +1318,7 @@ func (s *SilenceQuery) collectField(ctx context.Context, opCtx *graphql.Operatio
 				path  = append(path, alias)
 				query = (&UserClient{config: s.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, "User")...); err != nil {
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
 				return err
 			}
 			s.withUser = query
@@ -1015,7 +1466,7 @@ func (u *UserQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 				path  = append(path, alias)
 				query = (&SilenceClient{config: u.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, "Silence")...); err != nil {
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, silenceImplementors)...); err != nil {
 				return err
 			}
 			u.WithNamedSilences(alias, func(wq *SilenceQuery) {
@@ -1172,14 +1623,15 @@ func limitRows(ctx context.Context, partitionBy string, limit int, first, last *
 
 // mayAddCondition appends another type condition to the satisfies list
 // if condition is enabled (Node/Nodes) and it does not exist in the list.
-func mayAddCondition(satisfies []string, typeCond string) []string {
-	if len(satisfies) == 0 {
-		return satisfies
-	}
-	for _, s := range satisfies {
-		if typeCond == s {
-			return satisfies
+func mayAddCondition(satisfies []string, typeCond []string) []string {
+Cond:
+	for _, c := range typeCond {
+		for _, s := range satisfies {
+			if c == s {
+				continue Cond
+			}
 		}
+		satisfies = append(satisfies, c)
 	}
-	return append(satisfies, typeCond)
+	return satisfies
 }

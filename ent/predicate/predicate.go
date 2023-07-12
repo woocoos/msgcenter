@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// MsgAlert is the predicate function for msgalert builders.
+type MsgAlert func(*sql.Selector)
+
 // MsgChannel is the predicate function for msgchannel builders.
 type MsgChannel func(*sql.Selector)
 
@@ -20,6 +23,12 @@ type MsgTemplate func(*sql.Selector)
 
 // MsgType is the predicate function for msgtype builders.
 type MsgType func(*sql.Selector)
+
+// Nlog is the predicate function for nlog builders.
+type Nlog func(*sql.Selector)
+
+// NlogAlert is the predicate function for nlogalert builders.
+type NlogAlert func(*sql.Selector)
 
 // OrgRoleUser is the predicate function for orgroleuser builders.
 type OrgRoleUser func(*sql.Selector)

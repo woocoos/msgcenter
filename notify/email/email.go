@@ -20,6 +20,10 @@ type Email struct {
 	customTplFunc notify.CustomerConfigFunc[profile.EmailConfig]
 }
 
+func (n *Email) SendResolved() bool {
+	return n.config.SendResolved
+}
+
 func NewEmail(c *profile.EmailConfig, tmpl *template.Template, fn notify.CustomerConfigFunc[profile.EmailConfig]) *Email {
 	return &Email{
 		config:        c,

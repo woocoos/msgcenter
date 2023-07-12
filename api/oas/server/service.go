@@ -49,8 +49,7 @@ type Service struct {
 	route          *dispatch.Route
 	setAlertStatus setAlertStatusFn
 
-	logger log.ComponentLogger
-	m      *metrics.Alerts
+	m *metrics.Alerts
 }
 
 func RegisterHandlers(router *gin.RouterGroup, srv *Service) {
@@ -321,7 +320,7 @@ func (s *Service) DeleteSilence(c *gin.Context, req *oas.DeleteSilenceRequest) e
 }
 
 func (s *Service) GetSilence(c *gin.Context, req *oas.GetSilenceRequest) (*oas.GettableSilence, error) {
-	sils, _, err := s.Silences.Query(silence.QIDs(req.UriParams.SilenceID))
+	sils, _, err := s.Silences.Query(silence.QIDs([]int{req.UriParams.SilenceID}))
 	if err != nil {
 		return nil, err
 	}
@@ -329,6 +328,7 @@ func (s *Service) GetSilence(c *gin.Context, req *oas.GetSilenceRequest) (*oas.G
 		c.Status(http.StatusNotFound)
 		return nil, nil
 	}
+
 	sil, err := GettableSilenceFromProto(sils[0])
 	if err != nil {
 		return nil, err
@@ -370,7 +370,14 @@ func (s *Service) PostSilences(c *gin.Context, req *oas.PostSilencesRequest) (re
 		return nil, err
 	}
 
-	sid, err := s.Silences.Set(sil)
+	sid, err := s.Silences.Set(&silence.Entry{
+		ID:        sil.ID,
+		UpdatedAt: sil.UpdatedAt,
+		Matchers:  sil.Matchers,
+		StartsAt:  sil.StartsAt,
+		EndsAt:    sil.EndsAt,
+		State:     sil.State,
+	})
 	if err != nil {
 		if errors.Is(err, silence.ErrNotFound) {
 			return nil, err
@@ -470,17 +477,17 @@ func PostableSilenceToEnt(s *oas.PostableSilence) (*ent.Silence, error) {
 }
 
 // GettableSilenceFromProto converts *silencepb.Silence to open_api_models.GettableSilence.
-func GettableSilenceFromProto(s *ent.Silence) (*oas.GettableSilence, error) {
+func GettableSilenceFromProto(s *silence.Entry) (*oas.GettableSilence, error) {
 	start := s.StartsAt
 	end := s.EndsAt
 	updated := s.UpdatedAt
 	state := string(alert.CalcSilenceState(start, end))
 	sil := &oas.GettableSilence{
 		Silence: &oas.Silence{
-			StartsAt:  start,
-			EndsAt:    end,
-			Comment:   s.Comments,
-			CreatedBy: s.CreatedBy,
+			StartsAt: start,
+			EndsAt:   end,
+			//Comment:   s.Comments,
+			//CreatedBy: s.CreatedBy,
 		},
 		ID:        s.ID,
 		UpdatedAt: updated,
@@ -525,7 +532,7 @@ func GettableSilenceFromProto(s *ent.Silence) (*oas.GettableSilence, error) {
 // A silence matches a filter (list of matchers) if
 // for all matchers in the filter, there exists a matcher in the silence
 // such that their names, types, and values are equivalent.
-func CheckSilenceMatchesFilterLabels(s *ent.Silence, matchers []*label.Matcher) bool {
+func CheckSilenceMatchesFilterLabels(s *silence.Entry, matchers []*label.Matcher) bool {
 	for _, matcher := range matchers {
 		found := false
 		for _, m := range s.Matchers {

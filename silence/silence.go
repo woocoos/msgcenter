@@ -8,9 +8,7 @@ import (
 	"github.com/tsingsun/members"
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/log"
-	"github.com/vmihailenco/msgpack/v4"
 	"github.com/woocoos/entco/pkg/snowflake"
-	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/metrics"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
@@ -35,12 +33,12 @@ var (
 	ErrInvalidState = fmt.Errorf("invalid state")
 )
 
-type matcherCache map[*ent.Silence]label.Matchers
+type matcherCache map[*Entry]label.Matchers
 
 // Get retrieves the matchers for a given silence. If it is a missed cache
 // access, it compiles and adds the matchers of the requested silence to the
 // cache.
-func (c matcherCache) Get(s *ent.Silence) (label.Matchers, error) {
+func (c matcherCache) Get(s *Entry) (label.Matchers, error) {
 	if m, ok := c[s]; ok {
 		return m, nil
 	}
@@ -49,7 +47,7 @@ func (c matcherCache) Get(s *ent.Silence) (label.Matchers, error) {
 
 // add compiles a silences' matchers and adds them to the cache.
 // It returns the compiled matchers.
-func (c matcherCache) add(s *ent.Silence) (label.Matchers, error) {
+func (c matcherCache) add(s *Entry) (label.Matchers, error) {
 	ms := make(label.Matchers, len(s.Matchers))
 
 	for i, m := range s.Matchers {
@@ -87,8 +85,9 @@ func (s *Silencer) Mutes(lset label.LabelSet) bool {
 
 	var (
 		err        error
-		allSils    []*ent.Silence
+		allSils    []*Entry
 		newVersion = markerVersion
+		now        = time.Now()
 	)
 	if markerVersion == s.silences.Version() {
 		totalSilences := len(activeIDs) + len(pendingIDs)
@@ -108,14 +107,14 @@ func (s *Silencer) Mutes(lset label.LabelSet) bool {
 		// applicable silences is based on.
 		allIDs := append(append(make([]int, 0, totalSilences), activeIDs...), pendingIDs...)
 		allSils, _, err = s.silences.Query(
-			QIDs(allIDs...),
-			QState(alert.SilenceStateActive, alert.SilenceStatePending),
+			QIDs(allIDs),
+			QState(now, alert.SilenceStateActive, alert.SilenceStatePending),
 		)
 	} else {
 		// New silences have been added, do a full query.
 		allSils, newVersion, err = s.silences.Query(
-			QState(alert.SilenceStateActive, alert.SilenceStatePending),
-			QMatches(lset),
+			QState(now, alert.SilenceStateActive, alert.SilenceStatePending),
+			QMatchers(lset, s.silences.mc),
 		)
 	}
 	if err != nil {
@@ -131,7 +130,6 @@ func (s *Silencer) Mutes(lset label.LabelSet) bool {
 	// result. So let's do it in any case. Note that we cannot reuse the
 	// current ID slices for concurrency reasons.
 	activeIDs, pendingIDs = nil, nil
-	now := s.silences.nowUTC()
 	for _, sil := range allSils {
 		switch getState(sil, now) {
 		case alert.SilenceStatePending:
@@ -175,7 +173,7 @@ type Option func(*Options)
 // WithDataLoader sets the data loader function for the silences.
 // if not set, the silences will use the memory to store silences.
 // in distributed mode, this should be set to use the sync data.
-func WithDataLoader(fn func(ids ...int) ([]*ent.Silence, error)) Option {
+func WithDataLoader(fn func(ids ...int) ([]*Entry, error)) Option {
 	return func(o *Options) {
 		o.DataLoader = fn
 	}
@@ -191,7 +189,7 @@ type Options struct {
 	MaintenanceInterval time.Duration
 	MaintenanceFunc     MaintenanceFunc
 
-	DataLoader func(ids ...int) ([]*ent.Silence, error)
+	DataLoader func(ids ...int) ([]*Entry, error)
 	Spreader   members.Spreader
 }
 
@@ -269,10 +267,6 @@ func (s *Silences) Merge(b []byte) error {
 	return s.st.Merge(b)
 }
 
-func (s *Silences) nowUTC() time.Time {
-	return time.Now().UTC()
-}
-
 func (s *Silences) Start(ctx context.Context) error {
 	t := time.NewTicker(s.MaintenanceInterval)
 	defer t.Stop()
@@ -280,7 +274,7 @@ func (s *Silences) Start(ctx context.Context) error {
 	runMaintenance := func(do MaintenanceFunc) error {
 		metrics.Silences.MaintenanceTotal.Inc()
 		logger.Debug("Running maintenance")
-		start := s.nowUTC()
+		start := time.Now()
 		err := do()
 		if err != nil {
 			metrics.Silences.MaintenanceErrorsTotal.Inc()
@@ -315,10 +309,9 @@ func (s *Silences) Stop(ctx context.Context) error {
 // GC runs a garbage collection that removes silences that have ended longer
 // than the configured retention time ago.
 func (s *Silences) GC() (int, error) {
-	start := time.Now()
-	defer func() { metrics.Silences.GcDuration.Observe(time.Since(start).Seconds()) }()
+	now := time.Now()
+	defer func() { metrics.Silences.GcDuration.Observe(time.Since(now).Seconds()) }()
 
-	now := s.nowUTC()
 	var n int
 
 	s.mtx.Lock()
@@ -370,7 +363,7 @@ func matchesEmpty(m *label.Matcher) bool {
 	}
 }
 
-func validateSilence(s *ent.Silence) error {
+func validateSilence(s *Entry) error {
 	if s.ID == 0 {
 		return errors.New("ID missing")
 	}
@@ -402,13 +395,7 @@ func validateSilence(s *ent.Silence) error {
 	return nil
 }
 
-// cloneSilence returns a shallow copy of a silence.
-func cloneSilence(sil *ent.Silence) *ent.Silence {
-	s := *sil
-	return &s
-}
-
-func (s *Silences) getSilence(id int) (*ent.Silence, bool) {
+func (s *Silences) getSilence(id int) (*Entry, bool) {
 	sil, ok := s.st[id]
 	if !ok {
 		return nil, false
@@ -416,7 +403,7 @@ func (s *Silences) getSilence(id int) (*ent.Silence, bool) {
 	return sil, true
 }
 
-func (s *Silences) setSilence(sil *ent.Silence, now time.Time) error {
+func (s *Silences) setSilence(sil *Entry, now time.Time) error {
 	sil.UpdatedAt = now
 
 	if err := validateSilence(sil); err != nil {
@@ -438,17 +425,17 @@ func (s *Silences) setSilence(sil *ent.Silence, now time.Time) error {
 
 // Set the specified silence. If a silence with the ID already exists and the modification
 // modifies history, the old silence gets expired and a new one is created.
-func (s *Silences) Set(sil *ent.Silence) (int, error) {
+func (s *Silences) Set(sil *Entry) (int, error) {
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 
-	now := s.nowUTC()
+	now := time.Now()
 	prev, ok := s.getSilence(sil.ID)
 	if ok {
 		if canUpdate(prev, sil, now) {
 			return sil.ID, s.setSilence(sil, now)
 		}
-		if getState(prev, s.nowUTC()) != alert.SilenceStateExpired {
+		if getState(prev, now) != alert.SilenceStateExpired {
 			// We cannot update the silence, expire the old one.
 			if err := s.expire(prev.ID); err != nil {
 				return 0, fmt.Errorf("expire previous silence %w", err)
@@ -466,7 +453,7 @@ func (s *Silences) Set(sil *ent.Silence) (int, error) {
 
 // canUpdate returns true if silence a can be updated to b without
 // affecting the historic view of silencing.
-func canUpdate(a, b *ent.Silence, now time.Time) bool {
+func canUpdate(a, b *Entry, now time.Time) bool {
 	if !reflect.DeepEqual(a.Matchers, b.Matchers) {
 		return false
 	}
@@ -507,7 +494,7 @@ func (s *Silences) expire(id int) error {
 		return ErrNotFound
 	}
 	sil = cloneSilence(sil)
-	now := s.nowUTC()
+	now := time.Now()
 
 	switch getState(sil, now) {
 	case alert.SilenceStateExpired:
@@ -523,74 +510,10 @@ func (s *Silences) expire(id int) error {
 	return s.setSilence(sil, now)
 }
 
-// QueryParam expresses parameters along which silences are queried.
-type QueryParam func(*query) error
-
-type query struct {
-	ids     []int
-	filters []silenceFilter
-}
-
-// silenceFilter is a function that returns true if a silence
-// should be dropped from a result set for a given time.
-type silenceFilter func(*ent.Silence, *Silences, time.Time) (bool, error)
-
-// QIDs configures a query to select the given silence IDs.
-func QIDs(ids ...int) QueryParam {
-	return func(q *query) error {
-		q.ids = append(q.ids, ids...)
-		return nil
-	}
-}
-
-// QMatches returns silences that match the given label set.
-func QMatches(set label.LabelSet) QueryParam {
-	return func(q *query) error {
-		f := func(sil *ent.Silence, s *Silences, _ time.Time) (bool, error) {
-			m, err := s.mc.Get(sil)
-			if err != nil {
-				return true, err
-			}
-			return m.Matches(set), nil
-		}
-		q.filters = append(q.filters, f)
-		return nil
-	}
-}
-
-// getState returns a silence's SilenceState at the given timestamp.
-func getState(sil *ent.Silence, ts time.Time) alert.SilenceState {
-	if ts.Before(sil.StartsAt) {
-		return alert.SilenceStatePending
-	}
-	if ts.After(sil.EndsAt) {
-		return alert.SilenceStateExpired
-	}
-	return alert.SilenceStateActive
-}
-
-// QState filters queried silences by the given states.
-func QState(states ...alert.SilenceState) QueryParam {
-	return func(q *query) error {
-		f := func(sil *ent.Silence, _ *Silences, now time.Time) (bool, error) {
-			s := getState(sil, now)
-
-			for _, ps := range states {
-				if s == ps {
-					return true, nil
-				}
-			}
-			return false, nil
-		}
-		q.filters = append(q.filters, f)
-		return nil
-	}
-}
-
 // QueryOne queries with the given parameters and returns the first result.
 // Returns ErrNotFound if the query result is empty.
-func (s *Silences) QueryOne(params ...QueryParam) (*ent.Silence, error) {
-	res, _, err := s.Query(params...)
+func (s *Silences) QueryOne(qs ...EntryQuery) (*Entry, error) {
+	res, _, err := s.Query(qs...)
 	if err != nil {
 		return nil, err
 	}
@@ -602,18 +525,11 @@ func (s *Silences) QueryOne(params ...QueryParam) (*ent.Silence, error) {
 
 // Query for silences based on the given query parameters. It returns the
 // resulting silences and the state version the result is based on.
-func (s *Silences) Query(params ...QueryParam) ([]*ent.Silence, int, error) {
+func (s *Silences) Query(qs ...EntryQuery) ([]*Entry, int, error) {
 	metrics.Silences.QueriesTotal.Inc()
 	defer prometheus.NewTimer(metrics.Silences.QueryDuration).ObserveDuration()
 
-	q := &query{}
-	for _, p := range params {
-		if err := p(q); err != nil {
-			metrics.Silences.QueryErrorsTotal.Inc()
-			return nil, s.Version(), err
-		}
-	}
-	sils, version, err := s.query(q, s.nowUTC())
+	sils, version, err := s.query(qs...)
 	if err != nil {
 		metrics.Silences.QueryErrorsTotal.Inc()
 	}
@@ -630,55 +546,25 @@ func (s *Silences) Version() int {
 // CountState counts silences by state.
 func (s *Silences) CountState(states ...alert.SilenceState) (int, error) {
 	// This could probably be optimized.
-	sils, _, err := s.Query(QState(states...))
+	sils, _, err := s.Query(QState(time.Now(), states...))
 	if err != nil {
 		return -1, err
 	}
 	return len(sils), nil
 }
 
-func (s *Silences) query(q *query, now time.Time) ([]*ent.Silence, int, error) {
-	// If we have no ID constraint, all silences are our base set.  This and
-	// the use of post-filter functions is the trivial solution for now.
-	var res []*ent.Silence
-
+func (s *Silences) query(qs ...EntryQuery) ([]*Entry, int, error) {
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 
-	if q.ids != nil {
-		for _, id := range q.ids {
-			if s, ok := s.st[id]; ok {
-				res = append(res, s)
-			}
-		}
-	} else {
-		for _, sil := range s.st {
-			res = append(res, sil)
-		}
+	resf, err := s.st.query(qs...)
+	if err != nil {
+		return nil, s.version, err
 	}
-
-	var resf []*ent.Silence
-	for _, sil := range res {
-		remove := false
-		for _, f := range q.filters {
-			ok, err := f(sil, s, now)
-			if err != nil {
-				return nil, s.version, err
-			}
-			if !ok {
-				remove = true
-				break
-			}
-		}
-		if !remove {
-			resf = append(resf, cloneSilence(sil))
-		}
-	}
-
 	return resf, s.version, nil
 }
 
-// loadSnapshot loads all silences data from DataLoader
+// loadData loads all silences data from DataLoader
 func (s *Silences) loadData() error {
 	datas, err := s.DataLoader()
 	if err != nil {
@@ -694,44 +580,4 @@ func (s *Silences) loadData() error {
 	s.mtx.Unlock()
 
 	return nil
-}
-
-type state map[int]*ent.Silence
-
-func (s state) merge(e *ent.Silence, now time.Time) bool {
-	id := e.ID
-	if e.EndsAt.Before(now) {
-		return false
-	}
-
-	prev, ok := s[id]
-	if !ok || prev.UpdatedAt.Before(e.UpdatedAt) {
-		s[id] = e
-		return true
-	}
-	return false
-}
-
-func (s state) Merge(bs []byte) error {
-	var msg []*ent.Silence
-	if err := msgpack.Unmarshal(bs, &msg); err != nil {
-		return err
-	}
-	for _, e := range msg {
-		s.merge(e, time.Now())
-	}
-	return nil
-}
-
-func (s state) MarshalBinary() ([]byte, error) {
-	var msg []*ent.Silence
-
-	for _, e := range s {
-		msg = append(msg, e)
-	}
-	return msgpack.Marshal(msg)
-}
-
-func (s state) marshalBinary(e *ent.Silence) ([]byte, error) {
-	return msgpack.Marshal([]*ent.Silence{e})
 }

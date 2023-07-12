@@ -37,12 +37,12 @@ func (a *Alert) Name() string {
 	return a.Labels[label.AlertNameLabel]
 }
 
-// Resolved returns true iff the activity interval ended in the past.
+// Resolved returns true if the activity interval ended in the past.
 func (a *Alert) Resolved() bool {
 	return a.ResolvedAt(time.Now())
 }
 
-// ResolvedAt returns true off the activity interval ended before
+// ResolvedAt returns true if the activity interval ended before
 // the given timestamp.
 func (a *Alert) ResolvedAt(ts time.Time) bool {
 	if a.EndsAt.IsZero() {

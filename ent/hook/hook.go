@@ -9,6 +9,18 @@ import (
 	"github.com/woocoos/msgcenter/ent"
 )
 
+// The MsgAlertFunc type is an adapter to allow the use of ordinary
+// function as MsgAlert mutator.
+type MsgAlertFunc func(context.Context, *ent.MsgAlertMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MsgAlertFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MsgAlertMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MsgAlertMutation", m)
+}
+
 // The MsgChannelFunc type is an adapter to allow the use of ordinary
 // function as MsgChannel mutator.
 type MsgChannelFunc func(context.Context, *ent.MsgChannelMutation) (ent.Value, error)
@@ -67,6 +79,30 @@ func (f MsgTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MsgTypeMutation", m)
+}
+
+// The NlogFunc type is an adapter to allow the use of ordinary
+// function as Nlog mutator.
+type NlogFunc func(context.Context, *ent.NlogMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f NlogFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.NlogMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.NlogMutation", m)
+}
+
+// The NlogAlertFunc type is an adapter to allow the use of ordinary
+// function as NlogAlert mutator.
+type NlogAlertFunc func(context.Context, *ent.NlogAlertMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f NlogAlertFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.NlogAlertMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.NlogAlertMutation", m)
 }
 
 // The OrgRoleUserFunc type is an adapter to allow the use of ordinary

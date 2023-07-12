@@ -8,11 +8,14 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/nlog"
+	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/ent/silence"
@@ -73,6 +76,33 @@ func (f TraverseFunc) Traverse(ctx context.Context, q ent.Query) error {
 		return err
 	}
 	return f(ctx, query)
+}
+
+// The MsgAlertFunc type is an adapter to allow the use of ordinary function as a Querier.
+type MsgAlertFunc func(context.Context, *ent.MsgAlertQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f MsgAlertFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.MsgAlertQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.MsgAlertQuery", q)
+}
+
+// The TraverseMsgAlert type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseMsgAlert func(context.Context, *ent.MsgAlertQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseMsgAlert) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseMsgAlert) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.MsgAlertQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.MsgAlertQuery", q)
 }
 
 // The MsgChannelFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -210,6 +240,60 @@ func (f TraverseMsgType) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.MsgTypeQuery", q)
 }
 
+// The NlogFunc type is an adapter to allow the use of ordinary function as a Querier.
+type NlogFunc func(context.Context, *ent.NlogQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f NlogFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.NlogQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.NlogQuery", q)
+}
+
+// The TraverseNlog type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseNlog func(context.Context, *ent.NlogQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseNlog) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseNlog) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.NlogQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.NlogQuery", q)
+}
+
+// The NlogAlertFunc type is an adapter to allow the use of ordinary function as a Querier.
+type NlogAlertFunc func(context.Context, *ent.NlogAlertQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f NlogAlertFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.NlogAlertQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.NlogAlertQuery", q)
+}
+
+// The TraverseNlogAlert type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseNlogAlert func(context.Context, *ent.NlogAlertQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseNlogAlert) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseNlogAlert) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.NlogAlertQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.NlogAlertQuery", q)
+}
+
 // The OrgRoleUserFunc type is an adapter to allow the use of ordinary function as a Querier.
 type OrgRoleUserFunc func(context.Context, *ent.OrgRoleUserQuery) (ent.Value, error)
 
@@ -294,6 +378,8 @@ func (f TraverseUser) Traverse(ctx context.Context, q ent.Query) error {
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
+	case *ent.MsgAlertQuery:
+		return &query[*ent.MsgAlertQuery, predicate.MsgAlert, msgalert.OrderOption]{typ: ent.TypeMsgAlert, tq: q}, nil
 	case *ent.MsgChannelQuery:
 		return &query[*ent.MsgChannelQuery, predicate.MsgChannel, msgchannel.OrderOption]{typ: ent.TypeMsgChannel, tq: q}, nil
 	case *ent.MsgEventQuery:
@@ -304,6 +390,10 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.MsgTemplateQuery, predicate.MsgTemplate, msgtemplate.OrderOption]{typ: ent.TypeMsgTemplate, tq: q}, nil
 	case *ent.MsgTypeQuery:
 		return &query[*ent.MsgTypeQuery, predicate.MsgType, msgtype.OrderOption]{typ: ent.TypeMsgType, tq: q}, nil
+	case *ent.NlogQuery:
+		return &query[*ent.NlogQuery, predicate.Nlog, nlog.OrderOption]{typ: ent.TypeNlog, tq: q}, nil
+	case *ent.NlogAlertQuery:
+		return &query[*ent.NlogAlertQuery, predicate.NlogAlert, nlogalert.OrderOption]{typ: ent.TypeNlogAlert, tq: q}, nil
 	case *ent.OrgRoleUserQuery:
 		return &query[*ent.OrgRoleUserQuery, predicate.OrgRoleUser, orgroleuser.OrderOption]{typ: ent.TypeOrgRoleUser, tq: q}, nil
 	case *ent.SilenceQuery:

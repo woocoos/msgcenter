@@ -351,18 +351,18 @@ func (c *Coordinator) RemoveTenantReceiver(receiverNames []string) error {
 // buildReceiverIntegrations builds a list of integration notifiers off of a
 // receiver config.
 func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *template.Template) (integrations []notify.Integration, errs error) {
-	add := func(name string, i int, rs notify.ResolvedSender, f func() (notify.Notifier, error)) {
+	add := func(name string, i int, f func() (notify.Notifier, error)) {
 		n, err := f()
 		if err != nil {
 			errs = errors.Join(err)
 			return
 		}
-		integrations = append(integrations, notify.NewIntegration(n, rs, name, i))
+		integrations = append(integrations, notify.NewIntegration(n, name, i))
 	}
 	var ()
 	tpldir := c.configuration.Abs(c.configuration.String("template.path"))
 	for i, cfg := range nc.EmailConfigs {
-		add("email", i, cfg, func() (notify.Notifier, error) {
+		add("email", i, func() (notify.Notifier, error) {
 			return email.NewEmail(cfg, tmpl, overrideEmailConfig(tpldir, c.db)), nil
 		})
 	}

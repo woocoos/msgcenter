@@ -6,11 +6,14 @@ import (
 	"time"
 
 	"github.com/woocoos/msgcenter/codegen/entgen/schema"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/nlog"
+	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
@@ -20,6 +23,25 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	msgalertMixin := schema.MsgAlert{}.Mixin()
+	msgalertMixinHooks1 := msgalertMixin[1].Hooks()
+	msgalert.Hooks[0] = msgalertMixinHooks1[0]
+	msgalertMixinInters1 := msgalertMixin[1].Interceptors()
+	msgalert.Interceptors[0] = msgalertMixinInters1[0]
+	msgalertFields := schema.MsgAlert{}.Fields()
+	_ = msgalertFields
+	// msgalertDescTimeout is the schema descriptor for timeout field.
+	msgalertDescTimeout := msgalertFields[5].Descriptor()
+	// msgalert.DefaultTimeout holds the default value on creation for the timeout field.
+	msgalert.DefaultTimeout = msgalertDescTimeout.Default.(bool)
+	// msgalertDescCreatedAt is the schema descriptor for created_at field.
+	msgalertDescCreatedAt := msgalertFields[7].Descriptor()
+	// msgalert.DefaultCreatedAt holds the default value on creation for the created_at field.
+	msgalert.DefaultCreatedAt = msgalertDescCreatedAt.Default.(func() time.Time)
+	// msgalertDescDeleted is the schema descriptor for deleted field.
+	msgalertDescDeleted := msgalertFields[9].Descriptor()
+	// msgalert.DefaultDeleted holds the default value on creation for the deleted field.
+	msgalert.DefaultDeleted = msgalertDescDeleted.Default.(bool)
 	msgchannelMixin := schema.MsgChannel{}.Mixin()
 	msgchannelMixinHooks1 := msgchannelMixin[1].Hooks()
 	msgchannelHooks := schema.MsgChannel{}.Hooks()
@@ -130,6 +152,23 @@ func init() {
 	msgtypeDescCanCustom := msgtypeFields[6].Descriptor()
 	// msgtype.DefaultCanCustom holds the default value on creation for the can_custom field.
 	msgtype.DefaultCanCustom = msgtypeDescCanCustom.Default.(bool)
+	nlogMixin := schema.Nlog{}.Mixin()
+	nlogMixinHooks1 := nlogMixin[1].Hooks()
+	nlog.Hooks[0] = nlogMixinHooks1[0]
+	nlogMixinInters1 := nlogMixin[1].Interceptors()
+	nlog.Interceptors[0] = nlogMixinInters1[0]
+	nlogFields := schema.Nlog{}.Fields()
+	_ = nlogFields
+	// nlogDescCreatedAt is the schema descriptor for created_at field.
+	nlogDescCreatedAt := nlogFields[5].Descriptor()
+	// nlog.DefaultCreatedAt holds the default value on creation for the created_at field.
+	nlog.DefaultCreatedAt = nlogDescCreatedAt.Default.(func() time.Time)
+	nlogalertFields := schema.NlogAlert{}.Fields()
+	_ = nlogalertFields
+	// nlogalertDescCreatedAt is the schema descriptor for created_at field.
+	nlogalertDescCreatedAt := nlogalertFields[3].Descriptor()
+	// nlogalert.DefaultCreatedAt holds the default value on creation for the created_at field.
+	nlogalert.DefaultCreatedAt = nlogalertDescCreatedAt.Default.(func() time.Time)
 	orgroleuserHooks := schema.OrgRoleUser{}.Hooks()
 	orgroleuser.Hooks[0] = orgroleuserHooks[0]
 	silenceMixin := schema.Silence{}.Mixin()

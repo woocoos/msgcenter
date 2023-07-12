@@ -3,10 +3,9 @@ module github.com/woocoos/msgcenter
 go 1.20
 
 require (
-	entgo.io/contrib v0.4.5
+	entgo.io/contrib v0.4.6-0.20230615102013-704944fdc0f6
 	entgo.io/ent v0.12.4-0.20230702151415-1ec75238037c
 	github.com/99designs/gqlgen v0.17.34
-	github.com/benbjohnson/clock v1.3.0
 	github.com/cenkalti/backoff/v4 v4.2.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-sql-driver/mysql v1.7.0
@@ -17,20 +16,17 @@ require (
 	github.com/knadh/koanf/providers/rawbytes v0.1.0
 	github.com/knadh/koanf/v2 v2.0.1
 	github.com/mattn/go-sqlite3 v1.14.16
-	github.com/matttproud/golang_protobuf_extensions v1.0.4
 	github.com/prometheus/client_golang v1.11.1
 	github.com/stretchr/testify v1.8.3
-	github.com/tsingsun/members v0.0.0-20230710091051-5766137a0396
+	github.com/tsingsun/members v0.0.0-20230712074048-c38e433601b8
 	github.com/tsingsun/woocoo v0.3.1-0.20230710030305-2fae153355b0
 	github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230706082952-8c3654ddbca6
 	github.com/vektah/gqlparser/v2 v2.5.4
-	github.com/vmihailenco/msgpack/v4 v4.3.12
-	github.com/woocoos/entco v0.0.0-20230706084622-005132298767
+	github.com/vmihailenco/msgpack/v5 v5.3.5
+	github.com/woocoos/entco v0.0.0-20230712043412-bca501d411c0
 	go.uber.org/zap v1.24.0
 	golang.org/x/sync v0.3.0
 	golang.org/x/text v0.9.0
-	google.golang.org/protobuf v1.30.0
-	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
@@ -86,6 +82,7 @@ require (
 	github.com/knadh/koanf/providers/file v0.1.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
+	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/miekg/dns v1.1.26 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.0 // indirect
@@ -104,8 +101,6 @@ require (
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
-	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
-	github.com/vmihailenco/tagparser v0.1.2 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/woocoos/casbin-ent-adapter v0.0.0-20230404005858-cd33f1b0b92e // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
@@ -121,7 +116,7 @@ require (
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/tools v0.9.3 // indirect
-	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

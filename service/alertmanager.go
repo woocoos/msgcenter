@@ -59,10 +59,17 @@ func DefaultAlertManager(cnf *conf.Configuration, opts ...AmOption) (am *AlertMa
 	if err = am.Members(); err != nil {
 		return nil, err
 	}
-	am.NotificationLog, err = nflog.NewFromConfiguration(cnf)
+
+	nflg, err := nflog.NewFromConfiguration(cnf)
 	if err != nil {
 		return nil, err
 	}
+	if am.Peer != nil {
+		nflg.Spreader, err = am.Peer.AddShard(nflg)
+	}
+	nflg.NLogCallback = NlogCallback{db: am.client}
+	am.NotificationLog = nflg
+
 	am.Silences, err = silence.NewFromConfiguration(cnf, silence.WithDataLoader(SilencesDataLoad(am.client)))
 	if err != nil {
 		return nil, err
@@ -72,7 +79,7 @@ func DefaultAlertManager(cnf *conf.Configuration, opts ...AmOption) (am *AlertMa
 	}
 	am.Marker = alert.NewMarker(prometheus.DefaultRegisterer)
 	am.Alerts, err = mem.NewAlerts(context.Background(), am.Marker,
-		am.Cnf.Duration("alerts.gcInterval"), nil)
+		am.Cnf.Duration("alerts.gcInterval"), &AlertCallback{db: am.client})
 	if err != nil {
 		return nil, err
 	}

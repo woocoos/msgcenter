@@ -9,6 +9,27 @@ import (
 )
 
 var (
+	// MsgAlertColumns holds the columns for the "msg_alert" table.
+	MsgAlertColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "labels", Type: field.TypeJSON, Nullable: true},
+		{Name: "annotations", Type: field.TypeJSON, Nullable: true},
+		{Name: "starts_at", Type: field.TypeTime},
+		{Name: "ends_at", Type: field.TypeTime},
+		{Name: "url", Type: field.TypeString, Nullable: true},
+		{Name: "timeout", Type: field.TypeBool, Default: false},
+		{Name: "fingerprint", Type: field.TypeString},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "deleted", Type: field.TypeBool, Default: false},
+	}
+	// MsgAlertTable holds the schema information for the "msg_alert" table.
+	MsgAlertTable = &schema.Table{
+		Name:       "msg_alert",
+		Columns:    MsgAlertColumns,
+		PrimaryKey: []*schema.Column{MsgAlertColumns[0]},
+	}
 	// MsgChannelColumns holds the columns for the "msg_channel" table.
 	MsgChannelColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
@@ -151,6 +172,60 @@ var (
 		Columns:    MsgTypeColumns,
 		PrimaryKey: []*schema.Column{MsgTypeColumns[0]},
 	}
+	// MsgNlogColumns holds the columns for the "msg_nlog" table.
+	MsgNlogColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "group_key", Type: field.TypeString},
+		{Name: "receiver", Type: field.TypeString},
+		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "internal", "webhook"}},
+		{Name: "idx", Type: field.TypeInt},
+		{Name: "send_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "expires_at", Type: field.TypeTime},
+	}
+	// MsgNlogTable holds the schema information for the "msg_nlog" table.
+	MsgNlogTable = &schema.Table{
+		Name:       "msg_nlog",
+		Columns:    MsgNlogColumns,
+		PrimaryKey: []*schema.Column{MsgNlogColumns[0]},
+	}
+	// MsgNlogAlertColumns holds the columns for the "msg_nlog_alert" table.
+	MsgNlogAlertColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "state", Type: field.TypeEnum, Enums: []string{"firing", "resolve"}},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "nlog_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "alert_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+	}
+	// MsgNlogAlertTable holds the schema information for the "msg_nlog_alert" table.
+	MsgNlogAlertTable = &schema.Table{
+		Name:       "msg_nlog_alert",
+		Columns:    MsgNlogAlertColumns,
+		PrimaryKey: []*schema.Column{MsgNlogAlertColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "msg_nlog_alert_msg_nlog_nlog",
+				Columns:    []*schema.Column{MsgNlogAlertColumns[3]},
+				RefColumns: []*schema.Column{MsgNlogColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "msg_nlog_alert_msg_alert_alert",
+				Columns:    []*schema.Column{MsgNlogAlertColumns[4]},
+				RefColumns: []*schema.Column{MsgAlertColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "nlogalert_nlog_id_alert_id",
+				Unique:  true,
+				Columns: []*schema.Column{MsgNlogAlertColumns[3], MsgNlogAlertColumns[4]},
+			},
+		},
+	}
 	// OrgRoleUserColumns holds the columns for the "org_role_user" table.
 	OrgRoleUserColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -209,11 +284,14 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		MsgAlertTable,
 		MsgChannelTable,
 		MsgEventTable,
 		MsgSubscriberTable,
 		MsgTemplateTable,
 		MsgTypeTable,
+		MsgNlogTable,
+		MsgNlogAlertTable,
 		OrgRoleUserTable,
 		MsgSilenceTable,
 		UserTable,
@@ -221,6 +299,9 @@ var (
 )
 
 func init() {
+	MsgAlertTable.Annotation = &entsql.Annotation{
+		Table: "msg_alert",
+	}
 	MsgChannelTable.Annotation = &entsql.Annotation{
 		Table: "msg_channel",
 	}
@@ -239,6 +320,14 @@ func init() {
 	}
 	MsgTypeTable.Annotation = &entsql.Annotation{
 		Table: "msg_type",
+	}
+	MsgNlogTable.Annotation = &entsql.Annotation{
+		Table: "msg_nlog",
+	}
+	MsgNlogAlertTable.ForeignKeys[0].RefTable = MsgNlogTable
+	MsgNlogAlertTable.ForeignKeys[1].RefTable = MsgAlertTable
+	MsgNlogAlertTable.Annotation = &entsql.Annotation{
+		Table: "msg_nlog_alert",
 	}
 	OrgRoleUserTable.Annotation = &entsql.Annotation{
 		Table: "org_role_user",
