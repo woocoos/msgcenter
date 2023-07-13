@@ -182,9 +182,13 @@ export type EmailConfigInput = {
 };
 
 export enum MatchType {
+  /**  =  */
   MatchEqual = 'MatchEqual',
+  /**  !=  */
   MatchNotEqual = 'MatchNotEqual',
+  /**  !~  */
   MatchNotRegexp = 'MatchNotRegexp',
+  /**  =~  */
   MatchRegexp = 'MatchRegexp'
 }
 
@@ -403,6 +407,11 @@ export type MsgEvent = Node & {
   status?: Maybe<MsgEventSimpleStatus>;
   updatedAt?: Maybe<Scalars['Time']['output']>;
   updatedBy?: Maybe<Scalars['Int']['output']>;
+};
+
+
+export type MsgEventRouteStrArgs = {
+  type: RouteStrType;
 };
 
 /** A connection to a list of items. */
@@ -994,13 +1003,16 @@ export type MsgType = Node & {
   createdBy: Scalars['Int']['output'];
   /** 消息事件 */
   events?: Maybe<Array<MsgEvent>>;
+  /**  排除的用户  */
   excludeSubscriberUsers: Array<MsgSubscriber>;
   id: Scalars['ID']['output'];
   /** 消息类型名称,应用内唯一 */
   name: Scalars['String']['output'];
   /** 状态 */
   status?: Maybe<MsgTypeSimpleStatus>;
+  /**  订阅的用户组  */
   subscriberRoles: Array<MsgSubscriber>;
+  /**  订阅的用户  */
   subscriberUsers: Array<MsgSubscriber>;
   /** 订阅者 */
   subscribers?: Maybe<Array<MsgSubscriber>>;
@@ -1171,28 +1183,51 @@ export type MsgTypeWhereInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  /**  创建消息通道  */
   createMsgChannel: MsgChannel;
+  /**  创建消息事件  */
   createMsgEvent: MsgEvent;
+  /**  消息订阅  */
   createMsgSubscriber: Array<MsgSubscriber>;
+  /**  创建消息模板  */
   createMsgTemplate: MsgTemplate;
+  /**  创建消息类型  */
   createMsgType: MsgType;
+  /**  创建静默  */
   createSilence: Silence;
+  /**  删除消息通道  */
   deleteMsgChannel: Scalars['Boolean']['output'];
+  /**  删除消息事件  */
   deleteMsgEvent: Scalars['Boolean']['output'];
+  /**  删除订阅  */
   deleteMsgSubscriber: Scalars['Boolean']['output'];
+  /**  删除消息模板  */
   deleteMsgTemplate: Scalars['Boolean']['output'];
+  /**  删除消息类型  */
   deleteMsgType: Scalars['Boolean']['output'];
+  /**  删除静默  */
   deleteSilence: Scalars['Boolean']['output'];
+  /**  禁用消息通道  */
   disableMsgChannel: MsgChannel;
+  /**  禁用消息事件  */
   disableMsgEvent: MsgEvent;
+  /**  禁用消息模板  */
   disableMsgTemplate: MsgTemplate;
+  /**  启用消息通道  */
   enableMsgChannel: MsgChannel;
+  /**  启用消息事件  */
   enableMsgEvent: MsgEvent;
+  /**  启用消息模板  */
   enableMsgTemplate: MsgTemplate;
+  /**  更新消息通道  */
   updateMsgChannel: MsgChannel;
+  /**  更新消息事件  */
   updateMsgEvent: MsgEvent;
+  /**  更新消息模板  */
   updateMsgTemplate: MsgTemplate;
+  /**  更新消息类型  */
   updateMsgType: MsgType;
+  /**  更新静默  */
   updateSilence: Silence;
 };
 
@@ -1351,15 +1386,21 @@ export type PageInfo = {
 
 export type Query = {
   __typename?: 'Query';
+  /**  消息通道列表  */
   msgChannels: MsgChannelConnection;
+  /**  消息事件列表  */
   msgEvents: MsgEventConnection;
+  /**  消息模板列表  */
   msgTemplates: MsgTemplateConnection;
+  /**  消息类型分类  */
   msgTypeCategories: Array<Scalars['String']['output']>;
+  /**  消息类型列表  */
   msgTypes: MsgTypeConnection;
   /** Fetches an object given its ID. */
   node?: Maybe<Node>;
   /** Lookup nodes by a list of IDs. */
   nodes: Array<Maybe<Node>>;
+  /**  静默消息  */
   silences: SilenceConnection;
 };
 
@@ -1466,6 +1507,11 @@ export type RouteInput = {
   repeatInterval?: InputMaybe<Scalars['Duration']['input']>;
   routes?: InputMaybe<Array<InputMaybe<RouteInput>>>;
 };
+
+export enum RouteStrType {
+  Json = 'Json',
+  Yaml = 'Yaml'
+}
 
 export type Silence = Node & {
   __typename?: 'Silence';
@@ -1861,6 +1907,7 @@ export type MsgEventInfoQuery = { __typename?: 'Query', node?: { __typename?: 'M
 
 export type MsgEventInfoRouteQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
+  type: RouteStrType;
 }>;
 
 
@@ -2079,7 +2126,7 @@ export const EnableMsgChannelDocument = {"kind":"Document","definitions":[{"kind
 export const DisableMsgChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"disableMsgChannel"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"disableMsgChannel"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DisableMsgChannelMutation, DisableMsgChannelMutationVariables>;
 export const MsgEventListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"msgEventList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MsgEventOrder"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MsgEventWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"msgEvents"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"msgTypeID"}},{"kind":"Field","name":{"kind":"Name","value":"modes"}},{"kind":"Field","name":{"kind":"Name","value":"msgType"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"category"}},{"kind":"Field","name":{"kind":"Name","value":"appID"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<MsgEventListQuery, MsgEventListQueryVariables>;
 export const MsgEventInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MsgEventInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"MsgEvent"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"msgTypeID"}},{"kind":"Field","name":{"kind":"Name","value":"modes"}},{"kind":"Field","name":{"kind":"Name","value":"msgType"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"category"}},{"kind":"Field","name":{"kind":"Name","value":"appID"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]} as unknown as DocumentNode<MsgEventInfoQuery, MsgEventInfoQueryVariables>;
-export const MsgEventInfoRouteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MsgEventInfoRoute"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"MsgEvent"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"msgTypeID"}},{"kind":"Field","name":{"kind":"Name","value":"modes"}},{"kind":"Field","name":{"kind":"Name","value":"routeStr"}}]}}]}}]}}]} as unknown as DocumentNode<MsgEventInfoRouteQuery, MsgEventInfoRouteQueryVariables>;
+export const MsgEventInfoRouteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MsgEventInfoRoute"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"type"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RouteStrType"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"MsgEvent"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"msgTypeID"}},{"kind":"Field","name":{"kind":"Name","value":"modes"}},{"kind":"Field","name":{"kind":"Name","value":"routeStr"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"type"},"value":{"kind":"Variable","name":{"kind":"Name","value":"type"}}}]}]}}]}}]}}]} as unknown as DocumentNode<MsgEventInfoRouteQuery, MsgEventInfoRouteQueryVariables>;
 export const CreateMsgEventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createMsgEvent"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateMsgEventInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createMsgEvent"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<CreateMsgEventMutation, CreateMsgEventMutationVariables>;
 export const UpdateMsgEventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateMsgEvent"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateMsgEventInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMsgEvent"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateMsgEventMutation, UpdateMsgEventMutationVariables>;
 export const DelMsgEventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"delMsgEvent"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMsgEvent"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DelMsgEventMutation, DelMsgEventMutationVariables>;

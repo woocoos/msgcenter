@@ -20,6 +20,7 @@
     "dayjs": "^1.11.8",
     "graphql": "^16.6.0",
     "i18next": "^22.5.0",
+    "js-yaml": "^4.1.0",
     "jwt-decode": "^3.1.2",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",

@@ -176,9 +176,13 @@ scalar LabelName
 scalar MapString
 
 enum MatchType {
+  """ = """
   MatchEqual
+  """ != """
   MatchNotEqual
+  """ !~ """
   MatchNotRegexp
+  """ =~ """
   MatchRegexp
 }
 
@@ -387,7 +391,7 @@ type MsgEvent implements Node {
   name: String!
   """消息路由配置"""
   route: Route
-  routeStr: String!
+  routeStr(type: RouteStrType!): String!
   """状态"""
   status: MsgEventSimpleStatus
   updatedAt: Time
@@ -976,13 +980,16 @@ type MsgType implements Node {
   createdBy: Int!
   """消息事件"""
   events: [MsgEvent!]
+  """ 排除的用户 """
   excludeSubscriberUsers: [MsgSubscriber!]!
   id: ID!
   """消息类型名称,应用内唯一"""
   name: String!
   """状态"""
   status: MsgTypeSimpleStatus
+  """ 订阅的用户组 """
   subscriberRoles: [MsgSubscriber!]!
+  """ 订阅的用户 """
   subscriberUsers: [MsgSubscriber!]!
   """订阅者"""
   subscribers: [MsgSubscriber!]
@@ -1150,28 +1157,51 @@ input MsgTypeWhereInput {
 }
 
 type Mutation {
+  """ 创建消息通道 """
   createMsgChannel(input: CreateMsgChannelInput!): MsgChannel!
+  """ 创建消息事件 """
   createMsgEvent(input: CreateMsgEventInput!): MsgEvent!
+  """ 消息订阅 """
   createMsgSubscriber(inputs: [CreateMsgSubscriberInput!]!): [MsgSubscriber!]!
+  """ 创建消息模板 """
   createMsgTemplate(input: CreateMsgTemplateInput!): MsgTemplate!
+  """ 创建消息类型 """
   createMsgType(input: CreateMsgTypeInput!): MsgType!
+  """ 创建静默 """
   createSilence(input: CreateSilenceInput!): Silence!
+  """ 删除消息通道 """
   deleteMsgChannel(id: ID!): Boolean!
+  """ 删除消息事件 """
   deleteMsgEvent(id: ID!): Boolean!
+  """ 删除订阅 """
   deleteMsgSubscriber(ids: [ID!]!): Boolean!
+  """ 删除消息模板 """
   deleteMsgTemplate(id: ID!): Boolean!
+  """ 删除消息类型 """
   deleteMsgType(id: ID!): Boolean!
+  """ 删除静默 """
   deleteSilence(id: ID!): Boolean!
+  """ 禁用消息通道 """
   disableMsgChannel(id: ID!): MsgChannel!
+  """ 禁用消息事件 """
   disableMsgEvent(id: ID!): MsgEvent!
+  """ 禁用消息模板 """
   disableMsgTemplate(id: ID!): MsgTemplate!
+  """ 启用消息通道 """
   enableMsgChannel(id: ID!): MsgChannel!
+  """ 启用消息事件 """
   enableMsgEvent(id: ID!): MsgEvent!
+  """ 启用消息模板 """
   enableMsgTemplate(id: ID!): MsgTemplate!
+  """ 更新消息通道 """
   updateMsgChannel(id: ID!, input: UpdateMsgChannelInput!): MsgChannel!
+  """ 更新消息事件 """
   updateMsgEvent(id: ID!, input: UpdateMsgEventInput!): MsgEvent!
+  """ 更新消息模板 """
   updateMsgTemplate(id: ID!, input: UpdateMsgTemplateInput!): MsgTemplate!
+  """ 更新消息类型 """
   updateMsgType(id: ID!, input: UpdateMsgTypeInput!): MsgType!
+  """ 更新静默 """
   updateSilence(id: ID!, input: UpdateSilenceInput!): Silence!
 }
 
@@ -1210,10 +1240,15 @@ type PageInfo {
 }
 
 type Query {
+  """ 消息通道列表 """
   msgChannels(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: MsgChannelOrder, where: MsgChannelWhereInput): MsgChannelConnection!
+  """ 消息事件列表 """
   msgEvents(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: MsgEventOrder, where: MsgEventWhereInput): MsgEventConnection!
+  """ 消息模板列表 """
   msgTemplates(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: MsgTemplateOrder, where: MsgTemplateWhereInput): MsgTemplateConnection!
+  """ 消息类型分类 """
   msgTypeCategories(appID: ID, keyword: String): [String!]!
+  """ 消息类型列表 """
   msgTypes(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: MsgTypeOrder, where: MsgTypeWhereInput): MsgTypeConnection!
   """Fetches an object given its ID."""
   node(
@@ -1225,6 +1260,7 @@ type Query {
     """The list of node IDs."""
     ids: [GID!]!
   ): [Node]!
+  """ 静默消息 """
   silences(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: SilenceOrder, where: SilenceWhereInput): SilenceConnection!
 }
 
@@ -1262,6 +1298,11 @@ input RouteInput {
   receiver: String
   repeatInterval: Duration
   routes: [RouteInput]
+}
+
+enum RouteStrType {
+  Json
+  Yaml
 }
 
 type Silence implements Node {

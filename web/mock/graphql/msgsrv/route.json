@@ -1,0 +1,38 @@
+{
+  "receiver": "email",
+  "matchers": [
+    {
+      "name": "app",
+      "type": "MatchEqual",
+      "value": "1"
+    },
+    {
+      "name": "alertname",
+      "type": "MatchEqual",
+      "value": "AlterPassword"
+    }
+  ],
+  "routes": [
+    {
+      "receiver": "email",
+      "matchers": [
+        {
+          "name": "receiver",
+          "type": "MatchRegexp",
+          "value": "email"
+        }
+      ],
+      "continue": true
+    },
+    {
+      "receiver": "internal",
+      "matchers": [
+        {
+          "name": "receiver",
+          "type": "MatchRegexp",
+          "value": "internal"
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import { gql } from "@/__generated__/msgsrv";
-import { CreateMsgEventInput, MsgEventOrder, MsgEventWhereInput, UpdateMsgEventInput } from "@/__generated__/msgsrv/graphql";
+import { CreateMsgEventInput, MsgEventOrder, MsgEventWhereInput, RouteStrType, UpdateMsgEventInput } from "@/__generated__/msgsrv/graphql";
 import { mutationRequest, pagingRequest, queryRequest } from "..";
 import { gid } from "@/util";
 
@@ -36,11 +36,11 @@ const queryMsgEventInfo = gql(/* GraphQL */`query MsgEventInfo($gid:GID!){
   }
 }`);
 
-const queryMsgEventInfoRoute = gql(/* GraphQL */`query MsgEventInfoRoute($gid:GID!){
+const queryMsgEventInfoRoute = gql(/* GraphQL */`query MsgEventInfoRoute($gid:GID!,$type:RouteStrType!){
   node(id: $gid){
     id
     ... on MsgEvent{
-      id,name,comments,status,createdAt,msgTypeID,modes,routeStr
+      id,name,comments,status,createdAt,msgTypeID,modes,routeStr(type:$type)
     }
   }
 }
@@ -112,9 +112,10 @@ export async function getMsgEventInfo(msgEventId: string) {
  * @param msgEventId
  * @returns
  */
-export async function getMsgEventInfoRoute(msgEventId: string) {
+export async function getMsgEventInfoRoute(msgEventId: string, type: RouteStrType) {
   const result = await queryRequest(queryMsgEventInfoRoute, {
-    gid: gid('msg_event', msgEventId)
+    gid: gid('msg_event', msgEventId),
+    type,
   })
   if (result.data?.node?.__typename === 'MsgEvent') {
     return result.data.node

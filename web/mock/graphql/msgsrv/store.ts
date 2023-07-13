@@ -82,6 +82,48 @@ export const delList = (store: IMockStore, ref: Ref, field: string, key: string)
 }
 
 /**
+ * 获取完整的对象
+ * @param store
+ * @param ref
+ */
+export const getObject = (store: IMockStore, ref: Ref) => {
+  const data = store['store'][ref.$ref.typeName][ref.$ref.key],
+    keys = Object.keys(data);
+  if (keys.length) {
+    const result = {};
+    keys.forEach(key => {
+      const keyData: (Ref | number | string | boolean)[] | Ref | number | boolean | string = data[key];
+      if (keyData) {
+        if (Array.isArray(keyData)) {
+          result[key] = keyData.map(item => {
+            if (item) {
+              if (typeof item === 'object') {
+                return getObject(store, store.get(item.$ref.typeName, item.$ref.key) as Ref)
+              } else {
+                return item;
+              }
+            } else {
+              return null;
+            }
+          })
+        } else if (typeof keyData === 'object') {
+          result[key] = getObject(store, store.get(keyData.$ref.typeName, keyData.$ref.key) as Ref)
+        } else {
+          result[key] = keyData
+        }
+      } else {
+        result[key] = null;
+      }
+    })
+    return result;
+  }
+  return null
+}
+
+
+
+
+/**
  * store内的基础数据
  */
 export const initStoreData = (store: IMockStore) => {

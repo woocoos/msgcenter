@@ -3,7 +3,8 @@ import { Ref, addMocksToSchema, createMockStore, mockServer, relayStylePaginatio
 import { readFileSync } from "fs";
 import { join } from "path";
 import * as casual from "casual";
-import { addList, addListTemp, delList, delListTemp, initStoreData, listTemp } from "./store";
+import { addList, addListTemp, delList, delListTemp, getObject, initStoreData, listTemp } from "./store";
+import * as yaml from 'js-yaml'
 
 const preserveResolvers = true
 
@@ -31,6 +32,25 @@ const schemaWithMocks = addMocksToSchema({
   store,
   preserveResolvers,
   resolvers: {
+    MsgEvent: {
+      routeStr: (pRef: Ref, { type }) => {
+        const routeRef = store.get(pRef, 'route') as Ref
+        const route = getObject(store, routeRef)
+        if (route) {
+          if (type === 'Json') {
+            return JSON.stringify(route);
+          } else if (type === 'Yaml') {
+            return yaml.dump(route)
+          }
+        } else {
+          if (type === 'Json') {
+            return readFileSync(join(process.cwd(), 'mock', 'graphql', 'msgsrv', "route.json"), 'utf-8')
+          } else if (type == 'Yaml') {
+            return readFileSync(join(process.cwd(), 'mock', 'graphql', 'msgsrv', "route.yaml"), 'utf-8')
+          }
+        }
+      }
+    },
     Query: {
       msgChannels: relayStylePaginationMock(store),
       msgEvents: relayStylePaginationMock(store),
@@ -193,10 +213,12 @@ const schemaWithMocks = addMocksToSchema({
         if (input.msgTypeID) {
           input.msgType = store.get('MsgType', input.msgTypeID)
         }
-        if (input.route) {
-          input.routeStr = JSON.stringify(routeStr(input.route));
-        }
-
+        // if (input.route) {
+        // yaml
+        // input.routeStr = yaml.dump(input.route)
+        // json
+        // input.routeStr = JSON.stringify(routeStr(input.route));
+        // }
         store.set('MsgEvent', id, input)
         return store.get('MsgEvent', id)
       },
@@ -282,71 +304,6 @@ function parseGid(gid: string) {
   return {
     type: nType,
     id: did,
-  }
-}
-
-function routeStr(route) {
-  const nRoute = { ...route };
-  if (route.matchers) {
-    nRoute.matchers = route.matchers?.map(item => {
-      if (item.type == 'MatchEqual') {
-        return `${item.name}="${item.value}"`
-      } else if (item.type == 'MatchNotEqual') {
-        return `${item.name}!="${item.value}"`
-      } else if (item.type == 'MatchRegexp') {
-        return `${item.name}=~"${item.value}"`
-      } else if (item.type == 'MatchNotRegexp') {
-        return `${item.name}!~"${item.value}"`
-      }
-    })
-  }
-  if (route.routes) {
-    nRoute.routes = route.routes.map(item => routeStr(item));
-  }
-  return nRoute
-}
-
-/**
- * 消息事件配置编辑时候的模板
- * @returns
- */
-function routeEditTemp() {
-  return {
-    "receiver": "email",
-    "matchers": [
-      {
-        "name": "app",
-        "type": "MatchEqual",
-        "value": "1"
-      }, {
-        "name": "alertname",
-        "type": "MatchEqual",
-        "value": "AlterPassword"
-      }
-    ],
-    "routes": [
-      {
-        "receiver": "email",
-        "matchers": [
-          {
-            "name": "receiver",
-            "type": "MatchRegexp",
-            "value": "email"
-          }
-        ],
-        "continue": true
-      },
-      {
-        "receiver": "internal",
-        "matchers": [
-          {
-            "name": "receiver",
-            "type": "MatchRegexp",
-            "value": "internal"
-          }
-        ]
-      }
-    ]
   }
 }
 

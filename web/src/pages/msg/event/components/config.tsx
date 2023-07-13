@@ -4,13 +4,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Editor from '@monaco-editor/react';
 import { getMsgEventInfoRoute, updateMsgEvent } from '@/services/msgsrv/event';
-import { MatchType, Route } from '@/__generated__/msgsrv/graphql';
-
-type RouteStr = {
-  matchers?: string[];
-  routes: RouteStr[];
-  [key: string]: any;
-}
+import { RouteStrType } from '@/__generated__/msgsrv/graphql';
+import * as yaml from 'js-yaml'
+import { Typography } from 'antd';
 
 type ProFormData = {
   route: string;
@@ -23,6 +19,7 @@ export default (props: {
   onClose: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
+    [errStr, setErrStr] = useState<string>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
@@ -35,73 +32,35 @@ export default (props: {
       }
       setSaveDisabled(true);
     },
-    parseRoute = (data: RouteStr) => {
-      const nData = { ...data } as Route
-      if (data.matchers) {
-        nData.matchers = data.matchers.map(item => {
-          if (item.indexOf('!=') > -1) {
-            const itemSplit = item.split('!=')
-            return {
-              name: itemSplit[0],
-              type: MatchType.MatchNotEqual,
-              value: itemSplit[1].replaceAll('"', '')
-            }
-          } else if (item.indexOf('=~') > -1) {
-            const itemSplit = item.split('=~')
-            return {
-              name: itemSplit[0],
-              type: MatchType.MatchRegexp,
-              value: itemSplit[1].replaceAll('"', '')
-            }
-          } else if (item.indexOf('!~') > -1) {
-            const itemSplit = item.split('!~')
-            return {
-              name: itemSplit[0],
-              type: MatchType.MatchNotRegexp,
-              value: itemSplit[1].replaceAll('"', '')
-            }
-          } else {
-            const itemSplit = item.split('=')
-            return {
-              name: itemSplit[0],
-              type: MatchType.MatchEqual,
-              value: itemSplit[1].replaceAll('"', '')
-            }
-          }
-        })
-      }
-      if (data.routes) {
-        nData.routes = data.routes.map(route => parseRoute(route))
-      }
-      return nData;
-    },
     getRequest = async () => {
       setSaveLoading(false);
       setSaveDisabled(true);
       const initData: ProFormData = {
-        route: '{}'
+        route: ``
       }
-      const result = await getMsgEventInfoRoute(props.id);
-      if (result?.id && result.routeStr) {
-        try {
-          initData.route = JSON.stringify(parseRoute(JSON.parse(result.routeStr)), null, 4)
-        } catch (error) {
-        }
+      const result = await getMsgEventInfoRoute(props.id, RouteStrType.Yaml);
+      if (result?.id) {
+        initData.route = result.routeStr
       }
       return initData;
     },
     onValuesChange = () => {
       setSaveDisabled(false);
+      setErrStr(undefined);
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-
-      const result = await updateMsgEvent(props.id, {
-        route: JSON.parse(values.route),
-      });
-      if (result?.id) {
-        setSaveDisabled(true);
-        props.onClose(true);
+      try {
+        const route = yaml.load(values.route, { json: true })
+        const result = await updateMsgEvent(props.id, {
+          route: route,
+        });
+        if (result?.id) {
+          setSaveDisabled(true);
+          props.onClose(true);
+        }
+      } catch (error) {
+        setErrStr(error.message)
       }
       setSaveLoading(false);
       return false;
@@ -131,11 +90,11 @@ export default (props: {
       onFinish={onFinish}
       onOpenChange={onOpenChange}
     >
-      <ProFormText name="route">
+      <ProFormText name="route" extra={errStr ? <Typography.Text type="danger">{errStr}</Typography.Text> : <></>}>
         <Editor
           className="adminx-editor"
           height="70vh"
-          defaultLanguage="json"
+          defaultLanguage="yaml"
         />
       </ProFormText>
     </DrawerForm>

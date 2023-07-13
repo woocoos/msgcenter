@@ -23,7 +23,7 @@ const documents = {
     "mutation disableMsgChannel($id:ID!){\n disableMsgChannel(id:$id){id}\n}": types.DisableMsgChannelDocument,
     "query msgEventList($first: Int,$orderBy:MsgEventOrder,$where:MsgEventWhereInput){\n  msgEvents(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,status,createdAt,msgTypeID,modes\n        msgType{\n          id,category,appID,name\n        }\n      }\n    }\n  }\n}": types.MsgEventListDocument,
     "query MsgEventInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes\n      msgType{\n        id,category,appID,name\n      }\n    }\n  }\n}": types.MsgEventInfoDocument,
-    "query MsgEventInfoRoute($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes,routeStr\n    }\n  }\n}\n": types.MsgEventInfoRouteDocument,
+    "query MsgEventInfoRoute($gid:GID!,$type:RouteStrType!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes,routeStr(type:$type)\n    }\n  }\n}\n": types.MsgEventInfoRouteDocument,
     "mutation createMsgEvent($input: CreateMsgEventInput!){\n  createMsgEvent(input: $input){id}\n}": types.CreateMsgEventDocument,
     "mutation updateMsgEvent($id:ID!,$input: UpdateMsgEventInput!){\n  updateMsgEvent(id:$id,input: $input){id}\n}": types.UpdateMsgEventDocument,
     "mutation delMsgEvent($id:ID!){\n  deleteMsgEvent(id:$id)\n}": types.DelMsgEventDocument,
@@ -110,7 +110,7 @@ export function gql(source: "query MsgEventInfo($gid:GID!){\n  node(id: $gid){\n
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query MsgEventInfoRoute($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes,routeStr\n    }\n  }\n}\n"): (typeof documents)["query MsgEventInfoRoute($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes,routeStr\n    }\n  }\n}\n"];
+export function gql(source: "query MsgEventInfoRoute($gid:GID!,$type:RouteStrType!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes,routeStr(type:$type)\n    }\n  }\n}\n"): (typeof documents)["query MsgEventInfoRoute($gid:GID!,$type:RouteStrType!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes,routeStr(type:$type)\n    }\n  }\n}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
