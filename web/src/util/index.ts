@@ -157,20 +157,12 @@ export const getDate = (
  * @returns  '5h6m'
  */
 export const dateRangeTurnDuration = (date: [dayjs.ConfigType, dayjs.ConfigType]) => {
-  const format = {
-    year: 'y',
-    month: "M",
-    day: 'd',
-    hour: 'h',
-    minute: 'm',
-    second: 's',
-  };
   let duration: string[] = [], startDate = dayjs(date[0]);
-  ["year", "month", "day", "hour", "minute", "second"].forEach(unit => {
-    const diffValue = dayjs(date[1]).diff(startDate, format[unit]);
+  ["y", "M", "d", "h", "m", "s"].forEach((unit) => {
+    const diffValue = dayjs(date[1]).diff(startDate, unit as dayjs.UnitType);
     if (diffValue) {
-      startDate = startDate.add(diffValue, format[unit])
-      duration.push(`${diffValue}${format[unit]}`)
+      startDate = startDate.add(diffValue, unit as dayjs.ManipulateType)
+      duration.push(`${diffValue}${unit}`)
     }
   })
   return duration.join('');
