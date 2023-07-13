@@ -94,6 +94,7 @@ export default {
     template: '模板',
     subject: '标题',
     attachments: '附件',
+    duration: '持续时长',
 
     // 多个字符组成
     confirm_copy: '确定是否复制',

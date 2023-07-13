@@ -1,18 +1,20 @@
 import { MatcherInput, Silence } from '@/__generated__/msgsrv/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { updateFormat } from '@/util';
-import { DrawerForm, ProFormDateTimeRangePicker, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { useState } from 'react';
+import { dateRangeTurnDuration, durationTurnEndDate, getDate, updateFormat } from '@/util';
+import { DrawerForm, ProFormDateTimeRangePicker, ProFormInstance, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Org } from '@/__generated__/adminx/graphql';
 import { createSilence, getSilenceInfo, updateSilence } from '@/services/msgsrv/silence';
 import { cacheOrg } from '@/services/adminx/org';
 import InputOrg from '@/components/Adminx/Org/input';
 import Matchers from './matchers';
+import { Col, Row } from 'antd';
 
 type ProFormData = {
   org?: Org;
   rangeAt?: [string, string];
+  duration?: string;
   matchers: MatcherInput[];
   comments?: string;
 };
@@ -25,6 +27,7 @@ export default (props: {
   onClose: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
+    formRef = useRef<ProFormInstance<ProFormData>>(),
     [info, setInfo] = useState<Silence>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
@@ -58,7 +61,14 @@ export default (props: {
             }
           });
           initData.org = cacheOrg[result.tenantID];
-          initData.rangeAt = [result.startsAt, result.endsAt];
+          if (result.startsAt && result.endsAt) {
+            initData.rangeAt = [getDate(result.startsAt, 'YYYY-MM-DD HH:mm:ss') as string, getDate(result.endsAt, 'YYYY-MM-DD HH:mm:ss') as string];
+          } else {
+            initData.rangeAt = undefined
+          }
+          initData.duration = initData.rangeAt
+            ? dateRangeTurnDuration(initData.rangeAt) || undefined
+            : undefined;
           initData.comments = result.comments || undefined;
         }
       }
@@ -71,8 +81,8 @@ export default (props: {
       setSaveLoading(true);
       const input = {
         tenantID: values.org?.id ? Number(values.org.id) : 0,
-        startsAt: values.rangeAt?.[0],
-        endsAt: values.rangeAt?.[1],
+        startsAt: getDate(values.rangeAt?.[0], 'YYYY-MM-DDTHH:mm:ssZ'),
+        endsAt: getDate(values.rangeAt?.[1], 'YYYY-MM-DDTHH:mm:ssZ'),
         comments: values.comments,
         matchers: values.matchers,
       };
@@ -91,7 +101,7 @@ export default (props: {
   return (
     <DrawerForm<ProFormData>
       drawerProps={{
-        width: 500,
+        width: 580,
         destroyOnClose: true,
       }}
       submitter={{
@@ -106,6 +116,7 @@ export default (props: {
       }}
       title={props.title}
       open={props?.open}
+      formRef={formRef}
       onReset={getRequest}
       request={getRequest}
       onValuesChange={onValuesChange}
@@ -120,16 +131,48 @@ export default (props: {
         ]}>
         <InputOrg />
       </ProFormText>
-      <ProFormDateTimeRangePicker
-        name="rangeAt"
-        label={t('effective_time')}
-        fieldProps={{
-          style: { width: '100%' }
-        }}
-        rules={[
-          { required: true, message: `${t('please_enter_effective_time')}` },
-        ]}
-      />
+      <Row gutter={20}>
+        <Col span={16}>
+          <ProFormDateTimeRangePicker
+            name="rangeAt"
+            label={t('effective_time')}
+            fieldProps={{
+              style: { width: '100%' },
+              format: 'YYYY-MM-DD HH:mm:ss',
+              onChange: (values) => {
+                if (values) {
+                  formRef.current?.setFieldValue('duration', dateRangeTurnDuration([values[0], values[1]]));
+                } else {
+                  formRef.current?.setFieldValue('duration', null);
+                }
+              }
+            }}
+            rules={[
+              { required: true, message: `${t('please_enter_effective_time')}` },
+            ]}
+          />
+        </Col>
+        <Col span={8}>
+          <ProFormText
+            name="duration"
+            label={t('duration')}
+            rules={[
+              { required: true, message: `${t('please_enter_duration')}` },
+            ]}
+            fieldProps={{
+              onBlur: () => {
+                const startAt = formRef.current?.getFieldValue('rangeAt');
+                if (startAt?.[0]) {
+                  const endDate = durationTurnEndDate(startAt[0], formRef.current?.getFieldValue('duration'), 'YYYY-MM-DD HH:mm:ss');
+                  if (endDate) {
+                    formRef.current?.setFieldValue('rangeAt', [startAt[0], endDate]);
+                  }
+                }
+              }
+            }}
+          />
+        </Col>
+      </Row>
       <ProFormText
         name="matchers"
         label={t('match_msg')}

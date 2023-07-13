@@ -118,10 +118,10 @@ export const loopTreeData = <T extends { key: string; children?: Array<T> }>(
 
 /**
  * 格式化日期
- * @param {Date|Number|String} date
- * @param {String|null} format  YYYY-MM-DD HH:mm:ss
- * @param {String|null} tz  时区
- * @param {Boolean} isTzSet  true将当前时间设置成这个时区，false 将当前时间根据时区转换
+ * @param date
+ * @param format  YYYY-MM-DD HH:mm:ss
+ * @param tz  时区
+ * @param isTzSet  true将当前时间设置成这个时区，false 将当前时间根据时区转换
  * 例子 isTzSet=true
  *      dayjs.tz("2022-07-07 16:30:00", "America/New_York").format("YYYY-MM-DDTHH:mm:ssZ")
  *      = "2022-07-07T16:30:00-04:00"
@@ -131,13 +131,12 @@ export const loopTreeData = <T extends { key: string; children?: Array<T> }>(
  * @returns
  */
 export const getDate = (
-  date: number | Date | string | dayjs.Dayjs,
-  format?: string,
+  date: dayjs.ConfigType,
+  format = 'YYYY-MM-DD',
   tz?: string,
   isTzSet?: boolean,
 ) => {
   if (date) {
-    format = format || 'YYYY-MM-DD';
     if (tz) {
       if (isTzSet) {
         return dayjs.tz(date, tz).format(format);
@@ -147,9 +146,61 @@ export const getDate = (
     }
     return dayjs(date).format(format);
   } else {
-    return null;
+    return null
   }
 };
+
+/**
+ * 日期数据范围转换成文本表示
+ * @param date
+ * @param format
+ * @returns  '5h6m'
+ */
+export const dateRangeTurnDuration = (date: [dayjs.ConfigType, dayjs.ConfigType]) => {
+  const format = {
+    year: 'y',
+    month: "M",
+    day: 'd',
+    hour: 'h',
+    minute: 'm',
+    second: 's',
+  };
+  let duration: string[] = [], startDate = dayjs(date[0]);
+  ["year", "month", "day", "hour", "minute", "second"].forEach(unit => {
+    const diffValue = dayjs(date[1]).diff(startDate, format[unit]);
+    if (diffValue) {
+      startDate = startDate.add(diffValue, format[unit])
+      duration.push(`${diffValue}${format[unit]}`)
+    }
+  })
+  return duration.join('');
+}
+
+/**
+ * 日期数据范围转换成文本表示
+ * @param startDate
+ * @param duration '5h6m'
+ * @param format
+ * @returns
+ */
+export const durationTurnEndDate = (
+  startDate: dayjs.ConfigType,
+  duration: string,
+  format = 'YYYY-MM-DD',
+) => {
+  const keys = ['y', "M", 'd', 'h', 'm', 's'], dl = duration.length;
+  let addValue = '', endDate = dayjs(startDate);
+  for (let i = 0; i < dl; i++) {
+    const item = duration[i];
+    if (keys.includes(item)) {
+      endDate = endDate.add(Number(addValue), item as dayjs.ManipulateType);
+      addValue = '';
+    } else {
+      addValue += item;
+    }
+  }
+  return getDate(endDate, format);
+}
 
 /**
   * 生成随机字符串

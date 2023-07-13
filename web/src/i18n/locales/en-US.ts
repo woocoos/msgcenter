@@ -94,6 +94,7 @@ export default {
     template: 'template',
     subject: 'subject',
     attachments: 'attachments',
+    duration: 'duration',
 
     // 多个字符组成
     confirm_copy: 'confirm copy',
