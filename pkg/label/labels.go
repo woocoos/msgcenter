@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/tsingsun/woocoo/pkg/gds"
 	"sort"
+	"strconv"
 	"unicode/utf8"
 )
 
@@ -160,6 +161,22 @@ type Fingerprint uint64
 
 func (f Fingerprint) String() string {
 	return fmt.Sprintf("%016x", uint64(f))
+}
+
+func (f *Fingerprint) Parse(s string) error {
+	v, err := strconv.ParseUint(s, 16, 64)
+	if err != nil {
+		return err
+	}
+	*f = Fingerprint(v)
+	return nil
+}
+
+// StringToFingerprint parses a string representation of a Fingerprint.
+func StringToFingerprint(s string) (Fingerprint, error) {
+	var f Fingerprint
+	err := f.Parse(s)
+	return f, err
 }
 
 // labelSetToFingerprint works exactly as LabelsToSignature but takes a LabelSet as

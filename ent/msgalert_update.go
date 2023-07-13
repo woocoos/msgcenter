@@ -15,6 +15,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/predicate"
+	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 
 	"github.com/woocoos/msgcenter/ent/internal"
@@ -106,6 +107,20 @@ func (mau *MsgAlertUpdate) SetNillableTimeout(b *bool) *MsgAlertUpdate {
 // SetFingerprint sets the "fingerprint" field.
 func (mau *MsgAlertUpdate) SetFingerprint(s string) *MsgAlertUpdate {
 	mau.mutation.SetFingerprint(s)
+	return mau
+}
+
+// SetState sets the "state" field.
+func (mau *MsgAlertUpdate) SetState(as alert.AlertStatus) *MsgAlertUpdate {
+	mau.mutation.SetState(as)
+	return mau
+}
+
+// SetNillableState sets the "state" field if the given value is not nil.
+func (mau *MsgAlertUpdate) SetNillableState(as *alert.AlertStatus) *MsgAlertUpdate {
+	if as != nil {
+		mau.SetState(*as)
+	}
 	return mau
 }
 
@@ -247,7 +262,30 @@ func (mau *MsgAlertUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (mau *MsgAlertUpdate) check() error {
+	if v, ok := mau.mutation.Labels(); ok {
+		if err := v.Validate(); err != nil {
+			return &ValidationError{Name: "labels", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.labels": %w`, err)}
+		}
+	}
+	if v, ok := mau.mutation.Annotations(); ok {
+		if err := v.Validate(); err != nil {
+			return &ValidationError{Name: "annotations", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.annotations": %w`, err)}
+		}
+	}
+	if v, ok := mau.mutation.State(); ok {
+		if err := msgalert.StateValidator(v); err != nil {
+			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.state": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (mau *MsgAlertUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := mau.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(msgalert.Table, msgalert.Columns, sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt))
 	if ps := mau.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -285,6 +323,9 @@ func (mau *MsgAlertUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := mau.mutation.Fingerprint(); ok {
 		_spec.SetField(msgalert.FieldFingerprint, field.TypeString, value)
+	}
+	if value, ok := mau.mutation.State(); ok {
+		_spec.SetField(msgalert.FieldState, field.TypeEnum, value)
 	}
 	if value, ok := mau.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgalert.FieldUpdatedAt, field.TypeTime, value)
@@ -501,6 +542,20 @@ func (mauo *MsgAlertUpdateOne) SetFingerprint(s string) *MsgAlertUpdateOne {
 	return mauo
 }
 
+// SetState sets the "state" field.
+func (mauo *MsgAlertUpdateOne) SetState(as alert.AlertStatus) *MsgAlertUpdateOne {
+	mauo.mutation.SetState(as)
+	return mauo
+}
+
+// SetNillableState sets the "state" field if the given value is not nil.
+func (mauo *MsgAlertUpdateOne) SetNillableState(as *alert.AlertStatus) *MsgAlertUpdateOne {
+	if as != nil {
+		mauo.SetState(*as)
+	}
+	return mauo
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (mauo *MsgAlertUpdateOne) SetUpdatedAt(t time.Time) *MsgAlertUpdateOne {
 	mauo.mutation.SetUpdatedAt(t)
@@ -652,7 +707,30 @@ func (mauo *MsgAlertUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (mauo *MsgAlertUpdateOne) check() error {
+	if v, ok := mauo.mutation.Labels(); ok {
+		if err := v.Validate(); err != nil {
+			return &ValidationError{Name: "labels", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.labels": %w`, err)}
+		}
+	}
+	if v, ok := mauo.mutation.Annotations(); ok {
+		if err := v.Validate(); err != nil {
+			return &ValidationError{Name: "annotations", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.annotations": %w`, err)}
+		}
+	}
+	if v, ok := mauo.mutation.State(); ok {
+		if err := msgalert.StateValidator(v); err != nil {
+			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.state": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (mauo *MsgAlertUpdateOne) sqlSave(ctx context.Context) (_node *MsgAlert, err error) {
+	if err := mauo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(msgalert.Table, msgalert.Columns, sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt))
 	id, ok := mauo.mutation.ID()
 	if !ok {
@@ -707,6 +785,9 @@ func (mauo *MsgAlertUpdateOne) sqlSave(ctx context.Context) (_node *MsgAlert, er
 	}
 	if value, ok := mauo.mutation.Fingerprint(); ok {
 		_spec.SetField(msgalert.FieldFingerprint, field.TypeString, value)
+	}
+	if value, ok := mauo.mutation.State(); ok {
+		_spec.SetField(msgalert.FieldState, field.TypeEnum, value)
 	}
 	if value, ok := mauo.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgalert.FieldUpdatedAt, field.TypeTime, value)

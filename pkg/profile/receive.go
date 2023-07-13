@@ -75,3 +75,14 @@ func TenantReceiverName(tid string, ori string) string {
 func AppRouteName(aid string, rname string) string {
 	return rname + "_" + aid
 }
+
+// ReceiverKey inditifies a receiver with the position of a receiver group.
+type ReceiverKey struct {
+	// Configured name of the receiver.
+	Name string
+	// Name of the integration of the receiver.
+	Integration string
+	// Index of the receiver with respect to the integration.
+	// Every integration in a group may have 0..N configurations.
+	Index uint32
+}

@@ -49,7 +49,7 @@ func (Nlog) Fields() []ent.Field {
 			Annotations(entgql.OrderField("createdAt"), entgql.Skip(entgql.SkipMutationCreateInput)),
 		field.Time("updated_at").Optional().
 			Annotations(entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput)),
-		field.Time("expires_at").Comment("驱逐时间"),
+		field.Time("expires_at").Comment("过期时间"),
 	}
 }
 

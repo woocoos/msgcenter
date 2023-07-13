@@ -3,11 +3,14 @@
 package msgalert
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/woocoos/msgcenter/pkg/alert"
 )
 
 const (
@@ -31,6 +34,8 @@ const (
 	FieldTimeout = "timeout"
 	// FieldFingerprint holds the string denoting the fingerprint field in the database.
 	FieldFingerprint = "fingerprint"
+	// FieldState holds the string denoting the state field in the database.
+	FieldState = "state"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -68,6 +73,7 @@ var Columns = []string{
 	FieldURL,
 	FieldTimeout,
 	FieldFingerprint,
+	FieldState,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeleted,
@@ -105,6 +111,18 @@ var (
 	DefaultDeleted bool
 )
 
+const DefaultState alert.AlertStatus = "none"
+
+// StateValidator is a validator for the "state" field enum values. It is called by the builders before save.
+func StateValidator(s alert.AlertStatus) error {
+	switch s {
+	case "none", "firing", "resolved":
+		return nil
+	default:
+		return fmt.Errorf("msgalert: invalid enum value for state field: %q", s)
+	}
+}
+
 // OrderOption defines the ordering options for the MsgAlert queries.
 type OrderOption func(*sql.Selector)
 
@@ -141,6 +159,11 @@ func ByTimeout(opts ...sql.OrderTermOption) OrderOption {
 // ByFingerprint orders the results by the fingerprint field.
 func ByFingerprint(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldFingerprint, opts...).ToFunc()
+}
+
+// ByState orders the results by the state field.
+func ByState(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldState, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.
@@ -199,3 +222,10 @@ func newNlogAlertsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, true, NlogAlertsTable, NlogAlertsColumn),
 	)
 }
+
+var (
+	// alert.AlertStatus must implement graphql.Marshaler.
+	_ graphql.Marshaler = (*alert.AlertStatus)(nil)
+	// alert.AlertStatus must implement graphql.Unmarshaler.
+	_ graphql.Unmarshaler = (*alert.AlertStatus)(nil)
+)

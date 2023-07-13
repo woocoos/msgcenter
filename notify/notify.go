@@ -9,7 +9,6 @@ import (
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/woocoos/msgcenter/inhibit"
 	"github.com/woocoos/msgcenter/metrics"
-	"github.com/woocoos/msgcenter/nflog"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -37,8 +36,8 @@ type Notifier interface {
 
 // NotificationLog is the interface for the notification log. It provides methods to persist and query notifications.
 type NotificationLog interface {
-	Log(ctx context.Context, r *nflog.Receiver, gkey string, firingAlerts, resolvedAlerts []uint64, expiry time.Duration) error
-	Query(params ...nflog.EntryQuery) ([]*nflog.Entry, error)
+	Log(ctx context.Context, r *profile.ReceiverKey, gkey string, firingAlerts, resolvedAlerts []uint64, expiry time.Duration) error
+	Query(params ...EntryQuery) ([]*LogEntry, error)
 }
 
 // CustomerConfigFunc is a function that can be overridden by out component.
@@ -143,7 +142,7 @@ func createReceiverStage(
 ) Stage {
 	var fs FanoutStage
 	for i := range integrations {
-		recv := &nflog.Receiver{
+		recv := &profile.ReceiverKey{
 			Name:        name,
 			Integration: integrations[i].Name(),
 			Index:       uint32(integrations[i].Index()),
@@ -288,14 +287,14 @@ func (ws *WaitStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.
 type DedupStage struct {
 	rs    ResolvedSender
 	nflog NotificationLog
-	recv  *nflog.Receiver
+	recv  *profile.ReceiverKey
 
 	now  func() time.Time
 	hash func(*alert.Alert) uint64
 }
 
 // NewDedupStage wraps a DedupStage that runs against the given notification log.
-func NewDedupStage(rs ResolvedSender, l NotificationLog, recv *nflog.Receiver) *DedupStage {
+func NewDedupStage(rs ResolvedSender, l NotificationLog, recv *profile.ReceiverKey) *DedupStage {
 	return &DedupStage{
 		rs:    rs,
 		nflog: l,
@@ -309,7 +308,7 @@ func hashAlert(a *alert.Alert) uint64 {
 	return uint64(a.Labels.Fingerprint())
 }
 
-func (n *DedupStage) needsUpdate(entry *nflog.Entry, firing, resolved map[uint64]struct{}, repeat time.Duration) bool {
+func (n *DedupStage) needsUpdate(entry *LogEntry, firing, resolved map[uint64]struct{}, repeat time.Duration) bool {
 	// If we haven't notified about the alert group before, notify right away
 	// unless we only have resolved alerts.
 	if entry == nil {
@@ -373,12 +372,12 @@ func (n *DedupStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.
 	ctx = WithFiringAlerts(ctx, firing)
 	ctx = WithResolvedAlerts(ctx, resolved)
 
-	entries, err := n.nflog.Query(nflog.QGroupKey(gkey), nflog.QReceiver(n.recv))
-	if err != nil && err != nflog.ErrNotFound {
+	entries, err := n.nflog.Query(QGroupKey(gkey), QReceiver(n.recv))
+	if err != nil {
 		return ctx, nil, err
 	}
 
-	var entry *nflog.Entry
+	var entry *LogEntry
 	switch len(entries) {
 	case 0:
 	case 1:
@@ -507,11 +506,11 @@ func (r RetryStage) exec(ctx context.Context, alerts ...*alert.Alert) (context.C
 // passed alerts should have already been sent to the receivers.
 type SetNotifiesStage struct {
 	nflog NotificationLog
-	recv  *nflog.Receiver
+	recv  *profile.ReceiverKey
 }
 
 // NewSetNotifiesStage returns a new instance of a SetNotifiesStage.
-func NewSetNotifiesStage(l NotificationLog, recv *nflog.Receiver) *SetNotifiesStage {
+func NewSetNotifiesStage(l NotificationLog, recv *profile.ReceiverKey) *SetNotifiesStage {
 	return &SetNotifiesStage{
 		nflog: l,
 		recv:  recv,

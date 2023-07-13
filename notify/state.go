@@ -1,42 +1,45 @@
-package nflog
+package notify
 
 import (
 	"bytes"
 	"github.com/vmihailenco/msgpack/v5"
+	"github.com/woocoos/msgcenter/pkg/profile"
 	"io"
 	"time"
 )
 
 type (
-	Entry struct {
-		ID             int       `json:"id,omitempty"`
-		ExpiresAt      time.Time `json:"expires_at,omitempty"`
-		UpdatedAt      time.Time `json:"updated_at,omitempty"`
-		GroupKey       string    `json:"group_key,omitempty"`
-		Receiver       string    `json:"receiver,omitempty"`
-		FiringAlerts   []uint64  `json:"firing_alerts,omitempty"`
-		ResolvedAlerts []uint64  `json:"resolved_alerts,omitempty"`
+	LogEntry struct {
+		ID             int                  `json:"id,omitempty"`
+		ExpiresAt      time.Time            `json:"expires_at,omitempty"`
+		UpdatedAt      time.Time            `json:"updated_at,omitempty"`
+		GroupKey       string               `json:"group_key,omitempty"`
+		Receiver       string               `json:"receiver,omitempty"`
+		ReceiverType   profile.ReceiverType `json:"receiver_type,omitempty"`
+		Idx            int                  `json:"idx,omitempty"`
+		FiringAlerts   []uint64             `json:"firing_alerts,omitempty"`
+		ResolvedAlerts []uint64             `json:"resolved_alerts,omitempty"`
 	}
 
-	state map[int]*Entry
+	state map[int]*LogEntry
 
-	EntryQuery func(*Entry) bool
+	EntryQuery func(*LogEntry) bool
 )
 
-func QReceiver(r *Receiver) EntryQuery {
-	return func(e *Entry) bool {
+func QReceiver(r *profile.ReceiverKey) EntryQuery {
+	return func(e *LogEntry) bool {
 		return e.Receiver == r.Name
 	}
 }
 
 func QGroupKey(gk string) EntryQuery {
-	return func(e *Entry) bool {
+	return func(e *LogEntry) bool {
 		return e.GroupKey == gk
 	}
 }
 
-func (s state) query(qs ...EntryQuery) ([]*Entry, error) {
-	var res []*Entry
+func (s state) query(qs ...EntryQuery) ([]*LogEntry, error) {
+	var res []*LogEntry
 	for _, e := range s {
 		var ok bool
 		for _, q := range qs {
@@ -63,7 +66,7 @@ func (s state) clone() state {
 
 // merge returns true or false whether the MeshEntry was merged or
 // not. This information is used to decide to gossip the message further.
-func (s state) merge(e *Entry, now time.Time) bool {
+func (s state) merge(e *LogEntry, now time.Time) bool {
 	if e.ExpiresAt.Before(now) {
 		return false
 	}
@@ -79,7 +82,7 @@ func (s state) merge(e *Entry, now time.Time) bool {
 func (s state) Merge(bs []byte) error {
 	dec := msgpack.NewDecoder(bytes.NewReader(bs))
 	for {
-		var e *Entry
+		var e *LogEntry
 		if err := dec.Decode(&e); err != nil {
 			if err == io.EOF {
 				break
@@ -103,7 +106,7 @@ func (s state) MarshalBinary() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (s state) marshalBinary(e *Entry) ([]byte, error) {
+func (s state) marshalBinary(e *LogEntry) ([]byte, error) {
 	var buf bytes.Buffer
 	enc := msgpack.NewEncoder(&buf)
 	if err := enc.Encode(e); err != nil {
@@ -114,7 +117,7 @@ func (s state) marshalBinary(e *Entry) ([]byte, error) {
 
 // IsFiringSubset returns whether the given subset is a subset of the alerts
 // that were firing at the time of the last notification.
-func (m *Entry) IsFiringSubset(subset map[uint64]struct{}) bool {
+func (m *LogEntry) IsFiringSubset(subset map[uint64]struct{}) bool {
 	set := map[uint64]struct{}{}
 	for i := range m.FiringAlerts {
 		set[m.FiringAlerts[i]] = struct{}{}
@@ -125,7 +128,7 @@ func (m *Entry) IsFiringSubset(subset map[uint64]struct{}) bool {
 
 // IsResolvedSubset returns whether the given subset is a subset of the alerts
 // that were resolved at the time of the last notification.
-func (m *Entry) IsResolvedSubset(subset map[uint64]struct{}) bool {
+func (m *LogEntry) IsResolvedSubset(subset map[uint64]struct{}) bool {
 	set := map[uint64]struct{}{}
 	for i := range m.ResolvedAlerts {
 		set[m.ResolvedAlerts[i]] = struct{}{}

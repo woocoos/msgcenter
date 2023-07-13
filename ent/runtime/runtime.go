@@ -35,11 +35,11 @@ func init() {
 	// msgalert.DefaultTimeout holds the default value on creation for the timeout field.
 	msgalert.DefaultTimeout = msgalertDescTimeout.Default.(bool)
 	// msgalertDescCreatedAt is the schema descriptor for created_at field.
-	msgalertDescCreatedAt := msgalertFields[7].Descriptor()
+	msgalertDescCreatedAt := msgalertFields[8].Descriptor()
 	// msgalert.DefaultCreatedAt holds the default value on creation for the created_at field.
 	msgalert.DefaultCreatedAt = msgalertDescCreatedAt.Default.(func() time.Time)
 	// msgalertDescDeleted is the schema descriptor for deleted field.
-	msgalertDescDeleted := msgalertFields[9].Descriptor()
+	msgalertDescDeleted := msgalertFields[10].Descriptor()
 	// msgalert.DefaultDeleted holds the default value on creation for the deleted field.
 	msgalert.DefaultDeleted = msgalertDescDeleted.Default.(bool)
 	msgchannelMixin := schema.MsgChannel{}.Mixin()
@@ -166,7 +166,7 @@ func init() {
 	nlogalertFields := schema.NlogAlert{}.Fields()
 	_ = nlogalertFields
 	// nlogalertDescCreatedAt is the schema descriptor for created_at field.
-	nlogalertDescCreatedAt := nlogalertFields[3].Descriptor()
+	nlogalertDescCreatedAt := nlogalertFields[2].Descriptor()
 	// nlogalert.DefaultCreatedAt holds the default value on creation for the created_at field.
 	nlogalert.DefaultCreatedAt = nlogalertDescCreatedAt.Default.(func() time.Time)
 	orgroleuserHooks := schema.OrgRoleUser{}.Hooks()

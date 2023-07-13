@@ -14,6 +14,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
+	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 )
 
@@ -86,6 +87,20 @@ func (mac *MsgAlertCreate) SetNillableTimeout(b *bool) *MsgAlertCreate {
 // SetFingerprint sets the "fingerprint" field.
 func (mac *MsgAlertCreate) SetFingerprint(s string) *MsgAlertCreate {
 	mac.mutation.SetFingerprint(s)
+	return mac
+}
+
+// SetState sets the "state" field.
+func (mac *MsgAlertCreate) SetState(as alert.AlertStatus) *MsgAlertCreate {
+	mac.mutation.SetState(as)
+	return mac
+}
+
+// SetNillableState sets the "state" field if the given value is not nil.
+func (mac *MsgAlertCreate) SetNillableState(as *alert.AlertStatus) *MsgAlertCreate {
+	if as != nil {
+		mac.SetState(*as)
+	}
 	return mac
 }
 
@@ -208,6 +223,10 @@ func (mac *MsgAlertCreate) defaults() error {
 		v := msgalert.DefaultTimeout
 		mac.mutation.SetTimeout(v)
 	}
+	if _, ok := mac.mutation.State(); !ok {
+		v := msgalert.DefaultState
+		mac.mutation.SetState(v)
+	}
 	if _, ok := mac.mutation.CreatedAt(); !ok {
 		if msgalert.DefaultCreatedAt == nil {
 			return fmt.Errorf("ent: uninitialized msgalert.DefaultCreatedAt (forgotten import ent/runtime?)")
@@ -248,6 +267,14 @@ func (mac *MsgAlertCreate) check() error {
 	}
 	if _, ok := mac.mutation.Fingerprint(); !ok {
 		return &ValidationError{Name: "fingerprint", err: errors.New(`ent: missing required field "MsgAlert.fingerprint"`)}
+	}
+	if _, ok := mac.mutation.State(); !ok {
+		return &ValidationError{Name: "state", err: errors.New(`ent: missing required field "MsgAlert.state"`)}
+	}
+	if v, ok := mac.mutation.State(); ok {
+		if err := msgalert.StateValidator(v); err != nil {
+			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.state": %w`, err)}
+		}
 	}
 	if _, ok := mac.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "MsgAlert.created_at"`)}
@@ -320,6 +347,10 @@ func (mac *MsgAlertCreate) createSpec() (*MsgAlert, *sqlgraph.CreateSpec) {
 	if value, ok := mac.mutation.Fingerprint(); ok {
 		_spec.SetField(msgalert.FieldFingerprint, field.TypeString, value)
 		_node.Fingerprint = value
+	}
+	if value, ok := mac.mutation.State(); ok {
+		_spec.SetField(msgalert.FieldState, field.TypeEnum, value)
+		_node.State = value
 	}
 	if value, ok := mac.mutation.CreatedAt(); ok {
 		_spec.SetField(msgalert.FieldCreatedAt, field.TypeTime, value)
@@ -525,6 +556,18 @@ func (u *MsgAlertUpsert) UpdateFingerprint() *MsgAlertUpsert {
 	return u
 }
 
+// SetState sets the "state" field.
+func (u *MsgAlertUpsert) SetState(v alert.AlertStatus) *MsgAlertUpsert {
+	u.Set(msgalert.FieldState, v)
+	return u
+}
+
+// UpdateState sets the "state" field to the value that was provided on create.
+func (u *MsgAlertUpsert) UpdateState() *MsgAlertUpsert {
+	u.SetExcluded(msgalert.FieldState)
+	return u
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (u *MsgAlertUpsert) SetUpdatedAt(v time.Time) *MsgAlertUpsert {
 	u.Set(msgalert.FieldUpdatedAt, v)
@@ -725,6 +768,20 @@ func (u *MsgAlertUpsertOne) SetFingerprint(v string) *MsgAlertUpsertOne {
 func (u *MsgAlertUpsertOne) UpdateFingerprint() *MsgAlertUpsertOne {
 	return u.Update(func(s *MsgAlertUpsert) {
 		s.UpdateFingerprint()
+	})
+}
+
+// SetState sets the "state" field.
+func (u *MsgAlertUpsertOne) SetState(v alert.AlertStatus) *MsgAlertUpsertOne {
+	return u.Update(func(s *MsgAlertUpsert) {
+		s.SetState(v)
+	})
+}
+
+// UpdateState sets the "state" field to the value that was provided on create.
+func (u *MsgAlertUpsertOne) UpdateState() *MsgAlertUpsertOne {
+	return u.Update(func(s *MsgAlertUpsert) {
+		s.UpdateState()
 	})
 }
 
@@ -1095,6 +1152,20 @@ func (u *MsgAlertUpsertBulk) SetFingerprint(v string) *MsgAlertUpsertBulk {
 func (u *MsgAlertUpsertBulk) UpdateFingerprint() *MsgAlertUpsertBulk {
 	return u.Update(func(s *MsgAlertUpsert) {
 		s.UpdateFingerprint()
+	})
+}
+
+// SetState sets the "state" field.
+func (u *MsgAlertUpsertBulk) SetState(v alert.AlertStatus) *MsgAlertUpsertBulk {
+	return u.Update(func(s *MsgAlertUpsert) {
+		s.SetState(v)
+	})
+}
+
+// UpdateState sets the "state" field to the value that was provided on create.
+func (u *MsgAlertUpsertBulk) UpdateState() *MsgAlertUpsertBulk {
+	return u.Update(func(s *MsgAlertUpsert) {
+		s.UpdateState()
 	})
 }
 

@@ -143,14 +143,22 @@ type MsgAlert implements Node {
   url: String
   """状态"""
   timeout: Boolean!
-  """指纹"""
+  """指纹hash值"""
   fingerprint: String!
+  """通知状态,firing: 触发通知,resolved: 已处理过"""
+  state: MsgAlertAlertStatus!
   createdAt: Time!
   updatedAt: Time
   """是否移除"""
   deleted: Boolean!
   nlog: [Nlog!]
   nlogAlerts: [NlogAlert!]
+}
+"""MsgAlertAlertStatus is enum for the field state"""
+enum MsgAlertAlertStatus @goModel(model: "github.com/woocoos/msgcenter/pkg/alert.AlertStatus") {
+  none
+  firing
+  resolved
 }
 """A connection to a list of items."""
 type MsgAlertConnection {
@@ -256,6 +264,11 @@ input MsgAlertWhereInput {
   fingerprintHasSuffix: String
   fingerprintEqualFold: String
   fingerprintContainsFold: String
+  """state field predicates"""
+  state: MsgAlertAlertStatus
+  stateNEQ: MsgAlertAlertStatus
+  stateIn: [MsgAlertAlertStatus!]
+  stateNotIn: [MsgAlertAlertStatus!]
   """created_at field predicates"""
   createdAt: Time
   createdAtNEQ: Time
@@ -1217,7 +1230,7 @@ type Nlog implements Node {
   sendAt: Time!
   createdAt: Time!
   updatedAt: Time
-  """驱逐时间"""
+  """过期时间"""
   expiresAt: Time!
   alerts: [MsgAlert!]
   nlogAlert: [NlogAlert!]
@@ -1228,8 +1241,6 @@ type NlogAlert implements Node {
   nlogID: ID!
   """alert id"""
   alertID: ID!
-  """状态"""
-  state: NlogAlertState!
   createdAt: Time!
   nlog: Nlog!
   alert: MsgAlert!
@@ -1244,11 +1255,6 @@ input NlogAlertOrder {
 """Properties by which NlogAlert connections can be ordered."""
 enum NlogAlertOrderField {
   createdAt
-}
-"""NlogAlertState is enum for the field state"""
-enum NlogAlertState @goModel(model: "github.com/woocoos/msgcenter/ent/nlogalert.State") {
-  firing
-  resolve
 }
 """
 NlogAlertWhereInput is used for filtering NlogAlert objects.
@@ -1267,11 +1273,6 @@ input NlogAlertWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """state field predicates"""
-  state: NlogAlertState
-  stateNEQ: NlogAlertState
-  stateIn: [NlogAlertState!]
-  stateNotIn: [NlogAlertState!]
   """created_at field predicates"""
   createdAt: Time
   createdAtNEQ: Time

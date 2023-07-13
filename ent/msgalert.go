@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/woocoos/msgcenter/ent/msgalert"
+	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 )
 
@@ -33,8 +34,10 @@ type MsgAlert struct {
 	URL string `json:"url,omitempty"`
 	// 状态
 	Timeout bool `json:"timeout,omitempty"`
-	// 指纹
+	// 指纹hash值
 	Fingerprint string `json:"fingerprint,omitempty"`
+	// 通知状态,firing: 触发通知,resolved: 已处理过
+	State alert.AlertStatus `json:"state,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -92,7 +95,7 @@ func (*MsgAlert) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case msgalert.FieldID, msgalert.FieldTenantID:
 			values[i] = new(sql.NullInt64)
-		case msgalert.FieldURL, msgalert.FieldFingerprint:
+		case msgalert.FieldURL, msgalert.FieldFingerprint, msgalert.FieldState:
 			values[i] = new(sql.NullString)
 		case msgalert.FieldStartsAt, msgalert.FieldEndsAt, msgalert.FieldCreatedAt, msgalert.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -168,6 +171,12 @@ func (ma *MsgAlert) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field fingerprint", values[i])
 			} else if value.Valid {
 				ma.Fingerprint = value.String
+			}
+		case msgalert.FieldState:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field state", values[i])
+			} else if value.Valid {
+				ma.State = alert.AlertStatus(value.String)
 			}
 		case msgalert.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -256,6 +265,9 @@ func (ma *MsgAlert) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("fingerprint=")
 	builder.WriteString(ma.Fingerprint)
+	builder.WriteString(", ")
+	builder.WriteString("state=")
+	builder.WriteString(fmt.Sprintf("%v", ma.State))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(ma.CreatedAt.Format(time.ANSIC))

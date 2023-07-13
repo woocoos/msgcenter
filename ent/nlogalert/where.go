@@ -112,26 +112,6 @@ func AlertIDNotIn(vs ...int) predicate.NlogAlert {
 	return predicate.NlogAlert(sql.FieldNotIn(FieldAlertID, vs...))
 }
 
-// StateEQ applies the EQ predicate on the "state" field.
-func StateEQ(v State) predicate.NlogAlert {
-	return predicate.NlogAlert(sql.FieldEQ(FieldState, v))
-}
-
-// StateNEQ applies the NEQ predicate on the "state" field.
-func StateNEQ(v State) predicate.NlogAlert {
-	return predicate.NlogAlert(sql.FieldNEQ(FieldState, v))
-}
-
-// StateIn applies the In predicate on the "state" field.
-func StateIn(vs ...State) predicate.NlogAlert {
-	return predicate.NlogAlert(sql.FieldIn(FieldState, vs...))
-}
-
-// StateNotIn applies the NotIn predicate on the "state" field.
-func StateNotIn(vs ...State) predicate.NlogAlert {
-	return predicate.NlogAlert(sql.FieldNotIn(FieldState, vs...))
-}
-
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.NlogAlert {
 	return predicate.NlogAlert(sql.FieldEQ(FieldCreatedAt, v))

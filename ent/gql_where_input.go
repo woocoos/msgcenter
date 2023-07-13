@@ -105,6 +105,12 @@ type MsgAlertWhereInput struct {
 	FingerprintEqualFold    *string  `json:"fingerprintEqualFold,omitempty"`
 	FingerprintContainsFold *string  `json:"fingerprintContainsFold,omitempty"`
 
+	// "state" field predicates.
+	State      *alert.AlertStatus  `json:"state,omitempty"`
+	StateNEQ   *alert.AlertStatus  `json:"stateNEQ,omitempty"`
+	StateIn    []alert.AlertStatus `json:"stateIn,omitempty"`
+	StateNotIn []alert.AlertStatus `json:"stateNotIn,omitempty"`
+
 	// "created_at" field predicates.
 	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
@@ -396,6 +402,18 @@ func (i *MsgAlertWhereInput) P() (predicate.MsgAlert, error) {
 	}
 	if i.FingerprintContainsFold != nil {
 		predicates = append(predicates, msgalert.FingerprintContainsFold(*i.FingerprintContainsFold))
+	}
+	if i.State != nil {
+		predicates = append(predicates, msgalert.StateEQ(*i.State))
+	}
+	if i.StateNEQ != nil {
+		predicates = append(predicates, msgalert.StateNEQ(*i.StateNEQ))
+	}
+	if len(i.StateIn) > 0 {
+		predicates = append(predicates, msgalert.StateIn(i.StateIn...))
+	}
+	if len(i.StateNotIn) > 0 {
+		predicates = append(predicates, msgalert.StateNotIn(i.StateNotIn...))
 	}
 	if i.CreatedAt != nil {
 		predicates = append(predicates, msgalert.CreatedAtEQ(*i.CreatedAt))
@@ -3759,12 +3777,6 @@ type NlogAlertWhereInput struct {
 	AlertIDIn    []int `json:"alertIDIn,omitempty"`
 	AlertIDNotIn []int `json:"alertIDNotIn,omitempty"`
 
-	// "state" field predicates.
-	State      *nlogalert.State  `json:"state,omitempty"`
-	StateNEQ   *nlogalert.State  `json:"stateNEQ,omitempty"`
-	StateIn    []nlogalert.State `json:"stateIn,omitempty"`
-	StateNotIn []nlogalert.State `json:"stateNotIn,omitempty"`
-
 	// "created_at" field predicates.
 	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
 	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
@@ -3902,18 +3914,6 @@ func (i *NlogAlertWhereInput) P() (predicate.NlogAlert, error) {
 	}
 	if len(i.AlertIDNotIn) > 0 {
 		predicates = append(predicates, nlogalert.AlertIDNotIn(i.AlertIDNotIn...))
-	}
-	if i.State != nil {
-		predicates = append(predicates, nlogalert.StateEQ(*i.State))
-	}
-	if i.StateNEQ != nil {
-		predicates = append(predicates, nlogalert.StateNEQ(*i.StateNEQ))
-	}
-	if len(i.StateIn) > 0 {
-		predicates = append(predicates, nlogalert.StateIn(i.StateIn...))
-	}
-	if len(i.StateNotIn) > 0 {
-		predicates = append(predicates, nlogalert.StateNotIn(i.StateNotIn...))
 	}
 	if i.CreatedAt != nil {
 		predicates = append(predicates, nlogalert.CreatedAtEQ(*i.CreatedAt))

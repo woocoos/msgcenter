@@ -26,7 +26,6 @@ func (NlogAlert) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("nlog_id").Comment("nlog id"),
 		field.Int("alert_id").Comment("alert id"),
-		field.Enum("state").Values("firing", "resolve").Comment("状态"),
 		field.Time("created_at").Immutable().Default(time.Now).Immutable().
 			Annotations(entgql.OrderField("createdAt"), entgql.Skip(entgql.SkipMutationCreateInput)),
 	}

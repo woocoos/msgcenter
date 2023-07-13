@@ -43,12 +43,6 @@ func (nau *NlogAlertUpdate) SetAlertID(i int) *NlogAlertUpdate {
 	return nau
 }
 
-// SetState sets the "state" field.
-func (nau *NlogAlertUpdate) SetState(n nlogalert.State) *NlogAlertUpdate {
-	nau.mutation.SetState(n)
-	return nau
-}
-
 // SetNlog sets the "nlog" edge to the Nlog entity.
 func (nau *NlogAlertUpdate) SetNlog(n *Nlog) *NlogAlertUpdate {
 	return nau.SetNlogID(n.ID)
@@ -105,11 +99,6 @@ func (nau *NlogAlertUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (nau *NlogAlertUpdate) check() error {
-	if v, ok := nau.mutation.State(); ok {
-		if err := nlogalert.StateValidator(v); err != nil {
-			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "NlogAlert.state": %w`, err)}
-		}
-	}
 	if _, ok := nau.mutation.NlogID(); nau.mutation.NlogCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "NlogAlert.nlog"`)
 	}
@@ -130,9 +119,6 @@ func (nau *NlogAlertUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := nau.mutation.State(); ok {
-		_spec.SetField(nlogalert.FieldState, field.TypeEnum, value)
 	}
 	if nau.mutation.NlogCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -230,12 +216,6 @@ func (nauo *NlogAlertUpdateOne) SetAlertID(i int) *NlogAlertUpdateOne {
 	return nauo
 }
 
-// SetState sets the "state" field.
-func (nauo *NlogAlertUpdateOne) SetState(n nlogalert.State) *NlogAlertUpdateOne {
-	nauo.mutation.SetState(n)
-	return nauo
-}
-
 // SetNlog sets the "nlog" edge to the Nlog entity.
 func (nauo *NlogAlertUpdateOne) SetNlog(n *Nlog) *NlogAlertUpdateOne {
 	return nauo.SetNlogID(n.ID)
@@ -305,11 +285,6 @@ func (nauo *NlogAlertUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (nauo *NlogAlertUpdateOne) check() error {
-	if v, ok := nauo.mutation.State(); ok {
-		if err := nlogalert.StateValidator(v); err != nil {
-			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "NlogAlert.state": %w`, err)}
-		}
-	}
 	if _, ok := nauo.mutation.NlogID(); nauo.mutation.NlogCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "NlogAlert.nlog"`)
 	}
@@ -347,9 +322,6 @@ func (nauo *NlogAlertUpdateOne) sqlSave(ctx context.Context) (_node *NlogAlert, 
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := nauo.mutation.State(); ok {
-		_spec.SetField(nlogalert.FieldState, field.TypeEnum, value)
 	}
 	if nauo.mutation.NlogCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -8,6 +8,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/woocoos/msgcenter/ent/predicate"
+	"github.com/woocoos/msgcenter/pkg/alert"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
@@ -390,6 +391,36 @@ func FingerprintEqualFold(v string) predicate.MsgAlert {
 // FingerprintContainsFold applies the ContainsFold predicate on the "fingerprint" field.
 func FingerprintContainsFold(v string) predicate.MsgAlert {
 	return predicate.MsgAlert(sql.FieldContainsFold(FieldFingerprint, v))
+}
+
+// StateEQ applies the EQ predicate on the "state" field.
+func StateEQ(v alert.AlertStatus) predicate.MsgAlert {
+	vc := v
+	return predicate.MsgAlert(sql.FieldEQ(FieldState, vc))
+}
+
+// StateNEQ applies the NEQ predicate on the "state" field.
+func StateNEQ(v alert.AlertStatus) predicate.MsgAlert {
+	vc := v
+	return predicate.MsgAlert(sql.FieldNEQ(FieldState, vc))
+}
+
+// StateIn applies the In predicate on the "state" field.
+func StateIn(vs ...alert.AlertStatus) predicate.MsgAlert {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MsgAlert(sql.FieldIn(FieldState, v...))
+}
+
+// StateNotIn applies the NotIn predicate on the "state" field.
+func StateNotIn(vs ...alert.AlertStatus) predicate.MsgAlert {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MsgAlert(sql.FieldNotIn(FieldState, v...))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

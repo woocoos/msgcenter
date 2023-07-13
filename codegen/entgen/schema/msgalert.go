@@ -7,14 +7,17 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/woocoos/entco/schemax"
 	gen "github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/intercept"
+	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"time"
 )
 
 // MsgAlert holds the schema definition for the MsgAlert entity.
+// if MsgAlert has state value that means it has been notified.
 type MsgAlert struct {
 	ent.Schema
 }
@@ -45,7 +48,9 @@ func (MsgAlert) Fields() []ent.Field {
 		field.Time("ends_at").Comment("结束时间"),
 		field.String("url").Optional().Comment("generatorURL"),
 		field.Bool("timeout").Default(false).Comment("状态"),
-		field.String("fingerprint").Comment("指纹"),
+		field.String("fingerprint").Comment("指纹hash值"),
+		field.Enum("state").GoType(alert.AlertStatus("")).Default(string(alert.AlertNone)).
+			Comment("通知状态,firing: 触发通知,resolved: 已处理过"),
 		field.Time("created_at").Immutable().Default(time.Now).Immutable().
 			Annotations(entgql.OrderField("createdAt"), entgql.Skip(entgql.SkipMutationCreateInput)),
 		field.Time("updated_at").Optional().
@@ -58,5 +63,12 @@ func (MsgAlert) Fields() []ent.Field {
 func (MsgAlert) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("nlog", Nlog.Type).Ref("alerts").Through("nlog_alerts", NlogAlert.Type),
+	}
+}
+
+// Indexes of the MsgAlert.
+func (MsgAlert) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("fingerprint"),
 	}
 }

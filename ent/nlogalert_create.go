@@ -36,12 +36,6 @@ func (nac *NlogAlertCreate) SetAlertID(i int) *NlogAlertCreate {
 	return nac
 }
 
-// SetState sets the "state" field.
-func (nac *NlogAlertCreate) SetState(n nlogalert.State) *NlogAlertCreate {
-	nac.mutation.SetState(n)
-	return nac
-}
-
 // SetCreatedAt sets the "created_at" field.
 func (nac *NlogAlertCreate) SetCreatedAt(t time.Time) *NlogAlertCreate {
 	nac.mutation.SetCreatedAt(t)
@@ -115,14 +109,6 @@ func (nac *NlogAlertCreate) check() error {
 	if _, ok := nac.mutation.AlertID(); !ok {
 		return &ValidationError{Name: "alert_id", err: errors.New(`ent: missing required field "NlogAlert.alert_id"`)}
 	}
-	if _, ok := nac.mutation.State(); !ok {
-		return &ValidationError{Name: "state", err: errors.New(`ent: missing required field "NlogAlert.state"`)}
-	}
-	if v, ok := nac.mutation.State(); ok {
-		if err := nlogalert.StateValidator(v); err != nil {
-			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "NlogAlert.state": %w`, err)}
-		}
-	}
 	if _, ok := nac.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "NlogAlert.created_at"`)}
 	}
@@ -160,10 +146,6 @@ func (nac *NlogAlertCreate) createSpec() (*NlogAlert, *sqlgraph.CreateSpec) {
 	)
 	_spec.Schema = nac.schemaConfig.NlogAlert
 	_spec.OnConflict = nac.conflict
-	if value, ok := nac.mutation.State(); ok {
-		_spec.SetField(nlogalert.FieldState, field.TypeEnum, value)
-		_node.State = value
-	}
 	if value, ok := nac.mutation.CreatedAt(); ok {
 		_spec.SetField(nlogalert.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -280,18 +262,6 @@ func (u *NlogAlertUpsert) UpdateAlertID() *NlogAlertUpsert {
 	return u
 }
 
-// SetState sets the "state" field.
-func (u *NlogAlertUpsert) SetState(v nlogalert.State) *NlogAlertUpsert {
-	u.Set(nlogalert.FieldState, v)
-	return u
-}
-
-// UpdateState sets the "state" field to the value that was provided on create.
-func (u *NlogAlertUpsert) UpdateState() *NlogAlertUpsert {
-	u.SetExcluded(nlogalert.FieldState)
-	return u
-}
-
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -362,20 +332,6 @@ func (u *NlogAlertUpsertOne) SetAlertID(v int) *NlogAlertUpsertOne {
 func (u *NlogAlertUpsertOne) UpdateAlertID() *NlogAlertUpsertOne {
 	return u.Update(func(s *NlogAlertUpsert) {
 		s.UpdateAlertID()
-	})
-}
-
-// SetState sets the "state" field.
-func (u *NlogAlertUpsertOne) SetState(v nlogalert.State) *NlogAlertUpsertOne {
-	return u.Update(func(s *NlogAlertUpsert) {
-		s.SetState(v)
-	})
-}
-
-// UpdateState sets the "state" field to the value that was provided on create.
-func (u *NlogAlertUpsertOne) UpdateState() *NlogAlertUpsertOne {
-	return u.Update(func(s *NlogAlertUpsert) {
-		s.UpdateState()
 	})
 }
 
@@ -611,20 +567,6 @@ func (u *NlogAlertUpsertBulk) SetAlertID(v int) *NlogAlertUpsertBulk {
 func (u *NlogAlertUpsertBulk) UpdateAlertID() *NlogAlertUpsertBulk {
 	return u.Update(func(s *NlogAlertUpsert) {
 		s.UpdateAlertID()
-	})
-}
-
-// SetState sets the "state" field.
-func (u *NlogAlertUpsertBulk) SetState(v nlogalert.State) *NlogAlertUpsertBulk {
-	return u.Update(func(s *NlogAlertUpsert) {
-		s.SetState(v)
-	})
-}
-
-// UpdateState sets the "state" field to the value that was provided on create.
-func (u *NlogAlertUpsertBulk) UpdateState() *NlogAlertUpsertBulk {
-	return u.Update(func(s *NlogAlertUpsert) {
-		s.UpdateState()
 	})
 }
 

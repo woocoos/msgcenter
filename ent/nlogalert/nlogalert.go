@@ -3,9 +3,6 @@
 package nlogalert
 
 import (
-	"fmt"
-	"io"
-	"strconv"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -21,8 +18,6 @@ const (
 	FieldNlogID = "nlog_id"
 	// FieldAlertID holds the string denoting the alert_id field in the database.
 	FieldAlertID = "alert_id"
-	// FieldState holds the string denoting the state field in the database.
-	FieldState = "state"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// EdgeNlog holds the string denoting the nlog edge name in mutations.
@@ -52,7 +47,6 @@ var Columns = []string{
 	FieldID,
 	FieldNlogID,
 	FieldAlertID,
-	FieldState,
 	FieldCreatedAt,
 }
 
@@ -71,29 +65,6 @@ var (
 	DefaultCreatedAt func() time.Time
 )
 
-// State defines the type for the "state" enum field.
-type State string
-
-// State values.
-const (
-	StateFiring  State = "firing"
-	StateResolve State = "resolve"
-)
-
-func (s State) String() string {
-	return string(s)
-}
-
-// StateValidator is a validator for the "state" field enum values. It is called by the builders before save.
-func StateValidator(s State) error {
-	switch s {
-	case StateFiring, StateResolve:
-		return nil
-	default:
-		return fmt.Errorf("nlogalert: invalid enum value for state field: %q", s)
-	}
-}
-
 // OrderOption defines the ordering options for the NlogAlert queries.
 type OrderOption func(*sql.Selector)
 
@@ -110,11 +81,6 @@ func ByNlogID(opts ...sql.OrderTermOption) OrderOption {
 // ByAlertID orders the results by the alert_id field.
 func ByAlertID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAlertID, opts...).ToFunc()
-}
-
-// ByState orders the results by the state field.
-func ByState(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldState, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.
@@ -148,22 +114,4 @@ func newAlertStep() *sqlgraph.Step {
 		sqlgraph.To(AlertInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, AlertTable, AlertColumn),
 	)
-}
-
-// MarshalGQL implements graphql.Marshaler interface.
-func (e State) MarshalGQL(w io.Writer) {
-	io.WriteString(w, strconv.Quote(e.String()))
-}
-
-// UnmarshalGQL implements graphql.Unmarshaler interface.
-func (e *State) UnmarshalGQL(val interface{}) error {
-	str, ok := val.(string)
-	if !ok {
-		return fmt.Errorf("enum %T must be a string", val)
-	}
-	*e = State(str)
-	if err := StateValidator(*e); err != nil {
-		return fmt.Errorf("%s is not a valid State", str)
-	}
-	return nil
 }

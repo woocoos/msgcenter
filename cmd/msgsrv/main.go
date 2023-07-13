@@ -20,7 +20,7 @@ import (
 	"github.com/woocoos/msgcenter/dispatch"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/metrics"
-	"github.com/woocoos/msgcenter/nflog"
+	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -93,7 +93,7 @@ func main() {
 	}
 
 	apiSrv := buildWebServer(cnf, api, cfgopts)
-	app.RegisterServer(am.Alerts.(*mem.Alerts), am.NotificationLog.(*nflog.Log), am.Peer, am.Silences, apiSrv,
+	app.RegisterServer(am.Alerts.(*mem.Alerts), am.NotificationLog.(*notify.Log), am.Peer, am.Silences, apiSrv,
 		newPromHttp(cnf.Sub("prometheus")),
 	)
 	// join before service run

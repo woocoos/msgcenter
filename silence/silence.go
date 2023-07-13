@@ -203,14 +203,17 @@ func (o *Options) validate() error {
 
 // NewFromConfiguration returns a new Silences object with the given configuration.
 func NewFromConfiguration(cfg *conf.Configuration, opts ...Option) (*Silences, error) {
-	silenceOpts := Options{
-		Retention:           cfg.Duration("data.retention"),
-		MaintenanceInterval: cfg.Duration("data.maintenanceInterval"),
+	options := Options{
+		Retention:           time.Hour * 120,
+		MaintenanceInterval: time.Minute * 15,
+	}
+	if err := cfg.Unmarshal(&options); err != nil {
+		return nil, err
 	}
 	for _, opt := range opts {
-		opt(&silenceOpts)
+		opt(&options)
 	}
-	return New(silenceOpts)
+	return New(options)
 }
 
 // New returns a new Silences object with the given configuration.
@@ -273,17 +276,13 @@ func (s *Silences) Start(ctx context.Context) error {
 
 	runMaintenance := func(do MaintenanceFunc) error {
 		metrics.Silences.MaintenanceTotal.Inc()
-		logger.Debug("Running maintenance")
-		start := time.Now()
-		err := do()
-		if err != nil {
+		if err := do(); err != nil {
 			metrics.Silences.MaintenanceErrorsTotal.Inc()
 			return err
 		}
-		logger.Debug("Maintenance done", zap.Duration("duration", time.Since(start)))
 		return nil
 	}
-
+	logger.Debug("silences maintenance started")
 Loop:
 	for {
 		select {

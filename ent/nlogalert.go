@@ -23,8 +23,6 @@ type NlogAlert struct {
 	NlogID int `json:"nlog_id,omitempty"`
 	// alert id
 	AlertID int `json:"alert_id,omitempty"`
-	// 状态
-	State nlogalert.State `json:"state,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -79,8 +77,6 @@ func (*NlogAlert) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case nlogalert.FieldID, nlogalert.FieldNlogID, nlogalert.FieldAlertID:
 			values[i] = new(sql.NullInt64)
-		case nlogalert.FieldState:
-			values[i] = new(sql.NullString)
 		case nlogalert.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		default:
@@ -115,12 +111,6 @@ func (na *NlogAlert) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field alert_id", values[i])
 			} else if value.Valid {
 				na.AlertID = int(value.Int64)
-			}
-		case nlogalert.FieldState:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field state", values[i])
-			} else if value.Valid {
-				na.State = nlogalert.State(value.String)
 			}
 		case nlogalert.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -179,9 +169,6 @@ func (na *NlogAlert) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("alert_id=")
 	builder.WriteString(fmt.Sprintf("%v", na.AlertID))
-	builder.WriteString(", ")
-	builder.WriteString("state=")
-	builder.WriteString(fmt.Sprintf("%v", na.State))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(na.CreatedAt.Format(time.ANSIC))

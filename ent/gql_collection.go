@@ -106,6 +106,11 @@ func (ma *MsgAlertQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				selectedFields = append(selectedFields, msgalert.FieldFingerprint)
 				fieldSeen[msgalert.FieldFingerprint] = struct{}{}
 			}
+		case "state":
+			if _, ok := fieldSeen[msgalert.FieldState]; !ok {
+				selectedFields = append(selectedFields, msgalert.FieldState)
+				fieldSeen[msgalert.FieldState] = struct{}{}
+			}
 		case "createdAt":
 			if _, ok := fieldSeen[msgalert.FieldCreatedAt]; !ok {
 				selectedFields = append(selectedFields, msgalert.FieldCreatedAt)
@@ -1217,11 +1222,6 @@ func (na *NlogAlertQuery) collectField(ctx context.Context, opCtx *graphql.Opera
 			if _, ok := fieldSeen[nlogalert.FieldAlertID]; !ok {
 				selectedFields = append(selectedFields, nlogalert.FieldAlertID)
 				fieldSeen[nlogalert.FieldAlertID] = struct{}{}
-			}
-		case "state":
-			if _, ok := fieldSeen[nlogalert.FieldState]; !ok {
-				selectedFields = append(selectedFields, nlogalert.FieldState)
-				fieldSeen[nlogalert.FieldState] = struct{}{}
 			}
 		case "createdAt":
 			if _, ok := fieldSeen[nlogalert.FieldCreatedAt]; !ok {

@@ -66,6 +66,7 @@ type MsgAlertMutation struct {
 	url                *string
 	timeout            *bool
 	fingerprint        *string
+	state              *alert.AlertStatus
 	created_at         *time.Time
 	updated_at         *time.Time
 	deleted            *bool
@@ -532,6 +533,42 @@ func (m *MsgAlertMutation) ResetFingerprint() {
 	m.fingerprint = nil
 }
 
+// SetState sets the "state" field.
+func (m *MsgAlertMutation) SetState(as alert.AlertStatus) {
+	m.state = &as
+}
+
+// State returns the value of the "state" field in the mutation.
+func (m *MsgAlertMutation) State() (r alert.AlertStatus, exists bool) {
+	v := m.state
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldState returns the old "state" field's value of the MsgAlert entity.
+// If the MsgAlert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgAlertMutation) OldState(ctx context.Context) (v alert.AlertStatus, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldState is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldState requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldState: %w", err)
+	}
+	return oldValue.State, nil
+}
+
+// ResetState resets all changes to the "state" field.
+func (m *MsgAlertMutation) ResetState() {
+	m.state = nil
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *MsgAlertMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -795,7 +832,7 @@ func (m *MsgAlertMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MsgAlertMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 12)
 	if m.tenant_id != nil {
 		fields = append(fields, msgalert.FieldTenantID)
 	}
@@ -819,6 +856,9 @@ func (m *MsgAlertMutation) Fields() []string {
 	}
 	if m.fingerprint != nil {
 		fields = append(fields, msgalert.FieldFingerprint)
+	}
+	if m.state != nil {
+		fields = append(fields, msgalert.FieldState)
 	}
 	if m.created_at != nil {
 		fields = append(fields, msgalert.FieldCreatedAt)
@@ -853,6 +893,8 @@ func (m *MsgAlertMutation) Field(name string) (ent.Value, bool) {
 		return m.Timeout()
 	case msgalert.FieldFingerprint:
 		return m.Fingerprint()
+	case msgalert.FieldState:
+		return m.State()
 	case msgalert.FieldCreatedAt:
 		return m.CreatedAt()
 	case msgalert.FieldUpdatedAt:
@@ -884,6 +926,8 @@ func (m *MsgAlertMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldTimeout(ctx)
 	case msgalert.FieldFingerprint:
 		return m.OldFingerprint(ctx)
+	case msgalert.FieldState:
+		return m.OldState(ctx)
 	case msgalert.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case msgalert.FieldUpdatedAt:
@@ -954,6 +998,13 @@ func (m *MsgAlertMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetFingerprint(v)
+		return nil
+	case msgalert.FieldState:
+		v, ok := value.(alert.AlertStatus)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetState(v)
 		return nil
 	case msgalert.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -1090,6 +1141,9 @@ func (m *MsgAlertMutation) ResetField(name string) error {
 		return nil
 	case msgalert.FieldFingerprint:
 		m.ResetFingerprint()
+		return nil
+	case msgalert.FieldState:
+		m.ResetState()
 		return nil
 	case msgalert.FieldCreatedAt:
 		m.ResetCreatedAt()
@@ -8750,7 +8804,6 @@ type NlogAlertMutation struct {
 	op            Op
 	typ           string
 	id            *int
-	state         *nlogalert.State
 	created_at    *time.Time
 	clearedFields map[string]struct{}
 	nlog          *int
@@ -8932,42 +8985,6 @@ func (m *NlogAlertMutation) ResetAlertID() {
 	m.alert = nil
 }
 
-// SetState sets the "state" field.
-func (m *NlogAlertMutation) SetState(n nlogalert.State) {
-	m.state = &n
-}
-
-// State returns the value of the "state" field in the mutation.
-func (m *NlogAlertMutation) State() (r nlogalert.State, exists bool) {
-	v := m.state
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldState returns the old "state" field's value of the NlogAlert entity.
-// If the NlogAlert object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NlogAlertMutation) OldState(ctx context.Context) (v nlogalert.State, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldState is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldState requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldState: %w", err)
-	}
-	return oldValue.State, nil
-}
-
-// ResetState resets all changes to the "state" field.
-func (m *NlogAlertMutation) ResetState() {
-	m.state = nil
-}
-
 // SetCreatedAt sets the "created_at" field.
 func (m *NlogAlertMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -9090,15 +9107,12 @@ func (m *NlogAlertMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NlogAlertMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 3)
 	if m.nlog != nil {
 		fields = append(fields, nlogalert.FieldNlogID)
 	}
 	if m.alert != nil {
 		fields = append(fields, nlogalert.FieldAlertID)
-	}
-	if m.state != nil {
-		fields = append(fields, nlogalert.FieldState)
 	}
 	if m.created_at != nil {
 		fields = append(fields, nlogalert.FieldCreatedAt)
@@ -9115,8 +9129,6 @@ func (m *NlogAlertMutation) Field(name string) (ent.Value, bool) {
 		return m.NlogID()
 	case nlogalert.FieldAlertID:
 		return m.AlertID()
-	case nlogalert.FieldState:
-		return m.State()
 	case nlogalert.FieldCreatedAt:
 		return m.CreatedAt()
 	}
@@ -9132,8 +9144,6 @@ func (m *NlogAlertMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldNlogID(ctx)
 	case nlogalert.FieldAlertID:
 		return m.OldAlertID(ctx)
-	case nlogalert.FieldState:
-		return m.OldState(ctx)
 	case nlogalert.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	}
@@ -9158,13 +9168,6 @@ func (m *NlogAlertMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAlertID(v)
-		return nil
-	case nlogalert.FieldState:
-		v, ok := value.(nlogalert.State)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetState(v)
 		return nil
 	case nlogalert.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -9230,9 +9233,6 @@ func (m *NlogAlertMutation) ResetField(name string) error {
 		return nil
 	case nlogalert.FieldAlertID:
 		m.ResetAlertID()
-		return nil
-	case nlogalert.FieldState:
-		m.ResetState()
 		return nil
 	case nlogalert.FieldCreatedAt:
 		m.ResetCreatedAt()

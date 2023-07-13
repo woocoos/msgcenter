@@ -1,6 +1,9 @@
 package label
 
-import "testing"
+import (
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
 
 func Test_labelSetToFingerprint(t *testing.T) {
 	type args struct {
@@ -34,9 +37,13 @@ func Test_labelSetToFingerprint(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := labelSetToFingerprint(tt.args.ls); got != tt.want {
+			got := labelSetToFingerprint(tt.args.ls)
+			if got != tt.want {
 				t.Errorf("labelSetToFingerprint() = %v, want %v", got, tt.want)
 			}
+			var got2 Fingerprint
+			assert.NoError(t, got2.Parse(got.String()))
+			assert.Equal(t, tt.want, got2)
 		})
 	}
 }

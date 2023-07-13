@@ -9,7 +9,6 @@ import (
 	"github.com/woocoos/msgcenter/dispatch"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/inhibit"
-	"github.com/woocoos/msgcenter/nflog"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -60,7 +59,7 @@ func DefaultAlertManager(cnf *conf.Configuration, opts ...AmOption) (am *AlertMa
 		return nil, err
 	}
 
-	nflg, err := nflog.NewFromConfiguration(cnf)
+	nflg, err := notify.NewLog(cnf)
 	if err != nil {
 		return nil, err
 	}

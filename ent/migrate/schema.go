@@ -20,6 +20,7 @@ var (
 		{Name: "url", Type: field.TypeString, Nullable: true},
 		{Name: "timeout", Type: field.TypeBool, Default: false},
 		{Name: "fingerprint", Type: field.TypeString},
+		{Name: "state", Type: field.TypeEnum, Enums: []string{"none", "firing", "resolved"}, Default: "none"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "deleted", Type: field.TypeBool, Default: false},
@@ -29,6 +30,13 @@ var (
 		Name:       "msg_alert",
 		Columns:    MsgAlertColumns,
 		PrimaryKey: []*schema.Column{MsgAlertColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "msgalert_fingerprint",
+				Unique:  false,
+				Columns: []*schema.Column{MsgAlertColumns[8]},
+			},
+		},
 	}
 	// MsgChannelColumns holds the columns for the "msg_channel" table.
 	MsgChannelColumns = []*schema.Column{
@@ -194,7 +202,6 @@ var (
 	// MsgNlogAlertColumns holds the columns for the "msg_nlog_alert" table.
 	MsgNlogAlertColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "state", Type: field.TypeEnum, Enums: []string{"firing", "resolve"}},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "nlog_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
 		{Name: "alert_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
@@ -207,13 +214,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "msg_nlog_alert_msg_nlog_nlog",
-				Columns:    []*schema.Column{MsgNlogAlertColumns[3]},
+				Columns:    []*schema.Column{MsgNlogAlertColumns[2]},
 				RefColumns: []*schema.Column{MsgNlogColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "msg_nlog_alert_msg_alert_alert",
-				Columns:    []*schema.Column{MsgNlogAlertColumns[4]},
+				Columns:    []*schema.Column{MsgNlogAlertColumns[3]},
 				RefColumns: []*schema.Column{MsgAlertColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -222,7 +229,7 @@ var (
 			{
 				Name:    "nlogalert_nlog_id_alert_id",
 				Unique:  true,
-				Columns: []*schema.Column{MsgNlogAlertColumns[3], MsgNlogAlertColumns[4]},
+				Columns: []*schema.Column{MsgNlogAlertColumns[2], MsgNlogAlertColumns[3]},
 			},
 		},
 	}

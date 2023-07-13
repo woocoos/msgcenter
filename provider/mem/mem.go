@@ -55,7 +55,9 @@ func NewAlerts(ctx context.Context, m alert.Marker, intervalGC time.Duration, al
 	if alertCallback == nil {
 		alertCallback = noopCallback{}
 	}
-
+	if intervalGC == 0 {
+		intervalGC = 30 * time.Minute
+	}
 	ctx, cancel := context.WithCancel(ctx)
 	a := &Alerts{
 		marker:     m,
@@ -72,12 +74,12 @@ func NewAlerts(ctx context.Context, m alert.Marker, intervalGC time.Duration, al
 
 func (a *Alerts) Start(_ context.Context) error {
 	a.alerts.SetGCCallback(func(alerts []*alert.Alert) {
-		for _, alert := range alerts {
+		for _, alt := range alerts {
 			// As we don't persist alerts, we no longer consider them after
 			// they are resolved. Alerts waiting for resolved notifications are
 			// held in memory in aggregation groups redundantly.
-			a.marker.Delete(alert.Fingerprint())
-			a.callback.PostDelete(alert)
+			a.marker.Delete(alt.Fingerprint())
+			a.callback.PostDelete(alt)
 		}
 
 		a.mtx.Lock()
@@ -145,9 +147,9 @@ func (a *Alerts) GetPending() provider.AlertIterator {
 	go func() {
 		defer close(ch)
 
-		for _, a := range a.alerts.List() {
+		for _, alt := range a.alerts.List() {
 			select {
-			case ch <- a:
+			case ch <- alt:
 			case <-done:
 				return
 			}
@@ -164,8 +166,8 @@ func (a *Alerts) Get(fp label.Fingerprint) (*alert.Alert, error) {
 
 // Put adds the given alert to the set.
 func (a *Alerts) Put(alerts ...*alert.Alert) error {
-	for _, alert := range alerts {
-		fp := alert.Fingerprint()
+	for _, alt := range alerts {
+		fp := alt.Fingerprint()
 
 		existing := false
 
@@ -175,28 +177,28 @@ func (a *Alerts) Put(alerts ...*alert.Alert) error {
 			existing = true
 
 			// Merge alerts if there is an overlap in activity range.
-			if (alert.EndsAt.After(old.StartsAt) && alert.EndsAt.Before(old.EndsAt)) ||
-				(alert.StartsAt.After(old.StartsAt) && alert.StartsAt.Before(old.EndsAt)) {
-				alert = old.Merge(alert)
+			if (alt.EndsAt.After(old.StartsAt) && alt.EndsAt.Before(old.EndsAt)) ||
+				(alt.StartsAt.After(old.StartsAt) && alt.StartsAt.Before(old.EndsAt)) {
+				alt = old.Merge(alt)
 			}
 		}
 
-		if err := a.callback.PreStore(alert, existing); err != nil {
+		if err := a.callback.PreStore(alt, existing); err != nil {
 			logger.Error("pre-store callback returned error on set alert", zap.Error(err))
 			continue
 		}
 
-		if err := a.alerts.Set(alert); err != nil {
+		if err := a.alerts.Set(alt); err != nil {
 			logger.Error("error on set alert", zap.Error(err))
 			continue
 		}
 
-		a.callback.PostStore(alert, existing)
+		a.callback.PostStore(alt, existing)
 
 		a.mtx.Lock()
 		for _, l := range a.listeners {
 			select {
-			case l.alerts <- alert:
+			case l.alerts <- alt:
 			case <-l.done:
 			}
 		}
@@ -209,12 +211,12 @@ func (a *Alerts) Put(alerts ...*alert.Alert) error {
 // count returns the number of non-resolved alerts we currently have stored filtered by the provided state.
 func (a *Alerts) count(state alert.AlertState) int {
 	var count int
-	for _, alert := range a.alerts.List() {
-		if alert.Resolved() {
+	for _, alt := range a.alerts.List() {
+		if alt.Resolved() {
 			continue
 		}
 
-		status := a.marker.Status(alert.Fingerprint())
+		status := a.marker.Status(alt.Fingerprint())
 		if status.State != state {
 			continue
 		}
