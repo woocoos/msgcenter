@@ -1,42 +1,33 @@
 import { createModel } from 'ice';
-import { LoginRes } from '@/services/basis';
-import { setItem, removeItem } from '@/pkg/localStore';
+import { LoginRes } from '@/services/auth';
+import { setItem, removeItem, getItem } from '@/pkg/localStore';
 import { User } from '@/__generated__/adminx/graphql';
 
-type BasisUserState = {
+type UserState = {
   id: string;
   displayName: string;
   avatarFileId?: string;
 };
 
-type BasisModelState = {
-  locale: LocalLanguage;
-  token: string;
+type ModelState = {
   refreshToken: string;
+  token: string;
   tenantId: string;
-  darkMode: boolean;
-  compactMode: boolean;
-  user: BasisUserState | null;
+  user: UserState | null;
 };
 
-export type LocalLanguage = 'zh-CN' | 'en-US';
 
 export default createModel({
   state: {
-    locale: 'zh-CN',
     token: '',
     refreshToken: '',
     tenantId: '',
     user: null,
     darkMode: false,
     compactMode: false,
-  } as BasisModelState,
+  } as ModelState,
   reducers: {
-    updateLocale(prevState: BasisModelState, payload: LocalLanguage) {
-      setItem('locale', payload);
-      prevState.locale = payload;
-    },
-    updateToken(prevState: BasisModelState, payload: string) {
+    updateToken(prevState: ModelState, payload: string) {
       if (payload) {
         setItem('token', payload);
       } else {
@@ -44,7 +35,7 @@ export default createModel({
       }
       prevState.token = payload;
     },
-    updateRefreshToken(prevState: BasisModelState, payload: string) {
+    updateRefreshToken(prevState: ModelState, payload: string) {
       if (payload) {
         setItem('refreshToken', payload);
       } else {
@@ -52,7 +43,7 @@ export default createModel({
       }
       prevState.refreshToken = payload;
     },
-    updateTenantId(prevState: BasisModelState, payload: string) {
+    updateTenantId(prevState: ModelState, payload: string) {
       if (payload) {
         setItem('tenantId', payload);
       } else {
@@ -60,7 +51,7 @@ export default createModel({
       }
       prevState.tenantId = payload;
     },
-    updateUser(prevState: BasisModelState, payload: BasisUserState | null) {
+    updateUser(prevState: ModelState, payload: UserState | null) {
       if (payload) {
         setItem('user', payload);
       } else {
@@ -68,17 +59,13 @@ export default createModel({
       }
       prevState.user = payload;
     },
-    updateDarkMode(prevState: BasisModelState, payload: boolean) {
-      setItem('darkMode', payload);
-      prevState.darkMode = payload;
-    },
   },
   effects: () => ({
     /**
      * 登录
      * @param payload
      */
-    async login(payload: LoginRes, rootState: any) {
+    async loginAfter(payload: LoginRes) {
       if (payload.accessToken) {
         this.updateToken(payload.accessToken);
         if (payload.user) {
@@ -86,9 +73,10 @@ export default createModel({
             id: payload.user.id,
             displayName: payload.user.displayName,
             avatarFileID: payload.user?.avatarFileId || '',
-          } as User);
+          } as User)
           if (payload.user.domains?.length) {
-            if (!payload.user.domains.find(item => item.id == rootState.basis.tenantId)) {
+            const tenantId = getItem<string>('tenantId')
+            if (!payload.user.domains.find(item => item.id == tenantId)) {
               this.updateTenantId(payload.user.domains[0].id);
             }
           } else {
@@ -105,10 +93,6 @@ export default createModel({
     async logout() {
       this.updateToken('');
       this.updateUser(null);
-
-      if (!location.pathname.split('/').includes('login')) {
-        location.href = `/login?redirect=${encodeURIComponent(location.href)}`
-      }
     },
     /**
      * 更新用户信息

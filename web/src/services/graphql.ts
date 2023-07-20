@@ -4,7 +4,8 @@ import { ReactNode } from 'react';
 import { makeOperation, mapExchange } from 'urql';
 import i18n from '@/i18n';
 import { message } from 'antd';
-import { refreshToken } from './basis';
+import { refreshToken } from './auth';
+import { goLogin } from '@/util';
 
 export type TreeDataState<T> = {
   key: string;
@@ -29,16 +30,16 @@ export type TreeEditorAction = 'editor' | 'peer' | 'child';
 
 export const urglMapExchange = mapExchange({
   onOperation(operation) {
-    const basisState = store.getModelState('basis'), headers: Record<string, any> = {};
+    const userState = store.getModelState('user'), headers: Record<string, any> = {};
     if (operation.context.fetchOptions?.['headers']?.['Authorization']) {
       headers['Authorization'] = operation.context.fetchOptions?.['headers']?.['Authorization'];
-    } else if (basisState.token) {
-      headers['Authorization'] = `Bearer ${basisState.token}`;
+    } else if (userState.token) {
+      headers['Authorization'] = `Bearer ${userState.token}`;
     }
     if (operation.context.fetchOptions?.['headers']?.['X-Tenant-ID']) {
       headers['X-Tenant-ID'] = operation.context.fetchOptions?.['headers']?.['X-Tenant-ID'];
-    } else if (basisState.tenantId) {
-      headers['X-Tenant-ID'] = basisState.tenantId;
+    } else if (userState.tenantId) {
+      headers['X-Tenant-ID'] = userState.tenantId;
     }
 
     return makeOperation(operation.kind, operation, {
@@ -57,7 +58,8 @@ export const urglMapExchange = mapExchange({
     let msg = '';
     switch (error.response.status) {
       case 401:
-        store.dispatch.basis.logout();
+        store.dispatch.user.logout();
+        goLogin();
         msg = i18n.t('401');
         break;
       case 403:

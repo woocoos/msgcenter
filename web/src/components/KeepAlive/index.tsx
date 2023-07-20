@@ -7,10 +7,10 @@ export default (props: {
   children: ReactNode;
   clearAlive?: boolean;
 }) => {
-  const [basisState] = store.useModel('basis'),
+  const [userState] = store.useModel('user'),
     [searchParams] = useSearchParams(),
     location = useLocation(),
-    id = searchParams.get('id') || basisState.tenantId,
+    id = searchParams.get('id') || userState.tenantId,
     cacheKey = btoa(location.pathname),
     { dropScope, getCachingNodes } = useAliveController();
 

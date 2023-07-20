@@ -1,6 +1,8 @@
 import { createStore } from 'ice';
-import basis from '@/models/basis';
+import app from '@/models/app';
+import user from '@/models/user';
 
 export default createStore({
-  basis,
+  app,
+  user,
 });

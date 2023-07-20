@@ -19,7 +19,7 @@ export default (props: {
   onClose: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
-    [basisState] = store.useModel('basis'),
+    [userState] = store.useModel('user'),
     [subject, setSubject] = useState<SubjectType>('user'),
     [info, setInfo] = useState<MsgType>(),
     [loading, setLoading] = useState(false),
@@ -49,7 +49,7 @@ export default (props: {
     getTransferData = async () => {
       const data: TransferItem[] = [], tkeys: string[] = [];
       if ('user' === subject) {
-        const result = await getOrgUserList(basisState.tenantId, {
+        const result = await getOrgUserList(userState.tenantId, {
           current: 1,
           pageSize: 999,
         })
@@ -70,7 +70,7 @@ export default (props: {
           }
         })
       } else if ('exUser' === subject) {
-        const result = await getOrgUserList(basisState.tenantId, {
+        const result = await getOrgUserList(userState.tenantId, {
           current: 1,
           pageSize: 999,
         })
@@ -127,7 +127,7 @@ export default (props: {
           const inputs = addKeys.map(key => {
             const data: CreateMsgSubscriberInput = {
               msgTypeID: info.id,
-              tenantID: basisState.tenantId,
+              tenantID: userState.tenantId,
             }
             if (subject === 'user') {
               data.userID = key

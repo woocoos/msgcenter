@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Dropdown } from 'antd';
 import styles from './index.module.css';
 import store from '@/store';
-import { LocalLanguage } from '@/models/basis';
+import { CurrentLanguages } from '@/i18n';
 
 const I18nDropdown: React.FC = () => {
-  const [basisState, basisDispatcher] = store.useModel('basis');
+  const [appState, appDispatcher] = store.useModel('app');
   const [locale, setLocale] = useState('');
 
   const
     onMenuClick = (ev) => {
       const mItem = menu.items.find((item) => item.key === ev.key);
       if (mItem) {
-        basisDispatcher.updateLocale(mItem.key as LocalLanguage);
+        appDispatcher.updateLocale(mItem.key);
         setLocale(mItem.label);
       }
     };
@@ -20,12 +20,12 @@ const I18nDropdown: React.FC = () => {
   const menu = {
     items: [
       {
-        key: 'zh-CN',
+        key: CurrentLanguages.zhCN,
         label: '简体',
         onClick: onMenuClick,
       },
       {
-        key: 'en-US',
+        key: CurrentLanguages.enUS,
         label: 'English',
         onClick: onMenuClick,
       },
@@ -33,15 +33,15 @@ const I18nDropdown: React.FC = () => {
   };
 
   useEffect(() => {
-    const mItem = menu.items.find((item) => item.key === basisState.locale);
+    const mItem = menu.items.find((item) => item.key === appState.locale);
     if (mItem) {
       setLocale(mItem.label);
     }
-  }, [basisState.locale]);
+  }, [appState.locale]);
 
   return (
     <Dropdown menu={menu}>
-      <span className={`${styles.action} ${styles.account}`}>
+      <span className={styles.action}>
         <span>{locale}</span>
       </span>
     </Dropdown>

@@ -3,22 +3,25 @@ import { initReactI18next } from 'react-i18next';
 import enUS from './locales/en-US';
 import zhCN from './locales/zh-CN';
 
+export enum CurrentLanguages {
+  'zhCN' = 'zh-CN',
+  'enUS' = 'en-US'
+};
+
 // 多语言文件
 const resources = {
-  'en-US': enUS,
-  'zh-CN': zhCN,
+  [CurrentLanguages.enUS]: enUS,
+  [CurrentLanguages.zhCN]: zhCN,
 };
 
 
 i18n
-  .use(initReactI18next) // passes i18n down to react-i18next
+  .use(initReactI18next)
   .init({
     resources,
-    lng: navigator.language, // language to use, more information here: https://www.i18next.com/overview/configuration-options#languages-namespaces-resources
-    // you can use the i18n.changeLanguage function to change the language manually: https://www.i18next.com/overview/api#changelanguage
-    // if you're using a language detector, do not define the lng option
+    lng: CurrentLanguages.zhCN,
     interpolation: {
-      escapeValue: false, // react already safes from xss
+      escapeValue: false,
     },
   });
 

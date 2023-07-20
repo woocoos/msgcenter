@@ -35,16 +35,16 @@ let refreshTokenFn: NodeJS.Timeout;
 export function refreshToken() {
   clearTimeout(refreshTokenFn);
   refreshTokenFn = setTimeout(async () => {
-    const basisState = store.getModelState('basis');
-    if (basisState.token && basisState.refreshToken) {
-      const jwt = jwtDcode<JwtPayload>(basisState.token);
+    const userState = store.getModelState('user');
+    if (userState.token && userState.refreshToken) {
+      const jwt = jwtDcode<JwtPayload>(userState.token);
       if ((jwt.exp || 0) * 1000 - Date.now() < 30 * 60 * 1000) {
         // 小于30分钟的时候需要刷新token
         const tr = await request.post(`${baseURL}/login/refresh-token`, {
-          refreshToken: basisState.refreshToken,
+          refreshToken: userState.refreshToken,
         });
         if (tr.accessToken) {
-          store.dispatch.basis.updateToken(tr.accessToken);
+          store.dispatch.user.updateToken(tr.accessToken);
         }
       }
     }

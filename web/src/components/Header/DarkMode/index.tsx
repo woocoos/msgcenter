@@ -5,16 +5,16 @@ import { useTranslation } from 'react-i18next';
 
 const I18nDropdown: React.FC = () => {
   const { t } = useTranslation(),
-    [basisState, basisDispatcher] = store.useModel('basis');
+    [appState, appDispatcher] = store.useModel('app');
 
   return (
     <Switch
       style={{ margin: '0 12px' }}
       checkedChildren={t('bright')}
       unCheckedChildren={t('dark')}
-      defaultChecked={!basisState.darkMode}
+      defaultChecked={!appState.darkMode}
       onChange={(checked) => {
-        basisDispatcher.updateDarkMode(!checked);
+        appDispatcher.updateDarkMode(!checked);
       }}
     />
   );
