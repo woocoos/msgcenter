@@ -29,8 +29,6 @@ var (
 var (
 	// ErrNotFound is returned if a silence was not found.
 	ErrNotFound = fmt.Errorf("silence not found")
-	// ErrInvalidState is returned if the state isn't valid.
-	ErrInvalidState = fmt.Errorf("invalid state")
 )
 
 type matcherCache map[*Entry]label.Matchers

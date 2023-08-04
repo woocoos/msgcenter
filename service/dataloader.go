@@ -24,7 +24,7 @@ func SilencesDataLoad(client *ent.Client) func(ids ...int) ([]*sil.Entry, error)
 		}
 		ds, err := query.Select(silence.FieldID, silence.FieldUpdatedAt, silence.FieldState, silence.FieldMatchers,
 			silence.FieldStartsAt, silence.FieldEndsAt).
-			All(schemax.SkipTenantKey(context.Background()))
+			All(schemax.SkipTenantPrivacy(context.Background()))
 		if err != nil {
 			return nil, err
 		}

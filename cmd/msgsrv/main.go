@@ -26,6 +26,7 @@ import (
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/provider/mem"
 	"github.com/woocoos/msgcenter/service"
+	"net/http"
 	"os"
 	"time"
 
@@ -92,10 +93,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	apiSrv := buildWebServer(cnf, api, cfgopts)
+	apiSrv := buildApiServer(cnf, api, cfgopts)
 	app.RegisterServer(am.Alerts.(*mem.Alerts), am.NotificationLog.(*notify.Log), am.Peer, am.Silences, apiSrv,
 		newPromHttp(cnf.Sub("prometheus")),
 	)
+
+	if cnf.IsSet("ui.enabled") {
+		app.RegisterServer(buildUiServer(cnf))
+	}
+
 	// join before service run
 	if err = am.Peer.Join(context.Background()); err != nil {
 		log.Fatal(err)
@@ -122,7 +128,7 @@ func buildEntClient(cnf *conf.AppConfiguration) *ent.Client {
 	return dbClient
 }
 
-func buildWebServer(cnf *conf.AppConfiguration, ws *server.Service, amopt *server.Options) *web.Server {
+func buildApiServer(cnf *conf.AppConfiguration, ws *server.Service, amopt *server.Options) *web.Server {
 	webSrv := web.New(web.WithConfiguration(cnf.Sub("web")),
 		web.WithGracefulStop(),
 		web.RegisterMiddleware(gql.New()),
@@ -146,6 +152,14 @@ func buildWebServer(cnf *conf.AppConfiguration, ws *server.Service, amopt *serve
 		log.Fatal(err)
 	}
 	return webSrv
+}
+
+func buildUiServer(cnf *conf.AppConfiguration) *web.Server {
+	uiSrv := web.New(web.WithConfiguration(cnf.Sub("ui")),
+		web.WithGracefulStop(),
+	)
+	uiSrv.Router().StaticFS("/", http.Dir("../../web/build"))
+	return uiSrv
 }
 
 func newPromHttp(cnf *conf.Configuration) woocoo.Server {

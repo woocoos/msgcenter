@@ -48,6 +48,11 @@ web:
                 group: "/graphql"
                 withAuthorization: false
                 appCode: "msg"
+
+ui:
+  server:
+    addr: 127.0.0.1:10071
+
 store:
   msgcenter:
     driverName: mysql

@@ -44,7 +44,7 @@ func (a *AlertCallback) PreStore(alert *alert.Alert, existing bool) error {
 		c.SetTenantID(0)
 	}
 	//id := alert.Fingerprint()
-	return c.Exec(schemax.SkipTenantKey(context.Background()))
+	return c.Exec(schemax.SkipTenantPrivacy(context.Background()))
 }
 
 func (a *AlertCallback) PostStore(alert *alert.Alert, existing bool) {
@@ -63,7 +63,7 @@ func (a *AlertCallback) PostDelete(alert *alert.Alert) {
 		}
 		c.Where(msgalert.TenantID(tid))
 	}
-	err := c.Exec(schemax.SkipTenantKey(context.Background()))
+	err := c.Exec(schemax.SkipTenantPrivacy(context.Background()))
 	if err != nil {
 		logger.Error("delete alert error", zap.Error(err))
 	}
@@ -77,7 +77,7 @@ func (n NlogCallback) LoadData() ([]*notify.LogEntry, error) {
 	// expireAt > now will be evicted from nlog cache
 	ds, err := n.db.Nlog.Query().Where(nlog.ExpiresAtGT(time.Now())).
 		WithAlerts().
-		All(schemax.SkipTenantKey(context.Background()))
+		All(schemax.SkipTenantPrivacy(context.Background()))
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ func (n NlogCallback) CreateLog(ctx context.Context, r *profile.ReceiverKey, gke
 		}
 		tenantID = tid
 	}
-	tctx := schemax.SkipTenantKey(ctx)
+	tctx := schemax.SkipTenantPrivacy(ctx)
 	var alertids []int
 	if len(firingAlerts) > 0 {
 		ids, err := n.updateAlerts(tctx, firingAlerts, alert.AlertFiring)

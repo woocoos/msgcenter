@@ -1,13 +1,9 @@
 package provider
 
 import (
-	"fmt"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 )
-
-// ErrNotFound is returned if a provider cannot find a requested item.
-var ErrNotFound = fmt.Errorf("item not found")
 
 // Iterator provides the functions common to all iterators. To be useful, a
 // specific iterator interface (e.g. AlertIterator) has to be implemented that

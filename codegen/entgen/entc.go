@@ -31,29 +31,10 @@ func main() {
 	err = entc.Generate("./codegen/entgen/schema", &gen.Config{
 		Package: "github.com/woocoos/msgcenter/ent",
 		Features: []gen.Feature{gen.FeatureVersionedMigration, gen.FeatureUpsert,
-			gen.FeatureIntercept, gen.FeatureSchemaConfig,
-		},
+			gen.FeatureIntercept, gen.FeatureSchemaConfig},
 		Target: "./ent",
-		Hooks: []gen.Hook{
-			SkipMutationHook("User"),
-		},
 	}, opts...)
 	if err != nil {
 		log.Fatalf("running ent codegen: %v", err)
-	}
-}
-
-func SkipMutationHook(tables ...string) gen.Hook {
-	return func(next gen.Generator) gen.Generator {
-		return gen.GenerateFunc(func(g *gen.Graph) error {
-			for _, node := range g.Nodes {
-				for _, table := range tables {
-					if node.Name == table {
-					}
-				}
-			}
-
-			return next.Generate(g)
-		})
 	}
 }

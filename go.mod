@@ -5,7 +5,7 @@ go 1.20
 require (
 	entgo.io/contrib v0.4.6-0.20230615102013-704944fdc0f6
 	entgo.io/ent v0.12.4-0.20230702151415-1ec75238037c
-	github.com/99designs/gqlgen v0.17.34
+	github.com/99designs/gqlgen v0.17.36
 	github.com/cenkalti/backoff/v4 v4.2.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-sql-driver/mysql v1.7.0
@@ -19,11 +19,11 @@ require (
 	github.com/prometheus/client_golang v1.11.1
 	github.com/stretchr/testify v1.8.3
 	github.com/tsingsun/members v0.0.0-20230712074048-c38e433601b8
-	github.com/tsingsun/woocoo v0.3.1-0.20230710030305-2fae153355b0
-	github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230706082952-8c3654ddbca6
-	github.com/vektah/gqlparser/v2 v2.5.4
+	github.com/tsingsun/woocoo v0.3.1-0.20230731092426-7f7941155bc5
+	github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230731092426-7f7941155bc5
+	github.com/vektah/gqlparser/v2 v2.5.8
 	github.com/vmihailenco/msgpack/v5 v5.3.5
-	github.com/woocoos/entco v0.0.0-20230712043412-bca501d411c0
+	github.com/woocoos/entco v0.0.0-20230801090619-8fb61186ac01
 	go.uber.org/zap v1.24.0
 	golang.org/x/sync v0.3.0
 	golang.org/x/text v0.9.0
