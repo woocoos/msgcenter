@@ -1,7 +1,7 @@
 import { gql } from "@/__generated__/msgsrv";
 import { CreateMsgTemplateInput, MsgTemplateOrder, MsgTemplateWhereInput, UpdateMsgTemplateInput } from "@/__generated__/msgsrv/graphql";
-import { mutationRequest, pagingRequest, queryRequest } from "..";
-import { gid } from "@/util";
+import { gid } from "@knockout-js/api";
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 export const EnumMsgTemplateStatus = {
   active: { text: '活跃', status: 'success' },
@@ -74,7 +74,7 @@ export async function getMsgTemplateList(
     where?: MsgTemplateWhereInput;
     orderBy?: MsgTemplateOrder;
   }) {
-  const result = await pagingRequest(
+  const result = await paging(
     queryMsgTemplateList, {
     first: gather.pageSize || 20,
     where: gather.where,
@@ -93,7 +93,7 @@ export async function getMsgTemplateList(
  * @returns
  */
 export async function getMsgTemplateInfo(msgTemplateId: string) {
-  const result = await queryRequest(queryMsgTemplateInfo, {
+  const result = await query(queryMsgTemplateInfo, {
     gid: gid('msg_template', msgTemplateId)
   })
   if (result.data?.node?.__typename === 'MsgTemplate') {
@@ -108,7 +108,7 @@ export async function getMsgTemplateInfo(msgTemplateId: string) {
  * @returns
  */
 export async function createMsgTemplate(input: CreateMsgTemplateInput) {
-  const result = await mutationRequest(mutationCreateMsgTemplate, {
+  const result = await mutation(mutationCreateMsgTemplate, {
     input
   })
   if (result.data?.createMsgTemplate.id) {
@@ -124,7 +124,7 @@ export async function createMsgTemplate(input: CreateMsgTemplateInput) {
  * @returns
  */
 export async function updateMsgTemplate(msgTemplateId: string, input: UpdateMsgTemplateInput) {
-  const result = await mutationRequest(mutationUpdateMsgTemplate, {
+  const result = await mutation(mutationUpdateMsgTemplate, {
     id: msgTemplateId,
     input,
   })
@@ -140,7 +140,7 @@ export async function updateMsgTemplate(msgTemplateId: string, input: UpdateMsgT
  * @returns
  */
 export async function delMsgTemplate(msgTemplateId: string) {
-  const result = await mutationRequest(mutationDelMsgTemplate, {
+  const result = await mutation(mutationDelMsgTemplate, {
     id: msgTemplateId,
   })
   if (result.data?.deleteMsgTemplate) {
@@ -155,7 +155,7 @@ export async function delMsgTemplate(msgTemplateId: string) {
  * @returns
  */
 export async function disableMsgTemplate(msgTemplateId: string) {
-  const result = await mutationRequest(mutationDisableMsgTemplate, {
+  const result = await mutation(mutationDisableMsgTemplate, {
     id: msgTemplateId,
   })
   if (result.data?.disableMsgTemplate.id) {
@@ -170,7 +170,7 @@ export async function disableMsgTemplate(msgTemplateId: string) {
  * @returns
  */
 export async function enableMsgTemplate(msgTemplateId: string) {
-  const result = await mutationRequest(mutationEnableMsgTemplate, {
+  const result = await mutation(mutationEnableMsgTemplate, {
     id: msgTemplateId,
   })
   if (result.data?.enableMsgTemplate.id) {

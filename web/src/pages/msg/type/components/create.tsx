@@ -1,14 +1,14 @@
-import { App } from '@/__generated__/adminx/graphql';
 import { MsgType, MsgTypeSimpleStatus } from '@/__generated__/msgsrv/graphql';
-import InputApp from '@/components/Adminx/App/input';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { cacheApp } from '@/services/adminx/app/indtx';
 import { EnumMsgTypeStatus, createMsgType, getMsgTypeInfo, updateMsgType } from '@/services/msgsrv/type';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormSwitch } from '@ant-design/pro-components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InputCategory from './inputCategory';
+import { useLeavePrompt } from '@knockout-js/layout';
+import { AppSelect } from '@knockout-js/org';
+import { App } from '@knockout-js/api';
 
 type ProFormData = {
   app?: App;
@@ -28,10 +28,13 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     [info, setInfo] = useState<MsgType>(),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     onOpenChange = (open: boolean) => {
@@ -127,7 +130,7 @@ export default (props: {
         rules={[
           { required: true, message: `${t('please_enter_app')}` },
         ]}>
-        <InputApp />
+        <AppSelect />
       </ProFormText>
       <ProFormText
         name="category"

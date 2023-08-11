@@ -1,12 +1,12 @@
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { DrawerForm, ProFormText } from '@ant-design/pro-components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Editor from '@monaco-editor/react';
 import { getMsgEventInfoRoute, updateMsgEvent } from '@/services/msgsrv/event';
 import { RouteStrType } from '@/__generated__/msgsrv/graphql';
 import * as yaml from 'js-yaml'
 import { Typography } from 'antd';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 type ProFormData = {
   route: string;
@@ -20,10 +20,13 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     [errStr, setErrStr] = useState<string>(),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     onOpenChange = (open: boolean) => {

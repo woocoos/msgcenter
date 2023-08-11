@@ -3,11 +3,10 @@ import { Modal } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
-import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { MsgType, MsgTypeWhereInput } from '@/__generated__/msgsrv/graphql';
-import InputApp from '@/components/Adminx/App/input';
 import { cacheApp, updateCacheAppListByIds } from '@/services/adminx/app/indtx';
 import { getMsgTypeList } from '@/services/msgsrv/type';
+import { AppSelect } from '@knockout-js/org';
 
 export default (props: {
   open: boolean;
@@ -22,7 +21,7 @@ export default (props: {
       {
         title: t('app'), dataIndex: 'app', width: 120,
         renderFormItem() {
-          return <InputApp />
+          return <AppSelect />
         },
         render: (text, record) => {
           return record.appID ? cacheApp[record.appID]?.name || record.appID : '-';
@@ -36,37 +35,18 @@ export default (props: {
     // 选中处理
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
-  const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as MsgType[], success: true, total: 0 },
-        where: MsgTypeWhereInput = {};
-      where.appID = params.app?.id;
-      where.category = params.category;
-      where.nameContains = params.name;
-
-      const result = await getMsgTypeList({
-        current: params.current,
-        pageSize: params.pageSize,
-        where,
-      });
-      if (result?.totalCount) {
-        table.data = result.edges?.map(item => item?.node) as MsgType[];
-        await updateCacheAppListByIds(table.data.map(item => item.appID || ''))
-        table.total = result.totalCount;
-      }
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
-    },
-    handleOk = () => {
-      props?.onClose(dataSource.filter(item => selectedRowKeys.includes(item.id)));
-    },
-    handleCancel = () => {
-      props?.onClose();
-    };
-
   return (
-    <Modal title={props.title} open={props.open} onOk={handleOk} onCancel={handleCancel} width={900}>
+    <Modal
+      title={props.title}
+      open={props.open}
+      width={900}
+      onOk={() => {
+        props?.onClose(dataSource.filter(item => selectedRowKeys.includes(item.id)));
+      }}
+      onCancel={() => {
+        props?.onClose();
+      }}
+    >
       <ProTable
         rowKey={'id'}
         size="small"
@@ -78,7 +58,27 @@ export default (props: {
         options={false}
         scroll={{ x: 'max-content', y: 300 }}
         columns={columns}
-        request={getRequest}
+        request={async (params) => {
+          const table = { data: [] as MsgType[], success: true, total: 0 },
+            where: MsgTypeWhereInput = {};
+          where.appID = params.app?.id;
+          where.category = params.category;
+          where.nameContains = params.name;
+
+          const result = await getMsgTypeList({
+            current: params.current,
+            pageSize: params.pageSize,
+            where,
+          });
+          if (result?.totalCount) {
+            table.data = result.edges?.map(item => item?.node) as MsgType[];
+            await updateCacheAppListByIds(table.data.map(item => item.appID || ''))
+            table.total = result.totalCount;
+          }
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         pagination={{ showSizeChanger: true }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,

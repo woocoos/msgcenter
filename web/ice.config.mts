@@ -5,18 +5,10 @@ import auth from '@ice/plugin-auth';
 import antd from '@ice/plugin-antd';
 import jsxPlus from '@ice/plugin-jsx-plus';
 import icestark from '@ice/plugin-icestark';
+import urqlPlugin from '@knockout-js/ice-urql';
 
 // The project config, see https://v3.ice.work/docs/guide/basic/config
-const minify = process.env.NODE_ENV === 'production' ? 'swc' : false,
-  port = process.env.PORT,
-  isNoMock = process.argv.includes('--no-mock'),
-  mockItems = process.env.ICE_MOCK_ITEMS?.split(',') as string[],
-  isMockItems = {
-    adminx: mockItems.includes('adminx') && !isNoMock,
-    files: mockItems.includes('files') && !isNoMock,
-    auth: mockItems.includes('auth') && !isNoMock,
-    msgsrv: mockItems.includes('msgsrv') && !isNoMock,
-  };
+const minify = process.env.NODE_ENV === 'production' ? 'swc' : false;
 
 export default defineConfig(() => ({
   ssg: false,
@@ -32,29 +24,30 @@ export default defineConfig(() => ({
   },
   plugins: [
     icestark({ type: 'child' }),
+    urqlPlugin(),
     request(),
     store(),
-    auth(),
     jsxPlus(),
     antd({
       importStyle: false,
     }),
+    auth(),
   ],
   proxy: {
     '/api-msgsrv': {
-      target: isMockItems.msgsrv ? `http://127.0.0.1:${port}` : process.env.ICE_PROXY_MSGSRV,
+      target: process.env.ICE_PROXY_MSGSRV,
       changeOrigin: true,
-      pathRewrite: { '^/api-msgsrv': isMockItems.msgsrv ? '/mock-api-msgsrv' : '' },
+      pathRewrite: { '^/api-msgsrv': '' },
     },
     '/api-adminx': {
-      target: isMockItems.adminx ? `http://127.0.0.1:${port}` : process.env.ICE_PROXY_ADMINX,
+      target: process.env.ICE_PROXY_ADMINX,
       changeOrigin: true,
-      pathRewrite: { '^/api-adminx': isMockItems.adminx ? '/mock-api-adminx' : '' },
+      pathRewrite: { '^/api-adminx': '' },
     },
     '/api-files': {
-      target: isMockItems.files ? `http://127.0.0.1:${port}` : process.env.ICE_PROXY_FILES,
+      target: process.env.ICE_PROXY_FILES,
       changeOrigin: true,
-      pathRewrite: { '^/api-files': isMockItems.files ? '/mock-api-files' : '' },
+      pathRewrite: { '^/api-files': '' },
     },
   },
 }));

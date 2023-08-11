@@ -1,15 +1,15 @@
 import { MatcherInput, Silence } from '@/__generated__/msgsrv/graphql';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { dateRangeTurnDuration, durationTurnEndDate, getDate, updateFormat } from '@/util';
 import { DrawerForm, ProFormDateTimeRangePicker, ProFormInstance, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Org } from '@/__generated__/adminx/graphql';
 import { createSilence, getSilenceInfo, updateSilence } from '@/services/msgsrv/silence';
 import { cacheOrg } from '@/services/adminx/org';
-import InputOrg from '@/components/Adminx/Org/input';
 import Matchers from './matchers';
 import { Col, Row } from 'antd';
+import { useLeavePrompt } from '@knockout-js/layout';
+import { OrgSelect } from '@knockout-js/org';
+import { Org, OrgKind } from '@knockout-js/api';
 
 type ProFormData = {
   org?: Org;
@@ -28,11 +28,14 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     formRef = useRef<ProFormInstance<ProFormData>>(),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [info, setInfo] = useState<Silence>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     onOpenChange = (open: boolean) => {
@@ -129,7 +132,7 @@ export default (props: {
         rules={[
           { required: true, message: `${t('please_enter_org')}` },
         ]}>
-        <InputOrg />
+        <OrgSelect kind={OrgKind.Root} />
       </ProFormText>
       <Row gutter={20}>
         <Col span={16}>

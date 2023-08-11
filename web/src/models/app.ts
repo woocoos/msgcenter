@@ -1,10 +1,10 @@
 import { createModel } from 'ice';
 import { setItem } from '@/pkg/localStore';
-import { CurrentLanguages } from '@/i18n';
+import { LocaleType } from '@knockout-js/layout';
 
 
 type ModelState = {
-  locale: CurrentLanguages;
+  locale: LocaleType;
   darkMode: boolean;
   compactMode: boolean;
 };
@@ -12,12 +12,12 @@ type ModelState = {
 
 export default createModel({
   state: {
-    locale: CurrentLanguages.zhCN,
+    locale: LocaleType.zhCN,
     darkMode: false,
     compactMode: false,
   } as ModelState,
   reducers: {
-    updateLocale(prevState: ModelState, payload: CurrentLanguages) {
+    updateLocale(prevState: ModelState, payload: LocaleType) {
       setItem('locale', payload);
       prevState.locale = payload;
     },

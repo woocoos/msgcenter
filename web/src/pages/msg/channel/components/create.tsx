@@ -1,12 +1,12 @@
-import { Org } from '@/__generated__/adminx/graphql';
 import { MsgChannel, MsgChannelReceiverType } from '@/__generated__/msgsrv/graphql';
-import InputOrg from '@/components/Adminx/Org/input';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { cacheOrg } from '@/services/adminx/org';
 import { EnumMsgChannelReceiverType, createMsgChannel, getMsgChannelInfo, updateMsgChannel } from '@/services/msgsrv/channel';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { useState } from 'react';
+import { Org, OrgKind } from '@knockout-js/api';
+import { useLeavePrompt } from '@knockout-js/layout';
+import { OrgSelect } from '@knockout-js/org';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ProFormData = {
@@ -24,10 +24,13 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     [info, setInfo] = useState<MsgChannel>(),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     onOpenChange = (open: boolean) => {
@@ -110,7 +113,7 @@ export default (props: {
         rules={[
           { required: true, message: `${t('please_enter_org')}` },
         ]}>
-        <InputOrg />
+        <OrgSelect kind={OrgKind.Root} />
       </ProFormText>
       <ProFormText
         name="name"

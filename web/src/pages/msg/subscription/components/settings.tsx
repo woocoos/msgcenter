@@ -1,4 +1,3 @@
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CreateMsgSubscriberInput, MsgType } from '@/__generated__/msgsrv/graphql';
@@ -9,6 +8,7 @@ import { getOrgUserList } from '@/services/adminx/org/user';
 import store from '@/store';
 import { getOrgGroupList } from '@/services/adminx/org/role';
 import { TransferItem } from 'antd/es/transfer';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 type SubjectType = 'user' | 'exUser' | 'orgRole'
 
@@ -21,6 +21,7 @@ export default (props: {
   const { t } = useTranslation(),
     [userState] = store.useModel('user'),
     [subject, setSubject] = useState<SubjectType>('user'),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [info, setInfo] = useState<MsgType>(),
     [loading, setLoading] = useState(false),
     [dataSource, setDataSource] = useState<TransferItem[]>([]),
@@ -28,7 +29,9 @@ export default (props: {
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     onOpenChange = (open: boolean) => {

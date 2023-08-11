@@ -1,7 +1,6 @@
 import { gql } from '@/__generated__/adminx';
-import { pagingRequest, queryRequest } from '../';
-import { OrgRole, OrgRoleOrder, OrgRoleWhereInput } from '@/__generated__/adminx/graphql';
-import { gid } from '@/util';
+import { OrgRole, OrgRoleOrder, OrgRoleWhereInput, gid } from '@knockout-js/api';
+import { paging, query } from '@knockout-js/ice-urql/request';
 
 export const cacheOrgRole: Record<string, OrgRole> = {}
 
@@ -40,12 +39,14 @@ export async function getOrgGroupList(
     orderBy?: OrgRoleOrder;
   },
 ) {
-  const result = await pagingRequest(
+  const result = await paging(
     queryOrgGroupList, {
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy,
-  }, gather.current || 1);
+  }, gather.current || 1, {
+    instanceName: 'ucenter',
+  });
 
   if (result.data?.orgGroups) {
     return result.data?.orgGroups;
@@ -61,9 +62,11 @@ export async function updateCacheOrgRoleListByIds(ids: (string | number)[]) {
   const cacheIds = Object.keys(cacheOrgRole)
   const newCacheIds = ids.filter(id => !cacheIds.includes(`${id}`))
   if (newCacheIds.length) {
-    const result = await queryRequest(queryOrgRoleIdList, {
+    const result = await query(queryOrgRoleIdList, {
       ids: newCacheIds.map(id => gid('org_role', id))
-    })
+    }, {
+      instanceName: 'ucenter',
+    });
     result.data?.nodes?.forEach(item => {
       if (item?.__typename === 'OrgRole') {
         cacheOrgRole[item.id] = item as OrgRole

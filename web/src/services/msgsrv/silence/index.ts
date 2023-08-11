@@ -1,7 +1,7 @@
 import { gql } from "@/__generated__/msgsrv";
-import { mutationRequest, pagingRequest, queryRequest } from "..";
-import { gid } from "@/util";
 import { CreateSilenceInput, SilenceOrder, SilenceWhereInput, UpdateSilenceInput } from "@/__generated__/msgsrv/graphql";
+import { gid } from "@knockout-js/api";
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 export const EnumSilenceStatus = {
   active: { text: 'active', status: 'success' },
@@ -70,7 +70,7 @@ export async function getSilenceList(
     where?: SilenceWhereInput;
     orderBy?: SilenceOrder;
   }) {
-  const result = await pagingRequest(
+  const result = await paging(
     querySilenceList, {
     first: gather.pageSize || 20,
     where: gather.where,
@@ -90,7 +90,7 @@ export async function getSilenceList(
  * @returns
  */
 export async function getSilenceInfo(silenceId: string) {
-  const result = await queryRequest(querySilenceInfo, {
+  const result = await query(querySilenceInfo, {
     gid: gid('silence', silenceId)
   })
   if (result.data?.node?.__typename === "Silence") {
@@ -106,7 +106,7 @@ export async function getSilenceInfo(silenceId: string) {
  * @returns
  */
 export async function createSilence(input: CreateSilenceInput) {
-  const result = await mutationRequest(mutationCreateSilence, {
+  const result = await mutation(mutationCreateSilence, {
     input
   })
   if (result.data?.createSilence.id) {
@@ -122,7 +122,7 @@ export async function createSilence(input: CreateSilenceInput) {
  * @returns
  */
 export async function updateSilence(silenceId: string, input: UpdateSilenceInput) {
-  const result = await mutationRequest(mutationUpdateSilence, {
+  const result = await mutation(mutationUpdateSilence, {
     id: silenceId,
     input,
   })
@@ -138,7 +138,7 @@ export async function updateSilence(silenceId: string, input: UpdateSilenceInput
  * @returns
  */
 export async function delSilence(silenceId: string) {
-  const result = await mutationRequest(mutationDelSilence, {
+  const result = await mutation(mutationDelSilence, {
     id: silenceId,
   })
   if (result.data?.deleteSilence) {

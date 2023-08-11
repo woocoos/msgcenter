@@ -1,7 +1,7 @@
 import { gql } from "@/__generated__/msgsrv";
 import { CreateMsgEventInput, MsgEventOrder, MsgEventWhereInput, RouteStrType, UpdateMsgEventInput } from "@/__generated__/msgsrv/graphql";
-import { mutationRequest, pagingRequest, queryRequest } from "..";
-import { gid } from "@/util";
+import { gid } from "@knockout-js/api";
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 export const EnumMsgEventStatus = {
   active: { text: 'active', status: 'success' },
@@ -79,7 +79,7 @@ export async function getMsgEventList(
     where?: MsgEventWhereInput;
     orderBy?: MsgEventOrder;
   }) {
-  const result = await pagingRequest(
+  const result = await paging(
     queryMsgEventList, {
     first: gather.pageSize || 20,
     where: gather.where,
@@ -98,7 +98,7 @@ export async function getMsgEventList(
  * @returns
  */
 export async function getMsgEventInfo(msgEventId: string) {
-  const result = await queryRequest(queryMsgEventInfo, {
+  const result = await query(queryMsgEventInfo, {
     gid: gid('msg_event', msgEventId)
   })
   if (result.data?.node?.__typename === 'MsgEvent') {
@@ -113,7 +113,7 @@ export async function getMsgEventInfo(msgEventId: string) {
  * @returns
  */
 export async function getMsgEventInfoRoute(msgEventId: string, type: RouteStrType) {
-  const result = await queryRequest(queryMsgEventInfoRoute, {
+  const result = await query(queryMsgEventInfoRoute, {
     gid: gid('msg_event', msgEventId),
     type,
   })
@@ -129,7 +129,7 @@ export async function getMsgEventInfoRoute(msgEventId: string, type: RouteStrTyp
  * @returns
  */
 export async function createMsgEvent(input: CreateMsgEventInput) {
-  const result = await mutationRequest(mutationCreateMsgEvent, {
+  const result = await mutation(mutationCreateMsgEvent, {
     input
   })
   if (result.data?.createMsgEvent.id) {
@@ -145,7 +145,7 @@ export async function createMsgEvent(input: CreateMsgEventInput) {
  * @returns
  */
 export async function updateMsgEvent(msgEventId: string, input: UpdateMsgEventInput) {
-  const result = await mutationRequest(mutationUpdateMsgEvent, {
+  const result = await mutation(mutationUpdateMsgEvent, {
     id: msgEventId,
     input,
   })
@@ -161,7 +161,7 @@ export async function updateMsgEvent(msgEventId: string, input: UpdateMsgEventIn
  * @returns
  */
 export async function delMsgEvent(msgEventId: string) {
-  const result = await mutationRequest(mutationDelMsgEvent, {
+  const result = await mutation(mutationDelMsgEvent, {
     id: msgEventId,
   })
   if (result.data?.deleteMsgEvent) {
@@ -176,7 +176,7 @@ export async function delMsgEvent(msgEventId: string) {
  * @returns
  */
 export async function disableMsgEvent(msgEventId: string) {
-  const result = await mutationRequest(mutationDisableMsgEvent, {
+  const result = await mutation(mutationDisableMsgEvent, {
     id: msgEventId,
   })
   if (result.data?.disableMsgEvent.id) {
@@ -191,7 +191,7 @@ export async function disableMsgEvent(msgEventId: string) {
  * @returns
  */
 export async function enableMsgEvent(msgEventId: string) {
-  const result = await mutationRequest(mutationEnableMsgEvent, {
+  const result = await mutation(mutationEnableMsgEvent, {
     id: msgEventId,
   })
   if (result.data?.enableMsgEvent.id) {

@@ -1,15 +1,14 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal } from 'antd';
 import { useRef, useState } from 'react';
-import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
 import { MsgType, MsgTypeSimpleStatus, MsgTypeWhereInput } from '@/__generated__/msgsrv/graphql';
 import { EnumMsgTypeStatus, delMsgType, getMsgTypeList } from '@/services/msgsrv/type';
-import InputApp from '@/components/Adminx/App/input';
 import Create from './components/create';
 import { cacheApp, updateCacheAppListByIds } from '@/services/adminx/app/indtx';
 import InputCategory from './components/inputCategory';
+import { AppSelect } from '@knockout-js/org';
 
 
 export default () => {
@@ -22,7 +21,7 @@ export default () => {
       {
         title: t('app'), dataIndex: 'app', width: 120,
         renderFormItem() {
-          return <InputApp />
+          return <AppSelect />
         },
         render: (text, record) => {
           return record.appID ? cacheApp[record.appID]?.name || record.appID : '-';
@@ -105,27 +104,6 @@ export default () => {
 
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as MsgType[], success: true, total: 0 },
-        where: MsgTypeWhereInput = {};
-      where.appID = params.app?.id;
-      where.category = params.category;
-      where.nameContains = params.name;
-      where.statusIn = filter.status as MsgTypeSimpleStatus[]
-      const result = await getMsgTypeList({
-        current: params.current,
-        pageSize: params.pageSize,
-        where,
-      });
-      if (result?.totalCount) {
-        table.data = result.edges?.map(item => item?.node) as MsgType[]
-        await updateCacheAppListByIds(table.data.map(item => item.appID || ''))
-        table.total = result.totalCount;
-      }
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
-    },
     onDel = (record: MsgType) => {
       Modal.confirm({
         title: t('delete'),
@@ -185,7 +163,27 @@ export default () => {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
-        request={getRequest}
+        request={async (params, sort, filter) => {
+          const table = { data: [] as MsgType[], success: true, total: 0 },
+            where: MsgTypeWhereInput = {};
+          where.appID = params.app?.id;
+          where.category = params.category;
+          where.nameContains = params.name;
+          where.statusIn = filter.status as MsgTypeSimpleStatus[]
+          const result = await getMsgTypeList({
+            current: params.current,
+            pageSize: params.pageSize,
+            where,
+          });
+          if (result?.totalCount) {
+            table.data = result.edges?.map(item => item?.node) as MsgType[]
+            await updateCacheAppListByIds(table.data.map(item => item.appID || ''))
+            table.total = result.totalCount;
+          }
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },

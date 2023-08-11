@@ -1,7 +1,7 @@
 import { gql } from "@/__generated__/msgsrv";
 import { CreateMsgSubscriberInput, CreateMsgTypeInput, MsgTypeOrder, MsgTypeWhereInput, UpdateMsgTypeInput } from "@/__generated__/msgsrv/graphql";
-import { mutationRequest, pagingRequest, queryRequest } from "..";
-import { gid } from "@/util";
+import { gid } from "@knockout-js/api";
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 export const EnumMsgTypeStatus = {
   active: { text: '活跃', status: 'success' },
@@ -106,7 +106,7 @@ export async function getMsgTypeList(
     where?: MsgTypeWhereInput;
     orderBy?: MsgTypeOrder;
   }) {
-  const result = await pagingRequest(
+  const result = await paging(
     queryMsgTypeList, {
     first: gather.pageSize || 20,
     where: gather.where,
@@ -125,7 +125,7 @@ export async function getMsgTypeList(
  * @returns
  */
 export async function getMsgTypeInfo(msgTypeId: string) {
-  const result = await queryRequest(queryMsgTypeInfo, {
+  const result = await query(queryMsgTypeInfo, {
     gid: gid('msg_type', msgTypeId)
   })
   if (result.data?.node?.__typename === 'MsgType') {
@@ -140,7 +140,7 @@ export async function getMsgTypeInfo(msgTypeId: string) {
  * @returns
  */
 export async function createMsgType(input: CreateMsgTypeInput) {
-  const result = await mutationRequest(mutationCreateMsgType, {
+  const result = await mutation(mutationCreateMsgType, {
     input
   })
   if (result.data?.createMsgType.id) {
@@ -156,7 +156,7 @@ export async function createMsgType(input: CreateMsgTypeInput) {
  * @returns
  */
 export async function updateMsgType(msgTypeId: string, input: UpdateMsgTypeInput) {
-  const result = await mutationRequest(mutationUpdateMsgType, {
+  const result = await mutation(mutationUpdateMsgType, {
     id: msgTypeId,
     input,
   })
@@ -172,7 +172,7 @@ export async function updateMsgType(msgTypeId: string, input: UpdateMsgTypeInput
  * @returns
  */
 export async function delMsgType(msgTypeId: string) {
-  const result = await mutationRequest(mutationDelMsgType, {
+  const result = await mutation(mutationDelMsgType, {
     id: msgTypeId,
   })
   if (result.data?.deleteMsgType) {
@@ -190,7 +190,7 @@ export async function delMsgType(msgTypeId: string) {
  * @returns
  */
 export async function getMsgTypeCategoryList(keyword?: string, appId?: string) {
-  const result = await queryRequest(queryMsgTypeCategory, {
+  const result = await query(queryMsgTypeCategory, {
     keyword,
     appID: appId,
   })
@@ -213,7 +213,7 @@ export async function getMsgTypeListAndSub(
     where?: MsgTypeWhereInput;
     orderBy?: MsgTypeOrder;
   }) {
-  const result = await pagingRequest(
+  const result = await paging(
     queryMsgTypeListAndSub, {
     first: gather.pageSize || 20,
     where: gather.where,
@@ -233,7 +233,7 @@ export async function getMsgTypeListAndSub(
  * @returns
  */
 export async function getMsgTypeAndSubInfo(msgTypeId: string) {
-  const result = await queryRequest(queryMsgTypeAndSubInfo, {
+  const result = await query(queryMsgTypeAndSubInfo, {
     gid: gid('msg_type', msgTypeId)
   })
   if (result.data?.node?.__typename === 'MsgType') {
@@ -248,7 +248,7 @@ export async function getMsgTypeAndSubInfo(msgTypeId: string) {
  * @returns
  */
 export async function createSub(inputs: CreateMsgSubscriberInput[]) {
-  const result = await mutationRequest(mutationCreateSub, {
+  const result = await mutation(mutationCreateSub, {
     inputs,
   })
   if (result.data?.createMsgSubscriber) {
@@ -263,7 +263,7 @@ export async function createSub(inputs: CreateMsgSubscriberInput[]) {
  * @returns
  */
 export async function delSub(ids: string[]) {
-  const result = await mutationRequest(mutationDelSub, {
+  const result = await mutation(mutationDelSub, {
     ids,
   })
   if (result.data?.deleteMsgSubscriber) {

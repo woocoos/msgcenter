@@ -1,8 +1,6 @@
 import { gql } from '@/__generated__/adminx';
-import { gid } from '@/util';
-import { pagingRequest } from '../';
-import { UserOrder, UserWhereInput } from '@/__generated__/adminx/graphql';
-
+import { UserOrder, UserWhereInput, gid } from '@knockout-js/api';
+import { paging } from '@knockout-js/ice-urql/request';
 
 const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
   node(id:$gid){
@@ -20,7 +18,6 @@ const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$first: 
   }
 }`);
 
-
 /**
  * 组织下的用户信息
  * @param orgId
@@ -35,13 +32,15 @@ export async function getOrgUserList(
     orderBy?: UserOrder;
   },
 ) {
-  const result = await pagingRequest(
+  const result = await paging(
     queryOrgUserList, {
     gid: gid('org', orgId),
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy,
-  }, gather.current || 1);
+  }, gather.current || 1, {
+    instanceName: 'ucenter',
+  });
 
   if (result.data?.node?.__typename === 'Org') {
     return result.data.node.users;

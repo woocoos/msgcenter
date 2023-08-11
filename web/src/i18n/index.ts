@@ -2,24 +2,19 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import enUS from './locales/en-US';
 import zhCN from './locales/zh-CN';
-
-export enum CurrentLanguages {
-  'zhCN' = 'zh-CN',
-  'enUS' = 'en-US'
-};
+import { LocaleType } from '@knockout-js/layout';
 
 // 多语言文件
 const resources = {
-  [CurrentLanguages.enUS]: enUS,
-  [CurrentLanguages.zhCN]: zhCN,
+  [LocaleType.enUS]: enUS,
+  [LocaleType.zhCN]: zhCN,
 };
-
 
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: CurrentLanguages.zhCN,
+    lng: LocaleType.zhCN,
     interpolation: {
       escapeValue: false,
     },

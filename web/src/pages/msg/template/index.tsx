@@ -1,7 +1,6 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, Dropdown } from 'antd';
 import { useRef, useState } from 'react';
-import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
 import { Link, useSearchParams } from '@ice/runtime';
@@ -115,32 +114,6 @@ export default () => {
       }
       return null;
     },
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as MsgTemplate[], success: true, total: 0 },
-        where: MsgTemplateWhereInput = {};
-      const msgEvent = msgEventInfo?.id ? msgEventInfo : await getMsgEvent();
-      if (msgEvent?.id) {
-        where.msgEventID = msgEvent.id
-        where.tenantID = params.org?.id
-        where.nameContains = params.name;
-        where.subjectContains = params.subject;
-        where.receiverTypeIn = filter.modes as MsgTemplateReceiverType[]
-        where.statusIn = filter.status as MsgTemplateSimpleStatus[]
-        const result = await getMsgTemplateList({
-          current: params.current,
-          pageSize: params.pageSize,
-          where,
-        });
-        if (result?.totalCount) {
-          table.data = result.edges?.map(item => item?.node) as MsgTemplate[]
-          await updateCacheOrgListByIds(table.data.map(item => item.tenantID))
-          table.total = result.totalCount;
-        }
-      }
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
-    },
     onDel = (record: MsgTemplate) => {
       Modal.confirm({
         title: t('delete'),
@@ -221,7 +194,32 @@ export default () => {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
-        request={getRequest}
+        request={async (params, sort, filter) => {
+          const table = { data: [] as MsgTemplate[], success: true, total: 0 },
+            where: MsgTemplateWhereInput = {};
+          const msgEvent = msgEventInfo?.id ? msgEventInfo : await getMsgEvent();
+          if (msgEvent?.id) {
+            where.msgEventID = msgEvent.id
+            where.tenantID = params.org?.id
+            where.nameContains = params.name;
+            where.subjectContains = params.subject;
+            where.receiverTypeIn = filter.modes as MsgTemplateReceiverType[]
+            where.statusIn = filter.status as MsgTemplateSimpleStatus[]
+            const result = await getMsgTemplateList({
+              current: params.current,
+              pageSize: params.pageSize,
+              where,
+            });
+            if (result?.totalCount) {
+              table.data = result.edges?.map(item => item?.node) as MsgTemplate[]
+              await updateCacheOrgListByIds(table.data.map(item => item.tenantID))
+              table.total = result.totalCount;
+            }
+          }
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },

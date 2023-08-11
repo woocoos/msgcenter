@@ -1,7 +1,6 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal } from 'antd';
 import { useRef, useState } from 'react';
-import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
 import { MsgEvent, MsgEventSimpleStatus, MsgEventWhereInput } from '@/__generated__/msgsrv/graphql';
@@ -120,28 +119,6 @@ export default () => {
 
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as MsgEvent[], success: true, total: 0 },
-        where: MsgEventWhereInput = {};
-      where.nameContains = params.name;
-      where.hasMsgTypeWith = [{
-        nameContains: params.msgTypeName,
-        categoryContains: params.msgTypeCategory,
-      }];
-      where.statusIn = filter.status as MsgEventSimpleStatus[]
-      const result = await getMsgEventList({
-        current: params.current,
-        pageSize: params.pageSize,
-        where,
-      });
-      if (result?.totalCount) {
-        table.data = result.edges?.map(item => item?.node) as MsgEvent[]
-        table.total = result.totalCount;
-      }
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
-    },
     onDel = (record: MsgEvent) => {
       Modal.confirm({
         title: t('delete'),
@@ -214,7 +191,28 @@ export default () => {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
-        request={getRequest}
+        request={async (params, sort, filter) => {
+          const table = { data: [] as MsgEvent[], success: true, total: 0 },
+            where: MsgEventWhereInput = {};
+          where.nameContains = params.name;
+          where.hasMsgTypeWith = [{
+            nameContains: params.msgTypeName,
+            categoryContains: params.msgTypeCategory,
+          }];
+          where.statusIn = filter.status as MsgEventSimpleStatus[]
+          const result = await getMsgEventList({
+            current: params.current,
+            pageSize: params.pageSize,
+            where,
+          });
+          if (result?.totalCount) {
+            table.data = result.edges?.map(item => item?.node) as MsgEvent[]
+            table.total = result.totalCount;
+          }
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },

@@ -1,7 +1,7 @@
 import { createModel } from 'ice';
 import { LoginRes } from '@/services/auth';
 import { setItem, removeItem, getItem } from '@/pkg/localStore';
-import { User } from '@/__generated__/adminx/graphql';
+import { User } from '@knockout-js/api';
 
 type UserState = {
   id: string;

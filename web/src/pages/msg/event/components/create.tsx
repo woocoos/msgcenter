@@ -1,12 +1,12 @@
 import { MsgEvent, MsgType } from '@/__generated__/msgsrv/graphql';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { createMsgEvent, getMsgEventInfo, updateMsgEvent } from '@/services/msgsrv/event';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormCheckbox, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InputMsgType from '../../type/components/input';
 import { EnumMsgTemplateReceiverType } from '@/services/msgsrv/template';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 type ProFormData = {
   msgType?: MsgType;
@@ -23,10 +23,13 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     [info, setInfo] = useState<MsgEvent>(),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     onOpenChange = (open: boolean) => {

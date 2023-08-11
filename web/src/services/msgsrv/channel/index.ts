@@ -1,7 +1,7 @@
 import { gql } from "@/__generated__/msgsrv";
-import { mutationRequest, pagingRequest, queryRequest } from "..";
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 import { CreateMsgChannelInput, MsgChannelOrder, MsgChannelWhereInput, UpdateMsgChannelInput } from "@/__generated__/msgsrv/graphql";
-import { gid } from "@/util";
+import { gid } from "@knockout-js/api";
 
 
 export const EnumMsgChannelReceiverType = {
@@ -84,7 +84,7 @@ export async function getMsgChannelList(
     where?: MsgChannelWhereInput;
     orderBy?: MsgChannelOrder;
   }) {
-  const result = await pagingRequest(
+  const result = await paging(
     queryMsgChannelList, {
     first: gather.pageSize || 20,
     where: gather.where,
@@ -103,7 +103,7 @@ export async function getMsgChannelList(
  * @returns
  */
 export async function getMsgChannelInfo(msgChannelId: string) {
-  const result = await queryRequest(queryMsgChannelInfo, {
+  const result = await query(queryMsgChannelInfo, {
     gid: gid('msg_channel', msgChannelId)
   })
   if (result.data?.node?.__typename === 'MsgChannel') {
@@ -118,7 +118,7 @@ export async function getMsgChannelInfo(msgChannelId: string) {
  * @returns
  */
 export async function getMsgChannelReceiverInfo(msgChannelId: string) {
-  const result = await queryRequest(queryMsgChannelReceiverInfo, {
+  const result = await query(queryMsgChannelReceiverInfo, {
     gid: gid('msg_channel', msgChannelId)
   })
   if (result.data?.node?.__typename === 'MsgChannel') {
@@ -133,7 +133,7 @@ export async function getMsgChannelReceiverInfo(msgChannelId: string) {
  * @returns
  */
 export async function createMsgChannel(input: CreateMsgChannelInput) {
-  const result = await mutationRequest(mutationCreateMsgChannel, {
+  const result = await mutation(mutationCreateMsgChannel, {
     input
   })
   if (result.data?.createMsgChannel.id) {
@@ -149,7 +149,7 @@ export async function createMsgChannel(input: CreateMsgChannelInput) {
  * @returns
  */
 export async function updateMsgChannel(msgChannelId: string, input: UpdateMsgChannelInput) {
-  const result = await mutationRequest(mutationUpdateMsgChannel, {
+  const result = await mutation(mutationUpdateMsgChannel, {
     id: msgChannelId,
     input,
   })
@@ -165,7 +165,7 @@ export async function updateMsgChannel(msgChannelId: string, input: UpdateMsgCha
  * @returns
  */
 export async function disableMsgChannel(msgChannelId: string) {
-  const result = await mutationRequest(mutationDisableMsgChannel, {
+  const result = await mutation(mutationDisableMsgChannel, {
     id: msgChannelId,
   })
   if (result.data?.disableMsgChannel.id) {
@@ -180,7 +180,7 @@ export async function disableMsgChannel(msgChannelId: string) {
  * @returns
  */
 export async function enableMsgChannel(msgChannelId: string) {
-  const result = await mutationRequest(mutationEnableMsgChannel, {
+  const result = await mutation(mutationEnableMsgChannel, {
     id: msgChannelId,
   })
   if (result.data?.enableMsgChannel.id) {
@@ -195,7 +195,7 @@ export async function enableMsgChannel(msgChannelId: string) {
  * @returns
  */
 export async function delMsgChannel(msgChannelId: string) {
-  const result = await mutationRequest(mutationDelMsgChannel, {
+  const result = await mutation(mutationDelMsgChannel, {
     id: msgChannelId,
   })
   if (result.data?.deleteMsgChannel) {

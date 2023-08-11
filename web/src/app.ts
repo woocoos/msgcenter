@@ -2,6 +2,7 @@ import { defineAppConfig, defineDataLoader } from 'ice';
 import { defineAuthConfig } from '@ice/plugin-auth/esm/types';
 import { defineStoreConfig } from '@ice/plugin-store/esm/types';
 import { defineRequestConfig } from '@ice/plugin-request/esm/types';
+import { defineUrqlConfig } from "@knockout-js/ice-urql/esm/types";
 import { message } from 'antd';
 import store from '@/store';
 import '@/assets/styles/index.css';
@@ -10,9 +11,9 @@ import { userPermissions } from './services/adminx/user';
 import { browserLanguage, goLogin } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import i18n from './i18n';
-import { User } from './__generated__/adminx/graphql';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { isInIcestark } from '@ice/stark-app';
+import { User } from '@knockout-js/api';
 
 export const icestark = defineChildConfig(() => ({
   mount: () => {
@@ -90,18 +91,49 @@ export const dataLoader = defineDataLoader(async () => {
   };
 });
 
+
+// urql
+export const urqlConfig = defineUrqlConfig([
+  {
+    instanceName: 'default',
+    url: '/api-msgsrv/graphql/query',
+    exchangeOpt: {
+      authOpts: {
+        store: {
+          getState: () => {
+            const { token, tenantId, refreshToken } = store.getModelState('user')
+            return {
+              token, tenantId, refreshToken
+            }
+          },
+          setStateToken: (newToken) => {
+            store.dispatch.user.updateToken(newToken)
+          }
+        },
+        login: process.env.ICE_LOGIN_URL,
+        refreshApi: "/api-auth/login/refresh-token"
+      }
+    }
+  },
+  {
+    instanceName: 'ucenter',
+    url: '/api-adminx/graphql/query',
+  },
+])
+
+
 // 权限
 export const authConfig = defineAuthConfig(async (appData) => {
   const { user } = appData,
     initialAuth = {};
   // 判断路由权限
   if (user.token) {
-    const ups = await userPermissions({
+    const result = await userPermissions({
       Authorization: `Bearer ${user.token}`,
       'X-Tenant-ID': user.tenantId,
     });
-    if (ups) {
-      ups.forEach(item => {
+    if (result) {
+      result.forEach(item => {
         if (item) {
           initialAuth[item.name] = true;
         }
@@ -126,6 +158,7 @@ export const storeConfig = defineStoreConfig(async (appData) => {
     },
   };
 });
+
 
 // 请求配置
 export const requestConfig = defineRequestConfig(() => {

@@ -1,15 +1,15 @@
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormInstance, ProFormRadio, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Org } from '@/__generated__/adminx/graphql';
 import { MsgEvent, MsgTemplate, MsgTemplateFormat, MsgTemplateReceiverType } from '@/__generated__/msgsrv/graphql';
 import { EnumMsgTemplateFormat, createMsgTemplate, getMsgTemplateInfo, updateMsgTemplate } from '@/services/msgsrv/template';
-import InputOrg from '@/components/Adminx/Org/input';
 import TempBtnUpload from '@/components/UploadFiles/tempBtn';
 import { cacheOrg } from '@/services/adminx/org';
 import Multiple from '@/components/UploadFiles/multiple';
+import { useLeavePrompt } from '@knockout-js/layout';
+import { OrgSelect } from '@knockout-js/org';
+import { Org, OrgKind } from '@knockout-js/api';
 
 type ProFormData = {
   org?: Org;
@@ -36,11 +36,14 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     formRef = useRef<ProFormInstance>(),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [info, setInfo] = useState<MsgTemplate>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     onOpenChange = (open: boolean) => {
@@ -142,7 +145,7 @@ export default (props: {
         rules={[
           { required: true, message: `${t('please_enter_org')}` },
         ]}>
-        <InputOrg />
+        <OrgSelect kind={OrgKind.Root} />
       </ProFormText>
       <ProFormText
         name="name"

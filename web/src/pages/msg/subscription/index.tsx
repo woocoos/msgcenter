@@ -1,7 +1,6 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Space } from 'antd';
 import { useRef, useState } from 'react';
-import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
 import { MsgType, MsgTypeWhereInput } from '@/__generated__/msgsrv/graphql';
@@ -76,81 +75,6 @@ export default () => {
       id: '',
     });
 
-
-  const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as ProTableColumnsData[], success: true, total: 0 },
-        where: MsgTypeWhereInput = {};
-      where.nameContains = params.name;
-      where.categoryContains = params.msgTypeCategory;
-      const result = await getMsgTypeListAndSub({
-        current: params.current,
-        pageSize: 999,
-        where,
-      });
-      if (result?.totalCount) {
-        const msgTypeList = result.edges?.map(item => item?.node),
-          userIds: string[] = [],
-          userGroupIds: string[] = [],
-          data: ProTableColumnsData[] = [];
-
-        msgTypeList?.forEach(item => {
-          if (item) {
-            item.subscriberUsers.forEach(su => {
-              if (su.userID) {
-                userIds.push(su.userID)
-              }
-            })
-            item.excludeSubscriberUsers.forEach(su => {
-              if (su.userID) {
-                userIds.push(su.userID)
-              }
-            })
-            item.subscriberRoles.forEach(sr => {
-              if (sr.orgRoleID) {
-                userGroupIds.push(`${sr.orgRoleID}`)
-              }
-            })
-          }
-        })
-
-        await updateCacheUserListByIds(userIds)
-        await updateCacheOrgRoleListByIds(userGroupIds)
-
-        msgTypeList?.forEach(mt => {
-          if (mt) {
-            const dataItem = data.find(item => item.name == mt.category),
-              addData = {
-                id: mt.id,
-                name: mt.name,
-                receiving_user: mt.subscriberUsers.map(su => su.userID ? cacheUser[su.userID].displayName : '').filter(su => !!su).join('、'),
-                receiving_user_group: mt.subscriberRoles.map(sr => sr.orgRoleID ? cacheOrgRole[sr.orgRoleID].name : '').filter(sr => !!sr).join('、'),
-                exclude_user: mt.excludeSubscriberUsers.map(su => su.userID ? cacheUser[su.userID].displayName : '').filter(su => !!su).join('、'),
-                msgType: mt as MsgType,
-              }
-            if (dataItem) {
-              dataItem.children?.push(addData)
-            } else {
-              data.push({
-                id: `category-${mt.category}`,
-                name: mt.category,
-                receiving_user: '',
-                receiving_user_group: '',
-                exclude_user: '',
-                children: [addData]
-              })
-            }
-          }
-        })
-        table.data = data
-        table.total = data.length;
-
-      }
-      setExpandedRowKeys(table.data.map(item => item.id))
-      return table;
-    };
-
-
   return (
     <PageContainer
       header={{
@@ -177,7 +101,77 @@ export default () => {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
-        request={getRequest}
+        request={async (params) => {
+          const table = { data: [] as ProTableColumnsData[], success: true, total: 0 },
+            where: MsgTypeWhereInput = {};
+          where.nameContains = params.name;
+          where.categoryContains = params.msgTypeCategory;
+          const result = await getMsgTypeListAndSub({
+            current: params.current,
+            pageSize: 999,
+            where,
+          });
+          if (result?.totalCount) {
+            const msgTypeList = result.edges?.map(item => item?.node),
+              userIds: string[] = [],
+              userGroupIds: string[] = [],
+              data: ProTableColumnsData[] = [];
+
+            msgTypeList?.forEach(item => {
+              if (item) {
+                item.subscriberUsers.forEach(su => {
+                  if (su.userID) {
+                    userIds.push(su.userID)
+                  }
+                })
+                item.excludeSubscriberUsers.forEach(su => {
+                  if (su.userID) {
+                    userIds.push(su.userID)
+                  }
+                })
+                item.subscriberRoles.forEach(sr => {
+                  if (sr.orgRoleID) {
+                    userGroupIds.push(`${sr.orgRoleID}`)
+                  }
+                })
+              }
+            })
+
+            await updateCacheUserListByIds(userIds)
+            await updateCacheOrgRoleListByIds(userGroupIds)
+
+            msgTypeList?.forEach(mt => {
+              if (mt) {
+                const dataItem = data.find(item => item.name == mt.category),
+                  addData = {
+                    id: mt.id,
+                    name: mt.name,
+                    receiving_user: mt.subscriberUsers.map(su => su.userID ? cacheUser[su.userID].displayName : '').filter(su => !!su).join('、'),
+                    receiving_user_group: mt.subscriberRoles.map(sr => sr.orgRoleID ? cacheOrgRole[sr.orgRoleID].name : '').filter(sr => !!sr).join('、'),
+                    exclude_user: mt.excludeSubscriberUsers.map(su => su.userID ? cacheUser[su.userID].displayName : '').filter(su => !!su).join('、'),
+                    msgType: mt as MsgType,
+                  }
+                if (dataItem) {
+                  dataItem.children?.push(addData)
+                } else {
+                  data.push({
+                    id: `category-${mt.category}`,
+                    name: mt.category,
+                    receiving_user: '',
+                    receiving_user_group: '',
+                    exclude_user: '',
+                    children: [addData]
+                  })
+                }
+              }
+            })
+            table.data = data
+            table.total = data.length;
+
+          }
+          setExpandedRowKeys(table.data.map(item => item.id))
+          return table;
+        }}
         pagination={false}
         expandable={{
           expandedRowKeys,

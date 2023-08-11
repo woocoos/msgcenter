@@ -1,14 +1,14 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal } from 'antd';
 import { useRef, useState } from 'react';
-import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
 import { cacheOrg, updateCacheOrgListByIds } from '@/services/adminx/org';
 import Create from './components/create';
-import InputOrg from '@/components/Adminx/Org/input';
 import { Silence, SilenceSilenceState, SilenceWhereInput } from '@/__generated__/msgsrv/graphql';
 import { EnumSilenceMatchType, EnumSilenceStatus, delSilence, getSilenceList } from '@/services/msgsrv/silence';
+import { OrgSelect } from '@knockout-js/org';
+import { OrgKind } from '@knockout-js/api';
 
 
 export default () => {
@@ -21,7 +21,7 @@ export default () => {
       {
         title: t('org'), dataIndex: 'org', width: 120,
         renderFormItem: () => {
-          return <InputOrg />
+          return <OrgSelect kind={OrgKind.Root} />
         },
         render: (text, record) => {
           return record.tenantID ? cacheOrg[record.tenantID]?.name || record.tenantID : '-';
@@ -106,27 +106,6 @@ export default () => {
 
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as Silence[], success: true, total: 0 },
-        where: SilenceWhereInput = {};
-      where.tenantID = params.org?.id;
-      where.startsAt = params.startsAt
-      where.endsAt = params.endsAt
-      where.stateIn = filter.status as SilenceSilenceState[]
-      const result = await getSilenceList({
-        current: params.current,
-        pageSize: params.pageSize,
-        where,
-      });
-      if (result?.totalCount) {
-        table.data = result.edges?.map(item => item?.node) as Silence[]
-        await updateCacheOrgListByIds(table.data.map(item => item.tenantID || ''))
-        table.total = result.totalCount;
-      }
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
-    },
     onDel = (record: Silence) => {
       Modal.confirm({
         title: t('delete'),
@@ -186,7 +165,27 @@ export default () => {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
-        request={getRequest}
+        request={async (params, sort, filter) => {
+          const table = { data: [] as Silence[], success: true, total: 0 },
+            where: SilenceWhereInput = {};
+          where.tenantID = params.org?.id;
+          where.startsAt = params.startsAt
+          where.endsAt = params.endsAt
+          where.stateIn = filter.status as SilenceSilenceState[]
+          const result = await getSilenceList({
+            current: params.current,
+            pageSize: params.pageSize,
+            where,
+          });
+          if (result?.totalCount) {
+            table.data = result.edges?.map(item => item?.node) as Silence[]
+            await updateCacheOrgListByIds(table.data.map(item => item.tenantID || ''))
+            table.total = result.totalCount;
+          }
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
