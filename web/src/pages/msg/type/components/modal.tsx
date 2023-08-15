@@ -3,10 +3,10 @@ import { Modal } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
-import { MsgType, MsgTypeWhereInput } from '@/__generated__/msgsrv/graphql';
-import { cacheApp, updateCacheAppListByIds } from '@/services/adminx/app/indtx';
+import { MsgType, MsgTypeWhereInput } from '@/generated/msgsrv/graphql';
 import { getMsgTypeList } from '@/services/msgsrv/type';
 import { AppSelect } from '@knockout-js/org';
+import { App, getApps } from '@knockout-js/api';
 
 export default (props: {
   open: boolean;
@@ -24,13 +24,15 @@ export default (props: {
           return <AppSelect />
         },
         render: (text, record) => {
-          return record.appID ? cacheApp[record.appID]?.name || record.appID : '-';
+          const app = apps.find(item => item.id == record.appID)
+          return record.appID ? app?.name || record.appID : '-';
         },
       },
       { title: t('category'), dataIndex: 'category', width: 120 },
       { title: t('name'), dataIndex: 'name', width: 120 },
       { title: t('description'), dataIndex: 'comments', width: 120, search: false },
     ],
+    [apps, setApps] = useState<App[]>([]),
     [dataSource, setDataSource] = useState<MsgType[]>([]),
     // 选中处理
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
@@ -72,7 +74,7 @@ export default (props: {
           });
           if (result?.totalCount) {
             table.data = result.edges?.map(item => item?.node) as MsgType[];
-            await updateCacheAppListByIds(table.data.map(item => item.appID || ''))
+            setApps(await getApps(table.data.map(item => item.appID || '')));
             table.total = result.totalCount;
           }
           setSelectedRowKeys([]);

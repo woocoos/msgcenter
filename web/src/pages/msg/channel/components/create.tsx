@@ -1,9 +1,8 @@
-import { MsgChannel, MsgChannelReceiverType } from '@/__generated__/msgsrv/graphql';
-import { cacheOrg } from '@/services/adminx/org';
+import { MsgChannel, MsgChannelReceiverType } from '@/generated/msgsrv/graphql';
 import { EnumMsgChannelReceiverType, createMsgChannel, getMsgChannelInfo, updateMsgChannel } from '@/services/msgsrv/channel';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { Org, OrgKind } from '@knockout-js/api';
+import { Org, OrgKind, getOrg } from '@knockout-js/api';
 import { useLeavePrompt } from '@knockout-js/layout';
 import { OrgSelect } from '@knockout-js/org';
 import { useEffect, useState } from 'react';
@@ -49,7 +48,7 @@ export default (props: {
         const result = await getMsgChannelInfo(props.id);
         if (result?.id) {
           setInfo(result as MsgChannel);
-          initData.org = result.tenantID ? cacheOrg[result.tenantID] : undefined;
+          initData.org = result.tenantID ? await getOrg(result.tenantID) as Org : undefined;
           initData.name = result.name;
           initData.comments = result.comments;
           initData.receiverType = result.receiverType;

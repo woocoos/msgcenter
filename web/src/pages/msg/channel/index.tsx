@@ -3,9 +3,9 @@ import { Button, Space, Modal } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { MsgChannel, MsgChannelReceiverType, MsgChannelSimpleStatus, MsgChannelWhereInput } from '@/__generated__/msgsrv/graphql';
+import { MsgChannel, MsgChannelReceiverType, MsgChannelSimpleStatus, MsgChannelWhereInput } from '@/generated/msgsrv/graphql';
 import { EnumMsgChannelReceiverType, EnumMsgChannelStatus, delMsgChannel, disableMsgChannel, enableMsgChannel, getMsgChannelList } from '@/services/msgsrv/channel';
-import { cacheOrg, updateCacheOrgListByIds } from '@/services/adminx/org';
+import { Org, getOrgs } from '@knockout-js/api';
 import Create from './components/create';
 import Config from './components/config';
 import { OrgSelect } from '@knockout-js/org';
@@ -25,7 +25,8 @@ export default () => {
           return <OrgSelect kind={OrgKind.Root} />
         },
         render: (text, record) => {
-          return record.tenantID ? cacheOrg[record.tenantID]?.name || record.tenantID : '-';
+          const org = orgs.find(item => item.id == record.tenantID)
+          return record.tenantID ? org?.name || record.tenantID : '-';
         },
       },
       { title: t('name'), dataIndex: 'name', width: 120 },
@@ -93,6 +94,7 @@ export default () => {
         },
       },
     ],
+    [orgs, setOrgs] = useState<Org[]>([]),
     [dataSource, setDataSource] = useState<MsgChannel[]>([]),
     // 选中处理
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
@@ -197,7 +199,7 @@ export default () => {
           });
           if (result?.totalCount) {
             table.data = result.edges?.map(item => item?.node) as MsgChannel[]
-            await updateCacheOrgListByIds(table.data.map(item => item.tenantID || ''))
+            setOrgs(await getOrgs(table.data.map(item => item.tenantID || '')))
             table.total = result.totalCount;
           }
           setSelectedRowKeys([]);

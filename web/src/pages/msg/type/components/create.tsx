@@ -1,5 +1,4 @@
-import { MsgType, MsgTypeSimpleStatus } from '@/__generated__/msgsrv/graphql';
-import { cacheApp } from '@/services/adminx/app/indtx';
+import { MsgType, MsgTypeSimpleStatus } from '@/generated/msgsrv/graphql';
 import { EnumMsgTypeStatus, createMsgType, getMsgTypeInfo, updateMsgType } from '@/services/msgsrv/type';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormSwitch } from '@ant-design/pro-components';
@@ -8,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import InputCategory from './inputCategory';
 import { useLeavePrompt } from '@knockout-js/layout';
 import { AppSelect } from '@knockout-js/org';
-import { App } from '@knockout-js/api';
+import { App, getApp } from '@knockout-js/api';
 
 type ProFormData = {
   app?: App;
@@ -57,7 +56,7 @@ export default (props: {
         const result = await getMsgTypeInfo(props.id);
         if (result?.id) {
           setInfo(result as MsgType);
-          initData.app = result.appID ? cacheApp[result.appID] : undefined;
+          initData.app = result.appID ? await getApp(result.appID) as App : undefined;
           initData.category = result.category;
           initData.name = result.name;
           initData.comments = result.comments;

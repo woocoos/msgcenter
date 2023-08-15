@@ -1,4 +1,4 @@
-import { MsgEvent, MsgType } from '@/__generated__/msgsrv/graphql';
+import { MsgEvent, MsgType } from '@/generated/msgsrv/graphql';
 import { createMsgEvent, getMsgEventInfo, updateMsgEvent } from '@/services/msgsrv/event';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormCheckbox, ProFormText, ProFormTextArea } from '@ant-design/pro-components';

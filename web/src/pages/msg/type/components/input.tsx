@@ -3,7 +3,7 @@ import ModalMsgType from './modal';
 import { useState } from 'react';
 import { CloseCircleFilled } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { MsgType } from '@/__generated__/msgsrv/graphql';
+import { MsgType } from '@/generated/msgsrv/graphql';
 
 export default (props: {
   value?: MsgType;

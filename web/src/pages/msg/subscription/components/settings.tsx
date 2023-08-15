@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CreateMsgSubscriberInput, MsgType } from '@/__generated__/msgsrv/graphql';
+import { CreateMsgSubscriberInput, MsgType } from '@/generated/msgsrv/graphql';
 import { DrawerForm } from '@ant-design/pro-components';
 import { createSub, delSub, getMsgTypeAndSubInfo } from '@/services/msgsrv/type';
 import { Radio, Skeleton, Space, Transfer, Typography, message } from 'antd';
-import { getOrgUserList } from '@/services/adminx/org/user';
+import { getOrgUserList } from '@knockout-js/api';
 import store from '@/store';
-import { getOrgGroupList } from '@/services/adminx/org/role';
+import { getOrgGroupList } from '@knockout-js/api';
 import { TransferItem } from 'antd/es/transfer';
 import { useLeavePrompt } from '@knockout-js/layout';
 

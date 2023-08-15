@@ -2,18 +2,15 @@ import { defineAppConfig, defineDataLoader } from 'ice';
 import { defineAuthConfig } from '@ice/plugin-auth/esm/types';
 import { defineStoreConfig } from '@ice/plugin-store/esm/types';
 import { defineRequestConfig } from '@ice/plugin-request/esm/types';
-import { defineUrqlConfig } from "@knockout-js/ice-urql/esm/types";
-import { message } from 'antd';
+import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/esm/types";
 import store from '@/store';
 import '@/assets/styles/index.css';
 import { getItem, removeItem, setItem } from '@/pkg/localStore';
-import { userPermissions } from './services/adminx/user';
 import { browserLanguage, goLogin } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
-import i18n from './i18n';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { isInIcestark } from '@ice/stark-app';
-import { User } from '@knockout-js/api';
+import { User, userPermissions } from '@knockout-js/api';
 
 export const icestark = defineChildConfig(() => ({
   mount: () => {
@@ -128,7 +125,7 @@ export const authConfig = defineAuthConfig(async (appData) => {
     initialAuth = {};
   // 判断路由权限
   if (user.token) {
-    const result = await userPermissions({
+    const result = await userPermissions(process.env.ICE_APP_CODE as string, {
       Authorization: `Bearer ${user.token}`,
       'X-Tenant-ID': user.tenantId,
     });
@@ -164,72 +161,17 @@ export const storeConfig = defineStoreConfig(async (appData) => {
 export const requestConfig = defineRequestConfig(() => {
   return [
     {
-      interceptors: {
-        request: {
-          onConfig(config: any) {
-            const userState = store.getModelState('user');
-            if (!config.headers['Authorization'] && userState.token) {
-              config.headers['Authorization'] = `Bearer ${userState.token}`;
+      interceptors: requestInterceptor({
+        store: {
+          getState: () => {
+            const { token, tenantId } = store.getModelState('user')
+            return {
+              token, tenantId
             }
-            if (!config.headers['X-Tenant-ID'] && userState.tenantId) {
-              config.headers['X-Tenant-ID'] = userState.tenantId;
-            }
-
-            return config;
           },
         },
-        response: {
-          onConfig(response) {
-            if (response.status === 200 && response.data.errors) {
-              // 提取第一个异常来展示
-              if (response.data.errors?.[0]?.message) {
-                message.error(response.data.errors?.[0]?.message);
-              }
-            }
-            return response;
-          },
-          onError: (error) => {
-            const errRes = error.response as any;
-            let msg = '';
-            if (errRes?.data?.errors?.[0]?.message) {
-              msg = errRes?.data?.errors?.[0]?.message;
-            }
-            switch (errRes.status) {
-              case 401:
-                store.dispatch.user.logout();
-                goLogin();
-                if (!msg) {
-                  msg = i18n.t('401');
-                }
-                break;
-              case 403:
-                if (!msg) {
-                  msg = i18n.t('403');
-                }
-                break;
-              case 404:
-                if (!msg) {
-                  msg = i18n.t('404');
-                }
-                break;
-              case 500:
-                if (!msg) {
-                  msg = i18n.t('500');
-                }
-                break;
-              default:
-                if (!msg) {
-                  msg = errRes.statusText;
-                }
-            }
-            if (msg) {
-              message.error(msg);
-            }
-            // 请求出错：服务端返回错误状态码
-            return error;
-          },
-        },
-      },
+        login: process.env.ICE_LOGIN_URL,
+      })
     },
   ];
 });

@@ -3,12 +3,11 @@ import { Space } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { MsgType, MsgTypeWhereInput } from '@/__generated__/msgsrv/graphql';
+import { MsgType, MsgTypeWhereInput } from '@/generated/msgsrv/graphql';
 import { getMsgTypeListAndSub } from '@/services/msgsrv/type';
 import InputCategory from '../type/components/inputCategory';
-import { cacheUser, updateCacheUserListByIds } from '@/services/adminx/user';
-import { cacheOrgRole, updateCacheOrgRoleListByIds } from '@/services/adminx/org/role';
 import Settings from './components/settings';
+import { OrgRole, User, getOrgRoles, getUsers } from '@knockout-js/api';
 
 type ProTableColumnsData = {
   id: string;
@@ -137,8 +136,8 @@ export default () => {
               }
             })
 
-            await updateCacheUserListByIds(userIds)
-            await updateCacheOrgRoleListByIds(userGroupIds)
+            const users = await getUsers(userIds);
+            const userGroups = await getOrgRoles(userGroupIds);
 
             msgTypeList?.forEach(mt => {
               if (mt) {
@@ -146,9 +145,18 @@ export default () => {
                   addData = {
                     id: mt.id,
                     name: mt.name,
-                    receiving_user: mt.subscriberUsers.map(su => su.userID ? cacheUser[su.userID].displayName : '').filter(su => !!su).join('、'),
-                    receiving_user_group: mt.subscriberRoles.map(sr => sr.orgRoleID ? cacheOrgRole[sr.orgRoleID].name : '').filter(sr => !!sr).join('、'),
-                    exclude_user: mt.excludeSubscriberUsers.map(su => su.userID ? cacheUser[su.userID].displayName : '').filter(su => !!su).join('、'),
+                    receiving_user: mt.subscriberUsers.map(su => {
+                      const user = users.find(u => u.id == su.userID);
+                      return su.userID ? user?.displayName : ''
+                    }).filter(su => !!su).join('、'),
+                    receiving_user_group: mt.subscriberRoles.map(sr => {
+                      const userGroup = userGroups.find(ug => ug.id == sr.orgRoleID);
+                      return sr.orgRoleID ? userGroup?.name : ''
+                    }).filter(sr => !!sr).join('、'),
+                    exclude_user: mt.excludeSubscriberUsers.map(su => {
+                      const user = users.find(u => u.id == su.userID);
+                      return su.userID ? user?.displayName : ''
+                    }).filter(su => !!su).join('、'),
                     msgType: mt as MsgType,
                   }
                 if (dataItem) {

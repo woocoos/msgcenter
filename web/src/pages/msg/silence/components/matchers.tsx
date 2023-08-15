@@ -1,4 +1,4 @@
-import { MatcherInput } from "@/__generated__/msgsrv/graphql";
+import { MatcherInput } from "@/generated/msgsrv/graphql";
 import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Popconfirm, Space, Tag } from "antd";
 import { useState } from "react";

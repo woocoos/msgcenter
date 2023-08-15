@@ -8,7 +8,7 @@ import * as yaml from 'js-yaml'
 
 const preserveResolvers = true
 
-const typeDefs = readFileSync(join(process.cwd(), 'script', '__generated__', "msgsrv.graphql"), 'utf-8');
+const typeDefs = readFileSync(join(process.cwd(), 'script', 'generated', "msgsrv.graphql"), 'utf-8');
 
 const schema = makeExecutableSchema({ typeDefs });
 

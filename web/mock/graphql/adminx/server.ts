@@ -6,7 +6,7 @@ import * as casual from "casual";
 import { initStoreData, listTemp } from "./store";
 
 const preserveResolvers = true
-const typeDefs = readFileSync(join(process.cwd(), 'script', '__generated__', "adminx.graphql"), 'utf-8');
+const typeDefs = readFileSync(join(process.cwd(), 'script', 'generated', "adminx.graphql"), 'utf-8');
 const schema = makeExecutableSchema({ typeDefs });
 const mocks = {
   ID: () => casual.integer(1, 1000000000),

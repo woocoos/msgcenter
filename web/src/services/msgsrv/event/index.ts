@@ -1,5 +1,5 @@
-import { gql } from "@/__generated__/msgsrv";
-import { CreateMsgEventInput, MsgEventOrder, MsgEventWhereInput, RouteStrType, UpdateMsgEventInput } from "@/__generated__/msgsrv/graphql";
+import { gql } from "@/generated/msgsrv";
+import { CreateMsgEventInput, MsgEventOrder, MsgEventWhereInput, RouteStrType, UpdateMsgEventInput } from "@/generated/msgsrv/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 

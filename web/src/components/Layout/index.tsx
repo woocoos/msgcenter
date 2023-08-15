@@ -10,7 +10,6 @@ import { getFilesRaw } from '@/services/files';
 import { Layout, useLeavePrompt } from '@knockout-js/layout';
 import { goLogin } from '@/util';
 import { logout } from '@/services/auth';
-import logo from '@/assets/images/woocoo.png';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 
 export default () => {
@@ -65,6 +64,7 @@ export default () => {
     ]);
   }, []);
 
+
   return <Layout
     appCode="adminx"
     pathname={location.pathname}
@@ -110,7 +110,6 @@ export default () => {
         },
       },
       title: 'Msgsrv',
-      logo: <img src={logo} alt="logo" />,
       [process.env.ICE_CORE_MODE === 'development' ? 'menu' : '']: {
         request: userMenuList
       }

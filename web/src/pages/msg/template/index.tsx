@@ -4,12 +4,12 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
 import { Link, useSearchParams } from '@ice/runtime';
-import { MsgEvent, MsgTemplate, MsgTemplateReceiverType, MsgTemplateSimpleStatus, MsgTemplateWhereInput } from '@/__generated__/msgsrv/graphql';
+import { MsgEvent, MsgTemplate, MsgTemplateReceiverType, MsgTemplateSimpleStatus, MsgTemplateWhereInput } from '@/generated/msgsrv/graphql';
 import { EnumMsgTemplateFormat, EnumMsgTemplateReceiverType, EnumMsgTemplateStatus, delMsgTemplate, disableMsgTemplate, enableMsgTemplate, getMsgTemplateList } from '@/services/msgsrv/template';
-import { cacheOrg, updateCacheOrgListByIds } from '@/services/adminx/org';
 import { getMsgEventInfo } from '@/services/msgsrv/event';
 import { DownOutlined } from '@ant-design/icons';
 import Create from './components/create';
+import { Org, getOrgs } from '@knockout-js/api';
 
 
 export default () => {
@@ -24,7 +24,8 @@ export default () => {
       {
         title: t('org'), dataIndex: 'org', width: 120,
         render: (text, record) => {
-          return record.tenantID ? cacheOrg[record.tenantID]?.name || record.tenantID : '';
+          const org = orgs.find(item => item.id == record.tenantID)
+          return record.tenantID ? org?.name || record.tenantID : '';
         },
       },
       {
@@ -86,6 +87,7 @@ export default () => {
         },
       },
     ],
+    [orgs, setOrgs] = useState<Org[]>([]),
     [dataSource, setDataSource] = useState<MsgTemplate[]>([]),
     // 选中处理
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
@@ -211,8 +213,8 @@ export default () => {
               where,
             });
             if (result?.totalCount) {
-              table.data = result.edges?.map(item => item?.node) as MsgTemplate[]
-              await updateCacheOrgListByIds(table.data.map(item => item.tenantID))
+              table.data = result.edges?.map(item => item?.node) as MsgTemplate[];
+              setOrgs(await getOrgs(table.data.map(item => item.tenantID)))
               table.total = result.totalCount;
             }
           }

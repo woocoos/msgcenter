@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Editor from '@monaco-editor/react';
 import { getMsgEventInfoRoute, updateMsgEvent } from '@/services/msgsrv/event';
-import { RouteStrType } from '@/__generated__/msgsrv/graphql';
+import { RouteStrType } from '@/generated/msgsrv/graphql';
 import * as yaml from 'js-yaml'
 import { Typography } from 'antd';
 import { useLeavePrompt } from '@knockout-js/layout';

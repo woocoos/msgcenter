@@ -2,14 +2,13 @@ import { updateFormat } from '@/util';
 import { DrawerForm, ProFormInstance, ProFormRadio, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MsgEvent, MsgTemplate, MsgTemplateFormat, MsgTemplateReceiverType } from '@/__generated__/msgsrv/graphql';
+import { MsgEvent, MsgTemplate, MsgTemplateFormat, MsgTemplateReceiverType } from '@/generated/msgsrv/graphql';
 import { EnumMsgTemplateFormat, createMsgTemplate, getMsgTemplateInfo, updateMsgTemplate } from '@/services/msgsrv/template';
 import TempBtnUpload from '@/components/UploadFiles/tempBtn';
-import { cacheOrg } from '@/services/adminx/org';
 import Multiple from '@/components/UploadFiles/multiple';
 import { useLeavePrompt } from '@knockout-js/layout';
 import { OrgSelect } from '@knockout-js/org';
-import { Org, OrgKind } from '@knockout-js/api';
+import { Org, OrgKind, getOrg } from '@knockout-js/api';
 
 type ProFormData = {
   org?: Org;
@@ -64,7 +63,7 @@ export default (props: {
         const result = await getMsgTemplateInfo(props.id);
         if (result?.id) {
           setInfo(result as MsgTemplate);
-          initData.org = cacheOrg[result.tenantID];
+          initData.org = await getOrg(result.tenantID) as Org;
           initData.name = result.name;
           initData.subject = result.subject || '';
           initData.format = result.format;

@@ -1,4 +1,4 @@
-import { MatchType, MatcherInput, } from '@/__generated__/msgsrv/graphql';
+import { MatchType, MatcherInput, } from '@/generated/msgsrv/graphql';
 import { ModalForm, ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

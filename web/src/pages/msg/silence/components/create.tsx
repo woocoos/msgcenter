@@ -1,15 +1,14 @@
-import { MatcherInput, Silence } from '@/__generated__/msgsrv/graphql';
+import { MatcherInput, Silence } from '@/generated/msgsrv/graphql';
 import { dateRangeTurnDuration, durationTurnEndDate, getDate, updateFormat } from '@/util';
 import { DrawerForm, ProFormDateTimeRangePicker, ProFormInstance, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createSilence, getSilenceInfo, updateSilence } from '@/services/msgsrv/silence';
-import { cacheOrg } from '@/services/adminx/org';
 import Matchers from './matchers';
 import { Col, Row } from 'antd';
 import { useLeavePrompt } from '@knockout-js/layout';
 import { OrgSelect } from '@knockout-js/org';
-import { Org, OrgKind } from '@knockout-js/api';
+import { Org, OrgKind, getOrg } from '@knockout-js/api';
 
 type ProFormData = {
   org?: Org;
@@ -63,7 +62,7 @@ export default (props: {
               })
             }
           });
-          initData.org = cacheOrg[result.tenantID];
+          initData.org = await getOrg(result.tenantID) as Org;
           if (result.startsAt && result.endsAt) {
             initData.rangeAt = [getDate(result.startsAt, 'YYYY-MM-DD HH:mm:ss') as string, getDate(result.endsAt, 'YYYY-MM-DD HH:mm:ss') as string];
           } else {

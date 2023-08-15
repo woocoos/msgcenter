@@ -3,9 +3,9 @@ import { Button, Space, Modal } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { cacheOrg, updateCacheOrgListByIds } from '@/services/adminx/org';
+import { Org, getOrgs } from '@knockout-js/api';
 import Create from './components/create';
-import { Silence, SilenceSilenceState, SilenceWhereInput } from '@/__generated__/msgsrv/graphql';
+import { Silence, SilenceSilenceState, SilenceWhereInput } from '@/generated/msgsrv/graphql';
 import { EnumSilenceMatchType, EnumSilenceStatus, delSilence, getSilenceList } from '@/services/msgsrv/silence';
 import { OrgSelect } from '@knockout-js/org';
 import { OrgKind } from '@knockout-js/api';
@@ -24,7 +24,8 @@ export default () => {
           return <OrgSelect kind={OrgKind.Root} />
         },
         render: (text, record) => {
-          return record.tenantID ? cacheOrg[record.tenantID]?.name || record.tenantID : '-';
+          const org = orgs.find(item => item.id == `${record.tenantID}`)
+          return record.tenantID ? org?.name || record.tenantID : '-';
         },
       },
       { title: t('starts_at'), dataIndex: 'startsAt', valueType: "dateTime", width: 120 },
@@ -88,6 +89,7 @@ export default () => {
         },
       },
     ],
+    [orgs, setOrgs] = useState<Org[]>([]),
     [dataSource, setDataSource] = useState<Silence[]>([]),
     // 选中处理
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
@@ -179,7 +181,7 @@ export default () => {
           });
           if (result?.totalCount) {
             table.data = result.edges?.map(item => item?.node) as Silence[]
-            await updateCacheOrgListByIds(table.data.map(item => item.tenantID || ''))
+            setOrgs(await getOrgs(table.data.map(item => item.tenantID || '')))
             table.total = result.totalCount;
           }
           setSelectedRowKeys([]);
