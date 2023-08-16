@@ -66,7 +66,7 @@ export default () => {
 
 
   return <Layout
-    appCode="adminx"
+    appCode={process.env.ICE_APP_CODE as string}
     pathname={location.pathname}
     onClickMenuItem={(item, isOpen) => {
       if (isOpen) {
