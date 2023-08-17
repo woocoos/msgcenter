@@ -1,16 +1,21 @@
 import store from '@/store';
 import { useEffect, useState } from 'react';
-import { userMenuList } from './menuConfig';
+import menuList from './menu.json';
 import { history } from 'ice';
 import { Outlet, useLocation } from '@ice/runtime';
 import i18n from '@/i18n';
-import { useToken } from '@ant-design/pro-components';
+import { MenuDataItem, useToken } from '@ant-design/pro-components';
 import { monitorKeyChange } from '@/pkg/localStore';
 import { getFilesRaw } from '@/services/files';
 import { Layout, useLeavePrompt } from '@knockout-js/layout';
 import { goLogin } from '@/util';
 import { logout } from '@/services/auth';
 import defaultAvatar from '@/assets/images/default-avatar.png';
+import { createFromIconfontCN } from '@ant-design/icons';
+
+const IconFont = createFromIconfontCN({
+  scriptUrl: "//at.alicdn.com/t/c/font_4214307_8x56lkek9tu.js"
+})
 
 export default () => {
   const [userState, userDispatcher] = store.useModel('user'),
@@ -68,6 +73,7 @@ export default () => {
   return <Layout
     appCode={process.env.ICE_APP_CODE as string}
     pathname={location.pathname}
+    IconFont={IconFont}
     onClickMenuItem={(item, isOpen) => {
       if (isOpen) {
         window.open(item.path ?? '');
@@ -111,7 +117,20 @@ export default () => {
       },
       title: 'Msgsrv',
       [process.env.ICE_CORE_MODE === 'development' ? 'menu' : '']: {
-        request: userMenuList
+        request: () => {
+          const list: MenuDataItem[] = [];
+          menuList.forEach(item => {
+            const menuItem: MenuDataItem = { name: item.name };
+            if (item.icon) {
+              menuItem.icon = <IconFont type={item.icon} />
+            }
+            if (item.children) {
+              menuItem.children = item.children
+            }
+            list.push(menuItem)
+          })
+          return list
+        }
       }
     }}
   >

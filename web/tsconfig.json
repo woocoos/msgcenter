@@ -19,6 +19,7 @@
     "importHelpers": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": false,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "paths": {
       "@/*": [

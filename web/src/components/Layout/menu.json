@@ -1,0 +1,29 @@
+[
+  {
+    "name": "消息中心",
+    "icon": "icon-icon_xiaoxi3",
+    "children": [
+      {
+        "name": "消息类型",
+        "path": "/msg/type"
+      },
+      {
+        "name": "消息事件",
+        "path": "/msg/event"
+      },
+      {
+        "name": "消息通道",
+        "path": "/msg/channel"
+      },
+      {
+        "name": "消息订阅",
+        "path": "/msg/subscription"
+      },
+      {
+        "name": "静默消息",
+        "path": "/msg/silence"
+      }
+    ]
+  }
+]
+
