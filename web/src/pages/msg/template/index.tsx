@@ -2,7 +2,7 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Button, Space, Modal, Dropdown } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import { Link, useSearchParams } from '@ice/runtime';
 import { MsgEvent, MsgTemplate, MsgTemplateReceiverType, MsgTemplateSimpleStatus, MsgTemplateWhereInput } from '@/generated/msgsrv/graphql';
 import { EnumMsgTemplateFormat, EnumMsgTemplateReceiverType, EnumMsgTemplateStatus, delMsgTemplate, disableMsgTemplate, enableMsgTemplate, getMsgTemplateList } from '@/services/msgsrv/template';

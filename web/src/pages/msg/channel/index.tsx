@@ -2,7 +2,7 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Button, Space, Modal } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import { MsgChannel, MsgChannelReceiverType, MsgChannelSimpleStatus, MsgChannelWhereInput } from '@/generated/msgsrv/graphql';
 import { EnumMsgChannelReceiverType, EnumMsgChannelStatus, delMsgChannel, disableMsgChannel, enableMsgChannel, getMsgChannelList } from '@/services/msgsrv/channel';
 import { Org, getOrgs } from '@knockout-js/api';

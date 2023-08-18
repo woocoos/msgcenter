@@ -2,7 +2,7 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Button, Space, Modal } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import { MsgEvent, MsgEventSimpleStatus, MsgEventWhereInput } from '@/generated/msgsrv/graphql';
 import { EnumMsgEventStatus, delMsgEvent, disableMsgEvent, enableMsgEvent, getMsgEventList } from '@/services/msgsrv/event';
 import Create from './components/create';
