@@ -66,7 +66,7 @@ export const dataLoader = defineDataLoader(async () => {
     tenantId = spmData.tenantId ?? getItem<string>('tenantId'),
     darkMode = getItem<string>('darkMode'),
     compactMode = getItem<string>('compactMode'),
-    user = getItem<User>('user');
+    user = spmData.user ?? getItem<User>('user');
 
   if (token) {
     // 增加jwt判断token过期的处理
