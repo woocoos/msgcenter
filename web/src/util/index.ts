@@ -16,15 +16,6 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 /**
- * 前往登录
- */
-export const goLogin = () => {
-  if (!location.pathname.split('/').includes('login')) {
-    location.href = `${process.env.ICE_LOGIN_URL}?redirect=${encodeURIComponent(location.href)}`
-  }
-}
-
-/**
  * 首字母大写
  * @param str
  * @returns

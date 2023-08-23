@@ -3,7 +3,6 @@ import * as process from "process";
 
 const dotenv = require('dotenv')
 dotenv.config()
-dotenv.config({ path: `.env.${process.env.NODE_ENV}`, override: true })
 dotenv.config({ path: '.env.local', override: true })
 
 /**

@@ -1,6 +1,8 @@
 import { AuthType } from '@ice/plugin-auth/types';
 import { useAuth } from 'ice';
 
+const NODE_ENV = process.env.NODE_ENV ?? '';
+
 export default (props: {
   children: any;
   authKey: string | string[];
@@ -41,5 +43,5 @@ export const checkAuth = (authKey: string, auth?: AuthType) => {
     [auth] = useAuth();
   }
 
-  return process.env.ICE_CORE_MODE === 'development' || auth[authKey];
+  return NODE_ENV === 'development' || auth[authKey];
 };

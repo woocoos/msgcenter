@@ -6,11 +6,21 @@ import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/type
 import store from '@/store';
 import '@/assets/styles/index.css';
 import { getItem, removeItem, setItem } from '@/pkg/localStore';
-import { browserLanguage, goLogin } from './util';
+import { browserLanguage } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { isInIcestark } from '@ice/stark-app';
 import { User, userPermissions } from '@knockout-js/api';
+import { logout, parseSpm } from './services/auth';
+
+const ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
+  ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
+  NODE_ENV = process.env.NODE_ENV ?? '',
+  ICE_DEV_TOKEN = process.env.ICE_DEV_TOKEN ?? '',
+  ICE_DEV_TID = process.env.ICE_DEV_TID ?? '',
+  ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
+  ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '',
+  ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '';
 
 export const icestark = defineChildConfig(() => ({
   mount: () => {
@@ -21,10 +31,10 @@ export const icestark = defineChildConfig(() => ({
   },
 }));
 
-if (process.env.ICE_CORE_MODE === 'development') {
+if (NODE_ENV === 'development') {
   // 无登录项目增加前端缓存内容 方便开发和展示
-  setItem('token', process.env.ICE_TOKEN)
-  setItem('tenantId', process.env.ICE_TENANT_ID)
+  setItem('token', ICE_DEV_TOKEN)
+  setItem('tenantId', ICE_DEV_TID)
   setItem('user', {
     id: 1,
     displayName: 'admin',
@@ -42,19 +52,20 @@ export default defineAppConfig(() => ({
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
   if (!isInIcestark()) {
-    const sign = 'sign_cid=adminx'
-    if (document.cookie.indexOf(sign) === -1) {
+    const signCid = `sign_cid=${ICE_APP_CODE}`
+    if (document.cookie.indexOf(signCid) === -1) {
       removeItem('token')
       removeItem('refreshToken')
     }
-    document.cookie = sign
+    document.cookie = signCid
   }
+  const spmData = await parseSpm();
   let locale = getItem<string>('locale'),
-    token = getItem<string>('token'),
-    refreshToken = getItem<string>('refreshToken'),
+    token = spmData.token ?? getItem<string>('token'),
+    refreshToken = spmData.refreshToken ?? getItem<string>('refreshToken'),
+    tenantId = spmData.tenantId ?? getItem<string>('tenantId'),
     darkMode = getItem<string>('darkMode'),
     compactMode = getItem<string>('compactMode'),
-    tenantId = getItem<string>('tenantId'),
     user = getItem<User>('user');
 
   if (token) {
@@ -93,7 +104,7 @@ export const dataLoader = defineDataLoader(async () => {
 export const urqlConfig = defineUrqlConfig([
   {
     instanceName: 'default',
-    url: '/api-msgsrv/graphql/query',
+    url: ICE_API_MSGSRV,
     exchangeOpt: {
       authOpts: {
         store: {
@@ -107,14 +118,14 @@ export const urqlConfig = defineUrqlConfig([
             store.dispatch.user.updateToken(newToken)
           }
         },
-        login: process.env.ICE_LOGIN_URL,
-        refreshApi: "/api-auth/login/refresh-token"
+        login: ICE_LOGIN_URL,
+        refreshApi: `${ICE_API_AUTH_PREFIX}/login/refresh-token`
       }
     }
   },
   {
     instanceName: 'ucenter',
-    url: '/api-adminx/graphql/query',
+    url: ICE_API_ADMINX,
   },
 ])
 
@@ -125,7 +136,7 @@ export const authConfig = defineAuthConfig(async (appData) => {
     initialAuth = {};
   // 判断路由权限
   if (user.token) {
-    const result = await userPermissions(process.env.ICE_APP_CODE as string, {
+    const result = await userPermissions(ICE_APP_CODE, {
       Authorization: `Bearer ${user.token}`,
       'X-Tenant-ID': user.tenantId,
     });
@@ -137,8 +148,7 @@ export const authConfig = defineAuthConfig(async (appData) => {
       });
     }
   } else {
-    store.dispatch.user.logout();
-    goLogin();
+    await logout();
   }
   return {
     initialAuth,
@@ -170,7 +180,7 @@ export const requestConfig = defineRequestConfig(() => {
             }
           },
         },
-        login: process.env.ICE_LOGIN_URL,
+        login: ICE_LOGIN_URL,
       })
     },
   ];

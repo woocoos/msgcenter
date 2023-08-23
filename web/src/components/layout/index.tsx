@@ -8,14 +8,15 @@ import { MenuDataItem, useToken } from '@ant-design/pro-components';
 import { monitorKeyChange } from '@/pkg/localStore';
 import { getFilesRaw } from '@/services/files';
 import { Layout, useLeavePrompt } from '@knockout-js/layout';
-import { goLogin } from '@/util';
-import { logout } from '@/services/auth';
+import { logout, urlSpm } from '@/services/auth';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import { createFromIconfontCN } from '@ant-design/icons';
 
-const IconFont = createFromIconfontCN({
-  scriptUrl: "//at.alicdn.com/t/c/font_4214307_8x56lkek9tu.js"
-})
+const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
+  NODE_ENV = process.env.NODE_ENV ?? '',
+  IconFont = createFromIconfontCN({
+    scriptUrl: "//at.alicdn.com/t/c/font_4214307_8x56lkek9tu.js"
+  });
 
 export default () => {
   const [userState, userDispatcher] = store.useModel('user'),
@@ -71,14 +72,14 @@ export default () => {
 
 
   return <Layout
-    appCode={process.env.ICE_APP_CODE as string}
+    appCode={ICE_APP_CODE}
     pathname={location.pathname}
     IconFont={IconFont}
-    onClickMenuItem={(item, isOpen) => {
+    onClickMenuItem={async (item, isOpen) => {
       if (isOpen) {
-        window.open(item.path ?? '');
+        window.open(await urlSpm(item.path ?? ''));
       } else {
-        history?.push(item.path ?? '');
+        history?.push(await urlSpm(item.path ?? ''));
       }
     }}
     tenantProps={{
@@ -98,8 +99,6 @@ export default () => {
       onLogoutClick: () => {
         if (checkLeave()) {
           logout();
-          userDispatcher.logout();
-          goLogin();
         }
       },
     }}
@@ -116,7 +115,7 @@ export default () => {
         },
       },
       title: 'Msgsrv',
-      [process.env.ICE_CORE_MODE === 'development' ? 'menu' : '']: {
+      [NODE_ENV === 'development' ? 'menu' : '']: {
         request: () => {
           const list: MenuDataItem[] = [];
           menuList.forEach(item => {
