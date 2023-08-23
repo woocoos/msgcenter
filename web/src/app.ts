@@ -168,21 +168,17 @@ export const storeConfig = defineStoreConfig(async (appData) => {
 
 
 // 请求配置
-export const requestConfig = defineRequestConfig(() => {
-  return [
-    {
-      interceptors: requestInterceptor({
-        store: {
-          getState: () => {
-            const { token, tenantId } = store.getModelState('user')
-            return {
-              token, tenantId
-            }
-          },
-        },
-        login: ICE_LOGIN_URL,
-      })
+export const requestConfig = defineRequestConfig({
+  interceptors: requestInterceptor({
+    store: {
+      getState: () => {
+        const { token, tenantId } = store.getModelState('user')
+        return {
+          token, tenantId
+        }
+      },
     },
-  ];
+    login: ICE_LOGIN_URL,
+  })
 });
 
