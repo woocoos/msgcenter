@@ -9,6 +9,7 @@ import (
 	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/contrib/gql"
 	"github.com/tsingsun/woocoo/pkg/conf"
+	"github.com/tsingsun/woocoo/pkg/httpx"
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/tsingsun/woocoo/web"
 	"github.com/woocoos/entco/ecx"
@@ -74,6 +75,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	configCoordinator.SetHttpClient(buildHttpClient(cnf))
 
 	configCoordinator.SetDBClient(dbClient)
 	configCoordinator.ReloadHooks(func(cfg *profile.Config) error {
@@ -166,4 +169,16 @@ func newPromHttp(cnf *conf.Configuration) woocoo.Server {
 	hd := web.New(web.WithConfiguration(cnf))
 	hd.Router().GET("/metrics", gin.WrapH(promhttp.Handler()))
 	return hd
+}
+
+func buildHttpClient(cnf *conf.AppConfiguration) *http.Client {
+	cfg, err := httpx.NewClientConfig(cnf.Sub("oauth-with-cache"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	httpClient, err := cfg.Client(context.Background(), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return httpClient
 }

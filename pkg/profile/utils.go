@@ -53,7 +53,7 @@ func (h *HostPort) String() string {
 	if h.Host == "" && h.Port == "" {
 		return ""
 	}
-	return fmt.Sprintf("%s:%s", h.Host, h.Port)
+	return fmt.Sprintf(`"%s:%s"`, h.Host, h.Port)
 }
 
 type URL url.URL

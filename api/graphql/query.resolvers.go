@@ -7,8 +7,10 @@ package graphql
 import (
 	"context"
 	"encoding/json"
-	"entgo.io/contrib/entgql"
 	"fmt"
+	"github.com/woocoos/msgcenter/ent/msgalert"
+
+	"entgo.io/contrib/entgql"
 	"github.com/woocoos/entco/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/api/graphql/model"
@@ -18,7 +20,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
-	"gopkg.in/yaml.v3"
+	yaml "gopkg.in/yaml.v3"
 )
 
 // RouteStr is the resolver for the routeStr field.
@@ -128,6 +130,13 @@ func (r *queryResolver) Silences(ctx context.Context, after *entgql.Cursor[int],
 	return r.Client.Silence.Query().Paginate(ctx, after, first, before, last,
 		ent.WithSilenceOrder(orderBy),
 		ent.WithSilenceFilter(where.Filter))
+}
+
+// MsgAlerts is the resolver for the msgAlerts field.
+func (r *queryResolver) MsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) (*ent.MsgAlertConnection, error) {
+	return r.Client.MsgAlert.Query().Where(msgalert.Deleted(false)).Paginate(ctx, after, first, before, last,
+		ent.WithMsgAlertOrder(orderBy),
+		ent.WithMsgAlertFilter(where.Filter))
 }
 
 // Matchers is the resolver for the matchers field.

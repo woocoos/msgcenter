@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/log"
+	"github.com/woocoos/entco/pkg/identity"
 	"github.com/woocoos/entco/schemax/typex"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
@@ -21,6 +22,9 @@ import (
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/template"
 	"go.uber.org/zap"
+	"io"
+	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -29,6 +33,12 @@ import (
 )
 
 var logger = log.Component("config")
+
+const (
+	TempRelativePathTplTemp    = "tplTemp"
+	TempRelativePathTplData    = "tplData"
+	TempRelativePathAttachment = "attachment"
+)
 
 // Coordinator helps the Alert Manager collaborate with external components
 type Coordinator struct {
@@ -43,6 +53,21 @@ type Coordinator struct {
 
 	db        *ent.Client
 	Subscribe *UserSubscribe
+
+	HttpClient *http.Client
+
+	TempOptions TempOptions
+}
+
+type TempOptions struct {
+	Path         string `yaml:"path"`
+	PrefixDir    string `yaml:"prefixDir"`
+	FileBaseUrl  string `yaml:"fileBaseUrl"`
+	RelativePath struct {
+		TplTemp    string `yaml:"tplTemp"`
+		TplData    string `yaml:"tplData"`
+		Attachment string `yaml:"attachment"`
+	} `yaml:"relativePath"`
 }
 
 // NewCoordinator returns a new coordinator with the given configuration for alert manager.
@@ -55,12 +80,22 @@ func NewCoordinator(cnf *conf.Configuration) *Coordinator {
 		Subscribe:       &UserSubscribe{},
 	}
 
+	tempOptions := TempOptions{}
+	err := cnf.Sub("template").Unmarshal(&tempOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
+	c.TempOptions = tempOptions
 	return c
 }
 
 func (c *Coordinator) SetDBClient(db *ent.Client) {
 	c.db = db
 	c.Subscribe.DB = db
+}
+
+func (c *Coordinator) SetHttpClient(httpClient *http.Client) {
+	c.HttpClient = httpClient
 }
 
 func (c *Coordinator) ProfileString() string {
@@ -360,7 +395,7 @@ func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *templ
 		integrations = append(integrations, notify.NewIntegration(n, name, i))
 	}
 	var ()
-	tpldir := c.configuration.Abs(c.configuration.String("template.path"))
+	tpldir := c.configuration.Abs(c.TempOptions.Path)
 	for i, cfg := range nc.EmailConfigs {
 		add("email", i, func() (notify.Notifier, error) {
 			return email.NewEmail(cfg, tmpl, overrideEmailConfig(tpldir, c.db)), nil
@@ -426,8 +461,8 @@ func overrideEmailConfig(basedir string, client *ent.Client) notify.CustomerConf
 				cfg.Headers[k] = data.Bcc
 			}
 		}
-		if data.Attachments != "" {
-			cfg.Headers["Attachments"] = data.Attachments
+		if data.Attachments != nil && len(data.Attachments) > 0 {
+			cfg.Headers["Attachments"] = strings.Join(data.Attachments, ",")
 		}
 		return cfg, nil
 	}
@@ -452,12 +487,110 @@ func findTemplate(ctx context.Context, basedir string, client *ent.Client, rt pr
 	if event == nil {
 		return nil, nil
 	}
-	if event.Attachments != "" {
-		as := strings.Split(event.Attachments, ",")
-		for i, attacher := range as {
+	if event.Attachments != nil && len(event.Attachments) > 0 {
+		as := make([]string, len(event.Attachments))
+		for i, attacher := range event.Attachments {
 			as[i] = filepath.Join(basedir, attacher)
 		}
-		event.Attachments = strings.Join(as, ",")
+		event.Attachments = as
 	}
 	return event, nil
+}
+
+// ValidateFilePath 验证路径是否符合规则
+// dir:tplData、tplTemp、attachment
+func (c *Coordinator) ValidateFilePath(ctx context.Context, path, dir string) error {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return err
+	}
+	pd := c.TempOptions.PrefixDir
+	path = filepath.Join(path)
+	p := strings.TrimPrefix(path, "/")
+	rp := ""
+	if dir == TempRelativePathTplData {
+		rp = c.TempOptions.RelativePath.TplData
+	} else if dir == TempRelativePathTplTemp {
+		rp = c.TempOptions.RelativePath.TplTemp
+	} else if dir == TempRelativePathAttachment {
+		rp = c.TempOptions.RelativePath.Attachment
+	}
+	prefixPath := filepath.Join(pd, rp, strconv.Itoa(tid))
+	if !strings.HasPrefix(p, strings.TrimPrefix(prefixPath, "/")) {
+		return fmt.Errorf("invalid path: %s,must be like:%s/xxx", path, prefixPath)
+	}
+	return nil
+}
+
+// GetRelativeFilePath 获取path相对于template.path的相对路径
+func (c *Coordinator) GetRelativeFilePath(path string) string {
+	pd := c.TempOptions.PrefixDir
+	pd = strings.TrimPrefix(pd, "/")
+	path = strings.TrimPrefix(path, "/")
+	return strings.TrimPrefix(path, pd)
+}
+
+func (c *Coordinator) CopyFile(dstName, srcName string) (written int64, err error) {
+	src, err := os.Open(srcName)
+	if err != nil {
+		return
+	}
+	defer src.Close()
+	dst, err := os.OpenFile(dstName, os.O_CREATE|os.O_EXCL|os.O_WRONLY, os.ModePerm)
+	if err != nil {
+		return
+	}
+	defer dst.Close()
+	return io.Copy(dst, src)
+}
+
+// GetTplDataPath 将tpl临时文件路径转为正式存储路径
+func (c *Coordinator) GetTplDataPath(tempPath string) string {
+	tpldir := c.TempOptions.Path
+	data := c.TempOptions.RelativePath.TplData
+	temp := c.TempOptions.RelativePath.TplTemp
+	return c.configuration.Abs(
+		filepath.Join(
+			tpldir,
+			data,
+			strings.TrimPrefix(
+				strings.TrimPrefix(c.GetRelativeFilePath(tempPath), "/"),
+				strings.TrimPrefix(temp, "/"),
+			),
+		),
+	)
+}
+
+// GetTplTempPath 获取tpl正式文件路径
+func (c *Coordinator) GetTplTempPath(tempPath string) string {
+	tpldir := c.configuration.Abs(c.TempOptions.Path)
+	return c.configuration.Abs(filepath.Join(tpldir, c.GetRelativeFilePath(tempPath)))
+}
+
+// ReportFileRefCount 文件引用上报
+func (c *Coordinator) ReportFileRefCount(ctx context.Context, newFileIDs, oldFileIDs []int) error {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return err
+	}
+	params := ""
+	for _, v := range newFileIDs {
+		params = params + fmt.Sprintf(`{ "fileId": %d, "opType": "plus" },`, v)
+	}
+	for _, v := range oldFileIDs {
+		params = params + fmt.Sprintf(`{ "fileId": %d, "opType": "minus" },`, v)
+	}
+	if params == "" {
+		return nil
+	}
+	params = strings.TrimSuffix(params, ",")
+	body := strings.NewReader(fmt.Sprintf(`{ "inputs": [%s] }`, params))
+	req, err := http.NewRequest("POST", c.TempOptions.FileBaseUrl+"/files/report-ref-count", body)
+	if err != nil {
+		return err
+	}
+	req.Header.Add("X-Tenant-ID", strconv.Itoa(tid))
+	req.Header.Add("Content-Type", "application/json")
+	_, err = c.HttpClient.Do(req)
+	return err
 }

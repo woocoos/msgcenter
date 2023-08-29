@@ -49,7 +49,7 @@ func initmsg(tx *ent.Tx) {
 	ctx := context.Background()
 	tx.MsgType.Create().SetName("alert").SetID(1).SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
 		SetAppID(1).SetCategory("账户安全").SetCanSubs(true).SetCanCustom(true).SaveX(ctx)
-	tx.MsgEvent.Create().SetID(1).SetMsgTypeID(1).SetName("AlterPassword").SetStatus(typex.SimpleStatusActive).
+	tx.MsgEvent.Create().SetID(1).SetMsgTypeID(1).SetName(alterPassWordEventName).SetStatus(typex.SimpleStatusActive).
 		SetCreatedBy(1).SetModes("email,internal").
 		SetRoute(&profile.Route{
 			Name:     alterPassWordEventName,
@@ -78,11 +78,11 @@ func initmsg(tx *ent.Tx) {
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
 		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
-		SetBody(`{{ template "1000.alterpwd.txt" . }}`).SetAttachments("1000/alterpwd.tmpl").
-		SetTpl("1000/alterpwd.tmpl").SaveX(ctx)
+		SetBody(`{{ template "1.alterpwd.txt" . }}`).SetAttachments([]string{"msg/att/1/alterpwd.tmpl"}).
+		SetTpl("msg/tpl/data/1/alterpwd.tmpl").SaveX(ctx)
 
 	tx.MsgChannel.Create().SetName("email").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
-		SetTenantID(1000).SetReceiverType(profile.ReceiverEmail).
+		SetTenantID(1).SetReceiverType(profile.ReceiverEmail).
 		SetReceiver(&profile.Receiver{
 			Name: "email",
 			EmailConfigs: []*profile.EmailConfig{
@@ -93,7 +93,7 @@ func initmsg(tx *ent.Tx) {
 				},
 			},
 		}).SaveX(ctx)
-	tx.MsgType.Create().SetName("alert").SetID(2).SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
+	tx.MsgType.Create().SetName("alert1").SetID(2).SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
 		SetAppID(1).SetCategory("订阅类型").SetCanSubs(true).SetCanCustom(true).SaveX(ctx)
 	tx.MsgEvent.Create().SetID(2).SetMsgTypeID(2).SetName(subEventName).SetStatus(typex.SimpleStatusActive).
 		SetCreatedBy(1).SetModes("email,internal").
@@ -124,8 +124,8 @@ func initmsg(tx *ent.Tx) {
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
 		SetSubject(`订阅事件提醒`).SetCc(`{{ template "email.cc" . }}`).
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
-		SetBody(`{{ template "1000.subevent.txt" . }}`).
-		SetTpl("1000/subevent.tmpl").SaveX(ctx)
+		SetBody(`{{ template "1.subevent.txt" . }}`).
+		SetTpl("msg/tpl/data/1/subevent.tmpl").SaveX(ctx)
 
 	tx.MsgSubscriber.Create().SetID(1).SetMsgTypeID(2).SetTenantID(1).SetUserID(1).SetCreatedBy(1).
 		SaveX(ctx)

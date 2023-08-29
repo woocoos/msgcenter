@@ -276,16 +276,6 @@ func ByTplFileID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTplFileID, opts...).ToFunc()
 }
 
-// ByAttachments orders the results by the attachments field.
-func ByAttachments(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAttachments, opts...).ToFunc()
-}
-
-// ByAttachmentsFileIds orders the results by the attachments_file_ids field.
-func ByAttachmentsFileIds(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAttachmentsFileIds, opts...).ToFunc()
-}
-
 // ByComments orders the results by the comments field.
 func ByComments(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldComments, opts...).ToFunc()

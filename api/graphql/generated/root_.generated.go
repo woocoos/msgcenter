@@ -33,6 +33,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	MsgAlert() MsgAlertResolver
 	MsgEvent() MsgEventResolver
 	MsgType() MsgTypeResolver
 	Mutation() MutationResolver
@@ -61,6 +62,35 @@ type ComplexityRoot struct {
 		Name  func(childComplexity int) int
 		Type  func(childComplexity int) int
 		Value func(childComplexity int) int
+	}
+
+	MsgAlert struct {
+		Annotations func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		Deleted     func(childComplexity int) int
+		EndsAt      func(childComplexity int) int
+		Fingerprint func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Labels      func(childComplexity int) int
+		Nlog        func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.NlogOrder, where *ent.NlogWhereInput) int
+		NlogAlerts  func(childComplexity int) int
+		StartsAt    func(childComplexity int) int
+		State       func(childComplexity int) int
+		TenantID    func(childComplexity int) int
+		Timeout     func(childComplexity int) int
+		URL         func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
+	}
+
+	MsgAlertConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgAlertEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
 	}
 
 	MsgChannel struct {
@@ -226,6 +256,41 @@ type ComplexityRoot struct {
 		UpdateSilence       func(childComplexity int, id int, input ent.UpdateSilenceInput) int
 	}
 
+	Nlog struct {
+		Alerts       func(childComplexity int) int
+		CreatedAt    func(childComplexity int) int
+		ExpiresAt    func(childComplexity int) int
+		GroupKey     func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Idx          func(childComplexity int) int
+		NlogAlert    func(childComplexity int) int
+		Receiver     func(childComplexity int) int
+		ReceiverType func(childComplexity int) int
+		SendAt       func(childComplexity int) int
+		TenantID     func(childComplexity int) int
+		UpdatedAt    func(childComplexity int) int
+	}
+
+	NlogAlert struct {
+		Alert     func(childComplexity int) int
+		AlertID   func(childComplexity int) int
+		CreatedAt func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Nlog      func(childComplexity int) int
+		NlogID    func(childComplexity int) int
+	}
+
+	NlogConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	NlogEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
 	PageInfo struct {
 		EndCursor       func(childComplexity int) int
 		HasNextPage     func(childComplexity int) int
@@ -234,6 +299,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		MsgAlerts         func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) int
 		MsgChannels       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgChannelOrder, where *ent.MsgChannelWhereInput) int
 		MsgEvents         func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) int
 		MsgTemplates      func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) int
@@ -396,6 +462,151 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Matcher.Value(childComplexity), true
+
+	case "MsgAlert.annotations":
+		if e.complexity.MsgAlert.Annotations == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.Annotations(childComplexity), true
+
+	case "MsgAlert.createdAt":
+		if e.complexity.MsgAlert.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.CreatedAt(childComplexity), true
+
+	case "MsgAlert.deleted":
+		if e.complexity.MsgAlert.Deleted == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.Deleted(childComplexity), true
+
+	case "MsgAlert.endsAt":
+		if e.complexity.MsgAlert.EndsAt == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.EndsAt(childComplexity), true
+
+	case "MsgAlert.fingerprint":
+		if e.complexity.MsgAlert.Fingerprint == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.Fingerprint(childComplexity), true
+
+	case "MsgAlert.id":
+		if e.complexity.MsgAlert.ID == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.ID(childComplexity), true
+
+	case "MsgAlert.labels":
+		if e.complexity.MsgAlert.Labels == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.Labels(childComplexity), true
+
+	case "MsgAlert.nlog":
+		if e.complexity.MsgAlert.Nlog == nil {
+			break
+		}
+
+		args, err := ec.field_MsgAlert_nlog_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.MsgAlert.Nlog(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.NlogOrder), args["where"].(*ent.NlogWhereInput)), true
+
+	case "MsgAlert.nlogAlerts":
+		if e.complexity.MsgAlert.NlogAlerts == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.NlogAlerts(childComplexity), true
+
+	case "MsgAlert.startsAt":
+		if e.complexity.MsgAlert.StartsAt == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.StartsAt(childComplexity), true
+
+	case "MsgAlert.state":
+		if e.complexity.MsgAlert.State == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.State(childComplexity), true
+
+	case "MsgAlert.tenantID":
+		if e.complexity.MsgAlert.TenantID == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.TenantID(childComplexity), true
+
+	case "MsgAlert.timeout":
+		if e.complexity.MsgAlert.Timeout == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.Timeout(childComplexity), true
+
+	case "MsgAlert.url":
+		if e.complexity.MsgAlert.URL == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.URL(childComplexity), true
+
+	case "MsgAlert.updatedAt":
+		if e.complexity.MsgAlert.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.UpdatedAt(childComplexity), true
+
+	case "MsgAlertConnection.edges":
+		if e.complexity.MsgAlertConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgAlertConnection.Edges(childComplexity), true
+
+	case "MsgAlertConnection.pageInfo":
+		if e.complexity.MsgAlertConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgAlertConnection.PageInfo(childComplexity), true
+
+	case "MsgAlertConnection.totalCount":
+		if e.complexity.MsgAlertConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgAlertConnection.TotalCount(childComplexity), true
+
+	case "MsgAlertEdge.cursor":
+		if e.complexity.MsgAlertEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgAlertEdge.Cursor(childComplexity), true
+
+	case "MsgAlertEdge.node":
+		if e.complexity.MsgAlertEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgAlertEdge.Node(childComplexity), true
 
 	case "MsgChannel.comments":
 		if e.complexity.MsgChannel.Comments == nil {
@@ -1364,6 +1575,167 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateSilence(childComplexity, args["id"].(int), args["input"].(ent.UpdateSilenceInput)), true
 
+	case "Nlog.alerts":
+		if e.complexity.Nlog.Alerts == nil {
+			break
+		}
+
+		return e.complexity.Nlog.Alerts(childComplexity), true
+
+	case "Nlog.createdAt":
+		if e.complexity.Nlog.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Nlog.CreatedAt(childComplexity), true
+
+	case "Nlog.expiresAt":
+		if e.complexity.Nlog.ExpiresAt == nil {
+			break
+		}
+
+		return e.complexity.Nlog.ExpiresAt(childComplexity), true
+
+	case "Nlog.groupKey":
+		if e.complexity.Nlog.GroupKey == nil {
+			break
+		}
+
+		return e.complexity.Nlog.GroupKey(childComplexity), true
+
+	case "Nlog.id":
+		if e.complexity.Nlog.ID == nil {
+			break
+		}
+
+		return e.complexity.Nlog.ID(childComplexity), true
+
+	case "Nlog.idx":
+		if e.complexity.Nlog.Idx == nil {
+			break
+		}
+
+		return e.complexity.Nlog.Idx(childComplexity), true
+
+	case "Nlog.nlogAlert":
+		if e.complexity.Nlog.NlogAlert == nil {
+			break
+		}
+
+		return e.complexity.Nlog.NlogAlert(childComplexity), true
+
+	case "Nlog.receiver":
+		if e.complexity.Nlog.Receiver == nil {
+			break
+		}
+
+		return e.complexity.Nlog.Receiver(childComplexity), true
+
+	case "Nlog.receiverType":
+		if e.complexity.Nlog.ReceiverType == nil {
+			break
+		}
+
+		return e.complexity.Nlog.ReceiverType(childComplexity), true
+
+	case "Nlog.sendAt":
+		if e.complexity.Nlog.SendAt == nil {
+			break
+		}
+
+		return e.complexity.Nlog.SendAt(childComplexity), true
+
+	case "Nlog.tenantID":
+		if e.complexity.Nlog.TenantID == nil {
+			break
+		}
+
+		return e.complexity.Nlog.TenantID(childComplexity), true
+
+	case "Nlog.updatedAt":
+		if e.complexity.Nlog.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Nlog.UpdatedAt(childComplexity), true
+
+	case "NlogAlert.alert":
+		if e.complexity.NlogAlert.Alert == nil {
+			break
+		}
+
+		return e.complexity.NlogAlert.Alert(childComplexity), true
+
+	case "NlogAlert.alertID":
+		if e.complexity.NlogAlert.AlertID == nil {
+			break
+		}
+
+		return e.complexity.NlogAlert.AlertID(childComplexity), true
+
+	case "NlogAlert.createdAt":
+		if e.complexity.NlogAlert.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.NlogAlert.CreatedAt(childComplexity), true
+
+	case "NlogAlert.id":
+		if e.complexity.NlogAlert.ID == nil {
+			break
+		}
+
+		return e.complexity.NlogAlert.ID(childComplexity), true
+
+	case "NlogAlert.nlog":
+		if e.complexity.NlogAlert.Nlog == nil {
+			break
+		}
+
+		return e.complexity.NlogAlert.Nlog(childComplexity), true
+
+	case "NlogAlert.nlogID":
+		if e.complexity.NlogAlert.NlogID == nil {
+			break
+		}
+
+		return e.complexity.NlogAlert.NlogID(childComplexity), true
+
+	case "NlogConnection.edges":
+		if e.complexity.NlogConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.NlogConnection.Edges(childComplexity), true
+
+	case "NlogConnection.pageInfo":
+		if e.complexity.NlogConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.NlogConnection.PageInfo(childComplexity), true
+
+	case "NlogConnection.totalCount":
+		if e.complexity.NlogConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.NlogConnection.TotalCount(childComplexity), true
+
+	case "NlogEdge.cursor":
+		if e.complexity.NlogEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.NlogEdge.Cursor(childComplexity), true
+
+	case "NlogEdge.node":
+		if e.complexity.NlogEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.NlogEdge.Node(childComplexity), true
+
 	case "PageInfo.endCursor":
 		if e.complexity.PageInfo.EndCursor == nil {
 			break
@@ -1391,6 +1763,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PageInfo.StartCursor(childComplexity), true
+
+	case "Query.msgAlerts":
+		if e.complexity.Query.MsgAlerts == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgAlerts_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgAlerts(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgAlertOrder), args["where"].(*ent.MsgAlertWhereInput)), true
 
 	case "Query.msgChannels":
 		if e.complexity.Query.MsgChannels == nil {
@@ -1749,6 +2133,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateSilenceInput,
 		ec.unmarshalInputEmailConfigInput,
 		ec.unmarshalInputMatcherInput,
+		ec.unmarshalInputMsgAlertOrder,
+		ec.unmarshalInputMsgAlertWhereInput,
 		ec.unmarshalInputMsgChannelOrder,
 		ec.unmarshalInputMsgChannelWhereInput,
 		ec.unmarshalInputMsgEventOrder,
@@ -1759,6 +2145,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputMsgTemplateWhereInput,
 		ec.unmarshalInputMsgTypeOrder,
 		ec.unmarshalInputMsgTypeWhereInput,
+		ec.unmarshalInputNlogAlertOrder,
+		ec.unmarshalInputNlogAlertWhereInput,
+		ec.unmarshalInputNlogOrder,
+		ec.unmarshalInputNlogWhereInput,
 		ec.unmarshalInputReceiverInput,
 		ec.unmarshalInputRouteInput,
 		ec.unmarshalInputSilenceOrder,
@@ -1940,14 +2330,14 @@ input CreateMsgTemplateInput {
   bcc: String
   """消息体"""
   body: String
-  """模板地址"""
+  """模板地址。key：/msg/tpl/temp/1/xxx"""
   tpl: String
   """模板地址"""
   tplFileID: ID
-  """附件地址,多个附件用逗号分隔"""
-  attachments: String
-  """附件地址,多个附件用逗号分隔"""
-  attachmentsFileIds: String
+  """附件地址。key：/msg/att/1/xxx"""
+  attachments: [String!]
+  """附件ids"""
+  attachmentsFileIds: [Int!]
   """备注"""
   comments: String
   eventID: ID!
@@ -1994,8 +2384,197 @@ Define a Relay Cursor type:
 https://relay.dev/graphql/connections.htm#sec-Cursor
 """
 scalar Cursor
-"""An object with an Global ID,for using in Noder interface."""
+"""An object with a Global ID,for using in Noder interface."""
 scalar GID
+type MsgAlert implements Node {
+  id: ID!
+  tenantID: Int!
+  """标签"""
+  labels: MapString
+  """注解"""
+  annotations: MapString
+  """开始时间"""
+  startsAt: Time!
+  """结束时间"""
+  endsAt: Time!
+  """generatorURL"""
+  url: String
+  """状态"""
+  timeout: Boolean!
+  """指纹hash值"""
+  fingerprint: String!
+  """通知状态,firing: 触发通知,resolved: 已处理过"""
+  state: MsgAlertAlertStatus!
+  createdAt: Time!
+  updatedAt: Time
+  """是否移除"""
+  deleted: Boolean!
+  nlog(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for Nlogs returned from the connection."""
+    orderBy: NlogOrder
+
+    """Filtering options for Nlogs returned from the connection."""
+    where: NlogWhereInput
+  ): NlogConnection!
+  nlogAlerts: [NlogAlert!]
+}
+"""MsgAlertAlertStatus is enum for the field state"""
+enum MsgAlertAlertStatus @goModel(model: "github.com/woocoos/msgcenter/pkg/alert.AlertStatus") {
+  none
+  firing
+  resolved
+}
+"""A connection to a list of items."""
+type MsgAlertConnection {
+  """A list of edges."""
+  edges: [MsgAlertEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type MsgAlertEdge {
+  """The item at the end of the edge."""
+  node: MsgAlert
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
+"""Ordering options for MsgAlert connections"""
+input MsgAlertOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order MsgAlerts."""
+  field: MsgAlertOrderField!
+}
+"""Properties by which MsgAlert connections can be ordered."""
+enum MsgAlertOrderField {
+  createdAt
+}
+"""
+MsgAlertWhereInput is used for filtering MsgAlert objects.
+Input was generated by ent.
+"""
+input MsgAlertWhereInput {
+  not: MsgAlertWhereInput
+  and: [MsgAlertWhereInput!]
+  or: [MsgAlertWhereInput!]
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  """tenant_id field predicates"""
+  tenantID: Int
+  tenantIDNEQ: Int
+  tenantIDIn: [Int!]
+  tenantIDNotIn: [Int!]
+  tenantIDGT: Int
+  tenantIDGTE: Int
+  tenantIDLT: Int
+  tenantIDLTE: Int
+  """starts_at field predicates"""
+  startsAt: Time
+  startsAtNEQ: Time
+  startsAtIn: [Time!]
+  startsAtNotIn: [Time!]
+  startsAtGT: Time
+  startsAtGTE: Time
+  startsAtLT: Time
+  startsAtLTE: Time
+  """ends_at field predicates"""
+  endsAt: Time
+  endsAtNEQ: Time
+  endsAtIn: [Time!]
+  endsAtNotIn: [Time!]
+  endsAtGT: Time
+  endsAtGTE: Time
+  endsAtLT: Time
+  endsAtLTE: Time
+  """url field predicates"""
+  url: String
+  urlNEQ: String
+  urlIn: [String!]
+  urlNotIn: [String!]
+  urlGT: String
+  urlGTE: String
+  urlLT: String
+  urlLTE: String
+  urlContains: String
+  urlHasPrefix: String
+  urlHasSuffix: String
+  urlIsNil: Boolean
+  urlNotNil: Boolean
+  urlEqualFold: String
+  urlContainsFold: String
+  """timeout field predicates"""
+  timeout: Boolean
+  timeoutNEQ: Boolean
+  """fingerprint field predicates"""
+  fingerprint: String
+  fingerprintNEQ: String
+  fingerprintIn: [String!]
+  fingerprintNotIn: [String!]
+  fingerprintGT: String
+  fingerprintGTE: String
+  fingerprintLT: String
+  fingerprintLTE: String
+  fingerprintContains: String
+  fingerprintHasPrefix: String
+  fingerprintHasSuffix: String
+  fingerprintEqualFold: String
+  fingerprintContainsFold: String
+  """state field predicates"""
+  state: MsgAlertAlertStatus
+  stateNEQ: MsgAlertAlertStatus
+  stateIn: [MsgAlertAlertStatus!]
+  stateNotIn: [MsgAlertAlertStatus!]
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtIsNil: Boolean
+  updatedAtNotNil: Boolean
+  """deleted field predicates"""
+  deleted: Boolean
+  deletedNEQ: Boolean
+  """nlog edge predicates"""
+  hasNlog: Boolean
+  hasNlogWith: [NlogWhereInput!]
+  """nlog_alerts edge predicates"""
+  hasNlogAlerts: Boolean
+  hasNlogAlertsWith: [NlogAlertWhereInput!]
+}
 type MsgChannel implements Node {
   id: ID!
   createdBy: Int!
@@ -2483,14 +3062,14 @@ type MsgTemplate implements Node {
   bcc: String
   """消息体"""
   body: String
-  """模板地址"""
+  """模板地址。key：/msg/tpl/temp/1/xxx"""
   tpl: String
   """模板地址"""
   tplFileID: ID
-  """附件地址,多个附件用逗号分隔"""
-  attachments: String
-  """附件地址,多个附件用逗号分隔"""
-  attachmentsFileIds: String
+  """附件地址。key：/msg/att/1/xxx"""
+  attachments: [String!]
+  """附件ids"""
+  attachmentsFileIds: [Int!]
   """备注"""
   comments: String
   event: MsgEvent!
@@ -2912,6 +3491,220 @@ input MsgTypeWhereInput {
   hasSubscribers: Boolean
   hasSubscribersWith: [MsgSubscriberWhereInput!]
 }
+type Nlog implements Node {
+  id: ID!
+  tenantID: Int!
+  """分组键"""
+  groupKey: String!
+  """接收组名称"""
+  receiver: String!
+  """支持的消息模式:站内信,app推送,邮件,短信,微信等"""
+  receiverType: NlogReceiverType!
+  """通道的索引位置"""
+  idx: Int!
+  """发送时间"""
+  sendAt: Time!
+  createdAt: Time!
+  updatedAt: Time
+  """过期时间"""
+  expiresAt: Time!
+  alerts: [MsgAlert!]
+  nlogAlert: [NlogAlert!]
+}
+type NlogAlert implements Node {
+  id: ID!
+  """nlog id"""
+  nlogID: ID!
+  """alert id"""
+  alertID: ID!
+  createdAt: Time!
+  nlog: Nlog!
+  alert: MsgAlert!
+}
+"""Ordering options for NlogAlert connections"""
+input NlogAlertOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order NlogAlerts."""
+  field: NlogAlertOrderField!
+}
+"""Properties by which NlogAlert connections can be ordered."""
+enum NlogAlertOrderField {
+  createdAt
+}
+"""
+NlogAlertWhereInput is used for filtering NlogAlert objects.
+Input was generated by ent.
+"""
+input NlogAlertWhereInput {
+  not: NlogAlertWhereInput
+  and: [NlogAlertWhereInput!]
+  or: [NlogAlertWhereInput!]
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+}
+"""A connection to a list of items."""
+type NlogConnection {
+  """A list of edges."""
+  edges: [NlogEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type NlogEdge {
+  """The item at the end of the edge."""
+  node: Nlog
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
+"""Ordering options for Nlog connections"""
+input NlogOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order Nlogs."""
+  field: NlogOrderField!
+}
+"""Properties by which Nlog connections can be ordered."""
+enum NlogOrderField {
+  createdAt
+}
+"""NlogReceiverType is enum for the field receiver_type"""
+enum NlogReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
+  email
+  internal
+  webhook
+}
+"""
+NlogWhereInput is used for filtering Nlog objects.
+Input was generated by ent.
+"""
+input NlogWhereInput {
+  not: NlogWhereInput
+  and: [NlogWhereInput!]
+  or: [NlogWhereInput!]
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  """tenant_id field predicates"""
+  tenantID: Int
+  tenantIDNEQ: Int
+  tenantIDIn: [Int!]
+  tenantIDNotIn: [Int!]
+  tenantIDGT: Int
+  tenantIDGTE: Int
+  tenantIDLT: Int
+  tenantIDLTE: Int
+  """group_key field predicates"""
+  groupKey: String
+  groupKeyNEQ: String
+  groupKeyIn: [String!]
+  groupKeyNotIn: [String!]
+  groupKeyGT: String
+  groupKeyGTE: String
+  groupKeyLT: String
+  groupKeyLTE: String
+  groupKeyContains: String
+  groupKeyHasPrefix: String
+  groupKeyHasSuffix: String
+  groupKeyEqualFold: String
+  groupKeyContainsFold: String
+  """receiver field predicates"""
+  receiver: String
+  receiverNEQ: String
+  receiverIn: [String!]
+  receiverNotIn: [String!]
+  receiverGT: String
+  receiverGTE: String
+  receiverLT: String
+  receiverLTE: String
+  receiverContains: String
+  receiverHasPrefix: String
+  receiverHasSuffix: String
+  receiverEqualFold: String
+  receiverContainsFold: String
+  """receiver_type field predicates"""
+  receiverType: NlogReceiverType
+  receiverTypeNEQ: NlogReceiverType
+  receiverTypeIn: [NlogReceiverType!]
+  receiverTypeNotIn: [NlogReceiverType!]
+  """idx field predicates"""
+  idx: Int
+  idxNEQ: Int
+  idxIn: [Int!]
+  idxNotIn: [Int!]
+  idxGT: Int
+  idxGTE: Int
+  idxLT: Int
+  idxLTE: Int
+  """send_at field predicates"""
+  sendAt: Time
+  sendAtNEQ: Time
+  sendAtIn: [Time!]
+  sendAtNotIn: [Time!]
+  sendAtGT: Time
+  sendAtGTE: Time
+  sendAtLT: Time
+  sendAtLTE: Time
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtIsNil: Boolean
+  updatedAtNotNil: Boolean
+  """expires_at field predicates"""
+  expiresAt: Time
+  expiresAtNEQ: Time
+  expiresAtIn: [Time!]
+  expiresAtNotIn: [Time!]
+  expiresAtGT: Time
+  expiresAtGTE: Time
+  expiresAtLT: Time
+  expiresAtLTE: Time
+  """alerts edge predicates"""
+  hasAlerts: Boolean
+  hasAlertsWith: [MsgAlertWhereInput!]
+  """nlog_alert edge predicates"""
+  hasNlogAlert: Boolean
+  hasNlogAlertWith: [NlogAlertWhereInput!]
+}
 """
 An object with an ID.
 Follows the [Relay Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm)
@@ -3179,17 +3972,19 @@ input UpdateMsgTemplateInput {
   """消息体"""
   body: String
   clearBody: Boolean
-  """模板地址"""
+  """模板地址。key：/msg/tpl/temp/1/xxx"""
   tpl: String
   clearTpl: Boolean
   """模板地址"""
   tplFileID: ID
   clearTplFileID: Boolean
-  """附件地址,多个附件用逗号分隔"""
-  attachments: String
+  """附件地址。key：/msg/att/1/xxx"""
+  attachments: [String!]
+  appendAttachments: [String!]
   clearAttachments: Boolean
-  """附件地址,多个附件用逗号分隔"""
-  attachmentsFileIds: String
+  """附件ids"""
+  attachmentsFileIds: [Int!]
+  appendAttachmentsFileIds: [Int!]
   clearAttachmentsFileIds: Boolean
   """备注"""
   comments: String
@@ -3255,9 +4050,13 @@ type User implements Node {
   silences: [Silence!]
 }
 `, BuiltIn: false},
-	{Name: "../query.graphql", Input: `scalar Duration
+	{Name: "../query.graphql", Input: `""" time duration: RFCXXX duration string, e.g. 1h30m """
+scalar Duration
+""" utf8 string """
 scalar LabelName
+""" map[string]string JSON Raw """
 scalar MapString
+""" host:port """
 scalar HostPort
 
 enum MatchType {
@@ -3378,6 +4177,16 @@ extend type Query {
         orderBy: SilenceOrder
         where: SilenceWhereInput
     ):SilenceConnection!
+
+    """消息列表"""
+    msgAlerts(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgAlertOrder
+        where: MsgAlertWhereInput
+    ):MsgAlertConnection
 }`, BuiltIn: false},
 	{Name: "../mutation.graphql", Input: `type Mutation {
     """ 创建消息类型 """

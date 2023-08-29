@@ -8,28 +8,46 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
-func (ma *MsgAlert) Nlog(ctx context.Context) (result []*Nlog, err error) {
-	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = ma.NamedNlog(graphql.GetFieldContext(ctx).Field.Alias)
-	} else {
-		result, err = ma.Edges.NlogOrErr()
+func (ma *MsgAlert) Nlog(
+	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *NlogOrder, where *NlogWhereInput,
+) (*NlogConnection, error) {
+	opts := []NlogPaginateOption{
+		WithNlogOrder(orderBy),
+		WithNlogFilter(where.Filter),
 	}
-	if IsNotLoaded(err) {
-		result, err = ma.QueryNlog().All(ctx)
+	alias := graphql.GetFieldContext(ctx).Field.Alias
+	totalCount, hasTotalCount := ma.Edges.totalCount[0][alias]
+	if nodes, err := ma.NamedNlog(alias); err == nil || hasTotalCount {
+		pager, err := newNlogPager(opts, last != nil)
+		if err != nil {
+			return nil, err
+		}
+		conn := &NlogConnection{Edges: []*NlogEdge{}, TotalCount: totalCount}
+		conn.build(nodes, pager, after, first, before, last)
+		return conn, nil
 	}
-	return result, err
+	return ma.QueryNlog().Paginate(ctx, after, first, before, last, opts...)
 }
 
-func (ma *MsgAlert) NlogAlerts(ctx context.Context) (result []*NlogAlert, err error) {
-	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = ma.NamedNlogAlerts(graphql.GetFieldContext(ctx).Field.Alias)
-	} else {
-		result, err = ma.Edges.NlogAlertsOrErr()
+func (ma *MsgAlert) NlogAlerts(
+	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *NlogAlertOrder, where *NlogAlertWhereInput,
+) (*NlogAlertConnection, error) {
+	opts := []NlogAlertPaginateOption{
+		WithNlogAlertOrder(orderBy),
+		WithNlogAlertFilter(where.Filter),
 	}
-	if IsNotLoaded(err) {
-		result, err = ma.QueryNlogAlerts().All(ctx)
+	alias := graphql.GetFieldContext(ctx).Field.Alias
+	totalCount, hasTotalCount := ma.Edges.totalCount[1][alias]
+	if nodes, err := ma.NamedNlogAlerts(alias); err == nil || hasTotalCount {
+		pager, err := newNlogAlertPager(opts, last != nil)
+		if err != nil {
+			return nil, err
+		}
+		conn := &NlogAlertConnection{Edges: []*NlogAlertEdge{}, TotalCount: totalCount}
+		conn.build(nodes, pager, after, first, before, last)
+		return conn, nil
 	}
-	return result, err
+	return ma.QueryNlogAlerts().Paginate(ctx, after, first, before, last, opts...)
 }
 
 func (me *MsgEvent) MsgType(ctx context.Context) (*MsgType, error) {

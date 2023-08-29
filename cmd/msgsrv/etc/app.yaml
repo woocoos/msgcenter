@@ -20,7 +20,7 @@ log:
 
 web:
   server:
-    addr: 127.0.0.1:10070
+    addr: 127.0.0.1:10072
   engine:
     routerGroups:
       - alertmanager:
@@ -51,12 +51,16 @@ web:
 
 ui:
   server:
-    addr: 127.0.0.1:10071
+    addr: 127.0.0.1:10073
 
 store:
   msgcenter:
     driverName: mysql
     dsn: "root:@tcp(localhost:3306)/msgcenter?parseTime=true&loc=Local"
+  redis: &redis
+    addrs:
+      - 127.0.0.1:6379
+    db: 1
 
 entcache:
   level: context
@@ -82,8 +86,29 @@ alertManager:
   alerts:
     gcInterval: 30m
   template:
-    path: ../../test/testdata/tpl # path for custom template
+    path: ../../test/testdata/files # path for custom template
+    prefixDir: "/msg"  # 相对于存储服务的前缀路径
+    fileBaseUrl: "http://127.0.0.1:10071"
+    relativePath:
+      tplTemp: "/tpl/temp" # 模板临时路径
+      tplData: "/tpl/data" # 模板正式路径
+      attachment: "/att" # 附件存储路径
 
 prometheus:
   server:
     addr: 127.0.0.1:9093
+
+oauth-with-cache:
+  timeout: 2s
+  oauth2:
+    clientID: 206734260394752
+    clientSecret: T2UlqISVFq4DR9InXamj3l74iWdu3Tyr
+    endpoint:
+      tokenURL: http://127.0.0.1:10070/token
+    scopes:
+    cache:
+      type: redis
+      <<: *redis
+      local:
+        size: 1000
+        ttl: 100s

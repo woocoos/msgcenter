@@ -1,14 +1,20 @@
 package schema
 
 import (
+	"context"
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"fmt"
 	"github.com/woocoos/entco/schemax"
 	"github.com/woocoos/entco/schemax/typex"
+	gen "github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/hook"
+	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/predicate"
 )
 
 // MsgType 应用的消息类型
@@ -58,4 +64,48 @@ func (MsgType) Edges() []ent.Edge {
 			entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
 		),
 	}
+}
+
+func (MsgType) Hooks() []ent.Hook {
+	return []ent.Hook{
+		typeNameHook(),
+	}
+}
+
+func typeNameHook() ent.Hook {
+	return hook.If(func(next ent.Mutator) ent.Mutator {
+		return hook.MsgTypeFunc(func(ctx context.Context, m *gen.MsgTypeMutation) (gen.Value, error) {
+			name, ok := m.Name()
+			if !ok {
+				return next.Mutate(ctx, m)
+			}
+			appID := 0
+			if m.Op() == gen.OpCreate {
+				appID, _ = m.AppID()
+			} else if m.Op() == gen.OpUpdate || m.Op() == gen.OpUpdateOne {
+				appID, _ = m.AppID()
+				if appID == 0 {
+					mtID, _ := m.ID()
+					mt, err := m.Client().MsgType.Query().Where(msgtype.ID(mtID)).Select(msgtype.FieldAppID).Only(ctx)
+					if err != nil {
+						return nil, err
+					}
+					appID = mt.AppID
+				}
+			}
+			var where []predicate.MsgType
+			where = append(where, msgtype.Name(name))
+			if appID != 0 {
+				where = append(where, msgtype.AppID(appID))
+			}
+			has, err := m.Client().MsgType.Query().Where(where...).Exist(ctx)
+			if err != nil {
+				return nil, err
+			}
+			if has {
+				return nil, fmt.Errorf("the msgtype name must be unique in the app")
+			}
+			return next.Mutate(ctx, m)
+		})
+	}, hook.HasFields("name"))
 }

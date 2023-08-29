@@ -15,6 +15,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/hook"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"regexp"
 	"strings"
@@ -83,10 +84,7 @@ func nameHook() ent.Hook {
 			}
 			appID := 0
 			if m.Op() == gen.OpCreate {
-				mtid, ok := m.MsgTypeID()
-				if !ok {
-					return next.Mutate(ctx, m)
-				}
+				mtid, _ := m.MsgTypeID()
 				aid, err := m.Client().MsgType.Query().Where(msgtype.ID(mtid)).Select(msgtype.FieldAppID).Int(ctx)
 				if err != nil {
 					return nil, err
@@ -95,10 +93,7 @@ func nameHook() ent.Hook {
 			} else if m.Op() == gen.OpUpdate || m.Op() == gen.OpUpdateOne {
 				mtid, _ := m.MsgTypeID()
 				if mtid == 0 {
-					meid, ok := m.ID()
-					if !ok {
-						return next.Mutate(ctx, m)
-					}
+					meid, _ := m.ID()
 					me, err := m.Client().MsgEvent.Query().Where(msgevent.ID(meid)).WithMsgType().Only(ctx)
 					if err != nil {
 						return nil, err
@@ -112,11 +107,12 @@ func nameHook() ent.Hook {
 					appID = aid
 				}
 			}
-			if appID == 0 {
-				return next.Mutate(ctx, m)
+			var where []predicate.MsgEvent
+			where = append(where, msgevent.Name(name))
+			if appID != 0 {
+				where = append(where, msgevent.HasMsgTypeWith(msgtype.AppID(appID)))
 			}
-
-			has, err := m.Client().MsgType.Query().Where(msgtype.AppID(appID), msgtype.HasEventsWith(msgevent.NameEQ(name))).Exist(ctx)
+			has, err := m.Client().MsgEvent.Query().Where(where...).Exist(ctx)
 			if err != nil {
 				return nil, err
 			}

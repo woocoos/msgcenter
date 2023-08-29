@@ -52,13 +52,13 @@ func (MsgTemplate) Fields() []ent.Field {
 		field.String("bcc").Optional().Comment("密送"),
 		field.String("body").Optional().Comment("消息体").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
-		field.Text("tpl").Optional().Comment("模板地址").Annotations(
+		field.Text("tpl").Optional().Comment("模板地址。key：/msg/tpl/temp/1/xxx").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
 		field.Int("tpl_file_id").Optional().Comment("模板地址").Annotations(
 			entgql.Skip(entgql.SkipWhereInput), entgql.Type("ID")),
-		field.Text("attachments").Optional().Comment("附件地址,多个附件用逗号分隔").Annotations(
+		field.Strings("attachments").Optional().Comment("附件地址。key：/msg/att/1/xxx").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
-		field.String("attachments_file_ids").Optional().Comment("附件地址,多个附件用逗号分隔").Annotations(
+		field.Ints("attachments_file_ids").Optional().Comment("附件ids").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
 		field.String("comments").Optional().Comment("备注").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),

@@ -52,7 +52,7 @@ type MsgAlert struct {
 
 // MsgAlertEdges holds the relations/edges for other nodes in the graph.
 type MsgAlertEdges struct {
-	// Nlog holds the value of the nlog edge.
+	// 消息日志
 	Nlog []*Nlog `json:"nlog,omitempty"`
 	// NlogAlerts holds the value of the nlog_alerts edge.
 	NlogAlerts []*NlogAlert `json:"nlog_alerts,omitempty"`

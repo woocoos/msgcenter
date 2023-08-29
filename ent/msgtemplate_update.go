@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/entco/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -318,16 +319,14 @@ func (mtu *MsgTemplateUpdate) ClearTplFileID() *MsgTemplateUpdate {
 }
 
 // SetAttachments sets the "attachments" field.
-func (mtu *MsgTemplateUpdate) SetAttachments(s string) *MsgTemplateUpdate {
+func (mtu *MsgTemplateUpdate) SetAttachments(s []string) *MsgTemplateUpdate {
 	mtu.mutation.SetAttachments(s)
 	return mtu
 }
 
-// SetNillableAttachments sets the "attachments" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableAttachments(s *string) *MsgTemplateUpdate {
-	if s != nil {
-		mtu.SetAttachments(*s)
-	}
+// AppendAttachments appends s to the "attachments" field.
+func (mtu *MsgTemplateUpdate) AppendAttachments(s []string) *MsgTemplateUpdate {
+	mtu.mutation.AppendAttachments(s)
 	return mtu
 }
 
@@ -338,16 +337,14 @@ func (mtu *MsgTemplateUpdate) ClearAttachments() *MsgTemplateUpdate {
 }
 
 // SetAttachmentsFileIds sets the "attachments_file_ids" field.
-func (mtu *MsgTemplateUpdate) SetAttachmentsFileIds(s string) *MsgTemplateUpdate {
-	mtu.mutation.SetAttachmentsFileIds(s)
+func (mtu *MsgTemplateUpdate) SetAttachmentsFileIds(i []int) *MsgTemplateUpdate {
+	mtu.mutation.SetAttachmentsFileIds(i)
 	return mtu
 }
 
-// SetNillableAttachmentsFileIds sets the "attachments_file_ids" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableAttachmentsFileIds(s *string) *MsgTemplateUpdate {
-	if s != nil {
-		mtu.SetAttachmentsFileIds(*s)
-	}
+// AppendAttachmentsFileIds appends i to the "attachments_file_ids" field.
+func (mtu *MsgTemplateUpdate) AppendAttachmentsFileIds(i []int) *MsgTemplateUpdate {
+	mtu.mutation.AppendAttachmentsFileIds(i)
 	return mtu
 }
 
@@ -560,16 +557,26 @@ func (mtu *MsgTemplateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.ClearField(msgtemplate.FieldTplFileID, field.TypeInt)
 	}
 	if value, ok := mtu.mutation.Attachments(); ok {
-		_spec.SetField(msgtemplate.FieldAttachments, field.TypeString, value)
+		_spec.SetField(msgtemplate.FieldAttachments, field.TypeJSON, value)
+	}
+	if value, ok := mtu.mutation.AppendedAttachments(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, msgtemplate.FieldAttachments, value)
+		})
 	}
 	if mtu.mutation.AttachmentsCleared() {
-		_spec.ClearField(msgtemplate.FieldAttachments, field.TypeString)
+		_spec.ClearField(msgtemplate.FieldAttachments, field.TypeJSON)
 	}
 	if value, ok := mtu.mutation.AttachmentsFileIds(); ok {
-		_spec.SetField(msgtemplate.FieldAttachmentsFileIds, field.TypeString, value)
+		_spec.SetField(msgtemplate.FieldAttachmentsFileIds, field.TypeJSON, value)
+	}
+	if value, ok := mtu.mutation.AppendedAttachmentsFileIds(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, msgtemplate.FieldAttachmentsFileIds, value)
+		})
 	}
 	if mtu.mutation.AttachmentsFileIdsCleared() {
-		_spec.ClearField(msgtemplate.FieldAttachmentsFileIds, field.TypeString)
+		_spec.ClearField(msgtemplate.FieldAttachmentsFileIds, field.TypeJSON)
 	}
 	if value, ok := mtu.mutation.Comments(); ok {
 		_spec.SetField(msgtemplate.FieldComments, field.TypeString, value)
@@ -915,16 +922,14 @@ func (mtuo *MsgTemplateUpdateOne) ClearTplFileID() *MsgTemplateUpdateOne {
 }
 
 // SetAttachments sets the "attachments" field.
-func (mtuo *MsgTemplateUpdateOne) SetAttachments(s string) *MsgTemplateUpdateOne {
+func (mtuo *MsgTemplateUpdateOne) SetAttachments(s []string) *MsgTemplateUpdateOne {
 	mtuo.mutation.SetAttachments(s)
 	return mtuo
 }
 
-// SetNillableAttachments sets the "attachments" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableAttachments(s *string) *MsgTemplateUpdateOne {
-	if s != nil {
-		mtuo.SetAttachments(*s)
-	}
+// AppendAttachments appends s to the "attachments" field.
+func (mtuo *MsgTemplateUpdateOne) AppendAttachments(s []string) *MsgTemplateUpdateOne {
+	mtuo.mutation.AppendAttachments(s)
 	return mtuo
 }
 
@@ -935,16 +940,14 @@ func (mtuo *MsgTemplateUpdateOne) ClearAttachments() *MsgTemplateUpdateOne {
 }
 
 // SetAttachmentsFileIds sets the "attachments_file_ids" field.
-func (mtuo *MsgTemplateUpdateOne) SetAttachmentsFileIds(s string) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetAttachmentsFileIds(s)
+func (mtuo *MsgTemplateUpdateOne) SetAttachmentsFileIds(i []int) *MsgTemplateUpdateOne {
+	mtuo.mutation.SetAttachmentsFileIds(i)
 	return mtuo
 }
 
-// SetNillableAttachmentsFileIds sets the "attachments_file_ids" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableAttachmentsFileIds(s *string) *MsgTemplateUpdateOne {
-	if s != nil {
-		mtuo.SetAttachmentsFileIds(*s)
-	}
+// AppendAttachmentsFileIds appends i to the "attachments_file_ids" field.
+func (mtuo *MsgTemplateUpdateOne) AppendAttachmentsFileIds(i []int) *MsgTemplateUpdateOne {
+	mtuo.mutation.AppendAttachmentsFileIds(i)
 	return mtuo
 }
 
@@ -1187,16 +1190,26 @@ func (mtuo *MsgTemplateUpdateOne) sqlSave(ctx context.Context) (_node *MsgTempla
 		_spec.ClearField(msgtemplate.FieldTplFileID, field.TypeInt)
 	}
 	if value, ok := mtuo.mutation.Attachments(); ok {
-		_spec.SetField(msgtemplate.FieldAttachments, field.TypeString, value)
+		_spec.SetField(msgtemplate.FieldAttachments, field.TypeJSON, value)
+	}
+	if value, ok := mtuo.mutation.AppendedAttachments(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, msgtemplate.FieldAttachments, value)
+		})
 	}
 	if mtuo.mutation.AttachmentsCleared() {
-		_spec.ClearField(msgtemplate.FieldAttachments, field.TypeString)
+		_spec.ClearField(msgtemplate.FieldAttachments, field.TypeJSON)
 	}
 	if value, ok := mtuo.mutation.AttachmentsFileIds(); ok {
-		_spec.SetField(msgtemplate.FieldAttachmentsFileIds, field.TypeString, value)
+		_spec.SetField(msgtemplate.FieldAttachmentsFileIds, field.TypeJSON, value)
+	}
+	if value, ok := mtuo.mutation.AppendedAttachmentsFileIds(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, msgtemplate.FieldAttachmentsFileIds, value)
+		})
 	}
 	if mtuo.mutation.AttachmentsFileIdsCleared() {
-		_spec.ClearField(msgtemplate.FieldAttachmentsFileIds, field.TypeString)
+		_spec.ClearField(msgtemplate.FieldAttachmentsFileIds, field.TypeJSON)
 	}
 	if value, ok := mtuo.mutation.Comments(); ok {
 		_spec.SetField(msgtemplate.FieldComments, field.TypeString, value)

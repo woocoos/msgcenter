@@ -132,7 +132,7 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
 		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
-		SetBody(`{{ template "1000.alterpwd.txt" . }}`).SetAttachments("1000/alterpwd.tmpl").
+		SetBody(`{{ template "1000.alterpwd.txt" . }}`).SetAttachments([]string{"1000/alterpwd.tmpl"}).
 		SetTpl("1000/alterpwd.tmpl").SaveX(ctx)
 
 	client.MsgChannel.Create().SetName("email").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).

@@ -7,6 +7,9 @@ package graphql
 import (
 	"context"
 	"fmt"
+	"os"
+	"strconv"
+
 	"github.com/woocoos/entco/pkg/identity"
 	"github.com/woocoos/entco/schemax/typex"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
@@ -18,8 +21,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/service"
 	"github.com/woocoos/msgcenter/silence"
-	"strconv"
 )
 
 // CreateMsgType is the resolver for the createMsgType field.
@@ -156,12 +159,94 @@ func (r *mutationResolver) DisableMsgChannel(ctx context.Context, id int) (*ent.
 
 // CreateMsgTemplate is the resolver for the createMsgTemplate field.
 func (r *mutationResolver) CreateMsgTemplate(ctx context.Context, input ent.CreateMsgTemplateInput) (*ent.MsgTemplate, error) {
-	return ent.FromContext(ctx).MsgTemplate.Create().SetInput(input).Save(ctx)
+	if (input.Tpl != nil && input.TplFileID == nil) || (input.Tpl == nil && input.TplFileID != nil) {
+		return nil, fmt.Errorf("tpl and tplFileID is required")
+	}
+	if (input.Attachments != nil && input.AttachmentsFileIds == nil) ||
+		(input.Attachments == nil && input.AttachmentsFileIds != nil) ||
+		(len(input.Attachments) != len(input.AttachmentsFileIds)) {
+		return nil, fmt.Errorf("attachments and attachmentsFileIds is required and lengths must be same")
+	}
+	newFileIDs := make([]int, 0)
+	// 验证模板路径
+	if input.Tpl != nil {
+		err := r.Coordinator.ValidateFilePath(ctx, *input.Tpl, service.TempRelativePathTplTemp)
+		if err != nil {
+			return nil, err
+		}
+		newFileIDs = append(newFileIDs, *input.TplFileID)
+	}
+	// 验证附件路径
+	if input.Attachments != nil {
+		for _, att := range input.Attachments {
+			err := r.Coordinator.ValidateFilePath(ctx, att, service.TempRelativePathAttachment)
+			if err != nil {
+				return nil, err
+			}
+		}
+		newFileIDs = append(newFileIDs, input.AttachmentsFileIds...)
+	}
+	temp, err := ent.FromContext(ctx).MsgTemplate.Create().SetInput(input).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// 上报文件引用次数
+	err = r.Coordinator.ReportFileRefCount(ctx, newFileIDs, nil)
+	if err != nil {
+		return nil, err
+	}
+	return temp, nil
 }
 
 // UpdateMsgTemplate is the resolver for the updateMsgTemplate field.
 func (r *mutationResolver) UpdateMsgTemplate(ctx context.Context, id int, input ent.UpdateMsgTemplateInput) (*ent.MsgTemplate, error) {
-	return ent.FromContext(ctx).MsgTemplate.UpdateOneID(id).SetInput(input).Save(ctx)
+	if (input.Tpl != nil && input.TplFileID == nil) || (input.Tpl == nil && input.TplFileID != nil) {
+		return nil, fmt.Errorf("tpl and tplFileID must exist at the same time")
+	}
+	if (input.Attachments != nil && input.AttachmentsFileIds == nil) || (input.Attachments == nil && input.AttachmentsFileIds != nil) {
+		return nil, fmt.Errorf("attachments and attachmentsFileIds must exist at the same time")
+	}
+	newFileIDs := make([]int, 0)
+	// 验证模板路径
+	if input.Tpl != nil {
+		err := r.Coordinator.ValidateFilePath(ctx, *input.Tpl, service.TempRelativePathTplTemp)
+		if err != nil {
+			return nil, err
+		}
+		newFileIDs = append(newFileIDs, *input.TplFileID)
+	}
+	// 验证附件路径
+	if input.Attachments != nil {
+		for _, att := range input.Attachments {
+			err := r.Coordinator.ValidateFilePath(ctx, att, service.TempRelativePathAttachment)
+			if err != nil {
+				return nil, err
+			}
+		}
+		newFileIDs = append(newFileIDs, input.AttachmentsFileIds...)
+	}
+	otemp, err := ent.FromContext(ctx).MsgTemplate.Query().Where(msgtemplate.ID(id)).Select(msgtemplate.FieldAttachmentsFileIds, msgtemplate.FieldTplFileID).Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	oldFIleIDs := make([]int, 0)
+	if otemp.TplFileID != 0 {
+		oldFIleIDs = append(oldFIleIDs, otemp.TplFileID)
+	}
+	if otemp.AttachmentsFileIds != nil {
+		oldFIleIDs = append(oldFIleIDs, otemp.AttachmentsFileIds...)
+	}
+	// 更新模板
+	temp, err := ent.FromContext(ctx).MsgTemplate.UpdateOneID(id).SetInput(input).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// 上报文件引用次数
+	err = r.Coordinator.ReportFileRefCount(ctx, newFileIDs, oldFIleIDs)
+	if err != nil {
+		return nil, err
+	}
+	return temp, nil
 }
 
 // DeleteMsgTemplate is the resolver for the deleteMsgTemplate field.
@@ -173,8 +258,26 @@ func (r *mutationResolver) DeleteMsgTemplate(ctx context.Context, id int) (bool,
 		return false, fmt.Errorf("the active status cannot be deleted")
 	}
 	err := client.MsgTemplate.DeleteOneID(id).Exec(ctx)
-	// TODO 还需同步删除模板文件
-	return err == nil, err
+	if err != nil {
+		return false, err
+	}
+	otemp, err := ent.FromContext(ctx).MsgTemplate.Query().Where(msgtemplate.ID(id)).Select(msgtemplate.FieldAttachmentsFileIds, msgtemplate.FieldTplFileID).Only(ctx)
+	if err != nil {
+		return false, err
+	}
+	oldFIleIDs := make([]int, 0)
+	if otemp.TplFileID != 0 {
+		oldFIleIDs = append(oldFIleIDs, otemp.TplFileID)
+	}
+	if otemp.AttachmentsFileIds != nil {
+		oldFIleIDs = append(oldFIleIDs, otemp.AttachmentsFileIds...)
+	}
+	// 上报文件引用次数
+	err = r.Coordinator.ReportFileRefCount(ctx, nil, oldFIleIDs)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // EnableMsgTemplate is the resolver for the enableMsgTemplate field.
@@ -183,12 +286,24 @@ func (r *mutationResolver) EnableMsgTemplate(ctx context.Context, id int) (*ent.
 	if err != nil {
 		return nil, err
 	}
+	temp, err = temp.Update().SetStatus(typex.SimpleStatusActive).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// 将temp文件复制到data目录下
+	size, err := r.Coordinator.CopyFile(r.Coordinator.GetTplDataPath(temp.Tpl), r.Coordinator.GetTplTempPath(temp.Tpl))
+	if err != nil {
+		return nil, err
+	}
+	if size <= 0 {
+		return nil, fmt.Errorf("tpl file is nil")
+	}
 	// 重新加载模板
-	//err = r.Coordinator.LoadTemplates()
-	//if err != nil {
-	//	return nil, err
-	//}
-	return temp.Update().SetStatus(typex.SimpleStatusActive).Save(ctx)
+	err = r.Coordinator.LoadTemplates()
+	if err != nil {
+		return nil, err
+	}
+	return temp, nil
 }
 
 // DisableMsgTemplate is the resolver for the disableMsgTemplate field.
@@ -197,11 +312,16 @@ func (r *mutationResolver) DisableMsgTemplate(ctx context.Context, id int) (*ent
 	if err != nil {
 		return nil, err
 	}
+	// 将文件从data目录下删除
+	err = os.Remove(r.Coordinator.GetTplDataPath(temp.Tpl))
+	if err != nil {
+		return nil, err
+	}
 	// 重新加载模板
-	//err = r.Coordinator.LoadTemplates()
-	//if err != nil {
-	//	return nil, err
-	//}
+	err = r.Coordinator.LoadTemplates()
+	if err != nil {
+		return nil, err
+	}
 	return temp.Update().SetStatus(typex.SimpleStatusInactive).Save(ctx)
 }
 

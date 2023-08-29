@@ -6,10 +6,26 @@ package graphql
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/ent"
 )
+
+// Labels is the resolver for the labels field.
+func (r *msgAlertResolver) Labels(ctx context.Context, obj *ent.MsgAlert) (map[string]string, error) {
+	panic(fmt.Errorf("not implemented: Labels - labels"))
+}
+
+// Annotations is the resolver for the annotations field.
+func (r *msgAlertResolver) Annotations(ctx context.Context, obj *ent.MsgAlert) (map[string]string, error) {
+	panic(fmt.Errorf("not implemented: Annotations - annotations"))
+}
+
+// NlogAlerts is the resolver for the nlogAlerts field.
+func (r *msgAlertResolver) NlogAlerts(ctx context.Context, obj *ent.MsgAlert) ([]*ent.NlogAlert, error) {
+	panic(fmt.Errorf("not implemented: NlogAlerts - nlogAlerts"))
+}
 
 // Node is the resolver for the node field.
 func (r *queryResolver) Node(ctx context.Context, id string) (ent.Noder, error) {
@@ -21,6 +37,9 @@ func (r *queryResolver) Nodes(ctx context.Context, ids []string) ([]ent.Noder, e
 	return r.Client.NodersEx(ctx, ids)
 }
 
+// MsgAlert returns generated.MsgAlertResolver implementation.
+func (r *Resolver) MsgAlert() generated.MsgAlertResolver { return &msgAlertResolver{r} }
+
 // MsgEvent returns generated.MsgEventResolver implementation.
 func (r *Resolver) MsgEvent() generated.MsgEventResolver { return &msgEventResolver{r} }
 
@@ -30,6 +49,7 @@ func (r *Resolver) MsgType() generated.MsgTypeResolver { return &msgTypeResolver
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+type msgAlertResolver struct{ *Resolver }
 type msgEventResolver struct{ *Resolver }
 type msgTypeResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

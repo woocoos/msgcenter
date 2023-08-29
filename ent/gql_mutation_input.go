@@ -261,8 +261,8 @@ type CreateMsgTemplateInput struct {
 	Body               *string
 	Tpl                *string
 	TplFileID          *int
-	Attachments        *string
-	AttachmentsFileIds *string
+	Attachments        []string
+	AttachmentsFileIds []int
 	Comments           *string
 	EventID            int
 }
@@ -299,10 +299,10 @@ func (i *CreateMsgTemplateInput) Mutate(m *MsgTemplateMutation) {
 		m.SetTplFileID(*v)
 	}
 	if v := i.Attachments; v != nil {
-		m.SetAttachments(*v)
+		m.SetAttachments(v)
 	}
 	if v := i.AttachmentsFileIds; v != nil {
-		m.SetAttachmentsFileIds(*v)
+		m.SetAttachmentsFileIds(v)
 	}
 	if v := i.Comments; v != nil {
 		m.SetComments(*v)
@@ -318,34 +318,36 @@ func (c *MsgTemplateCreate) SetInput(i CreateMsgTemplateInput) *MsgTemplateCreat
 
 // UpdateMsgTemplateInput represents a mutation input for updating msgtemplates.
 type UpdateMsgTemplateInput struct {
-	MsgTypeID               *int
-	TenantID                *int
-	Name                    *string
-	ReceiverType            *profile.ReceiverType
-	Format                  *msgtemplate.Format
-	ClearSubject            bool
-	Subject                 *string
-	ClearFrom               bool
-	From                    *string
-	ClearTo                 bool
-	To                      *string
-	ClearCc                 bool
-	Cc                      *string
-	ClearBcc                bool
-	Bcc                     *string
-	ClearBody               bool
-	Body                    *string
-	ClearTpl                bool
-	Tpl                     *string
-	ClearTplFileID          bool
-	TplFileID               *int
-	ClearAttachments        bool
-	Attachments             *string
-	ClearAttachmentsFileIds bool
-	AttachmentsFileIds      *string
-	ClearComments           bool
-	Comments                *string
-	EventID                 *int
+	MsgTypeID                *int
+	TenantID                 *int
+	Name                     *string
+	ReceiverType             *profile.ReceiverType
+	Format                   *msgtemplate.Format
+	ClearSubject             bool
+	Subject                  *string
+	ClearFrom                bool
+	From                     *string
+	ClearTo                  bool
+	To                       *string
+	ClearCc                  bool
+	Cc                       *string
+	ClearBcc                 bool
+	Bcc                      *string
+	ClearBody                bool
+	Body                     *string
+	ClearTpl                 bool
+	Tpl                      *string
+	ClearTplFileID           bool
+	TplFileID                *int
+	ClearAttachments         bool
+	Attachments              []string
+	AppendAttachments        []string
+	ClearAttachmentsFileIds  bool
+	AttachmentsFileIds       []int
+	AppendAttachmentsFileIds []int
+	ClearComments            bool
+	Comments                 *string
+	EventID                  *int
 }
 
 // Mutate applies the UpdateMsgTemplateInput on the MsgTemplateMutation builder.
@@ -417,13 +419,19 @@ func (i *UpdateMsgTemplateInput) Mutate(m *MsgTemplateMutation) {
 		m.ClearAttachments()
 	}
 	if v := i.Attachments; v != nil {
-		m.SetAttachments(*v)
+		m.SetAttachments(v)
+	}
+	if i.AppendAttachments != nil {
+		m.AppendAttachments(i.Attachments)
 	}
 	if i.ClearAttachmentsFileIds {
 		m.ClearAttachmentsFileIds()
 	}
 	if v := i.AttachmentsFileIds; v != nil {
-		m.SetAttachmentsFileIds(*v)
+		m.SetAttachmentsFileIds(v)
+	}
+	if i.AppendAttachmentsFileIds != nil {
+		m.AppendAttachmentsFileIds(i.AttachmentsFileIds)
 	}
 	if i.ClearComments {
 		m.ClearComments()

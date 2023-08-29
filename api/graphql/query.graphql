@@ -125,4 +125,14 @@ extend type Query {
         orderBy: SilenceOrder
         where: SilenceWhereInput
     ):SilenceConnection!
+
+    """消息列表"""
+    msgAlerts(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgAlertOrder
+        where: MsgAlertWhereInput
+    ):MsgAlertConnection
 }

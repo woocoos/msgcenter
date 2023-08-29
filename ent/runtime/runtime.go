@@ -127,7 +127,9 @@ func init() {
 	msgtemplate.NameValidator = msgtemplateDescName.Validators[0].(func(string) error)
 	msgtypeMixin := schema.MsgType{}.Mixin()
 	msgtypeMixinHooks1 := msgtypeMixin[1].Hooks()
+	msgtypeHooks := schema.MsgType{}.Hooks()
 	msgtype.Hooks[0] = msgtypeMixinHooks1[0]
+	msgtype.Hooks[1] = msgtypeHooks[0]
 	msgtypeMixinFields1 := msgtypeMixin[1].Fields()
 	_ = msgtypeMixinFields1
 	msgtypeFields := schema.MsgType{}.Fields()

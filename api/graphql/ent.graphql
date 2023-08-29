@@ -72,14 +72,14 @@ input CreateMsgTemplateInput {
   bcc: String
   """消息体"""
   body: String
-  """模板地址"""
+  """模板地址。key：/msg/tpl/temp/1/xxx"""
   tpl: String
   """模板地址"""
   tplFileID: ID
-  """附件地址,多个附件用逗号分隔"""
-  attachments: String
-  """附件地址,多个附件用逗号分隔"""
-  attachmentsFileIds: String
+  """附件地址。key：/msg/att/1/xxx"""
+  attachments: [String!]
+  """附件ids"""
+  attachmentsFileIds: [Int!]
   """备注"""
   comments: String
   eventID: ID!
@@ -126,7 +126,7 @@ Define a Relay Cursor type:
 https://relay.dev/graphql/connections.htm#sec-Cursor
 """
 scalar Cursor
-"""An object with an Global ID,for using in Noder interface."""
+"""An object with a Global ID,for using in Noder interface."""
 scalar GID
 type MsgAlert implements Node {
   id: ID!
@@ -151,7 +151,25 @@ type MsgAlert implements Node {
   updatedAt: Time
   """是否移除"""
   deleted: Boolean!
-  nlog: [Nlog!]
+  nlog(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for Nlogs returned from the connection."""
+    orderBy: NlogOrder
+
+    """Filtering options for Nlogs returned from the connection."""
+    where: NlogWhereInput
+  ): NlogConnection!
   nlogAlerts: [NlogAlert!]
 }
 """MsgAlertAlertStatus is enum for the field state"""
@@ -786,14 +804,14 @@ type MsgTemplate implements Node {
   bcc: String
   """消息体"""
   body: String
-  """模板地址"""
+  """模板地址。key：/msg/tpl/temp/1/xxx"""
   tpl: String
   """模板地址"""
   tplFileID: ID
-  """附件地址,多个附件用逗号分隔"""
-  attachments: String
-  """附件地址,多个附件用逗号分隔"""
-  attachmentsFileIds: String
+  """附件地址。key：/msg/att/1/xxx"""
+  attachments: [String!]
+  """附件ids"""
+  attachmentsFileIds: [Int!]
   """备注"""
   comments: String
   event: MsgEvent!
@@ -1696,17 +1714,19 @@ input UpdateMsgTemplateInput {
   """消息体"""
   body: String
   clearBody: Boolean
-  """模板地址"""
+  """模板地址。key：/msg/tpl/temp/1/xxx"""
   tpl: String
   clearTpl: Boolean
   """模板地址"""
   tplFileID: ID
   clearTplFileID: Boolean
-  """附件地址,多个附件用逗号分隔"""
-  attachments: String
+  """附件地址。key：/msg/att/1/xxx"""
+  attachments: [String!]
+  appendAttachments: [String!]
   clearAttachments: Boolean
-  """附件地址,多个附件用逗号分隔"""
-  attachmentsFileIds: String
+  """附件ids"""
+  attachmentsFileIds: [Int!]
+  appendAttachmentsFileIds: [Int!]
   clearAttachmentsFileIds: Boolean
   """备注"""
   comments: String

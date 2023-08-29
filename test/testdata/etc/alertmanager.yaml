@@ -8,8 +8,8 @@ global:
 
 # 模板文件位置
 templates:
-  - 'testdata/tpl/*.tmpl'
-  - 'testdata/tpl/**/*.tmpl'
+  - 'testdata/files/tpl/data/*.tmpl'
+  - 'testdata/files/tpl/data/**/*.tmpl'
 
 # 根路由规则
 route:
