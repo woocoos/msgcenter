@@ -22,15 +22,6 @@ const ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
   ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '';
 
-export const icestark = defineChildConfig(() => ({
-  mount: () => {
-    // 在微应用挂载前执行
-  },
-  unmount: () => {
-    // 在微应用卸载后执行
-  },
-}));
-
 if (NODE_ENV === 'development') {
   // 无登录项目增加前端缓存内容 方便开发和展示
   setItem('token', ICE_DEV_TOKEN)
@@ -40,6 +31,27 @@ if (NODE_ENV === 'development') {
     displayName: 'admin',
   })
 }
+
+export const icestark = defineChildConfig(() => ({
+  mount: (data) => {
+    // 在微应用挂载前执行
+    if (data?.customProps) {
+      setItem('locale', data.customProps.app.locale);
+      setItem('darkMode', data.customProps.app.darkMode);
+      setItem('compactMode', data.customProps.app.compactMode);
+      setItem('token', data.customProps.user.token);
+      setItem('refreshToken', data.customProps.user.refreshToken);
+      setItem('tenantId', data.customProps.user.tenantId);
+      setItem('user', data.customProps.user.user);
+    }
+  },
+  unmount: () => {
+    // 在微应用卸载后执行
+    removeItem('token');
+    removeItem('refreshToken');
+    removeItem('tenantId');
+  },
+}));
 
 // App config, see https://v3.ice.work/docs/guide/basic/app
 export default defineAppConfig(() => ({
