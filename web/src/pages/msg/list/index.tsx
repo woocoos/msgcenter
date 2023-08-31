@@ -28,8 +28,18 @@ export default () => {
       {
         title: t('end_at'), dataIndex: 'endsAt', width: 120, valueType: "dateTime",
       },
-      { title: t('msg_alert_labels'), dataIndex: 'labels', width: 120, search: false, },
-      { title: t('msg_alert_annotations'), dataIndex: 'annotations', width: 120, search: false, },
+      {
+        title: t('msg_alert_labels'), dataIndex: 'labels', width: 120, search: false,
+        render(text, record) {
+          return record.labels ? mapStringRender(record.labels) : '-';
+        },
+      },
+      {
+        title: t('msg_alert_annotations'), dataIndex: 'annotations', width: 120, search: false,
+        render(text, record) {
+          return record.annotations ? mapStringRender(record.annotations) : '-';
+        },
+      },
       {
         title: t('msg_alert_timeout'), dataIndex: 'timeout', width: 120, search: false,
         render(text, record) {
@@ -57,6 +67,14 @@ export default () => {
         },
       },
     ];
+
+  const mapStringRender = (mapString: Record<string, string>) => {
+    const strAry: string[] = [];
+    for (let key in mapString) {
+      strAry.push(`${key}="${mapString[key]}"`);
+    }
+    return strAry.join(',')
+  }
 
   return <KeepAlive clearAlive>
     <PageContainer
