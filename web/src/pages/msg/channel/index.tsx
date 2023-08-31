@@ -75,11 +75,13 @@ export default () => {
                 {t('configuration')}
               </a>
             </Auth>
-            <Auth authKey="deleteMsgChannel">
-              <a key="delete" onClick={() => onDel(record)}>
-                {t('delete')}
-              </a>
-            </Auth>
+            {
+              record.status === MsgChannelSimpleStatus.Active ? <></> : <Auth authKey="deleteMsgChannel">
+                <a key="delete" onClick={() => onDel(record)}>
+                  {t('delete')}
+                </a>
+              </Auth>
+            }
             {
               record.status === MsgChannelSimpleStatus.Active ? <Auth authKey="disableMsgChannel">
                 <a key="disable" style={{ color: '#ff0000' }} onClick={() => onClickStatus(record)}>

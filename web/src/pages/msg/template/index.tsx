@@ -67,11 +67,13 @@ export default () => {
                 {t('edit')}
               </a>
             </Auth>
-            <Auth authKey="deleteMsgTemplate">
-              <a key="delete" onClick={() => onDel(record)}>
-                {t('delete')}
-              </a>
-            </Auth>
+            {
+              record.status === MsgTemplateSimpleStatus.Active ? <></> : <Auth authKey="deleteMsgTemplate">
+                <a key="delete" onClick={() => onDel(record)}>
+                  {t('delete')}
+                </a>
+              </Auth>
+            }
             {
               record.status === MsgTemplateSimpleStatus.Active ? <Auth authKey="disableMsgTemplate">
                 <a key="disable" style={{ color: '#ff0000' }} onClick={() => onClickStatus(record)}>

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Editor from '@monaco-editor/react';
 import { getMsgEventInfoRoute, updateMsgEvent } from '@/services/msgsrv/event';
-import { RouteStrType } from '@/generated/msgsrv/graphql';
+import { MatchType, RouteStrType } from '@/generated/msgsrv/graphql';
 import * as yaml from 'js-yaml'
 import { Typography } from 'antd';
 import { useLeavePrompt } from '@knockout-js/layout';
@@ -43,7 +43,11 @@ export default (props: {
       }
       const result = await getMsgEventInfoRoute(props.id, RouteStrType.Yaml);
       if (result?.id) {
-        initData.route = result.routeStr
+        initData.route = result.routeStr.
+          replaceAll(MatchType.MatchEqual, '=').
+          replaceAll(MatchType.MatchNotEqual, '!=').
+          replaceAll(MatchType.MatchRegexp, '=~').
+          replaceAll(MatchType.MatchNotRegexp, '!~');
       }
       return initData;
     },
@@ -54,9 +58,14 @@ export default (props: {
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
       try {
-        const route = yaml.load(values.route, { json: true })
+        const jsonRoute = yaml.load(values.route, { json: true });
+        const route = JSON.parse(JSON.stringify(jsonRoute).
+          replaceAll('!=', MatchType.MatchNotEqual).
+          replaceAll('=~', MatchType.MatchRegexp).
+          replaceAll('!~', MatchType.MatchNotRegexp).
+          replaceAll('=', MatchType.MatchEqual));
         const result = await updateMsgEvent(props.id, {
-          route: route,
+          route,
         });
         if (result?.id) {
           setSaveDisabled(true);

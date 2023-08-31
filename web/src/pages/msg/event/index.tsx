@@ -82,11 +82,13 @@ export default () => {
                 {t('configuration')}
               </a>
             </Auth>
-            <Auth authKey="deleteMsgEvent">
-              <a key="delete" onClick={() => onDel(record)}>
-                {t('delete')}
-              </a>
-            </Auth>
+            {
+              record.status === MsgEventSimpleStatus.Active ? <></> : <Auth authKey="deleteMsgEvent">
+                <a key="delete" onClick={() => onDel(record)}>
+                  {t('delete')}
+                </a>
+              </Auth>
+            }
             {
               record.status === MsgEventSimpleStatus.Active ? <Auth authKey="disableMsgEvent">
                 <a key="disable" style={{ color: '#ff0000' }} onClick={() => onClickStatus(record)}>
