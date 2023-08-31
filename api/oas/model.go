@@ -5,7 +5,7 @@ package oas
 import "time"
 
 type Alert struct {
-	GeneratorURL string   `binding:"uri,omitempty" json:"generatorURL,omitempty"`
+	GeneratorURL string   `binding:"omitempty,uri" json:"generatorURL,omitempty"`
 	Labels       LabelSet `binding:"required" json:"labels"`
 }
 
@@ -30,7 +30,7 @@ type AlertmanagerConfig struct {
 type AlertmanagerStatus struct {
 	Cluster     ClusterStatus      `binding:"required" json:"cluster"`
 	Config      AlertmanagerConfig `json:"config"`
-	Uptime      time.Time          `time_format:"2006-01-02T15:04:05Z07:00" binding:"required" json:"uptime"`
+	Uptime      time.Time          `binding:"required" json:"uptime" time_format:"2006-01-02T15:04:05Z07:00"`
 	VersionInfo VersionInfo        `binding:"required" json:"versionInfo"`
 }
 
@@ -43,12 +43,12 @@ type ClusterStatus struct {
 type GettableAlert struct {
 	*Alert      `json:",inline"`
 	Annotations LabelSet    `binding:"required" json:"annotations"`
-	EndsAt      time.Time   `time_format:"2006-01-02T15:04:05Z07:00" binding:"required" json:"endsAt"`
+	EndsAt      time.Time   `binding:"required" json:"endsAt" time_format:"2006-01-02T15:04:05Z07:00"`
 	Fingerprint string      `binding:"required" json:"fingerprint"`
 	Receivers   []*Receiver `binding:"required" json:"receivers"`
-	StartsAt    time.Time   `time_format:"2006-01-02T15:04:05Z07:00" binding:"required" json:"startsAt"`
+	StartsAt    time.Time   `binding:"required" json:"startsAt" time_format:"2006-01-02T15:04:05Z07:00"`
 	Status      AlertStatus `json:"status"`
-	UpdatedAt   time.Time   `time_format:"2006-01-02T15:04:05Z07:00" binding:"required" json:"updatedAt"`
+	UpdatedAt   time.Time   `binding:"required" json:"updatedAt" time_format:"2006-01-02T15:04:05Z07:00"`
 }
 
 type GettableAlerts []*GettableAlert
@@ -57,7 +57,7 @@ type GettableSilence struct {
 	*Silence  `json:",inline"`
 	ID        int           `binding:"required" json:"id"`
 	Status    SilenceStatus `binding:"required" json:"status"`
-	UpdatedAt time.Time     `time_format:"2006-01-02T15:04:05Z07:00" binding:"required" json:"updatedAt"`
+	UpdatedAt time.Time     `binding:"required" json:"updatedAt" time_format:"2006-01-02T15:04:05Z07:00"`
 }
 
 type GettableSilences []*GettableSilence
@@ -81,8 +81,8 @@ type PeerStatus struct {
 type PostableAlert struct {
 	*Alert      `json:",inline"`
 	Annotations LabelSet  `json:"annotations,omitempty"`
-	EndsAt      time.Time `time_format:"2006-01-02T15:04:05Z07:00" json:"endsAt,omitempty"`
-	StartsAt    time.Time `time_format:"2006-01-02T15:04:05Z07:00" json:"startsAt,omitempty"`
+	EndsAt      time.Time `json:"endsAt,omitempty" time_format:"2006-01-02T15:04:05Z07:00"`
+	StartsAt    time.Time `json:"startsAt,omitempty" time_format:"2006-01-02T15:04:05Z07:00"`
 }
 
 type PostableAlerts []*PostableAlert
@@ -99,9 +99,9 @@ type Receiver struct {
 type Silence struct {
 	Comment   string    `binding:"required" json:"comment"`
 	CreatedBy int       `binding:"required" json:"createdBy"`
-	EndsAt    time.Time `time_format:"2006-01-02T15:04:05Z07:00" binding:"gt,required" json:"endsAt"`
-	Matchers  Matchers  `binding:"min=1,omitempty" json:"matchers"`
-	StartsAt  time.Time `time_format:"2006-01-02T15:04:05Z07:00" binding:"ltfield=EndsAt,required" json:"startsAt"`
+	EndsAt    time.Time `binding:"gt,required" json:"endsAt" time_format:"2006-01-02T15:04:05Z07:00"`
+	Matchers  Matchers  `binding:"omitempty,min=1" json:"matchers"`
+	StartsAt  time.Time `binding:"ltfield=EndsAt,required" json:"startsAt" time_format:"2006-01-02T15:04:05Z07:00"`
 	TenantID  int       `binding:"required" json:"tenantID"`
 }
 

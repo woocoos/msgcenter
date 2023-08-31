@@ -2337,7 +2337,7 @@ input CreateMsgTemplateInput {
   """附件地址。key：/msg/att/1/xxx"""
   attachments: [String!]
   """附件ids"""
-  attachmentsFileIds: [Int!]
+  attachmentsFileIds: [ID!]
   """备注"""
   comments: String
   eventID: ID!
@@ -3069,7 +3069,7 @@ type MsgTemplate implements Node {
   """附件地址。key：/msg/att/1/xxx"""
   attachments: [String!]
   """附件ids"""
-  attachmentsFileIds: [Int!]
+  attachmentsFileIds: [ID!]
   """备注"""
   comments: String
   event: MsgEvent!
@@ -3983,8 +3983,8 @@ input UpdateMsgTemplateInput {
   appendAttachments: [String!]
   clearAttachments: Boolean
   """附件ids"""
-  attachmentsFileIds: [Int!]
-  appendAttachmentsFileIds: [Int!]
+  attachmentsFileIds: [ID!]
+  appendAttachmentsFileIds: [ID!]
   clearAttachmentsFileIds: Boolean
   """备注"""
   comments: String

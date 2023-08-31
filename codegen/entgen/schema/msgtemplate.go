@@ -59,7 +59,7 @@ func (MsgTemplate) Fields() []ent.Field {
 		field.Strings("attachments").Optional().Comment("附件地址。key：/msg/att/1/xxx").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
 		field.Ints("attachments_file_ids").Optional().Comment("附件ids").Annotations(
-			entgql.Skip(entgql.SkipWhereInput)),
+			entgql.Skip(entgql.SkipWhereInput), entgql.Type("[ID!]")),
 		field.String("comments").Optional().Comment("备注").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
 	}

@@ -4687,7 +4687,7 @@ func (ec *executionContext) _MsgTemplate_attachmentsFileIds(ctx context.Context,
 	}
 	res := resTmp.([]int)
 	fc.Result = res
-	return ec.marshalOInt2ᚕintᚄ(ctx, field.Selections, res)
+	return ec.marshalOID2ᚕintᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MsgTemplate_attachmentsFileIds(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4697,7 +4697,7 @@ func (ec *executionContext) fieldContext_MsgTemplate_attachmentsFileIds(ctx cont
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -9616,7 +9616,7 @@ func (ec *executionContext) unmarshalInputCreateMsgTemplateInput(ctx context.Con
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("attachmentsFileIds"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18151,7 +18151,7 @@ func (ec *executionContext) unmarshalInputUpdateMsgTemplateInput(ctx context.Con
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("attachmentsFileIds"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18160,7 +18160,7 @@ func (ec *executionContext) unmarshalInputUpdateMsgTemplateInput(ctx context.Con
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appendAttachmentsFileIds"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
