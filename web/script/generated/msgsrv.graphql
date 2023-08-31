@@ -209,7 +209,7 @@ type MsgAlert implements Node {
   """是否移除"""
   deleted: Boolean!
   """结束时间"""
-  endsAt: Time!
+  endsAt: Time
   """指纹hash值"""
   fingerprint: String!
   id: ID!
@@ -305,10 +305,12 @@ input MsgAlertWhereInput {
   endsAtGT: Time
   endsAtGTE: Time
   endsAtIn: [Time!]
+  endsAtIsNil: Boolean
   endsAtLT: Time
   endsAtLTE: Time
   endsAtNEQ: Time
   endsAtNotIn: [Time!]
+  endsAtNotNil: Boolean
   """fingerprint field predicates"""
   fingerprint: String
   fingerprintContains: String

@@ -95,6 +95,7 @@ export default {
     subject: '标题',
     attachments: '附件',
     duration: '持续时长',
+    log: '日志',
 
     // 多个字符组成
     confirm_copy: '确定是否复制',
@@ -152,6 +153,18 @@ export default {
     match_type: '匹配类型',
     match_name: '匹配名称',
     match_value: '匹配值',
+    msg_alert_labels: '标签',
+    msg_alert_annotations: '注解',
+    msg_alert_timeout: '超时',
+    msg_alert: '消息列表',
+    msg_alert_list: '消息列表',
+    send_at: '发送时间',
+    expires_at: '过期时间',
+    msg_log_groupKey: '分组键',
+    msg_log_receiver: '接收组名称',
+    msg_log_receiverType: '接收组类型',
+    msg_log: '消息日志',
+    msg_log_list: '消息日志列表',
 
     // 创建
     create_msg_type: '创建消息类型',

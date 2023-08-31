@@ -95,6 +95,7 @@ export default {
     subject: 'subject',
     attachments: 'attachments',
     duration: 'duration',
+    log: 'log',
 
     // 多个字符组成
     confirm_copy: 'confirm copy',
@@ -149,6 +150,18 @@ export default {
     match_type: 'Matching type',
     match_name: 'Matching name',
     match_value: 'Matching value',
+    msg_alert_labels: 'tag',
+    msg_alert_annotations: 'annotation',
+    msg_alert_timeout: 'timeout',
+    msg_alert: 'message list',
+    msg_alert_list: 'message list',
+    send_at: 'sending time',
+    expires_at: 'expiration time',
+    msg_log_groupKey: 'block key',
+    msg_log_receiver: 'receiving group name',
+    msg_log_receiverType: 'receiving group type',
+    msg_log: 'message log',
+    msg_log_list: 'Message log list',
 
     // 创建
     create_msg_type: 'Create message type',

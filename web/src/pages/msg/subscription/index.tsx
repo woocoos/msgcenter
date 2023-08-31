@@ -8,6 +8,7 @@ import { getMsgTypeListAndSub } from '@/services/msgsrv/type';
 import InputCategory from '../type/components/inputCategory';
 import Settings from './components/settings';
 import { OrgRole, User, getOrgRoles, getUsers } from '@knockout-js/api';
+import { KeepAlive } from '@knockout-js/layout';
 
 type ProTableColumnsData = {
   id: string;
@@ -75,127 +76,129 @@ export default () => {
     });
 
   return (
-    <PageContainer
-      header={{
-        title: t('msg_subscription'),
-        style: { background: token.colorBgContainer },
-        breadcrumb: {
-          items: [
-            { title: t('msg_center') },
-            { title: t('msg_subscription') },
-          ],
-        },
-      }}
-    >
-      <ProTable
-        actionRef={proTableRef}
-        search={{
-          searchText: `${t('query')}`,
-          resetText: `${t('reset')}`,
-          labelWidth: 'auto',
+    <KeepAlive clearAlive>
+      <PageContainer
+        header={{
+          title: t('msg_subscription'),
+          style: { background: token.colorBgContainer },
+          breadcrumb: {
+            items: [
+              { title: t('msg_center') },
+              { title: t('msg_subscription') },
+            ],
+          },
         }}
-        rowKey={'id'}
-        toolbar={{
-          title: t('msg_subscription_list'),
-        }}
-        scroll={{ x: 'max-content' }}
-        columns={columns}
-        request={async (params) => {
-          const table = { data: [] as ProTableColumnsData[], success: true, total: 0 },
-            where: MsgTypeWhereInput = {};
-          where.nameContains = params.name;
-          where.categoryContains = params.msgTypeCategory;
-          const result = await getMsgTypeListAndSub({
-            current: params.current,
-            pageSize: 999,
-            where,
-          });
-          if (result?.totalCount) {
-            const msgTypeList = result.edges?.map(item => item?.node),
-              userIds: string[] = [],
-              userGroupIds: string[] = [],
-              data: ProTableColumnsData[] = [];
+      >
+        <ProTable
+          actionRef={proTableRef}
+          search={{
+            searchText: `${t('query')}`,
+            resetText: `${t('reset')}`,
+            labelWidth: 'auto',
+          }}
+          rowKey={'id'}
+          toolbar={{
+            title: t('msg_subscription_list'),
+          }}
+          scroll={{ x: 'max-content' }}
+          columns={columns}
+          request={async (params) => {
+            const table = { data: [] as ProTableColumnsData[], success: true, total: 0 },
+              where: MsgTypeWhereInput = {};
+            where.nameContains = params.name;
+            where.categoryContains = params.msgTypeCategory;
+            const result = await getMsgTypeListAndSub({
+              current: params.current,
+              pageSize: 999,
+              where,
+            });
+            if (result?.totalCount) {
+              const msgTypeList = result.edges?.map(item => item?.node),
+                userIds: string[] = [],
+                userGroupIds: string[] = [],
+                data: ProTableColumnsData[] = [];
 
-            msgTypeList?.forEach(item => {
-              if (item) {
-                item.subscriberUsers.forEach(su => {
-                  if (su.userID) {
-                    userIds.push(su.userID)
-                  }
-                })
-                item.excludeSubscriberUsers.forEach(su => {
-                  if (su.userID) {
-                    userIds.push(su.userID)
-                  }
-                })
-                item.subscriberRoles.forEach(sr => {
-                  if (sr.orgRoleID) {
-                    userGroupIds.push(`${sr.orgRoleID}`)
-                  }
-                })
-              }
-            })
-
-            const users = await getUsers(userIds);
-            const userGroups = await getOrgRoles(userGroupIds);
-
-            msgTypeList?.forEach(mt => {
-              if (mt) {
-                const dataItem = data.find(item => item.name == mt.category),
-                  addData = {
-                    id: mt.id,
-                    name: mt.name,
-                    receiving_user: mt.subscriberUsers.map(su => {
-                      const user = users.find(u => u.id == su.userID);
-                      return su.userID ? user?.displayName : ''
-                    }).filter(su => !!su).join('、'),
-                    receiving_user_group: mt.subscriberRoles.map(sr => {
-                      const userGroup = userGroups.find(ug => ug.id == sr.orgRoleID);
-                      return sr.orgRoleID ? userGroup?.name : ''
-                    }).filter(sr => !!sr).join('、'),
-                    exclude_user: mt.excludeSubscriberUsers.map(su => {
-                      const user = users.find(u => u.id == su.userID);
-                      return su.userID ? user?.displayName : ''
-                    }).filter(su => !!su).join('、'),
-                    msgType: mt as MsgType,
-                  }
-                if (dataItem) {
-                  dataItem.children?.push(addData)
-                } else {
-                  data.push({
-                    id: `category-${mt.category}`,
-                    name: mt.category,
-                    receiving_user: '',
-                    receiving_user_group: '',
-                    exclude_user: '',
-                    children: [addData]
+              msgTypeList?.forEach(item => {
+                if (item) {
+                  item.subscriberUsers.forEach(su => {
+                    if (su.userID) {
+                      userIds.push(su.userID)
+                    }
+                  })
+                  item.excludeSubscriberUsers.forEach(su => {
+                    if (su.userID) {
+                      userIds.push(su.userID)
+                    }
+                  })
+                  item.subscriberRoles.forEach(sr => {
+                    if (sr.orgRoleID) {
+                      userGroupIds.push(`${sr.orgRoleID}`)
+                    }
                   })
                 }
-              }
-            })
-            table.data = data
-            table.total = data.length;
+              })
 
-          }
-          setExpandedRowKeys(table.data.map(item => item.id))
-          return table;
-        }}
-        pagination={false}
-        expandable={{
-          expandedRowKeys,
-        }}
-      />
-      <Settings
-        open={modal.open}
-        title={modal.title}
-        id={modal.id}
-        onClose={(isSuccess) => {
-          if (isSuccess) {
-            proTableRef.current?.reload();
-          }
-          setModal({ open: false, title: modal.title, id: '' });
-        }}
-      />
-    </PageContainer>
+              const users = await getUsers(userIds);
+              const userGroups = await getOrgRoles(userGroupIds);
+
+              msgTypeList?.forEach(mt => {
+                if (mt) {
+                  const dataItem = data.find(item => item.name == mt.category),
+                    addData = {
+                      id: mt.id,
+                      name: mt.name,
+                      receiving_user: mt.subscriberUsers.map(su => {
+                        const user = users.find(u => u.id == su.userID);
+                        return su.userID ? user?.displayName : ''
+                      }).filter(su => !!su).join('、'),
+                      receiving_user_group: mt.subscriberRoles.map(sr => {
+                        const userGroup = userGroups.find(ug => ug.id == sr.orgRoleID);
+                        return sr.orgRoleID ? userGroup?.name : ''
+                      }).filter(sr => !!sr).join('、'),
+                      exclude_user: mt.excludeSubscriberUsers.map(su => {
+                        const user = users.find(u => u.id == su.userID);
+                        return su.userID ? user?.displayName : ''
+                      }).filter(su => !!su).join('、'),
+                      msgType: mt as MsgType,
+                    }
+                  if (dataItem) {
+                    dataItem.children?.push(addData)
+                  } else {
+                    data.push({
+                      id: `category-${mt.category}`,
+                      name: mt.category,
+                      receiving_user: '',
+                      receiving_user_group: '',
+                      exclude_user: '',
+                      children: [addData]
+                    })
+                  }
+                }
+              })
+              table.data = data
+              table.total = data.length;
+
+            }
+            setExpandedRowKeys(table.data.map(item => item.id))
+            return table;
+          }}
+          pagination={false}
+          expandable={{
+            expandedRowKeys,
+          }}
+        />
+        <Settings
+          open={modal.open}
+          title={modal.title}
+          id={modal.id}
+          onClose={(isSuccess) => {
+            if (isSuccess) {
+              proTableRef.current?.reload();
+            }
+            setModal({ open: false, title: modal.title, id: '' });
+          }}
+        />
+      </PageContainer>
+    </KeepAlive>
   );
 };

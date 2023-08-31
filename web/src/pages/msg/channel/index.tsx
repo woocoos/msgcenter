@@ -10,6 +10,7 @@ import Create from './components/create';
 import Config from './components/config';
 import { OrgSelect } from '@knockout-js/org';
 import { OrgKind } from '@knockout-js/api';
+import { KeepAlive } from '@knockout-js/layout';
 
 
 export default () => {
@@ -147,95 +148,97 @@ export default () => {
 
 
   return (
-    <PageContainer
-      header={{
-        title: t('msg_channel'),
-        style: { background: token.colorBgContainer },
-        breadcrumb: {
-          items: [
-            { title: t('msg_center') },
-            { title: t('msg_channel') },
-          ],
-        },
-      }}
-    >
-      <ProTable
-        actionRef={proTableRef}
-        search={{
-          searchText: `${t('query')}`,
-          resetText: `${t('reset')}`,
-          labelWidth: 'auto',
+    <KeepAlive clearAlive>
+      <PageContainer
+        header={{
+          title: t('msg_channel'),
+          style: { background: token.colorBgContainer },
+          breadcrumb: {
+            items: [
+              { title: t('msg_center') },
+              { title: t('msg_channel') },
+            ],
+          },
         }}
-        rowKey={'id'}
-        toolbar={{
-          title: t('msg_channel_list'),
-          actions: [
-            <Auth authKey="createMsgChannel">
-              <Button
-                key="created"
-                type="primary"
-                onClick={() => {
-                  setModal({ open: true, title: t('create_msg_channel'), id: '', scene: 'editor' });
-                }}
-              >
-                {t('create_msg_channel')}
-              </Button>
-            </Auth>,
-          ],
-        }}
-        scroll={{ x: 'max-content' }}
-        columns={columns}
-        request={async (params, sort, filter) => {
-          const table = { data: [] as MsgChannel[], success: true, total: 0 },
-            where: MsgChannelWhereInput = {};
-          where.tenantID = params.org?.id;
-          where.nameContains = params.name;
-          where.receiverTypeIn = filter.receiverType as MsgChannelReceiverType[];
-          where.statusIn = filter.status as MsgChannelSimpleStatus[]
-          const result = await getMsgChannelList({
-            current: params.current,
-            pageSize: params.pageSize,
-            where,
-          });
-          if (result?.totalCount) {
-            table.data = result.edges?.map(item => item?.node) as MsgChannel[]
-            setOrgs(await getOrgs(table.data.map(item => item.tenantID || '')))
-            table.total = result.totalCount;
-          }
-          setSelectedRowKeys([]);
-          setDataSource(table.data);
-          return table;
-        }}
-        rowSelection={{
-          selectedRowKeys: selectedRowKeys,
-          onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
-          type: 'checkbox',
-        }}
-      />
-      <Create
-        x-if={modal.scene === 'editor'}
-        open={modal.open}
-        title={modal.title}
-        id={modal.id}
-        onClose={(isSuccess) => {
-          if (isSuccess) {
-            proTableRef.current?.reload();
-          }
-          setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
-        }}
-      />
-      <Config
-        x-if={modal.scene === 'config'}
-        open={modal.open}
-        title={modal.title}
-        id={modal.id}
-        onClose={(isSuccess) => {
-          if (isSuccess) {
-            proTableRef.current?.reload();
-          }
-          setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
-        }}
-      />
-    </PageContainer>
+      >
+        <ProTable
+          actionRef={proTableRef}
+          search={{
+            searchText: `${t('query')}`,
+            resetText: `${t('reset')}`,
+            labelWidth: 'auto',
+          }}
+          rowKey={'id'}
+          toolbar={{
+            title: t('msg_channel_list'),
+            actions: [
+              <Auth authKey="createMsgChannel">
+                <Button
+                  key="created"
+                  type="primary"
+                  onClick={() => {
+                    setModal({ open: true, title: t('create_msg_channel'), id: '', scene: 'editor' });
+                  }}
+                >
+                  {t('create_msg_channel')}
+                </Button>
+              </Auth>,
+            ],
+          }}
+          scroll={{ x: 'max-content' }}
+          columns={columns}
+          request={async (params, sort, filter) => {
+            const table = { data: [] as MsgChannel[], success: true, total: 0 },
+              where: MsgChannelWhereInput = {};
+            where.tenantID = params.org?.id;
+            where.nameContains = params.name;
+            where.receiverTypeIn = filter.receiverType as MsgChannelReceiverType[];
+            where.statusIn = filter.status as MsgChannelSimpleStatus[]
+            const result = await getMsgChannelList({
+              current: params.current,
+              pageSize: params.pageSize,
+              where,
+            });
+            if (result?.totalCount) {
+              table.data = result.edges?.map(item => item?.node) as MsgChannel[]
+              setOrgs(await getOrgs(table.data.map(item => item.tenantID || '')))
+              table.total = result.totalCount;
+            }
+            setSelectedRowKeys([]);
+            setDataSource(table.data);
+            return table;
+          }}
+          rowSelection={{
+            selectedRowKeys: selectedRowKeys,
+            onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
+            type: 'checkbox',
+          }}
+        />
+        <Create
+          x-if={modal.scene === 'editor'}
+          open={modal.open}
+          title={modal.title}
+          id={modal.id}
+          onClose={(isSuccess) => {
+            if (isSuccess) {
+              proTableRef.current?.reload();
+            }
+            setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
+          }}
+        />
+        <Config
+          x-if={modal.scene === 'config'}
+          open={modal.open}
+          title={modal.title}
+          id={modal.id}
+          onClose={(isSuccess) => {
+            if (isSuccess) {
+              proTableRef.current?.reload();
+            }
+            setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
+          }}
+        />
+      </PageContainer>
+    </KeepAlive>
   );
 };

@@ -29,6 +29,8 @@ const documents = {
     "mutation delMsgEvent($id:ID!){\n  deleteMsgEvent(id:$id)\n}": types.DelMsgEventDocument,
     "mutation enableMsgEvent($id:ID!){\n  enableMsgEvent(id:$id){id}\n}": types.EnableMsgEventDocument,
     "mutation disableMsgEvent($id:ID!){\n  disableMsgEvent(id:$id){id}\n}": types.DisableMsgEventDocument,
+    "query msgAlertList($first: Int,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){\n  msgAlerts(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,startsAt,endsAt,labels,annotations,state,timeout\n      }\n    }\n  }\n}": types.MsgAlertListDocument,
+    "query msgAlertLogList($gid:GID!,$first: Int,$orderBy:NlogOrder,$where:NlogWhereInput){\n   node(id: $gid){\n    id\n    ... on MsgAlert{\n      id,\n      nlog(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,sendAt,expiresAt,groupKey,receiver,receiverType\n          }\n        }\n      }\n    }\n  }\n}": types.MsgAlertLogListDocument,
     "query silenceList($first: Int,$orderBy:SilenceOrder,$where:SilenceWhereInput){\n  silences(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,tenantID,comments,createdAt,startsAt,endsAt,state,\n        matchers{\n          type,name,value\n        }\n\n      }\n    }\n  }\n}": types.SilenceListDocument,
     "query SilenceInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on Silence{\n      id,tenantID,startsAt,endsAt,comments,state\n      matchers{\n        type,name,value\n      }\n    }\n  }\n}": types.SilenceInfoDocument,
     "mutation createSilence($input: CreateSilenceInput!){\n  createSilence(input: $input){id}\n}": types.CreateSilenceDocument,
@@ -131,6 +133,14 @@ export function gql(source: "mutation enableMsgEvent($id:ID!){\n  enableMsgEvent
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation disableMsgEvent($id:ID!){\n  disableMsgEvent(id:$id){id}\n}"): (typeof documents)["mutation disableMsgEvent($id:ID!){\n  disableMsgEvent(id:$id){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query msgAlertList($first: Int,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){\n  msgAlerts(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,startsAt,endsAt,labels,annotations,state,timeout\n      }\n    }\n  }\n}"): (typeof documents)["query msgAlertList($first: Int,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){\n  msgAlerts(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,startsAt,endsAt,labels,annotations,state,timeout\n      }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query msgAlertLogList($gid:GID!,$first: Int,$orderBy:NlogOrder,$where:NlogWhereInput){\n   node(id: $gid){\n    id\n    ... on MsgAlert{\n      id,\n      nlog(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,sendAt,expiresAt,groupKey,receiver,receiverType\n          }\n        }\n      }\n    }\n  }\n}"): (typeof documents)["query msgAlertLogList($gid:GID!,$first: Int,$orderBy:NlogOrder,$where:NlogWhereInput){\n   node(id: $gid){\n    id\n    ... on MsgAlert{\n      id,\n      nlog(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,sendAt,expiresAt,groupKey,receiver,receiverType\n          }\n        }\n      }\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

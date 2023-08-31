@@ -9,6 +9,7 @@ import Create from './components/create';
 import InputCategory from './components/inputCategory';
 import { AppSelect } from '@knockout-js/org';
 import { App, getApps } from '@knockout-js/api';
+import { KeepAlive } from '@knockout-js/layout';
 
 
 export default () => {
@@ -127,81 +128,83 @@ export default () => {
 
 
   return (
-    <PageContainer
-      header={{
-        title: t('msg_type'),
-        style: { background: token.colorBgContainer },
-        breadcrumb: {
-          items: [
-            { title: t('msg_center') },
-            { title: t('msg_type') },
-          ],
-        },
-      }}
-    >
-      <ProTable
-        actionRef={proTableRef}
-        search={{
-          searchText: `${t('query')}`,
-          resetText: `${t('reset')}`,
-          labelWidth: 'auto',
+    <KeepAlive clearAlive>
+      <PageContainer
+        header={{
+          title: t('msg_type'),
+          style: { background: token.colorBgContainer },
+          breadcrumb: {
+            items: [
+              { title: t('msg_center') },
+              { title: t('msg_type') },
+            ],
+          },
         }}
-        rowKey={'id'}
-        toolbar={{
-          title: t('msg_type_list'),
-          actions: [
-            <Auth authKey="createMsgType">
-              <Button
-                key="created"
-                type="primary"
-                onClick={() => {
-                  setModal({ open: true, title: t('create_msg_type'), id: '' });
-                }}
-              >
-                {t('create_msg_type')}
-              </Button>
-            </Auth>,
-          ],
-        }}
-        scroll={{ x: 'max-content' }}
-        columns={columns}
-        request={async (params, sort, filter) => {
-          const table = { data: [] as MsgType[], success: true, total: 0 },
-            where: MsgTypeWhereInput = {};
-          where.appID = params.app?.id;
-          where.category = params.category;
-          where.nameContains = params.name;
-          where.statusIn = filter.status as MsgTypeSimpleStatus[]
-          const result = await getMsgTypeList({
-            current: params.current,
-            pageSize: params.pageSize,
-            where,
-          });
-          if (result?.totalCount) {
-            table.data = result.edges?.map(item => item?.node) as MsgType[]
-            setApps(await getApps(table.data.map(item => item.appID || '')))
-            table.total = result.totalCount;
-          }
-          setSelectedRowKeys([]);
-          setDataSource(table.data);
-          return table;
-        }}
-        rowSelection={{
-          selectedRowKeys: selectedRowKeys,
-          onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
-          type: 'checkbox',
-        }}
-      />
-      <Create
-        open={modal.open}
-        title={modal.title}
-        id={modal.id}
-        onClose={(isSuccess) => {
-          if (isSuccess) {
-            proTableRef.current?.reload();
-          }
-          setModal({ open: false, title: modal.title, id: '' });
-        }} />
-    </PageContainer>
+      >
+        <ProTable
+          actionRef={proTableRef}
+          search={{
+            searchText: `${t('query')}`,
+            resetText: `${t('reset')}`,
+            labelWidth: 'auto',
+          }}
+          rowKey={'id'}
+          toolbar={{
+            title: t('msg_type_list'),
+            actions: [
+              <Auth authKey="createMsgType">
+                <Button
+                  key="created"
+                  type="primary"
+                  onClick={() => {
+                    setModal({ open: true, title: t('create_msg_type'), id: '' });
+                  }}
+                >
+                  {t('create_msg_type')}
+                </Button>
+              </Auth>,
+            ],
+          }}
+          scroll={{ x: 'max-content' }}
+          columns={columns}
+          request={async (params, sort, filter) => {
+            const table = { data: [] as MsgType[], success: true, total: 0 },
+              where: MsgTypeWhereInput = {};
+            where.appID = params.app?.id;
+            where.category = params.category;
+            where.nameContains = params.name;
+            where.statusIn = filter.status as MsgTypeSimpleStatus[]
+            const result = await getMsgTypeList({
+              current: params.current,
+              pageSize: params.pageSize,
+              where,
+            });
+            if (result?.totalCount) {
+              table.data = result.edges?.map(item => item?.node) as MsgType[]
+              setApps(await getApps(table.data.map(item => item.appID || '')))
+              table.total = result.totalCount;
+            }
+            setSelectedRowKeys([]);
+            setDataSource(table.data);
+            return table;
+          }}
+          rowSelection={{
+            selectedRowKeys: selectedRowKeys,
+            onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
+            type: 'checkbox',
+          }}
+        />
+        <Create
+          open={modal.open}
+          title={modal.title}
+          id={modal.id}
+          onClose={(isSuccess) => {
+            if (isSuccess) {
+              proTableRef.current?.reload();
+            }
+            setModal({ open: false, title: modal.title, id: '' });
+          }} />
+      </PageContainer>
+    </KeepAlive>
   );
 };

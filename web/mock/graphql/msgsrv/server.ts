@@ -57,6 +57,7 @@ const schemaWithMocks = addMocksToSchema({
       msgTemplates: relayStylePaginationMock(store),
       msgTypes: relayStylePaginationMock(store),
       silences: relayStylePaginationMock(store),
+      msgAlerts: relayStylePaginationMock(store),
       msgTypeCategories: () => {
         return ['故障消息', '业务消息', '客户交易'];
       },

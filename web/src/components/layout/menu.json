@@ -22,6 +22,10 @@
       {
         "name": "静默消息",
         "path": "/msg/silence"
+      },
+      {
+        "name": "消息列表",
+        "path": "/msg/list"
       }
     ]
   }

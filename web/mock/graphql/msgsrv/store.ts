@@ -143,6 +143,11 @@ export const initStoreData = (store: IMockStore) => {
   ]))
   store.set('Query', 'ROOT', 'silences', listTemp([
   ]))
+  store.set('Query', 'ROOT', 'msgAlerts', listTemp([
+    store.get('MsgAlert', 1),
+    store.get('MsgAlert', 2),
+    store.get('MsgAlert', 3),
+  ]))
 
   // -------------root-end------------------------
 
@@ -189,4 +194,28 @@ export const initStoreData = (store: IMockStore) => {
     id: 3, tenantID: 1, msgTypeID: 1, orgRoleID: 1, exclude: false,
   })
 
+  // MsgAlert
+  store.set('MsgAlert', 1, {
+    id: 1, tenantID: 1, state: "none", nlog: listTemp([
+      store.get('Nlog', 1),
+      store.get('Nlog', 2),
+    ])
+  })
+  store.set('MsgAlert', 2, {
+    id: 2, tenantID: 1, state: "firing"
+  })
+  store.set('MsgAlert', 3, {
+    id: 3, tenantID: 1, state: "resolved"
+  })
+
+  // Nlog
+  store.set('Nlog', 1, {
+    id: 1, tenantID: 1, groupKey: "groupKey", receiver: "email"
+  })
+  store.set('Nlog', 2, {
+    id: 2, tenantID: 1, groupKey: "groupKey2", receiver: "email"
+  })
+  store.set('Nlog', 3, {
+    id: 3, tenantID: 1, groupKey: "groupKey3", receiver: "email"
+  })
 }

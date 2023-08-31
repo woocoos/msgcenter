@@ -9,6 +9,7 @@ import { Silence, SilenceSilenceState, SilenceWhereInput } from '@/generated/msg
 import { EnumSilenceMatchType, EnumSilenceStatus, delSilence, getSilenceList } from '@/services/msgsrv/silence';
 import { OrgSelect } from '@knockout-js/org';
 import { OrgKind } from '@knockout-js/api';
+import { KeepAlive } from '@knockout-js/layout';
 
 
 export default () => {
@@ -129,83 +130,85 @@ export default () => {
 
 
   return (
-    <PageContainer
-      header={{
-        title: t('silence_msg'),
-        style: { background: token.colorBgContainer },
-        breadcrumb: {
-          items: [
-            { title: t('msg_center') },
-            { title: t('silence_msg') },
-          ],
-        },
-      }}
-    >
-      <ProTable
-        actionRef={proTableRef}
-        search={{
-          searchText: `${t('query')}`,
-          resetText: `${t('reset')}`,
-          labelWidth: 'auto',
+    <KeepAlive clearAlive>
+      <PageContainer
+        header={{
+          title: t('silence_msg'),
+          style: { background: token.colorBgContainer },
+          breadcrumb: {
+            items: [
+              { title: t('msg_center') },
+              { title: t('silence_msg') },
+            ],
+          },
         }}
-        rowKey={'id'}
-        toolbar={{
-          title: t('silence_msg_list'),
-          actions: [
-            <Auth authKey="createSilence">
-              <Button
-                key="created"
-                type="primary"
-                onClick={() => {
-                  setModal({ open: true, title: t('create_silence_msg'), id: '', scene: 'editor' });
-                }}
-              >
-                {t('create_silence_msg')}
-              </Button>
-            </Auth>,
-          ],
-        }}
-        scroll={{ x: 'max-content' }}
-        columns={columns}
-        request={async (params, sort, filter) => {
-          const table = { data: [] as Silence[], success: true, total: 0 },
-            where: SilenceWhereInput = {};
-          where.tenantID = params.org?.id;
-          where.startsAt = params.startsAt
-          where.endsAt = params.endsAt
-          where.stateIn = filter.status as SilenceSilenceState[]
-          const result = await getSilenceList({
-            current: params.current,
-            pageSize: params.pageSize,
-            where,
-          });
-          if (result?.totalCount) {
-            table.data = result.edges?.map(item => item?.node) as Silence[]
-            setOrgs(await getOrgs(table.data.map(item => item.tenantID || '')))
-            table.total = result.totalCount;
-          }
-          setSelectedRowKeys([]);
-          setDataSource(table.data);
-          return table;
-        }}
-        rowSelection={{
-          selectedRowKeys: selectedRowKeys,
-          onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
-          type: 'checkbox',
-        }}
-      />
-      <Create
-        open={modal.open}
-        title={modal.title}
-        id={modal.id}
-        isCopy={modal.scene === 'copy'}
-        onClose={(isSuccess) => {
-          if (isSuccess) {
-            proTableRef.current?.reload();
-          }
-          setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
-        }}
-      />
-    </PageContainer>
+      >
+        <ProTable
+          actionRef={proTableRef}
+          search={{
+            searchText: `${t('query')}`,
+            resetText: `${t('reset')}`,
+            labelWidth: 'auto',
+          }}
+          rowKey={'id'}
+          toolbar={{
+            title: t('silence_msg_list'),
+            actions: [
+              <Auth authKey="createSilence">
+                <Button
+                  key="created"
+                  type="primary"
+                  onClick={() => {
+                    setModal({ open: true, title: t('create_silence_msg'), id: '', scene: 'editor' });
+                  }}
+                >
+                  {t('create_silence_msg')}
+                </Button>
+              </Auth>,
+            ],
+          }}
+          scroll={{ x: 'max-content' }}
+          columns={columns}
+          request={async (params, sort, filter) => {
+            const table = { data: [] as Silence[], success: true, total: 0 },
+              where: SilenceWhereInput = {};
+            where.tenantID = params.org?.id;
+            where.startsAt = params.startsAt
+            where.endsAt = params.endsAt
+            where.stateIn = filter.status as SilenceSilenceState[]
+            const result = await getSilenceList({
+              current: params.current,
+              pageSize: params.pageSize,
+              where,
+            });
+            if (result?.totalCount) {
+              table.data = result.edges?.map(item => item?.node) as Silence[]
+              setOrgs(await getOrgs(table.data.map(item => item.tenantID || '')))
+              table.total = result.totalCount;
+            }
+            setSelectedRowKeys([]);
+            setDataSource(table.data);
+            return table;
+          }}
+          rowSelection={{
+            selectedRowKeys: selectedRowKeys,
+            onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
+            type: 'checkbox',
+          }}
+        />
+        <Create
+          open={modal.open}
+          title={modal.title}
+          id={modal.id}
+          isCopy={modal.scene === 'copy'}
+          onClose={(isSuccess) => {
+            if (isSuccess) {
+              proTableRef.current?.reload();
+            }
+            setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
+          }}
+        />
+      </PageContainer>
+    </KeepAlive>
   );
 };
