@@ -195,10 +195,12 @@ export default () => {
           const table = { data: [] as MsgEvent[], success: true, total: 0 },
             where: MsgEventWhereInput = {};
           where.nameContains = params.name;
-          where.hasMsgTypeWith = [{
-            nameContains: params.msgTypeName,
-            categoryContains: params.msgTypeCategory,
-          }];
+          if (params.msgTypeName || params.msgTypeCategory) {
+            where.hasMsgTypeWith = [{
+              nameContains: params.msgTypeName,
+              categoryContains: params.msgTypeCategory,
+            }];
+          }
           where.statusIn = filter.status as MsgEventSimpleStatus[]
           const result = await getMsgEventList({
             current: params.current,

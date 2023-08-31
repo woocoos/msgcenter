@@ -17,6 +17,7 @@ export default {
       id: fileId,
       name: `${Math.floor(Math.floor(Math.random() * 100000) + Date.now()).toString(16)}.${fileId}`,
       size: 5000,
+      path: `${Math.floor(Math.floor(Math.random() * 100000) + Date.now()).toString(16)}.${fileId}`,
       createdAt: new Date()
     });
   },

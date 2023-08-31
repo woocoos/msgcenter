@@ -1,21 +1,35 @@
 import { getFiles, getFilesRaw, updateFiles } from "@/services/files";
+import store from "@/store";
 import { UploadOutlined } from "@ant-design/icons";
 import { Button, Modal, Space, Typography, Upload, message } from "antd"
 import { RcFile } from "antd/es/upload";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '';
+
 export default (props: {
+  bucket?: string;
+  appCode?: string;
+  tid?: string;
+  /**
+   * 目录格式  xxx/ss
+   */
   directory?: string;
+  /**
+   * 强制使用目录当前缀
+   */
+  forceDirectory?: boolean;
   value?: string;
   maxSize?: number;
   accept?: string;
   children?: ReactNode;
   onChange?: (value?: string) => void;
-  onChangeFile?: (value?: RcFile) => void;
+  onChangePath?: (path?: string) => void;
 }) => {
   const { t } = useTranslation(),
     iframeRef = useRef<HTMLIFrameElement>(null),
+    [userState] = store.useModel('user'),
     [loading, setLoading] = useState(false),
     [modal, setModal] = useState<{
       show: boolean,
@@ -38,6 +52,12 @@ export default (props: {
         return (fileSize / (1024 * 1024 * 1024)).toFixed(2) + 'GB';
       }
     },
+    // 随机数
+    randomId = (len: number) => {
+      let str = '';
+      for (; str.length < len; str += Math.random().toString(36).substring(2));
+      return str.substring(0, len);
+    },
     beforeUpload = async (file: RcFile) => {
       let isTrue = true;
       const maxSize = props.maxSize || 1024 * 5000
@@ -53,29 +73,54 @@ export default (props: {
     },
     updateFile = async (file: RcFile) => {
       const suffix = file.name.split('.').pop(),
-        directory = props.directory || 'temp',
-        key = `${directory}/${Math.floor(Math.floor(Math.random() * 100000) + Date.now()).toString(16)}.${suffix}`
+        bucket = props.bucket ?? 'local',
+        tid = props.tid ?? userState.tenantId,
+        appCode = props.appCode ?? ICE_APP_CODE,
+        keys: string[] = [];
+
+      if (props.forceDirectory && props.directory) {
+        keys.push(props.directory)
+      } else {
+        if (appCode) {
+          keys.push(appCode)
+        }
+        if (tid) {
+          keys.push(tid)
+        }
+        if (props.directory) {
+          keys.push(props.directory)
+        }
+      }
+
+      keys.push(`${randomId(16)}.${suffix}`)
+
+      const key = `/${keys.join('/')}`.replace('//', '/');
       setLoading(true)
-      const result = await updateFiles({
-        key,
-        bucket: "adminx-msg",
-        file: file,
-      })
-      if (result) {
-        props.onChange?.(result)
-        props.onChangeFile?.(file)
+      if (bucket === 'local') {
+        const result = await updateFiles({
+          key,
+          bucket,
+          file,
+        })
+        if (result) {
+          props.onChange?.(result);
+          props.onChangePath?.(key);
+        }
       }
       setLoading(false)
     },
     getFile = async () => {
       if (props.value) {
+        const bucket = props.bucket ?? 'local';
         const result = await getFiles(props.value);
         if (result?.id) {
           setName(result.name)
         }
-        const resultRaw = await getFilesRaw(props.value, 'url')
-        if (typeof resultRaw === 'string') {
-          setUrlSrc(resultRaw)
+        if (bucket === 'local') {
+          const resultRaw = await getFilesRaw(props.value, 'url')
+          if (typeof resultRaw === 'string') {
+            setUrlSrc(resultRaw)
+          }
         }
       }
     },

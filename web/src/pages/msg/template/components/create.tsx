@@ -9,6 +9,7 @@ import Multiple from '@/components/uploadFiles/multiple';
 import { useLeavePrompt } from '@knockout-js/layout';
 import { OrgSelect } from '@knockout-js/org';
 import { Org, OrgKind, getOrg } from '@knockout-js/api';
+import store from '@/store';
 
 type ProFormData = {
   org?: Org;
@@ -21,8 +22,8 @@ type ProFormData = {
   bcc?: string;
   format: MsgTemplateFormat;
   body?: string;
-  tpl?: string;
-  attachments?: string[];
+  tplFileID?: string;
+  attachmentsFileIds?: string[];
 };
 
 export default (props: {
@@ -35,8 +36,11 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     formRef = useRef<ProFormInstance>(),
+    [userState] = store.useModel('user'),
     [, setLeavePromptWhen] = useLeavePrompt(),
     [info, setInfo] = useState<MsgTemplate>(),
+    [tpl, setTpl] = useState<string>(),
+    [attachments, setAttachments] = useState<string[]>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
@@ -73,8 +77,8 @@ export default (props: {
           initData.cc = result.cc || undefined;
           initData.bcc = result.bcc || undefined;
           initData.body = result.body || undefined;
-          initData.tpl = result.tpl || undefined;
-          initData.attachments = result.attachments?.split(',') || undefined;
+          initData.tplFileID = result.tplFileID || undefined;
+          initData.attachmentsFileIds = result.attachmentsFileIds || undefined;
         }
       }
       return initData;
@@ -97,11 +101,12 @@ export default (props: {
         cc: values.cc,
         bcc: values.bcc,
         body: values.body,
-        tpl: values.tpl,
-        attachments: values.attachments ? values.attachments.join(',') : undefined,
+        tpl: tpl,
+        tplFileID: values.tplFileID,
+        attachments: attachments,
+        attachmentsFileIds: values.attachmentsFileIds ?? undefined,
         comments: values.comments,
       }
-
       const result = props.id
         ? await updateMsgTemplate(props.id, updateFormat(input, info || {}))
         : await createMsgTemplate(input);
@@ -200,16 +205,26 @@ export default (props: {
           rows: 6,
         }}
       />
-      <ProFormText name="tpl">
-        <TempBtnUpload accept=".html,.txt" />
+      <ProFormText name="tplFileID">
+        <TempBtnUpload
+          accept=".tmpl"
+          forceDirectory
+          directory={`/msg/tpl/temp/${userState.tenantId}`}
+          onChangePath={setTpl}
+        />
       </ProFormText>
       <ProFormText
         x-if={props.receiverType === MsgTemplateReceiverType.Email}
-        name="attachments"
+        name="attachmentsFileIds"
         label={t('attachments')}
         tooltip={t('attachments_tip')}
       >
-        <Multiple accept=".doc,.docx,.jpg,.jpeg,.png,.pdf" />
+        <Multiple
+          accept=".doc,.docx,.jpg,.jpeg,.png,.pdf"
+          forceDirectory
+          directory={`/msg/att/${userState.tenantId}`}
+          onChangePath={setAttachments}
+        />
       </ProFormText>
     </DrawerForm>
   );

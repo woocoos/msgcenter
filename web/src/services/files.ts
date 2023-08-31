@@ -1,10 +1,20 @@
 import { request } from 'ice';
 
-type Files = {
+type FileSource = {
+  id: number;
+  kind: "local";
+  endpoint: string;
+  bucket: string;
+  region: string;
+}
+
+export type Files = {
   id: string;
   name: string;
   size: number;
-  createdAt: string
+  path: string;
+  createdAt: string;
+  fileSource: FileSource;
 }
 
 const ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '/api-files';
