@@ -2396,7 +2396,7 @@ type MsgAlert implements Node {
   """开始时间"""
   startsAt: Time!
   """结束时间"""
-  endsAt: Time!
+  endsAt: Time
   """generatorURL"""
   url: String
   """状态"""
@@ -2507,6 +2507,8 @@ input MsgAlertWhereInput {
   endsAtGTE: Time
   endsAtLT: Time
   endsAtLTE: Time
+  endsAtIsNil: Boolean
+  endsAtNotNil: Boolean
   """url field predicates"""
   url: String
   urlNEQ: String

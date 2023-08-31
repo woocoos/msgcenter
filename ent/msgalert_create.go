@@ -56,6 +56,14 @@ func (mac *MsgAlertCreate) SetEndsAt(t time.Time) *MsgAlertCreate {
 	return mac
 }
 
+// SetNillableEndsAt sets the "ends_at" field if the given value is not nil.
+func (mac *MsgAlertCreate) SetNillableEndsAt(t *time.Time) *MsgAlertCreate {
+	if t != nil {
+		mac.SetEndsAt(*t)
+	}
+	return mac
+}
+
 // SetURL sets the "url" field.
 func (mac *MsgAlertCreate) SetURL(s string) *MsgAlertCreate {
 	mac.mutation.SetURL(s)
@@ -258,9 +266,6 @@ func (mac *MsgAlertCreate) check() error {
 	}
 	if _, ok := mac.mutation.StartsAt(); !ok {
 		return &ValidationError{Name: "starts_at", err: errors.New(`ent: missing required field "MsgAlert.starts_at"`)}
-	}
-	if _, ok := mac.mutation.EndsAt(); !ok {
-		return &ValidationError{Name: "ends_at", err: errors.New(`ent: missing required field "MsgAlert.ends_at"`)}
 	}
 	if _, ok := mac.mutation.Timeout(); !ok {
 		return &ValidationError{Name: "timeout", err: errors.New(`ent: missing required field "MsgAlert.timeout"`)}
@@ -514,6 +519,12 @@ func (u *MsgAlertUpsert) UpdateEndsAt() *MsgAlertUpsert {
 	return u
 }
 
+// ClearEndsAt clears the value of the "ends_at" field.
+func (u *MsgAlertUpsert) ClearEndsAt() *MsgAlertUpsert {
+	u.SetNull(msgalert.FieldEndsAt)
+	return u
+}
+
 // SetURL sets the "url" field.
 func (u *MsgAlertUpsert) SetURL(v string) *MsgAlertUpsert {
 	u.Set(msgalert.FieldURL, v)
@@ -719,6 +730,13 @@ func (u *MsgAlertUpsertOne) SetEndsAt(v time.Time) *MsgAlertUpsertOne {
 func (u *MsgAlertUpsertOne) UpdateEndsAt() *MsgAlertUpsertOne {
 	return u.Update(func(s *MsgAlertUpsert) {
 		s.UpdateEndsAt()
+	})
+}
+
+// ClearEndsAt clears the value of the "ends_at" field.
+func (u *MsgAlertUpsertOne) ClearEndsAt() *MsgAlertUpsertOne {
+	return u.Update(func(s *MsgAlertUpsert) {
+		s.ClearEndsAt()
 	})
 }
 
@@ -1103,6 +1121,13 @@ func (u *MsgAlertUpsertBulk) SetEndsAt(v time.Time) *MsgAlertUpsertBulk {
 func (u *MsgAlertUpsertBulk) UpdateEndsAt() *MsgAlertUpsertBulk {
 	return u.Update(func(s *MsgAlertUpsert) {
 		s.UpdateEndsAt()
+	})
+}
+
+// ClearEndsAt clears the value of the "ends_at" field.
+func (u *MsgAlertUpsertBulk) ClearEndsAt() *MsgAlertUpsertBulk {
+	return u.Update(func(s *MsgAlertUpsert) {
+		s.ClearEndsAt()
 	})
 }
 

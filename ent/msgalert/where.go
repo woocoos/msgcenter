@@ -243,6 +243,16 @@ func EndsAtLTE(v time.Time) predicate.MsgAlert {
 	return predicate.MsgAlert(sql.FieldLTE(FieldEndsAt, v))
 }
 
+// EndsAtIsNil applies the IsNil predicate on the "ends_at" field.
+func EndsAtIsNil() predicate.MsgAlert {
+	return predicate.MsgAlert(sql.FieldIsNull(FieldEndsAt))
+}
+
+// EndsAtNotNil applies the NotNil predicate on the "ends_at" field.
+func EndsAtNotNil() predicate.MsgAlert {
+	return predicate.MsgAlert(sql.FieldNotNull(FieldEndsAt))
+}
+
 // URLEQ applies the EQ predicate on the "url" field.
 func URLEQ(v string) predicate.MsgAlert {
 	return predicate.MsgAlert(sql.FieldEQ(FieldURL, v))

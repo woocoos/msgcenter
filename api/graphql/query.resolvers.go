@@ -14,7 +14,6 @@ import (
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
-	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
@@ -134,7 +133,7 @@ func (r *queryResolver) Silences(ctx context.Context, after *entgql.Cursor[int],
 
 // MsgAlerts is the resolver for the msgAlerts field.
 func (r *queryResolver) MsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) (*ent.MsgAlertConnection, error) {
-	return r.Client.MsgAlert.Query().Where(msgalert.Deleted(false)).Paginate(ctx, after, first, before, last,
+	return r.Client.MsgAlert.Query().Paginate(ctx, after, first, before, last,
 		ent.WithMsgAlertOrder(orderBy),
 		ent.WithMsgAlertFilter(where.Filter))
 }

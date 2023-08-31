@@ -45,7 +45,7 @@ func (MsgAlert) Fields() []ent.Field {
 		field.JSON("annotations", &label.LabelSet{}).Optional().Comment("注解").
 			Annotations(entgql.Skip(entgql.SkipWhereInput), entgql.Type("MapString")),
 		field.Time("starts_at").Comment("开始时间"),
-		field.Time("ends_at").Comment("结束时间"),
+		field.Time("ends_at").Optional().Comment("结束时间"),
 		field.String("url").Optional().Comment("generatorURL"),
 		field.Bool("timeout").Default(false).Comment("状态"),
 		field.String("fingerprint").Comment("指纹hash值"),

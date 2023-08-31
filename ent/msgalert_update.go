@@ -70,6 +70,20 @@ func (mau *MsgAlertUpdate) SetEndsAt(t time.Time) *MsgAlertUpdate {
 	return mau
 }
 
+// SetNillableEndsAt sets the "ends_at" field if the given value is not nil.
+func (mau *MsgAlertUpdate) SetNillableEndsAt(t *time.Time) *MsgAlertUpdate {
+	if t != nil {
+		mau.SetEndsAt(*t)
+	}
+	return mau
+}
+
+// ClearEndsAt clears the value of the "ends_at" field.
+func (mau *MsgAlertUpdate) ClearEndsAt() *MsgAlertUpdate {
+	mau.mutation.ClearEndsAt()
+	return mau
+}
+
 // SetURL sets the "url" field.
 func (mau *MsgAlertUpdate) SetURL(s string) *MsgAlertUpdate {
 	mau.mutation.SetURL(s)
@@ -312,6 +326,9 @@ func (mau *MsgAlertUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := mau.mutation.EndsAt(); ok {
 		_spec.SetField(msgalert.FieldEndsAt, field.TypeTime, value)
 	}
+	if mau.mutation.EndsAtCleared() {
+		_spec.ClearField(msgalert.FieldEndsAt, field.TypeTime)
+	}
 	if value, ok := mau.mutation.URL(); ok {
 		_spec.SetField(msgalert.FieldURL, field.TypeString, value)
 	}
@@ -499,6 +516,20 @@ func (mauo *MsgAlertUpdateOne) SetStartsAt(t time.Time) *MsgAlertUpdateOne {
 // SetEndsAt sets the "ends_at" field.
 func (mauo *MsgAlertUpdateOne) SetEndsAt(t time.Time) *MsgAlertUpdateOne {
 	mauo.mutation.SetEndsAt(t)
+	return mauo
+}
+
+// SetNillableEndsAt sets the "ends_at" field if the given value is not nil.
+func (mauo *MsgAlertUpdateOne) SetNillableEndsAt(t *time.Time) *MsgAlertUpdateOne {
+	if t != nil {
+		mauo.SetEndsAt(*t)
+	}
+	return mauo
+}
+
+// ClearEndsAt clears the value of the "ends_at" field.
+func (mauo *MsgAlertUpdateOne) ClearEndsAt() *MsgAlertUpdateOne {
+	mauo.mutation.ClearEndsAt()
 	return mauo
 }
 
@@ -773,6 +804,9 @@ func (mauo *MsgAlertUpdateOne) sqlSave(ctx context.Context) (_node *MsgAlert, er
 	}
 	if value, ok := mauo.mutation.EndsAt(); ok {
 		_spec.SetField(msgalert.FieldEndsAt, field.TypeTime, value)
+	}
+	if mauo.mutation.EndsAtCleared() {
+		_spec.ClearField(msgalert.FieldEndsAt, field.TypeTime)
 	}
 	if value, ok := mauo.mutation.URL(); ok {
 		_spec.SetField(msgalert.FieldURL, field.TypeString, value)

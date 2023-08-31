@@ -16,7 +16,7 @@ var (
 		{Name: "labels", Type: field.TypeJSON, Nullable: true},
 		{Name: "annotations", Type: field.TypeJSON, Nullable: true},
 		{Name: "starts_at", Type: field.TypeTime},
-		{Name: "ends_at", Type: field.TypeTime},
+		{Name: "ends_at", Type: field.TypeTime, Nullable: true},
 		{Name: "url", Type: field.TypeString, Nullable: true},
 		{Name: "timeout", Type: field.TypeBool, Default: false},
 		{Name: "fingerprint", Type: field.TypeString},

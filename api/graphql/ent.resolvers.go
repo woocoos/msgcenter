@@ -6,6 +6,7 @@ package graphql
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/woocoos/msgcenter/api/graphql/generated"
@@ -14,12 +15,30 @@ import (
 
 // Labels is the resolver for the labels field.
 func (r *msgAlertResolver) Labels(ctx context.Context, obj *ent.MsgAlert) (map[string]string, error) {
-	panic(fmt.Errorf("not implemented: Labels - labels"))
+	val, err := json.Marshal(obj.Labels)
+	if err != nil {
+		return nil, err
+	}
+	var data map[string]string
+	err = json.Unmarshal(val, &data)
+	if err != nil {
+		return nil, err
+	}
+	return data, err
 }
 
 // Annotations is the resolver for the annotations field.
 func (r *msgAlertResolver) Annotations(ctx context.Context, obj *ent.MsgAlert) (map[string]string, error) {
-	panic(fmt.Errorf("not implemented: Annotations - annotations"))
+	val, err := json.Marshal(obj.Annotations)
+	if err != nil {
+		return nil, err
+	}
+	var data map[string]string
+	err = json.Unmarshal(val, &data)
+	if err != nil {
+		return nil, err
+	}
+	return data, err
 }
 
 // NlogAlerts is the resolver for the nlogAlerts field.

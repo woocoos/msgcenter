@@ -32,8 +32,13 @@ func (a *AlertCallback) PreStore(alert *alert.Alert, existing bool) error {
 	}
 	fp := alert.Fingerprint().String()
 	c := a.db.MsgAlert.Create().SetLabels(&alert.Labels).SetAnnotations(&alert.Annotations).
-		SetStartsAt(alert.StartsAt).SetEndsAt(alert.EndsAt).SetURL(alert.GeneratorURL).
+		SetStartsAt(alert.StartsAt).SetURL(alert.GeneratorURL).
 		SetTimeout(alert.Timeout).SetFingerprint(fp)
+	if alert.EndsAt.IsZero() {
+		c.SetNillableEndsAt(nil)
+	} else {
+		c.SetEndsAt(alert.EndsAt)
+	}
 	if s, ok := alert.Labels[label.TenantLabel]; ok {
 		tid, err := strconv.Atoi(s)
 		if err != nil {

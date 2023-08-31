@@ -407,9 +407,22 @@ func (m *MsgAlertMutation) OldEndsAt(ctx context.Context) (v time.Time, err erro
 	return oldValue.EndsAt, nil
 }
 
+// ClearEndsAt clears the value of the "ends_at" field.
+func (m *MsgAlertMutation) ClearEndsAt() {
+	m.ends_at = nil
+	m.clearedFields[msgalert.FieldEndsAt] = struct{}{}
+}
+
+// EndsAtCleared returns if the "ends_at" field was cleared in this mutation.
+func (m *MsgAlertMutation) EndsAtCleared() bool {
+	_, ok := m.clearedFields[msgalert.FieldEndsAt]
+	return ok
+}
+
 // ResetEndsAt resets all changes to the "ends_at" field.
 func (m *MsgAlertMutation) ResetEndsAt() {
 	m.ends_at = nil
+	delete(m.clearedFields, msgalert.FieldEndsAt)
 }
 
 // SetURL sets the "url" field.
@@ -1078,6 +1091,9 @@ func (m *MsgAlertMutation) ClearedFields() []string {
 	if m.FieldCleared(msgalert.FieldAnnotations) {
 		fields = append(fields, msgalert.FieldAnnotations)
 	}
+	if m.FieldCleared(msgalert.FieldEndsAt) {
+		fields = append(fields, msgalert.FieldEndsAt)
+	}
 	if m.FieldCleared(msgalert.FieldURL) {
 		fields = append(fields, msgalert.FieldURL)
 	}
@@ -1103,6 +1119,9 @@ func (m *MsgAlertMutation) ClearField(name string) error {
 		return nil
 	case msgalert.FieldAnnotations:
 		m.ClearAnnotations()
+		return nil
+	case msgalert.FieldEndsAt:
+		m.ClearEndsAt()
 		return nil
 	case msgalert.FieldURL:
 		m.ClearURL()

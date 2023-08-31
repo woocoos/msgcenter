@@ -60,14 +60,16 @@ type MsgAlertWhereInput struct {
 	StartsAtLTE   *time.Time  `json:"startsAtLTE,omitempty"`
 
 	// "ends_at" field predicates.
-	EndsAt      *time.Time  `json:"endsAt,omitempty"`
-	EndsAtNEQ   *time.Time  `json:"endsAtNEQ,omitempty"`
-	EndsAtIn    []time.Time `json:"endsAtIn,omitempty"`
-	EndsAtNotIn []time.Time `json:"endsAtNotIn,omitempty"`
-	EndsAtGT    *time.Time  `json:"endsAtGT,omitempty"`
-	EndsAtGTE   *time.Time  `json:"endsAtGTE,omitempty"`
-	EndsAtLT    *time.Time  `json:"endsAtLT,omitempty"`
-	EndsAtLTE   *time.Time  `json:"endsAtLTE,omitempty"`
+	EndsAt       *time.Time  `json:"endsAt,omitempty"`
+	EndsAtNEQ    *time.Time  `json:"endsAtNEQ,omitempty"`
+	EndsAtIn     []time.Time `json:"endsAtIn,omitempty"`
+	EndsAtNotIn  []time.Time `json:"endsAtNotIn,omitempty"`
+	EndsAtGT     *time.Time  `json:"endsAtGT,omitempty"`
+	EndsAtGTE    *time.Time  `json:"endsAtGTE,omitempty"`
+	EndsAtLT     *time.Time  `json:"endsAtLT,omitempty"`
+	EndsAtLTE    *time.Time  `json:"endsAtLTE,omitempty"`
+	EndsAtIsNil  bool        `json:"endsAtIsNil,omitempty"`
+	EndsAtNotNil bool        `json:"endsAtNotNil,omitempty"`
 
 	// "url" field predicates.
 	URL             *string  `json:"url,omitempty"`
@@ -312,6 +314,12 @@ func (i *MsgAlertWhereInput) P() (predicate.MsgAlert, error) {
 	}
 	if i.EndsAtLTE != nil {
 		predicates = append(predicates, msgalert.EndsAtLTE(*i.EndsAtLTE))
+	}
+	if i.EndsAtIsNil {
+		predicates = append(predicates, msgalert.EndsAtIsNil())
+	}
+	if i.EndsAtNotNil {
+		predicates = append(predicates, msgalert.EndsAtNotNil())
 	}
 	if i.URL != nil {
 		predicates = append(predicates, msgalert.URLEQ(*i.URL))
