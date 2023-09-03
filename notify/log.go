@@ -167,17 +167,22 @@ func (l *Log) Log(ctx context.Context, r *profile.ReceiverKey, gkey string, firi
 			return nil
 		}
 	}
-
+	e := &LogEntry{
+		ID:       key,
+		GroupKey: gkey,
+		Receiver: profile.ReceiverKey{
+			Name:        r.Name,
+			Integration: r.Integration,
+			Index:       r.Index,
+		},
+		ExpiresAt:      expiresAt,
+		UpdatedAt:      now,
+		FiringAlerts:   firingAlerts,
+		ResolvedAlerts: resolvedAlerts,
+	}
+	l.st.merge(e, time.Now())
 	if l.Spreader != nil {
-		b, err := l.st.marshalBinary(&LogEntry{
-			ID:             key,
-			GroupKey:       gkey,
-			Receiver:       r.Integration,
-			ExpiresAt:      expiresAt,
-			UpdatedAt:      now,
-			FiringAlerts:   firingAlerts,
-			ResolvedAlerts: resolvedAlerts,
-		})
+		b, err := l.st.marshalBinary(e)
 		if err != nil {
 			return err
 		}

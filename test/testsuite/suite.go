@@ -147,7 +147,7 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 				},
 			},
 		}).SaveX(ctx)
-	client.MsgType.Create().SetName("alert").SetID(2).SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
+	client.MsgType.Create().SetName("alert1").SetID(2).SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
 		SetAppID(1).SetCategory("订阅类型").SetCanSubs(true).SetCanCustom(true).SaveX(ctx)
 	client.MsgEvent.Create().SetID(2).SetMsgTypeID(2).SetName(subEventName).SetStatus(typex.SimpleStatusActive).
 		SetCreatedBy(1).SetModes("email,internal").

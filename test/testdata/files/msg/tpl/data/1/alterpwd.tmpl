@@ -1,0 +1,10 @@
+{{/* gotype: github.com/woocoos/msgcenter/template.Data */}}
+
+{{ define "1.alterpwd.txt"}}
+    {{- with .CommonAnnotations }}
+        Dear {{.nickname}} !
+
+        Your password has been changed successfully. If you did not change your password, please contact the administrator in time.
+    {{- end }}
+
+{{end}}

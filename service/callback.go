@@ -110,8 +110,12 @@ func (n NlogCallback) LoadData() ([]*notify.LogEntry, error) {
 			}
 		}
 		logs = append(logs, &notify.LogEntry{
-			ID:             d.ID,
-			Receiver:       d.Receiver,
+			ID: d.ID,
+			Receiver: profile.ReceiverKey{
+				Name:        d.Receiver,
+				Integration: string(d.ReceiverType),
+				Index:       uint32(d.Idx),
+			},
 			ReceiverType:   d.ReceiverType,
 			GroupKey:       d.GroupKey,
 			FiringAlerts:   firingAlerts,

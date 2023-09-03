@@ -315,8 +315,6 @@ github.com/tsingsun/members v0.0.0-20230712074048-c38e433601b8 h1:RnYlO0Pkbnmz9B
 github.com/tsingsun/members v0.0.0-20230712074048-c38e433601b8/go.mod h1:BixlbwZ3Mxp4GAviAqi5Vb03RwPBtvgvVGi4TTWmA6Y=
 github.com/tsingsun/woocoo v0.3.1-0.20230823082600-583415142264 h1:ct4tuJeN8PkUojU5iihJZcg3Nroe6KUbiZ6UlHlwGTE=
 github.com/tsingsun/woocoo v0.3.1-0.20230823082600-583415142264/go.mod h1:oXKTMPMS7VSCDsiJjYG+nl/8S2sTXQPd39N4j1NAdk0=
-github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230731092426-7f7941155bc5 h1:3tDuT7HqQ6Fo7Z7cpJcg2I7LCaDLhVSLCO2asY/ZRlc=
-github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230731092426-7f7941155bc5/go.mod h1:5i4n5NXy38095NjNhJRMoo3SwFH8NmpRnABqftFCVoc=
 github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230823082600-583415142264 h1:bxF056RWipbmqK/sYhgCNbzI0VZYg2WJW6aqV/dNPZ8=
 github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230823082600-583415142264/go.mod h1:gDAs7FTDUReF09Qgx1PnmFHc9VbQv9Tk3xM3qagkC7Y=
 github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS4MhqMhdFk5YI=
@@ -335,8 +333,6 @@ github.com/vmihailenco/tagparser/v2 v2.0.0 h1:y09buUbR+b5aycVFQs/g70pqKVZNBmxwAh
 github.com/vmihailenco/tagparser/v2 v2.0.0/go.mod h1:Wri+At7QHww0WTrCBeu4J6bNtoV6mEfg5OIWRZA9qds=
 github.com/woocoos/casbin-ent-adapter v0.0.0-20230404005858-cd33f1b0b92e h1:GbxL4wa7cs+l7Bi6L2mjfkFiqDK9t6N2oyOrNp+yV1U=
 github.com/woocoos/casbin-ent-adapter v0.0.0-20230404005858-cd33f1b0b92e/go.mod h1:44V48kYKt7r9gWei7Ld+QaL0qVIBlOWrhkNTVMpnx3I=
-github.com/woocoos/entco v0.0.0-20230801090619-8fb61186ac01 h1:wO1JMl7zfXty3x/n17DKgZFQi8v93QpPt4TygLirBy8=
-github.com/woocoos/entco v0.0.0-20230801090619-8fb61186ac01/go.mod h1:7dCxlx1xLQEVA7HRICRw1RlpKbZh/fDWcBBg+lXWGds=
 github.com/woocoos/entco v0.0.0-20230817024016-0a9ab1dc1b63 h1:MlyDs5UL0bdfDW7idXGOpRky4w/zj/XDjZheRcVm1M4=
 github.com/woocoos/entco v0.0.0-20230817024016-0a9ab1dc1b63/go.mod h1:Aq4q10qVB9ZYbvThNR7bSwu955FqpLpUV1MeIZ+n7nI=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

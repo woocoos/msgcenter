@@ -10,11 +10,12 @@ import (
 
 type (
 	LogEntry struct {
-		ID             int                  `json:"id,omitempty"`
-		ExpiresAt      time.Time            `json:"expires_at,omitempty"`
-		UpdatedAt      time.Time            `json:"updated_at,omitempty"`
+		ID        int       `json:"id,omitempty"`
+		ExpiresAt time.Time `json:"expires_at,omitempty"`
+		UpdatedAt time.Time `json:"updated_at,omitempty"`
+		// The key identifying the dispatching group.
 		GroupKey       string               `json:"group_key,omitempty"`
-		Receiver       string               `json:"receiver,omitempty"`
+		Receiver       profile.ReceiverKey  `json:"receiver,omitempty"`
 		ReceiverType   profile.ReceiverType `json:"receiver_type,omitempty"`
 		Idx            int                  `json:"idx,omitempty"`
 		FiringAlerts   []uint64             `json:"firing_alerts,omitempty"`
@@ -28,7 +29,7 @@ type (
 
 func QReceiver(r *profile.ReceiverKey) EntryQuery {
 	return func(e *LogEntry) bool {
-		return e.Receiver == r.Name
+		return e.Receiver == *r
 	}
 }
 
