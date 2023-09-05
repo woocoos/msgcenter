@@ -21,7 +21,7 @@ export default (props: {
   const { t } = useTranslation(),
     [userState] = store.useModel('user'),
     [subject, setSubject] = useState<SubjectType>('user'),
-    [, setLeavePromptWhen] = useLeavePrompt(),
+    [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [info, setInfo] = useState<MsgType>(),
     [loading, setLoading] = useState(false),
     [dataSource, setDataSource] = useState<TransferItem[]>([]),
@@ -36,9 +36,12 @@ export default (props: {
   const
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose?.();
+        if (checkLeave()) {
+          props.onClose?.();
+        }
+      } else {
+        setSaveDisabled(true);
       }
-      setSaveDisabled(true);
     },
     getRequest = async () => {
       setLoading(true);
@@ -200,6 +203,7 @@ export default (props: {
       drawerProps={{
         width: 600,
         destroyOnClose: true,
+        maskClosable: false,
       }}
       request={getRequest}
       onFinish={onFinish}

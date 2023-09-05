@@ -27,7 +27,7 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     formRef = useRef<ProFormInstance<ProFormData>>(),
-    [, setLeavePromptWhen] = useLeavePrompt(),
+    [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [info, setInfo] = useState<Silence>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
@@ -39,9 +39,12 @@ export default (props: {
   const
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose?.();
+        if (checkLeave()) {
+          props.onClose?.();
+        }
+      } else {
+        setSaveDisabled(true);
       }
-      setSaveDisabled(true);
     },
     getRequest = async () => {
       setSaveLoading(false);
@@ -105,6 +108,7 @@ export default (props: {
       drawerProps={{
         width: 580,
         destroyOnClose: true,
+        maskClosable: false,
       }}
       submitter={{
         searchConfig: {

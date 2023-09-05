@@ -162,6 +162,7 @@ export default {
     msg_log_receiverType: 'receiving group type',
     msg_log: 'message log',
     msg_log_list: 'Message log list',
+    msg_event_config_tip: 'The modification takes effect after being enabled again',
 
     // 创建
     create_msg_type: 'Create message type',

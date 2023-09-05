@@ -6,10 +6,12 @@ import { MsgEvent, MsgTemplate, MsgTemplateFormat, MsgTemplateReceiverType } fro
 import { EnumMsgTemplateFormat, createMsgTemplate, getMsgTemplateInfo, updateMsgTemplate } from '@/services/msgsrv/template';
 import TempBtnUpload from '@/components/uploadFiles/tempBtn';
 import Multiple from '@/components/uploadFiles/multiple';
+import InputMultiple from '@/components/input/multiple';
 import { useLeavePrompt } from '@knockout-js/layout';
 import { OrgSelect } from '@knockout-js/org';
 import { Org, OrgKind, getOrg } from '@knockout-js/api';
 import store from '@/store';
+import { Col, Row } from 'antd';
 
 type ProFormData = {
   org?: Org;
@@ -37,7 +39,7 @@ export default (props: {
   const { t } = useTranslation(),
     formRef = useRef<ProFormInstance>(),
     [userState] = store.useModel('user'),
-    [, setLeavePromptWhen] = useLeavePrompt(),
+    [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [info, setInfo] = useState<MsgTemplate>(),
     [tpl, setTpl] = useState<string>(),
     [attachments, setAttachments] = useState<string[]>(),
@@ -51,9 +53,12 @@ export default (props: {
   const
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose?.();
+        if (checkLeave()) {
+          props.onClose?.();
+        }
+      } else {
+        setSaveDisabled(true);
       }
-      setSaveDisabled(true);
     },
     getRequest = async () => {
       setSaveLoading(false);
@@ -121,8 +126,9 @@ export default (props: {
   return (
     <DrawerForm<ProFormData>
       drawerProps={{
-        width: 500,
+        width: 1000,
         destroyOnClose: true,
+        maskClosable: false,
       }}
       submitter={{
         searchConfig: {
@@ -143,21 +149,27 @@ export default (props: {
       onOpenChange={onOpenChange}
       formRef={formRef}
     >
-      <ProFormText
-        name="org"
-        label={t('org')}
-        rules={[
-          { required: true, message: `${t('please_enter_org')}` },
-        ]}>
-        <OrgSelect kind={OrgKind.Root} />
-      </ProFormText>
-      <ProFormText
-        name="name"
-        label={t('name')}
-        rules={[
-          { required: true, message: `${t('please_enter_name')}` },
-        ]}
-      />
+      <Row gutter={20}>
+        <Col span={8}>
+          <ProFormText
+            name="org"
+            label={t('org')}
+            rules={[
+              { required: true, message: `${t('please_enter_org')}` },
+            ]}>
+            <OrgSelect kind={OrgKind.Root} />
+          </ProFormText>
+        </Col>
+        <Col span={8}>
+          <ProFormText
+            name="name"
+            label={t('name')}
+            rules={[
+              { required: true, message: `${t('please_enter_name')}` },
+            ]}
+          />
+        </Col>
+      </Row>
       <ProFormTextArea
         name="comments"
         label={t('description')}
@@ -174,22 +186,30 @@ export default (props: {
         x-if={props.receiverType === MsgTemplateReceiverType.Email}
         name="cc"
         label={t('msg_temp_cc')}
-      />
+      >
+        <InputMultiple decollator=";" />
+      </ProFormText>
       <ProFormText
         x-if={props.receiverType === MsgTemplateReceiverType.Email}
         name="bcc"
         label={t('msg_temp_bcc')}
-      />
+      >
+        <InputMultiple decollator=";" />
+      </ProFormText>
       <ProFormText
         x-if={props.receiverType === MsgTemplateReceiverType.Email}
         name="to"
         label={t('msg_temp_to')}
-      />
+      >
+        <InputMultiple decollator=";" />
+      </ProFormText>
       <ProFormText
         x-if={props.receiverType === MsgTemplateReceiverType.Email}
         name="from"
         label={t('msg_temp_from')}
-      />
+      >
+        <InputMultiple decollator=";" />
+      </ProFormText>
       <ProFormRadio.Group
         name="format"
         label={t('msg_temp_format')}

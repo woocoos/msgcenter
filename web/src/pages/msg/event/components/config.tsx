@@ -5,7 +5,7 @@ import Editor from '@monaco-editor/react';
 import { getMsgEventInfoRoute, updateMsgEvent } from '@/services/msgsrv/event';
 import { MatchType, RouteStrType } from '@/generated/msgsrv/graphql';
 import * as yaml from 'js-yaml'
-import { Typography } from 'antd';
+import { Alert, Typography } from 'antd';
 import { useLeavePrompt } from '@knockout-js/layout';
 
 type ProFormData = {
@@ -20,7 +20,7 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     [errStr, setErrStr] = useState<string>(),
-    [, setLeavePromptWhen] = useLeavePrompt(),
+    [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
@@ -31,9 +31,12 @@ export default (props: {
   const
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose?.();
+        if (checkLeave()) {
+          props.onClose?.();
+        }
+      } else {
+        setSaveDisabled(true);
       }
-      setSaveDisabled(true);
     },
     getRequest = async () => {
       setSaveLoading(false);
@@ -81,8 +84,9 @@ export default (props: {
   return (
     <DrawerForm<ProFormData>
       drawerProps={{
-        width: 700,
+        width: 800,
         destroyOnClose: true,
+        maskClosable: false,
       }}
       submitter={{
         searchConfig: {
@@ -102,6 +106,8 @@ export default (props: {
       onFinish={onFinish}
       onOpenChange={onOpenChange}
     >
+      <Alert showIcon message={t('msg_event_config_tip')} />
+      <br />
       <ProFormText name="route" extra={errStr ? <Typography.Text type="danger">{errStr}</Typography.Text> : <></>}>
         <Editor
           className="adminx-editor"

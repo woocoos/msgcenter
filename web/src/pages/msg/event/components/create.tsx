@@ -23,7 +23,7 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     [info, setInfo] = useState<MsgEvent>(),
-    [, setLeavePromptWhen] = useLeavePrompt(),
+    [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
@@ -34,9 +34,12 @@ export default (props: {
   const
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose?.();
+        if (checkLeave()) {
+          props.onClose?.();
+        }
+      } else {
+        setSaveDisabled(true);
       }
-      setSaveDisabled(true);
     },
     getRequest = async () => {
       setSaveLoading(false);
@@ -88,6 +91,7 @@ export default (props: {
       drawerProps={{
         width: 500,
         destroyOnClose: true,
+        maskClosable: false,
       }}
       submitter={{
         searchConfig: {
