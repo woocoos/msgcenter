@@ -27,6 +27,11 @@ export default () => {
     [avatar, setAvatar] = useState<string>();
 
   useEffect(() => {
+    i18n.changeLanguage(appState.locale);
+  }, [appState.locale]);
+
+
+  useEffect(() => {
     if (userState.user?.avatarFileId) {
       getFilesRaw(userState.user?.avatarFileId, 'url').then(result => {
         if (typeof result === 'string') {
@@ -34,14 +39,7 @@ export default () => {
         }
       })
     }
-  }, [userState.user]);
 
-  useEffect(() => {
-    i18n.changeLanguage(appState.locale);
-  }, [appState.locale]);
-
-
-  useEffect(() => {
     monitorKeyChange([
       {
         key: 'tenantId',
@@ -70,16 +68,17 @@ export default () => {
     ]);
   }, []);
 
-
   return <Layout
     appCode={ICE_APP_CODE}
     pathname={location.pathname}
     IconFont={IconFont}
     onClickMenuItem={async (item, isOpen) => {
-      if (isOpen) {
-        window.open(await urlSpm(item.path ?? ''));
-      } else {
-        history?.push(await urlSpm(item.path ?? ''));
+      if (checkLeave()) {
+        if (isOpen) {
+          window.open(await urlSpm(item.path ?? ''));
+        } else {
+          history?.push(await urlSpm(item.path ?? ''));
+        }
       }
     }}
     tenantProps={{
