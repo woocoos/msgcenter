@@ -10,6 +10,8 @@ type SchemaConfig struct {
 	MsgAlert      string // MsgAlert table.
 	MsgChannel    string // MsgChannel table.
 	MsgEvent      string // MsgEvent table.
+	MsgInternal   string // MsgInternal table.
+	MsgInternalTo string // MsgInternalTo table.
 	MsgSubscriber string // MsgSubscriber table.
 	MsgTemplate   string // MsgTemplate table.
 	MsgType       string // MsgType table.

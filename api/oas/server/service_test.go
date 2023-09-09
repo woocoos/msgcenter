@@ -2,19 +2,29 @@ package server
 
 import (
 	"context"
+	"encoding/json"
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/tsingsun/woocoo/web"
+	"github.com/woocoos/entco/schemax"
 	"github.com/woocoos/msgcenter/api/oas"
 	"github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/msgalert"
+	"github.com/woocoos/msgcenter/notify/webhook"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/provider/mem"
 	"github.com/woocoos/msgcenter/test/maildev"
 	"github.com/woocoos/msgcenter/test/testsuite"
+	"io"
 	"math/rand"
+	"net"
+	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
@@ -24,9 +34,7 @@ import (
 	_ "github.com/woocoos/msgcenter/ent/runtime"
 )
 
-var (
-	subEventName = "SubEvent"
-)
+var ()
 
 func open(ctx context.Context) *ent.Client {
 	client, err := ent.Open("sqlite3", "file:msgcenter?mode=memory&cache=shared&_fk=1",
@@ -52,6 +60,9 @@ type serviceSuite struct {
 	server    *web.Server
 	shutdowns []func()
 	maildev   maildev.MailDev
+
+	webhook        *httptest.Server
+	webhookHandler http.Handler
 }
 
 // TestServiceSuite runs the service test suite
@@ -66,6 +77,30 @@ func TestServiceSuite(t *testing.T) {
 	}
 	s.DSN = "file:msgcenter?mode=memory&cache=shared&_fk=1"
 	s.DriverName = "sqlite3"
+	s.webhook = httptest.NewUnstartedServer(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path == "/token" {
+				w.Header().Set("Content-Type", "application/json")
+				d, err := json.Marshal(map[string]string{
+					"access_token": "90d64460d14870c08c81352a05dedd3465940a7c",
+					"expires_in":   "7200", // defaultExpiryDelta = 10 * time.Second, so set 11 seconds and sleep 1 second
+					"scope":        "user",
+					"token_type":   "bearer",
+				})
+				require.NoError(t, err)
+				w.Write(d)
+				return
+			} else if r.URL.Path == "/webhook" {
+				if s.webhookHandler != nil {
+					s.webhookHandler.ServeHTTP(w, r)
+				}
+			}
+			return
+		}))
+	var err error
+	s.webhook.Listener, err = net.Listen("tcp", "127.0.0.1:5001")
+	require.NoError(t, err)
+	s.webhook.Start()
 	suite.Run(t, s)
 }
 
@@ -145,13 +180,14 @@ func (s *serviceSuite) TestPostAlertsWithTenant() {
 	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
 	// rand a string
 	to := fmt.Sprintf("%d@localhost", rand.Intn(10000000))
+	// route: default
 	req := oas.PostableAlerts{
 		{
 			Alert: &oas.Alert{
 				Labels: map[string]string{
-					"receiver":        "email|webhook",
-					"alertname":       "noSubscribe",
-					label.TenantLabel: "1",
+					"receiver":           "email|webhook",
+					label.AlertNameLabel: "noSubscribe",
+					label.TenantLabel:    "1",
 				},
 			},
 			Annotations: map[string]string{
@@ -174,13 +210,14 @@ func (s *serviceSuite) TestPostAlertsWithTenant() {
 // TestPostAlertsWithTenant tenant with custom template and attachment
 func (s *serviceSuite) TestUserSubscribe() {
 	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	// route: default
 	req := oas.PostableAlerts{
 		{
 			Alert: &oas.Alert{
 				Labels: map[string]string{
-					"receiver":  "email|webhook",
-					"alertname": subEventName,
-					"tenant":    "1",
+					"receiver":           "email|webhook",
+					label.AlertNameLabel: testsuite.SubEventName,
+					"tenant":             "1",
 				},
 			},
 			Annotations: map[string]string{
@@ -198,6 +235,113 @@ func (s *serviceSuite) TestUserSubscribe() {
 	s.Require().NotNil(mail)
 	// user 1 or user2,but notify not keep order
 	s.Require().Equal("订阅事件提醒", mail.Subject)
+
+	ss, err := s.Client.MsgAlert.Query().Where(msgalert.TenantID(1), func(selector *sql.Selector) {
+		selector.Where(sqljson.ValueEQ(msgalert.FieldLabels, testsuite.SubEventName, sqljson.Path("alertname")))
+	}).All(schemax.SkipTenantPrivacy(context.Background()))
+	s.Require().NoError(err)
+	s.Require().Len(ss, 3)
+}
+
+func (s *serviceSuite) TestWebhook() {
+	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	var got webhook.Message
+	s.webhookHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		err = json.Unmarshal(body, &got)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	})
+	req := oas.PostableAlerts{
+		{
+			Alert: &oas.Alert{
+				Labels: map[string]string{
+					"event":    "app:approve",
+					"receiver": "webhook",
+					"skipSub":  "Y",
+				},
+			},
+			Annotations: map[string]string{
+				"summary": "webhook test",
+			},
+			StartsAt: time.Now(),
+			EndsAt:   time.Now().Add(time.Hour),
+		},
+	}
+	s.Require().NoError(s.Service.PostAlerts(ctx, &oas.PostAlertsRequest{PostableAlerts: req}))
+	time.Sleep(time.Second * 2)
+	s.Require().NotNil(got.Data)
+	s.Require().Equal("webhook test", got.Data.CommonAnnotations["summary"])
+}
+
+func (s *serviceSuite) TestWebhook_CustomTpl_DingTalk() {
+	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	var got string
+	s.webhookHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		got = string(body)
+	})
+	req := oas.PostableAlerts{
+		{
+			Alert: &oas.Alert{
+				Labels: map[string]string{
+					label.AlertNameLabel: testsuite.WebhookEventName,
+					"event":              "app:approve",
+					"receiver":           "webhook",
+					"tenant":             "1",
+					"skipSub":            "Y",
+					"severity":           "critical",
+				},
+			},
+			Annotations: map[string]string{
+				"summary": "webhook template test",
+			},
+			EndsAt:   time.Now().Add(time.Hour),
+			StartsAt: time.Now().Add(time.Second * 5),
+		},
+	}
+	s.Require().NoError(s.Service.PostAlerts(ctx, &oas.PostAlertsRequest{PostableAlerts: req}))
+	time.Sleep(time.Second * 2)
+	s.Require().Contains(got, "webhook template test")
+}
+
+func (s *serviceSuite) TestMessage() {
+	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	req := oas.PostableAlerts{
+		{
+			Alert: &oas.Alert{
+				Labels: map[string]string{
+					"tenant":  "1",
+					"event":   "app:message",
+					"skipSub": "Y",
+					"user":    "1,2",
+				},
+			},
+			Annotations: map[string]string{
+				"summary": "internal message test",
+			},
+			StartsAt: time.Now(),
+			EndsAt:   time.Now().Add(time.Hour),
+		},
+	}
+	s.Require().NoError(s.Service.PostAlerts(ctx, &oas.PostAlertsRequest{PostableAlerts: req}))
+	time.Sleep(time.Second * 2)
+	mis, err := s.Client.MsgInternal.Query().All(schemax.SkipTenantPrivacy(context.Background()))
+	s.Require().NoError(err)
+	s.Len(mis, 1)
+	mist, err := mis[0].MsgInternalTo(schemax.SkipTenantPrivacy(context.Background()))
+	s.Require().NoError(err)
+	s.Len(mist, 2)
 }
 
 func (s *serviceSuite) TestPostSilence() {

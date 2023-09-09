@@ -1,4 +1,4 @@
-package main
+package ams
 
 import (
 	"context"
@@ -35,24 +35,26 @@ import (
 	_ "github.com/woocoos/msgcenter/ent/runtime"
 )
 
-var (
+// Server alert server, includes: API提醒服务,包括API及消息分发功能,可选服务包括: UI
+type Server struct {
+	appCnf   *conf.AppConfiguration
+	apiSrv   *web.Server
 	dbClient *ent.Client
-	//casbinClient *casbinent.Client
-)
+	apps     []woocoo.Server
+}
 
-func main() {
-	app := woocoo.New()
-	cnf := app.AppConfiguration()
-	dbClient = buildEntClient(cnf)
-	defer dbClient.Close()
-
+func NewServer(cnf *conf.AppConfiguration) *Server {
+	s := &Server{
+		appCnf: cnf,
+	}
+	s.buildEntClient()
 	alertManagerCnf := cnf.Sub("alertManager")
 	dataDir := alertManagerCnf.String("storage.path")
 	if err := os.MkdirAll(dataDir, os.ModePerm); err != nil {
 		log.Fatal(err)
 	}
 
-	am, err := service.DefaultAlertManager(alertManagerCnf, service.WithClient(dbClient))
+	am, err := service.DefaultAlertManager(alertManagerCnf, service.WithClient(s.dbClient))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -78,7 +80,7 @@ func main() {
 
 	configCoordinator.SetHttpClient(buildHttpClient(cnf))
 
-	configCoordinator.SetDBClient(dbClient)
+	configCoordinator.SetDBClient(s.dbClient)
 	configCoordinator.ReloadHooks(func(cfg *profile.Config) error {
 		// TODO tmpl.ExternalURL = am
 		err := am.Start(configCoordinator, cfg)
@@ -95,43 +97,55 @@ func main() {
 	if err := configCoordinator.Reload(); err != nil {
 		log.Fatal(err)
 	}
+	s.buildApiServer(cnf, api, cfgopts)
 
-	apiSrv := buildApiServer(cnf, api, cfgopts)
-	app.RegisterServer(am.Alerts.(*mem.Alerts), am.NotificationLog.(*notify.Log), am.Peer, am.Silences, apiSrv,
+	s.apps = []woocoo.Server{
+		am.Alerts.(*mem.Alerts), am.NotificationLog.(*notify.Log), am.Peer, am.Silences,
+		s.apiSrv,
 		newPromHttp(cnf.Sub("prometheus")),
-	)
-
+		s, // self
+	}
 	if cnf.IsSet("ui.enabled") {
-		app.RegisterServer(buildUiServer(cnf))
+		s.apps = append(s.apps, buildUiServer(cnf))
 	}
 
 	// join before service run
 	if err = am.Peer.Join(context.Background()); err != nil {
 		log.Fatal(err)
 	}
-	if err := app.Run(); err != nil {
-		log.Fatal(err)
-	}
+
+	return s
 }
 
-func buildEntClient(cnf *conf.AppConfiguration) *ent.Client {
-	pd := oteldriver.BuildOTELDriver(cnf, "store.msgcenter")
-	pd = ecx.BuildEntCacheDriver(cnf, pd)
+// Servers 需要被woocoo.App 注册的服务
+func (s *Server) Servers() []woocoo.Server {
+	return s.apps
+}
+
+func (s *Server) Start(ctx context.Context) error {
+	return nil
+}
+
+func (s *Server) Stop(ctx context.Context) error {
+	s.dbClient.Close()
+	return nil
+}
+
+func (s *Server) buildEntClient() {
+	pd := oteldriver.BuildOTELDriver(s.appCnf, "store.msgcenter")
+	pd = ecx.BuildEntCacheDriver(s.appCnf, pd)
 	scfg := ent.AlternateSchema(ent.SchemaConfig{
 		User:        "portal",
 		OrgRoleUser: "portal",
 	})
-	if cnf.Development {
-		dbClient = ent.NewClient(ent.Driver(pd), ent.Debug(), scfg)
-		//casbinClient = casbinent.NewClient(casbinent.Driver(pd), casbinent.Debug())
+	if s.appCnf.Development {
+		s.dbClient = ent.NewClient(ent.Driver(pd), ent.Debug(), scfg)
 	} else {
-		dbClient = ent.NewClient(ent.Driver(pd), scfg)
-		//casbinClient = casbinent.NewClient(casbinent.Driver(pd))
+		s.dbClient = ent.NewClient(ent.Driver(pd), scfg)
 	}
-	return dbClient
 }
 
-func buildApiServer(cnf *conf.AppConfiguration, ws *server.Service, amopt *server.Options) *web.Server {
+func (s *Server) buildApiServer(cnf *conf.AppConfiguration, ws *server.Service, amopt *server.Options) {
 	webSrv := web.New(web.WithConfiguration(cnf.Sub("web")),
 		web.WithGracefulStop(),
 		web.RegisterMiddleware(gql.New()),
@@ -142,7 +156,7 @@ func buildApiServer(cnf *conf.AppConfiguration, ws *server.Service, amopt *serve
 	//gql
 	gqlsrv := handler.NewDefaultServer(
 		graphql.NewSchema(
-			graphql.WithClient(dbClient),
+			graphql.WithClient(s.dbClient),
 			graphql.WithCoordinator(amopt.Coordinator),
 			graphql.WithSilences(amopt.Silences),
 		),
@@ -150,11 +164,11 @@ func buildApiServer(cnf *conf.AppConfiguration, ws *server.Service, amopt *serve
 	gqlsrv.AroundResponses(gqlx.ContextCache())
 	gqlsrv.AroundResponses(gqlx.SimplePagination())
 	// mutation事务
-	gqlsrv.Use(entgql.Transactioner{TxOpener: dbClient})
+	gqlsrv.Use(entgql.Transactioner{TxOpener: s.dbClient})
 	if err := gql.RegisterGraphqlServer(webSrv, gqlsrv); err != nil {
 		log.Fatal(err)
 	}
-	return webSrv
+	s.apiSrv = webSrv
 }
 
 func buildUiServer(cnf *conf.AppConfiguration) *web.Server {
@@ -163,12 +177,6 @@ func buildUiServer(cnf *conf.AppConfiguration) *web.Server {
 	)
 	uiSrv.Router().StaticFS("/", http.Dir("../../web/build"))
 	return uiSrv
-}
-
-func newPromHttp(cnf *conf.Configuration) woocoo.Server {
-	hd := web.New(web.WithConfiguration(cnf))
-	hd.Router().GET("/metrics", gin.WrapH(promhttp.Handler()))
-	return hd
 }
 
 func buildHttpClient(cnf *conf.AppConfiguration) *http.Client {
@@ -181,4 +189,10 @@ func buildHttpClient(cnf *conf.AppConfiguration) *http.Client {
 		log.Fatal(err)
 	}
 	return httpClient
+}
+
+func newPromHttp(cnf *conf.Configuration) woocoo.Server {
+	hd := web.New(web.WithConfiguration(cnf))
+	hd.Router().GET("/metrics", gin.WrapH(promhttp.Handler()))
+	return hd
 }

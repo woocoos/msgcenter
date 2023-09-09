@@ -436,6 +436,16 @@ func (r *mutationResolver) DeleteSilence(ctx context.Context, id int) (bool, err
 	return err == nil, err
 }
 
+// MarkMessageReaOrUnRead is the resolver for the markMessageReaOrUnRead field.
+func (r *mutationResolver) MarkMessageReaOrUnRead(ctx context.Context, ids []int, read bool) (bool, error) {
+	panic(fmt.Errorf("not implemented: MarkMessageReaOrUnRead - markMessageReaOrUnRead"))
+}
+
+// MarkMessageDeleted is the resolver for the markMessageDeleted field.
+func (r *mutationResolver) MarkMessageDeleted(ctx context.Context, ids []int) (bool, error) {
+	panic(fmt.Errorf("not implemented: MarkMessageDeleted - markMessageDeleted"))
+}
+
 // Matchers is the resolver for the matchers field.
 func (r *routeInputResolver) Matchers(ctx context.Context, obj *profile.Route, data []*label.Matcher) error {
 	obj.Matchers = data

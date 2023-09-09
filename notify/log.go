@@ -23,7 +23,9 @@ type (
 	// NLogCallback is the interface that must be implemented by the notification log callback.
 	NLogCallback interface {
 		LoadData() ([]*LogEntry, error)
-		CreateLog(ctx context.Context, r *profile.ReceiverKey, gkey string, firingAlerts, resolvedAlerts []uint64, expiresAt time.Time) (int, error)
+		// CreateLog creates a new notification log entry. returns the id of the log entry.
+		CreateLog(ctx context.Context, r *profile.ReceiverKey, gkey string, firingAlerts, resolvedAlerts []uint64,
+			expiresAt time.Time) (int, error)
 		EvictLog(ctx context.Context, ids []int)
 	}
 	// Log holds the notification log state for alerts that have been notified.

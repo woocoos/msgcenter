@@ -14,11 +14,11 @@ import (
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
-	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/metrics"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/notify/email"
-	"github.com/woocoos/msgcenter/pkg/label"
+	"github.com/woocoos/msgcenter/notify/message"
+	"github.com/woocoos/msgcenter/notify/webhook"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/template"
 	"go.uber.org/zap"
@@ -53,8 +53,8 @@ type Coordinator struct {
 
 	db        *ent.Client
 	Subscribe *UserSubscribe
-
-	HttpClient *http.Client
+	// knockout http client
+	KOClient *http.Client
 
 	TempOptions TempOptions
 }
@@ -95,7 +95,7 @@ func (c *Coordinator) SetDBClient(db *ent.Client) {
 }
 
 func (c *Coordinator) SetHttpClient(httpClient *http.Client) {
-	c.HttpClient = httpClient
+	c.KOClient = httpClient
 }
 
 func (c *Coordinator) ProfileString() string {
@@ -242,10 +242,13 @@ func (c *Coordinator) loadFromDB() error {
 	if err != nil {
 		return err
 	}
-	routes := make([]*profile.Route, len(evs))
-	for i, ev := range evs {
+	routes := make([]*profile.Route, 0, len(evs))
+	for _, ev := range evs {
+		if ev.Route == nil {
+			continue
+		}
 		ev.Route.Name = profile.AppRouteName(strconv.Itoa(ev.Edges.MsgType.AppID), ev.Name)
-		routes[i] = ev.Route
+		routes = append(routes, ev.Route)
 	}
 	if err = c.addTenantReceiver(receivers); err != nil {
 		return err
@@ -262,7 +265,7 @@ func (c *Coordinator) AddNamedRoute(input []*profile.Route) error {
 	return c.addNamedRoute(input)
 }
 
-// AddNamedRoute adds a route to the current configuration.
+// AddNamedRoute adds a route to the current configuration. Notice: it is unsafe to call this method concurrently.
 func (c *Coordinator) addNamedRoute(input []*profile.Route) error {
 	rs, err := json.Marshal(input)
 	if err != nil {
@@ -398,10 +401,19 @@ func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *templ
 	tpldir := c.configuration.Abs(c.TempOptions.Path)
 	for i, cfg := range nc.EmailConfigs {
 		add("email", i, func() (notify.Notifier, error) {
-			return email.NewEmail(cfg, tmpl, overrideEmailConfig(tpldir, c.db)), nil
+			return email.New(cfg, tmpl, overrideEmailConfig(tpldir, c.db))
 		})
 	}
-
+	for i, cfg := range nc.WebhookConfigs {
+		add("webhook", i, func() (notify.Notifier, error) {
+			return webhook.New(cfg, tmpl, overrideWebHookConfig(tpldir, c.db))
+		})
+	}
+	if nc.MessageConfig != nil {
+		add("message", 0, func() (notify.Notifier, error) {
+			return message.New(nc.MessageConfig, tmpl, c.db, overrideMessageConfig(tpldir, c.db))
+		})
+	}
 	if errs != nil {
 		return nil, errs
 	}
@@ -415,86 +427,6 @@ func md5HashAsMetricValue(data []byte) float64 {
 	bytes := make([]byte, 8)
 	copy(bytes, smallSum)
 	return float64(binary.LittleEndian.Uint64(bytes))
-}
-
-// use for email.Email.customTplFunc.
-// 1. Support load template from database
-// 2. Get user info 's email address if exist user id in label. the user info email replace template to address.
-func overrideEmailConfig(basedir string, client *ent.Client) notify.CustomerConfigFunc[profile.EmailConfig] {
-	return func(ctx context.Context, cfg profile.EmailConfig, set label.LabelSet,
-	) (profile.EmailConfig, error) {
-		data, err := findTemplate(ctx, basedir, client, profile.ReceiverEmail, set)
-		if err != nil {
-			if ent.IsNotFound(err) {
-				return cfg, nil
-			}
-			return cfg, err
-		}
-		if data == nil {
-			return cfg, nil
-		}
-		if uid, ok := set[label.ToUserIDLabel]; ok {
-			id, err := strconv.Atoi(uid)
-			if err != nil {
-				return cfg, err
-			}
-			ui, err := client.User.Get(ctx, id)
-			if err != nil {
-				return cfg, err
-			}
-			cfg.To = ui.Email
-		} else {
-			cfg.To = data.To
-		}
-		cfg.From = data.From
-		cfg.Subject = data.Subject
-		if data.Format == msgtemplate.FormatHTML {
-			cfg.HTML = data.Body
-		} else {
-			cfg.Text = data.Body
-		}
-		for k := range cfg.Headers {
-			switch strings.ToLower(k) {
-			case "cc":
-				cfg.Headers[k] = data.Cc
-			case "bcc":
-				cfg.Headers[k] = data.Bcc
-			}
-		}
-		if data.Attachments != nil && len(data.Attachments) > 0 {
-			cfg.Headers["Attachments"] = strings.Join(data.Attachments, ",")
-		}
-		return cfg, nil
-	}
-}
-
-func findTemplate(ctx context.Context, basedir string, client *ent.Client, rt profile.ReceiverType, labels label.LabelSet) (*ent.MsgTemplate, error) {
-	tid, ok := labels[label.TenantLabel]
-	if !ok {
-		return nil, &ent.NotFoundError{}
-	}
-	tenantID, err := strconv.Atoi(tid)
-	if err != nil {
-		return nil, err
-	}
-	en := labels[label.AlertNameLabel]
-	event, err := client.MsgTemplate.Query().Where(msgtemplate.TenantID(tenantID), msgtemplate.HasEventWith(
-		msgevent.Name(en), msgevent.StatusEQ(typex.SimpleStatusActive)), msgtemplate.ReceiverTypeEQ(rt),
-	).Only(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if event == nil {
-		return nil, nil
-	}
-	if event.Attachments != nil && len(event.Attachments) > 0 {
-		as := make([]string, len(event.Attachments))
-		for i, attacher := range event.Attachments {
-			as[i] = filepath.Join(basedir, attacher)
-		}
-		event.Attachments = as
-	}
-	return event, nil
 }
 
 // ValidateFilePath 验证路径是否符合规则
@@ -591,6 +523,6 @@ func (c *Coordinator) ReportFileRefCount(ctx context.Context, newFileIDs, oldFil
 	}
 	req.Header.Add("X-Tenant-ID", strconv.Itoa(tid))
 	req.Header.Add("Content-Type", "application/json")
-	_, err = c.HttpClient.Do(req)
+	_, err = c.KOClient.Do(req)
 	return err
 }

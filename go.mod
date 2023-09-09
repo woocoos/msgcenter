@@ -19,7 +19,7 @@ require (
 	github.com/prometheus/client_golang v1.11.1
 	github.com/stretchr/testify v1.8.4
 	github.com/tsingsun/members v0.0.0-20230712074048-c38e433601b8
-	github.com/tsingsun/woocoo v0.3.1-0.20230823082600-583415142264
+	github.com/tsingsun/woocoo v0.3.1-0.20230907004917-6823b964d7a7
 	github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230823082600-583415142264
 	github.com/vektah/gqlparser/v2 v2.5.8
 	github.com/vmihailenco/msgpack/v5 v5.3.5

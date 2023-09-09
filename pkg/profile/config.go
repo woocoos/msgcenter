@@ -61,7 +61,7 @@ func NewConfig(cfg *conf.Configuration) (c *Config, err error) {
 		return nil, fmt.Errorf("no config file specified")
 	}
 	// read config file by filename
-	bytes, err := os.ReadFile(filename)
+	bytes, err := os.ReadFile(cfg.Abs(filename))
 	if err != nil {
 		return nil, err
 	}

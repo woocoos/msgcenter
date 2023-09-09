@@ -14,6 +14,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msginternal"
+	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -629,6 +631,267 @@ func newMsgEventPaginateArgs(rv map[string]any) *msgeventPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*MsgEventWhereInput); ok {
 		args.opts = append(args.opts, WithMsgEventFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (mi *MsgInternalQuery) CollectFields(ctx context.Context, satisfies ...string) (*MsgInternalQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return mi, nil
+	}
+	if err := mi.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return mi, nil
+}
+
+func (mi *MsgInternalQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(msginternal.Columns))
+		selectedFields = []string{msginternal.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "msgInternalTo":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&MsgInternalToClient{config: mi.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msginternaltoImplementors)...); err != nil {
+				return err
+			}
+			mi.WithNamedMsgInternalTo(alias, func(wq *MsgInternalToQuery) {
+				*wq = *query
+			})
+		case "tenantID":
+			if _, ok := fieldSeen[msginternal.FieldTenantID]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldTenantID)
+				fieldSeen[msginternal.FieldTenantID] = struct{}{}
+			}
+		case "createdBy":
+			if _, ok := fieldSeen[msginternal.FieldCreatedBy]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldCreatedBy)
+				fieldSeen[msginternal.FieldCreatedBy] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[msginternal.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldCreatedAt)
+				fieldSeen[msginternal.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedBy":
+			if _, ok := fieldSeen[msginternal.FieldUpdatedBy]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldUpdatedBy)
+				fieldSeen[msginternal.FieldUpdatedBy] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[msginternal.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldUpdatedAt)
+				fieldSeen[msginternal.FieldUpdatedAt] = struct{}{}
+			}
+		case "subject":
+			if _, ok := fieldSeen[msginternal.FieldSubject]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldSubject)
+				fieldSeen[msginternal.FieldSubject] = struct{}{}
+			}
+		case "body":
+			if _, ok := fieldSeen[msginternal.FieldBody]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldBody)
+				fieldSeen[msginternal.FieldBody] = struct{}{}
+			}
+		case "format":
+			if _, ok := fieldSeen[msginternal.FieldFormat]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldFormat)
+				fieldSeen[msginternal.FieldFormat] = struct{}{}
+			}
+		case "redirect":
+			if _, ok := fieldSeen[msginternal.FieldRedirect]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldRedirect)
+				fieldSeen[msginternal.FieldRedirect] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		mi.Select(selectedFields...)
+	}
+	return nil
+}
+
+type msginternalPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []MsgInternalPaginateOption
+}
+
+func newMsgInternalPaginateArgs(rv map[string]any) *msginternalPaginateArgs {
+	args := &msginternalPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &MsgInternalOrder{Field: &MsgInternalOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithMsgInternalOrder(order))
+			}
+		case *MsgInternalOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithMsgInternalOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*MsgInternalWhereInput); ok {
+		args.opts = append(args.opts, WithMsgInternalFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (mit *MsgInternalToQuery) CollectFields(ctx context.Context, satisfies ...string) (*MsgInternalToQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return mit, nil
+	}
+	if err := mit.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return mit, nil
+}
+
+func (mit *MsgInternalToQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(msginternalto.Columns))
+		selectedFields = []string{msginternalto.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "msgInternal":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&MsgInternalClient{config: mit.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msginternalImplementors)...); err != nil {
+				return err
+			}
+			mit.withMsgInternal = query
+			if _, ok := fieldSeen[msginternalto.FieldMsgInternalID]; !ok {
+				selectedFields = append(selectedFields, msginternalto.FieldMsgInternalID)
+				fieldSeen[msginternalto.FieldMsgInternalID] = struct{}{}
+			}
+		case "user":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&UserClient{config: mit.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+				return err
+			}
+			mit.withUser = query
+			if _, ok := fieldSeen[msginternalto.FieldUserID]; !ok {
+				selectedFields = append(selectedFields, msginternalto.FieldUserID)
+				fieldSeen[msginternalto.FieldUserID] = struct{}{}
+			}
+		case "tenantID":
+			if _, ok := fieldSeen[msginternalto.FieldTenantID]; !ok {
+				selectedFields = append(selectedFields, msginternalto.FieldTenantID)
+				fieldSeen[msginternalto.FieldTenantID] = struct{}{}
+			}
+		case "msgInternalID":
+			if _, ok := fieldSeen[msginternalto.FieldMsgInternalID]; !ok {
+				selectedFields = append(selectedFields, msginternalto.FieldMsgInternalID)
+				fieldSeen[msginternalto.FieldMsgInternalID] = struct{}{}
+			}
+		case "userID":
+			if _, ok := fieldSeen[msginternalto.FieldUserID]; !ok {
+				selectedFields = append(selectedFields, msginternalto.FieldUserID)
+				fieldSeen[msginternalto.FieldUserID] = struct{}{}
+			}
+		case "readAt":
+			if _, ok := fieldSeen[msginternalto.FieldReadAt]; !ok {
+				selectedFields = append(selectedFields, msginternalto.FieldReadAt)
+				fieldSeen[msginternalto.FieldReadAt] = struct{}{}
+			}
+		case "deleteAt":
+			if _, ok := fieldSeen[msginternalto.FieldDeleteAt]; !ok {
+				selectedFields = append(selectedFields, msginternalto.FieldDeleteAt)
+				fieldSeen[msginternalto.FieldDeleteAt] = struct{}{}
+			}
+		case "createdAt":
+			if _, ok := fieldSeen[msginternalto.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, msginternalto.FieldCreatedAt)
+				fieldSeen[msginternalto.FieldCreatedAt] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		mit.Select(selectedFields...)
+	}
+	return nil
+}
+
+type msginternaltoPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []MsgInternalToPaginateOption
+}
+
+func newMsgInternalToPaginateArgs(rv map[string]any) *msginternaltoPaginateArgs {
+	args := &msginternaltoPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*MsgInternalToWhereInput); ok {
+		args.opts = append(args.opts, WithMsgInternalToFilter(v.Filter))
 	}
 	return args
 }

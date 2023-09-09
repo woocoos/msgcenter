@@ -17,6 +17,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msginternal"
+	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -40,6 +42,10 @@ type Client struct {
 	MsgChannel *MsgChannelClient
 	// MsgEvent is the client for interacting with the MsgEvent builders.
 	MsgEvent *MsgEventClient
+	// MsgInternal is the client for interacting with the MsgInternal builders.
+	MsgInternal *MsgInternalClient
+	// MsgInternalTo is the client for interacting with the MsgInternalTo builders.
+	MsgInternalTo *MsgInternalToClient
 	// MsgSubscriber is the client for interacting with the MsgSubscriber builders.
 	MsgSubscriber *MsgSubscriberClient
 	// MsgTemplate is the client for interacting with the MsgTemplate builders.
@@ -74,6 +80,8 @@ func (c *Client) init() {
 	c.MsgAlert = NewMsgAlertClient(c.config)
 	c.MsgChannel = NewMsgChannelClient(c.config)
 	c.MsgEvent = NewMsgEventClient(c.config)
+	c.MsgInternal = NewMsgInternalClient(c.config)
+	c.MsgInternalTo = NewMsgInternalToClient(c.config)
 	c.MsgSubscriber = NewMsgSubscriberClient(c.config)
 	c.MsgTemplate = NewMsgTemplateClient(c.config)
 	c.MsgType = NewMsgTypeClient(c.config)
@@ -169,6 +177,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		MsgAlert:      NewMsgAlertClient(cfg),
 		MsgChannel:    NewMsgChannelClient(cfg),
 		MsgEvent:      NewMsgEventClient(cfg),
+		MsgInternal:   NewMsgInternalClient(cfg),
+		MsgInternalTo: NewMsgInternalToClient(cfg),
 		MsgSubscriber: NewMsgSubscriberClient(cfg),
 		MsgTemplate:   NewMsgTemplateClient(cfg),
 		MsgType:       NewMsgTypeClient(cfg),
@@ -199,6 +209,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		MsgAlert:      NewMsgAlertClient(cfg),
 		MsgChannel:    NewMsgChannelClient(cfg),
 		MsgEvent:      NewMsgEventClient(cfg),
+		MsgInternal:   NewMsgInternalClient(cfg),
+		MsgInternalTo: NewMsgInternalToClient(cfg),
 		MsgSubscriber: NewMsgSubscriberClient(cfg),
 		MsgTemplate:   NewMsgTemplateClient(cfg),
 		MsgType:       NewMsgTypeClient(cfg),
@@ -236,8 +248,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgSubscriber, c.MsgTemplate, c.MsgType,
-		c.Nlog, c.NlogAlert, c.OrgRoleUser, c.Silence, c.User,
+		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal, c.MsgInternalTo,
+		c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert, c.OrgRoleUser,
+		c.Silence, c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -247,8 +260,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgSubscriber, c.MsgTemplate, c.MsgType,
-		c.Nlog, c.NlogAlert, c.OrgRoleUser, c.Silence, c.User,
+		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal, c.MsgInternalTo,
+		c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert, c.OrgRoleUser,
+		c.Silence, c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -263,6 +277,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.MsgChannel.mutate(ctx, m)
 	case *MsgEventMutation:
 		return c.MsgEvent.mutate(ctx, m)
+	case *MsgInternalMutation:
+		return c.MsgInternal.mutate(ctx, m)
+	case *MsgInternalToMutation:
+		return c.MsgInternalTo.mutate(ctx, m)
 	case *MsgSubscriberMutation:
 		return c.MsgSubscriber.mutate(ctx, m)
 	case *MsgTemplateMutation:
@@ -715,6 +733,303 @@ func (c *MsgEventClient) mutate(ctx context.Context, m *MsgEventMutation) (Value
 		return (&MsgEventDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown MsgEvent mutation op: %q", m.Op())
+	}
+}
+
+// MsgInternalClient is a client for the MsgInternal schema.
+type MsgInternalClient struct {
+	config
+}
+
+// NewMsgInternalClient returns a client for the MsgInternal from the given config.
+func NewMsgInternalClient(c config) *MsgInternalClient {
+	return &MsgInternalClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `msginternal.Hooks(f(g(h())))`.
+func (c *MsgInternalClient) Use(hooks ...Hook) {
+	c.hooks.MsgInternal = append(c.hooks.MsgInternal, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `msginternal.Intercept(f(g(h())))`.
+func (c *MsgInternalClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MsgInternal = append(c.inters.MsgInternal, interceptors...)
+}
+
+// Create returns a builder for creating a MsgInternal entity.
+func (c *MsgInternalClient) Create() *MsgInternalCreate {
+	mutation := newMsgInternalMutation(c.config, OpCreate)
+	return &MsgInternalCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MsgInternal entities.
+func (c *MsgInternalClient) CreateBulk(builders ...*MsgInternalCreate) *MsgInternalCreateBulk {
+	return &MsgInternalCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MsgInternal.
+func (c *MsgInternalClient) Update() *MsgInternalUpdate {
+	mutation := newMsgInternalMutation(c.config, OpUpdate)
+	return &MsgInternalUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MsgInternalClient) UpdateOne(mi *MsgInternal) *MsgInternalUpdateOne {
+	mutation := newMsgInternalMutation(c.config, OpUpdateOne, withMsgInternal(mi))
+	return &MsgInternalUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MsgInternalClient) UpdateOneID(id int) *MsgInternalUpdateOne {
+	mutation := newMsgInternalMutation(c.config, OpUpdateOne, withMsgInternalID(id))
+	return &MsgInternalUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MsgInternal.
+func (c *MsgInternalClient) Delete() *MsgInternalDelete {
+	mutation := newMsgInternalMutation(c.config, OpDelete)
+	return &MsgInternalDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MsgInternalClient) DeleteOne(mi *MsgInternal) *MsgInternalDeleteOne {
+	return c.DeleteOneID(mi.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MsgInternalClient) DeleteOneID(id int) *MsgInternalDeleteOne {
+	builder := c.Delete().Where(msginternal.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MsgInternalDeleteOne{builder}
+}
+
+// Query returns a query builder for MsgInternal.
+func (c *MsgInternalClient) Query() *MsgInternalQuery {
+	return &MsgInternalQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMsgInternal},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MsgInternal entity by its id.
+func (c *MsgInternalClient) Get(ctx context.Context, id int) (*MsgInternal, error) {
+	return c.Query().Where(msginternal.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MsgInternalClient) GetX(ctx context.Context, id int) *MsgInternal {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryMsgInternalTo queries the msg_internal_to edge of a MsgInternal.
+func (c *MsgInternalClient) QueryMsgInternalTo(mi *MsgInternal) *MsgInternalToQuery {
+	query := (&MsgInternalToClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := mi.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msginternal.Table, msginternal.FieldID, id),
+			sqlgraph.To(msginternalto.Table, msginternalto.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, msginternal.MsgInternalToTable, msginternal.MsgInternalToColumn),
+		)
+		schemaConfig := mi.schemaConfig
+		step.To.Schema = schemaConfig.MsgInternalTo
+		step.Edge.Schema = schemaConfig.MsgInternalTo
+		fromV = sqlgraph.Neighbors(mi.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *MsgInternalClient) Hooks() []Hook {
+	hooks := c.hooks.MsgInternal
+	return append(hooks[:len(hooks):len(hooks)], msginternal.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *MsgInternalClient) Interceptors() []Interceptor {
+	inters := c.inters.MsgInternal
+	return append(inters[:len(inters):len(inters)], msginternal.Interceptors[:]...)
+}
+
+func (c *MsgInternalClient) mutate(ctx context.Context, m *MsgInternalMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MsgInternalCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MsgInternalUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MsgInternalUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MsgInternalDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MsgInternal mutation op: %q", m.Op())
+	}
+}
+
+// MsgInternalToClient is a client for the MsgInternalTo schema.
+type MsgInternalToClient struct {
+	config
+}
+
+// NewMsgInternalToClient returns a client for the MsgInternalTo from the given config.
+func NewMsgInternalToClient(c config) *MsgInternalToClient {
+	return &MsgInternalToClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `msginternalto.Hooks(f(g(h())))`.
+func (c *MsgInternalToClient) Use(hooks ...Hook) {
+	c.hooks.MsgInternalTo = append(c.hooks.MsgInternalTo, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `msginternalto.Intercept(f(g(h())))`.
+func (c *MsgInternalToClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MsgInternalTo = append(c.inters.MsgInternalTo, interceptors...)
+}
+
+// Create returns a builder for creating a MsgInternalTo entity.
+func (c *MsgInternalToClient) Create() *MsgInternalToCreate {
+	mutation := newMsgInternalToMutation(c.config, OpCreate)
+	return &MsgInternalToCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MsgInternalTo entities.
+func (c *MsgInternalToClient) CreateBulk(builders ...*MsgInternalToCreate) *MsgInternalToCreateBulk {
+	return &MsgInternalToCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MsgInternalTo.
+func (c *MsgInternalToClient) Update() *MsgInternalToUpdate {
+	mutation := newMsgInternalToMutation(c.config, OpUpdate)
+	return &MsgInternalToUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MsgInternalToClient) UpdateOne(mit *MsgInternalTo) *MsgInternalToUpdateOne {
+	mutation := newMsgInternalToMutation(c.config, OpUpdateOne, withMsgInternalTo(mit))
+	return &MsgInternalToUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MsgInternalToClient) UpdateOneID(id int) *MsgInternalToUpdateOne {
+	mutation := newMsgInternalToMutation(c.config, OpUpdateOne, withMsgInternalToID(id))
+	return &MsgInternalToUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MsgInternalTo.
+func (c *MsgInternalToClient) Delete() *MsgInternalToDelete {
+	mutation := newMsgInternalToMutation(c.config, OpDelete)
+	return &MsgInternalToDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MsgInternalToClient) DeleteOne(mit *MsgInternalTo) *MsgInternalToDeleteOne {
+	return c.DeleteOneID(mit.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MsgInternalToClient) DeleteOneID(id int) *MsgInternalToDeleteOne {
+	builder := c.Delete().Where(msginternalto.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MsgInternalToDeleteOne{builder}
+}
+
+// Query returns a query builder for MsgInternalTo.
+func (c *MsgInternalToClient) Query() *MsgInternalToQuery {
+	return &MsgInternalToQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMsgInternalTo},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MsgInternalTo entity by its id.
+func (c *MsgInternalToClient) Get(ctx context.Context, id int) (*MsgInternalTo, error) {
+	return c.Query().Where(msginternalto.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MsgInternalToClient) GetX(ctx context.Context, id int) *MsgInternalTo {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryMsgInternal queries the msg_internal edge of a MsgInternalTo.
+func (c *MsgInternalToClient) QueryMsgInternal(mit *MsgInternalTo) *MsgInternalQuery {
+	query := (&MsgInternalClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := mit.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msginternalto.Table, msginternalto.FieldID, id),
+			sqlgraph.To(msginternal.Table, msginternal.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, msginternalto.MsgInternalTable, msginternalto.MsgInternalColumn),
+		)
+		schemaConfig := mit.schemaConfig
+		step.To.Schema = schemaConfig.MsgInternal
+		step.Edge.Schema = schemaConfig.MsgInternalTo
+		fromV = sqlgraph.Neighbors(mit.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a MsgInternalTo.
+func (c *MsgInternalToClient) QueryUser(mit *MsgInternalTo) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := mit.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msginternalto.Table, msginternalto.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, msginternalto.UserTable, msginternalto.UserColumn),
+		)
+		schemaConfig := mit.schemaConfig
+		step.To.Schema = schemaConfig.User
+		step.Edge.Schema = schemaConfig.MsgInternalTo
+		fromV = sqlgraph.Neighbors(mit.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *MsgInternalToClient) Hooks() []Hook {
+	hooks := c.hooks.MsgInternalTo
+	return append(hooks[:len(hooks):len(hooks)], msginternalto.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *MsgInternalToClient) Interceptors() []Interceptor {
+	inters := c.inters.MsgInternalTo
+	return append(inters[:len(inters):len(inters)], msginternalto.Interceptors[:]...)
+}
+
+func (c *MsgInternalToClient) mutate(ctx context.Context, m *MsgInternalToMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MsgInternalToCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MsgInternalToUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MsgInternalToUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MsgInternalToDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MsgInternalTo mutation op: %q", m.Op())
 	}
 }
 
@@ -1883,12 +2198,13 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		MsgAlert, MsgChannel, MsgEvent, MsgSubscriber, MsgTemplate, MsgType, Nlog,
-		NlogAlert, OrgRoleUser, Silence, User []ent.Hook
+		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSubscriber,
+		MsgTemplate, MsgType, Nlog, NlogAlert, OrgRoleUser, Silence, User []ent.Hook
 	}
 	inters struct {
-		MsgAlert, MsgChannel, MsgEvent, MsgSubscriber, MsgTemplate, MsgType, Nlog,
-		NlogAlert, OrgRoleUser, Silence, User []ent.Interceptor
+		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSubscriber,
+		MsgTemplate, MsgType, Nlog, NlogAlert, OrgRoleUser, Silence,
+		User []ent.Interceptor
 	}
 )
 

@@ -45,6 +45,10 @@ type Mutation {
     updateSilence(id: ID!, input: UpdateSilenceInput!): Silence!
     """ 删除静默 """
     deleteSilence(id: ID!): Boolean!
+    """ 设置站内信消息已读未读 """
+    markMessageReaOrUnRead(ids: [ID!]!, read: Boolean!): Boolean!
+    """ 删除站内信消息 """
+    markMessageDeleted(ids: [ID!]!): Boolean!
 }
 
 input RouteInput  {

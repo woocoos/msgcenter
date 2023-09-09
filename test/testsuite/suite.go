@@ -22,7 +22,8 @@ import (
 
 var (
 	alterPassWordEventName = "AlterPassword"
-	subEventName           = "SubEvent"
+	SubEventName           = "SubEvent"
+	WebhookEventName       = "WebhookEvent"
 )
 
 type BaseSuite struct {
@@ -110,7 +111,7 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 			Receiver: "email",
 			Matchers: label.Matchers{
 				{Type: label.MatchEqual, Name: "app", Value: "1"},
-				{Name: "alertname", Value: alterPassWordEventName, Type: label.MatchEqual},
+				{Name: label.AlertNameLabel, Value: alterPassWordEventName, Type: label.MatchEqual},
 			},
 			Routes: []*profile.Route{
 				{
@@ -132,8 +133,8 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
 		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
-		SetBody(`{{ template "1000.alterpwd.txt" . }}`).SetAttachments([]string{"1000/alterpwd.tmpl"}).
-		SetTpl("1000/alterpwd.tmpl").SaveX(ctx)
+		SetBody(`{{ template "1.alterpwd.txt" . }}`).SetAttachments([]string{"1/alterpwd.tmpl"}).
+		SetTpl("1/alterpwd.tmpl").SaveX(ctx)
 
 	client.MsgChannel.Create().SetName("email").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
 		SetTenantID(1).SetReceiverType(profile.ReceiverEmail).
@@ -147,16 +148,24 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 				},
 			},
 		}).SaveX(ctx)
+	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(1).SetTenantID(1).SetName(alterPassWordEventName).SetCreatedBy(1).
+		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
+		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
+		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
+		SetBody(`{{ template "1.alterpwd.txt" . }}`).SetAttachments([]string{"1/alterpwd.tmpl"}).
+		SetTpl("1/alterpwd.tmpl").SaveX(ctx)
+
 	client.MsgType.Create().SetName("alert1").SetID(2).SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
 		SetAppID(1).SetCategory("订阅类型").SetCanSubs(true).SetCanCustom(true).SaveX(ctx)
-	client.MsgEvent.Create().SetID(2).SetMsgTypeID(2).SetName(subEventName).SetStatus(typex.SimpleStatusActive).
+
+	client.MsgEvent.Create().SetID(2).SetMsgTypeID(2).SetName(SubEventName).SetStatus(typex.SimpleStatusActive).
 		SetCreatedBy(1).SetModes("email,internal").
 		SetRoute(&profile.Route{
-			Name:     subEventName,
+			Name:     SubEventName,
 			Receiver: "email",
 			Matchers: label.Matchers{
 				{Type: label.MatchEqual, Name: "app", Value: "1"},
-				{Name: "alertname", Value: subEventName, Type: label.MatchEqual},
+				{Name: "alertname", Value: SubEventName, Type: label.MatchEqual},
 			},
 			Routes: []*profile.Route{
 				{
@@ -174,12 +183,30 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 				},
 			},
 		}).SaveX(ctx)
-	client.MsgTemplate.Create().SetMsgTypeID(2).SetEventID(2).SetTenantID(1).SetName(subEventName).SetCreatedBy(1).
+	client.MsgTemplate.Create().SetMsgTypeID(2).SetEventID(2).SetTenantID(1).SetName(SubEventName).SetCreatedBy(1).
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
 		SetSubject(`订阅事件提醒`).SetCc(`{{ template "email.cc" . }}`).
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
-		SetBody(`{{ template "1000.subevent.txt" . }}`).
-		SetTpl("1000/subevent.tmpl").SaveX(ctx)
+		SetBody(`{{ template "1.subevent.txt" . }}`).
+		SetTpl("1/subevent.tmpl").SaveX(ctx)
+
+	client.MsgChannel.Create().SetName("webhook").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
+		SetTenantID(1).SetReceiverType(profile.ReceiverWebhook).
+		SetReceiver(&profile.Receiver{
+			Name: "webhook",
+			WebhookConfigs: []*profile.WebhookConfig{
+				{
+					URL: &profile.URL{Host: "localhost:5001", Scheme: "http", Path: "/webhook"},
+				},
+			},
+		}).SaveX(ctx)
+	client.MsgEvent.Create().SetID(3).SetMsgTypeID(1).SetName(WebhookEventName).SetStatus(typex.SimpleStatusActive).
+		SetCreatedBy(1).SetModes("webhook").SaveX(ctx)
+	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(3).SetTenantID(1).SetName("WebhookTemplate").SetCreatedBy(1).
+		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverWebhook).
+		SetSubject(`dingtalk`).
+		SetBody(`{{ template "dingtalk.content" . }}`).
+		SaveX(ctx)
 
 	client.User.Create().SetID(1).SetDisplayName("admin").SetEmail("admin@localhost").
 		SetPrincipalName("admin").SetMobile("13800138000").SaveX(ctx)

@@ -1,0 +1,56 @@
+appName: msgcenter
+version: 0.0.1
+development: true
+log:
+  withTraceID: true
+  traceIDKey: "traceId"
+  cores:
+    - level: debug
+      outputPaths:
+        - stdout
+      encoderConfig:
+        timeKey: "@timestamp"
+        messageKey: "message"
+        callerKey: "file"
+  rotate:
+    maxsize: 10
+    maxage: 10
+    maxbackups: 20
+    localtime: true
+
+web:
+  server:
+    addr: 127.0.0.1:10072
+  engine:
+    routerGroups:
+      - graphql:
+          basePath: "/graphql"
+          middlewares:
+            - accessLog:
+                exclude:
+                  - IntrospectionQuery
+            - recovery:
+            - errorHandle:
+            - jwt:
+                signingMethod: "HS256"
+                signingKey: "secret"
+                exclude:
+                  - "/graphql" #doc page
+            - tenant:
+                lookup: "header:X-Tenant-ID,query:X-Tenant-Id" ## browser may be transfer query ID to Id
+            - graphql:
+                group: "/graphql"
+                withAuthorization: false
+                appCode: "msg"
+
+store:
+  msgcenter:
+    driverName: mysql
+    dsn: "root:@tcp(localhost:3306)/msgcenter?parseTime=true&loc=Local"
+  redis: &redis
+    addrs:
+      - 127.0.0.1:6379
+    db: 1
+
+entcache:
+  level: context

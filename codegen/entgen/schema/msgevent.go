@@ -44,7 +44,7 @@ func (MsgEvent) Mixin() []ent.Mixin {
 // Fields of the MsgEvent.
 func (MsgEvent) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("msg_type_id").Comment("消息类型ID"),
+		field.Int("msg_type_id").Comment("消息类型ID").SchemaType(schemax.IntID{}.SchemaType()),
 		field.String("name").NotEmpty().MaxLen(45).Comment("消息事件名称,应用内唯一").
 			Match(regexp.MustCompile("[a-zA-Z0-9_]+$")),
 		field.Enum("status").GoType(typex.SimpleStatus("")).Default(typex.SimpleStatusInactive.String()).

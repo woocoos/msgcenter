@@ -12,9 +12,14 @@ import (
 )
 
 const (
+	// AlertNameLabel is the label name for the alert name which called event name.
 	AlertNameLabel = "alertname"
-	TenantLabel    = "tenant"
-	ToUserIDLabel  = "user"
+	// TenantLabel is the label name for the tenant id.
+	TenantLabel = "tenant"
+	// ToUserIDLabel is the label name for the user id. The alert belong to the user.It could be multiple users split by comma.
+	ToUserIDLabel = "user"
+	// SkipSubscribeLabel indicates if the alert is from Event Subs or skip Event Subs.
+	SkipSubscribeLabel = "skipSub"
 )
 
 type LabelName string

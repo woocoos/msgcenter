@@ -17,7 +17,7 @@ import (
 	"strings"
 )
 
-// MsgChannel 消息通道配置.
+// MsgChannel 消息通道配置.消息通道是特定类型的receiver,每一消息通道对应着一个receiver配置.
 type MsgChannel struct {
 	ent.Schema
 }

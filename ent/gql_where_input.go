@@ -11,6 +11,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msginternal"
+	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -1469,6 +1471,842 @@ func (i *MsgEventWhereInput) P() (predicate.MsgEvent, error) {
 		return predicates[0], nil
 	default:
 		return msgevent.And(predicates...), nil
+	}
+}
+
+// MsgInternalWhereInput represents a where input for filtering MsgInternal queries.
+type MsgInternalWhereInput struct {
+	Predicates []predicate.MsgInternal  `json:"-"`
+	Not        *MsgInternalWhereInput   `json:"not,omitempty"`
+	Or         []*MsgInternalWhereInput `json:"or,omitempty"`
+	And        []*MsgInternalWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "tenant_id" field predicates.
+	TenantID      *int  `json:"tenantID,omitempty"`
+	TenantIDNEQ   *int  `json:"tenantIDNEQ,omitempty"`
+	TenantIDIn    []int `json:"tenantIDIn,omitempty"`
+	TenantIDNotIn []int `json:"tenantIDNotIn,omitempty"`
+	TenantIDGT    *int  `json:"tenantIDGT,omitempty"`
+	TenantIDGTE   *int  `json:"tenantIDGTE,omitempty"`
+	TenantIDLT    *int  `json:"tenantIDLT,omitempty"`
+	TenantIDLTE   *int  `json:"tenantIDLTE,omitempty"`
+
+	// "created_by" field predicates.
+	CreatedBy      *int  `json:"createdBy,omitempty"`
+	CreatedByNEQ   *int  `json:"createdByNEQ,omitempty"`
+	CreatedByIn    []int `json:"createdByIn,omitempty"`
+	CreatedByNotIn []int `json:"createdByNotIn,omitempty"`
+	CreatedByGT    *int  `json:"createdByGT,omitempty"`
+	CreatedByGTE   *int  `json:"createdByGTE,omitempty"`
+	CreatedByLT    *int  `json:"createdByLT,omitempty"`
+	CreatedByLTE   *int  `json:"createdByLTE,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "updated_by" field predicates.
+	UpdatedBy       *int  `json:"updatedBy,omitempty"`
+	UpdatedByNEQ    *int  `json:"updatedByNEQ,omitempty"`
+	UpdatedByIn     []int `json:"updatedByIn,omitempty"`
+	UpdatedByNotIn  []int `json:"updatedByNotIn,omitempty"`
+	UpdatedByGT     *int  `json:"updatedByGT,omitempty"`
+	UpdatedByGTE    *int  `json:"updatedByGTE,omitempty"`
+	UpdatedByLT     *int  `json:"updatedByLT,omitempty"`
+	UpdatedByLTE    *int  `json:"updatedByLTE,omitempty"`
+	UpdatedByIsNil  bool  `json:"updatedByIsNil,omitempty"`
+	UpdatedByNotNil bool  `json:"updatedByNotNil,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt       *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ    *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn     []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn  []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT     *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE    *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT     *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE    *time.Time  `json:"updatedAtLTE,omitempty"`
+	UpdatedAtIsNil  bool        `json:"updatedAtIsNil,omitempty"`
+	UpdatedAtNotNil bool        `json:"updatedAtNotNil,omitempty"`
+
+	// "subject" field predicates.
+	Subject             *string  `json:"subject,omitempty"`
+	SubjectNEQ          *string  `json:"subjectNEQ,omitempty"`
+	SubjectIn           []string `json:"subjectIn,omitempty"`
+	SubjectNotIn        []string `json:"subjectNotIn,omitempty"`
+	SubjectGT           *string  `json:"subjectGT,omitempty"`
+	SubjectGTE          *string  `json:"subjectGTE,omitempty"`
+	SubjectLT           *string  `json:"subjectLT,omitempty"`
+	SubjectLTE          *string  `json:"subjectLTE,omitempty"`
+	SubjectContains     *string  `json:"subjectContains,omitempty"`
+	SubjectHasPrefix    *string  `json:"subjectHasPrefix,omitempty"`
+	SubjectHasSuffix    *string  `json:"subjectHasSuffix,omitempty"`
+	SubjectEqualFold    *string  `json:"subjectEqualFold,omitempty"`
+	SubjectContainsFold *string  `json:"subjectContainsFold,omitempty"`
+
+	// "format" field predicates.
+	Format             *string  `json:"format,omitempty"`
+	FormatNEQ          *string  `json:"formatNEQ,omitempty"`
+	FormatIn           []string `json:"formatIn,omitempty"`
+	FormatNotIn        []string `json:"formatNotIn,omitempty"`
+	FormatGT           *string  `json:"formatGT,omitempty"`
+	FormatGTE          *string  `json:"formatGTE,omitempty"`
+	FormatLT           *string  `json:"formatLT,omitempty"`
+	FormatLTE          *string  `json:"formatLTE,omitempty"`
+	FormatContains     *string  `json:"formatContains,omitempty"`
+	FormatHasPrefix    *string  `json:"formatHasPrefix,omitempty"`
+	FormatHasSuffix    *string  `json:"formatHasSuffix,omitempty"`
+	FormatEqualFold    *string  `json:"formatEqualFold,omitempty"`
+	FormatContainsFold *string  `json:"formatContainsFold,omitempty"`
+
+	// "redirect" field predicates.
+	Redirect             *string  `json:"redirect,omitempty"`
+	RedirectNEQ          *string  `json:"redirectNEQ,omitempty"`
+	RedirectIn           []string `json:"redirectIn,omitempty"`
+	RedirectNotIn        []string `json:"redirectNotIn,omitempty"`
+	RedirectGT           *string  `json:"redirectGT,omitempty"`
+	RedirectGTE          *string  `json:"redirectGTE,omitempty"`
+	RedirectLT           *string  `json:"redirectLT,omitempty"`
+	RedirectLTE          *string  `json:"redirectLTE,omitempty"`
+	RedirectContains     *string  `json:"redirectContains,omitempty"`
+	RedirectHasPrefix    *string  `json:"redirectHasPrefix,omitempty"`
+	RedirectHasSuffix    *string  `json:"redirectHasSuffix,omitempty"`
+	RedirectIsNil        bool     `json:"redirectIsNil,omitempty"`
+	RedirectNotNil       bool     `json:"redirectNotNil,omitempty"`
+	RedirectEqualFold    *string  `json:"redirectEqualFold,omitempty"`
+	RedirectContainsFold *string  `json:"redirectContainsFold,omitempty"`
+
+	// "msg_internal_to" edge predicates.
+	HasMsgInternalTo     *bool                      `json:"hasMsgInternalTo,omitempty"`
+	HasMsgInternalToWith []*MsgInternalToWhereInput `json:"hasMsgInternalToWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *MsgInternalWhereInput) AddPredicates(predicates ...predicate.MsgInternal) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the MsgInternalWhereInput filter on the MsgInternalQuery builder.
+func (i *MsgInternalWhereInput) Filter(q *MsgInternalQuery) (*MsgInternalQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyMsgInternalWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyMsgInternalWhereInput is returned in case the MsgInternalWhereInput is empty.
+var ErrEmptyMsgInternalWhereInput = errors.New("ent: empty predicate MsgInternalWhereInput")
+
+// P returns a predicate for filtering msginternals.
+// An error is returned if the input is empty or invalid.
+func (i *MsgInternalWhereInput) P() (predicate.MsgInternal, error) {
+	var predicates []predicate.MsgInternal
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, msginternal.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.MsgInternal, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, msginternal.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.MsgInternal, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, msginternal.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, msginternal.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, msginternal.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, msginternal.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, msginternal.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, msginternal.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, msginternal.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, msginternal.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, msginternal.IDLTE(*i.IDLTE))
+	}
+	if i.TenantID != nil {
+		predicates = append(predicates, msginternal.TenantIDEQ(*i.TenantID))
+	}
+	if i.TenantIDNEQ != nil {
+		predicates = append(predicates, msginternal.TenantIDNEQ(*i.TenantIDNEQ))
+	}
+	if len(i.TenantIDIn) > 0 {
+		predicates = append(predicates, msginternal.TenantIDIn(i.TenantIDIn...))
+	}
+	if len(i.TenantIDNotIn) > 0 {
+		predicates = append(predicates, msginternal.TenantIDNotIn(i.TenantIDNotIn...))
+	}
+	if i.TenantIDGT != nil {
+		predicates = append(predicates, msginternal.TenantIDGT(*i.TenantIDGT))
+	}
+	if i.TenantIDGTE != nil {
+		predicates = append(predicates, msginternal.TenantIDGTE(*i.TenantIDGTE))
+	}
+	if i.TenantIDLT != nil {
+		predicates = append(predicates, msginternal.TenantIDLT(*i.TenantIDLT))
+	}
+	if i.TenantIDLTE != nil {
+		predicates = append(predicates, msginternal.TenantIDLTE(*i.TenantIDLTE))
+	}
+	if i.CreatedBy != nil {
+		predicates = append(predicates, msginternal.CreatedByEQ(*i.CreatedBy))
+	}
+	if i.CreatedByNEQ != nil {
+		predicates = append(predicates, msginternal.CreatedByNEQ(*i.CreatedByNEQ))
+	}
+	if len(i.CreatedByIn) > 0 {
+		predicates = append(predicates, msginternal.CreatedByIn(i.CreatedByIn...))
+	}
+	if len(i.CreatedByNotIn) > 0 {
+		predicates = append(predicates, msginternal.CreatedByNotIn(i.CreatedByNotIn...))
+	}
+	if i.CreatedByGT != nil {
+		predicates = append(predicates, msginternal.CreatedByGT(*i.CreatedByGT))
+	}
+	if i.CreatedByGTE != nil {
+		predicates = append(predicates, msginternal.CreatedByGTE(*i.CreatedByGTE))
+	}
+	if i.CreatedByLT != nil {
+		predicates = append(predicates, msginternal.CreatedByLT(*i.CreatedByLT))
+	}
+	if i.CreatedByLTE != nil {
+		predicates = append(predicates, msginternal.CreatedByLTE(*i.CreatedByLTE))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, msginternal.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, msginternal.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, msginternal.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, msginternal.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, msginternal.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, msginternal.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, msginternal.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, msginternal.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.UpdatedBy != nil {
+		predicates = append(predicates, msginternal.UpdatedByEQ(*i.UpdatedBy))
+	}
+	if i.UpdatedByNEQ != nil {
+		predicates = append(predicates, msginternal.UpdatedByNEQ(*i.UpdatedByNEQ))
+	}
+	if len(i.UpdatedByIn) > 0 {
+		predicates = append(predicates, msginternal.UpdatedByIn(i.UpdatedByIn...))
+	}
+	if len(i.UpdatedByNotIn) > 0 {
+		predicates = append(predicates, msginternal.UpdatedByNotIn(i.UpdatedByNotIn...))
+	}
+	if i.UpdatedByGT != nil {
+		predicates = append(predicates, msginternal.UpdatedByGT(*i.UpdatedByGT))
+	}
+	if i.UpdatedByGTE != nil {
+		predicates = append(predicates, msginternal.UpdatedByGTE(*i.UpdatedByGTE))
+	}
+	if i.UpdatedByLT != nil {
+		predicates = append(predicates, msginternal.UpdatedByLT(*i.UpdatedByLT))
+	}
+	if i.UpdatedByLTE != nil {
+		predicates = append(predicates, msginternal.UpdatedByLTE(*i.UpdatedByLTE))
+	}
+	if i.UpdatedByIsNil {
+		predicates = append(predicates, msginternal.UpdatedByIsNil())
+	}
+	if i.UpdatedByNotNil {
+		predicates = append(predicates, msginternal.UpdatedByNotNil())
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, msginternal.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, msginternal.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, msginternal.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, msginternal.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, msginternal.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, msginternal.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, msginternal.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, msginternal.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.UpdatedAtIsNil {
+		predicates = append(predicates, msginternal.UpdatedAtIsNil())
+	}
+	if i.UpdatedAtNotNil {
+		predicates = append(predicates, msginternal.UpdatedAtNotNil())
+	}
+	if i.Subject != nil {
+		predicates = append(predicates, msginternal.SubjectEQ(*i.Subject))
+	}
+	if i.SubjectNEQ != nil {
+		predicates = append(predicates, msginternal.SubjectNEQ(*i.SubjectNEQ))
+	}
+	if len(i.SubjectIn) > 0 {
+		predicates = append(predicates, msginternal.SubjectIn(i.SubjectIn...))
+	}
+	if len(i.SubjectNotIn) > 0 {
+		predicates = append(predicates, msginternal.SubjectNotIn(i.SubjectNotIn...))
+	}
+	if i.SubjectGT != nil {
+		predicates = append(predicates, msginternal.SubjectGT(*i.SubjectGT))
+	}
+	if i.SubjectGTE != nil {
+		predicates = append(predicates, msginternal.SubjectGTE(*i.SubjectGTE))
+	}
+	if i.SubjectLT != nil {
+		predicates = append(predicates, msginternal.SubjectLT(*i.SubjectLT))
+	}
+	if i.SubjectLTE != nil {
+		predicates = append(predicates, msginternal.SubjectLTE(*i.SubjectLTE))
+	}
+	if i.SubjectContains != nil {
+		predicates = append(predicates, msginternal.SubjectContains(*i.SubjectContains))
+	}
+	if i.SubjectHasPrefix != nil {
+		predicates = append(predicates, msginternal.SubjectHasPrefix(*i.SubjectHasPrefix))
+	}
+	if i.SubjectHasSuffix != nil {
+		predicates = append(predicates, msginternal.SubjectHasSuffix(*i.SubjectHasSuffix))
+	}
+	if i.SubjectEqualFold != nil {
+		predicates = append(predicates, msginternal.SubjectEqualFold(*i.SubjectEqualFold))
+	}
+	if i.SubjectContainsFold != nil {
+		predicates = append(predicates, msginternal.SubjectContainsFold(*i.SubjectContainsFold))
+	}
+	if i.Format != nil {
+		predicates = append(predicates, msginternal.FormatEQ(*i.Format))
+	}
+	if i.FormatNEQ != nil {
+		predicates = append(predicates, msginternal.FormatNEQ(*i.FormatNEQ))
+	}
+	if len(i.FormatIn) > 0 {
+		predicates = append(predicates, msginternal.FormatIn(i.FormatIn...))
+	}
+	if len(i.FormatNotIn) > 0 {
+		predicates = append(predicates, msginternal.FormatNotIn(i.FormatNotIn...))
+	}
+	if i.FormatGT != nil {
+		predicates = append(predicates, msginternal.FormatGT(*i.FormatGT))
+	}
+	if i.FormatGTE != nil {
+		predicates = append(predicates, msginternal.FormatGTE(*i.FormatGTE))
+	}
+	if i.FormatLT != nil {
+		predicates = append(predicates, msginternal.FormatLT(*i.FormatLT))
+	}
+	if i.FormatLTE != nil {
+		predicates = append(predicates, msginternal.FormatLTE(*i.FormatLTE))
+	}
+	if i.FormatContains != nil {
+		predicates = append(predicates, msginternal.FormatContains(*i.FormatContains))
+	}
+	if i.FormatHasPrefix != nil {
+		predicates = append(predicates, msginternal.FormatHasPrefix(*i.FormatHasPrefix))
+	}
+	if i.FormatHasSuffix != nil {
+		predicates = append(predicates, msginternal.FormatHasSuffix(*i.FormatHasSuffix))
+	}
+	if i.FormatEqualFold != nil {
+		predicates = append(predicates, msginternal.FormatEqualFold(*i.FormatEqualFold))
+	}
+	if i.FormatContainsFold != nil {
+		predicates = append(predicates, msginternal.FormatContainsFold(*i.FormatContainsFold))
+	}
+	if i.Redirect != nil {
+		predicates = append(predicates, msginternal.RedirectEQ(*i.Redirect))
+	}
+	if i.RedirectNEQ != nil {
+		predicates = append(predicates, msginternal.RedirectNEQ(*i.RedirectNEQ))
+	}
+	if len(i.RedirectIn) > 0 {
+		predicates = append(predicates, msginternal.RedirectIn(i.RedirectIn...))
+	}
+	if len(i.RedirectNotIn) > 0 {
+		predicates = append(predicates, msginternal.RedirectNotIn(i.RedirectNotIn...))
+	}
+	if i.RedirectGT != nil {
+		predicates = append(predicates, msginternal.RedirectGT(*i.RedirectGT))
+	}
+	if i.RedirectGTE != nil {
+		predicates = append(predicates, msginternal.RedirectGTE(*i.RedirectGTE))
+	}
+	if i.RedirectLT != nil {
+		predicates = append(predicates, msginternal.RedirectLT(*i.RedirectLT))
+	}
+	if i.RedirectLTE != nil {
+		predicates = append(predicates, msginternal.RedirectLTE(*i.RedirectLTE))
+	}
+	if i.RedirectContains != nil {
+		predicates = append(predicates, msginternal.RedirectContains(*i.RedirectContains))
+	}
+	if i.RedirectHasPrefix != nil {
+		predicates = append(predicates, msginternal.RedirectHasPrefix(*i.RedirectHasPrefix))
+	}
+	if i.RedirectHasSuffix != nil {
+		predicates = append(predicates, msginternal.RedirectHasSuffix(*i.RedirectHasSuffix))
+	}
+	if i.RedirectIsNil {
+		predicates = append(predicates, msginternal.RedirectIsNil())
+	}
+	if i.RedirectNotNil {
+		predicates = append(predicates, msginternal.RedirectNotNil())
+	}
+	if i.RedirectEqualFold != nil {
+		predicates = append(predicates, msginternal.RedirectEqualFold(*i.RedirectEqualFold))
+	}
+	if i.RedirectContainsFold != nil {
+		predicates = append(predicates, msginternal.RedirectContainsFold(*i.RedirectContainsFold))
+	}
+
+	if i.HasMsgInternalTo != nil {
+		p := msginternal.HasMsgInternalTo()
+		if !*i.HasMsgInternalTo {
+			p = msginternal.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasMsgInternalToWith) > 0 {
+		with := make([]predicate.MsgInternalTo, 0, len(i.HasMsgInternalToWith))
+		for _, w := range i.HasMsgInternalToWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasMsgInternalToWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, msginternal.HasMsgInternalToWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyMsgInternalWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return msginternal.And(predicates...), nil
+	}
+}
+
+// MsgInternalToWhereInput represents a where input for filtering MsgInternalTo queries.
+type MsgInternalToWhereInput struct {
+	Predicates []predicate.MsgInternalTo  `json:"-"`
+	Not        *MsgInternalToWhereInput   `json:"not,omitempty"`
+	Or         []*MsgInternalToWhereInput `json:"or,omitempty"`
+	And        []*MsgInternalToWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "tenant_id" field predicates.
+	TenantID      *int  `json:"tenantID,omitempty"`
+	TenantIDNEQ   *int  `json:"tenantIDNEQ,omitempty"`
+	TenantIDIn    []int `json:"tenantIDIn,omitempty"`
+	TenantIDNotIn []int `json:"tenantIDNotIn,omitempty"`
+	TenantIDGT    *int  `json:"tenantIDGT,omitempty"`
+	TenantIDGTE   *int  `json:"tenantIDGTE,omitempty"`
+	TenantIDLT    *int  `json:"tenantIDLT,omitempty"`
+	TenantIDLTE   *int  `json:"tenantIDLTE,omitempty"`
+
+	// "msg_internal_id" field predicates.
+	MsgInternalID      *int  `json:"msgInternalID,omitempty"`
+	MsgInternalIDNEQ   *int  `json:"msgInternalIDNEQ,omitempty"`
+	MsgInternalIDIn    []int `json:"msgInternalIDIn,omitempty"`
+	MsgInternalIDNotIn []int `json:"msgInternalIDNotIn,omitempty"`
+
+	// "user_id" field predicates.
+	UserID      *int  `json:"userID,omitempty"`
+	UserIDNEQ   *int  `json:"userIDNEQ,omitempty"`
+	UserIDIn    []int `json:"userIDIn,omitempty"`
+	UserIDNotIn []int `json:"userIDNotIn,omitempty"`
+
+	// "read_at" field predicates.
+	ReadAt       *time.Time  `json:"readAt,omitempty"`
+	ReadAtNEQ    *time.Time  `json:"readAtNEQ,omitempty"`
+	ReadAtIn     []time.Time `json:"readAtIn,omitempty"`
+	ReadAtNotIn  []time.Time `json:"readAtNotIn,omitempty"`
+	ReadAtGT     *time.Time  `json:"readAtGT,omitempty"`
+	ReadAtGTE    *time.Time  `json:"readAtGTE,omitempty"`
+	ReadAtLT     *time.Time  `json:"readAtLT,omitempty"`
+	ReadAtLTE    *time.Time  `json:"readAtLTE,omitempty"`
+	ReadAtIsNil  bool        `json:"readAtIsNil,omitempty"`
+	ReadAtNotNil bool        `json:"readAtNotNil,omitempty"`
+
+	// "delete_at" field predicates.
+	DeleteAt       *time.Time  `json:"deleteAt,omitempty"`
+	DeleteAtNEQ    *time.Time  `json:"deleteAtNEQ,omitempty"`
+	DeleteAtIn     []time.Time `json:"deleteAtIn,omitempty"`
+	DeleteAtNotIn  []time.Time `json:"deleteAtNotIn,omitempty"`
+	DeleteAtGT     *time.Time  `json:"deleteAtGT,omitempty"`
+	DeleteAtGTE    *time.Time  `json:"deleteAtGTE,omitempty"`
+	DeleteAtLT     *time.Time  `json:"deleteAtLT,omitempty"`
+	DeleteAtLTE    *time.Time  `json:"deleteAtLTE,omitempty"`
+	DeleteAtIsNil  bool        `json:"deleteAtIsNil,omitempty"`
+	DeleteAtNotNil bool        `json:"deleteAtNotNil,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "msg_internal" edge predicates.
+	HasMsgInternal     *bool                    `json:"hasMsgInternal,omitempty"`
+	HasMsgInternalWith []*MsgInternalWhereInput `json:"hasMsgInternalWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *MsgInternalToWhereInput) AddPredicates(predicates ...predicate.MsgInternalTo) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the MsgInternalToWhereInput filter on the MsgInternalToQuery builder.
+func (i *MsgInternalToWhereInput) Filter(q *MsgInternalToQuery) (*MsgInternalToQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyMsgInternalToWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyMsgInternalToWhereInput is returned in case the MsgInternalToWhereInput is empty.
+var ErrEmptyMsgInternalToWhereInput = errors.New("ent: empty predicate MsgInternalToWhereInput")
+
+// P returns a predicate for filtering msginternaltos.
+// An error is returned if the input is empty or invalid.
+func (i *MsgInternalToWhereInput) P() (predicate.MsgInternalTo, error) {
+	var predicates []predicate.MsgInternalTo
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, msginternalto.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.MsgInternalTo, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, msginternalto.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.MsgInternalTo, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, msginternalto.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, msginternalto.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, msginternalto.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, msginternalto.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, msginternalto.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, msginternalto.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, msginternalto.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, msginternalto.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, msginternalto.IDLTE(*i.IDLTE))
+	}
+	if i.TenantID != nil {
+		predicates = append(predicates, msginternalto.TenantIDEQ(*i.TenantID))
+	}
+	if i.TenantIDNEQ != nil {
+		predicates = append(predicates, msginternalto.TenantIDNEQ(*i.TenantIDNEQ))
+	}
+	if len(i.TenantIDIn) > 0 {
+		predicates = append(predicates, msginternalto.TenantIDIn(i.TenantIDIn...))
+	}
+	if len(i.TenantIDNotIn) > 0 {
+		predicates = append(predicates, msginternalto.TenantIDNotIn(i.TenantIDNotIn...))
+	}
+	if i.TenantIDGT != nil {
+		predicates = append(predicates, msginternalto.TenantIDGT(*i.TenantIDGT))
+	}
+	if i.TenantIDGTE != nil {
+		predicates = append(predicates, msginternalto.TenantIDGTE(*i.TenantIDGTE))
+	}
+	if i.TenantIDLT != nil {
+		predicates = append(predicates, msginternalto.TenantIDLT(*i.TenantIDLT))
+	}
+	if i.TenantIDLTE != nil {
+		predicates = append(predicates, msginternalto.TenantIDLTE(*i.TenantIDLTE))
+	}
+	if i.MsgInternalID != nil {
+		predicates = append(predicates, msginternalto.MsgInternalIDEQ(*i.MsgInternalID))
+	}
+	if i.MsgInternalIDNEQ != nil {
+		predicates = append(predicates, msginternalto.MsgInternalIDNEQ(*i.MsgInternalIDNEQ))
+	}
+	if len(i.MsgInternalIDIn) > 0 {
+		predicates = append(predicates, msginternalto.MsgInternalIDIn(i.MsgInternalIDIn...))
+	}
+	if len(i.MsgInternalIDNotIn) > 0 {
+		predicates = append(predicates, msginternalto.MsgInternalIDNotIn(i.MsgInternalIDNotIn...))
+	}
+	if i.UserID != nil {
+		predicates = append(predicates, msginternalto.UserIDEQ(*i.UserID))
+	}
+	if i.UserIDNEQ != nil {
+		predicates = append(predicates, msginternalto.UserIDNEQ(*i.UserIDNEQ))
+	}
+	if len(i.UserIDIn) > 0 {
+		predicates = append(predicates, msginternalto.UserIDIn(i.UserIDIn...))
+	}
+	if len(i.UserIDNotIn) > 0 {
+		predicates = append(predicates, msginternalto.UserIDNotIn(i.UserIDNotIn...))
+	}
+	if i.ReadAt != nil {
+		predicates = append(predicates, msginternalto.ReadAtEQ(*i.ReadAt))
+	}
+	if i.ReadAtNEQ != nil {
+		predicates = append(predicates, msginternalto.ReadAtNEQ(*i.ReadAtNEQ))
+	}
+	if len(i.ReadAtIn) > 0 {
+		predicates = append(predicates, msginternalto.ReadAtIn(i.ReadAtIn...))
+	}
+	if len(i.ReadAtNotIn) > 0 {
+		predicates = append(predicates, msginternalto.ReadAtNotIn(i.ReadAtNotIn...))
+	}
+	if i.ReadAtGT != nil {
+		predicates = append(predicates, msginternalto.ReadAtGT(*i.ReadAtGT))
+	}
+	if i.ReadAtGTE != nil {
+		predicates = append(predicates, msginternalto.ReadAtGTE(*i.ReadAtGTE))
+	}
+	if i.ReadAtLT != nil {
+		predicates = append(predicates, msginternalto.ReadAtLT(*i.ReadAtLT))
+	}
+	if i.ReadAtLTE != nil {
+		predicates = append(predicates, msginternalto.ReadAtLTE(*i.ReadAtLTE))
+	}
+	if i.ReadAtIsNil {
+		predicates = append(predicates, msginternalto.ReadAtIsNil())
+	}
+	if i.ReadAtNotNil {
+		predicates = append(predicates, msginternalto.ReadAtNotNil())
+	}
+	if i.DeleteAt != nil {
+		predicates = append(predicates, msginternalto.DeleteAtEQ(*i.DeleteAt))
+	}
+	if i.DeleteAtNEQ != nil {
+		predicates = append(predicates, msginternalto.DeleteAtNEQ(*i.DeleteAtNEQ))
+	}
+	if len(i.DeleteAtIn) > 0 {
+		predicates = append(predicates, msginternalto.DeleteAtIn(i.DeleteAtIn...))
+	}
+	if len(i.DeleteAtNotIn) > 0 {
+		predicates = append(predicates, msginternalto.DeleteAtNotIn(i.DeleteAtNotIn...))
+	}
+	if i.DeleteAtGT != nil {
+		predicates = append(predicates, msginternalto.DeleteAtGT(*i.DeleteAtGT))
+	}
+	if i.DeleteAtGTE != nil {
+		predicates = append(predicates, msginternalto.DeleteAtGTE(*i.DeleteAtGTE))
+	}
+	if i.DeleteAtLT != nil {
+		predicates = append(predicates, msginternalto.DeleteAtLT(*i.DeleteAtLT))
+	}
+	if i.DeleteAtLTE != nil {
+		predicates = append(predicates, msginternalto.DeleteAtLTE(*i.DeleteAtLTE))
+	}
+	if i.DeleteAtIsNil {
+		predicates = append(predicates, msginternalto.DeleteAtIsNil())
+	}
+	if i.DeleteAtNotNil {
+		predicates = append(predicates, msginternalto.DeleteAtNotNil())
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, msginternalto.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, msginternalto.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, msginternalto.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, msginternalto.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, msginternalto.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, msginternalto.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, msginternalto.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, msginternalto.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+
+	if i.HasMsgInternal != nil {
+		p := msginternalto.HasMsgInternal()
+		if !*i.HasMsgInternal {
+			p = msginternalto.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasMsgInternalWith) > 0 {
+		with := make([]predicate.MsgInternal, 0, len(i.HasMsgInternalWith))
+		for _, w := range i.HasMsgInternalWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasMsgInternalWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, msginternalto.HasMsgInternalWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyMsgInternalToWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return msginternalto.And(predicates...), nil
 	}
 }
 

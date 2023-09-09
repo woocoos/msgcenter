@@ -17,6 +17,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msginternal"
+	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -46,6 +48,16 @@ var msgeventImplementors = []string{"MsgEvent", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
 func (*MsgEvent) IsNode() {}
+
+var msginternalImplementors = []string{"MsgInternal", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*MsgInternal) IsNode() {}
+
+var msginternaltoImplementors = []string{"MsgInternalTo", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*MsgInternalTo) IsNode() {}
 
 var msgsubscriberImplementors = []string{"MsgSubscriber", "Node"}
 
@@ -168,6 +180,30 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.MsgEvent.Query().
 			Where(msgevent.ID(id))
 		query, err := query.CollectFields(ctx, msgeventImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case msginternal.Table:
+		query := c.MsgInternal.Query().
+			Where(msginternal.ID(id))
+		query, err := query.CollectFields(ctx, msginternalImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case msginternalto.Table:
+		query := c.MsgInternalTo.Query().
+			Where(msginternalto.ID(id))
+		query, err := query.CollectFields(ctx, msginternaltoImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -369,6 +405,38 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.MsgEvent.Query().
 			Where(msgevent.IDIn(ids...))
 		query, err := query.CollectFields(ctx, msgeventImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case msginternal.Table:
+		query := c.MsgInternal.Query().
+			Where(msginternal.IDIn(ids...))
+		query, err := query.CollectFields(ctx, msginternalImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case msginternalto.Table:
+		query := c.MsgInternalTo.Query().
+			Where(msginternalto.IDIn(ids...))
+		query, err := query.CollectFields(ctx, msginternaltoImplementors...)
 		if err != nil {
 			return nil, err
 		}

@@ -45,6 +45,30 @@ func (f MsgEventFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MsgEventMutation", m)
 }
 
+// The MsgInternalFunc type is an adapter to allow the use of ordinary
+// function as MsgInternal mutator.
+type MsgInternalFunc func(context.Context, *ent.MsgInternalMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MsgInternalFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MsgInternalMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MsgInternalMutation", m)
+}
+
+// The MsgInternalToFunc type is an adapter to allow the use of ordinary
+// function as MsgInternalTo mutator.
+type MsgInternalToFunc func(context.Context, *ent.MsgInternalToMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MsgInternalToFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MsgInternalToMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MsgInternalToMutation", m)
+}
+
 // The MsgSubscriberFunc type is an adapter to allow the use of ordinary
 // function as MsgSubscriber mutator.
 type MsgSubscriberFunc func(context.Context, *ent.MsgSubscriberMutation) (ent.Value, error)

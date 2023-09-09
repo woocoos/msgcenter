@@ -47,7 +47,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString, Size: 45},
 		{Name: "tenant_id", Type: field.TypeInt},
-		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "internal", "webhook"}},
+		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "message", "webhook"}},
 		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"active", "inactive", "processing"}, Default: "inactive"},
 		{Name: "receiver", Type: field.TypeJSON, Nullable: true},
 		{Name: "comments", Type: field.TypeString, Nullable: true},
@@ -83,6 +83,55 @@ var (
 				Columns:    []*schema.Column{MsgEventColumns[10]},
 				RefColumns: []*schema.Column{MsgTypeColumns[0]},
 				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// MsgInternalColumns holds the columns for the "msg_internal" table.
+	MsgInternalColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "created_by", Type: field.TypeInt},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "subject", Type: field.TypeString},
+		{Name: "body", Type: field.TypeString, Nullable: true},
+		{Name: "format", Type: field.TypeString},
+		{Name: "redirect", Type: field.TypeString, Nullable: true},
+	}
+	// MsgInternalTable holds the schema information for the "msg_internal" table.
+	MsgInternalTable = &schema.Table{
+		Name:       "msg_internal",
+		Columns:    MsgInternalColumns,
+		PrimaryKey: []*schema.Column{MsgInternalColumns[0]},
+	}
+	// MsgInternalToColumns holds the columns for the "msg_internal_to" table.
+	MsgInternalToColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "read_at", Type: field.TypeTime, Nullable: true},
+		{Name: "delete_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "msg_internal_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "user_id", Type: field.TypeInt},
+	}
+	// MsgInternalToTable holds the schema information for the "msg_internal_to" table.
+	MsgInternalToTable = &schema.Table{
+		Name:       "msg_internal_to",
+		Columns:    MsgInternalToColumns,
+		PrimaryKey: []*schema.Column{MsgInternalToColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "msg_internal_to_msg_internal_msg_internal_to",
+				Columns:    []*schema.Column{MsgInternalToColumns[5]},
+				RefColumns: []*schema.Column{MsgInternalColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "msg_internal_to_user_user",
+				Columns:    []*schema.Column{MsgInternalToColumns[6]},
+				RefColumns: []*schema.Column{UserColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -126,11 +175,11 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "msg_type_id", Type: field.TypeInt},
+		{Name: "msg_type_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
 		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "name", Type: field.TypeString, Size: 45},
 		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"active", "inactive", "processing"}, Default: "inactive"},
-		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "internal", "webhook"}},
+		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "message", "webhook"}},
 		{Name: "format", Type: field.TypeEnum, Enums: []string{"txt", "html"}},
 		{Name: "subject", Type: field.TypeString, Nullable: true},
 		{Name: "from", Type: field.TypeString, Nullable: true},
@@ -186,7 +235,7 @@ var (
 		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
 		{Name: "group_key", Type: field.TypeString},
 		{Name: "receiver", Type: field.TypeString},
-		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "internal", "webhook"}},
+		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "message", "webhook"}},
 		{Name: "idx", Type: field.TypeInt},
 		{Name: "send_at", Type: field.TypeTime},
 		{Name: "created_at", Type: field.TypeTime},
@@ -294,6 +343,8 @@ var (
 		MsgAlertTable,
 		MsgChannelTable,
 		MsgEventTable,
+		MsgInternalTable,
+		MsgInternalToTable,
 		MsgSubscriberTable,
 		MsgTemplateTable,
 		MsgTypeTable,
@@ -315,6 +366,14 @@ func init() {
 	MsgEventTable.ForeignKeys[0].RefTable = MsgTypeTable
 	MsgEventTable.Annotation = &entsql.Annotation{
 		Table: "msg_event",
+	}
+	MsgInternalTable.Annotation = &entsql.Annotation{
+		Table: "msg_internal",
+	}
+	MsgInternalToTable.ForeignKeys[0].RefTable = MsgInternalTable
+	MsgInternalToTable.ForeignKeys[1].RefTable = UserTable
+	MsgInternalToTable.Annotation = &entsql.Annotation{
+		Table: "msg_internal_to",
 	}
 	MsgSubscriberTable.ForeignKeys[0].RefTable = UserTable
 	MsgSubscriberTable.ForeignKeys[1].RefTable = MsgTypeTable

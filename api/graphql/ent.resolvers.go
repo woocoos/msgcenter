@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"entgo.io/contrib/entgql"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/ent"
 )
@@ -54,6 +55,13 @@ func (r *queryResolver) Node(ctx context.Context, id string) (ent.Noder, error) 
 // Nodes is the resolver for the nodes field.
 func (r *queryResolver) Nodes(ctx context.Context, ids []string) ([]ent.Noder, error) {
 	return r.Client.NodersEx(ctx, ids)
+}
+
+// MsgInternals is the resolver for the msgInternals field.
+func (r *queryResolver) MsgInternals(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalOrder, where *ent.MsgInternalWhereInput) (*ent.MsgInternalConnection, error) {
+	return r.Client.MsgInternal.Query().Paginate(ctx, after, first, before, last,
+		ent.WithMsgInternalOrder(orderBy),
+		ent.WithMsgInternalFilter(where.Filter))
 }
 
 // MsgAlert returns generated.MsgAlertResolver implementation.

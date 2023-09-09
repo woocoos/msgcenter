@@ -36,8 +36,8 @@ func (MsgTemplate) Mixin() []ent.Mixin {
 // Fields of the MsgTemplate.
 func (MsgTemplate) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("msg_type_id").Comment("应用消息类型ID"),
-		field.Int("msg_event_id").Comment("消息事件ID"),
+		field.Int("msg_type_id").Comment("应用消息类型ID").SchemaType(schemax.IntID{}.SchemaType()),
+		field.Int("msg_event_id").Comment("消息事件ID").SchemaType(schemax.IntID{}.SchemaType()),
 		field.Int("tenant_id").Comment("组织ID").Annotations(entgql.Type("ID")),
 		field.String("name").MaxLen(45).Comment("消息模板名称"),
 		field.Enum("status").GoType(typex.SimpleStatus("")).Default(typex.SimpleStatusInactive.String()).

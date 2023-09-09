@@ -101,7 +101,7 @@ var (
 // ReceiverTypeValidator is a validator for the "receiver_type" field enum values. It is called by the builders before save.
 func ReceiverTypeValidator(rt profile.ReceiverType) error {
 	switch rt.String() {
-	case "email", "internal", "webhook":
+	case "email", "message", "webhook":
 		return nil
 	default:
 		return fmt.Errorf("nlog: invalid enum value for receiver_type field: %q", rt)

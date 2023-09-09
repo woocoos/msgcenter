@@ -15,6 +15,12 @@ type MsgChannel func(*sql.Selector)
 // MsgEvent is the predicate function for msgevent builders.
 type MsgEvent func(*sql.Selector)
 
+// MsgInternal is the predicate function for msginternal builders.
+type MsgInternal func(*sql.Selector)
+
+// MsgInternalTo is the predicate function for msginternalto builders.
+type MsgInternalTo func(*sql.Selector)
+
 // MsgSubscriber is the predicate function for msgsubscriber builders.
 type MsgSubscriber func(*sql.Selector)
 

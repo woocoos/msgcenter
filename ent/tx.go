@@ -18,6 +18,10 @@ type Tx struct {
 	MsgChannel *MsgChannelClient
 	// MsgEvent is the client for interacting with the MsgEvent builders.
 	MsgEvent *MsgEventClient
+	// MsgInternal is the client for interacting with the MsgInternal builders.
+	MsgInternal *MsgInternalClient
+	// MsgInternalTo is the client for interacting with the MsgInternalTo builders.
+	MsgInternalTo *MsgInternalToClient
 	// MsgSubscriber is the client for interacting with the MsgSubscriber builders.
 	MsgSubscriber *MsgSubscriberClient
 	// MsgTemplate is the client for interacting with the MsgTemplate builders.
@@ -168,6 +172,8 @@ func (tx *Tx) init() {
 	tx.MsgAlert = NewMsgAlertClient(tx.config)
 	tx.MsgChannel = NewMsgChannelClient(tx.config)
 	tx.MsgEvent = NewMsgEventClient(tx.config)
+	tx.MsgInternal = NewMsgInternalClient(tx.config)
+	tx.MsgInternalTo = NewMsgInternalToClient(tx.config)
 	tx.MsgSubscriber = NewMsgSubscriberClient(tx.config)
 	tx.MsgTemplate = NewMsgTemplateClient(tx.config)
 	tx.MsgType = NewMsgTypeClient(tx.config)

@@ -19,6 +19,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msginternal"
+	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -1014,6 +1016,565 @@ func (me *MsgEvent) ToEdge(order *MsgEventOrder) *MsgEventEdge {
 	return &MsgEventEdge{
 		Node:   me,
 		Cursor: order.Field.toCursor(me),
+	}
+}
+
+// MsgInternalEdge is the edge representation of MsgInternal.
+type MsgInternalEdge struct {
+	Node   *MsgInternal `json:"node"`
+	Cursor Cursor       `json:"cursor"`
+}
+
+// MsgInternalConnection is the connection containing edges to MsgInternal.
+type MsgInternalConnection struct {
+	Edges      []*MsgInternalEdge `json:"edges"`
+	PageInfo   PageInfo           `json:"pageInfo"`
+	TotalCount int                `json:"totalCount"`
+}
+
+func (c *MsgInternalConnection) build(nodes []*MsgInternal, pager *msginternalPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *MsgInternal
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *MsgInternal {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *MsgInternal {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*MsgInternalEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &MsgInternalEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// MsgInternalPaginateOption enables pagination customization.
+type MsgInternalPaginateOption func(*msginternalPager) error
+
+// WithMsgInternalOrder configures pagination ordering.
+func WithMsgInternalOrder(order *MsgInternalOrder) MsgInternalPaginateOption {
+	if order == nil {
+		order = DefaultMsgInternalOrder
+	}
+	o := *order
+	return func(pager *msginternalPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultMsgInternalOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithMsgInternalFilter configures pagination filter.
+func WithMsgInternalFilter(filter func(*MsgInternalQuery) (*MsgInternalQuery, error)) MsgInternalPaginateOption {
+	return func(pager *msginternalPager) error {
+		if filter == nil {
+			return errors.New("MsgInternalQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type msginternalPager struct {
+	reverse bool
+	order   *MsgInternalOrder
+	filter  func(*MsgInternalQuery) (*MsgInternalQuery, error)
+}
+
+func newMsgInternalPager(opts []MsgInternalPaginateOption, reverse bool) (*msginternalPager, error) {
+	pager := &msginternalPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultMsgInternalOrder
+	}
+	return pager, nil
+}
+
+func (p *msginternalPager) applyFilter(query *MsgInternalQuery) (*MsgInternalQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *msginternalPager) toCursor(mi *MsgInternal) Cursor {
+	return p.order.Field.toCursor(mi)
+}
+
+func (p *msginternalPager) applyCursors(query *MsgInternalQuery, after, before *Cursor) (*MsgInternalQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultMsgInternalOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *msginternalPager) applyOrder(query *MsgInternalQuery) *MsgInternalQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultMsgInternalOrder.Field {
+		query = query.Order(DefaultMsgInternalOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *msginternalPager) orderExpr(query *MsgInternalQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultMsgInternalOrder.Field {
+			b.Comma().Ident(DefaultMsgInternalOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to MsgInternal.
+func (mi *MsgInternalQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...MsgInternalPaginateOption,
+) (*MsgInternalConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newMsgInternalPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if mi, err = pager.applyFilter(mi); err != nil {
+		return nil, err
+	}
+	conn := &MsgInternalConnection{Edges: []*MsgInternalEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := mi.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if mi, err = pager.applyCursors(mi, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		mi.Limit(limit)
+	}
+	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
+		if first != nil {
+			mi.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
+		}
+		if last != nil {
+			mi.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
+		}
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := mi.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	mi = pager.applyOrder(mi)
+	nodes, err := mi.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// MsgInternalOrderFieldCreatedAt orders MsgInternal by created_at.
+	MsgInternalOrderFieldCreatedAt = &MsgInternalOrderField{
+		Value: func(mi *MsgInternal) (ent.Value, error) {
+			return mi.CreatedAt, nil
+		},
+		column: msginternal.FieldCreatedAt,
+		toTerm: msginternal.ByCreatedAt,
+		toCursor: func(mi *MsgInternal) Cursor {
+			return Cursor{
+				ID:    mi.ID,
+				Value: mi.CreatedAt,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f MsgInternalOrderField) String() string {
+	var str string
+	switch f.column {
+	case MsgInternalOrderFieldCreatedAt.column:
+		str = "createdAt"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f MsgInternalOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *MsgInternalOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("MsgInternalOrderField %T must be a string", v)
+	}
+	switch str {
+	case "createdAt":
+		*f = *MsgInternalOrderFieldCreatedAt
+	default:
+		return fmt.Errorf("%s is not a valid MsgInternalOrderField", str)
+	}
+	return nil
+}
+
+// MsgInternalOrderField defines the ordering field of MsgInternal.
+type MsgInternalOrderField struct {
+	// Value extracts the ordering value from the given MsgInternal.
+	Value    func(*MsgInternal) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) msginternal.OrderOption
+	toCursor func(*MsgInternal) Cursor
+}
+
+// MsgInternalOrder defines the ordering of MsgInternal.
+type MsgInternalOrder struct {
+	Direction OrderDirection         `json:"direction"`
+	Field     *MsgInternalOrderField `json:"field"`
+}
+
+// DefaultMsgInternalOrder is the default ordering of MsgInternal.
+var DefaultMsgInternalOrder = &MsgInternalOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &MsgInternalOrderField{
+		Value: func(mi *MsgInternal) (ent.Value, error) {
+			return mi.ID, nil
+		},
+		column: msginternal.FieldID,
+		toTerm: msginternal.ByID,
+		toCursor: func(mi *MsgInternal) Cursor {
+			return Cursor{ID: mi.ID}
+		},
+	},
+}
+
+// ToEdge converts MsgInternal into MsgInternalEdge.
+func (mi *MsgInternal) ToEdge(order *MsgInternalOrder) *MsgInternalEdge {
+	if order == nil {
+		order = DefaultMsgInternalOrder
+	}
+	return &MsgInternalEdge{
+		Node:   mi,
+		Cursor: order.Field.toCursor(mi),
+	}
+}
+
+// MsgInternalToEdge is the edge representation of MsgInternalTo.
+type MsgInternalToEdge struct {
+	Node   *MsgInternalTo `json:"node"`
+	Cursor Cursor         `json:"cursor"`
+}
+
+// MsgInternalToConnection is the connection containing edges to MsgInternalTo.
+type MsgInternalToConnection struct {
+	Edges      []*MsgInternalToEdge `json:"edges"`
+	PageInfo   PageInfo             `json:"pageInfo"`
+	TotalCount int                  `json:"totalCount"`
+}
+
+func (c *MsgInternalToConnection) build(nodes []*MsgInternalTo, pager *msginternaltoPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *MsgInternalTo
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *MsgInternalTo {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *MsgInternalTo {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*MsgInternalToEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &MsgInternalToEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// MsgInternalToPaginateOption enables pagination customization.
+type MsgInternalToPaginateOption func(*msginternaltoPager) error
+
+// WithMsgInternalToOrder configures pagination ordering.
+func WithMsgInternalToOrder(order *MsgInternalToOrder) MsgInternalToPaginateOption {
+	if order == nil {
+		order = DefaultMsgInternalToOrder
+	}
+	o := *order
+	return func(pager *msginternaltoPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultMsgInternalToOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithMsgInternalToFilter configures pagination filter.
+func WithMsgInternalToFilter(filter func(*MsgInternalToQuery) (*MsgInternalToQuery, error)) MsgInternalToPaginateOption {
+	return func(pager *msginternaltoPager) error {
+		if filter == nil {
+			return errors.New("MsgInternalToQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type msginternaltoPager struct {
+	reverse bool
+	order   *MsgInternalToOrder
+	filter  func(*MsgInternalToQuery) (*MsgInternalToQuery, error)
+}
+
+func newMsgInternalToPager(opts []MsgInternalToPaginateOption, reverse bool) (*msginternaltoPager, error) {
+	pager := &msginternaltoPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultMsgInternalToOrder
+	}
+	return pager, nil
+}
+
+func (p *msginternaltoPager) applyFilter(query *MsgInternalToQuery) (*MsgInternalToQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *msginternaltoPager) toCursor(mit *MsgInternalTo) Cursor {
+	return p.order.Field.toCursor(mit)
+}
+
+func (p *msginternaltoPager) applyCursors(query *MsgInternalToQuery, after, before *Cursor) (*MsgInternalToQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultMsgInternalToOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *msginternaltoPager) applyOrder(query *MsgInternalToQuery) *MsgInternalToQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultMsgInternalToOrder.Field {
+		query = query.Order(DefaultMsgInternalToOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *msginternaltoPager) orderExpr(query *MsgInternalToQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultMsgInternalToOrder.Field {
+			b.Comma().Ident(DefaultMsgInternalToOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to MsgInternalTo.
+func (mit *MsgInternalToQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...MsgInternalToPaginateOption,
+) (*MsgInternalToConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newMsgInternalToPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if mit, err = pager.applyFilter(mit); err != nil {
+		return nil, err
+	}
+	conn := &MsgInternalToConnection{Edges: []*MsgInternalToEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := mit.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if mit, err = pager.applyCursors(mit, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		mit.Limit(limit)
+	}
+	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
+		if first != nil {
+			mit.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
+		}
+		if last != nil {
+			mit.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
+		}
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := mit.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	mit = pager.applyOrder(mit)
+	nodes, err := mit.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// MsgInternalToOrderField defines the ordering field of MsgInternalTo.
+type MsgInternalToOrderField struct {
+	// Value extracts the ordering value from the given MsgInternalTo.
+	Value    func(*MsgInternalTo) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) msginternalto.OrderOption
+	toCursor func(*MsgInternalTo) Cursor
+}
+
+// MsgInternalToOrder defines the ordering of MsgInternalTo.
+type MsgInternalToOrder struct {
+	Direction OrderDirection           `json:"direction"`
+	Field     *MsgInternalToOrderField `json:"field"`
+}
+
+// DefaultMsgInternalToOrder is the default ordering of MsgInternalTo.
+var DefaultMsgInternalToOrder = &MsgInternalToOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &MsgInternalToOrderField{
+		Value: func(mit *MsgInternalTo) (ent.Value, error) {
+			return mit.ID, nil
+		},
+		column: msginternalto.FieldID,
+		toTerm: msginternalto.ByID,
+		toCursor: func(mit *MsgInternalTo) Cursor {
+			return Cursor{ID: mit.ID}
+		},
+	},
+}
+
+// ToEdge converts MsgInternalTo into MsgInternalToEdge.
+func (mit *MsgInternalTo) ToEdge(order *MsgInternalToOrder) *MsgInternalToEdge {
+	if order == nil {
+		order = DefaultMsgInternalToOrder
+	}
+	return &MsgInternalToEdge{
+		Node:   mit,
+		Cursor: order.Field.toCursor(mit),
 	}
 }
 

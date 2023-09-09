@@ -9,6 +9,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msginternal"
+	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -93,6 +95,32 @@ func init() {
 			return nil
 		}
 	}()
+	msginternalMixin := schema.MsgInternal{}.Mixin()
+	msginternalMixinHooks1 := msginternalMixin[1].Hooks()
+	msginternalMixinHooks2 := msginternalMixin[2].Hooks()
+	msginternal.Hooks[0] = msginternalMixinHooks1[0]
+	msginternal.Hooks[1] = msginternalMixinHooks2[0]
+	msginternalMixinInters1 := msginternalMixin[1].Interceptors()
+	msginternal.Interceptors[0] = msginternalMixinInters1[0]
+	msginternalMixinFields2 := msginternalMixin[2].Fields()
+	_ = msginternalMixinFields2
+	msginternalFields := schema.MsgInternal{}.Fields()
+	_ = msginternalFields
+	// msginternalDescCreatedAt is the schema descriptor for created_at field.
+	msginternalDescCreatedAt := msginternalMixinFields2[1].Descriptor()
+	// msginternal.DefaultCreatedAt holds the default value on creation for the created_at field.
+	msginternal.DefaultCreatedAt = msginternalDescCreatedAt.Default.(func() time.Time)
+	msginternaltoMixin := schema.MsgInternalTo{}.Mixin()
+	msginternaltoMixinHooks1 := msginternaltoMixin[1].Hooks()
+	msginternalto.Hooks[0] = msginternaltoMixinHooks1[0]
+	msginternaltoMixinInters1 := msginternaltoMixin[1].Interceptors()
+	msginternalto.Interceptors[0] = msginternaltoMixinInters1[0]
+	msginternaltoFields := schema.MsgInternalTo{}.Fields()
+	_ = msginternaltoFields
+	// msginternaltoDescCreatedAt is the schema descriptor for created_at field.
+	msginternaltoDescCreatedAt := msginternaltoFields[4].Descriptor()
+	// msginternalto.DefaultCreatedAt holds the default value on creation for the created_at field.
+	msginternalto.DefaultCreatedAt = msginternaltoDescCreatedAt.Default.(func() time.Time)
 	msgsubscriberMixin := schema.MsgSubscriber{}.Mixin()
 	msgsubscriberMixinHooks1 := msgsubscriberMixin[1].Hooks()
 	msgsubscriberHooks := schema.MsgSubscriber{}.Hooks()

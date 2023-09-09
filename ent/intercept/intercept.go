@@ -11,6 +11,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msginternal"
+	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -157,6 +159,60 @@ func (f TraverseMsgEvent) Traverse(ctx context.Context, q ent.Query) error {
 		return f(ctx, q)
 	}
 	return fmt.Errorf("unexpected query type %T. expect *ent.MsgEventQuery", q)
+}
+
+// The MsgInternalFunc type is an adapter to allow the use of ordinary function as a Querier.
+type MsgInternalFunc func(context.Context, *ent.MsgInternalQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f MsgInternalFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.MsgInternalQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.MsgInternalQuery", q)
+}
+
+// The TraverseMsgInternal type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseMsgInternal func(context.Context, *ent.MsgInternalQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseMsgInternal) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseMsgInternal) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.MsgInternalQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.MsgInternalQuery", q)
+}
+
+// The MsgInternalToFunc type is an adapter to allow the use of ordinary function as a Querier.
+type MsgInternalToFunc func(context.Context, *ent.MsgInternalToQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f MsgInternalToFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.MsgInternalToQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.MsgInternalToQuery", q)
+}
+
+// The TraverseMsgInternalTo type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseMsgInternalTo func(context.Context, *ent.MsgInternalToQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseMsgInternalTo) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseMsgInternalTo) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.MsgInternalToQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.MsgInternalToQuery", q)
 }
 
 // The MsgSubscriberFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -384,6 +440,10 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.MsgChannelQuery, predicate.MsgChannel, msgchannel.OrderOption]{typ: ent.TypeMsgChannel, tq: q}, nil
 	case *ent.MsgEventQuery:
 		return &query[*ent.MsgEventQuery, predicate.MsgEvent, msgevent.OrderOption]{typ: ent.TypeMsgEvent, tq: q}, nil
+	case *ent.MsgInternalQuery:
+		return &query[*ent.MsgInternalQuery, predicate.MsgInternal, msginternal.OrderOption]{typ: ent.TypeMsgInternal, tq: q}, nil
+	case *ent.MsgInternalToQuery:
+		return &query[*ent.MsgInternalToQuery, predicate.MsgInternalTo, msginternalto.OrderOption]{typ: ent.TypeMsgInternalTo, tq: q}, nil
 	case *ent.MsgSubscriberQuery:
 		return &query[*ent.MsgSubscriberQuery, predicate.MsgSubscriber, msgsubscriber.OrderOption]{typ: ent.TypeMsgSubscriber, tq: q}, nil
 	case *ent.MsgTemplateQuery:

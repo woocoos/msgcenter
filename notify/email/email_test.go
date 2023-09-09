@@ -131,7 +131,7 @@ func notifyEmailWithContext(ctx context.Context, cfg *profile.EmailConfig, serve
 	}
 	template.MustParse(tmpl.ParseGlob("*"))
 	tmpl.ExternalURL, _ = url.Parse("http://am")
-	email := NewEmail(cfg, tmpl, nil)
+	email, _ := New(cfg, tmpl, nil)
 
 	retry, err := email.Notify(ctx, firingAlert)
 	if err != nil {

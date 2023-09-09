@@ -70,6 +70,34 @@ func (me *MsgEvent) CustomerTemplate(ctx context.Context) (result []*MsgTemplate
 	return result, err
 }
 
+func (mi *MsgInternal) MsgInternalTo(ctx context.Context) (result []*MsgInternalTo, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = mi.NamedMsgInternalTo(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = mi.Edges.MsgInternalToOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = mi.QueryMsgInternalTo().All(ctx)
+	}
+	return result, err
+}
+
+func (mit *MsgInternalTo) MsgInternal(ctx context.Context) (*MsgInternal, error) {
+	result, err := mit.Edges.MsgInternalOrErr()
+	if IsNotLoaded(err) {
+		result, err = mit.QueryMsgInternal().Only(ctx)
+	}
+	return result, err
+}
+
+func (mit *MsgInternalTo) User(ctx context.Context) (*User, error) {
+	result, err := mit.Edges.UserOrErr()
+	if IsNotLoaded(err) {
+		result, err = mit.QueryUser().Only(ctx)
+	}
+	return result, err
+}
+
 func (ms *MsgSubscriber) MsgType(ctx context.Context) (*MsgType, error) {
 	result, err := ms.Edges.MsgTypeOrErr()
 	if IsNotLoaded(err) {

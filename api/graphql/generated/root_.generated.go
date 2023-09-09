@@ -146,6 +146,54 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	MsgInternal struct {
+		Body          func(childComplexity int) int
+		CreatedAt     func(childComplexity int) int
+		CreatedBy     func(childComplexity int) int
+		Format        func(childComplexity int) int
+		ID            func(childComplexity int) int
+		MsgInternalTo func(childComplexity int) int
+		Redirect      func(childComplexity int) int
+		Subject       func(childComplexity int) int
+		TenantID      func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
+		UpdatedBy     func(childComplexity int) int
+	}
+
+	MsgInternalConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgInternalEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	MsgInternalTo struct {
+		CreatedAt     func(childComplexity int) int
+		DeleteAt      func(childComplexity int) int
+		ID            func(childComplexity int) int
+		MsgInternal   func(childComplexity int) int
+		MsgInternalID func(childComplexity int) int
+		ReadAt        func(childComplexity int) int
+		TenantID      func(childComplexity int) int
+		User          func(childComplexity int) int
+		UserID        func(childComplexity int) int
+	}
+
+	MsgInternalToConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgInternalToEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
 	MsgSubscriber struct {
 		CreatedAt func(childComplexity int) int
 		CreatedBy func(childComplexity int) int
@@ -231,29 +279,31 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateMsgChannel    func(childComplexity int, input ent.CreateMsgChannelInput) int
-		CreateMsgEvent      func(childComplexity int, input ent.CreateMsgEventInput) int
-		CreateMsgSubscriber func(childComplexity int, inputs []*ent.CreateMsgSubscriberInput) int
-		CreateMsgTemplate   func(childComplexity int, input ent.CreateMsgTemplateInput) int
-		CreateMsgType       func(childComplexity int, input ent.CreateMsgTypeInput) int
-		CreateSilence       func(childComplexity int, input ent.CreateSilenceInput) int
-		DeleteMsgChannel    func(childComplexity int, id int) int
-		DeleteMsgEvent      func(childComplexity int, id int) int
-		DeleteMsgSubscriber func(childComplexity int, ids []int) int
-		DeleteMsgTemplate   func(childComplexity int, id int) int
-		DeleteMsgType       func(childComplexity int, id int) int
-		DeleteSilence       func(childComplexity int, id int) int
-		DisableMsgChannel   func(childComplexity int, id int) int
-		DisableMsgEvent     func(childComplexity int, id int) int
-		DisableMsgTemplate  func(childComplexity int, id int) int
-		EnableMsgChannel    func(childComplexity int, id int) int
-		EnableMsgEvent      func(childComplexity int, id int) int
-		EnableMsgTemplate   func(childComplexity int, id int) int
-		UpdateMsgChannel    func(childComplexity int, id int, input ent.UpdateMsgChannelInput) int
-		UpdateMsgEvent      func(childComplexity int, id int, input ent.UpdateMsgEventInput) int
-		UpdateMsgTemplate   func(childComplexity int, id int, input ent.UpdateMsgTemplateInput) int
-		UpdateMsgType       func(childComplexity int, id int, input ent.UpdateMsgTypeInput) int
-		UpdateSilence       func(childComplexity int, id int, input ent.UpdateSilenceInput) int
+		CreateMsgChannel       func(childComplexity int, input ent.CreateMsgChannelInput) int
+		CreateMsgEvent         func(childComplexity int, input ent.CreateMsgEventInput) int
+		CreateMsgSubscriber    func(childComplexity int, inputs []*ent.CreateMsgSubscriberInput) int
+		CreateMsgTemplate      func(childComplexity int, input ent.CreateMsgTemplateInput) int
+		CreateMsgType          func(childComplexity int, input ent.CreateMsgTypeInput) int
+		CreateSilence          func(childComplexity int, input ent.CreateSilenceInput) int
+		DeleteMsgChannel       func(childComplexity int, id int) int
+		DeleteMsgEvent         func(childComplexity int, id int) int
+		DeleteMsgSubscriber    func(childComplexity int, ids []int) int
+		DeleteMsgTemplate      func(childComplexity int, id int) int
+		DeleteMsgType          func(childComplexity int, id int) int
+		DeleteSilence          func(childComplexity int, id int) int
+		DisableMsgChannel      func(childComplexity int, id int) int
+		DisableMsgEvent        func(childComplexity int, id int) int
+		DisableMsgTemplate     func(childComplexity int, id int) int
+		EnableMsgChannel       func(childComplexity int, id int) int
+		EnableMsgEvent         func(childComplexity int, id int) int
+		EnableMsgTemplate      func(childComplexity int, id int) int
+		MarkMessageDeleted     func(childComplexity int, ids []int) int
+		MarkMessageReaOrUnRead func(childComplexity int, ids []int, read bool) int
+		UpdateMsgChannel       func(childComplexity int, id int, input ent.UpdateMsgChannelInput) int
+		UpdateMsgEvent         func(childComplexity int, id int, input ent.UpdateMsgEventInput) int
+		UpdateMsgTemplate      func(childComplexity int, id int, input ent.UpdateMsgTemplateInput) int
+		UpdateMsgType          func(childComplexity int, id int, input ent.UpdateMsgTypeInput) int
+		UpdateSilence          func(childComplexity int, id int, input ent.UpdateSilenceInput) int
 	}
 
 	Nlog struct {
@@ -302,6 +352,7 @@ type ComplexityRoot struct {
 		MsgAlerts         func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) int
 		MsgChannels       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgChannelOrder, where *ent.MsgChannelWhereInput) int
 		MsgEvents         func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) int
+		MsgInternals      func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalOrder, where *ent.MsgInternalWhereInput) int
 		MsgTemplates      func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) int
 		MsgTypeCategories func(childComplexity int, keyword *string, appID *int) int
 		MsgTypes          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTypeOrder, where *ent.MsgTypeWhereInput) int
@@ -857,6 +908,216 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgEventEdge.Node(childComplexity), true
+
+	case "MsgInternal.body":
+		if e.complexity.MsgInternal.Body == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.Body(childComplexity), true
+
+	case "MsgInternal.createdAt":
+		if e.complexity.MsgInternal.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.CreatedAt(childComplexity), true
+
+	case "MsgInternal.createdBy":
+		if e.complexity.MsgInternal.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.CreatedBy(childComplexity), true
+
+	case "MsgInternal.format":
+		if e.complexity.MsgInternal.Format == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.Format(childComplexity), true
+
+	case "MsgInternal.id":
+		if e.complexity.MsgInternal.ID == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.ID(childComplexity), true
+
+	case "MsgInternal.msgInternalTo":
+		if e.complexity.MsgInternal.MsgInternalTo == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.MsgInternalTo(childComplexity), true
+
+	case "MsgInternal.redirect":
+		if e.complexity.MsgInternal.Redirect == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.Redirect(childComplexity), true
+
+	case "MsgInternal.subject":
+		if e.complexity.MsgInternal.Subject == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.Subject(childComplexity), true
+
+	case "MsgInternal.tenantID":
+		if e.complexity.MsgInternal.TenantID == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.TenantID(childComplexity), true
+
+	case "MsgInternal.updatedAt":
+		if e.complexity.MsgInternal.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.UpdatedAt(childComplexity), true
+
+	case "MsgInternal.updatedBy":
+		if e.complexity.MsgInternal.UpdatedBy == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.UpdatedBy(childComplexity), true
+
+	case "MsgInternalConnection.edges":
+		if e.complexity.MsgInternalConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalConnection.Edges(childComplexity), true
+
+	case "MsgInternalConnection.pageInfo":
+		if e.complexity.MsgInternalConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalConnection.PageInfo(childComplexity), true
+
+	case "MsgInternalConnection.totalCount":
+		if e.complexity.MsgInternalConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalConnection.TotalCount(childComplexity), true
+
+	case "MsgInternalEdge.cursor":
+		if e.complexity.MsgInternalEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalEdge.Cursor(childComplexity), true
+
+	case "MsgInternalEdge.node":
+		if e.complexity.MsgInternalEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalEdge.Node(childComplexity), true
+
+	case "MsgInternalTo.createdAt":
+		if e.complexity.MsgInternalTo.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.CreatedAt(childComplexity), true
+
+	case "MsgInternalTo.deleteAt":
+		if e.complexity.MsgInternalTo.DeleteAt == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.DeleteAt(childComplexity), true
+
+	case "MsgInternalTo.id":
+		if e.complexity.MsgInternalTo.ID == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.ID(childComplexity), true
+
+	case "MsgInternalTo.msgInternal":
+		if e.complexity.MsgInternalTo.MsgInternal == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.MsgInternal(childComplexity), true
+
+	case "MsgInternalTo.msgInternalID":
+		if e.complexity.MsgInternalTo.MsgInternalID == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.MsgInternalID(childComplexity), true
+
+	case "MsgInternalTo.readAt":
+		if e.complexity.MsgInternalTo.ReadAt == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.ReadAt(childComplexity), true
+
+	case "MsgInternalTo.tenantID":
+		if e.complexity.MsgInternalTo.TenantID == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.TenantID(childComplexity), true
+
+	case "MsgInternalTo.user":
+		if e.complexity.MsgInternalTo.User == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.User(childComplexity), true
+
+	case "MsgInternalTo.userID":
+		if e.complexity.MsgInternalTo.UserID == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.UserID(childComplexity), true
+
+	case "MsgInternalToConnection.edges":
+		if e.complexity.MsgInternalToConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalToConnection.Edges(childComplexity), true
+
+	case "MsgInternalToConnection.pageInfo":
+		if e.complexity.MsgInternalToConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalToConnection.PageInfo(childComplexity), true
+
+	case "MsgInternalToConnection.totalCount":
+		if e.complexity.MsgInternalToConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalToConnection.TotalCount(childComplexity), true
+
+	case "MsgInternalToEdge.cursor":
+		if e.complexity.MsgInternalToEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalToEdge.Cursor(childComplexity), true
+
+	case "MsgInternalToEdge.node":
+		if e.complexity.MsgInternalToEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalToEdge.Node(childComplexity), true
 
 	case "MsgSubscriber.createdAt":
 		if e.complexity.MsgSubscriber.CreatedAt == nil {
@@ -1515,6 +1776,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.EnableMsgTemplate(childComplexity, args["id"].(int)), true
 
+	case "Mutation.markMessageDeleted":
+		if e.complexity.Mutation.MarkMessageDeleted == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_markMessageDeleted_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MarkMessageDeleted(childComplexity, args["ids"].([]int)), true
+
+	case "Mutation.markMessageReaOrUnRead":
+		if e.complexity.Mutation.MarkMessageReaOrUnRead == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_markMessageReaOrUnRead_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MarkMessageReaOrUnRead(childComplexity, args["ids"].([]int), args["read"].(bool)), true
+
 	case "Mutation.updateMsgChannel":
 		if e.complexity.Mutation.UpdateMsgChannel == nil {
 			break
@@ -1799,6 +2084,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.MsgEvents(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgEventOrder), args["where"].(*ent.MsgEventWhereInput)), true
+
+	case "Query.msgInternals":
+		if e.complexity.Query.MsgInternals == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgInternals_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgInternals(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgInternalOrder), args["where"].(*ent.MsgInternalWhereInput)), true
 
 	case "Query.msgTemplates":
 		if e.complexity.Query.MsgTemplates == nil {
@@ -2139,6 +2436,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputMsgChannelWhereInput,
 		ec.unmarshalInputMsgEventOrder,
 		ec.unmarshalInputMsgEventWhereInput,
+		ec.unmarshalInputMsgInternalOrder,
+		ec.unmarshalInputMsgInternalToWhereInput,
+		ec.unmarshalInputMsgInternalWhereInput,
 		ec.unmarshalInputMsgSubscriberOrder,
 		ec.unmarshalInputMsgSubscriberWhereInput,
 		ec.unmarshalInputMsgTemplateOrder,
@@ -2626,7 +2926,7 @@ enum MsgChannelOrderField {
 """MsgChannelReceiverType is enum for the field receiver_type"""
 enum MsgChannelReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
   email
-  internal
+  message
   webhook
 }
 """MsgChannelSimpleStatus is enum for the field status"""
@@ -2904,6 +3204,266 @@ input MsgEventWhereInput {
   hasCustomerTemplate: Boolean
   hasCustomerTemplateWith: [MsgTemplateWhereInput!]
 }
+type MsgInternal implements Node {
+  id: ID!
+  tenantID: Int!
+  createdBy: Int!
+  createdAt: Time!
+  updatedBy: Int
+  updatedAt: Time
+  """标题"""
+  subject: String!
+  """消息体"""
+  body: String
+  """内容类型: html,txt"""
+  format: String!
+  """消息跳转"""
+  redirect: String
+  msgInternalTo: [MsgInternalTo!]
+}
+"""A connection to a list of items."""
+type MsgInternalConnection {
+  """A list of edges."""
+  edges: [MsgInternalEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type MsgInternalEdge {
+  """The item at the end of the edge."""
+  node: MsgInternal
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
+"""Ordering options for MsgInternal connections"""
+input MsgInternalOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order MsgInternals."""
+  field: MsgInternalOrderField!
+}
+"""Properties by which MsgInternal connections can be ordered."""
+enum MsgInternalOrderField {
+  createdAt
+}
+type MsgInternalTo implements Node {
+  id: ID!
+  tenantID: Int!
+  """站内信ID"""
+  msgInternalID: ID!
+  """用户ID"""
+  userID: ID!
+  """阅读时间"""
+  readAt: Time
+  """删除时间"""
+  deleteAt: Time
+  createdAt: Time!
+  msgInternal: MsgInternal!
+  user: User!
+}
+"""A connection to a list of items."""
+type MsgInternalToConnection {
+  """A list of edges."""
+  edges: [MsgInternalToEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type MsgInternalToEdge {
+  """The item at the end of the edge."""
+  node: MsgInternalTo
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
+"""
+MsgInternalToWhereInput is used for filtering MsgInternalTo objects.
+Input was generated by ent.
+"""
+input MsgInternalToWhereInput {
+  not: MsgInternalToWhereInput
+  and: [MsgInternalToWhereInput!]
+  or: [MsgInternalToWhereInput!]
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  """tenant_id field predicates"""
+  tenantID: Int
+  tenantIDNEQ: Int
+  tenantIDIn: [Int!]
+  tenantIDNotIn: [Int!]
+  tenantIDGT: Int
+  tenantIDGTE: Int
+  tenantIDLT: Int
+  tenantIDLTE: Int
+  """msg_internal_id field predicates"""
+  msgInternalID: ID
+  msgInternalIDNEQ: ID
+  msgInternalIDIn: [ID!]
+  msgInternalIDNotIn: [ID!]
+  """user_id field predicates"""
+  userID: ID
+  userIDNEQ: ID
+  userIDIn: [ID!]
+  userIDNotIn: [ID!]
+  """read_at field predicates"""
+  readAt: Time
+  readAtNEQ: Time
+  readAtIn: [Time!]
+  readAtNotIn: [Time!]
+  readAtGT: Time
+  readAtGTE: Time
+  readAtLT: Time
+  readAtLTE: Time
+  readAtIsNil: Boolean
+  readAtNotNil: Boolean
+  """delete_at field predicates"""
+  deleteAt: Time
+  deleteAtNEQ: Time
+  deleteAtIn: [Time!]
+  deleteAtNotIn: [Time!]
+  deleteAtGT: Time
+  deleteAtGTE: Time
+  deleteAtLT: Time
+  deleteAtLTE: Time
+  deleteAtIsNil: Boolean
+  deleteAtNotNil: Boolean
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  """msg_internal edge predicates"""
+  hasMsgInternal: Boolean
+  hasMsgInternalWith: [MsgInternalWhereInput!]
+}
+"""
+MsgInternalWhereInput is used for filtering MsgInternal objects.
+Input was generated by ent.
+"""
+input MsgInternalWhereInput {
+  not: MsgInternalWhereInput
+  and: [MsgInternalWhereInput!]
+  or: [MsgInternalWhereInput!]
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  """tenant_id field predicates"""
+  tenantID: Int
+  tenantIDNEQ: Int
+  tenantIDIn: [Int!]
+  tenantIDNotIn: [Int!]
+  tenantIDGT: Int
+  tenantIDGTE: Int
+  tenantIDLT: Int
+  tenantIDLTE: Int
+  """created_by field predicates"""
+  createdBy: Int
+  createdByNEQ: Int
+  createdByIn: [Int!]
+  createdByNotIn: [Int!]
+  createdByGT: Int
+  createdByGTE: Int
+  createdByLT: Int
+  createdByLTE: Int
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  """updated_by field predicates"""
+  updatedBy: Int
+  updatedByNEQ: Int
+  updatedByIn: [Int!]
+  updatedByNotIn: [Int!]
+  updatedByGT: Int
+  updatedByGTE: Int
+  updatedByLT: Int
+  updatedByLTE: Int
+  updatedByIsNil: Boolean
+  updatedByNotNil: Boolean
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtIsNil: Boolean
+  updatedAtNotNil: Boolean
+  """subject field predicates"""
+  subject: String
+  subjectNEQ: String
+  subjectIn: [String!]
+  subjectNotIn: [String!]
+  subjectGT: String
+  subjectGTE: String
+  subjectLT: String
+  subjectLTE: String
+  subjectContains: String
+  subjectHasPrefix: String
+  subjectHasSuffix: String
+  subjectEqualFold: String
+  subjectContainsFold: String
+  """format field predicates"""
+  format: String
+  formatNEQ: String
+  formatIn: [String!]
+  formatNotIn: [String!]
+  formatGT: String
+  formatGTE: String
+  formatLT: String
+  formatLTE: String
+  formatContains: String
+  formatHasPrefix: String
+  formatHasSuffix: String
+  formatEqualFold: String
+  formatContainsFold: String
+  """redirect field predicates"""
+  redirect: String
+  redirectNEQ: String
+  redirectIn: [String!]
+  redirectNotIn: [String!]
+  redirectGT: String
+  redirectGTE: String
+  redirectLT: String
+  redirectLTE: String
+  redirectContains: String
+  redirectHasPrefix: String
+  redirectHasSuffix: String
+  redirectIsNil: Boolean
+  redirectNotNil: Boolean
+  redirectEqualFold: String
+  redirectContainsFold: String
+  """msg_internal_to edge predicates"""
+  hasMsgInternalTo: Boolean
+  hasMsgInternalToWith: [MsgInternalToWhereInput!]
+}
 type MsgSubscriber implements Node {
   id: ID!
   createdBy: Int!
@@ -3111,7 +3671,7 @@ enum MsgTemplateOrderField {
 """MsgTemplateReceiverType is enum for the field receiver_type"""
 enum MsgTemplateReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
   email
-  internal
+  message
   webhook
 }
 """MsgTemplateSimpleStatus is enum for the field status"""
@@ -3591,7 +4151,7 @@ enum NlogOrderField {
 """NlogReceiverType is enum for the field receiver_type"""
 enum NlogReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
   email
-  internal
+  message
   webhook
 }
 """
@@ -3747,6 +4307,26 @@ type Query {
     """The list of node IDs."""
     ids: [GID!]!
   ): [Node]!
+  """站内信查询"""
+  msgInternals(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for MsgInternals returned from the connection."""
+    orderBy: MsgInternalOrder
+
+    """Filtering options for MsgInternals returned from the connection."""
+    where: MsgInternalWhereInput
+  ): MsgInternalConnection!
 }
 type Silence implements Node {
   id: ID!
@@ -4237,6 +4817,10 @@ extend type Query {
     updateSilence(id: ID!, input: UpdateSilenceInput!): Silence!
     """ 删除静默 """
     deleteSilence(id: ID!): Boolean!
+    """ 设置站内信消息已读未读 """
+    markMessageReaOrUnRead(ids: [ID!]!, read: Boolean!): Boolean!
+    """ 删除站内信消息 """
+    markMessageDeleted(ids: [ID!]!): Boolean!
 }
 
 input RouteInput  {

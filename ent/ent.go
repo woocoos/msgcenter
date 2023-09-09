@@ -15,6 +15,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msginternal"
+	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -86,6 +88,8 @@ func checkColumn(table, column string) error {
 			msgalert.Table:      msgalert.ValidColumn,
 			msgchannel.Table:    msgchannel.ValidColumn,
 			msgevent.Table:      msgevent.ValidColumn,
+			msginternal.Table:   msginternal.ValidColumn,
+			msginternalto.Table: msginternalto.ValidColumn,
 			msgsubscriber.Table: msgsubscriber.ValidColumn,
 			msgtemplate.Table:   msgtemplate.ValidColumn,
 			msgtype.Table:       msgtype.ValidColumn,

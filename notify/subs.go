@@ -36,10 +36,10 @@ func NewEventSubscribeStage(alerts provider.Alerts, subs Subscriber) *EventSubsc
 
 // Exec implements the Stage interface.
 // If the alert has a label "to", it will be used as the recipient.means the alert will be sent to the user.
-// need not handle subscribe.
+// Need to not handle subscribing.
 func (u EventSubscribeStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.Context, []*alert.Alert, error) {
 	for _, a := range alerts {
-		if _, ok := a.Labels[label.ToUserIDLabel]; ok {
+		if _, ok := a.Labels[label.SkipSubscribeLabel]; ok {
 			return ctx, alerts, nil
 		}
 	}
@@ -61,6 +61,7 @@ func (u EventSubscribeStage) exec(ctx context.Context, alerts ...*alert.Alert) (
 		for i, a := range alerts {
 			ac := a.Clone()
 			ac.Labels[label.ToUserIDLabel] = ui.UserID
+			ac.Labels[label.SkipSubscribeLabel] = "Y"
 			uls[i] = ac
 		}
 		if err := u.alerts.Put(uls...); err != nil {

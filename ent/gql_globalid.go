@@ -32,6 +32,18 @@ func (me *MsgEvent) GlobalID(context.Context) (string, error) {
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
+// GlobalID returns the global identifier for the given MsgInternal node.
+func (mi *MsgInternal) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("MsgInternal:%d", mi.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
+// GlobalID returns the global identifier for the given MsgInternalTo node.
+func (mit *MsgInternalTo) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("MsgInternalTo:%d", mit.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
 // GlobalID returns the global identifier for the given MsgSubscriber node.
 func (ms *MsgSubscriber) GlobalID(context.Context) (string, error) {
 	id := fmt.Sprintf("MsgSubscriber:%d", ms.ID)
@@ -96,6 +108,10 @@ func GlobalID(tp, id string) (string, error) {
 	case "MsgChannel":
 		break
 	case "MsgEvent":
+		break
+	case "MsgInternal":
+		break
+	case "MsgInternalTo":
 		break
 	case "MsgSubscriber":
 		break

@@ -31,6 +31,7 @@ type ResolvedSender interface {
 // recoverable. This information is useful for a retry logic.
 type Notifier interface {
 	ResolvedSender
+	// Notify sends notifications for the given alerts. Returns a bool value whether retrying
 	Notify(context.Context, ...*alert.Alert) (bool, error)
 }
 
@@ -42,7 +43,7 @@ type NotificationLog interface {
 
 // CustomerConfigFunc is a function that can be overridden by out component.
 // the function constrained the original configuration cannot be modified
-type CustomerConfigFunc[T profile.ReceiverConfigs] func(context.Context, T, label.LabelSet) (T, error)
+type CustomerConfigFunc[T profile.ReceiverConfigs] func(context.Context, *T, label.LabelSet) error
 
 // Integration wraps a notifier and its configuration to be uniquely identified
 // by name and index from its origin in the configuration.

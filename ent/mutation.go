@@ -15,6 +15,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msginternal"
+	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -41,6 +43,8 @@ const (
 	TypeMsgAlert      = "MsgAlert"
 	TypeMsgChannel    = "MsgChannel"
 	TypeMsgEvent      = "MsgEvent"
+	TypeMsgInternal   = "MsgInternal"
+	TypeMsgInternalTo = "MsgInternalTo"
 	TypeMsgSubscriber = "MsgSubscriber"
 	TypeMsgTemplate   = "MsgTemplate"
 	TypeMsgType       = "MsgType"
@@ -3428,6 +3432,1822 @@ func (m *MsgEventMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown MsgEvent edge %s", name)
+}
+
+// MsgInternalMutation represents an operation that mutates the MsgInternal nodes in the graph.
+type MsgInternalMutation struct {
+	config
+	op                     Op
+	typ                    string
+	id                     *int
+	tenant_id              *int
+	addtenant_id           *int
+	created_by             *int
+	addcreated_by          *int
+	created_at             *time.Time
+	updated_by             *int
+	addupdated_by          *int
+	updated_at             *time.Time
+	subject                *string
+	body                   *string
+	format                 *string
+	redirect               *string
+	clearedFields          map[string]struct{}
+	msg_internal_to        map[int]struct{}
+	removedmsg_internal_to map[int]struct{}
+	clearedmsg_internal_to bool
+	done                   bool
+	oldValue               func(context.Context) (*MsgInternal, error)
+	predicates             []predicate.MsgInternal
+}
+
+var _ ent.Mutation = (*MsgInternalMutation)(nil)
+
+// msginternalOption allows management of the mutation configuration using functional options.
+type msginternalOption func(*MsgInternalMutation)
+
+// newMsgInternalMutation creates new mutation for the MsgInternal entity.
+func newMsgInternalMutation(c config, op Op, opts ...msginternalOption) *MsgInternalMutation {
+	m := &MsgInternalMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeMsgInternal,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withMsgInternalID sets the ID field of the mutation.
+func withMsgInternalID(id int) msginternalOption {
+	return func(m *MsgInternalMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *MsgInternal
+		)
+		m.oldValue = func(ctx context.Context) (*MsgInternal, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().MsgInternal.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withMsgInternal sets the old MsgInternal of the mutation.
+func withMsgInternal(node *MsgInternal) msginternalOption {
+	return func(m *MsgInternalMutation) {
+		m.oldValue = func(context.Context) (*MsgInternal, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m MsgInternalMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m MsgInternalMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of MsgInternal entities.
+func (m *MsgInternalMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *MsgInternalMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *MsgInternalMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().MsgInternal.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *MsgInternalMutation) SetTenantID(i int) {
+	m.tenant_id = &i
+	m.addtenant_id = nil
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *MsgInternalMutation) TenantID() (r int, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the MsgInternal entity.
+// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalMutation) OldTenantID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// AddTenantID adds i to the "tenant_id" field.
+func (m *MsgInternalMutation) AddTenantID(i int) {
+	if m.addtenant_id != nil {
+		*m.addtenant_id += i
+	} else {
+		m.addtenant_id = &i
+	}
+}
+
+// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
+func (m *MsgInternalMutation) AddedTenantID() (r int, exists bool) {
+	v := m.addtenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *MsgInternalMutation) ResetTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (m *MsgInternalMutation) SetCreatedBy(i int) {
+	m.created_by = &i
+	m.addcreated_by = nil
+}
+
+// CreatedBy returns the value of the "created_by" field in the mutation.
+func (m *MsgInternalMutation) CreatedBy() (r int, exists bool) {
+	v := m.created_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedBy returns the old "created_by" field's value of the MsgInternal entity.
+// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalMutation) OldCreatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedBy: %w", err)
+	}
+	return oldValue.CreatedBy, nil
+}
+
+// AddCreatedBy adds i to the "created_by" field.
+func (m *MsgInternalMutation) AddCreatedBy(i int) {
+	if m.addcreated_by != nil {
+		*m.addcreated_by += i
+	} else {
+		m.addcreated_by = &i
+	}
+}
+
+// AddedCreatedBy returns the value that was added to the "created_by" field in this mutation.
+func (m *MsgInternalMutation) AddedCreatedBy() (r int, exists bool) {
+	v := m.addcreated_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCreatedBy resets all changes to the "created_by" field.
+func (m *MsgInternalMutation) ResetCreatedBy() {
+	m.created_by = nil
+	m.addcreated_by = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *MsgInternalMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *MsgInternalMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the MsgInternal entity.
+// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *MsgInternalMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedBy sets the "updated_by" field.
+func (m *MsgInternalMutation) SetUpdatedBy(i int) {
+	m.updated_by = &i
+	m.addupdated_by = nil
+}
+
+// UpdatedBy returns the value of the "updated_by" field in the mutation.
+func (m *MsgInternalMutation) UpdatedBy() (r int, exists bool) {
+	v := m.updated_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedBy returns the old "updated_by" field's value of the MsgInternal entity.
+// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalMutation) OldUpdatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedBy: %w", err)
+	}
+	return oldValue.UpdatedBy, nil
+}
+
+// AddUpdatedBy adds i to the "updated_by" field.
+func (m *MsgInternalMutation) AddUpdatedBy(i int) {
+	if m.addupdated_by != nil {
+		*m.addupdated_by += i
+	} else {
+		m.addupdated_by = &i
+	}
+}
+
+// AddedUpdatedBy returns the value that was added to the "updated_by" field in this mutation.
+func (m *MsgInternalMutation) AddedUpdatedBy() (r int, exists bool) {
+	v := m.addupdated_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearUpdatedBy clears the value of the "updated_by" field.
+func (m *MsgInternalMutation) ClearUpdatedBy() {
+	m.updated_by = nil
+	m.addupdated_by = nil
+	m.clearedFields[msginternal.FieldUpdatedBy] = struct{}{}
+}
+
+// UpdatedByCleared returns if the "updated_by" field was cleared in this mutation.
+func (m *MsgInternalMutation) UpdatedByCleared() bool {
+	_, ok := m.clearedFields[msginternal.FieldUpdatedBy]
+	return ok
+}
+
+// ResetUpdatedBy resets all changes to the "updated_by" field.
+func (m *MsgInternalMutation) ResetUpdatedBy() {
+	m.updated_by = nil
+	m.addupdated_by = nil
+	delete(m.clearedFields, msginternal.FieldUpdatedBy)
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *MsgInternalMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *MsgInternalMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the MsgInternal entity.
+// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (m *MsgInternalMutation) ClearUpdatedAt() {
+	m.updated_at = nil
+	m.clearedFields[msginternal.FieldUpdatedAt] = struct{}{}
+}
+
+// UpdatedAtCleared returns if the "updated_at" field was cleared in this mutation.
+func (m *MsgInternalMutation) UpdatedAtCleared() bool {
+	_, ok := m.clearedFields[msginternal.FieldUpdatedAt]
+	return ok
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *MsgInternalMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	delete(m.clearedFields, msginternal.FieldUpdatedAt)
+}
+
+// SetSubject sets the "subject" field.
+func (m *MsgInternalMutation) SetSubject(s string) {
+	m.subject = &s
+}
+
+// Subject returns the value of the "subject" field in the mutation.
+func (m *MsgInternalMutation) Subject() (r string, exists bool) {
+	v := m.subject
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSubject returns the old "subject" field's value of the MsgInternal entity.
+// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalMutation) OldSubject(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSubject is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSubject requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSubject: %w", err)
+	}
+	return oldValue.Subject, nil
+}
+
+// ResetSubject resets all changes to the "subject" field.
+func (m *MsgInternalMutation) ResetSubject() {
+	m.subject = nil
+}
+
+// SetBody sets the "body" field.
+func (m *MsgInternalMutation) SetBody(s string) {
+	m.body = &s
+}
+
+// Body returns the value of the "body" field in the mutation.
+func (m *MsgInternalMutation) Body() (r string, exists bool) {
+	v := m.body
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBody returns the old "body" field's value of the MsgInternal entity.
+// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalMutation) OldBody(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBody is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBody requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBody: %w", err)
+	}
+	return oldValue.Body, nil
+}
+
+// ClearBody clears the value of the "body" field.
+func (m *MsgInternalMutation) ClearBody() {
+	m.body = nil
+	m.clearedFields[msginternal.FieldBody] = struct{}{}
+}
+
+// BodyCleared returns if the "body" field was cleared in this mutation.
+func (m *MsgInternalMutation) BodyCleared() bool {
+	_, ok := m.clearedFields[msginternal.FieldBody]
+	return ok
+}
+
+// ResetBody resets all changes to the "body" field.
+func (m *MsgInternalMutation) ResetBody() {
+	m.body = nil
+	delete(m.clearedFields, msginternal.FieldBody)
+}
+
+// SetFormat sets the "format" field.
+func (m *MsgInternalMutation) SetFormat(s string) {
+	m.format = &s
+}
+
+// Format returns the value of the "format" field in the mutation.
+func (m *MsgInternalMutation) Format() (r string, exists bool) {
+	v := m.format
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFormat returns the old "format" field's value of the MsgInternal entity.
+// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalMutation) OldFormat(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFormat is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFormat requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFormat: %w", err)
+	}
+	return oldValue.Format, nil
+}
+
+// ResetFormat resets all changes to the "format" field.
+func (m *MsgInternalMutation) ResetFormat() {
+	m.format = nil
+}
+
+// SetRedirect sets the "redirect" field.
+func (m *MsgInternalMutation) SetRedirect(s string) {
+	m.redirect = &s
+}
+
+// Redirect returns the value of the "redirect" field in the mutation.
+func (m *MsgInternalMutation) Redirect() (r string, exists bool) {
+	v := m.redirect
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRedirect returns the old "redirect" field's value of the MsgInternal entity.
+// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalMutation) OldRedirect(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRedirect is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRedirect requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRedirect: %w", err)
+	}
+	return oldValue.Redirect, nil
+}
+
+// ClearRedirect clears the value of the "redirect" field.
+func (m *MsgInternalMutation) ClearRedirect() {
+	m.redirect = nil
+	m.clearedFields[msginternal.FieldRedirect] = struct{}{}
+}
+
+// RedirectCleared returns if the "redirect" field was cleared in this mutation.
+func (m *MsgInternalMutation) RedirectCleared() bool {
+	_, ok := m.clearedFields[msginternal.FieldRedirect]
+	return ok
+}
+
+// ResetRedirect resets all changes to the "redirect" field.
+func (m *MsgInternalMutation) ResetRedirect() {
+	m.redirect = nil
+	delete(m.clearedFields, msginternal.FieldRedirect)
+}
+
+// AddMsgInternalToIDs adds the "msg_internal_to" edge to the MsgInternalTo entity by ids.
+func (m *MsgInternalMutation) AddMsgInternalToIDs(ids ...int) {
+	if m.msg_internal_to == nil {
+		m.msg_internal_to = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.msg_internal_to[ids[i]] = struct{}{}
+	}
+}
+
+// ClearMsgInternalTo clears the "msg_internal_to" edge to the MsgInternalTo entity.
+func (m *MsgInternalMutation) ClearMsgInternalTo() {
+	m.clearedmsg_internal_to = true
+}
+
+// MsgInternalToCleared reports if the "msg_internal_to" edge to the MsgInternalTo entity was cleared.
+func (m *MsgInternalMutation) MsgInternalToCleared() bool {
+	return m.clearedmsg_internal_to
+}
+
+// RemoveMsgInternalToIDs removes the "msg_internal_to" edge to the MsgInternalTo entity by IDs.
+func (m *MsgInternalMutation) RemoveMsgInternalToIDs(ids ...int) {
+	if m.removedmsg_internal_to == nil {
+		m.removedmsg_internal_to = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.msg_internal_to, ids[i])
+		m.removedmsg_internal_to[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedMsgInternalTo returns the removed IDs of the "msg_internal_to" edge to the MsgInternalTo entity.
+func (m *MsgInternalMutation) RemovedMsgInternalToIDs() (ids []int) {
+	for id := range m.removedmsg_internal_to {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// MsgInternalToIDs returns the "msg_internal_to" edge IDs in the mutation.
+func (m *MsgInternalMutation) MsgInternalToIDs() (ids []int) {
+	for id := range m.msg_internal_to {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetMsgInternalTo resets all changes to the "msg_internal_to" edge.
+func (m *MsgInternalMutation) ResetMsgInternalTo() {
+	m.msg_internal_to = nil
+	m.clearedmsg_internal_to = false
+	m.removedmsg_internal_to = nil
+}
+
+// Where appends a list predicates to the MsgInternalMutation builder.
+func (m *MsgInternalMutation) Where(ps ...predicate.MsgInternal) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the MsgInternalMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *MsgInternalMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.MsgInternal, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *MsgInternalMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *MsgInternalMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (MsgInternal).
+func (m *MsgInternalMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *MsgInternalMutation) Fields() []string {
+	fields := make([]string, 0, 9)
+	if m.tenant_id != nil {
+		fields = append(fields, msginternal.FieldTenantID)
+	}
+	if m.created_by != nil {
+		fields = append(fields, msginternal.FieldCreatedBy)
+	}
+	if m.created_at != nil {
+		fields = append(fields, msginternal.FieldCreatedAt)
+	}
+	if m.updated_by != nil {
+		fields = append(fields, msginternal.FieldUpdatedBy)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, msginternal.FieldUpdatedAt)
+	}
+	if m.subject != nil {
+		fields = append(fields, msginternal.FieldSubject)
+	}
+	if m.body != nil {
+		fields = append(fields, msginternal.FieldBody)
+	}
+	if m.format != nil {
+		fields = append(fields, msginternal.FieldFormat)
+	}
+	if m.redirect != nil {
+		fields = append(fields, msginternal.FieldRedirect)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *MsgInternalMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case msginternal.FieldTenantID:
+		return m.TenantID()
+	case msginternal.FieldCreatedBy:
+		return m.CreatedBy()
+	case msginternal.FieldCreatedAt:
+		return m.CreatedAt()
+	case msginternal.FieldUpdatedBy:
+		return m.UpdatedBy()
+	case msginternal.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case msginternal.FieldSubject:
+		return m.Subject()
+	case msginternal.FieldBody:
+		return m.Body()
+	case msginternal.FieldFormat:
+		return m.Format()
+	case msginternal.FieldRedirect:
+		return m.Redirect()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *MsgInternalMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case msginternal.FieldTenantID:
+		return m.OldTenantID(ctx)
+	case msginternal.FieldCreatedBy:
+		return m.OldCreatedBy(ctx)
+	case msginternal.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case msginternal.FieldUpdatedBy:
+		return m.OldUpdatedBy(ctx)
+	case msginternal.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case msginternal.FieldSubject:
+		return m.OldSubject(ctx)
+	case msginternal.FieldBody:
+		return m.OldBody(ctx)
+	case msginternal.FieldFormat:
+		return m.OldFormat(ctx)
+	case msginternal.FieldRedirect:
+		return m.OldRedirect(ctx)
+	}
+	return nil, fmt.Errorf("unknown MsgInternal field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MsgInternalMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case msginternal.FieldTenantID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
+	case msginternal.FieldCreatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedBy(v)
+		return nil
+	case msginternal.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case msginternal.FieldUpdatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedBy(v)
+		return nil
+	case msginternal.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case msginternal.FieldSubject:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSubject(v)
+		return nil
+	case msginternal.FieldBody:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBody(v)
+		return nil
+	case msginternal.FieldFormat:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFormat(v)
+		return nil
+	case msginternal.FieldRedirect:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRedirect(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MsgInternal field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *MsgInternalMutation) AddedFields() []string {
+	var fields []string
+	if m.addtenant_id != nil {
+		fields = append(fields, msginternal.FieldTenantID)
+	}
+	if m.addcreated_by != nil {
+		fields = append(fields, msginternal.FieldCreatedBy)
+	}
+	if m.addupdated_by != nil {
+		fields = append(fields, msginternal.FieldUpdatedBy)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *MsgInternalMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case msginternal.FieldTenantID:
+		return m.AddedTenantID()
+	case msginternal.FieldCreatedBy:
+		return m.AddedCreatedBy()
+	case msginternal.FieldUpdatedBy:
+		return m.AddedUpdatedBy()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MsgInternalMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case msginternal.FieldTenantID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTenantID(v)
+		return nil
+	case msginternal.FieldCreatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCreatedBy(v)
+		return nil
+	case msginternal.FieldUpdatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpdatedBy(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MsgInternal numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *MsgInternalMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(msginternal.FieldUpdatedBy) {
+		fields = append(fields, msginternal.FieldUpdatedBy)
+	}
+	if m.FieldCleared(msginternal.FieldUpdatedAt) {
+		fields = append(fields, msginternal.FieldUpdatedAt)
+	}
+	if m.FieldCleared(msginternal.FieldBody) {
+		fields = append(fields, msginternal.FieldBody)
+	}
+	if m.FieldCleared(msginternal.FieldRedirect) {
+		fields = append(fields, msginternal.FieldRedirect)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *MsgInternalMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *MsgInternalMutation) ClearField(name string) error {
+	switch name {
+	case msginternal.FieldUpdatedBy:
+		m.ClearUpdatedBy()
+		return nil
+	case msginternal.FieldUpdatedAt:
+		m.ClearUpdatedAt()
+		return nil
+	case msginternal.FieldBody:
+		m.ClearBody()
+		return nil
+	case msginternal.FieldRedirect:
+		m.ClearRedirect()
+		return nil
+	}
+	return fmt.Errorf("unknown MsgInternal nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *MsgInternalMutation) ResetField(name string) error {
+	switch name {
+	case msginternal.FieldTenantID:
+		m.ResetTenantID()
+		return nil
+	case msginternal.FieldCreatedBy:
+		m.ResetCreatedBy()
+		return nil
+	case msginternal.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case msginternal.FieldUpdatedBy:
+		m.ResetUpdatedBy()
+		return nil
+	case msginternal.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case msginternal.FieldSubject:
+		m.ResetSubject()
+		return nil
+	case msginternal.FieldBody:
+		m.ResetBody()
+		return nil
+	case msginternal.FieldFormat:
+		m.ResetFormat()
+		return nil
+	case msginternal.FieldRedirect:
+		m.ResetRedirect()
+		return nil
+	}
+	return fmt.Errorf("unknown MsgInternal field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *MsgInternalMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.msg_internal_to != nil {
+		edges = append(edges, msginternal.EdgeMsgInternalTo)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *MsgInternalMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case msginternal.EdgeMsgInternalTo:
+		ids := make([]ent.Value, 0, len(m.msg_internal_to))
+		for id := range m.msg_internal_to {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *MsgInternalMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedmsg_internal_to != nil {
+		edges = append(edges, msginternal.EdgeMsgInternalTo)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *MsgInternalMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case msginternal.EdgeMsgInternalTo:
+		ids := make([]ent.Value, 0, len(m.removedmsg_internal_to))
+		for id := range m.removedmsg_internal_to {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *MsgInternalMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedmsg_internal_to {
+		edges = append(edges, msginternal.EdgeMsgInternalTo)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *MsgInternalMutation) EdgeCleared(name string) bool {
+	switch name {
+	case msginternal.EdgeMsgInternalTo:
+		return m.clearedmsg_internal_to
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *MsgInternalMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown MsgInternal unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *MsgInternalMutation) ResetEdge(name string) error {
+	switch name {
+	case msginternal.EdgeMsgInternalTo:
+		m.ResetMsgInternalTo()
+		return nil
+	}
+	return fmt.Errorf("unknown MsgInternal edge %s", name)
+}
+
+// MsgInternalToMutation represents an operation that mutates the MsgInternalTo nodes in the graph.
+type MsgInternalToMutation struct {
+	config
+	op                  Op
+	typ                 string
+	id                  *int
+	tenant_id           *int
+	addtenant_id        *int
+	read_at             *time.Time
+	delete_at           *time.Time
+	created_at          *time.Time
+	clearedFields       map[string]struct{}
+	msg_internal        *int
+	clearedmsg_internal bool
+	user                *int
+	cleareduser         bool
+	done                bool
+	oldValue            func(context.Context) (*MsgInternalTo, error)
+	predicates          []predicate.MsgInternalTo
+}
+
+var _ ent.Mutation = (*MsgInternalToMutation)(nil)
+
+// msginternaltoOption allows management of the mutation configuration using functional options.
+type msginternaltoOption func(*MsgInternalToMutation)
+
+// newMsgInternalToMutation creates new mutation for the MsgInternalTo entity.
+func newMsgInternalToMutation(c config, op Op, opts ...msginternaltoOption) *MsgInternalToMutation {
+	m := &MsgInternalToMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeMsgInternalTo,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withMsgInternalToID sets the ID field of the mutation.
+func withMsgInternalToID(id int) msginternaltoOption {
+	return func(m *MsgInternalToMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *MsgInternalTo
+		)
+		m.oldValue = func(ctx context.Context) (*MsgInternalTo, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().MsgInternalTo.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withMsgInternalTo sets the old MsgInternalTo of the mutation.
+func withMsgInternalTo(node *MsgInternalTo) msginternaltoOption {
+	return func(m *MsgInternalToMutation) {
+		m.oldValue = func(context.Context) (*MsgInternalTo, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m MsgInternalToMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m MsgInternalToMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of MsgInternalTo entities.
+func (m *MsgInternalToMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *MsgInternalToMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *MsgInternalToMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().MsgInternalTo.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *MsgInternalToMutation) SetTenantID(i int) {
+	m.tenant_id = &i
+	m.addtenant_id = nil
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *MsgInternalToMutation) TenantID() (r int, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the MsgInternalTo entity.
+// If the MsgInternalTo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalToMutation) OldTenantID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// AddTenantID adds i to the "tenant_id" field.
+func (m *MsgInternalToMutation) AddTenantID(i int) {
+	if m.addtenant_id != nil {
+		*m.addtenant_id += i
+	} else {
+		m.addtenant_id = &i
+	}
+}
+
+// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
+func (m *MsgInternalToMutation) AddedTenantID() (r int, exists bool) {
+	v := m.addtenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *MsgInternalToMutation) ResetTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+}
+
+// SetMsgInternalID sets the "msg_internal_id" field.
+func (m *MsgInternalToMutation) SetMsgInternalID(i int) {
+	m.msg_internal = &i
+}
+
+// MsgInternalID returns the value of the "msg_internal_id" field in the mutation.
+func (m *MsgInternalToMutation) MsgInternalID() (r int, exists bool) {
+	v := m.msg_internal
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMsgInternalID returns the old "msg_internal_id" field's value of the MsgInternalTo entity.
+// If the MsgInternalTo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalToMutation) OldMsgInternalID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMsgInternalID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMsgInternalID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMsgInternalID: %w", err)
+	}
+	return oldValue.MsgInternalID, nil
+}
+
+// ResetMsgInternalID resets all changes to the "msg_internal_id" field.
+func (m *MsgInternalToMutation) ResetMsgInternalID() {
+	m.msg_internal = nil
+}
+
+// SetUserID sets the "user_id" field.
+func (m *MsgInternalToMutation) SetUserID(i int) {
+	m.user = &i
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *MsgInternalToMutation) UserID() (r int, exists bool) {
+	v := m.user
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the MsgInternalTo entity.
+// If the MsgInternalTo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalToMutation) OldUserID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *MsgInternalToMutation) ResetUserID() {
+	m.user = nil
+}
+
+// SetReadAt sets the "read_at" field.
+func (m *MsgInternalToMutation) SetReadAt(t time.Time) {
+	m.read_at = &t
+}
+
+// ReadAt returns the value of the "read_at" field in the mutation.
+func (m *MsgInternalToMutation) ReadAt() (r time.Time, exists bool) {
+	v := m.read_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReadAt returns the old "read_at" field's value of the MsgInternalTo entity.
+// If the MsgInternalTo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalToMutation) OldReadAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReadAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReadAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReadAt: %w", err)
+	}
+	return oldValue.ReadAt, nil
+}
+
+// ClearReadAt clears the value of the "read_at" field.
+func (m *MsgInternalToMutation) ClearReadAt() {
+	m.read_at = nil
+	m.clearedFields[msginternalto.FieldReadAt] = struct{}{}
+}
+
+// ReadAtCleared returns if the "read_at" field was cleared in this mutation.
+func (m *MsgInternalToMutation) ReadAtCleared() bool {
+	_, ok := m.clearedFields[msginternalto.FieldReadAt]
+	return ok
+}
+
+// ResetReadAt resets all changes to the "read_at" field.
+func (m *MsgInternalToMutation) ResetReadAt() {
+	m.read_at = nil
+	delete(m.clearedFields, msginternalto.FieldReadAt)
+}
+
+// SetDeleteAt sets the "delete_at" field.
+func (m *MsgInternalToMutation) SetDeleteAt(t time.Time) {
+	m.delete_at = &t
+}
+
+// DeleteAt returns the value of the "delete_at" field in the mutation.
+func (m *MsgInternalToMutation) DeleteAt() (r time.Time, exists bool) {
+	v := m.delete_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteAt returns the old "delete_at" field's value of the MsgInternalTo entity.
+// If the MsgInternalTo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalToMutation) OldDeleteAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteAt: %w", err)
+	}
+	return oldValue.DeleteAt, nil
+}
+
+// ClearDeleteAt clears the value of the "delete_at" field.
+func (m *MsgInternalToMutation) ClearDeleteAt() {
+	m.delete_at = nil
+	m.clearedFields[msginternalto.FieldDeleteAt] = struct{}{}
+}
+
+// DeleteAtCleared returns if the "delete_at" field was cleared in this mutation.
+func (m *MsgInternalToMutation) DeleteAtCleared() bool {
+	_, ok := m.clearedFields[msginternalto.FieldDeleteAt]
+	return ok
+}
+
+// ResetDeleteAt resets all changes to the "delete_at" field.
+func (m *MsgInternalToMutation) ResetDeleteAt() {
+	m.delete_at = nil
+	delete(m.clearedFields, msginternalto.FieldDeleteAt)
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *MsgInternalToMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *MsgInternalToMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the MsgInternalTo entity.
+// If the MsgInternalTo object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalToMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *MsgInternalToMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// ClearMsgInternal clears the "msg_internal" edge to the MsgInternal entity.
+func (m *MsgInternalToMutation) ClearMsgInternal() {
+	m.clearedmsg_internal = true
+}
+
+// MsgInternalCleared reports if the "msg_internal" edge to the MsgInternal entity was cleared.
+func (m *MsgInternalToMutation) MsgInternalCleared() bool {
+	return m.clearedmsg_internal
+}
+
+// MsgInternalIDs returns the "msg_internal" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// MsgInternalID instead. It exists only for internal usage by the builders.
+func (m *MsgInternalToMutation) MsgInternalIDs() (ids []int) {
+	if id := m.msg_internal; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetMsgInternal resets all changes to the "msg_internal" edge.
+func (m *MsgInternalToMutation) ResetMsgInternal() {
+	m.msg_internal = nil
+	m.clearedmsg_internal = false
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *MsgInternalToMutation) ClearUser() {
+	m.cleareduser = true
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *MsgInternalToMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *MsgInternalToMutation) UserIDs() (ids []int) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *MsgInternalToMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+}
+
+// Where appends a list predicates to the MsgInternalToMutation builder.
+func (m *MsgInternalToMutation) Where(ps ...predicate.MsgInternalTo) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the MsgInternalToMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *MsgInternalToMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.MsgInternalTo, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *MsgInternalToMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *MsgInternalToMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (MsgInternalTo).
+func (m *MsgInternalToMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *MsgInternalToMutation) Fields() []string {
+	fields := make([]string, 0, 6)
+	if m.tenant_id != nil {
+		fields = append(fields, msginternalto.FieldTenantID)
+	}
+	if m.msg_internal != nil {
+		fields = append(fields, msginternalto.FieldMsgInternalID)
+	}
+	if m.user != nil {
+		fields = append(fields, msginternalto.FieldUserID)
+	}
+	if m.read_at != nil {
+		fields = append(fields, msginternalto.FieldReadAt)
+	}
+	if m.delete_at != nil {
+		fields = append(fields, msginternalto.FieldDeleteAt)
+	}
+	if m.created_at != nil {
+		fields = append(fields, msginternalto.FieldCreatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *MsgInternalToMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case msginternalto.FieldTenantID:
+		return m.TenantID()
+	case msginternalto.FieldMsgInternalID:
+		return m.MsgInternalID()
+	case msginternalto.FieldUserID:
+		return m.UserID()
+	case msginternalto.FieldReadAt:
+		return m.ReadAt()
+	case msginternalto.FieldDeleteAt:
+		return m.DeleteAt()
+	case msginternalto.FieldCreatedAt:
+		return m.CreatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *MsgInternalToMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case msginternalto.FieldTenantID:
+		return m.OldTenantID(ctx)
+	case msginternalto.FieldMsgInternalID:
+		return m.OldMsgInternalID(ctx)
+	case msginternalto.FieldUserID:
+		return m.OldUserID(ctx)
+	case msginternalto.FieldReadAt:
+		return m.OldReadAt(ctx)
+	case msginternalto.FieldDeleteAt:
+		return m.OldDeleteAt(ctx)
+	case msginternalto.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown MsgInternalTo field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MsgInternalToMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case msginternalto.FieldTenantID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
+	case msginternalto.FieldMsgInternalID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMsgInternalID(v)
+		return nil
+	case msginternalto.FieldUserID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case msginternalto.FieldReadAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReadAt(v)
+		return nil
+	case msginternalto.FieldDeleteAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteAt(v)
+		return nil
+	case msginternalto.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MsgInternalTo field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *MsgInternalToMutation) AddedFields() []string {
+	var fields []string
+	if m.addtenant_id != nil {
+		fields = append(fields, msginternalto.FieldTenantID)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *MsgInternalToMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case msginternalto.FieldTenantID:
+		return m.AddedTenantID()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MsgInternalToMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case msginternalto.FieldTenantID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTenantID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MsgInternalTo numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *MsgInternalToMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(msginternalto.FieldReadAt) {
+		fields = append(fields, msginternalto.FieldReadAt)
+	}
+	if m.FieldCleared(msginternalto.FieldDeleteAt) {
+		fields = append(fields, msginternalto.FieldDeleteAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *MsgInternalToMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *MsgInternalToMutation) ClearField(name string) error {
+	switch name {
+	case msginternalto.FieldReadAt:
+		m.ClearReadAt()
+		return nil
+	case msginternalto.FieldDeleteAt:
+		m.ClearDeleteAt()
+		return nil
+	}
+	return fmt.Errorf("unknown MsgInternalTo nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *MsgInternalToMutation) ResetField(name string) error {
+	switch name {
+	case msginternalto.FieldTenantID:
+		m.ResetTenantID()
+		return nil
+	case msginternalto.FieldMsgInternalID:
+		m.ResetMsgInternalID()
+		return nil
+	case msginternalto.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case msginternalto.FieldReadAt:
+		m.ResetReadAt()
+		return nil
+	case msginternalto.FieldDeleteAt:
+		m.ResetDeleteAt()
+		return nil
+	case msginternalto.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown MsgInternalTo field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *MsgInternalToMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.msg_internal != nil {
+		edges = append(edges, msginternalto.EdgeMsgInternal)
+	}
+	if m.user != nil {
+		edges = append(edges, msginternalto.EdgeUser)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *MsgInternalToMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case msginternalto.EdgeMsgInternal:
+		if id := m.msg_internal; id != nil {
+			return []ent.Value{*id}
+		}
+	case msginternalto.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *MsgInternalToMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *MsgInternalToMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *MsgInternalToMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedmsg_internal {
+		edges = append(edges, msginternalto.EdgeMsgInternal)
+	}
+	if m.cleareduser {
+		edges = append(edges, msginternalto.EdgeUser)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *MsgInternalToMutation) EdgeCleared(name string) bool {
+	switch name {
+	case msginternalto.EdgeMsgInternal:
+		return m.clearedmsg_internal
+	case msginternalto.EdgeUser:
+		return m.cleareduser
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *MsgInternalToMutation) ClearEdge(name string) error {
+	switch name {
+	case msginternalto.EdgeMsgInternal:
+		m.ClearMsgInternal()
+		return nil
+	case msginternalto.EdgeUser:
+		m.ClearUser()
+		return nil
+	}
+	return fmt.Errorf("unknown MsgInternalTo unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *MsgInternalToMutation) ResetEdge(name string) error {
+	switch name {
+	case msginternalto.EdgeMsgInternal:
+		m.ResetMsgInternal()
+		return nil
+	case msginternalto.EdgeUser:
+		m.ResetUser()
+		return nil
+	}
+	return fmt.Errorf("unknown MsgInternalTo edge %s", name)
 }
 
 // MsgSubscriberMutation represents an operation that mutates the MsgSubscriber nodes in the graph.
