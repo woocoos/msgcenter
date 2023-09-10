@@ -56,7 +56,7 @@ func UserIDsFromLabels(set label.LabelSet) ([]int, error) {
 }
 
 // findTemplate find template from database
-func findTemplate(ctx context.Context, basedir string, client *ent.Client, rt profile.ReceiverType,
+func findTemplate(ctx context.Context, basedir string, prefixDir string, client *ent.Client, rt profile.ReceiverType,
 	labels label.LabelSet) (*ent.MsgTemplate, error) {
 	tid, err := tenantIDFromLabels(labels)
 	if err != nil {
@@ -79,7 +79,7 @@ func findTemplate(ctx context.Context, basedir string, client *ent.Client, rt pr
 	if event.Attachments != nil && len(event.Attachments) > 0 {
 		as := make([]string, len(event.Attachments))
 		for i, attacher := range event.Attachments {
-			as[i] = filepath.Join(basedir, attacher)
+			as[i] = filepath.Join(basedir, GetRelativeFilePath(attacher, prefixDir))
 		}
 		event.Attachments = as
 	}
@@ -106,10 +106,10 @@ func usersFromLabels(client *ent.Client, set label.LabelSet) ([]*ent.User, error
 // use for email.Email.customTplFunc.
 // 1. Support load template from database
 // 2. Get user info's email address if exist user id in label. The user info email replaces template to address.
-func overrideEmailConfig(basedir string, client *ent.Client) notify.CustomerConfigFunc[profile.EmailConfig] {
+func overrideEmailConfig(basedir, prefixDir string, client *ent.Client) notify.CustomerConfigFunc[profile.EmailConfig] {
 	return func(ctx context.Context, cfg *profile.EmailConfig, set label.LabelSet,
 	) error {
-		data, err := findTemplate(ctx, basedir, client, profile.ReceiverEmail, set)
+		data, err := findTemplate(ctx, basedir, prefixDir, client, profile.ReceiverEmail, set)
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return nil
@@ -142,13 +142,11 @@ func overrideEmailConfig(basedir string, client *ent.Client) notify.CustomerConf
 		} else {
 			cfg.Text = data.Body
 		}
-		for k := range cfg.Headers {
-			switch strings.ToLower(k) {
-			case "cc":
-				cfg.Headers[k] = data.Cc
-			case "bcc":
-				cfg.Headers[k] = data.Bcc
-			}
+		if data.Cc != "" {
+			cfg.Headers["Cc"] = data.Cc
+		}
+		if data.Bcc != "" {
+			cfg.Headers["Bcc"] = data.Bcc
 		}
 		if data.Attachments != nil && len(data.Attachments) > 0 {
 			cfg.Headers["Attachments"] = strings.Join(data.Attachments, ",")
@@ -157,10 +155,10 @@ func overrideEmailConfig(basedir string, client *ent.Client) notify.CustomerConf
 	}
 }
 
-func overrideWebHookConfig(basedir string, client *ent.Client) notify.CustomerConfigFunc[profile.WebhookConfig] {
+func overrideWebHookConfig(basedir, prefixDir string, client *ent.Client) notify.CustomerConfigFunc[profile.WebhookConfig] {
 	return func(ctx context.Context, cfg *profile.WebhookConfig, set label.LabelSet,
 	) error {
-		data, err := findTemplate(ctx, basedir, client, profile.ReceiverWebhook, set)
+		data, err := findTemplate(ctx, basedir, prefixDir, client, profile.ReceiverWebhook, set)
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return nil
@@ -173,7 +171,7 @@ func overrideWebHookConfig(basedir string, client *ent.Client) notify.CustomerCo
 	}
 }
 
-func overrideMessageConfig(basedir string, client *ent.Client) notify.CustomerConfigFunc[profile.MessageConfig] {
+func overrideMessageConfig(basedir, prefixDir string, client *ent.Client) notify.CustomerConfigFunc[profile.MessageConfig] {
 	return func(ctx context.Context, cfg *profile.MessageConfig, set label.LabelSet,
 	) error {
 		ul, ok := set[label.ToUserIDLabel]
@@ -182,7 +180,7 @@ func overrideMessageConfig(basedir string, client *ent.Client) notify.CustomerCo
 		}
 		cfg.To = ul
 
-		data, err := findTemplate(ctx, basedir, client, profile.ReceiverWebhook, set)
+		data, err := findTemplate(ctx, basedir, prefixDir, client, profile.ReceiverWebhook, set)
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return nil

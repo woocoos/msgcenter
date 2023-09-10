@@ -80,7 +80,7 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 	if err != nil {
 		return false, fmt.Errorf("execute 'to' template: %w", err)
 	}
-	email.AddTo(to)
+	email.AddTo(strings.Split(to, ";")...)
 
 	sub := tmpl(config.Subject)
 	if err != nil {
@@ -111,6 +111,10 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 					return false, err
 				}
 			}
+		case "cc":
+			email.AddCc(strings.Split(t, ";")...)
+		case "bcc":
+			email.AddBcc(strings.Split(t, ";")...)
 		default:
 			value, err := n.tmpl.ExecuteTextString(t, data)
 			if err != nil {

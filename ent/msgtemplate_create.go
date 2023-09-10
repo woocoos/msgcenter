@@ -482,7 +482,7 @@ func (mtc *MsgTemplateCreate) createSpec() (*MsgTemplate, *sqlgraph.CreateSpec) 
 	}
 	if value, ok := mtc.mutation.TplFileID(); ok {
 		_spec.SetField(msgtemplate.FieldTplFileID, field.TypeInt, value)
-		_node.TplFileID = value
+		_node.TplFileID = &value
 	}
 	if value, ok := mtc.mutation.Attachments(); ok {
 		_spec.SetField(msgtemplate.FieldAttachments, field.TypeJSON, value)

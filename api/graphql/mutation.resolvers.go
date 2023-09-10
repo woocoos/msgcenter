@@ -162,8 +162,8 @@ func (r *mutationResolver) CreateMsgTemplate(ctx context.Context, input ent.Crea
 	if (input.Tpl != nil && input.TplFileID == nil) || (input.Tpl == nil && input.TplFileID != nil) {
 		return nil, fmt.Errorf("tpl and tplFileID is required")
 	}
-	if (input.Attachments != nil && input.AttachmentsFileIds == nil) ||
-		(input.Attachments == nil && input.AttachmentsFileIds != nil) ||
+	if ((input.Attachments != nil && len(input.Attachments) != 0) && input.AttachmentsFileIds == nil) ||
+		(input.Attachments == nil && (input.AttachmentsFileIds != nil && len(input.AttachmentsFileIds) != 0)) ||
 		(len(input.Attachments) != len(input.AttachmentsFileIds)) {
 		return nil, fmt.Errorf("attachments and attachmentsFileIds is required and lengths must be same")
 	}
@@ -203,7 +203,8 @@ func (r *mutationResolver) UpdateMsgTemplate(ctx context.Context, id int, input 
 	if (input.Tpl != nil && input.TplFileID == nil) || (input.Tpl == nil && input.TplFileID != nil) {
 		return nil, fmt.Errorf("tpl and tplFileID must exist at the same time")
 	}
-	if (input.Attachments != nil && input.AttachmentsFileIds == nil) || (input.Attachments == nil && input.AttachmentsFileIds != nil) {
+	if ((input.Attachments != nil && len(input.Attachments) != 0) && input.AttachmentsFileIds == nil) ||
+		(input.Attachments == nil && (input.AttachmentsFileIds != nil && len(input.AttachmentsFileIds) != 0)) {
 		return nil, fmt.Errorf("attachments and attachmentsFileIds must exist at the same time")
 	}
 	newFileIDs := make([]int, 0)
@@ -230,8 +231,8 @@ func (r *mutationResolver) UpdateMsgTemplate(ctx context.Context, id int, input 
 		return nil, err
 	}
 	oldFIleIDs := make([]int, 0)
-	if otemp.TplFileID != 0 {
-		oldFIleIDs = append(oldFIleIDs, otemp.TplFileID)
+	if otemp.TplFileID != nil {
+		oldFIleIDs = append(oldFIleIDs, *otemp.TplFileID)
 	}
 	if otemp.AttachmentsFileIds != nil {
 		oldFIleIDs = append(oldFIleIDs, otemp.AttachmentsFileIds...)
@@ -266,8 +267,8 @@ func (r *mutationResolver) DeleteMsgTemplate(ctx context.Context, id int) (bool,
 		return false, err
 	}
 	oldFIleIDs := make([]int, 0)
-	if otemp.TplFileID != 0 {
-		oldFIleIDs = append(oldFIleIDs, otemp.TplFileID)
+	if otemp.TplFileID != nil {
+		oldFIleIDs = append(oldFIleIDs, *otemp.TplFileID)
 	}
 	if otemp.AttachmentsFileIds != nil {
 		oldFIleIDs = append(oldFIleIDs, otemp.AttachmentsFileIds...)
@@ -313,9 +314,12 @@ func (r *mutationResolver) DisableMsgTemplate(ctx context.Context, id int) (*ent
 		return nil, err
 	}
 	// 将文件从data目录下删除
-	err = os.Remove(r.Coordinator.GetTplDataPath(temp.Tpl))
-	if err != nil {
-		return nil, err
+	_, err = os.Stat(r.Coordinator.GetTplDataPath(temp.Tpl))
+	if err == nil {
+		err = os.Remove(r.Coordinator.GetTplDataPath(temp.Tpl))
+		if err != nil {
+			return nil, err
+		}
 	}
 	// 重新加载模板
 	err = r.Coordinator.LoadTemplates()

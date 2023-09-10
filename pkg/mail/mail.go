@@ -99,6 +99,44 @@ func (e *Email) SetHeader(k, v string) *Email {
 	return e
 }
 
+func (e *Email) AddCc(cc ...string) *Email {
+	if e.err != nil {
+		return e
+	}
+	var buf []*mail.Address
+	for _, addr := range cc {
+		parsedAddr, err := mail.ParseAddress(addr)
+		if err != nil {
+			e.err = fmt.Errorf("invalid to address: %w: %s", err, addr)
+			return e
+		}
+		buf = append(buf, parsedAddr)
+	}
+	for _, addr := range buf {
+		e.e.Cc = append(e.e.Cc, addr.String())
+	}
+	return e
+}
+
+func (e *Email) AddBcc(bcc ...string) *Email {
+	if e.err != nil {
+		return e
+	}
+	var buf []*mail.Address
+	for _, addr := range bcc {
+		parsedAddr, err := mail.ParseAddress(addr)
+		if err != nil {
+			e.err = fmt.Errorf("invalid to address: %w: %s", err, addr)
+			return e
+		}
+		buf = append(buf, parsedAddr)
+	}
+	for _, addr := range buf {
+		e.e.Bcc = append(e.e.Bcc, addr.String())
+	}
+	return e
+}
+
 // SetSubject sets the subject of the SMTP client.
 func (e *Email) SetSubject(subject string) *Email {
 	if e.err != nil {

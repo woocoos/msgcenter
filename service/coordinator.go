@@ -401,17 +401,17 @@ func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *templ
 	tpldir := c.configuration.Abs(c.TempOptions.Path)
 	for i, cfg := range nc.EmailConfigs {
 		add("email", i, func() (notify.Notifier, error) {
-			return email.New(cfg, tmpl, overrideEmailConfig(tpldir, c.db))
+			return email.New(cfg, tmpl, overrideEmailConfig(tpldir, c.TempOptions.PrefixDir, c.db))
 		})
 	}
 	for i, cfg := range nc.WebhookConfigs {
 		add("webhook", i, func() (notify.Notifier, error) {
-			return webhook.New(cfg, tmpl, overrideWebHookConfig(tpldir, c.db))
+			return webhook.New(cfg, tmpl, overrideWebHookConfig(tpldir, c.TempOptions.PrefixDir, c.db))
 		})
 	}
 	if nc.MessageConfig != nil {
 		add("message", 0, func() (notify.Notifier, error) {
-			return message.New(nc.MessageConfig, tmpl, c.db, overrideMessageConfig(tpldir, c.db))
+			return message.New(nc.MessageConfig, tmpl, c.db, overrideMessageConfig(tpldir, c.TempOptions.PrefixDir, c.db))
 		})
 	}
 	if errs != nil {
@@ -455,9 +455,8 @@ func (c *Coordinator) ValidateFilePath(ctx context.Context, path, dir string) er
 }
 
 // GetRelativeFilePath 获取path相对于template.path的相对路径
-func (c *Coordinator) GetRelativeFilePath(path string) string {
-	pd := c.TempOptions.PrefixDir
-	pd = strings.TrimPrefix(pd, "/")
+func GetRelativeFilePath(path, prefixDir string) string {
+	pd := strings.TrimPrefix(prefixDir, "/")
 	path = strings.TrimPrefix(path, "/")
 	return strings.TrimPrefix(path, pd)
 }
@@ -486,7 +485,7 @@ func (c *Coordinator) GetTplDataPath(tempPath string) string {
 			tpldir,
 			data,
 			strings.TrimPrefix(
-				strings.TrimPrefix(c.GetRelativeFilePath(tempPath), "/"),
+				strings.TrimPrefix(GetRelativeFilePath(tempPath, c.TempOptions.PrefixDir), "/"),
 				strings.TrimPrefix(temp, "/"),
 			),
 		),
@@ -496,7 +495,7 @@ func (c *Coordinator) GetTplDataPath(tempPath string) string {
 // GetTplTempPath 获取tpl正式文件路径
 func (c *Coordinator) GetTplTempPath(tempPath string) string {
 	tpldir := c.configuration.Abs(c.TempOptions.Path)
-	return c.configuration.Abs(filepath.Join(tpldir, c.GetRelativeFilePath(tempPath)))
+	return c.configuration.Abs(filepath.Join(tpldir, GetRelativeFilePath(tempPath, c.TempOptions.PrefixDir)))
 }
 
 // ReportFileRefCount 文件引用上报

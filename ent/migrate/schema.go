@@ -186,7 +186,7 @@ var (
 		{Name: "to", Type: field.TypeString, Nullable: true},
 		{Name: "cc", Type: field.TypeString, Nullable: true},
 		{Name: "bcc", Type: field.TypeString, Nullable: true},
-		{Name: "body", Type: field.TypeString, Nullable: true},
+		{Name: "body", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "tpl", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "tpl_file_id", Type: field.TypeInt, Nullable: true},
 		{Name: "attachments", Type: field.TypeJSON, Nullable: true},

@@ -4852,10 +4852,10 @@ input EmailConfigInput {
     from: String
     smartHost: HostPort!
     authType: String!
-    authUsername: String!
-    authPassword: String!
-    authSecret: String!
-    authIdentity: String!
+    authUsername: String
+    authPassword: String
+    authSecret: String
+    authIdentity: String
     headers: MapString
 }`, BuiltIn: false},
 }

@@ -111,6 +111,11 @@ func (m *Matcher) UnmarshalText(in []byte) error {
 	return nil
 }
 
+func (m *Matcher) UnmarshalJSON(data []byte) error {
+	type cm Matcher
+	return json.Unmarshal(data, (*cm)(m))
+}
+
 // openMetricsEscape is similar to the usual string escaping, but more
 // restricted. It merely replaces a new-line character with '\n', a double-quote
 // character with '\"', and a backslash with '\\', which is the escaping used by

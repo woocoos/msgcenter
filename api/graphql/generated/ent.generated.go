@@ -6082,9 +6082,9 @@ func (ec *executionContext) _MsgTemplate_tplFileID(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalOID2int(ctx, field.Selections, res)
+	return ec.marshalOID2ᚖint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MsgTemplate_tplFileID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {

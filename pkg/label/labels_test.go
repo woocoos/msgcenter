@@ -1,6 +1,7 @@
 package label
 
 import (
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -45,5 +46,14 @@ func Test_labelSetToFingerprint(t *testing.T) {
 			assert.NoError(t, got2.Parse(got.String()))
 			assert.Equal(t, tt.want, got2)
 		})
+	}
+}
+
+func TestUnmarshalMatcher(t *testing.T) {
+	str := `{"name": "alert", "type": 1, "value": "111"}`
+	m := Matcher{}
+	err := json.Unmarshal([]byte(str), &m)
+	if err != nil {
+		t.Error(err)
 	}
 }

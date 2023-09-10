@@ -7,8 +7,8 @@ route:
   repeatInterval: 1h
 # 模板文件位置
 templates:
-  - '../../test/testdata/files/msg/tpl/data/*.tmpl'
-  - '../../test/testdata/files/msg/tpl/data/**/*.tmpl'
+  - '../../test/testdata/files/tpl/data/*.tmpl'
+  - '../../test/testdata/files/tpl/data/**/*.tmpl'
 
 receivers:
   - name: "internal"

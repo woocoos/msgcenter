@@ -58,7 +58,7 @@ type MsgTemplate struct {
 	// 模板地址。key：/msg/tpl/temp/1/xxx
 	Tpl string `json:"tpl,omitempty"`
 	// 模板地址
-	TplFileID int `json:"tpl_file_id,omitempty"`
+	TplFileID *int `json:"tpl_file_id,omitempty"`
 	// 附件地址。key：/msg/att/1/xxx
 	Attachments []string `json:"attachments,omitempty"`
 	// 附件ids
@@ -241,7 +241,8 @@ func (mt *MsgTemplate) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field tpl_file_id", values[i])
 			} else if value.Valid {
-				mt.TplFileID = int(value.Int64)
+				mt.TplFileID = new(int)
+				*mt.TplFileID = int(value.Int64)
 			}
 		case msgtemplate.FieldAttachments:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -360,8 +361,10 @@ func (mt *MsgTemplate) String() string {
 	builder.WriteString("tpl=")
 	builder.WriteString(mt.Tpl)
 	builder.WriteString(", ")
-	builder.WriteString("tpl_file_id=")
-	builder.WriteString(fmt.Sprintf("%v", mt.TplFileID))
+	if v := mt.TplFileID; v != nil {
+		builder.WriteString("tpl_file_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("attachments=")
 	builder.WriteString(fmt.Sprintf("%v", mt.Attachments))
