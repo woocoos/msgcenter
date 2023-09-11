@@ -86,13 +86,12 @@ alertManager:
   alerts:
     gcInterval: 30m
   template:
-    path: ../../test/testdata/files # path for custom template
-    prefixDir: "/msg"  # 相对于存储服务的前缀路径
+    path: /Volumes/QEELYN/GIT/woocoo/knockout/cmd/files/tmp # path for custom template
     fileBaseUrl: "http://127.0.0.1:10071"
     relativePath:
-      tplTemp: "/tpl/temp" # 模板临时路径
-      tplData: "/tpl/data" # 模板正式路径
-      attachment: "/att" # 附件存储路径
+      tplTemp: "/msg/tpl/temp" # 模板临时路径
+      tplData: "/msg/tpl/data" # 模板正式路径
+      attachment: "/msg/att" # 附件存储路径
 
 prometheus:
   server:

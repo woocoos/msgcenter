@@ -61,7 +61,6 @@ type Coordinator struct {
 
 type TempOptions struct {
 	Path         string `yaml:"path"`
-	PrefixDir    string `yaml:"prefixDir"`
 	FileBaseUrl  string `yaml:"fileBaseUrl"`
 	RelativePath struct {
 		TplTemp    string `yaml:"tplTemp"`
@@ -401,17 +400,17 @@ func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *templ
 	tpldir := c.configuration.Abs(c.TempOptions.Path)
 	for i, cfg := range nc.EmailConfigs {
 		add("email", i, func() (notify.Notifier, error) {
-			return email.New(cfg, tmpl, overrideEmailConfig(tpldir, c.TempOptions.PrefixDir, c.db))
+			return email.New(cfg, tmpl, overrideEmailConfig(tpldir, c.db))
 		})
 	}
 	for i, cfg := range nc.WebhookConfigs {
 		add("webhook", i, func() (notify.Notifier, error) {
-			return webhook.New(cfg, tmpl, overrideWebHookConfig(tpldir, c.TempOptions.PrefixDir, c.db))
+			return webhook.New(cfg, tmpl, overrideWebHookConfig(tpldir, c.db))
 		})
 	}
 	if nc.MessageConfig != nil {
 		add("message", 0, func() (notify.Notifier, error) {
-			return message.New(nc.MessageConfig, tmpl, c.db, overrideMessageConfig(tpldir, c.TempOptions.PrefixDir, c.db))
+			return message.New(nc.MessageConfig, tmpl, c.db, overrideMessageConfig(tpldir, c.db))
 		})
 	}
 	if errs != nil {
@@ -436,7 +435,6 @@ func (c *Coordinator) ValidateFilePath(ctx context.Context, path, dir string) er
 	if err != nil {
 		return err
 	}
-	pd := c.TempOptions.PrefixDir
 	path = filepath.Join(path)
 	p := strings.TrimPrefix(path, "/")
 	rp := ""
@@ -447,18 +445,11 @@ func (c *Coordinator) ValidateFilePath(ctx context.Context, path, dir string) er
 	} else if dir == TempRelativePathAttachment {
 		rp = c.TempOptions.RelativePath.Attachment
 	}
-	prefixPath := filepath.Join(pd, rp, strconv.Itoa(tid))
+	prefixPath := filepath.Join(rp, strconv.Itoa(tid))
 	if !strings.HasPrefix(p, strings.TrimPrefix(prefixPath, "/")) {
 		return fmt.Errorf("invalid path: %s,must be like:%s/xxx", path, prefixPath)
 	}
 	return nil
-}
-
-// GetRelativeFilePath 获取path相对于template.path的相对路径
-func GetRelativeFilePath(path, prefixDir string) string {
-	pd := strings.TrimPrefix(prefixDir, "/")
-	path = strings.TrimPrefix(path, "/")
-	return strings.TrimPrefix(path, pd)
 }
 
 func (c *Coordinator) CopyFile(dstName, srcName string) (written int64, err error) {
@@ -485,7 +476,7 @@ func (c *Coordinator) GetTplDataPath(tempPath string) string {
 			tpldir,
 			data,
 			strings.TrimPrefix(
-				strings.TrimPrefix(GetRelativeFilePath(tempPath, c.TempOptions.PrefixDir), "/"),
+				strings.TrimPrefix(tempPath, "/"),
 				strings.TrimPrefix(temp, "/"),
 			),
 		),
@@ -495,7 +486,7 @@ func (c *Coordinator) GetTplDataPath(tempPath string) string {
 // GetTplTempPath 获取tpl正式文件路径
 func (c *Coordinator) GetTplTempPath(tempPath string) string {
 	tpldir := c.configuration.Abs(c.TempOptions.Path)
-	return c.configuration.Abs(filepath.Join(tpldir, GetRelativeFilePath(tempPath, c.TempOptions.PrefixDir)))
+	return c.configuration.Abs(filepath.Join(tpldir, tempPath))
 }
 
 // ReportFileRefCount 文件引用上报
