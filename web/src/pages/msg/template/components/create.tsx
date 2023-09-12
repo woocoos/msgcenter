@@ -4,10 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MsgEvent, MsgTemplate, MsgTemplateFormat, MsgTemplateReceiverType } from '@/generated/msgsrv/graphql';
 import { EnumMsgTemplateFormat, createMsgTemplate, getMsgTemplateInfo, updateMsgTemplate } from '@/services/msgsrv/template';
-import TempBtnUpload from '@/components/uploadFiles/tempBtn';
-import Multiple from '@/components/uploadFiles/multiple';
 import InputMultiple from '@/components/input/multiple';
-import { useLeavePrompt } from '@knockout-js/layout';
+import { UploadMultiple, UploadTemp, useLeavePrompt } from '@knockout-js/layout';
 import { OrgSelect } from '@knockout-js/org';
 import { Org, OrgKind, getOrg } from '@knockout-js/api';
 import store from '@/store';
@@ -226,7 +224,7 @@ export default (props: {
         }}
       />
       <ProFormText name="tplFileID">
-        <TempBtnUpload
+        <UploadTemp
           accept=".tmpl"
           forceDirectory
           directory={`/msg/tpl/temp/${userState.tenantId}`}
@@ -239,7 +237,7 @@ export default (props: {
         label={t('attachments')}
         tooltip={t('attachments_tip')}
       >
-        <Multiple
+        <UploadMultiple
           accept=".doc,.docx,.jpg,.jpeg,.png,.pdf"
           forceDirectory
           directory={`/msg/att/${userState.tenantId}`}

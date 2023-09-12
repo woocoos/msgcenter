@@ -10,7 +10,7 @@ import { browserLanguage } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { isInIcestark } from '@ice/stark-app';
-import { User, userPermissions } from '@knockout-js/api';
+import { User, files, userPermissions } from '@knockout-js/api';
 import { logout, parseSpm } from './services/auth';
 
 const ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
@@ -20,7 +20,8 @@ const ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
   ICE_DEV_TID = process.env.ICE_DEV_TID ?? '',
   ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '',
-  ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '';
+  ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
+  ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '';
 
 if (NODE_ENV === 'development') {
   // 无登录项目增加前端缓存内容 方便开发和展示
@@ -31,6 +32,8 @@ if (NODE_ENV === 'development') {
     displayName: 'admin',
   })
 }
+
+files.setFilesApi(ICE_API_FILES_PREFIX);
 
 export const icestark = defineChildConfig(() => ({
   mount: (data) => {

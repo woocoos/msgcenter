@@ -234,4 +234,9 @@ export const initStoreData = (store: IMockStore) => {
     roleID: 3, role: store.get('OrgRole', 3),
     orgPolicyID: 1, orgPolicy: store.get('OrgPolicy', 1)
   })
+
+  // OrgUserPreference
+  store.set('OrgUserPreference', 1, {
+    id: 1, userID: 1, orgID: 1, menuFavorite: null, menuRecent: null, user: store.get("User", 1), org: store.get('Org', 1)
+  })
 }
