@@ -86,7 +86,7 @@ alertManager:
   alerts:
     gcInterval: 30m
   template:
-    path: /Volumes/QEELYN/GIT/woocoo/knockout/cmd/files/tmp # path for custom template
+    path: ../../test/testdata/files # path for custom template
     fileBaseUrl: "http://127.0.0.1:10071"
     relativePath:
       tplTemp: "/msg/tpl/temp" # 模板临时路径
