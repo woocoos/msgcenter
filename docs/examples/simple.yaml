@@ -27,7 +27,7 @@ route:
   # 当发送第一个通知时，等待'groupInterval'发送一批通知为该组启动的新警报。
   groupInterval: 5m
 
-  # 如果警报已经成功发送，等待'repeatInterval'重新发送。
+  # 如果警报已经成功发送且未被内存中删除，等待'repeatInterval'重新发送。
   repeatInterval: 3h
 
   # 默认通知接收者。

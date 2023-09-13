@@ -3,8 +3,8 @@ package alert
 import (
 	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/woocoos/msgcenter/metrics"
 	"github.com/woocoos/msgcenter/pkg/label"
+	"github.com/woocoos/msgcenter/pkg/metrics"
 	"io"
 	"strconv"
 	"sync"

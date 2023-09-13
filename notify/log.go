@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/tsingsun/members"
 	"github.com/tsingsun/woocoo/pkg/conf"
-	"github.com/woocoos/msgcenter/metrics"
+	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"go.uber.org/zap"
 	"sync"

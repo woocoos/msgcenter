@@ -9,13 +9,14 @@
 *.so
 *.dylib
 *_debug_bin
-
+.env.local
 # Test binary, built with `go test -c`
 *.test
 test/tmp
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 cmd/msgsrv/data/
+
 *.idea/
 .run
 *.vscode/

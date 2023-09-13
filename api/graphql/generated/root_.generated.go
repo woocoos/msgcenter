@@ -39,6 +39,7 @@ type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
 	Route() RouteResolver
+	Subscription() SubscriptionResolver
 	RouteInput() RouteInputResolver
 }
 
@@ -62,6 +63,20 @@ type ComplexityRoot struct {
 		Name  func(childComplexity int) int
 		Type  func(childComplexity int) int
 		Value func(childComplexity int) int
+	}
+
+	Message struct {
+		Action  func(childComplexity int) int
+		Key     func(childComplexity int) int
+		Payload func(childComplexity int) int
+		SendAt  func(childComplexity int) int
+		Topic   func(childComplexity int) int
+	}
+
+	MessageFilter struct {
+		AppCode  func(childComplexity int) int
+		DeviceID func(childComplexity int) int
+		UserID   func(childComplexity int) int
 	}
 
 	MsgAlert struct {
@@ -405,6 +420,10 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	Subscription struct {
+		Message func(childComplexity int) int
+	}
+
 	User struct {
 		DisplayName   func(childComplexity int) int
 		Email         func(childComplexity int) int
@@ -513,6 +532,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Matcher.Value(childComplexity), true
+
+	case "Message.action":
+		if e.complexity.Message.Action == nil {
+			break
+		}
+
+		return e.complexity.Message.Action(childComplexity), true
+
+	case "Message.key":
+		if e.complexity.Message.Key == nil {
+			break
+		}
+
+		return e.complexity.Message.Key(childComplexity), true
+
+	case "Message.payload":
+		if e.complexity.Message.Payload == nil {
+			break
+		}
+
+		return e.complexity.Message.Payload(childComplexity), true
+
+	case "Message.sendAt":
+		if e.complexity.Message.SendAt == nil {
+			break
+		}
+
+		return e.complexity.Message.SendAt(childComplexity), true
+
+	case "Message.topic":
+		if e.complexity.Message.Topic == nil {
+			break
+		}
+
+		return e.complexity.Message.Topic(childComplexity), true
+
+	case "MessageFilter.appCode":
+		if e.complexity.MessageFilter.AppCode == nil {
+			break
+		}
+
+		return e.complexity.MessageFilter.AppCode(childComplexity), true
+
+	case "MessageFilter.deviceId":
+		if e.complexity.MessageFilter.DeviceID == nil {
+			break
+		}
+
+		return e.complexity.MessageFilter.DeviceID(childComplexity), true
+
+	case "MessageFilter.userId":
+		if e.complexity.MessageFilter.UserID == nil {
+			break
+		}
+
+		return e.complexity.MessageFilter.UserID(childComplexity), true
 
 	case "MsgAlert.annotations":
 		if e.complexity.MsgAlert.Annotations == nil {
@@ -2372,6 +2447,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SilenceEdge.Node(childComplexity), true
 
+	case "Subscription.message":
+		if e.complexity.Subscription.Message == nil {
+			break
+		}
+
+		return e.complexity.Subscription.Message(childComplexity), true
+
 	case "User.displayName":
 		if e.complexity.User.DisplayName == nil {
 			break
@@ -2502,6 +2584,23 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
 			data := ec._Mutation(ctx, rc.Operation.SelectionSet)
 			var buf bytes.Buffer
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
+		}
+	case ast.Subscription:
+		next := ec._Subscription(ctx, rc.Operation.SelectionSet)
+
+		var buf bytes.Buffer
+		return func(ctx context.Context) *graphql.Response {
+			buf.Reset()
+			data := next(ctx)
+
+			if data == nil {
+				return nil
+			}
 			data.MarshalGQL(&buf)
 
 			return &graphql.Response{
@@ -4857,6 +4956,31 @@ input EmailConfigInput {
     authSecret: String
     authIdentity: String
     headers: MapString
+}`, BuiltIn: false},
+	{Name: "../subscription.graphql", Input: `type Subscription {
+    # internal message
+    message: Message
+}
+
+"""
+SubscriptionAction is a generic type for all subscription actions
+"""
+type Message {
+    action: String!
+    payload: String!
+    key: String!
+    # message topic (e.g. "biz","customer")
+    topic: String!
+    sendAt: String!
+}
+
+"""
+MessageFilter is a generic type for all subscription filters
+"""
+type MessageFilter {
+    appCode: String!
+    userId: ID!
+    deviceId:String!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)

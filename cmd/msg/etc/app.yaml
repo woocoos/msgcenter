@@ -18,6 +18,10 @@ log:
     maxbackups: 20
     localtime: true
 
+jwt: &jwt
+  signingMethod: "HS256"
+  signingKey: "secret"
+
 web:
   server:
     addr: 127.0.0.1:10072
@@ -31,17 +35,17 @@ web:
                   - IntrospectionQuery
             - recovery:
             - errorHandle:
-            - jwt:
-                signingMethod: "HS256"
-                signingKey: "secret"
-                exclude:
-                  - "/graphql" #doc page
-            - tenant:
-                lookup: "header:X-Tenant-ID,query:X-Tenant-Id" ## browser may be transfer query ID to Id
             - graphql:
                 group: "/graphql"
                 withAuthorization: false
                 appCode: "msg"
+                middlewares:
+                  operation:
+                    - tenant:
+                    - jwt: *jwt
+                header: ## dev mode, remove in production, set the value in your .env.local
+                  X-Tenant-ID: ${TENANT}
+                  Authorization: "${AUTHORIZATION}"
 
 store:
   msgcenter:
@@ -54,3 +58,6 @@ store:
 
 entcache:
   level: context
+
+# 消息WebSocket
+webSocket:

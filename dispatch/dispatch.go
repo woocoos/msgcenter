@@ -3,10 +3,10 @@ package dispatch
 import (
 	"context"
 	"github.com/tsingsun/woocoo/pkg/log"
-	"github.com/woocoos/msgcenter/metrics"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
+	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/provider"
 	"go.uber.org/zap"
 	"sort"

@@ -8,6 +8,22 @@ import (
 	"strconv"
 )
 
+// SubscriptionAction is a generic type for all subscription actions
+type Message struct {
+	Action  string `json:"action"`
+	Payload string `json:"payload"`
+	Key     string `json:"key"`
+	Topic   string `json:"topic"`
+	SendAt  string `json:"sendAt"`
+}
+
+// MessageFilter is a generic type for all subscription filters
+type MessageFilter struct {
+	AppCode  string `json:"appCode"`
+	UserID   int    `json:"userId"`
+	DeviceID string `json:"deviceId"`
+}
+
 type RouteStrType string
 
 const (

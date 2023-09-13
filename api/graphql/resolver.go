@@ -1,11 +1,18 @@
 package graphql
 
 import (
+	"context"
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/redis/go-redis/v9"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
+	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/service"
 	"github.com/woocoos/msgcenter/silence"
+)
+
+var (
+	wsFilterCtxKey = "ko_msg_filter"
 )
 
 type Option func(*Resolver)
@@ -28,11 +35,29 @@ func WithSilences(silences *silence.Silences) Option {
 	}
 }
 
+func WithMsgClient(client redis.UniversalClient) Option {
+	return func(r *Resolver) {
+		r.MsgClient = client
+	}
+}
+
+func WithPubSub(pubSub PubSub) Option {
+	return func(r *Resolver) {
+		r.PubSub = pubSub
+	}
+}
+
+type PubSub interface {
+	Subscribe(ctx context.Context, topic string) (chan *model.Message, error)
+}
+
 // Resolver is the root resolver.
 type Resolver struct {
 	Coordinator *service.Coordinator
 	Client      *ent.Client
 	Silences    *silence.Silences
+	MsgClient   redis.UniversalClient
+	PubSub      PubSub
 }
 
 func NewResolver(opt ...Option) *Resolver {
@@ -48,4 +73,12 @@ func NewSchema(opts ...Option) graphql.ExecutableSchema {
 	return generated.NewExecutableSchema(generated.Config{
 		Resolvers: NewResolver(opts...),
 	})
+}
+
+func MessageFilterFromContext(ctx context.Context) *model.MessageFilter {
+	return ctx.Value(wsFilterCtxKey).(*model.MessageFilter)
+}
+
+func WithMessageFilter(ctx context.Context, filter model.MessageFilter) context.Context {
+	return context.WithValue(ctx, wsFilterCtxKey, &filter)
 }

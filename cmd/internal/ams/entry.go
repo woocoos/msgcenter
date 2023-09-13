@@ -4,6 +4,9 @@ import (
 	"context"
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/lru"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/tsingsun/woocoo"
@@ -20,10 +23,10 @@ import (
 	"github.com/woocoos/msgcenter/api/oas/server"
 	"github.com/woocoos/msgcenter/dispatch"
 	"github.com/woocoos/msgcenter/ent"
-	"github.com/woocoos/msgcenter/metrics"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
+	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/provider/mem"
 	"github.com/woocoos/msgcenter/service"
@@ -150,19 +153,30 @@ func (s *Server) buildEntClient() {
 func (s *Server) buildApiServer(cnf *conf.AppConfiguration, ws *server.Service, amopt *server.Options) {
 	webSrv := web.New(web.WithConfiguration(cnf.Sub("web")),
 		web.WithGracefulStop(),
-		web.RegisterMiddleware(gql.New()),
+		gql.RegistryMiddleware(),
 		identity.RegistryTenantIDMiddleware(),
 		//web.RegisterMiddleware(otelweb.NewMiddleware()),
 	)
 	server.RegisterHandlers(webSrv.Router().FindGroup("/api/v2").Group, ws)
-	//gql
-	gqlsrv := handler.NewDefaultServer(
-		graphql.NewSchema(
-			graphql.WithClient(s.dbClient),
-			graphql.WithCoordinator(amopt.Coordinator),
-			graphql.WithSilences(amopt.Silences),
-		),
-	)
+	//gql without websocket
+	gqlsrv := handler.New(graphql.NewSchema(
+		graphql.WithClient(s.dbClient),
+		graphql.WithCoordinator(amopt.Coordinator),
+		graphql.WithSilences(amopt.Silences),
+	))
+
+	gqlsrv.AddTransport(transport.Options{})
+	gqlsrv.AddTransport(transport.GET{})
+	gqlsrv.AddTransport(transport.POST{})
+	gqlsrv.AddTransport(transport.MultipartForm{})
+
+	gqlsrv.SetQueryCache(lru.New(1000))
+
+	gqlsrv.Use(extension.Introspection{})
+	gqlsrv.Use(extension.AutomaticPersistedQuery{
+		Cache: lru.New(100),
+	})
+
 	gqlsrv.AroundResponses(gqlx.ContextCache())
 	gqlsrv.AroundResponses(gqlx.SimplePagination())
 	// mutation事务
