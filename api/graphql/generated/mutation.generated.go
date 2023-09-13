@@ -2629,7 +2629,7 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"receiver", "groupBy", "matchers", "muteTimeIntervals", "activeTimeIntervals", "continue", "routes", "groupWait", "GroupInterval", "repeatInterval"}
+	fieldsInOrder := [...]string{"receiver", "groupBy", "matchers", "muteTimeIntervals", "activeTimeIntervals", "continue", "routes", "groupWait", "groupInterval", "repeatInterval"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -2710,10 +2710,10 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj in
 				return it, err
 			}
 			it.GroupWait = data
-		case "GroupInterval":
+		case "groupInterval":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("GroupInterval"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("groupInterval"))
 			data, err := ec.unmarshalODuration2ᚖtimeᚐDuration(ctx, v)
 			if err != nil {
 				return it, err

@@ -41,6 +41,7 @@ type Server struct {
 	apiSrv   *web.Server
 	dbClient *ent.Client
 	apps     []woocoo.Server
+	am       *service.AlertManager
 }
 
 func NewServer(cnf *conf.AppConfiguration) *Server {
@@ -58,7 +59,7 @@ func NewServer(cnf *conf.AppConfiguration) *Server {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer am.Stop()
+	s.am = am
 
 	metrics.BuildGlobal()
 	configCoordinator := service.NewCoordinator(alertManagerCnf)
@@ -127,6 +128,7 @@ func (s *Server) Start(ctx context.Context) error {
 }
 
 func (s *Server) Stop(ctx context.Context) error {
+	s.am.Stop()
 	s.dbClient.Close()
 	return nil
 }

@@ -7,7 +7,6 @@ package graphql
 import (
 	"context"
 	"fmt"
-	"os"
 	"strconv"
 
 	"github.com/woocoos/entco/pkg/identity"
@@ -59,7 +58,33 @@ func (r *mutationResolver) CreateMsgEvent(ctx context.Context, input ent.CreateM
 
 // UpdateMsgEvent is the resolver for the updateMsgEvent field.
 func (r *mutationResolver) UpdateMsgEvent(ctx context.Context, id int, input ent.UpdateMsgEventInput) (*ent.MsgEvent, error) {
-	return ent.FromContext(ctx).MsgEvent.UpdateOneID(id).SetInput(input).Save(ctx)
+	client := ent.FromContext(ctx)
+	ome, err := client.MsgEvent.Query().Where(msgevent.ID(id)).WithMsgType().Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	me, err := client.MsgEvent.UpdateOneID(id).SetInput(input).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+	mt, err := me.QueryMsgType().Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// 修改route，同步更新NamedRoute
+	if input.Route != nil && me.Status == typex.SimpleStatusActive {
+		// 移除
+		if err = r.Coordinator.RemoveNamedRoute([]string{profile.AppRouteName(strconv.Itoa(ome.Edges.MsgType.AppID), ome.Name)}); err != nil {
+			return nil, err
+		}
+		// 添加
+		route := *me.Route
+		route.Name = profile.AppRouteName(strconv.Itoa(mt.AppID), me.Name)
+		if err = r.Coordinator.AddNamedRoute([]*profile.Route{&route}); err != nil {
+			return nil, err
+		}
+	}
+	return me, nil
 }
 
 // DeleteMsgEvent is the resolver for the deleteMsgEvent field.
@@ -114,7 +139,29 @@ func (r *mutationResolver) CreateMsgChannel(ctx context.Context, input ent.Creat
 
 // UpdateMsgChannel is the resolver for the updateMsgChannel field.
 func (r *mutationResolver) UpdateMsgChannel(ctx context.Context, id int, input ent.UpdateMsgChannelInput) (*ent.MsgChannel, error) {
-	return ent.FromContext(ctx).MsgChannel.UpdateOneID(id).SetInput(input).Save(ctx)
+	client := ent.FromContext(ctx)
+	omc, err := client.MsgChannel.Query().Where(msgchannel.ID(id)).Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	mc, err := client.MsgChannel.UpdateOneID(id).SetInput(input).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// 修改receiver，同步修改TenantReceiver
+	if input.Receiver != nil && mc.Status == typex.SimpleStatusActive {
+		// 移除
+		if err = r.Coordinator.RemoveTenantReceiver([]string{profile.TenantReceiverName(strconv.Itoa(omc.TenantID), omc.Name)}); err != nil {
+			return nil, err
+		}
+		// 添加
+		receiver := *mc.Receiver
+		receiver.Name = profile.TenantReceiverName(strconv.Itoa(mc.TenantID), mc.Name)
+		if err = r.Coordinator.AddTenantReceiver([]*profile.Receiver{&receiver}); err != nil {
+			return nil, err
+		}
+	}
+	return mc, nil
 }
 
 // DeleteMsgChannel is the resolver for the deleteMsgChannel field.
@@ -207,7 +254,12 @@ func (r *mutationResolver) UpdateMsgTemplate(ctx context.Context, id int, input 
 		(input.Attachments == nil && (input.AttachmentsFileIds != nil && len(input.AttachmentsFileIds) != 0)) {
 		return nil, fmt.Errorf("attachments and attachmentsFileIds must exist at the same time")
 	}
+	otemp, err := ent.FromContext(ctx).MsgTemplate.Query().Where(msgtemplate.ID(id)).Select(msgtemplate.FieldAttachmentsFileIds, msgtemplate.FieldTplFileID).Only(ctx)
+	if err != nil {
+		return nil, err
+	}
 	newFileIDs := make([]int, 0)
+	oldFileIDs := make([]int, 0)
 	// 验证模板路径
 	if input.Tpl != nil {
 		err := r.Coordinator.ValidateFilePath(ctx, *input.Tpl, service.TempRelativePathTplTemp)
@@ -215,9 +267,13 @@ func (r *mutationResolver) UpdateMsgTemplate(ctx context.Context, id int, input 
 			return nil, err
 		}
 		newFileIDs = append(newFileIDs, *input.TplFileID)
+
+		if otemp.TplFileID != nil {
+			oldFileIDs = append(oldFileIDs, *otemp.TplFileID)
+		}
 	}
 	// 验证附件路径
-	if input.Attachments != nil {
+	if input.Attachments != nil && len(input.Attachments) > 0 {
 		for _, att := range input.Attachments {
 			err := r.Coordinator.ValidateFilePath(ctx, att, service.TempRelativePathAttachment)
 			if err != nil {
@@ -225,25 +281,32 @@ func (r *mutationResolver) UpdateMsgTemplate(ctx context.Context, id int, input 
 			}
 		}
 		newFileIDs = append(newFileIDs, input.AttachmentsFileIds...)
+
+		if otemp.AttachmentsFileIds != nil {
+			oldFileIDs = append(oldFileIDs, otemp.AttachmentsFileIds...)
+		}
 	}
-	otemp, err := ent.FromContext(ctx).MsgTemplate.Query().Where(msgtemplate.ID(id)).Select(msgtemplate.FieldAttachmentsFileIds, msgtemplate.FieldTplFileID).Only(ctx)
-	if err != nil {
-		return nil, err
-	}
-	oldFIleIDs := make([]int, 0)
-	if otemp.TplFileID != nil {
-		oldFIleIDs = append(oldFIleIDs, *otemp.TplFileID)
-	}
-	if otemp.AttachmentsFileIds != nil {
-		oldFIleIDs = append(oldFIleIDs, otemp.AttachmentsFileIds...)
-	}
+
 	// 更新模板
 	temp, err := ent.FromContext(ctx).MsgTemplate.UpdateOneID(id).SetInput(input).Save(ctx)
 	if err != nil {
 		return nil, err
 	}
+	// 模板文件更新，则删除旧模板文件
+	if input.Tpl != nil && input.TplFileID != nil && temp.Status == typex.SimpleStatusActive {
+		// 移除data下的旧模板
+		err = r.Coordinator.RemoveTplDataFile(otemp.Tpl)
+		if err != nil {
+			return nil, err
+		}
+		// 启用新模板
+		err = r.Coordinator.EnableTplDataFile(temp.Tpl)
+		if err != nil {
+			return nil, err
+		}
+	}
 	// 上报文件引用次数
-	err = r.Coordinator.ReportFileRefCount(ctx, newFileIDs, oldFIleIDs)
+	err = r.Coordinator.ReportFileRefCount(ctx, newFileIDs, oldFileIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -253,28 +316,31 @@ func (r *mutationResolver) UpdateMsgTemplate(ctx context.Context, id int, input 
 // DeleteMsgTemplate is the resolver for the deleteMsgTemplate field.
 func (r *mutationResolver) DeleteMsgTemplate(ctx context.Context, id int) (bool, error) {
 	client := ent.FromContext(ctx)
+	// 激活状态不可删
 	if has, err := client.MsgTemplate.Query().Where(msgtemplate.ID(id), msgtemplate.StatusEQ(typex.SimpleStatusActive)).Exist(ctx); err != nil {
 		return false, err
 	} else if has {
 		return false, fmt.Errorf("the active status cannot be deleted")
 	}
-	err := client.MsgTemplate.DeleteOneID(id).Exec(ctx)
-	if err != nil {
-		return false, err
-	}
+	// 获取模板数据
 	otemp, err := ent.FromContext(ctx).MsgTemplate.Query().Where(msgtemplate.ID(id)).Select(msgtemplate.FieldAttachmentsFileIds, msgtemplate.FieldTplFileID).Only(ctx)
 	if err != nil {
 		return false, err
 	}
-	oldFIleIDs := make([]int, 0)
+	// 删除模板
+	err = client.MsgTemplate.DeleteOneID(id).Exec(ctx)
+	if err != nil {
+		return false, err
+	}
+	// 更新文件引用次数
+	oldFileIDs := make([]int, 0)
 	if otemp.TplFileID != nil {
-		oldFIleIDs = append(oldFIleIDs, *otemp.TplFileID)
+		oldFileIDs = append(oldFileIDs, *otemp.TplFileID)
 	}
 	if otemp.AttachmentsFileIds != nil {
-		oldFIleIDs = append(oldFIleIDs, otemp.AttachmentsFileIds...)
+		oldFileIDs = append(oldFileIDs, otemp.AttachmentsFileIds...)
 	}
-	// 上报文件引用次数
-	err = r.Coordinator.ReportFileRefCount(ctx, nil, oldFIleIDs)
+	err = r.Coordinator.ReportFileRefCount(ctx, nil, oldFileIDs)
 	if err != nil {
 		return false, err
 	}
@@ -291,16 +357,11 @@ func (r *mutationResolver) EnableMsgTemplate(ctx context.Context, id int) (*ent.
 	if err != nil {
 		return nil, err
 	}
-	// 将temp文件复制到data目录下
-	size, err := r.Coordinator.CopyFile(r.Coordinator.GetTplDataPath(temp.Tpl), r.Coordinator.GetTplTempPath(temp.Tpl))
+	// 启用模板
+	err = r.Coordinator.EnableTplDataFile(temp.Tpl)
 	if err != nil {
 		return nil, err
 	}
-	if size <= 0 {
-		return nil, fmt.Errorf("tpl file is nil")
-	}
-	// 重新加载模板
-	err = r.Coordinator.LoadTemplates()
 	if err != nil {
 		return nil, err
 	}
@@ -313,16 +374,8 @@ func (r *mutationResolver) DisableMsgTemplate(ctx context.Context, id int) (*ent
 	if err != nil {
 		return nil, err
 	}
-	// 将文件从data目录下删除
-	_, err = os.Stat(r.Coordinator.GetTplDataPath(temp.Tpl))
-	if err == nil {
-		err = os.Remove(r.Coordinator.GetTplDataPath(temp.Tpl))
-		if err != nil {
-			return nil, err
-		}
-	}
-	// 重新加载模板
-	err = r.Coordinator.LoadTemplates()
+	// 移除data目录模板
+	err = r.Coordinator.RemoveTplDataFile(temp.Tpl)
 	if err != nil {
 		return nil, err
 	}

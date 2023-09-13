@@ -192,8 +192,9 @@ func (c *Coordinator) WalkReceivers(visit func(receiver profile.Receiver) error)
 	return nil
 }
 
-func (c *Coordinator) LoadTemplates() error {
-	return c.loadTemplates()
+func (c *Coordinator) TempParseFiles(filenames ...string) error {
+	_, err := c.Template.ParseFiles(filenames...)
+	return err
 }
 
 // loadTemplates loading template files
@@ -515,4 +516,42 @@ func (c *Coordinator) ReportFileRefCount(ctx context.Context, newFileIDs, oldFil
 	req.Header.Add("Content-Type", "application/json")
 	_, err = c.KOClient.Do(req)
 	return err
+}
+
+// EnableTplDataFile 启用模板文件
+// tplPath 为temp文件路径
+func (c *Coordinator) EnableTplDataFile(tplPath string) error {
+	if tplPath == "" {
+		return nil
+	}
+	// 将temp文件复制到data目录下
+	distName := c.GetTplDataPath(tplPath)
+	_, err := c.CopyFile(distName, c.GetTplTempPath(tplPath))
+	if err != nil {
+		return err
+	}
+	// 加载模板
+	err = c.TempParseFiles(distName)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// RemoveTplDataFile 移除data目录模板
+// tplPath 为temp文件路径
+func (c *Coordinator) RemoveTplDataFile(tplPath string) error {
+	if tplPath == "" {
+		return nil
+	}
+	// 将文件从data目录下删除
+	dataPath := c.GetTplDataPath(tplPath)
+	_, err := os.Stat(dataPath)
+	if err == nil {
+		err = os.Remove(dataPath)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

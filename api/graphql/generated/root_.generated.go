@@ -4832,7 +4832,7 @@ input RouteInput  {
     continue: Boolean
     routes: [RouteInput]
     groupWait: Duration
-    GroupInterval: Duration
+    groupInterval: Duration
     repeatInterval: Duration
 }
 

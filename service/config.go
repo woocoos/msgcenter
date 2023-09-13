@@ -66,8 +66,8 @@ func findTemplate(ctx context.Context, basedir string, client *ent.Client, rt pr
 		return nil, err
 	}
 	en := labels[label.AlertNameLabel]
-	event, err := client.MsgTemplate.Query().Where(msgtemplate.TenantID(tid), msgtemplate.HasEventWith(
-		msgevent.Name(en), msgevent.StatusEQ(typex.SimpleStatusActive)), msgtemplate.ReceiverTypeEQ(rt),
+	event, err := client.MsgTemplate.Query().Where(msgtemplate.TenantID(tid), msgtemplate.StatusEQ(typex.SimpleStatusActive),
+		msgtemplate.HasEventWith(msgevent.Name(en), msgevent.StatusEQ(typex.SimpleStatusActive)), msgtemplate.ReceiverTypeEQ(rt),
 	).Only(ctx)
 	if err != nil {
 		return nil, err

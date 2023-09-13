@@ -59,6 +59,10 @@ func (m MatchType) MarshalGQL(w io.Writer) {
 	w.Write([]byte(strconv.Quote(m.String())))
 }
 
+func (m MatchType) MarshalYAML() (interface{}, error) {
+	return m.String(), nil
+}
+
 type Matcher struct {
 	Type  MatchType `json:"type" yaml:"type"`
 	Name  string    `json:"name" yaml:"name"`
