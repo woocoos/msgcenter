@@ -103,7 +103,7 @@ receivers:
   - name: 'webhook'
     webhookConfigs:
       - url: "http://127.0.0.1:5001/webhook"
-        httpConfig:
+        httpConfig: &knockout
           timeout: 1s
           oauth2:
             clientID: 206734260394752

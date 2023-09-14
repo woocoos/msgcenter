@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: Alertmanager API
-  description: API of the Prometheus Alertmanager (https://github.com/prometheus/alertmanager)
+  description: API of the Knockout Message (https://github.com/prometheus/alertmanager)
   license:
     name: GNU Affero General Public License v3.0
     url: https://www.gnu.org/licenses
@@ -11,13 +11,15 @@ servers:
 
 tags:
   - name: general
-    description: General Alertmanager operations
+    description: General operations
   - name: receiver
-    description: Everything related to Alertmanager receivers
+    description: Everything related to receivers
   - name: silence
-    description: Everything related to Alertmanager silences
+    description: Everything related to silences
   - name: alert
-    description: Everything related to Alertmanager alerts
+    description: Everything related to alerts
+  - name: push
+    description: Everything related to push
 paths:
   /status:
     get:
@@ -315,6 +317,33 @@ paths:
             application/json:
               schema:
                 type: string
+  /push:
+    post:
+      tags:
+        - push
+      description: push data to message queue for notify message client
+      operationId: postPush
+      requestBody:
+        description: The push data to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pushData'
+      responses:
+        200:
+          description: Create push response
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: string
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: string
 components:
   schemas:
     alertmanagerStatus:
@@ -596,6 +625,9 @@ components:
         alertname: the name of alert.it is also the event name.
       additionalProperties:
         type: string
+    pushData:
+      type: object
+      description: Push data is for notify clients.
   responses:
     BadRequest:
       description: Bad request

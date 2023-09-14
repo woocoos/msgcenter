@@ -3448,6 +3448,7 @@ type MsgInternalMutation struct {
 	updated_by             *int
 	addupdated_by          *int
 	updated_at             *time.Time
+	category               *string
 	subject                *string
 	body                   *string
 	format                 *string
@@ -3832,6 +3833,42 @@ func (m *MsgInternalMutation) ResetUpdatedAt() {
 	delete(m.clearedFields, msginternal.FieldUpdatedAt)
 }
 
+// SetCategory sets the "category" field.
+func (m *MsgInternalMutation) SetCategory(s string) {
+	m.category = &s
+}
+
+// Category returns the value of the "category" field in the mutation.
+func (m *MsgInternalMutation) Category() (r string, exists bool) {
+	v := m.category
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCategory returns the old "category" field's value of the MsgInternal entity.
+// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalMutation) OldCategory(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCategory is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCategory requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCategory: %w", err)
+	}
+	return oldValue.Category, nil
+}
+
+// ResetCategory resets all changes to the "category" field.
+func (m *MsgInternalMutation) ResetCategory() {
+	m.category = nil
+}
+
 // SetSubject sets the "subject" field.
 func (m *MsgInternalMutation) SetSubject(s string) {
 	m.subject = &s
@@ -4090,7 +4127,7 @@ func (m *MsgInternalMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MsgInternalMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.tenant_id != nil {
 		fields = append(fields, msginternal.FieldTenantID)
 	}
@@ -4105,6 +4142,9 @@ func (m *MsgInternalMutation) Fields() []string {
 	}
 	if m.updated_at != nil {
 		fields = append(fields, msginternal.FieldUpdatedAt)
+	}
+	if m.category != nil {
+		fields = append(fields, msginternal.FieldCategory)
 	}
 	if m.subject != nil {
 		fields = append(fields, msginternal.FieldSubject)
@@ -4136,6 +4176,8 @@ func (m *MsgInternalMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedBy()
 	case msginternal.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case msginternal.FieldCategory:
+		return m.Category()
 	case msginternal.FieldSubject:
 		return m.Subject()
 	case msginternal.FieldBody:
@@ -4163,6 +4205,8 @@ func (m *MsgInternalMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldUpdatedBy(ctx)
 	case msginternal.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case msginternal.FieldCategory:
+		return m.OldCategory(ctx)
 	case msginternal.FieldSubject:
 		return m.OldSubject(ctx)
 	case msginternal.FieldBody:
@@ -4214,6 +4258,13 @@ func (m *MsgInternalMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case msginternal.FieldCategory:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCategory(v)
 		return nil
 	case msginternal.FieldSubject:
 		v, ok := value.(string)
@@ -4372,6 +4423,9 @@ func (m *MsgInternalMutation) ResetField(name string) error {
 		return nil
 	case msginternal.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case msginternal.FieldCategory:
+		m.ResetCategory()
 		return nil
 	case msginternal.FieldSubject:
 		m.ResetSubject()

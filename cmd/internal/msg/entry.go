@@ -111,13 +111,6 @@ func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
 	}
 }
 
-func (s *Server) wsError(ctx context.Context, err error) {
-	_, ok := err.(transport.WebsocketError)
-	if ok {
-		s.subs.RemoveConn(ctx)
-	}
-}
-
 // websocket 初始化连接,只做了简单的验证,根据需求.看是否需要提前验证.
 func (s *Server) wsInit(ctx context.Context, initPayload transport.InitPayload) (context.Context, error) {
 	bearer := initPayload.Authorization()
@@ -139,7 +132,18 @@ func (s *Server) wsInit(ctx context.Context, initPayload transport.InitPayload) 
 	return ctx, nil
 }
 
+func (s *Server) wsError(ctx context.Context, err error) {
+	_, ok := err.(transport.WebsocketError)
+	if ok {
+		s.subs.RemoveConn(ctx)
+	}
+}
+
 func (s *Server) Start(ctx context.Context) error {
+	err := s.subs.Start(ctx)
+	if err != nil {
+		return err
+	}
 	return s.webSrv.Start(ctx)
 }
 
@@ -147,6 +151,7 @@ func (s *Server) Stop(ctx context.Context) error {
 	s.webSrv.Stop(ctx)
 	s.dbClient.Close()
 	s.msgClient.Close()
+	s.subs.Stop(ctx)
 	return nil
 }
 

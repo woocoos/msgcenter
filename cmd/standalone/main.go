@@ -6,10 +6,12 @@ import (
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/woocoos/msgcenter/cmd/internal/ams"
+	"github.com/woocoos/msgcenter/cmd/internal/msg"
 )
 
 var (
 	amsConfig = flag.String("r", "../ams", "rms etc dir")
+	msgConfig = flag.String("m", "../msg", "msg etc dir")
 )
 
 func main() {
@@ -20,8 +22,12 @@ func main() {
 	rmscnf := &conf.AppConfiguration{Configuration: rmsc}
 
 	rmsSvr := ams.NewServer(rmscnf)
-
 	app.RegisterServer(rmsSvr.Servers()...)
+
+	msgc := conf.New(conf.WithBaseDir(*msgConfig), conf.WithGlobal(false)).Load()
+	msgcnf := &conf.AppConfiguration{Configuration: msgc}
+	msgSvr := msg.NewServer(msgcnf)
+	app.RegisterServer(msgSvr)
 
 	if err := app.Run(); err != nil {
 		log.Panic(err)

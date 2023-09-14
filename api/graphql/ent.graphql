@@ -653,6 +653,8 @@ type MsgInternal implements Node {
   createdAt: Time!
   updatedBy: Int
   updatedAt: Time
+  """消息类型分类"""
+  category: String!
   """标题"""
   subject: String!
   """消息体"""
@@ -858,6 +860,20 @@ input MsgInternalWhereInput {
   updatedAtLTE: Time
   updatedAtIsNil: Boolean
   updatedAtNotNil: Boolean
+  """category field predicates"""
+  category: String
+  categoryNEQ: String
+  categoryIn: [String!]
+  categoryNotIn: [String!]
+  categoryGT: String
+  categoryGTE: String
+  categoryLT: String
+  categoryLTE: String
+  categoryContains: String
+  categoryHasPrefix: String
+  categoryHasSuffix: String
+  categoryEqualFold: String
+  categoryContainsFold: String
   """subject field predicates"""
   subject: String
   subjectNEQ: String

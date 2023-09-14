@@ -82,6 +82,11 @@ func UpdatedAt(v time.Time) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
+// Category applies equality check predicate on the "category" field. It's identical to CategoryEQ.
+func Category(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldEQ(FieldCategory, v))
+}
+
 // Subject applies equality check predicate on the "subject" field. It's identical to SubjectEQ.
 func Subject(v string) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldEQ(FieldSubject, v))
@@ -320,6 +325,71 @@ func UpdatedAtIsNil() predicate.MsgInternal {
 // UpdatedAtNotNil applies the NotNil predicate on the "updated_at" field.
 func UpdatedAtNotNil() predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldNotNull(FieldUpdatedAt))
+}
+
+// CategoryEQ applies the EQ predicate on the "category" field.
+func CategoryEQ(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldEQ(FieldCategory, v))
+}
+
+// CategoryNEQ applies the NEQ predicate on the "category" field.
+func CategoryNEQ(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNEQ(FieldCategory, v))
+}
+
+// CategoryIn applies the In predicate on the "category" field.
+func CategoryIn(vs ...string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldIn(FieldCategory, vs...))
+}
+
+// CategoryNotIn applies the NotIn predicate on the "category" field.
+func CategoryNotIn(vs ...string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNotIn(FieldCategory, vs...))
+}
+
+// CategoryGT applies the GT predicate on the "category" field.
+func CategoryGT(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldGT(FieldCategory, v))
+}
+
+// CategoryGTE applies the GTE predicate on the "category" field.
+func CategoryGTE(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldGTE(FieldCategory, v))
+}
+
+// CategoryLT applies the LT predicate on the "category" field.
+func CategoryLT(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldLT(FieldCategory, v))
+}
+
+// CategoryLTE applies the LTE predicate on the "category" field.
+func CategoryLTE(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldLTE(FieldCategory, v))
+}
+
+// CategoryContains applies the Contains predicate on the "category" field.
+func CategoryContains(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldContains(FieldCategory, v))
+}
+
+// CategoryHasPrefix applies the HasPrefix predicate on the "category" field.
+func CategoryHasPrefix(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldHasPrefix(FieldCategory, v))
+}
+
+// CategoryHasSuffix applies the HasSuffix predicate on the "category" field.
+func CategoryHasSuffix(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldHasSuffix(FieldCategory, v))
+}
+
+// CategoryEqualFold applies the EqualFold predicate on the "category" field.
+func CategoryEqualFold(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldEqualFold(FieldCategory, v))
+}
+
+// CategoryContainsFold applies the ContainsFold predicate on the "category" field.
+func CategoryContainsFold(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldContainsFold(FieldCategory, v))
 }
 
 // SubjectEQ applies the EQ predicate on the "subject" field.

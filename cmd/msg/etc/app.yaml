@@ -5,9 +5,7 @@ log:
   withTraceID: true
   traceIDKey: "traceId"
   cores:
-    - level: debug
-      outputPaths:
-        - stdout
+    - level: info
       encoderConfig:
         timeKey: "@timestamp"
         messageKey: "message"
@@ -24,7 +22,7 @@ jwt: &jwt
 
 web:
   server:
-    addr: 127.0.0.1:10072
+    addr: 127.0.0.1:10074
   engine:
     routerGroups:
       - graphql:

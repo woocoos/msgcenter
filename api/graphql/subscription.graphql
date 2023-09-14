@@ -7,12 +7,12 @@ type Subscription {
 SubscriptionAction is a generic type for all subscription actions
 """
 type Message {
-    action: String!
-    payload: String!
-    key: String!
-    # message topic (e.g. "biz","customer")
     topic: String!
-    sendAt: String!
+    title: String!
+    content: String!
+    format: String!
+    url: String!
+    sendAt: Time!
 }
 
 """

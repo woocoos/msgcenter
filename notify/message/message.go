@@ -4,13 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/redis/go-redis/v9"
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/woocoos/entco/ecx"
 	"github.com/woocoos/entco/schemax"
 	"github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/pkg/push"
 	"github.com/woocoos/msgcenter/template"
 	"go.uber.org/zap"
 	"strconv"
@@ -27,15 +30,18 @@ type Notifier struct {
 	tmpl          *template.Template
 	customTplFunc notify.CustomerConfigFunc[profile.MessageConfig]
 	client        *ent.Client
+	rdb           redis.UniversalClient
 }
 
-func New(cfg *profile.MessageConfig, tmpl *template.Template, client *ent.Client,
+func New(cfg *profile.MessageConfig, tmpl *template.Template,
+	client *ent.Client, rdb redis.UniversalClient,
 	fn notify.CustomerConfigFunc[profile.MessageConfig]) (*Notifier, error) {
 	return &Notifier{
 		config:        cfg,
 		tmpl:          tmpl,
 		customTplFunc: fn,
 		client:        client,
+		rdb:           rdb,
 	}, nil
 }
 
@@ -79,11 +85,15 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 	if config.To == "" {
 		return false, errors.New("to is empty")
 	}
+	var pushData = push.Data{
+		Topic: "message",
+	}
+	// db error ,don't try
 	err = ecx.WithTx(ctx, func(ctx context.Context) (ecx.Transactor, error) {
 		return n.client.Tx(ctx)
 	}, func(itx ecx.Transactor) error {
 		tx := itx.(*ent.Tx)
-		msg := tx.MsgInternal.Create().SetCreatedBy(0)
+		msg := tx.MsgInternal.Create().SetCreatedBy(0).SetCategory(config.Extras["category"])
 		if config.Subject != "" {
 			msg.SetSubject(tmpl(config.Subject))
 			if err != nil {
@@ -112,6 +122,13 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 		if err != nil {
 			return err
 		}
+
+		pushData.Message = push.Message{
+			Title:   row.Subject,
+			Format:  msgtemplate.Format(row.Format),
+			Content: row.Body,
+		}
+
 		msggtos := make([]*ent.MsgInternalToCreate, 0)
 		for _, uid := range strings.Split(config.To, ",") {
 			suid, err := strconv.Atoi(uid)
@@ -122,6 +139,7 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 			msggtos = append(msggtos,
 				tx.MsgInternalTo.Create().SetTenantID(tid).SetUserID(suid).SetMsgInternalID(row.ID),
 			)
+			pushData.Audience.UserIDs = append(pushData.Audience.UserIDs, suid)
 		}
 		if len(msggtos) > 0 {
 			_, err = tx.MsgInternalTo.CreateBulk(msggtos...).Save(nctx)
@@ -131,5 +149,20 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 		}
 		return nil
 	})
+	if err != nil {
+		return false, err
+	}
+	n.notifyRedis(ctx, &pushData)
 	return
+}
+
+// only log error
+func (n *Notifier) notifyRedis(ctx context.Context, data *push.Data) {
+	md, err := push.Marshal(data)
+	if err != nil {
+		log.Errorf("notifyRedis: marshal:%v", err)
+	}
+	if err := n.rdb.Publish(ctx, data.Topic, md).Err(); err != nil {
+		log.Errorf("notifyRedis: publish redis:%v", err)
+	}
 }

@@ -27,6 +27,8 @@ type MsgInternal struct {
 	UpdatedBy int `json:"updated_by,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// 消息类型分类
+	Category string `json:"category,omitempty"`
 	// 标题
 	Subject string `json:"subject,omitempty"`
 	// 消息体
@@ -70,7 +72,7 @@ func (*MsgInternal) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case msginternal.FieldID, msginternal.FieldTenantID, msginternal.FieldCreatedBy, msginternal.FieldUpdatedBy:
 			values[i] = new(sql.NullInt64)
-		case msginternal.FieldSubject, msginternal.FieldBody, msginternal.FieldFormat, msginternal.FieldRedirect:
+		case msginternal.FieldCategory, msginternal.FieldSubject, msginternal.FieldBody, msginternal.FieldFormat, msginternal.FieldRedirect:
 			values[i] = new(sql.NullString)
 		case msginternal.FieldCreatedAt, msginternal.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -124,6 +126,12 @@ func (mi *MsgInternal) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				mi.UpdatedAt = value.Time
+			}
+		case msginternal.FieldCategory:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field category", values[i])
+			} else if value.Valid {
+				mi.Category = value.String
 			}
 		case msginternal.FieldSubject:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -204,6 +212,9 @@ func (mi *MsgInternal) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(mi.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("category=")
+	builder.WriteString(mi.Category)
 	builder.WriteString(", ")
 	builder.WriteString("subject=")
 	builder.WriteString(mi.Subject)

@@ -2,6 +2,7 @@ package testsuite
 
 import (
 	"context"
+	"github.com/alicebob/miniredis/v2"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/stretchr/testify/suite"
 	"github.com/tsingsun/woocoo"
@@ -33,11 +34,14 @@ type BaseSuite struct {
 	Client            *ent.Client
 	AlertManager      *service.AlertManager
 	ConfigCoordinator *service.Coordinator
+	redis             *miniredis.Miniredis
 }
 
 func (o *BaseSuite) Setup() error {
 	app := initTestApp()
 	o.Cnf = app.AppConfiguration()
+	o.redis = initMiniRedis(o.Cnf)
+
 	if o.DSN == "" && o.DriverName == "" {
 		o.DriverName = "sqlite3"
 		o.DSN = "file:msgcenter?mode=memory&cache=shared&_fk=1"
@@ -99,6 +103,15 @@ func open(ctx context.Context, driverName, dsn string) (*ent.Client, error) {
 		return nil, err
 	}
 	return client, nil
+}
+
+func initMiniRedis(cnf *conf.AppConfiguration) *miniredis.Miniredis {
+	db, err := miniredis.Run()
+	if err != nil {
+		panic(err)
+	}
+	cnf.Parser().Set("store.redis.addrs", []string{db.Addr()})
+	return db
 }
 
 func initDatabase(ctx context.Context, client *ent.Client) {

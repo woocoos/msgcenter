@@ -693,6 +693,11 @@ func (mi *MsgInternalQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 				selectedFields = append(selectedFields, msginternal.FieldUpdatedAt)
 				fieldSeen[msginternal.FieldUpdatedAt] = struct{}{}
 			}
+		case "category":
+			if _, ok := fieldSeen[msginternal.FieldCategory]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldCategory)
+				fieldSeen[msginternal.FieldCategory] = struct{}{}
+			}
 		case "subject":
 			if _, ok := fieldSeen[msginternal.FieldSubject]; !ok {
 				selectedFields = append(selectedFields, msginternal.FieldSubject)

@@ -39,6 +39,8 @@ type MessageConfig struct {
 	Text    string `yaml:"text,omitempty" json:"text,omitempty"`
 	// URL is the url of message redirect.
 	Redirect string `yaml:"url,omitempty" json:"url,omitempty"`
+	// key-values
+	Extras map[string]string `yaml:"extras,omitempty" json:"extras,omitempty"`
 }
 
 func (c *MessageConfig) UnmarshalJSON(bytes []byte) error {

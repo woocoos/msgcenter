@@ -37,6 +37,7 @@ func (MsgInternal) Mixin() []ent.Mixin {
 // Fields of the MsgInternal.
 func (MsgInternal) Fields() []ent.Field {
 	return []ent.Field{
+		field.String("category").MaxLen(20).Comment("消息类型分类"),
 		field.String("subject").Comment("标题"),
 		field.String("body").Optional().Comment("消息体").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),

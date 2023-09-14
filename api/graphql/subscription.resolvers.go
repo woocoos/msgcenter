@@ -6,16 +6,33 @@ package graphql
 
 import (
 	"context"
+
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/api/graphql/model"
 )
 
 // Message is the resolver for the Message field.
 func (r *subscriptionResolver) Message(ctx context.Context) (<-chan *model.Message, error) {
-	return r.PubSub.Subscribe(ctx, "message")
+	return r.PubSub.Subscribe(ctx, string(SubTopicMessage))
 }
 
 // Subscription returns generated.SubscriptionResolver implementation.
 func (r *Resolver) Subscription() generated.SubscriptionResolver { return &subscriptionResolver{r} }
 
 type subscriptionResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
+type SubTopic string
+
+var (
+	SubTopicMessage SubTopic = "message"
+)
+
+func SubTopics() []string {
+	return []string{string(SubTopicMessage)}
+}

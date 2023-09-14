@@ -110,6 +110,10 @@ func init() {
 	msginternalDescCreatedAt := msginternalMixinFields2[1].Descriptor()
 	// msginternal.DefaultCreatedAt holds the default value on creation for the created_at field.
 	msginternal.DefaultCreatedAt = msginternalDescCreatedAt.Default.(func() time.Time)
+	// msginternalDescCategory is the schema descriptor for category field.
+	msginternalDescCategory := msginternalFields[0].Descriptor()
+	// msginternal.CategoryValidator is a validator for the "category" field. It is called by the builders before save.
+	msginternal.CategoryValidator = msginternalDescCategory.Validators[0].(func(string) error)
 	msginternaltoMixin := schema.MsgInternalTo{}.Mixin()
 	msginternaltoMixinHooks1 := msginternaltoMixin[1].Hooks()
 	msginternalto.Hooks[0] = msginternaltoMixinHooks1[0]

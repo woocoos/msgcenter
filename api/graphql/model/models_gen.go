@@ -6,19 +6,22 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"time"
 )
 
 // SubscriptionAction is a generic type for all subscription actions
 type Message struct {
-	Action  string `json:"action"`
-	Payload string `json:"payload"`
-	Key     string `json:"key"`
-	Topic   string `json:"topic"`
-	SendAt  string `json:"sendAt"`
+	Topic   string    `json:"topic"`
+	Title   string    `json:"title"`
+	Content string    `json:"content"`
+	Format  string    `json:"format"`
+	URL     string    `json:"url"`
+	SendAt  time.Time `json:"sendAt"`
 }
 
 // MessageFilter is a generic type for all subscription filters
 type MessageFilter struct {
+	TenantID int    `json:"tenantId"`
 	AppCode  string `json:"appCode"`
 	UserID   int    `json:"userId"`
 	DeviceID string `json:"deviceId"`

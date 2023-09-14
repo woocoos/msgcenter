@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/log"
+	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/woocoos/entco/pkg/identity"
 	"github.com/woocoos/entco/schemax/typex"
 	"github.com/woocoos/msgcenter/ent"
@@ -410,8 +411,13 @@ func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *templ
 		})
 	}
 	if nc.MessageConfig != nil {
+		cli, err := redisx.NewClient(c.configuration.Root().Sub("store.redis"))
+		if err != nil {
+			return nil, err
+		}
 		add("message", 0, func() (notify.Notifier, error) {
-			return message.New(nc.MessageConfig, tmpl, c.db, overrideMessageConfig(tpldir, c.db))
+			return message.New(nc.MessageConfig, tmpl, c.db, cli.UniversalClient,
+				overrideMessageConfig(tpldir, c.db))
 		})
 	}
 	if errs != nil {

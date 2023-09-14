@@ -29,12 +29,6 @@ type (
 )
 
 var (
-	// check implemented by the API.
-	_ oas.GeneralServer  = (*Service)(nil)
-	_ oas.ReceiverServer = (*Service)(nil)
-	_ oas.SilenceServer  = (*Service)(nil)
-	_ oas.AlertServer    = (*Service)(nil)
-
 	logger = log.Component("api")
 )
 
@@ -43,7 +37,7 @@ type Service struct {
 
 	uptime time.Time
 
-	// mtx protects alertmanagerConfig, setAlertStatus and route.
+	// mtx protects config, setAlertStatus and route.
 	mtx sync.RWMutex
 
 	route          *dispatch.Route

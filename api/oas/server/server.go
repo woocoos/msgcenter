@@ -12,17 +12,17 @@ import (
 )
 
 // RegisterGeneralHandlers creates http.Handler with routing matching OpenAPI spec.
-func RegisterGeneralHandlers(router *gin.RouterGroup, si oas.GeneralServer) {
+func RegisterGeneralHandlers(router *gin.RouterGroup, si oas.GeneralService) {
 	router.GET("/status", wrapGetStatus(si))
 }
 
 // RegisterReceiverHandlers creates http.Handler with routing matching OpenAPI spec.
-func RegisterReceiverHandlers(router *gin.RouterGroup, si oas.ReceiverServer) {
+func RegisterReceiverHandlers(router *gin.RouterGroup, si oas.ReceiverService) {
 	router.GET("/receivers", wrapGetReceivers(si))
 }
 
 // RegisterSilenceHandlers creates http.Handler with routing matching OpenAPI spec.
-func RegisterSilenceHandlers(router *gin.RouterGroup, si oas.SilenceServer) {
+func RegisterSilenceHandlers(router *gin.RouterGroup, si oas.SilenceService) {
 	router.DELETE("/silence/:silenceID", wrapDeleteSilence(si))
 	router.GET("/silence/:silenceID", wrapGetSilence(si))
 	router.GET("/silences", wrapGetSilences(si))
@@ -30,12 +30,17 @@ func RegisterSilenceHandlers(router *gin.RouterGroup, si oas.SilenceServer) {
 }
 
 // RegisterAlertHandlers creates http.Handler with routing matching OpenAPI spec.
-func RegisterAlertHandlers(router *gin.RouterGroup, si oas.AlertServer) {
+func RegisterAlertHandlers(router *gin.RouterGroup, si oas.AlertService) {
 	router.GET("/alerts", wrapGetAlerts(si))
 	router.POST("/alerts", wrapPostAlerts(si))
 }
 
-func wrapGetStatus(si oas.GeneralServer) func(c *gin.Context) {
+// RegisterPushHandlers creates http.Handler with routing matching OpenAPI spec.
+func RegisterPushHandlers(router *gin.RouterGroup, si oas.PushService) {
+	router.POST("/push", wrapPostPush(si))
+}
+
+func wrapGetStatus(si oas.GeneralService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		resp, err := si.GetStatus(c)
 		if err != nil {
@@ -46,7 +51,7 @@ func wrapGetStatus(si oas.GeneralServer) func(c *gin.Context) {
 	}
 }
 
-func wrapGetReceivers(si oas.ReceiverServer) func(c *gin.Context) {
+func wrapGetReceivers(si oas.ReceiverService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		resp, err := si.GetReceivers(c)
 		if err != nil {
@@ -57,7 +62,7 @@ func wrapGetReceivers(si oas.ReceiverServer) func(c *gin.Context) {
 	}
 }
 
-func wrapDeleteSilence(si oas.SilenceServer) func(c *gin.Context) {
+func wrapDeleteSilence(si oas.SilenceService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req oas.DeleteSilenceRequest
 		if err := c.ShouldBindUri(&req.UriParams); err != nil {
@@ -72,7 +77,7 @@ func wrapDeleteSilence(si oas.SilenceServer) func(c *gin.Context) {
 	}
 }
 
-func wrapGetSilence(si oas.SilenceServer) func(c *gin.Context) {
+func wrapGetSilence(si oas.SilenceService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req oas.GetSilenceRequest
 		if err := c.ShouldBindUri(&req.UriParams); err != nil {
@@ -92,7 +97,7 @@ func wrapGetSilence(si oas.SilenceServer) func(c *gin.Context) {
 	}
 }
 
-func wrapGetSilences(si oas.SilenceServer) func(c *gin.Context) {
+func wrapGetSilences(si oas.SilenceService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req oas.GetSilencesRequest
 		if err := c.ShouldBind(&req); err != nil {
@@ -108,7 +113,7 @@ func wrapGetSilences(si oas.SilenceServer) func(c *gin.Context) {
 	}
 }
 
-func wrapPostSilences(si oas.SilenceServer) func(c *gin.Context) {
+func wrapPostSilences(si oas.SilenceService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req oas.PostSilencesRequest
 		if err := c.ShouldBind(&req.PostableSilence); err != nil {
@@ -128,7 +133,7 @@ func wrapPostSilences(si oas.SilenceServer) func(c *gin.Context) {
 	}
 }
 
-func wrapGetAlerts(si oas.AlertServer) func(c *gin.Context) {
+func wrapGetAlerts(si oas.AlertService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req oas.GetAlertsRequest
 		if err := c.ShouldBind(&req.Body); err != nil {
@@ -144,7 +149,7 @@ func wrapGetAlerts(si oas.AlertServer) func(c *gin.Context) {
 	}
 }
 
-func wrapPostAlerts(si oas.AlertServer) func(c *gin.Context) {
+func wrapPostAlerts(si oas.AlertService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var req oas.PostAlertsRequest
 		if err := c.ShouldBind(&req.PostableAlerts); err != nil {
@@ -152,6 +157,21 @@ func wrapPostAlerts(si oas.AlertServer) func(c *gin.Context) {
 			return
 		}
 		err := si.PostAlerts(c, &req)
+		if err != nil {
+			c.Error(err)
+			return
+		}
+	}
+}
+
+func wrapPostPush(si oas.PushService) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var req oas.PostPushRequest
+		if err := c.ShouldBind(&req.PushData); err != nil {
+			handler.AbortWithError(c, http.StatusBadRequest, err)
+			return
+		}
+		err := si.PostPush(c, &req)
 		if err != nil {
 			c.Error(err)
 			return

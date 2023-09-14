@@ -66,16 +66,18 @@ type ComplexityRoot struct {
 	}
 
 	Message struct {
-		Action  func(childComplexity int) int
-		Key     func(childComplexity int) int
-		Payload func(childComplexity int) int
+		Content func(childComplexity int) int
+		Format  func(childComplexity int) int
 		SendAt  func(childComplexity int) int
+		Title   func(childComplexity int) int
 		Topic   func(childComplexity int) int
+		URL     func(childComplexity int) int
 	}
 
 	MessageFilter struct {
 		AppCode  func(childComplexity int) int
 		DeviceID func(childComplexity int) int
+		TenantID func(childComplexity int) int
 		UserID   func(childComplexity int) int
 	}
 
@@ -163,6 +165,7 @@ type ComplexityRoot struct {
 
 	MsgInternal struct {
 		Body          func(childComplexity int) int
+		Category      func(childComplexity int) int
 		CreatedAt     func(childComplexity int) int
 		CreatedBy     func(childComplexity int) int
 		Format        func(childComplexity int) int
@@ -533,26 +536,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Matcher.Value(childComplexity), true
 
-	case "Message.action":
-		if e.complexity.Message.Action == nil {
+	case "Message.content":
+		if e.complexity.Message.Content == nil {
 			break
 		}
 
-		return e.complexity.Message.Action(childComplexity), true
+		return e.complexity.Message.Content(childComplexity), true
 
-	case "Message.key":
-		if e.complexity.Message.Key == nil {
+	case "Message.format":
+		if e.complexity.Message.Format == nil {
 			break
 		}
 
-		return e.complexity.Message.Key(childComplexity), true
-
-	case "Message.payload":
-		if e.complexity.Message.Payload == nil {
-			break
-		}
-
-		return e.complexity.Message.Payload(childComplexity), true
+		return e.complexity.Message.Format(childComplexity), true
 
 	case "Message.sendAt":
 		if e.complexity.Message.SendAt == nil {
@@ -561,12 +557,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Message.SendAt(childComplexity), true
 
+	case "Message.title":
+		if e.complexity.Message.Title == nil {
+			break
+		}
+
+		return e.complexity.Message.Title(childComplexity), true
+
 	case "Message.topic":
 		if e.complexity.Message.Topic == nil {
 			break
 		}
 
 		return e.complexity.Message.Topic(childComplexity), true
+
+	case "Message.url":
+		if e.complexity.Message.URL == nil {
+			break
+		}
+
+		return e.complexity.Message.URL(childComplexity), true
 
 	case "MessageFilter.appCode":
 		if e.complexity.MessageFilter.AppCode == nil {
@@ -581,6 +591,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MessageFilter.DeviceID(childComplexity), true
+
+	case "MessageFilter.tenantId":
+		if e.complexity.MessageFilter.TenantID == nil {
+			break
+		}
+
+		return e.complexity.MessageFilter.TenantID(childComplexity), true
 
 	case "MessageFilter.userId":
 		if e.complexity.MessageFilter.UserID == nil {
@@ -990,6 +1007,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgInternal.Body(childComplexity), true
+
+	case "MsgInternal.category":
+		if e.complexity.MsgInternal.Category == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.Category(childComplexity), true
 
 	case "MsgInternal.createdAt":
 		if e.complexity.MsgInternal.CreatedAt == nil {
@@ -3310,6 +3334,8 @@ type MsgInternal implements Node {
   createdAt: Time!
   updatedBy: Int
   updatedAt: Time
+  """消息类型分类"""
+  category: String!
   """标题"""
   subject: String!
   """消息体"""
@@ -3515,6 +3541,20 @@ input MsgInternalWhereInput {
   updatedAtLTE: Time
   updatedAtIsNil: Boolean
   updatedAtNotNil: Boolean
+  """category field predicates"""
+  category: String
+  categoryNEQ: String
+  categoryIn: [String!]
+  categoryNotIn: [String!]
+  categoryGT: String
+  categoryGTE: String
+  categoryLT: String
+  categoryLTE: String
+  categoryContains: String
+  categoryHasPrefix: String
+  categoryHasSuffix: String
+  categoryEqualFold: String
+  categoryContainsFold: String
   """subject field predicates"""
   subject: String
   subjectNEQ: String
@@ -4966,18 +5006,19 @@ input EmailConfigInput {
 SubscriptionAction is a generic type for all subscription actions
 """
 type Message {
-    action: String!
-    payload: String!
-    key: String!
-    # message topic (e.g. "biz","customer")
     topic: String!
-    sendAt: String!
+    title: String!
+    content: String!
+    format: String!
+    url: String!
+    sendAt: Time!
 }
 
 """
 MessageFilter is a generic type for all subscription filters
 """
 type MessageFilter {
+    tenantId: ID!
     appCode: String!
     userId: ID!
     deviceId:String!

@@ -8,6 +8,7 @@ import (
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
+	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/label"
@@ -187,7 +188,18 @@ func overrideMessageConfig(basedir string, client *ent.Client) notify.CustomerCo
 			}
 			return err
 		}
-
+		ev, err := data.QueryEvent().WithMsgType(func(query *ent.MsgTypeQuery) {
+			query.Select(msgtype.FieldCategory)
+		}).Only(ctx)
+		if err != nil {
+			// must have
+			return err
+		}
+		mt, err := ev.MsgType(ctx)
+		if err != nil {
+			return err
+		}
+		cfg.Extras["category"] = mt.Category
 		cfg.Subject = data.Subject
 		if data.Format == msgtemplate.FormatHTML {
 			cfg.HTML = data.Body

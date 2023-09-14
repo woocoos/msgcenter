@@ -94,6 +94,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "category", Type: field.TypeString, Size: 20},
 		{Name: "subject", Type: field.TypeString},
 		{Name: "body", Type: field.TypeString, Nullable: true},
 		{Name: "format", Type: field.TypeString},

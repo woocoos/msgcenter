@@ -78,6 +78,12 @@ func (miu *MsgInternalUpdate) ClearUpdatedAt() *MsgInternalUpdate {
 	return miu
 }
 
+// SetCategory sets the "category" field.
+func (miu *MsgInternalUpdate) SetCategory(s string) *MsgInternalUpdate {
+	miu.mutation.SetCategory(s)
+	return miu
+}
+
 // SetSubject sets the "subject" field.
 func (miu *MsgInternalUpdate) SetSubject(s string) *MsgInternalUpdate {
 	miu.mutation.SetSubject(s)
@@ -198,7 +204,20 @@ func (miu *MsgInternalUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (miu *MsgInternalUpdate) check() error {
+	if v, ok := miu.mutation.Category(); ok {
+		if err := msginternal.CategoryValidator(v); err != nil {
+			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.category": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (miu *MsgInternalUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := miu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(msginternal.Table, msginternal.Columns, sqlgraph.NewFieldSpec(msginternal.FieldID, field.TypeInt))
 	if ps := miu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -221,6 +240,9 @@ func (miu *MsgInternalUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if miu.mutation.UpdatedAtCleared() {
 		_spec.ClearField(msginternal.FieldUpdatedAt, field.TypeTime)
+	}
+	if value, ok := miu.mutation.Category(); ok {
+		_spec.SetField(msginternal.FieldCategory, field.TypeString, value)
 	}
 	if value, ok := miu.mutation.Subject(); ok {
 		_spec.SetField(msginternal.FieldSubject, field.TypeString, value)
@@ -357,6 +379,12 @@ func (miuo *MsgInternalUpdateOne) ClearUpdatedAt() *MsgInternalUpdateOne {
 	return miuo
 }
 
+// SetCategory sets the "category" field.
+func (miuo *MsgInternalUpdateOne) SetCategory(s string) *MsgInternalUpdateOne {
+	miuo.mutation.SetCategory(s)
+	return miuo
+}
+
 // SetSubject sets the "subject" field.
 func (miuo *MsgInternalUpdateOne) SetSubject(s string) *MsgInternalUpdateOne {
 	miuo.mutation.SetSubject(s)
@@ -490,7 +518,20 @@ func (miuo *MsgInternalUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (miuo *MsgInternalUpdateOne) check() error {
+	if v, ok := miuo.mutation.Category(); ok {
+		if err := msginternal.CategoryValidator(v); err != nil {
+			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.category": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (miuo *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgInternal, err error) {
+	if err := miuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(msginternal.Table, msginternal.Columns, sqlgraph.NewFieldSpec(msginternal.FieldID, field.TypeInt))
 	id, ok := miuo.mutation.ID()
 	if !ok {
@@ -530,6 +571,9 @@ func (miuo *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgIntern
 	}
 	if miuo.mutation.UpdatedAtCleared() {
 		_spec.ClearField(msginternal.FieldUpdatedAt, field.TypeTime)
+	}
+	if value, ok := miuo.mutation.Category(); ok {
+		_spec.SetField(msginternal.FieldCategory, field.TypeString, value)
 	}
 	if value, ok := miuo.mutation.Subject(); ok {
 		_spec.SetField(msginternal.FieldSubject, field.TypeString, value)

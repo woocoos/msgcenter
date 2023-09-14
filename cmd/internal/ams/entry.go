@@ -14,6 +14,7 @@ import (
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/httpx"
 	"github.com/tsingsun/woocoo/pkg/log"
+	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/tsingsun/woocoo/web"
 	"github.com/woocoos/entco/ecx"
 	"github.com/woocoos/entco/ecx/oteldriver"
@@ -101,7 +102,8 @@ func NewServer(cnf *conf.AppConfiguration) *Server {
 	if err := configCoordinator.Reload(); err != nil {
 		log.Fatal(err)
 	}
-	s.buildApiServer(cnf, api, cfgopts)
+	s.buildApiService(cnf, api, cfgopts)
+	s.buildPushService()
 
 	s.apps = []woocoo.Server{
 		am.Alerts.(*mem.Alerts), am.NotificationLog.(*notify.Log), am.Peer, am.Silences,
@@ -150,7 +152,7 @@ func (s *Server) buildEntClient() {
 	}
 }
 
-func (s *Server) buildApiServer(cnf *conf.AppConfiguration, ws *server.Service, amopt *server.Options) {
+func (s *Server) buildApiService(cnf *conf.AppConfiguration, ws *server.Service, amopt *server.Options) {
 	webSrv := web.New(web.WithConfiguration(cnf.Sub("web")),
 		web.WithGracefulStop(),
 		gql.RegistryMiddleware(),
@@ -185,6 +187,16 @@ func (s *Server) buildApiServer(cnf *conf.AppConfiguration, ws *server.Service, 
 		log.Fatal(err)
 	}
 	s.apiSrv = webSrv
+}
+
+func (s *Server) buildPushService() {
+	cli, err := redisx.NewClient(s.appCnf.Sub("store.redis"))
+	if err != nil {
+		panic(err)
+	}
+	server.RegisterPushHandlers(s.apiSrv.Router().FindGroup("/api/v2").Group,
+		server.NewPushService(cli.UniversalClient),
+	)
 }
 
 func buildUiServer(cnf *conf.AppConfiguration) *web.Server {

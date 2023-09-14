@@ -77,6 +77,12 @@ func (mic *MsgInternalCreate) SetNillableUpdatedAt(t *time.Time) *MsgInternalCre
 	return mic
 }
 
+// SetCategory sets the "category" field.
+func (mic *MsgInternalCreate) SetCategory(s string) *MsgInternalCreate {
+	mic.mutation.SetCategory(s)
+	return mic
+}
+
 // SetSubject sets the "subject" field.
 func (mic *MsgInternalCreate) SetSubject(s string) *MsgInternalCreate {
 	mic.mutation.SetSubject(s)
@@ -196,6 +202,14 @@ func (mic *MsgInternalCreate) check() error {
 	if _, ok := mic.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "MsgInternal.created_at"`)}
 	}
+	if _, ok := mic.mutation.Category(); !ok {
+		return &ValidationError{Name: "category", err: errors.New(`ent: missing required field "MsgInternal.category"`)}
+	}
+	if v, ok := mic.mutation.Category(); ok {
+		if err := msginternal.CategoryValidator(v); err != nil {
+			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.category": %w`, err)}
+		}
+	}
 	if _, ok := mic.mutation.Subject(); !ok {
 		return &ValidationError{Name: "subject", err: errors.New(`ent: missing required field "MsgInternal.subject"`)}
 	}
@@ -255,6 +269,10 @@ func (mic *MsgInternalCreate) createSpec() (*MsgInternal, *sqlgraph.CreateSpec) 
 	if value, ok := mic.mutation.UpdatedAt(); ok {
 		_spec.SetField(msginternal.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := mic.mutation.Category(); ok {
+		_spec.SetField(msginternal.FieldCategory, field.TypeString, value)
+		_node.Category = value
 	}
 	if value, ok := mic.mutation.Subject(); ok {
 		_spec.SetField(msginternal.FieldSubject, field.TypeString, value)
@@ -380,6 +398,18 @@ func (u *MsgInternalUpsert) UpdateUpdatedAt() *MsgInternalUpsert {
 // ClearUpdatedAt clears the value of the "updated_at" field.
 func (u *MsgInternalUpsert) ClearUpdatedAt() *MsgInternalUpsert {
 	u.SetNull(msginternal.FieldUpdatedAt)
+	return u
+}
+
+// SetCategory sets the "category" field.
+func (u *MsgInternalUpsert) SetCategory(v string) *MsgInternalUpsert {
+	u.Set(msginternal.FieldCategory, v)
+	return u
+}
+
+// UpdateCategory sets the "category" field to the value that was provided on create.
+func (u *MsgInternalUpsert) UpdateCategory() *MsgInternalUpsert {
+	u.SetExcluded(msginternal.FieldCategory)
 	return u
 }
 
@@ -546,6 +576,20 @@ func (u *MsgInternalUpsertOne) UpdateUpdatedAt() *MsgInternalUpsertOne {
 func (u *MsgInternalUpsertOne) ClearUpdatedAt() *MsgInternalUpsertOne {
 	return u.Update(func(s *MsgInternalUpsert) {
 		s.ClearUpdatedAt()
+	})
+}
+
+// SetCategory sets the "category" field.
+func (u *MsgInternalUpsertOne) SetCategory(v string) *MsgInternalUpsertOne {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.SetCategory(v)
+	})
+}
+
+// UpdateCategory sets the "category" field to the value that was provided on create.
+func (u *MsgInternalUpsertOne) UpdateCategory() *MsgInternalUpsertOne {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.UpdateCategory()
 	})
 }
 
@@ -884,6 +928,20 @@ func (u *MsgInternalUpsertBulk) UpdateUpdatedAt() *MsgInternalUpsertBulk {
 func (u *MsgInternalUpsertBulk) ClearUpdatedAt() *MsgInternalUpsertBulk {
 	return u.Update(func(s *MsgInternalUpsert) {
 		s.ClearUpdatedAt()
+	})
+}
+
+// SetCategory sets the "category" field.
+func (u *MsgInternalUpsertBulk) SetCategory(v string) *MsgInternalUpsertBulk {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.SetCategory(v)
+	})
+}
+
+// UpdateCategory sets the "category" field to the value that was provided on create.
+func (u *MsgInternalUpsertBulk) UpdateCategory() *MsgInternalUpsertBulk {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.UpdateCategory()
 	})
 }
 
