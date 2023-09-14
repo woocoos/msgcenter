@@ -1,6 +1,7 @@
 schema {
   query: Query
   mutation: Mutation
+  subscription: Subscription
 }
 
 directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
@@ -200,6 +201,23 @@ input MatcherInput {
   name: String!
   type: MatchType!
   value: String!
+}
+
+"""SubscriptionAction is a generic type for all subscription actions"""
+type Message {
+  action: String!
+  key: String!
+  payload: String!
+  sendAt: String!
+  topic: String!
+}
+
+"""MessageFilter is a generic type for all subscription filters"""
+type MessageFilter {
+  appCode: String!
+  deviceId: String!
+  tenantId: ID!
+  userId: ID!
 }
 
 type MsgAlert implements Node {
@@ -2005,10 +2023,10 @@ type Route {
 }
 
 input RouteInput {
-  GroupInterval: Duration
   activeTimeIntervals: [String!]
   continue: Boolean
   groupBy: [LabelName]
+  groupInterval: Duration
   groupWait: Duration
   matchers: [MatcherInput]
   muteTimeIntervals: [String!]
@@ -2166,6 +2184,10 @@ input SilenceWhereInput {
   updatedByNEQ: Int
   updatedByNotIn: [Int!]
   updatedByNotNil: Boolean
+}
+
+type Subscription {
+  message: Message
 }
 
 """The builtin Time type"""

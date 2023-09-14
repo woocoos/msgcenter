@@ -217,7 +217,7 @@ export default (props: {
       >
         <InputMultiple decollator=";" placeholder={`${t('please_enter_msg_temp_bcc')}`} />
       </ProFormText>
-      <div>
+      <div x-if={props.receiverType === MsgTemplateReceiverType.Email}>
         <Space>
           <a onClick={() => {
             formRef.current?.setFieldValue('cc', undefined);
@@ -229,7 +229,7 @@ export default (props: {
           }}>{t(showBcc ? 'hidd_bcc' : 'show_bcc')}</a>
         </Space>
       </div>
-      <br />
+      <br x-if={props.receiverType === MsgTemplateReceiverType.Email} />
       <ProFormText
         x-if={props.receiverType === MsgTemplateReceiverType.Email}
         name="from"

@@ -148,6 +148,18 @@ export const initStoreData = (store: IMockStore) => {
     store.get('MsgAlert', 2),
     store.get('MsgAlert', 3),
   ]))
+  store.set('Query', 'ROOT', 'msgInternals', listTemp([
+    store.get('MsgInternal', 1),
+    store.get('MsgInternal', 2),
+    store.get('MsgInternal', 3),
+    store.get('MsgInternal', 4),
+    store.get('MsgInternal', 5),
+    store.get('MsgInternal', 6),
+    store.get('MsgInternal', 7),
+    store.get('MsgInternal', 8),
+    store.get('MsgInternal', 9),
+    store.get('MsgInternal', 10),
+  ]))
 
   // -------------root-end------------------------
 
@@ -218,4 +230,12 @@ export const initStoreData = (store: IMockStore) => {
   store.set('Nlog', 3, {
     id: 3, tenantID: 1, groupKey: "groupKey3", receiver: "email"
   })
+
+  // MsgInternal
+  for (let i = 1; i <= 10; i++) {
+    store.set('MsgInternal', i, {
+      id: i, tenantID: 1, subject: `主题${i}`, body: `内容${i}`, format: 'text'
+    })
+  }
+
 }

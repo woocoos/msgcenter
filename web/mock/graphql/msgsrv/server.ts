@@ -58,6 +58,7 @@ const schemaWithMocks = addMocksToSchema({
       msgTypes: relayStylePaginationMock(store),
       silences: relayStylePaginationMock(store),
       msgAlerts: relayStylePaginationMock(store),
+      msgInternals: relayStylePaginationMock(store),
       msgTypeCategories: () => {
         return ['故障消息', '业务消息', '客户交易'];
       },
@@ -287,6 +288,12 @@ const schemaWithMocks = addMocksToSchema({
           store.get('Query', 'ROOT', 'msgTypes') as Ref,
           id,
         )
+        return true;
+      },
+      markMessageReaOrUnRead(_, { ids, read }) {
+        return true;
+      },
+      markMessageDeleted(_, { ids }) {
         return true;
       }
     }

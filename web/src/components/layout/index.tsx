@@ -11,6 +11,7 @@ import { logout, urlSpm } from '@/services/auth';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import { createFromIconfontCN } from '@ant-design/icons';
 import { files } from '@knockout-js/api';
+import FloatWs from '../ws';
 
 const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   NODE_ENV = process.env.NODE_ENV ?? '',
@@ -74,10 +75,11 @@ export default () => {
     IconFont={IconFont}
     onClickMenuItem={async (item, isOpen) => {
       if (checkLeave()) {
+        const url = await urlSpm(item.path ?? '')
         if (isOpen) {
-          window.open(await urlSpm(item.path ?? ''));
+          window.open(url);
         } else {
-          history?.push(await urlSpm(item.path ?? ''));
+          history?.push(url);
         }
       }
     }}
@@ -133,5 +135,6 @@ export default () => {
     }}
   >
     <Outlet />
+    {/* <FloatWs /> */}
   </Layout>
 }
