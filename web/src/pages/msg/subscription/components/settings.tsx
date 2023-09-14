@@ -38,6 +38,7 @@ export default (props: {
       if (!open) {
         if (checkLeave()) {
           props.onClose?.();
+          setSaveDisabled(true);
         }
       } else {
         setSaveDisabled(true);

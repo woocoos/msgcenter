@@ -1,5 +1,5 @@
 import { gql } from "@/generated/msgsrv";
-import { CreateMsgTemplateInput, MsgTemplateOrder, MsgTemplateWhereInput, UpdateMsgTemplateInput } from "@/generated/msgsrv/graphql";
+import { CreateMsgTemplateInput, MsgTemplateOrder, MsgTemplateOrderField, MsgTemplateWhereInput, OrderDirection, UpdateMsgTemplateInput } from "@/generated/msgsrv/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
@@ -11,6 +11,7 @@ export const EnumMsgTemplateStatus = {
 
 export const EnumMsgTemplateReceiverType = {
   email: { text: 'email' },
+  message: { text: 'message' },
   webhook: { text: 'webhook' },
 };
 
@@ -36,7 +37,7 @@ const queryMsgTemplateInfo = gql(/* GraphQL */`query MsgTemplateInfo($gid:GID!){
     id
     ... on MsgTemplate{
       id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,
-      receiverType,format,subject,from,to,cc,bcc,body,tplFileID,attachmentsFileIds
+      receiverType,format,subject,from,to,cc,bcc,body,tplFileID,attachmentsFileIds,tpl,attachments
     }
   }
 }`);
@@ -78,7 +79,10 @@ export async function getMsgTemplateList(
     queryMsgTemplateList, {
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: MsgTemplateOrderField.CreatedAt
+    },
   }, gather.current || 1);
 
   if (result.data?.msgTemplates) {

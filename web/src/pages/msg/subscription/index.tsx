@@ -3,7 +3,7 @@ import { Space } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
-import { MsgType, MsgTypeWhereInput } from '@/generated/msgsrv/graphql';
+import { MsgType, MsgTypeSimpleStatus, MsgTypeWhereInput } from '@/generated/msgsrv/graphql';
 import { getMsgTypeListAndSub } from '@/services/msgsrv/type';
 import InputCategory from '../type/components/inputCategory';
 import Settings from './components/settings';
@@ -104,7 +104,10 @@ export default () => {
           columns={columns}
           request={async (params) => {
             const table = { data: [] as ProTableColumnsData[], success: true, total: 0 },
-              where: MsgTypeWhereInput = {};
+              where: MsgTypeWhereInput = {
+                canSubs: true,
+                status: MsgTypeSimpleStatus.Active,
+              };
             where.nameContains = params.name;
             where.categoryContains = params.msgTypeCategory;
             const result = await getMsgTypeListAndSub({

@@ -1,5 +1,5 @@
 import { gql } from "@/generated/msgsrv";
-import { CreateMsgEventInput, MsgEventOrder, MsgEventWhereInput, RouteStrType, UpdateMsgEventInput } from "@/generated/msgsrv/graphql";
+import { CreateMsgEventInput, MsgEventOrder, MsgEventOrderField, MsgEventWhereInput, OrderDirection, RouteStrType, UpdateMsgEventInput } from "@/generated/msgsrv/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
@@ -83,7 +83,10 @@ export async function getMsgEventList(
     queryMsgEventList, {
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: MsgEventOrderField.CreatedAt
+    },
   }, gather.current || 1);
 
   if (result.data?.msgEvents) {

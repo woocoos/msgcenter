@@ -1,8 +1,10 @@
 import { getMsgTypeCategoryList } from '@/services/msgsrv/type';
 import { CloseCircleFilled, LoadingOutlined } from '@ant-design/icons';
 import { AutoComplete, Input } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+let stimeFn: NodeJS.Timeout | undefined = undefined;
 
 export default (props: {
   value?: string;
@@ -11,28 +13,27 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     [loading, setLoading] = useState(false),
-    [options, setOptions] = useState<{ value: string }[]>([]),
-    [stFn, setStFn] = useState<NodeJS.Timeout>();
+    [options, setOptions] = useState<{ value: string }[]>([]);
 
   const
-    onSearch = async (value: string) => {
+    onSearch = async (value?: string) => {
       setLoading(true);
-      clearTimeout(stFn);
-      const stout = setTimeout(async () => {
-        if (value) {
-          const result = await getMsgTypeCategoryList(value)
-          if (result) {
-            setOptions(result.map(item => ({
-              value: item,
-            })))
-          }
-        } else {
-          setOptions([])
-        }
+      clearTimeout(stimeFn);
+      stimeFn = setTimeout(async () => {
+        const result = await getMsgTypeCategoryList(value)
+        setOptions(result?.map(item => ({
+          value: item,
+        })) ?? [])
         setLoading(false);
       }, 500);
-      setStFn(stout);
     }
+
+  useEffect(() => {
+    onSearch();
+    return () => {
+      clearTimeout(stimeFn);
+    }
+  }, [])
 
   return <AutoComplete
     value={props.value}

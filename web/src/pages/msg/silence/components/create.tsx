@@ -41,6 +41,7 @@ export default (props: {
       if (!open) {
         if (checkLeave()) {
           props.onClose?.();
+          setSaveDisabled(true);
         }
       } else {
         setSaveDisabled(true);
@@ -167,12 +168,11 @@ export default (props: {
             ]}
             fieldProps={{
               onBlur: () => {
-                const startAt = formRef.current?.getFieldValue('rangeAt');
-                if (startAt?.[0]) {
-                  const endDate = durationTurnEndDate(startAt[0], formRef.current?.getFieldValue('duration'), 'YYYY-MM-DD HH:mm:ss');
-                  if (endDate) {
-                    formRef.current?.setFieldValue('rangeAt', [startAt[0], endDate]);
-                  }
+                const startAt = formRef.current?.getFieldValue('rangeAt'),
+                  start0 = startAt?.[0] ?? getDate(Date.now(), 'YYYY-MM-DD HH:mm:ss');
+                const endDate = durationTurnEndDate(start0, formRef.current?.getFieldValue('duration'), 'YYYY-MM-DD HH:mm:ss');
+                if (endDate) {
+                  formRef.current?.setFieldValue('rangeAt', [start0, endDate]);
                 }
               }
             }}

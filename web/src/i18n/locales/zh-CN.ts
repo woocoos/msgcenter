@@ -166,6 +166,10 @@ export default {
     msg_log: '消息日志',
     msg_log_list: '消息日志列表',
     msg_event_config_tip: '修改后请重新启用后生效',
+    hidd_cc: '删除抄送',
+    show_cc: '添加抄送',
+    hidd_bcc: '删除密送',
+    show_bcc: '添加密送',
 
     // 创建
     create_msg_type: '创建消息类型',
@@ -207,6 +211,10 @@ export default {
     please_enter_match_type: '请输入匹配类型',
     please_enter_match_name: '请输入匹配名称',
     please_enter_match_value: '请输入匹配值',
+    please_enter_msg_temp_to: '请输入收件人',
+    please_enter_msg_temp_cc: '请输入抄送邮箱，通过回车确认输入结束',
+    please_enter_msg_temp_bcc: '请输入密送邮箱，通过回车确认输入结束',
+    please_enter_msg_temp_from: '请输入发件人',
     // 添加
     add: "添加",
 

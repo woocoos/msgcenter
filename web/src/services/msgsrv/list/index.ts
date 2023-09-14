@@ -1,5 +1,5 @@
 import { gql } from "@/generated/msgsrv";
-import { MsgAlertOrder, MsgAlertWhereInput, NlogOrder, NlogWhereInput } from "@/generated/msgsrv/graphql";
+import { MsgAlertOrder, MsgAlertOrderField, MsgAlertWhereInput, NlogOrder, NlogOrderField, NlogWhereInput, OrderDirection } from "@/generated/msgsrv/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
@@ -11,7 +11,7 @@ export const EnumMsgAlertStatus = {
 
 export const EnumNlogReceiverType = {
   email: { text: 'email' },
-  internal: { text: 'internal' },
+  message: { text: 'message' },
   webhook: { text: 'webhook' },
 };
 
@@ -61,7 +61,10 @@ export async function getMsgAlertList(
     queryMsgAlertList, {
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: MsgAlertOrderField.CreatedAt
+    },
   }, gather.current || 1);
 
   if (result.data?.msgAlerts) {
@@ -89,7 +92,10 @@ export async function getMsgAlertLogList(
     gid: gid('msg_alert', msgAlertId),
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: NlogOrderField.CreatedAt
+    },
   }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'MsgAlert') {

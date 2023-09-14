@@ -9,6 +9,7 @@ import Create from './components/create';
 import { Link } from '@ice/runtime';
 import Config from './components/config';
 import { KeepAlive } from '@knockout-js/layout';
+import InputCategory from '../type/components/inputCategory';
 
 
 export default () => {
@@ -20,6 +21,9 @@ export default () => {
       // 有需要排序配置  sorter: true
       {
         title: t('msg_type_category'), dataIndex: 'msgTypeCategory', width: 120,
+        renderFormItem() {
+          return <InputCategory />
+        },
         render(text, record) {
           return record.msgType.category
         },

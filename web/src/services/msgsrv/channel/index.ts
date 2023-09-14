@@ -1,11 +1,12 @@
 import { gql } from "@/generated/msgsrv";
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
-import { CreateMsgChannelInput, MsgChannelOrder, MsgChannelWhereInput, UpdateMsgChannelInput } from "@/generated/msgsrv/graphql";
+import { CreateMsgChannelInput, MsgChannelOrder, MsgChannelOrderField, MsgChannelWhereInput, UpdateMsgChannelInput, OrderDirection } from "@/generated/msgsrv/graphql";
 import { gid } from "@knockout-js/api";
 
 
 export const EnumMsgChannelReceiverType = {
   email: { text: 'email' },
+  message: { text: 'message' },
   webhook: { text: 'webhook' },
 };
 
@@ -88,7 +89,10 @@ export async function getMsgChannelList(
     queryMsgChannelList, {
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: MsgChannelOrderField.CreatedAt
+    },
   }, gather.current || 1);
 
   if (result.data?.msgChannels) {

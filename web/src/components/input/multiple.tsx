@@ -6,6 +6,7 @@ export interface InputMultipleProps {
   value?: string;
   decollator: string;
   disabled?: boolean;
+  placeholder?: string;
   tagsStyle?: CSSProperties;
   onChange?: (value?: string) => void;
 }
@@ -23,6 +24,7 @@ export default (props: InputMultipleProps) => {
       tags.map((item, index) => <Tag key={index} closable={props.disabled ? false : true}>{item}</Tag>)
     }</div>}
     value={value}
+    placeholder={props.placeholder}
     onChange={(event) => {
       setValue(event.target.value);
     }} onPressEnter={(event) => {

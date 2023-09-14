@@ -163,6 +163,10 @@ export default {
     msg_log: 'message log',
     msg_log_list: 'Message log list',
     msg_event_config_tip: 'The modification takes effect after being enabled again',
+    hidd_cc: 'Delete cc',
+    show_cc: 'Add cc',
+    hidd_bcc: 'Delete BCC',
+    show_bcc: 'Add BCC',
 
     // 创建
     create_msg_type: 'Create message type',
@@ -202,6 +206,10 @@ export default {
     please_enter_match_type: 'Please enter matching type',
     please_enter_match_name: 'Please enter matching name',
     please_enter_match_value: 'Please enter matching value',
+    please_enter_msg_temp_to: 'Please enter the recipient',
+    please_enter_msg_temp_cc: 'Please enter the CC email address and press enter to confirm the input',
+    please_enter_msg_temp_bcc: 'Please enter the BCC email address and press Enter to confirm the input',
+    please_enter_msg_temp_from: 'Please enter sender',
     // 添加
     add: "Add",
 

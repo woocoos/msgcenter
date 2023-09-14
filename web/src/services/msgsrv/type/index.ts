@@ -1,5 +1,5 @@
 import { gql } from "@/generated/msgsrv";
-import { CreateMsgSubscriberInput, CreateMsgTypeInput, MsgTypeOrder, MsgTypeWhereInput, UpdateMsgTypeInput } from "@/generated/msgsrv/graphql";
+import { CreateMsgSubscriberInput, CreateMsgTypeInput, MsgTypeOrder, MsgTypeOrderField, MsgTypeWhereInput, OrderDirection, UpdateMsgTypeInput } from "@/generated/msgsrv/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
@@ -110,7 +110,10 @@ export async function getMsgTypeList(
     queryMsgTypeList, {
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: MsgTypeOrderField.CreatedAt
+    },
   }, gather.current || 1);
 
   if (result.data?.msgTypes) {
@@ -217,7 +220,10 @@ export async function getMsgTypeListAndSub(
     queryMsgTypeListAndSub, {
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: MsgTypeOrderField.CreatedAt
+    },
   }, gather.current || 1);
 
   if (result.data?.msgTypes) {

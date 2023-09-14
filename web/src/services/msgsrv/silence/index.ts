@@ -1,5 +1,5 @@
 import { gql } from "@/generated/msgsrv";
-import { CreateSilenceInput, SilenceOrder, SilenceWhereInput, UpdateSilenceInput } from "@/generated/msgsrv/graphql";
+import { CreateSilenceInput, OrderDirection, SilenceOrder, SilenceOrderField, SilenceWhereInput, UpdateSilenceInput } from "@/generated/msgsrv/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
@@ -74,7 +74,10 @@ export async function getSilenceList(
     querySilenceList, {
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: SilenceOrderField.CreatedAt
+    },
   }, gather.current || 1);
 
   if (result.data?.silences) {
@@ -91,7 +94,7 @@ export async function getSilenceList(
  */
 export async function getSilenceInfo(silenceId: string) {
   const result = await query(querySilenceInfo, {
-    gid: gid('silence', silenceId)
+    gid: gid('msg_silence', silenceId)
   })
   if (result.data?.node?.__typename === "Silence") {
     return result.data.node

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Editor from '@monaco-editor/react';
 import { useLeavePrompt } from '@knockout-js/layout';
+import * as yaml from 'js-yaml'
 
 type ProFormData = {
   receiver: string;
@@ -30,6 +31,7 @@ export default (props: {
       if (!open) {
         if (checkLeave()) {
           props.onClose?.();
+          setSaveDisabled(true);
         }
       } else {
         setSaveDisabled(true);
@@ -39,10 +41,10 @@ export default (props: {
       setSaveLoading(false);
       setSaveDisabled(true);
       const initData: ProFormData = {
-        receiver: JSON.stringify({
+        receiver: yaml.dump({
           name: '',
           emailConfigs: []
-        }, null, 4)
+        })
       }
       const result = await getMsgChannelReceiverInfo(props.id);
       if (result?.id) {
@@ -56,7 +58,7 @@ export default (props: {
               }
             })
           }
-          initData.receiver = JSON.stringify(receiver, null, 4)
+          initData.receiver = yaml.dump(receiver)
         }
       }
       return initData;
@@ -68,7 +70,7 @@ export default (props: {
       setSaveLoading(true);
 
       const result = await updateMsgChannel(props.id, {
-        receiver: JSON.parse(values.receiver),
+        receiver: yaml.load(values.receiver, { json: true }),
       });
       if (result?.id) {
         setSaveDisabled(true);
@@ -107,7 +109,7 @@ export default (props: {
         <Editor
           className="adminx-editor"
           height="70vh"
-          defaultLanguage="json"
+          defaultLanguage="yaml"
         />
       </ProFormText>
     </DrawerForm>
