@@ -4,11 +4,11 @@ import (
 	"context"
 	"entgo.io/contrib/entgql"
 	"errors"
-	"fmt"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/tsingsun/woocoo/contrib/gql"
 	"github.com/tsingsun/woocoo/pkg/conf"
@@ -21,8 +21,8 @@ import (
 	"github.com/woocoos/entco/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql"
 	"github.com/woocoos/msgcenter/ent"
+	"go.uber.org/zap"
 	"net/http"
-	"strconv"
 )
 
 // Server alert server, includes: API提醒服务,包括API及消息分发功能,可选服务包括: UI
@@ -87,6 +87,7 @@ func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
 			CheckOrigin: webSocketCheckOrigin(cnf.Sub("webSocket")),
 		},
 		InitFunc:  s.wsInit,
+		CloseFunc: s.wsClose,
 		ErrorFunc: s.wsError,
 	})
 
@@ -123,19 +124,25 @@ func (s *Server) wsInit(ctx context.Context, initPayload transport.InitPayload) 
 	}
 	gctx.Request.Header.Set("Authorization", bearer)
 	tidstr := initPayload.GetString(identity.TenantHeaderKey)
-	tid, err := strconv.Atoi(tidstr)
-	if err != nil {
-		return nil, fmt.Errorf("invalid tenant id %s:%v", tidstr, err)
-	}
+	//tid, _ := strconv.Atoi(tidstr)
+	//if tid == 0 {
+	//	return nil, identity.ErrMisTenantID
+	//}
 	gctx.Request.Header.Set(identity.TenantHeaderKey, tidstr)
-	ctx = identity.WithTenantID(ctx, tid)
+	ctx = context.WithValue(ctx, connectionIDKey, uuid.New())
 	return ctx, nil
 }
 
+func (s *Server) wsClose(ctx context.Context, code int) {
+	if err := s.subs.RemoveConn(ctx); err != nil {
+		logger.Error("remove ws connect error", zap.Error(err))
+	}
+}
+
 func (s *Server) wsError(ctx context.Context, err error) {
-	_, ok := err.(transport.WebsocketError)
-	if ok {
-		s.subs.RemoveConn(ctx)
+	var websocketError transport.WebsocketError
+	if !errors.As(err, &websocketError) {
+		logger.Error("remove ws connect error", zap.Error(err))
 	}
 }
 

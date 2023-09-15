@@ -6,6 +6,7 @@ log:
   traceIDKey: "traceId"
   cores:
     - level: info
+      disableStacktrace: true
       encoderConfig:
         timeKey: "@timestamp"
         messageKey: "message"

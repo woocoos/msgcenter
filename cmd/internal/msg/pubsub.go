@@ -2,7 +2,9 @@ package msg
 
 import (
 	"context"
+	"errors"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/woocoos/entco/pkg/identity"
@@ -11,21 +13,19 @@ import (
 	"github.com/woocoos/msgcenter/pkg/push"
 	"go.uber.org/zap"
 	"golang.org/x/exp/slices"
-	"strconv"
 	"sync"
 	"time"
 )
 
 var logger = log.Component("push")
 
-// Connection 对应客户端连接,共享队列机制.
+const connectionIDKey = "woocoos/msg/conn_id"
+
+// Connection 对应客户端连接,共享队列机制.连接在用户真正订阅时才会创建连接.
 type Connection struct {
+	ID          uuid.UUID
 	Filter      model.MessageFilter
 	Subscribers map[string]chan *model.Message
-}
-
-func (c *Connection) Key() string {
-	return c.Filter.AppCode + ":" + strconv.Itoa(c.Filter.UserID) + ":" + c.Filter.DeviceID
 }
 
 // PubSub 订阅管理器
@@ -47,12 +47,13 @@ func (pb *PubSub) GetFilter(ctx context.Context) (*model.MessageFilter, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, err = identity.TenantIDFromContext(ctx)
+	tid, err := identity.TenantIDFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 	initPayload := transport.GetInitPayload(ctx)
 	filter := model.MessageFilter{
+		TenantID: tid,
 		UserID:   uid,
 		AppCode:  initPayload.GetString("appCode"),
 		DeviceID: initPayload.GetString("deviceId"),
@@ -61,17 +62,18 @@ func (pb *PubSub) GetFilter(ctx context.Context) (*model.MessageFilter, error) {
 }
 
 // GetConn 从上下文获取客户端连接
-func (pb *PubSub) GetConn(ctx context.Context, filter *model.MessageFilter) (*Connection, error) {
+func (pb *PubSub) GetConn(ctx context.Context, connID uuid.UUID) (*Connection, error) {
 	for _, v := range pb.conns {
-		if v.Filter == *filter {
+		if v.ID == connID {
 			return v, nil
 		}
 	}
 	return nil, nil
 }
 
-func (pb *PubSub) AddConnBy(filter *model.MessageFilter) *Connection {
+func (pb *PubSub) AddConnBy(id uuid.UUID, filter *model.MessageFilter) *Connection {
 	s := &Connection{
+		ID:          id,
 		Filter:      *filter,
 		Subscribers: make(map[string]chan *model.Message),
 	}
@@ -79,21 +81,17 @@ func (pb *PubSub) AddConnBy(filter *model.MessageFilter) *Connection {
 	return s
 }
 
-func (pb *PubSub) RemoveConn(ctx context.Context) {
-	filter, err := pb.GetFilter(ctx)
-	if err != nil {
-		log.Errorf("RemoveConn:%v", err)
-		return
-	}
-	current, err := pb.GetConn(ctx, filter)
-	if err != nil {
-		return
+// RemoveConn 移除连接,忽略对于连接ID不匹配的错误
+func (pb *PubSub) RemoveConn(ctx context.Context) error {
+	connID, ok := ctx.Value(connectionIDKey).(uuid.UUID)
+	if !ok {
+		return nil
 	}
 	for i, conn := range pb.conns {
-		if conn.Key() == current.Key() {
-			pb.conns = append(pb.conns[:i], pb.conns[i+1:]...)
-		}
+		conn.ID = connID
+		pb.conns = append(pb.conns[:i], pb.conns[i+1:]...)
 	}
+	return nil
 }
 
 // Subscribe 根据topic订阅消息.
@@ -106,25 +104,23 @@ func (pb *PubSub) Subscribe(ctx context.Context, topic string) (chan *model.Mess
 }
 
 func (pb *PubSub) subscribe(ctx context.Context, filter *model.MessageFilter, topic string) (chan *model.Message, error) {
+	connID, ok := ctx.Value(connectionIDKey).(uuid.UUID)
+	if !ok {
+		return nil, errors.New("ws connection id not found")
+	}
 	ch := make(chan *model.Message, 100)
-	conn, err := pb.GetConn(ctx, filter)
+	conn, err := pb.GetConn(ctx, connID)
 	if err != nil {
 		return nil, err
 	}
 	if conn == nil {
-		conn = pb.AddConnBy(filter)
+		conn = pb.AddConnBy(connID, filter)
 	}
 	pb.mu.Lock()
 	defer pb.mu.Unlock()
 
 	conn.Subscribers[topic] = ch
 	return ch, nil
-}
-
-func (pb *PubSub) Publish(tars []chan *model.Message, message *model.Message) {
-	for _, tar := range tars {
-		tar <- message
-	}
 }
 
 func (pb *PubSub) Start(ctx context.Context) error {
@@ -152,6 +148,7 @@ func (pb *PubSub) subRedis(ctx context.Context) {
 				pb.handlerMessage(msg.Payload)
 			}
 		case <-ctx.Done():
+			ch.Close()
 			return
 		}
 	}
@@ -184,6 +181,7 @@ func convertMessage(data *push.Data) *model.Message {
 	return msg
 }
 
+// 根据消息的订阅信息匹配
 func match(filter model.MessageFilter, audience push.Audience) bool {
 	if filter.AppCode != audience.AppCode {
 		return false
