@@ -8,6 +8,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/tsingsun/woocoo/contrib/gql"
@@ -72,6 +74,13 @@ func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
 		web.WithGracefulStop(),
 		gql.RegistryMiddleware(),
 		identity.RegistryTenantIDMiddleware(),
+		web.WithMiddlewareApplyFunc("cors", func(cfg *conf.Configuration) gin.HandlerFunc {
+			var config cors.Config
+			if err := cfg.Unmarshal(&config); err != nil {
+				panic(err)
+			}
+			return cors.New(config)
+		}),
 		//web.RegisterMiddleware(otelweb.NewMiddleware()),
 	)
 	//gql use msg resolver

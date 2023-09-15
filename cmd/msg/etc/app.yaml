@@ -40,6 +40,8 @@ web:
                 appCode: "msg"
                 middlewares:
                   operation:
+                    - cors:
+                        allowOrigins: [ "*" ]
                     - tenant:
                     - jwt: *jwt
                 header: ## dev mode, remove in production, set the value in your .env.local
