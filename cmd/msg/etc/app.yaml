@@ -26,6 +26,9 @@ web:
     addr: 127.0.0.1:10074
   engine:
     routerGroups:
+      - default:
+          middlewares:
+            - cors:
       - graphql:
           basePath: "/graphql"
           middlewares:
@@ -40,8 +43,6 @@ web:
                 appCode: "msg"
                 middlewares:
                   operation:
-                    - cors:
-                        allowOrigins: [ "*" ]
                     - tenant:
                     - jwt: *jwt
                 header: ## dev mode, remove in production, set the value in your .env.local

@@ -26,6 +26,9 @@ receivers:
         requireTLS: false
         smarthost: localhost:1025
         to: alerts@example.com
+  - name: message
+    messageConfig:
+      sendResolved: false
 inhibit_rules:
   - source_match:
       severity: "critical"

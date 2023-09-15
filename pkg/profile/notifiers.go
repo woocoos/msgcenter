@@ -13,6 +13,7 @@ var (
 		SendResolved: false,
 		Subject:      `{{ template "message.default.subject" . }}`,
 		HTML:         `{{ template "message.default.html" . }}`,
+		Extras:       make(map[string]string),
 	}
 	// DefaultWebhookConfig defines default values for Webhook configurations.
 	DefaultWebhookConfig = WebhookConfig{

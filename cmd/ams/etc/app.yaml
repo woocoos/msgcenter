@@ -27,6 +27,11 @@ web:
     addr: 127.0.0.1:10072
   engine:
     routerGroups:
+      - default:
+          middlewares:
+            - cors:
+                allowOrigins: ['*']
+                allowHeaders: ["*"]
       - alertmanager:
           basePath: "/api/v2"
           middlewares:
@@ -36,6 +41,9 @@ web:
       - graphql:
           basePath: "/graphql"
           middlewares:
+            - cors:
+                allowOrigins: ['*']
+                allowHeaders: ["*"]
             - accessLog:
                 exclude:
                   - IntrospectionQuery

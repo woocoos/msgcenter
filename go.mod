@@ -23,7 +23,7 @@ require (
 	github.com/redis/go-redis/v9 v9.0.5
 	github.com/stretchr/testify v1.8.4
 	github.com/tsingsun/members v0.0.0-20230712074048-c38e433601b8
-	github.com/tsingsun/woocoo v0.3.1-0.20230915024621-579072770480
+	github.com/tsingsun/woocoo v0.3.1-0.20230915081423-3462ea8ba41e
 	github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230915025512-63b84bf7d26b
 	github.com/vektah/gqlparser/v2 v2.5.9
 	github.com/vmihailenco/msgpack/v5 v5.3.5

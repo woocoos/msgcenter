@@ -8,8 +8,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/tsingsun/woocoo/contrib/gql"
@@ -25,6 +23,7 @@ import (
 	"github.com/woocoos/msgcenter/ent"
 	"go.uber.org/zap"
 	"net/http"
+	"strconv"
 )
 
 // Server alert server, includes: API提醒服务,包括API及消息分发功能,可选服务包括: UI
@@ -74,13 +73,6 @@ func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
 		web.WithGracefulStop(),
 		gql.RegistryMiddleware(),
 		identity.RegistryTenantIDMiddleware(),
-		web.WithMiddlewareApplyFunc("cors", func(cfg *conf.Configuration) gin.HandlerFunc {
-			var config cors.Config
-			if err := cfg.Unmarshal(&config); err != nil {
-				panic(err)
-			}
-			return cors.New(config)
-		}),
 		//web.RegisterMiddleware(otelweb.NewMiddleware()),
 	)
 	//gql use msg resolver
@@ -93,7 +85,9 @@ func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
 	gqlsrv.AddTransport(transport.Websocket{
 		KeepAlivePingInterval: 10,
 		Upgrader: websocket.Upgrader{
-			CheckOrigin: webSocketCheckOrigin(cnf.Sub("webSocket")),
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
 		},
 		InitFunc:  s.wsInit,
 		CloseFunc: s.wsClose,
@@ -133,10 +127,10 @@ func (s *Server) wsInit(ctx context.Context, initPayload transport.InitPayload) 
 	}
 	gctx.Request.Header.Set("Authorization", bearer)
 	tidstr := initPayload.GetString(identity.TenantHeaderKey)
-	//tid, _ := strconv.Atoi(tidstr)
-	//if tid == 0 {
-	//	return nil, identity.ErrMisTenantID
-	//}
+	tid, _ := strconv.Atoi(tidstr)
+	if tid == 0 {
+		return nil, identity.ErrMisTenantID
+	}
 	gctx.Request.Header.Set(identity.TenantHeaderKey, tidstr)
 	ctx = context.WithValue(ctx, connectionIDKey, uuid.New())
 	return ctx, nil
@@ -169,25 +163,4 @@ func (s *Server) Stop(ctx context.Context) error {
 	s.msgClient.Close()
 	s.subs.Stop(ctx)
 	return nil
-}
-
-type wsConf struct {
-	Origins []string `json:"origins"`
-}
-
-func webSocketCheckOrigin(cnf *conf.Configuration) func(r *http.Request) bool {
-	wsc := &wsConf{}
-	cnf.Unmarshal(wsc)
-	return func(r *http.Request) bool {
-		if len(wsc.Origins) > 0 {
-			ro := r.Header.Get("Origin")
-			for _, o := range wsc.Origins {
-				if o == ro {
-					return true
-				}
-			}
-			return false
-		}
-		return true
-	}
 }
