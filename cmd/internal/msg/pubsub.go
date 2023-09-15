@@ -191,7 +191,9 @@ func match(filter model.MessageFilter, audience push.Audience) bool {
 		return false
 	}
 	//
-	if filter.DeviceID != "" {
+	if len(audience.DeviceIDs) > 0 && filter.DeviceID == "" {
+		return false
+	} else if filter.DeviceID != "" && len(audience.DeviceIDs) > 0 {
 		if slices.Index(audience.DeviceIDs, filter.DeviceID) == -1 {
 			return false
 		}
