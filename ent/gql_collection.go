@@ -895,6 +895,28 @@ func newMsgInternalToPaginateArgs(rv map[string]any) *msginternaltoPaginateArgs 
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
 	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &MsgInternalToOrder{Field: &MsgInternalToOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithMsgInternalToOrder(order))
+			}
+		case *MsgInternalToOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithMsgInternalToOrder(v))
+			}
+		}
+	}
 	if v, ok := rv[whereField].(*MsgInternalToWhereInput); ok {
 		args.opts = append(args.opts, WithMsgInternalToFilter(v.Filter))
 	}

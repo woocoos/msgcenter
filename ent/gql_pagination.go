@@ -1537,6 +1537,53 @@ func (mit *MsgInternalToQuery) Paginate(
 	return conn, nil
 }
 
+var (
+	// MsgInternalToOrderFieldCreatedAt orders MsgInternalTo by created_at.
+	MsgInternalToOrderFieldCreatedAt = &MsgInternalToOrderField{
+		Value: func(mit *MsgInternalTo) (ent.Value, error) {
+			return mit.CreatedAt, nil
+		},
+		column: msginternalto.FieldCreatedAt,
+		toTerm: msginternalto.ByCreatedAt,
+		toCursor: func(mit *MsgInternalTo) Cursor {
+			return Cursor{
+				ID:    mit.ID,
+				Value: mit.CreatedAt,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f MsgInternalToOrderField) String() string {
+	var str string
+	switch f.column {
+	case MsgInternalToOrderFieldCreatedAt.column:
+		str = "createdAt"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f MsgInternalToOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *MsgInternalToOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("MsgInternalToOrderField %T must be a string", v)
+	}
+	switch str {
+	case "createdAt":
+		*f = *MsgInternalToOrderFieldCreatedAt
+	default:
+		return fmt.Errorf("%s is not a valid MsgInternalToOrderField", str)
+	}
+	return nil
+}
+
 // MsgInternalToOrderField defines the ordering field of MsgInternalTo.
 type MsgInternalToOrderField struct {
 	// Value extracts the ordering value from the given MsgInternalTo.

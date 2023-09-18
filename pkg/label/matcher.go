@@ -56,7 +56,18 @@ func (m *MatchType) UnmarshalGQL(v interface{}) error {
 }
 
 func (m MatchType) MarshalGQL(w io.Writer) {
-	w.Write([]byte(strconv.Quote(m.String())))
+	gqlM := ""
+	switch m {
+	case MatchEqual:
+		gqlM = "MatchEqual"
+	case MatchNotEqual:
+		gqlM = "MatchNotEqual"
+	case MatchRegexp:
+		gqlM = "MatchRegexp"
+	case MatchNotRegexp:
+		gqlM = "MatchNotRegexp"
+	}
+	w.Write([]byte(strconv.Quote(gqlM)))
 }
 
 func (m MatchType) MarshalYAML() (interface{}, error) {

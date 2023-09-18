@@ -64,11 +64,21 @@ func (r *queryResolver) MsgInternals(ctx context.Context, after *entgql.Cursor[i
 		ent.WithMsgInternalFilter(where.Filter))
 }
 
+// MsgInternalTos is the resolver for the msgInternalTos field.
+func (r *queryResolver) MsgInternalTos(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) (*ent.MsgInternalToConnection, error) {
+	return r.Client.MsgInternalTo.Query().Paginate(ctx, after, first, before, last,
+		ent.WithMsgInternalToOrder(orderBy),
+		ent.WithMsgInternalToFilter(where.Filter))
+}
+
 // MsgAlert returns generated.MsgAlertResolver implementation.
 func (r *Resolver) MsgAlert() generated.MsgAlertResolver { return &msgAlertResolver{r} }
 
 // MsgEvent returns generated.MsgEventResolver implementation.
 func (r *Resolver) MsgEvent() generated.MsgEventResolver { return &msgEventResolver{r} }
+
+// MsgInternal returns generated.MsgInternalResolver implementation.
+func (r *Resolver) MsgInternal() generated.MsgInternalResolver { return &msgInternalResolver{r} }
 
 // MsgType returns generated.MsgTypeResolver implementation.
 func (r *Resolver) MsgType() generated.MsgTypeResolver { return &msgTypeResolver{r} }
@@ -78,5 +88,6 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type msgAlertResolver struct{ *Resolver }
 type msgEventResolver struct{ *Resolver }
+type msgInternalResolver struct{ *Resolver }
 type msgTypeResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

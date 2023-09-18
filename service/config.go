@@ -136,7 +136,9 @@ func overrideEmailConfig(basedir string, client *ent.Client) notify.CustomerConf
 		} else {
 			cfg.To = data.To
 		}
-		cfg.From = data.From
+		if data.From != "" {
+			cfg.From = data.From
+		}
 		cfg.Subject = data.Subject
 		if data.Format == msgtemplate.FormatHTML {
 			cfg.HTML = data.Body
@@ -181,7 +183,7 @@ func overrideMessageConfig(basedir string, client *ent.Client) notify.CustomerCo
 		}
 		cfg.To = ul
 
-		data, err := findTemplate(ctx, basedir, client, profile.ReceiverWebhook, set)
+		data, err := findTemplate(ctx, basedir, client, profile.ReceiverMessage, set)
 		if err != nil {
 			if ent.IsNotFound(err) {
 				return nil

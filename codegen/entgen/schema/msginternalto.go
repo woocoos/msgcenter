@@ -21,6 +21,7 @@ type MsgInternalTo struct {
 func (MsgInternalTo) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entsql.Annotation{Table: "msg_internal_to"},
+		entgql.QueryField().Description("站内信明细查询"),
 		entgql.RelayConnection(),
 		schemax.TenantField("tenant_id"),
 	}
@@ -40,7 +41,7 @@ func (MsgInternalTo) Fields() []ent.Field {
 		field.Int("user_id").Comment("用户ID").Immutable(),
 		field.Time("read_at").Optional().Comment("阅读时间"),
 		field.Time("delete_at").Optional().Comment("删除时间"),
-		field.Time("created_at").Immutable().Default(time.Now).Immutable(),
+		field.Time("created_at").Immutable().Default(time.Now).Annotations(entgql.OrderField("createdAt")),
 	}
 }
 

@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/woocoos/entco/pkg/identity"
 	"github.com/woocoos/entco/schemax/typex"
@@ -15,6 +16,7 @@ import (
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -493,14 +495,42 @@ func (r *mutationResolver) DeleteSilence(ctx context.Context, id int) (bool, err
 	return err == nil, err
 }
 
-// MarkMessageReaOrUnRead is the resolver for the markMessageReaOrUnRead field.
-func (r *mutationResolver) MarkMessageReaOrUnRead(ctx context.Context, ids []int, read bool) (bool, error) {
-	panic(fmt.Errorf("not implemented: MarkMessageReaOrUnRead - markMessageReaOrUnRead"))
+// MarkMessageReadOrUnRead is the resolver for the markMessageReadOrUnRead field.
+func (r *mutationResolver) MarkMessageReadOrUnRead(ctx context.Context, ids []int, read bool) (bool, error) {
+	uid, err := identity.UserIDFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	update := ent.FromContext(ctx).MsgInternalTo.Update().Where(
+		msginternalto.IDIn(ids...), msginternalto.UserID(uid), msginternalto.TenantID(tid),
+	)
+	if read {
+		update.SetReadAt(time.Now())
+	} else {
+		update.ClearReadAt()
+	}
+	err = update.Exec(ctx)
+	return err == nil, err
 }
 
 // MarkMessageDeleted is the resolver for the markMessageDeleted field.
 func (r *mutationResolver) MarkMessageDeleted(ctx context.Context, ids []int) (bool, error) {
-	panic(fmt.Errorf("not implemented: MarkMessageDeleted - markMessageDeleted"))
+	uid, err := identity.UserIDFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	err = ent.FromContext(ctx).MsgInternalTo.Update().Where(
+		msginternalto.IDIn(ids...), msginternalto.UserID(uid), msginternalto.TenantID(tid),
+	).SetDeleteAt(time.Now()).Exec(ctx)
+	return err == nil, err
 }
 
 // Matchers is the resolver for the matchers field.

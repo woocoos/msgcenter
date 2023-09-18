@@ -6,6 +6,7 @@ import (
 	"github.com/tsingsun/woocoo/pkg/gds"
 	"github.com/tsingsun/woocoo/web"
 	"github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/provider/mem"
@@ -22,6 +23,7 @@ type resolverSuite struct {
 	testsuite.BaseSuite
 	resolver  *Resolver
 	mr        *mutationResolver
+	qr        *queryResolver
 	server    *web.Server
 	shutdowns []func()
 }
@@ -47,6 +49,9 @@ func (s *resolverSuite) SetupSuite() {
 		Silences:    s.AlertManager.Silences,
 	}
 	s.mr = &mutationResolver{
+		Resolver: s.resolver,
+	}
+	s.qr = &queryResolver{
 		Resolver: s.resolver,
 	}
 
@@ -89,4 +94,47 @@ func (s *resolverSuite) TestCreateSilence() {
 	})
 	s.Require().NoError(err)
 	s.Require().NotNil(silence)
+}
+
+func (s *resolverSuite) TestUserSubMsgCategory() {
+	ctx := s.NewTestCtx()
+	category, err := s.qr.UserSubMsgCategory(ctx)
+	s.Require().NoError(err)
+	s.Require().NotEmpty(category)
+	s.Require().Equal(category[0], "订阅类型")
+}
+
+func (s *resolverSuite) TestUserUnreadMessagesFromMsgCategory() {
+	ctx := s.NewTestCtx()
+	nums, err := s.qr.UserUnreadMessagesFromMsgCategory(ctx, []string{"订阅类型"})
+	s.Require().NoError(err)
+	s.Require().NotEmpty(nums)
+	s.Require().Equal(nums[0], 2)
+}
+
+func (s *resolverSuite) TestUserUnreadMessages() {
+	ctx := s.NewTestCtx()
+	num, err := s.qr.UserUnreadMessages(ctx)
+	s.Require().NoError(err)
+	s.Require().Equal(num, 2)
+}
+
+func (s *resolverSuite) TestMarkMessageReaOrUnRead() {
+	ctx := s.NewTestCtx()
+	suc, err := s.mr.MarkMessageReadOrUnRead(ctx, []int{1}, true)
+	s.Require().NoError(err)
+	s.Require().True(suc)
+	has, err := s.Client.MsgInternalTo.Query().Where(msginternalto.IDIn(1), msginternalto.ReadAtNotNil()).Exist(ctx)
+	s.Require().NoError(err)
+	s.Require().True(has)
+}
+
+func (s *resolverSuite) TestMarkMessageDeleted() {
+	ctx := s.NewTestCtx()
+	suc, err := s.mr.MarkMessageDeleted(ctx, []int{2})
+	s.Require().NoError(err)
+	s.Require().True(suc)
+	has, err := s.Client.MsgInternalTo.Query().Where(msginternalto.IDIn(2), msginternalto.DeleteAtNotNil()).Exist(ctx)
+	s.Require().NoError(err)
+	s.Require().True(has)
 }

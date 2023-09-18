@@ -19,6 +19,7 @@ import (
 	"github.com/woocoos/msgcenter/test"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 var (
@@ -115,6 +116,7 @@ func initMiniRedis(cnf *conf.AppConfiguration) *miniredis.Miniredis {
 }
 
 func initDatabase(ctx context.Context, client *ent.Client) {
+	ctx = identity.WithTenantID(ctx, 1)
 	client.MsgType.Create().SetName("alert").SetID(1).SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
 		SetAppID(1).SetCategory("账户安全").SetCanSubs(true).SetCanCustom(true).SaveX(ctx)
 	client.MsgEvent.Create().SetID(1).SetMsgTypeID(1).SetName("AlterPassword").SetStatus(typex.SimpleStatusActive).
@@ -237,4 +239,13 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SaveX(ctx)
 	client.MsgSubscriber.Create().SetID(3).SetMsgTypeID(2).SetTenantID(1).SetUserID(3).SetExclude(true).
 		SetCreatedBy(1).SaveX(ctx)
+
+	client.MsgInternal.Create().SetID(1).SetTenantID(1).SetSubject("subject1").SetBody("body1").SetFormat("text").
+		SetCategory("订阅类型").SetCreatedBy(1).SaveX(ctx)
+	client.MsgInternalTo.Create().SetID(1).SetTenantID(1).SetCreatedAt(time.Now()).SetMsgInternalID(1).
+		SetUserID(1).SaveX(ctx)
+	client.MsgInternal.Create().SetID(2).SetTenantID(1).SetSubject("subject2").SetBody("body2").SetFormat("text").
+		SetCategory("订阅类型").SetCreatedBy(1).SaveX(ctx)
+	client.MsgInternalTo.Create().SetID(2).SetTenantID(1).SetCreatedAt(time.Now()).SetMsgInternalID(2).
+		SetUserID(1).SaveX(ctx)
 }

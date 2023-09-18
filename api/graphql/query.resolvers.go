@@ -14,11 +14,15 @@ import (
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/msginternal"
+	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/service"
 	yaml "gopkg.in/yaml.v3"
 )
 
@@ -45,6 +49,16 @@ func (r *msgEventResolver) RouteStr(ctx context.Context, obj *ent.MsgEvent, type
 		return "", err
 	}
 	return string(rs), nil
+}
+
+// ToSendCounts is the resolver for the toSendCounts field.
+func (r *msgInternalResolver) ToSendCounts(ctx context.Context, obj *ent.MsgInternal) (int, error) {
+	return r.Client.MsgInternalTo.Query().Where(msginternalto.MsgInternalID(obj.ID)).Count(ctx)
+}
+
+// HasReadCounts is the resolver for the hasReadCounts field.
+func (r *msgInternalResolver) HasReadCounts(ctx context.Context, obj *ent.MsgInternal) (int, error) {
+	return r.Client.MsgInternalTo.Query().Where(msginternalto.MsgInternalID(obj.ID), msginternalto.ReadAtNotNil()).Count(ctx)
 }
 
 // SubscriberUsers is the resolver for the subscriberUsers field.
@@ -136,6 +150,86 @@ func (r *queryResolver) MsgAlerts(ctx context.Context, after *entgql.Cursor[int]
 	return r.Client.MsgAlert.Query().Paginate(ctx, after, first, before, last,
 		ent.WithMsgAlertOrder(orderBy),
 		ent.WithMsgAlertFilter(where.Filter))
+}
+
+// UserMessages is the resolver for the userMessages field.
+func (r *queryResolver) UserMessages(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) (*ent.MsgInternalToConnection, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	uid, err := identity.UserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.Client.MsgInternalTo.Query().Where(msginternalto.UserID(uid), msginternalto.TenantID(tid)).
+		Paginate(ctx, after, first, before, last, ent.WithMsgInternalToOrder(orderBy), ent.WithMsgInternalToFilter(where.Filter))
+}
+
+// UserSubMsgCategory is the resolver for the userSubMsgCategory field.
+func (r *queryResolver) UserSubMsgCategory(ctx context.Context) ([]string, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	uid, err := identity.UserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// 用户加入的role
+	orIDs, err := r.Client.OrgRoleUser.Query().Where(
+		orgroleuser.OrgID(tid), orgroleuser.UserID(uid),
+	).Select(orgroleuser.FieldOrgRoleID).Ints(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// 查询用户定义的消息类型分类
+	categories, err := r.Client.MsgType.Query().Where(
+		msgtype.HasSubscribersWith(msgsubscriber.Or(msgsubscriber.UserID(uid), msgsubscriber.OrgRoleIDIn(orIDs...)),
+			msgsubscriber.TenantID(tid), msgsubscriber.Exclude(false)),
+	).Select(msgtype.FieldCategory).Strings(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return service.RemoveDuplicateElement(categories), nil
+}
+
+// UserUnreadMessagesFromMsgCategory is the resolver for the userUnreadMessagesFromMsgCategory field.
+func (r *queryResolver) UserUnreadMessagesFromMsgCategory(ctx context.Context, categories []string) ([]int, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return []int{}, err
+	}
+	uid, err := identity.UserIDFromContext(ctx)
+	if err != nil {
+		return []int{}, err
+	}
+	counts := make([]int, 0)
+	for _, v := range categories {
+		count, err := r.Client.MsgInternalTo.Query().Where(
+			msginternalto.UserID(uid), msginternalto.TenantID(tid), msginternalto.ReadAtIsNil(), msginternalto.HasMsgInternalWith(msginternal.Category(v)),
+		).Count(ctx)
+		if err != nil {
+			return []int{}, err
+		}
+		counts = append(counts, count)
+	}
+	return counts, nil
+}
+
+// UserUnreadMessages is the resolver for the userUnreadMessages field.
+func (r *queryResolver) UserUnreadMessages(ctx context.Context) (int, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return 0, err
+	}
+	uid, err := identity.UserIDFromContext(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return r.Client.MsgInternalTo.Query().Where(
+		msginternalto.UserID(uid), msginternalto.TenantID(tid), msginternalto.ReadAtIsNil(),
+	).Count(ctx)
 }
 
 // Matchers is the resolver for the matchers field.
