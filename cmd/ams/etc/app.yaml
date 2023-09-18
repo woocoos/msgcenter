@@ -32,23 +32,17 @@ web:
             - cors:
                 allowOrigins: ['*']
                 allowHeaders: ["*"]
-      - alertmanager:
-          basePath: "/api/v2"
-          middlewares:
-            - accessLog:
-            - recovery:
-            - errorHandle:
-      - graphql:
-          basePath: "/graphql"
-          middlewares:
-            - cors:
-                allowOrigins: ['*']
-                allowHeaders: ["*"]
             - accessLog:
                 exclude:
                   - IntrospectionQuery
             - recovery:
             - errorHandle:
+      - alertmanager:
+          basePath: "/api/v2"
+          middlewares:
+      - graphql:
+          basePath: "/graphql"
+          middlewares:
             - graphql:
                 group: "/graphql"
                 withAuthorization: false

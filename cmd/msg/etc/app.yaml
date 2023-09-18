@@ -29,14 +29,16 @@ web:
       - default:
           middlewares:
             - cors:
-      - graphql:
-          basePath: "/graphql"
-          middlewares:
+                allowOrigins: ['*']
+                allowHeaders: ["*"]
             - accessLog:
                 exclude:
                   - IntrospectionQuery
             - recovery:
             - errorHandle:
+      - graphql:
+          basePath: "/graphql"
+          middlewares:
             - graphql:
                 group: "/graphql"
                 withAuthorization: false

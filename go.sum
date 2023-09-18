@@ -348,8 +348,10 @@ github.com/tsingsun/woocoo v0.3.1-0.20230915053338-56dbeba9bb7f h1:Tzyq2kCg6Hz8A
 github.com/tsingsun/woocoo v0.3.1-0.20230915053338-56dbeba9bb7f/go.mod h1:kOglwG71n/VzhA13YA8ba8q2ei47LSRayrIY8a+Q1SI=
 github.com/tsingsun/woocoo v0.3.1-0.20230915081423-3462ea8ba41e h1:+o85EYiV7UjRO/dbTDu8IBW6xkwtP9Pe5sSSF+bWojk=
 github.com/tsingsun/woocoo v0.3.1-0.20230915081423-3462ea8ba41e/go.mod h1:kOglwG71n/VzhA13YA8ba8q2ei47LSRayrIY8a+Q1SI=
+github.com/tsingsun/woocoo v0.3.1-0.20230917150817-4ff6414bcd38/go.mod h1:TxI9kKZ3bCVn1XMqityH5x5CoLH0qq3/34uHI18/V38=
 github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230915025512-63b84bf7d26b h1:RJIUpsYh2Hul3ywZD6v8vIRNXsHFJJwZdIqmBBVz6Vk=
 github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230915025512-63b84bf7d26b/go.mod h1:7IIH1g5hfmwoo3k8GiQxiebnFAySgg17kmO2Ntkh4Z8=
+github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230917152545-2e3762efe21c/go.mod h1:reR6vaHT8YKcmr9H6LdTfs2HT/O4c2mH5mD2TUaGTco=
 github.com/twitchyliquid64/golang-asm v0.15.1 h1:SU5vSMR7hnwNxj24w34ZyCi/FmDZTkS4MhqMhdFk5YI=
 github.com/twitchyliquid64/golang-asm v0.15.1/go.mod h1:a1lVb/DtPvCB8fslRZhAngC2+aY1QWCk3Cedj/Gdt08=
 github.com/ugorji/go v1.2.7/go.mod h1:nF9osbDWLy6bDVv/Rtoh6QgnvNDpmCalQV5urGCCS6M=
@@ -371,6 +373,8 @@ github.com/woocoos/casbin-ent-adapter v0.0.0-20230404005858-cd33f1b0b92e h1:GbxL
 github.com/woocoos/casbin-ent-adapter v0.0.0-20230404005858-cd33f1b0b92e/go.mod h1:44V48kYKt7r9gWei7Ld+QaL0qVIBlOWrhkNTVMpnx3I=
 github.com/woocoos/entco v0.0.0-20230915031213-8f116b86eddd h1:a27K6peCDrGZkVaHtmw7nfMMOr7WC3M8TbRKVVfGf8k=
 github.com/woocoos/entco v0.0.0-20230915031213-8f116b86eddd/go.mod h1:oT/5TUh1tkEi/DmIpiCytUdu2P4bKctEXU16/HPo7Yc=
+github.com/woocoos/entco v0.0.0-20230917153800-53cfbdd5c883 h1:ybr1/juICux7421LJFc9ncC8zd1Fi1ykxpPDpiHEvK0=
+github.com/woocoos/entco v0.0.0-20230917153800-53cfbdd5c883/go.mod h1:mgJpi4B60/SBqLDB+jqUX6rhXLG5C8ASKtAEMxU2Dlw=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/gopher-lua v1.1.0 h1:BojcDhfyDWgU2f2TOzYK/g5p2gxMrku8oupLDqlnSqE=
