@@ -11,12 +11,13 @@ import (
 
 // SubscriptionAction is a generic type for all subscription actions
 type Message struct {
-	Topic   string    `json:"topic"`
-	Title   string    `json:"title"`
-	Content string    `json:"content"`
-	Format  string    `json:"format"`
-	URL     string    `json:"url"`
-	SendAt  time.Time `json:"sendAt"`
+	Topic   string            `json:"topic"`
+	Title   string            `json:"title"`
+	Content string            `json:"content"`
+	Format  string            `json:"format"`
+	URL     string            `json:"url"`
+	SendAt  time.Time         `json:"sendAt"`
+	Extras  map[string]string `json:"extras"`
 }
 
 // MessageFilter is a generic type for all subscription filters

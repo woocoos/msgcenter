@@ -8,20 +8,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GeneralService is the server API for General service.
-type GeneralService interface {
+// GeneralServer is the server API for General service.
+type GeneralServer interface {
 	// (GET /status)
 	GetStatus(*gin.Context) (*AlertmanagerStatus, error)
 }
 
-// ReceiverService is the server API for Receiver service.
-type ReceiverService interface {
+// ReceiverServer is the server API for Receiver service.
+type ReceiverServer interface {
 	// (GET /receivers)
 	GetReceivers(*gin.Context) ([]*Receiver, error)
 }
 
-// SilenceService is the server API for Silence service.
-type SilenceService interface {
+// SilenceServer is the server API for Silence service.
+type SilenceServer interface {
 	// (DELETE /silence/{silenceID})
 	DeleteSilence(*gin.Context, *DeleteSilenceRequest) error
 	// (GET /silence/{silenceID})
@@ -32,76 +32,76 @@ type SilenceService interface {
 	PostSilences(*gin.Context, *PostSilencesRequest) (*PostSilencesResponse, error)
 }
 
-// AlertService is the server API for Alert service.
-type AlertService interface {
+// AlertServer is the server API for Alert service.
+type AlertServer interface {
 	// (GET /alerts)
 	GetAlerts(*gin.Context, *GetAlertsRequest) (GettableAlerts, error)
 	// (POST /alerts)
 	PostAlerts(*gin.Context, *PostAlertsRequest) error
 }
 
-// PushService is the server API for Push service.
-type PushService interface {
+// PushServer is the server API for Push service.
+type PushServer interface {
 	// (POST /push)
 	PostPush(*gin.Context, *PostPushRequest) error
 }
 
-type UnimplementedGeneralService struct {
+type UnimplementedGeneralServer struct {
 }
 
-func (UnimplementedGeneralService) GetStatus(c *gin.Context) (_ *AlertmanagerStatus, err error) {
+func (UnimplementedGeneralServer) GetStatus(c *gin.Context) (_ *AlertmanagerStatus, err error) {
 	err = fmt.Errorf("method GetStatus not implemented")
 	return
 }
 
-type UnimplementedReceiverService struct {
+type UnimplementedReceiverServer struct {
 }
 
-func (UnimplementedReceiverService) GetReceivers(c *gin.Context) (_ []*Receiver, err error) {
+func (UnimplementedReceiverServer) GetReceivers(c *gin.Context) (_ []*Receiver, err error) {
 	err = fmt.Errorf("method GetReceivers not implemented")
 	return
 }
 
-type UnimplementedSilenceService struct {
+type UnimplementedSilenceServer struct {
 }
 
-func (UnimplementedSilenceService) DeleteSilence(c *gin.Context, req *DeleteSilenceRequest) (err error) {
+func (UnimplementedSilenceServer) DeleteSilence(c *gin.Context, req *DeleteSilenceRequest) (err error) {
 	err = fmt.Errorf("method DeleteSilence not implemented")
 	return
 }
 
-func (UnimplementedSilenceService) GetSilence(c *gin.Context, req *GetSilenceRequest) (_ *GettableSilence, err error) {
+func (UnimplementedSilenceServer) GetSilence(c *gin.Context, req *GetSilenceRequest) (_ *GettableSilence, err error) {
 	err = fmt.Errorf("method GetSilence not implemented")
 	return
 }
 
-func (UnimplementedSilenceService) GetSilences(c *gin.Context, req *GetSilencesRequest) (_ GettableSilences, err error) {
+func (UnimplementedSilenceServer) GetSilences(c *gin.Context, req *GetSilencesRequest) (_ GettableSilences, err error) {
 	err = fmt.Errorf("method GetSilences not implemented")
 	return
 }
 
-func (UnimplementedSilenceService) PostSilences(c *gin.Context, req *PostSilencesRequest) (_ *PostSilencesResponse, err error) {
+func (UnimplementedSilenceServer) PostSilences(c *gin.Context, req *PostSilencesRequest) (_ *PostSilencesResponse, err error) {
 	err = fmt.Errorf("method PostSilences not implemented")
 	return
 }
 
-type UnimplementedAlertService struct {
+type UnimplementedAlertServer struct {
 }
 
-func (UnimplementedAlertService) GetAlerts(c *gin.Context, req *GetAlertsRequest) (_ GettableAlerts, err error) {
+func (UnimplementedAlertServer) GetAlerts(c *gin.Context, req *GetAlertsRequest) (_ GettableAlerts, err error) {
 	err = fmt.Errorf("method GetAlerts not implemented")
 	return
 }
 
-func (UnimplementedAlertService) PostAlerts(c *gin.Context, req *PostAlertsRequest) (err error) {
+func (UnimplementedAlertServer) PostAlerts(c *gin.Context, req *PostAlertsRequest) (err error) {
 	err = fmt.Errorf("method PostAlerts not implemented")
 	return
 }
 
-type UnimplementedPushService struct {
+type UnimplementedPushServer struct {
 }
 
-func (UnimplementedPushService) PostPush(c *gin.Context, req *PostPushRequest) (err error) {
+func (UnimplementedPushServer) PostPush(c *gin.Context, req *PostPushRequest) (err error) {
 	err = fmt.Errorf("method PostPush not implemented")
 	return
 }

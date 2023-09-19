@@ -12,6 +12,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
+	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/pkg/push"
 	"github.com/woocoos/msgcenter/template"
@@ -127,6 +128,10 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 			Title:   row.Subject,
 			Format:  msgtemplate.Format(row.Format),
 			Content: row.Body,
+			Extras: map[label.LabelName]string{
+				"action":   "internal",
+				"actionID": strconv.Itoa(row.ID),
+			},
 		}
 
 		msggtos := make([]*ent.MsgInternalToCreate, 0)

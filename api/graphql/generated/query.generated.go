@@ -1378,6 +1378,27 @@ func (ec *executionContext) marshalNHostPort2githubᚗcomᚋwoocoosᚋmsgcenter�
 	return v
 }
 
+func (ec *executionContext) unmarshalNMapString2map(ctx context.Context, v interface{}) (map[string]string, error) {
+	res, err := typex.UnmarshalMapString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNMapString2map(ctx context.Context, sel ast.SelectionSet, v map[string]string) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	res := typex.MarshalMapString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNMatchType2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐMatchType(ctx context.Context, v interface{}) (label.MatchType, error) {
 	var res label.MatchType
 	err := res.UnmarshalGQL(v)

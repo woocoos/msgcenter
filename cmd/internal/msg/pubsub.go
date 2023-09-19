@@ -171,12 +171,19 @@ func (pb *PubSub) handlerMessage(body string) {
 }
 
 func convertMessage(data *push.Data) *model.Message {
+	extras := make(map[string]string)
+	if data.Message.Extras != nil {
+		for k, v := range data.Message.Extras {
+			extras[string(k)] = v
+		}
+	}
 	msg := &model.Message{
 		Topic:   data.Topic,
 		Title:   data.Message.Title,
 		Content: data.Message.Content,
 		Format:  string(data.Message.Format),
 		SendAt:  time.Now(),
+		Extras:  extras,
 	}
 	return msg
 }

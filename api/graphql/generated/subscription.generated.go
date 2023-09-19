@@ -298,6 +298,50 @@ func (ec *executionContext) fieldContext_Message_sendAt(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Message_extras(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Message_extras(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Extras, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(map[string]string)
+	fc.Result = res
+	return ec.marshalNMapString2map(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Message_extras(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Message",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type MapString does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MessageFilter_tenantId(ctx context.Context, field graphql.CollectedField, obj *model.MessageFilter) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MessageFilter_tenantId(ctx, field)
 	if err != nil {
@@ -536,6 +580,8 @@ func (ec *executionContext) fieldContext_Subscription_message(ctx context.Contex
 				return ec.fieldContext_Message_url(ctx, field)
 			case "sendAt":
 				return ec.fieldContext_Message_sendAt(ctx, field)
+			case "extras":
+				return ec.fieldContext_Message_extras(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
 		},
@@ -593,6 +639,11 @@ func (ec *executionContext) _Message(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "sendAt":
 			out.Values[i] = ec._Message_sendAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "extras":
+			out.Values[i] = ec._Message_extras(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

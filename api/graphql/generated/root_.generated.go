@@ -68,6 +68,7 @@ type ComplexityRoot struct {
 
 	Message struct {
 		Content func(childComplexity int) int
+		Extras  func(childComplexity int) int
 		Format  func(childComplexity int) int
 		SendAt  func(childComplexity int) int
 		Title   func(childComplexity int) int
@@ -550,6 +551,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Message.Content(childComplexity), true
+
+	case "Message.extras":
+		if e.complexity.Message.Extras == nil {
+			break
+		}
+
+		return e.complexity.Message.Extras(childComplexity), true
 
 	case "Message.format":
 		if e.complexity.Message.Format == nil {
@@ -5139,6 +5147,7 @@ type Message {
     format: String!
     url: String!
     sendAt: Time!
+    extras: MapString!
 }
 
 """

@@ -158,7 +158,7 @@ func (r *mutationResolver) UpdateMsgChannel(ctx context.Context, id int, input e
 		}
 		// 添加
 		receiver := *mc.Receiver
-		receiver.Name = profile.TenantReceiverName(strconv.Itoa(mc.TenantID), mc.Name)
+		receiver.Name = profile.TenantReceiverName(strconv.Itoa(mc.TenantID), mc.Receiver.Name)
 		if err = r.Coordinator.AddTenantReceiver([]*profile.Receiver{&receiver}); err != nil {
 			return nil, err
 		}
@@ -187,7 +187,7 @@ func (r *mutationResolver) EnableMsgChannel(ctx context.Context, id int) (*ent.M
 	if channel.Receiver == nil {
 		return nil, fmt.Errorf("receiver cannot nil")
 	}
-	channel.Receiver.Name = profile.TenantReceiverName(strconv.Itoa(channel.TenantID), channel.Name)
+	channel.Receiver.Name = profile.TenantReceiverName(strconv.Itoa(channel.TenantID), channel.Receiver.Name)
 	if err = r.Coordinator.AddTenantReceiver([]*profile.Receiver{channel.Receiver}); err != nil {
 		return nil, err
 	}

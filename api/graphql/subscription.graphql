@@ -13,6 +13,7 @@ type Message {
     format: String!
     url: String!
     sendAt: Time!
+    extras: MapString!
 }
 
 """
