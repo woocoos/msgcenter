@@ -59,6 +59,7 @@ const schemaWithMocks = addMocksToSchema({
       silences: relayStylePaginationMock(store),
       msgAlerts: relayStylePaginationMock(store),
       msgInternals: relayStylePaginationMock(store),
+      userMessages: relayStylePaginationMock(store),
       msgTypeCategories: () => {
         return ['故障消息', '业务消息', '客户交易'];
       },
@@ -290,7 +291,7 @@ const schemaWithMocks = addMocksToSchema({
         )
         return true;
       },
-      markMessageReaOrUnRead(_, { ids, read }) {
+      markMessageReadOrUnRead(_, { ids, read }) {
         return true;
       },
       markMessageDeleted(_, { ids }) {

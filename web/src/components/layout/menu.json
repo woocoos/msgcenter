@@ -26,8 +26,11 @@
       {
         "name": "消息列表",
         "path": "/msg/list"
+      },
+      {
+        "name": "站内信",
+        "path": "/msg/internal"
       }
     ]
   }
 ]
-

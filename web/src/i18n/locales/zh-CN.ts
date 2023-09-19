@@ -96,6 +96,9 @@ export default {
     attachments: '附件',
     duration: '持续时长',
     log: '日志',
+    created_at: '创建时间',
+    station_msg: '站内消息',
+    all_msg: '全部消息',
 
     // 多个字符组成
     confirm_copy: '确定是否复制',
@@ -170,6 +173,9 @@ export default {
     show_cc: '添加抄送',
     hidd_bcc: '删除密送',
     show_bcc: '添加密送',
+    mark_read: '标记已读',
+    unread_msg: '未读消息',
+    read_msg: '已读消息',
 
     // 创建
     create_msg_type: '创建消息类型',
@@ -215,6 +221,7 @@ export default {
     please_enter_msg_temp_cc: '请输入抄送邮箱，通过回车确认输入结束',
     please_enter_msg_temp_bcc: '请输入密送邮箱，通过回车确认输入结束',
     please_enter_msg_temp_from: '请输入发件人',
+    please_select_data: '请先选择数据',
     // 添加
     add: "添加",
 

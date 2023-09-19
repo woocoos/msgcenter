@@ -96,6 +96,9 @@ export default {
     attachments: 'attachments',
     duration: 'duration',
     log: 'log',
+    created_at: 'Creation time',
+    station_msg: 'Station message',
+    all_msg: 'Full message',
 
     // 多个字符组成
     confirm_copy: 'confirm copy',
@@ -167,6 +170,9 @@ export default {
     show_cc: 'Add cc',
     hidd_bcc: 'Delete BCC',
     show_bcc: 'Add BCC',
+    mark_read: 'Mark read',
+    unread_msg: 'Unread message',
+    read_msg: 'Read message',
 
     // 创建
     create_msg_type: 'Create message type',
@@ -210,6 +216,8 @@ export default {
     please_enter_msg_temp_cc: 'Please enter the CC email address and press enter to confirm the input',
     please_enter_msg_temp_bcc: 'Please enter the BCC email address and press Enter to confirm the input',
     please_enter_msg_temp_from: 'Please enter sender',
+    please_select_data: 'Please select the data first',
+
     // 添加
     add: "Add",
 

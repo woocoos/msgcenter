@@ -160,6 +160,18 @@ export const initStoreData = (store: IMockStore) => {
     store.get('MsgInternal', 9),
     store.get('MsgInternal', 10),
   ]))
+  store.set('Query', 'ROOT', 'userMessages', listTemp([
+    store.get('MsgInternalTo', 1),
+    store.get('MsgInternalTo', 2),
+    store.get('MsgInternalTo', 3),
+    store.get('MsgInternalTo', 4),
+    store.get('MsgInternalTo', 5),
+    store.get('MsgInternalTo', 6),
+    store.get('MsgInternalTo', 7),
+    store.get('MsgInternalTo', 8),
+    store.get('MsgInternalTo', 9),
+    store.get('MsgInternalTo', 10),
+  ]))
 
   // -------------root-end------------------------
 
@@ -238,4 +250,11 @@ export const initStoreData = (store: IMockStore) => {
     })
   }
 
+
+  // MsgInternalTo
+  for (let i = 1; i <= 10; i++) {
+    store.set('MsgInternalTo', i, {
+      id: i, tenantID: 1, userID: 1, msgInternal: store.get('MsgInternal', i), msgInternalID: i
+    })
+  }
 }
