@@ -7,7 +7,8 @@ import { useTranslation } from 'react-i18next';
 import InputCategory from './inputCategory';
 import { useLeavePrompt } from '@knockout-js/layout';
 import { AppSelect } from '@knockout-js/org';
-import { App, getApp } from '@knockout-js/api';
+import { getApp } from '@knockout-js/api';
+import { App } from '@knockout-js/api/ucenter';
 
 type ProFormData = {
   app?: App;

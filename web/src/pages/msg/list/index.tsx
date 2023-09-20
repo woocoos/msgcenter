@@ -2,7 +2,7 @@ import { MsgAlert, MsgAlertAlertStatus, MsgAlertWhereInput } from "@/generated/m
 import { EnumMsgAlertStatus, getMsgAlertList } from "@/services/msgsrv/list";
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from "@ant-design/pro-components";
 import { Link } from "@ice/runtime";
-import { OrgKind } from "@knockout-js/api";
+import { OrgKind } from "@knockout-js/api/ucenter";
 import { KeepAlive } from "@knockout-js/layout";
 import { OrgSelect } from "@knockout-js/org";
 import { Space } from "antd";

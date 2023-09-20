@@ -4,9 +4,8 @@ import { CreateMsgSubscriberInput, MsgType } from '@/generated/msgsrv/graphql';
 import { DrawerForm } from '@ant-design/pro-components';
 import { createSub, delSub, getMsgTypeAndSubInfo } from '@/services/msgsrv/type';
 import { Radio, Skeleton, Space, Transfer, Typography, message } from 'antd';
-import { getOrgUserList } from '@knockout-js/api';
+import { getOrgUserList, getOrgGroupList } from '@knockout-js/api';
 import store from '@/store';
-import { getOrgGroupList } from '@knockout-js/api';
 import { TransferItem } from 'antd/es/transfer';
 import { useLeavePrompt } from '@knockout-js/layout';
 

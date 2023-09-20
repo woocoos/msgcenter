@@ -6,7 +6,8 @@ import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { MsgType, MsgTypeWhereInput } from '@/generated/msgsrv/graphql';
 import { getMsgTypeList } from '@/services/msgsrv/type';
 import { AppSelect } from '@knockout-js/org';
-import { App, getApps } from '@knockout-js/api';
+import { getApps } from '@knockout-js/api';
+import { App } from '@knockout-js/api/ucenter';
 
 export default (props: {
   open: boolean;

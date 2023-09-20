@@ -8,7 +8,8 @@ import Matchers from './matchers';
 import { Col, Row } from 'antd';
 import { useLeavePrompt } from '@knockout-js/layout';
 import { OrgSelect } from '@knockout-js/org';
-import { Org, OrgKind, getOrg } from '@knockout-js/api';
+import { getOrg } from '@knockout-js/api';
+import { Org, OrgKind, } from '@knockout-js/api/ucenter';
 
 type ProFormData = {
   org?: Org;

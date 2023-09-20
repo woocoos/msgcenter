@@ -2,7 +2,7 @@ import { Nlog, NlogReceiverType, NlogWhereInput } from "@/generated/msgsrv/graph
 import { EnumNlogReceiverType, getMsgAlertLogList } from "@/services/msgsrv/list";
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from "@ant-design/pro-components";
 import { Link, useSearchParams } from "@ice/runtime";
-import { OrgKind } from "@knockout-js/api";
+import { OrgKind } from "@knockout-js/api/ucenter";
 import { OrgSelect } from "@knockout-js/org";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";

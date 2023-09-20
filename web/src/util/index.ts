@@ -1,4 +1,4 @@
-import { TreeAction } from '@knockout-js/api';
+import { TreeAction } from '@knockout-js/api/ucenter';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';

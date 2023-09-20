@@ -177,6 +177,7 @@ export default {
     unread_msg: '未读消息',
     read_msg: '已读消息',
     station_msg_detail: '站内消息详情',
+    msg_event_config_example: '配置示例',
 
     // 创建
     create_msg_type: '创建消息类型',

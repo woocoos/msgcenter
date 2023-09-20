@@ -9,7 +9,8 @@ import { EnumMsgTemplateFormat, EnumMsgTemplateReceiverType, EnumMsgTemplateStat
 import { getMsgEventInfo } from '@/services/msgsrv/event';
 import { DownOutlined } from '@ant-design/icons';
 import Create from './components/create';
-import { Org, getOrgs } from '@knockout-js/api';
+import { getOrgs } from '@knockout-js/api';
+import { Org } from '@knockout-js/api/ucenter';
 
 
 export default () => {

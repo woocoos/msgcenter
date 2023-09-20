@@ -1,5 +1,5 @@
 import store from '@/store';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import menuList from './menu.json';
 import { history } from 'ice';
 import { Outlet, useLocation } from '@ice/runtime';
@@ -10,8 +10,9 @@ import { Layout, useLeavePrompt } from '@knockout-js/layout';
 import { logout, urlSpm } from '@/services/auth';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import { createFromIconfontCN } from '@ant-design/icons';
-import { files } from '@knockout-js/api';
+import { getFilesRaw } from '@knockout-js/api';
 import FloatWs from '../ws';
+import { MsgDropdownRef } from '@knockout-js/layout/esm/components/msg-dropdown';
 
 const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   NODE_ENV = process.env.NODE_ENV ?? '',
@@ -22,6 +23,7 @@ const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
 export default () => {
   const [userState, userDispatcher] = store.useModel('user'),
     [appState, appDispatcher] = store.useModel('app'),
+    msgRef = useRef<MsgDropdownRef>(null),
     [checkLeave] = useLeavePrompt(),
     location = useLocation(),
     { token } = useToken(),
@@ -34,7 +36,7 @@ export default () => {
 
   useEffect(() => {
     if (userState.user?.avatarFileId) {
-      files.getFilesRaw(userState.user?.avatarFileId, 'url').then(result => {
+      getFilesRaw(userState.user?.avatarFileId, 'url').then(result => {
         if (typeof result === 'string') {
           setAvatar(result);
         }
@@ -70,6 +72,7 @@ export default () => {
   }, []);
 
   return <Layout
+    msgRef={msgRef}
     appCode={ICE_APP_CODE}
     pathname={location.pathname}
     IconFont={IconFont}
@@ -101,6 +104,14 @@ export default () => {
         if (checkLeave()) {
           logout();
         }
+      },
+    }}
+    msgProps={{
+      onItemClick: (data) => {
+        window.open(`/msg/internal/detail?toid=${data.id}`);
+      },
+      onMoreClick: () => {
+        window.open(`/msg/internal`);
       },
     }}
     themeSwitchProps={{

@@ -10,8 +10,9 @@ import { browserLanguage } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { isInIcestark } from '@ice/stark-app';
-import { User, files, userPermissions } from '@knockout-js/api';
+import { setFilesApi, userPermissions } from '@knockout-js/api';
 import { logout, parseSpm } from './services/auth';
+import { User } from '@knockout-js/api/ucenter';
 
 const ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
   ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
@@ -33,7 +34,7 @@ if (NODE_ENV === 'development') {
   })
 }
 
-files.setFilesApi(ICE_API_FILES_PREFIX);
+setFilesApi(ICE_API_FILES_PREFIX);
 
 export const icestark = defineChildConfig(() => ({
   mount: (data) => {

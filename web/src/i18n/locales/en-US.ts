@@ -174,6 +174,7 @@ export default {
     unread_msg: 'Unread message',
     read_msg: 'Read message',
     station_msg_detail: 'Site message details',
+    msg_event_config_example: 'Configuration example',
 
     // 创建
     create_msg_type: 'Create message type',

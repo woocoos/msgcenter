@@ -8,7 +8,8 @@ import { EnumMsgTypeStatus, delMsgType, getMsgTypeList } from '@/services/msgsrv
 import Create from './components/create';
 import InputCategory from './components/inputCategory';
 import { AppSelect } from '@knockout-js/org';
-import { App, getApps } from '@knockout-js/api';
+import { getApps } from '@knockout-js/api';
+import { App } from '@knockout-js/api/ucenter';
 import { KeepAlive } from '@knockout-js/layout';
 
 

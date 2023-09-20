@@ -1,5 +1,5 @@
 import store from '@/store';
-import { User } from '@knockout-js/api';
+import { User } from '@knockout-js/api/ucenter';
 import { request } from 'ice';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 

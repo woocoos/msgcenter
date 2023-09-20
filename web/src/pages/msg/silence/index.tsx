@@ -3,12 +3,12 @@ import { Button, Space, Modal } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
-import { Org, getOrgs } from '@knockout-js/api';
+import { getOrgs } from '@knockout-js/api';
 import Create from './components/create';
 import { Silence, SilenceSilenceState, SilenceWhereInput } from '@/generated/msgsrv/graphql';
 import { EnumSilenceMatchType, EnumSilenceStatus, delSilence, getSilenceList } from '@/services/msgsrv/silence';
 import { OrgSelect } from '@knockout-js/org';
-import { OrgKind } from '@knockout-js/api';
+import { Org, OrgKind } from '@knockout-js/api/ucenter';
 import { KeepAlive } from '@knockout-js/layout';
 
 

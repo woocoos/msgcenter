@@ -8,6 +8,7 @@ import { EnumMsgEventStatus, delMsgEvent, disableMsgEvent, enableMsgEvent, getMs
 import Create from './components/create';
 import { Link } from '@ice/runtime';
 import Config from './components/config';
+import ConfigExample from './components/configExample';
 import { KeepAlive } from '@knockout-js/layout';
 import InputCategory from '../type/components/inputCategory';
 
@@ -116,7 +117,7 @@ export default () => {
       open: boolean;
       title: string;
       id: string;
-      scene: 'editor' | 'config';
+      scene: 'editor' | 'config' | 'config_example';
     }>({
       open: false,
       title: '',
@@ -195,6 +196,13 @@ export default () => {
                   {t('create_msg_event')}
                 </Button>
               </Auth>,
+              <Button
+                onClick={() => {
+                  setModal({ open: true, title: t('msg_event_config_example'), id: '', scene: 'config_example' });
+                }}
+              >
+                {t('msg_event_config_example')}
+              </Button>
             ],
           }}
           scroll={{ x: 'max-content' }}
@@ -250,6 +258,14 @@ export default () => {
             if (isSuccess) {
               proTableRef.current?.reload();
             }
+            setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
+          }}
+        />
+        <ConfigExample
+          x-if={modal.scene === 'config_example'}
+          open={modal.open}
+          title={modal.title}
+          onClose={() => {
             setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
           }}
         />

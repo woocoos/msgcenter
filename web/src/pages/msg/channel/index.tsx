@@ -5,12 +5,13 @@ import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
 import { MsgChannel, MsgChannelReceiverType, MsgChannelSimpleStatus, MsgChannelWhereInput } from '@/generated/msgsrv/graphql';
 import { EnumMsgChannelReceiverType, EnumMsgChannelStatus, delMsgChannel, disableMsgChannel, enableMsgChannel, getMsgChannelList } from '@/services/msgsrv/channel';
-import { Org, getOrgs } from '@knockout-js/api';
+import { getOrgs } from '@knockout-js/api';
 import Create from './components/create';
 import Config from './components/config';
 import { OrgSelect } from '@knockout-js/org';
-import { OrgKind } from '@knockout-js/api';
+import { OrgKind, Org } from '@knockout-js/api/ucenter';
 import { KeepAlive } from '@knockout-js/layout';
+import ConfigExample from './components/configExample';
 
 
 export default () => {
@@ -106,7 +107,7 @@ export default () => {
       open: boolean;
       title: string;
       id: string;
-      scene: 'editor' | 'config';
+      scene: 'editor' | 'config' | 'config_example';
     }>({
       open: false,
       title: '',
@@ -185,6 +186,13 @@ export default () => {
                   {t('create_msg_channel')}
                 </Button>
               </Auth>,
+              <Button
+                onClick={() => {
+                  setModal({ open: true, title: t('msg_event_config_example'), id: '', scene: 'config_example' });
+                }}
+              >
+                {t('msg_event_config_example')}
+              </Button>
             ],
           }}
           scroll={{ x: 'max-content' }}
@@ -237,6 +245,14 @@ export default () => {
             if (isSuccess) {
               proTableRef.current?.reload();
             }
+            setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
+          }}
+        />
+        <ConfigExample
+          x-if={modal.scene === 'config_example'}
+          open={modal.open}
+          title={modal.title}
+          onClose={() => {
             setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
           }}
         />

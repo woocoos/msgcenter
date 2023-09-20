@@ -7,7 +7,8 @@ import { EnumMsgTemplateFormat, createMsgTemplate, getMsgTemplateInfo, updateMsg
 import InputMultiple from '@/components/input/multiple';
 import { UploadMultiple, UploadTemp, useLeavePrompt } from '@knockout-js/layout';
 import { OrgSelect } from '@knockout-js/org';
-import { Org, OrgKind, getOrg } from '@knockout-js/api';
+import { getOrg } from '@knockout-js/api';
+import { Org, OrgKind } from '@knockout-js/api/ucenter';
 import store from '@/store';
 import { Button, Col, Row, Space } from 'antd';
 
