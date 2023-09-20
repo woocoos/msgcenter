@@ -84,6 +84,7 @@ func NewServer(cnf *conf.AppConfiguration) *Server {
 	}
 
 	configCoordinator.SetHttpClient(buildHttpClient(cnf))
+	configCoordinator.SetAlertServer(api)
 
 	configCoordinator.SetDBClient(s.dbClient)
 	configCoordinator.ReloadHooks(func(cfg *profile.Config) error {

@@ -301,31 +301,33 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateMsgChannel        func(childComplexity int, input ent.CreateMsgChannelInput) int
-		CreateMsgEvent          func(childComplexity int, input ent.CreateMsgEventInput) int
-		CreateMsgSubscriber     func(childComplexity int, inputs []*ent.CreateMsgSubscriberInput) int
-		CreateMsgTemplate       func(childComplexity int, input ent.CreateMsgTemplateInput) int
-		CreateMsgType           func(childComplexity int, input ent.CreateMsgTypeInput) int
-		CreateSilence           func(childComplexity int, input ent.CreateSilenceInput) int
-		DeleteMsgChannel        func(childComplexity int, id int) int
-		DeleteMsgEvent          func(childComplexity int, id int) int
-		DeleteMsgSubscriber     func(childComplexity int, ids []int) int
-		DeleteMsgTemplate       func(childComplexity int, id int) int
-		DeleteMsgType           func(childComplexity int, id int) int
-		DeleteSilence           func(childComplexity int, id int) int
-		DisableMsgChannel       func(childComplexity int, id int) int
-		DisableMsgEvent         func(childComplexity int, id int) int
-		DisableMsgTemplate      func(childComplexity int, id int) int
-		EnableMsgChannel        func(childComplexity int, id int) int
-		EnableMsgEvent          func(childComplexity int, id int) int
-		EnableMsgTemplate       func(childComplexity int, id int) int
-		MarkMessageDeleted      func(childComplexity int, ids []int) int
-		MarkMessageReadOrUnRead func(childComplexity int, ids []int, read bool) int
-		UpdateMsgChannel        func(childComplexity int, id int, input ent.UpdateMsgChannelInput) int
-		UpdateMsgEvent          func(childComplexity int, id int, input ent.UpdateMsgEventInput) int
-		UpdateMsgTemplate       func(childComplexity int, id int, input ent.UpdateMsgTemplateInput) int
-		UpdateMsgType           func(childComplexity int, id int, input ent.UpdateMsgTypeInput) int
-		UpdateSilence           func(childComplexity int, id int, input ent.UpdateSilenceInput) int
+		CreateMsgChannel              func(childComplexity int, input ent.CreateMsgChannelInput) int
+		CreateMsgEvent                func(childComplexity int, input ent.CreateMsgEventInput) int
+		CreateMsgSubscriber           func(childComplexity int, inputs []*ent.CreateMsgSubscriberInput) int
+		CreateMsgTemplate             func(childComplexity int, input ent.CreateMsgTemplateInput) int
+		CreateMsgType                 func(childComplexity int, input ent.CreateMsgTypeInput) int
+		CreateSilence                 func(childComplexity int, input ent.CreateSilenceInput) int
+		DeleteMsgChannel              func(childComplexity int, id int) int
+		DeleteMsgEvent                func(childComplexity int, id int) int
+		DeleteMsgSubscriber           func(childComplexity int, ids []int) int
+		DeleteMsgTemplate             func(childComplexity int, id int) int
+		DeleteMsgType                 func(childComplexity int, id int) int
+		DeleteSilence                 func(childComplexity int, id int) int
+		DisableMsgChannel             func(childComplexity int, id int) int
+		DisableMsgEvent               func(childComplexity int, id int) int
+		DisableMsgTemplate            func(childComplexity int, id int) int
+		EnableMsgChannel              func(childComplexity int, id int) int
+		EnableMsgEvent                func(childComplexity int, id int) int
+		EnableMsgTemplate             func(childComplexity int, id int) int
+		MarkMsgInternalToDeleted      func(childComplexity int, ids []int) int
+		MarkMsgInternalToReadOrUnRead func(childComplexity int, ids []int, read bool) int
+		TestSendEmailTpl              func(childComplexity int, tplID int, email string, labels map[string]string, annotations map[string]string) int
+		TestSendMessageTpl            func(childComplexity int, tplID int, userID int, labels map[string]string, annotations map[string]string) int
+		UpdateMsgChannel              func(childComplexity int, id int, input ent.UpdateMsgChannelInput) int
+		UpdateMsgEvent                func(childComplexity int, id int, input ent.UpdateMsgEventInput) int
+		UpdateMsgTemplate             func(childComplexity int, id int, input ent.UpdateMsgTemplateInput) int
+		UpdateMsgType                 func(childComplexity int, id int, input ent.UpdateMsgTypeInput) int
+		UpdateSilence                 func(childComplexity int, id int, input ent.UpdateSilenceInput) int
 	}
 
 	Nlog struct {
@@ -371,21 +373,21 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		MsgAlerts                         func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) int
-		MsgChannels                       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgChannelOrder, where *ent.MsgChannelWhereInput) int
-		MsgEvents                         func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) int
-		MsgInternalTos                    func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) int
-		MsgInternals                      func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalOrder, where *ent.MsgInternalWhereInput) int
-		MsgTemplates                      func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) int
-		MsgTypeCategories                 func(childComplexity int, keyword *string, appID *int) int
-		MsgTypes                          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTypeOrder, where *ent.MsgTypeWhereInput) int
-		Node                              func(childComplexity int, id string) int
-		Nodes                             func(childComplexity int, ids []string) int
-		Silences                          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SilenceOrder, where *ent.SilenceWhereInput) int
-		UserMessages                      func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) int
-		UserSubMsgCategory                func(childComplexity int) int
-		UserUnreadMessages                func(childComplexity int) int
-		UserUnreadMessagesFromMsgCategory func(childComplexity int, categories []string) int
+		MsgAlerts                             func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) int
+		MsgChannels                           func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgChannelOrder, where *ent.MsgChannelWhereInput) int
+		MsgEvents                             func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) int
+		MsgInternalTos                        func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) int
+		MsgInternals                          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalOrder, where *ent.MsgInternalWhereInput) int
+		MsgTemplates                          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) int
+		MsgTypeCategories                     func(childComplexity int, keyword *string, appID *int) int
+		MsgTypes                              func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTypeOrder, where *ent.MsgTypeWhereInput) int
+		Node                                  func(childComplexity int, id string) int
+		Nodes                                 func(childComplexity int, ids []string) int
+		Silences                              func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SilenceOrder, where *ent.SilenceWhereInput) int
+		UserMsgInternalTos                    func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) int
+		UserSubMsgCategory                    func(childComplexity int) int
+		UserUnreadMsgInternals                func(childComplexity int) int
+		UserUnreadMsgInternalsFromMsgCategory func(childComplexity int, categories []string) int
 	}
 
 	Receiver struct {
@@ -1905,29 +1907,53 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.EnableMsgTemplate(childComplexity, args["id"].(int)), true
 
-	case "Mutation.markMessageDeleted":
-		if e.complexity.Mutation.MarkMessageDeleted == nil {
+	case "Mutation.markMsgInternalToDeleted":
+		if e.complexity.Mutation.MarkMsgInternalToDeleted == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_markMessageDeleted_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_markMsgInternalToDeleted_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.MarkMessageDeleted(childComplexity, args["ids"].([]int)), true
+		return e.complexity.Mutation.MarkMsgInternalToDeleted(childComplexity, args["ids"].([]int)), true
 
-	case "Mutation.markMessageReadOrUnRead":
-		if e.complexity.Mutation.MarkMessageReadOrUnRead == nil {
+	case "Mutation.markMsgInternalToReadOrUnRead":
+		if e.complexity.Mutation.MarkMsgInternalToReadOrUnRead == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_markMessageReadOrUnRead_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_markMsgInternalToReadOrUnRead_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.MarkMessageReadOrUnRead(childComplexity, args["ids"].([]int), args["read"].(bool)), true
+		return e.complexity.Mutation.MarkMsgInternalToReadOrUnRead(childComplexity, args["ids"].([]int), args["read"].(bool)), true
+
+	case "Mutation.testSendEmailTpl":
+		if e.complexity.Mutation.TestSendEmailTpl == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_testSendEmailTpl_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.TestSendEmailTpl(childComplexity, args["tplID"].(int), args["email"].(string), args["labels"].(map[string]string), args["annotations"].(map[string]string)), true
+
+	case "Mutation.testSendMessageTpl":
+		if e.complexity.Mutation.TestSendMessageTpl == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_testSendMessageTpl_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.TestSendMessageTpl(childComplexity, args["tplID"].(int), args["userID"].(int), args["labels"].(map[string]string), args["annotations"].(map[string]string)), true
 
 	case "Mutation.updateMsgChannel":
 		if e.complexity.Mutation.UpdateMsgChannel == nil {
@@ -2310,17 +2336,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Silences(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.SilenceOrder), args["where"].(*ent.SilenceWhereInput)), true
 
-	case "Query.userMessages":
-		if e.complexity.Query.UserMessages == nil {
+	case "Query.userMsgInternalTos":
+		if e.complexity.Query.UserMsgInternalTos == nil {
 			break
 		}
 
-		args, err := ec.field_Query_userMessages_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_userMsgInternalTos_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.UserMessages(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgInternalToOrder), args["where"].(*ent.MsgInternalToWhereInput)), true
+		return e.complexity.Query.UserMsgInternalTos(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgInternalToOrder), args["where"].(*ent.MsgInternalToWhereInput)), true
 
 	case "Query.userSubMsgCategory":
 		if e.complexity.Query.UserSubMsgCategory == nil {
@@ -2329,24 +2355,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.UserSubMsgCategory(childComplexity), true
 
-	case "Query.userUnreadMessages":
-		if e.complexity.Query.UserUnreadMessages == nil {
+	case "Query.userUnreadMsgInternals":
+		if e.complexity.Query.UserUnreadMsgInternals == nil {
 			break
 		}
 
-		return e.complexity.Query.UserUnreadMessages(childComplexity), true
+		return e.complexity.Query.UserUnreadMsgInternals(childComplexity), true
 
-	case "Query.userUnreadMessagesFromMsgCategory":
-		if e.complexity.Query.UserUnreadMessagesFromMsgCategory == nil {
+	case "Query.userUnreadMsgInternalsFromMsgCategory":
+		if e.complexity.Query.UserUnreadMsgInternalsFromMsgCategory == nil {
 			break
 		}
 
-		args, err := ec.field_Query_userUnreadMessagesFromMsgCategory_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_userUnreadMsgInternalsFromMsgCategory_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.UserUnreadMessagesFromMsgCategory(childComplexity, args["categories"].([]string)), true
+		return e.complexity.Query.UserUnreadMsgInternalsFromMsgCategory(childComplexity, args["categories"].([]string)), true
 
 	case "Receiver.emailConfigs":
 		if e.complexity.Receiver.EmailConfigs == nil {
@@ -5029,7 +5055,7 @@ extend type Query {
     ):MsgAlertConnection!
 
     """获取用户的站内信"""
-    userMessages(
+    userMsgInternalTos(
         after: Cursor
         first: Int
         before: Cursor
@@ -5040,9 +5066,9 @@ extend type Query {
     """用户订阅的消息分类"""
     userSubMsgCategory:[String!]!
     """消息分类站内信未读数"""
-    userUnreadMessagesFromMsgCategory(categories: [String!]!):[Int!]!
+    userUnreadMsgInternalsFromMsgCategory(categories: [String!]!):[Int!]!
     """用户站内信总未读数"""
-    userUnreadMessages:Int!
+    userUnreadMsgInternals:Int!
 }`, BuiltIn: false},
 	{Name: "../mutation.graphql", Input: `type Mutation {
     """ 创建消息类型 """
@@ -5092,9 +5118,13 @@ extend type Query {
     """ 删除静默 """
     deleteSilence(id: ID!): Boolean!
     """ 设置站内信消息已读未读 """
-    markMessageReadOrUnRead(ids: [ID!]!, read: Boolean!): Boolean!
+    markMsgInternalToReadOrUnRead(ids: [ID!]!, read: Boolean!): Boolean!
     """ 删除站内信消息 """
-    markMessageDeleted(ids: [ID!]!): Boolean!
+    markMsgInternalToDeleted(ids: [ID!]!): Boolean!
+    """ 测试邮件模板 """
+    testSendEmailTpl(tplID: ID!, email: String!, labels: MapString, annotations: MapString): Boolean!
+    """ 测试站内信模板 """
+    testSendMessageTpl(tplID: ID!, userID: ID!, labels: MapString, annotations: MapString): Boolean!
 }
 
 input RouteInput  {

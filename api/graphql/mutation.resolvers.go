@@ -10,9 +10,11 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/woocoos/entco/pkg/identity"
 	"github.com/woocoos/entco/schemax/typex"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
+	"github.com/woocoos/msgcenter/api/oas"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -24,6 +26,7 @@ import (
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service"
 	"github.com/woocoos/msgcenter/silence"
+	"golang.org/x/exp/maps"
 )
 
 // CreateMsgType is the resolver for the createMsgType field.
@@ -495,8 +498,8 @@ func (r *mutationResolver) DeleteSilence(ctx context.Context, id int) (bool, err
 	return err == nil, err
 }
 
-// MarkMessageReadOrUnRead is the resolver for the markMessageReadOrUnRead field.
-func (r *mutationResolver) MarkMessageReadOrUnRead(ctx context.Context, ids []int, read bool) (bool, error) {
+// MarkMsgInternalToReadOrUnRead is the resolver for the markMsgInternalToReadOrUnRead field.
+func (r *mutationResolver) MarkMsgInternalToReadOrUnRead(ctx context.Context, ids []int, read bool) (bool, error) {
 	uid, err := identity.UserIDFromContext(ctx)
 	if err != nil {
 		return false, err
@@ -517,8 +520,8 @@ func (r *mutationResolver) MarkMessageReadOrUnRead(ctx context.Context, ids []in
 	return err == nil, err
 }
 
-// MarkMessageDeleted is the resolver for the markMessageDeleted field.
-func (r *mutationResolver) MarkMessageDeleted(ctx context.Context, ids []int) (bool, error) {
+// MarkMsgInternalToDeleted is the resolver for the markMsgInternalToDeleted field.
+func (r *mutationResolver) MarkMsgInternalToDeleted(ctx context.Context, ids []int) (bool, error) {
 	uid, err := identity.UserIDFromContext(ctx)
 	if err != nil {
 		return false, err
@@ -530,6 +533,99 @@ func (r *mutationResolver) MarkMessageDeleted(ctx context.Context, ids []int) (b
 	err = ent.FromContext(ctx).MsgInternalTo.Update().Where(
 		msginternalto.IDIn(ids...), msginternalto.UserID(uid), msginternalto.TenantID(tid),
 	).SetDeleteAt(time.Now()).Exec(ctx)
+	return err == nil, err
+}
+
+// TestSendEmailTpl is the resolver for the testSendEmailTpl field.
+func (r *mutationResolver) TestSendEmailTpl(ctx context.Context, tplID int, email string, labels map[string]string, annotations map[string]string) (bool, error) {
+	client := ent.FromContext(ctx)
+	temp, err := client.MsgTemplate.Query().Where(msgtemplate.ID(tplID)).WithEvent().Only(ctx)
+	if err != nil {
+		return false, err
+	}
+	if temp.ReceiverType != profile.ReceiverEmail {
+		return false, fmt.Errorf("tplID:%d not an email template", tplID)
+	}
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	defaultLabels := map[string]string{
+		"receiver":  temp.Edges.Event.Route.Receiver,
+		"alertname": temp.Edges.Event.Name,
+		"tenant":    strconv.Itoa(tid),
+		"skipSub":   "Y",
+		"timestamp": strconv.Itoa(int(time.Now().Unix())),
+	}
+	if labels == nil {
+		labels = map[string]string{}
+	}
+	maps.Copy(labels, defaultLabels)
+
+	defaultAnnotations := map[string]string{
+		"to": email,
+	}
+	if annotations == nil {
+		annotations = map[string]string{}
+	}
+	maps.Copy(annotations, defaultAnnotations)
+	// 发送邮件
+	err = r.Coordinator.AlertServer.PostAlerts(ctx.Value(gin.ContextKey).(*gin.Context), &oas.PostAlertsRequest{
+		PostableAlerts: oas.PostableAlerts{
+			{
+				Alert: &oas.Alert{
+					Labels: labels,
+				},
+				Annotations: annotations,
+			},
+		},
+	})
+	return err == nil, err
+}
+
+// TestSendMessageTpl is the resolver for the testSendMessageTpl field.
+func (r *mutationResolver) TestSendMessageTpl(ctx context.Context, tplID int, userID int, labels map[string]string, annotations map[string]string) (bool, error) {
+	client := ent.FromContext(ctx)
+	temp, err := client.MsgTemplate.Query().Where(msgtemplate.ID(tplID)).WithEvent().Only(ctx)
+	if err != nil {
+		return false, err
+	}
+	if temp.ReceiverType != profile.ReceiverMessage {
+		return false, fmt.Errorf("tplID:%d not an message template", tplID)
+	}
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	defaultLabels := map[string]string{
+		"receiver":  temp.Edges.Event.Route.Receiver,
+		"alertname": temp.Edges.Event.Name,
+		"tenant":    strconv.Itoa(tid),
+		"skipSub":   "Y",
+		"timestamp": strconv.Itoa(int(time.Now().Unix())),
+		"user":      strconv.Itoa(userID),
+	}
+	if labels == nil {
+		labels = map[string]string{}
+	}
+	maps.Copy(labels, defaultLabels)
+
+	defaultAnnotations := map[string]string{}
+	if annotations == nil {
+		annotations = map[string]string{}
+	}
+	maps.Copy(annotations, defaultAnnotations)
+	// 发送站内信
+	err = r.Coordinator.AlertServer.PostAlerts(ctx.Value(gin.ContextKey).(*gin.Context), &oas.PostAlertsRequest{
+		PostableAlerts: oas.PostableAlerts{
+			{
+				Alert: &oas.Alert{
+					Labels: labels,
+				},
+				Annotations: annotations,
+			},
+		},
+	})
 	return err == nil, err
 }
 

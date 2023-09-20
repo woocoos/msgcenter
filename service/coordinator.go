@@ -12,6 +12,7 @@ import (
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/woocoos/entco/pkg/identity"
 	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/msgcenter/api/oas"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -55,7 +56,8 @@ type Coordinator struct {
 	db        *ent.Client
 	Subscribe *UserSubscribe
 	// knockout http client
-	KOClient *http.Client
+	KOClient    *http.Client
+	AlertServer oas.AlertServer
 
 	TempOptions TempOptions
 }
@@ -96,6 +98,10 @@ func (c *Coordinator) SetDBClient(db *ent.Client) {
 
 func (c *Coordinator) SetHttpClient(httpClient *http.Client) {
 	c.KOClient = httpClient
+}
+
+func (c *Coordinator) SetAlertServer(server oas.AlertServer) {
+	c.AlertServer = server
 }
 
 func (c *Coordinator) ProfileString() string {

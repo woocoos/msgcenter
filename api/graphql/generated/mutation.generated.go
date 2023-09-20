@@ -42,8 +42,10 @@ type MutationResolver interface {
 	CreateSilence(ctx context.Context, input ent.CreateSilenceInput) (*ent.Silence, error)
 	UpdateSilence(ctx context.Context, id int, input ent.UpdateSilenceInput) (*ent.Silence, error)
 	DeleteSilence(ctx context.Context, id int) (bool, error)
-	MarkMessageReadOrUnRead(ctx context.Context, ids []int, read bool) (bool, error)
-	MarkMessageDeleted(ctx context.Context, ids []int) (bool, error)
+	MarkMsgInternalToReadOrUnRead(ctx context.Context, ids []int, read bool) (bool, error)
+	MarkMsgInternalToDeleted(ctx context.Context, ids []int) (bool, error)
+	TestSendEmailTpl(ctx context.Context, tplID int, email string, labels map[string]string, annotations map[string]string) (bool, error)
+	TestSendMessageTpl(ctx context.Context, tplID int, userID int, labels map[string]string, annotations map[string]string) (bool, error)
 }
 
 type RouteInputResolver interface {
@@ -324,7 +326,7 @@ func (ec *executionContext) field_Mutation_enableMsgTemplate_args(ctx context.Co
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_markMessageDeleted_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_markMsgInternalToDeleted_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 []int
@@ -339,7 +341,7 @@ func (ec *executionContext) field_Mutation_markMessageDeleted_args(ctx context.C
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_markMessageReadOrUnRead_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_markMsgInternalToReadOrUnRead_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 []int
@@ -360,6 +362,90 @@ func (ec *executionContext) field_Mutation_markMessageReadOrUnRead_args(ctx cont
 		}
 	}
 	args["read"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_testSendEmailTpl_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["tplID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tplID"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["tplID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["email"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["email"] = arg1
+	var arg2 map[string]string
+	if tmp, ok := rawArgs["labels"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
+		arg2, err = ec.unmarshalOMapString2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["labels"] = arg2
+	var arg3 map[string]string
+	if tmp, ok := rawArgs["annotations"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("annotations"))
+		arg3, err = ec.unmarshalOMapString2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["annotations"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_testSendMessageTpl_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["tplID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tplID"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["tplID"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["userID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+		arg1, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["userID"] = arg1
+	var arg2 map[string]string
+	if tmp, ok := rawArgs["labels"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
+		arg2, err = ec.unmarshalOMapString2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["labels"] = arg2
+	var arg3 map[string]string
+	if tmp, ok := rawArgs["annotations"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("annotations"))
+		arg3, err = ec.unmarshalOMapString2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["annotations"] = arg3
 	return args, nil
 }
 
@@ -2322,8 +2408,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteSilence(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_markMessageReadOrUnRead(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_markMessageReadOrUnRead(ctx, field)
+func (ec *executionContext) _Mutation_markMsgInternalToReadOrUnRead(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_markMsgInternalToReadOrUnRead(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2336,7 +2422,7 @@ func (ec *executionContext) _Mutation_markMessageReadOrUnRead(ctx context.Contex
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().MarkMessageReadOrUnRead(rctx, fc.Args["ids"].([]int), fc.Args["read"].(bool))
+		return ec.resolvers.Mutation().MarkMsgInternalToReadOrUnRead(rctx, fc.Args["ids"].([]int), fc.Args["read"].(bool))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2353,7 +2439,7 @@ func (ec *executionContext) _Mutation_markMessageReadOrUnRead(ctx context.Contex
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_markMessageReadOrUnRead(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_markMsgInternalToReadOrUnRead(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -2370,15 +2456,15 @@ func (ec *executionContext) fieldContext_Mutation_markMessageReadOrUnRead(ctx co
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_markMessageReadOrUnRead_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_markMsgInternalToReadOrUnRead_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_markMessageDeleted(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_markMessageDeleted(ctx, field)
+func (ec *executionContext) _Mutation_markMsgInternalToDeleted(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_markMsgInternalToDeleted(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2391,7 +2477,7 @@ func (ec *executionContext) _Mutation_markMessageDeleted(ctx context.Context, fi
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().MarkMessageDeleted(rctx, fc.Args["ids"].([]int))
+		return ec.resolvers.Mutation().MarkMsgInternalToDeleted(rctx, fc.Args["ids"].([]int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2408,7 +2494,7 @@ func (ec *executionContext) _Mutation_markMessageDeleted(ctx context.Context, fi
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_markMessageDeleted(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_markMsgInternalToDeleted(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -2425,7 +2511,117 @@ func (ec *executionContext) fieldContext_Mutation_markMessageDeleted(ctx context
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_markMessageDeleted_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_markMsgInternalToDeleted_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_testSendEmailTpl(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_testSendEmailTpl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().TestSendEmailTpl(rctx, fc.Args["tplID"].(int), fc.Args["email"].(string), fc.Args["labels"].(map[string]string), fc.Args["annotations"].(map[string]string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_testSendEmailTpl(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_testSendEmailTpl_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_testSendMessageTpl(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_testSendMessageTpl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().TestSendMessageTpl(rctx, fc.Args["tplID"].(int), fc.Args["userID"].(int), fc.Args["labels"].(map[string]string), fc.Args["annotations"].(map[string]string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_testSendMessageTpl(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_testSendMessageTpl_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -2922,16 +3118,30 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "markMessageReadOrUnRead":
+		case "markMsgInternalToReadOrUnRead":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_markMessageReadOrUnRead(ctx, field)
+				return ec._Mutation_markMsgInternalToReadOrUnRead(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "markMessageDeleted":
+		case "markMsgInternalToDeleted":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_markMessageDeleted(ctx, field)
+				return ec._Mutation_markMsgInternalToDeleted(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "testSendEmailTpl":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_testSendEmailTpl(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "testSendMessageTpl":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_testSendMessageTpl(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

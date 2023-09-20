@@ -46,9 +46,13 @@ type Mutation {
     """ 删除静默 """
     deleteSilence(id: ID!): Boolean!
     """ 设置站内信消息已读未读 """
-    markMessageReadOrUnRead(ids: [ID!]!, read: Boolean!): Boolean!
+    markMsgInternalToReadOrUnRead(ids: [ID!]!, read: Boolean!): Boolean!
     """ 删除站内信消息 """
-    markMessageDeleted(ids: [ID!]!): Boolean!
+    markMsgInternalToDeleted(ids: [ID!]!): Boolean!
+    """ 测试邮件模板 """
+    testSendEmailTpl(tplID: ID!, email: String!, labels: MapString, annotations: MapString): Boolean!
+    """ 测试站内信模板 """
+    testSendMessageTpl(tplID: ID!, userID: ID!, labels: MapString, annotations: MapString): Boolean!
 }
 
 input RouteInput  {

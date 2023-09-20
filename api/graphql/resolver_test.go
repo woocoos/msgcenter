@@ -106,7 +106,7 @@ func (s *resolverSuite) TestUserSubMsgCategory() {
 
 func (s *resolverSuite) TestUserUnreadMessagesFromMsgCategory() {
 	ctx := s.NewTestCtx()
-	nums, err := s.qr.UserUnreadMessagesFromMsgCategory(ctx, []string{"订阅类型"})
+	nums, err := s.qr.UserUnreadMsgInternalsFromMsgCategory(ctx, []string{"订阅类型"})
 	s.Require().NoError(err)
 	s.Require().NotEmpty(nums)
 	s.Require().Equal(nums[0], 2)
@@ -114,14 +114,14 @@ func (s *resolverSuite) TestUserUnreadMessagesFromMsgCategory() {
 
 func (s *resolverSuite) TestUserUnreadMessages() {
 	ctx := s.NewTestCtx()
-	num, err := s.qr.UserUnreadMessages(ctx)
+	num, err := s.qr.UserUnreadMsgInternals(ctx)
 	s.Require().NoError(err)
 	s.Require().Equal(num, 2)
 }
 
 func (s *resolverSuite) TestMarkMessageReaOrUnRead() {
 	ctx := s.NewTestCtx()
-	suc, err := s.mr.MarkMessageReadOrUnRead(ctx, []int{1}, true)
+	suc, err := s.mr.MarkMsgInternalToReadOrUnRead(ctx, []int{1}, true)
 	s.Require().NoError(err)
 	s.Require().True(suc)
 	has, err := s.Client.MsgInternalTo.Query().Where(msginternalto.IDIn(1), msginternalto.ReadAtNotNil()).Exist(ctx)
@@ -131,7 +131,7 @@ func (s *resolverSuite) TestMarkMessageReaOrUnRead() {
 
 func (s *resolverSuite) TestMarkMessageDeleted() {
 	ctx := s.NewTestCtx()
-	suc, err := s.mr.MarkMessageDeleted(ctx, []int{2})
+	suc, err := s.mr.MarkMsgInternalToDeleted(ctx, []int{2})
 	s.Require().NoError(err)
 	s.Require().True(suc)
 	has, err := s.Client.MsgInternalTo.Query().Where(msginternalto.IDIn(2), msginternalto.DeleteAtNotNil()).Exist(ctx)

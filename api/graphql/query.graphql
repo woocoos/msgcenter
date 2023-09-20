@@ -144,7 +144,7 @@ extend type Query {
     ):MsgAlertConnection!
 
     """获取用户的站内信"""
-    userMessages(
+    userMsgInternalTos(
         after: Cursor
         first: Int
         before: Cursor
@@ -155,7 +155,7 @@ extend type Query {
     """用户订阅的消息分类"""
     userSubMsgCategory:[String!]!
     """消息分类站内信未读数"""
-    userUnreadMessagesFromMsgCategory(categories: [String!]!):[Int!]!
+    userUnreadMsgInternalsFromMsgCategory(categories: [String!]!):[Int!]!
     """用户站内信总未读数"""
-    userUnreadMessages:Int!
+    userUnreadMsgInternals:Int!
 }

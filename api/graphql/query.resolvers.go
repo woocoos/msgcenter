@@ -152,8 +152,8 @@ func (r *queryResolver) MsgAlerts(ctx context.Context, after *entgql.Cursor[int]
 		ent.WithMsgAlertFilter(where.Filter))
 }
 
-// UserMessages is the resolver for the userMessages field.
-func (r *queryResolver) UserMessages(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) (*ent.MsgInternalToConnection, error) {
+// UserMsgInternalTos is the resolver for the userMsgInternalTos field.
+func (r *queryResolver) UserMsgInternalTos(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) (*ent.MsgInternalToConnection, error) {
 	tid, err := identity.TenantIDFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -194,8 +194,8 @@ func (r *queryResolver) UserSubMsgCategory(ctx context.Context) ([]string, error
 	return service.RemoveDuplicateElement(categories), nil
 }
 
-// UserUnreadMessagesFromMsgCategory is the resolver for the userUnreadMessagesFromMsgCategory field.
-func (r *queryResolver) UserUnreadMessagesFromMsgCategory(ctx context.Context, categories []string) ([]int, error) {
+// UserUnreadMsgInternalsFromMsgCategory is the resolver for the userUnreadMsgInternalsFromMsgCategory field.
+func (r *queryResolver) UserUnreadMsgInternalsFromMsgCategory(ctx context.Context, categories []string) ([]int, error) {
 	tid, err := identity.TenantIDFromContext(ctx)
 	if err != nil {
 		return []int{}, err
@@ -217,8 +217,8 @@ func (r *queryResolver) UserUnreadMessagesFromMsgCategory(ctx context.Context, c
 	return counts, nil
 }
 
-// UserUnreadMessages is the resolver for the userUnreadMessages field.
-func (r *queryResolver) UserUnreadMessages(ctx context.Context) (int, error) {
+// UserUnreadMsgInternals is the resolver for the userUnreadMsgInternals field.
+func (r *queryResolver) UserUnreadMsgInternals(ctx context.Context) (int, error) {
 	tid, err := identity.TenantIDFromContext(ctx)
 	if err != nil {
 		return 0, err

@@ -56,10 +56,10 @@ type QueryResolver interface {
 	MsgTemplates(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) (*ent.MsgTemplateConnection, error)
 	Silences(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SilenceOrder, where *ent.SilenceWhereInput) (*ent.SilenceConnection, error)
 	MsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) (*ent.MsgAlertConnection, error)
-	UserMessages(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) (*ent.MsgInternalToConnection, error)
+	UserMsgInternalTos(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) (*ent.MsgInternalToConnection, error)
 	UserSubMsgCategory(ctx context.Context) ([]string, error)
-	UserUnreadMessagesFromMsgCategory(ctx context.Context, categories []string) ([]int, error)
-	UserUnreadMessages(ctx context.Context) (int, error)
+	UserUnreadMsgInternalsFromMsgCategory(ctx context.Context, categories []string) ([]int, error)
+	UserUnreadMsgInternals(ctx context.Context) (int, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -690,7 +690,7 @@ func (ec *executionContext) field_Query_silences_args(ctx context.Context, rawAr
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_userMessages_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_userMsgInternalTos_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 *entgql.Cursor[int]
@@ -750,7 +750,7 @@ func (ec *executionContext) field_Query_userMessages_args(ctx context.Context, r
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_userUnreadMessagesFromMsgCategory_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_userUnreadMsgInternalsFromMsgCategory_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 []string
@@ -9965,8 +9965,8 @@ func (ec *executionContext) fieldContext_Query_msgAlerts(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_userMessages(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_userMessages(ctx, field)
+func (ec *executionContext) _Query_userMsgInternalTos(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_userMsgInternalTos(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9979,7 +9979,7 @@ func (ec *executionContext) _Query_userMessages(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().UserMessages(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.MsgInternalToOrder), fc.Args["where"].(*ent.MsgInternalToWhereInput))
+		return ec.resolvers.Query().UserMsgInternalTos(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.MsgInternalToOrder), fc.Args["where"].(*ent.MsgInternalToWhereInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9996,7 +9996,7 @@ func (ec *executionContext) _Query_userMessages(ctx context.Context, field graph
 	return ec.marshalNMsgInternalToConnection2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalToConnection(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_userMessages(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_userMsgInternalTos(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -10021,7 +10021,7 @@ func (ec *executionContext) fieldContext_Query_userMessages(ctx context.Context,
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_userMessages_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_userMsgInternalTos_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -10072,8 +10072,8 @@ func (ec *executionContext) fieldContext_Query_userSubMsgCategory(ctx context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_userUnreadMessagesFromMsgCategory(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_userUnreadMessagesFromMsgCategory(ctx, field)
+func (ec *executionContext) _Query_userUnreadMsgInternalsFromMsgCategory(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_userUnreadMsgInternalsFromMsgCategory(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10086,7 +10086,7 @@ func (ec *executionContext) _Query_userUnreadMessagesFromMsgCategory(ctx context
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().UserUnreadMessagesFromMsgCategory(rctx, fc.Args["categories"].([]string))
+		return ec.resolvers.Query().UserUnreadMsgInternalsFromMsgCategory(rctx, fc.Args["categories"].([]string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10103,7 +10103,7 @@ func (ec *executionContext) _Query_userUnreadMessagesFromMsgCategory(ctx context
 	return ec.marshalNInt2ᚕintᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_userUnreadMessagesFromMsgCategory(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_userUnreadMsgInternalsFromMsgCategory(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -10120,15 +10120,15 @@ func (ec *executionContext) fieldContext_Query_userUnreadMessagesFromMsgCategory
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_userUnreadMessagesFromMsgCategory_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_userUnreadMsgInternalsFromMsgCategory_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_userUnreadMessages(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_userUnreadMessages(ctx, field)
+func (ec *executionContext) _Query_userUnreadMsgInternals(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_userUnreadMsgInternals(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10141,7 +10141,7 @@ func (ec *executionContext) _Query_userUnreadMessages(ctx context.Context, field
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().UserUnreadMessages(rctx)
+		return ec.resolvers.Query().UserUnreadMsgInternals(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10158,7 +10158,7 @@ func (ec *executionContext) _Query_userUnreadMessages(ctx context.Context, field
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_userUnreadMessages(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_userUnreadMsgInternals(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -24848,7 +24848,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "userMessages":
+		case "userMsgInternalTos":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -24857,7 +24857,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_userMessages(ctx, field)
+				res = ec._Query_userMsgInternalTos(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -24892,7 +24892,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "userUnreadMessagesFromMsgCategory":
+		case "userUnreadMsgInternalsFromMsgCategory":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -24901,7 +24901,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_userUnreadMessagesFromMsgCategory(ctx, field)
+				res = ec._Query_userUnreadMsgInternalsFromMsgCategory(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -24914,7 +24914,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "userUnreadMessages":
+		case "userUnreadMsgInternals":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -24923,7 +24923,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_userUnreadMessages(ctx, field)
+				res = ec._Query_userUnreadMsgInternals(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
