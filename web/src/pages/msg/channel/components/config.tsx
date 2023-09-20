@@ -43,7 +43,12 @@ export default (props: {
       const initData: ProFormData = {
         receiver: yaml.dump({
           name: '',
-          emailConfigs: []
+          emailConfigs: [],
+          messageConfig: {
+            redirect: '',
+            subject: '',
+            to: ''
+          }
         })
       }
       const result = await getMsgChannelReceiverInfo(props.id);
@@ -57,6 +62,9 @@ export default (props: {
                 delete item.__typename
               }
             })
+            if (receiver.messageConfig) {
+              delete receiver.messageConfig.__typename;
+            }
           }
           initData.receiver = yaml.dump(receiver)
         }

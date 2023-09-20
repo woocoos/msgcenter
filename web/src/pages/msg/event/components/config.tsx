@@ -107,8 +107,8 @@ export default (props: {
       onFinish={onFinish}
       onOpenChange={onOpenChange}
     >
-      <Alert showIcon message={t('msg_event_config_tip')} />
-      <br />
+      {/* <Alert showIcon message={t('msg_event_config_tip')} />
+      <br /> */}
       <ProFormText name="route" extra={errStr ? <Typography.Text type="danger">{errStr}</Typography.Text> : <></>}>
         <Editor
           className="adminx-editor"

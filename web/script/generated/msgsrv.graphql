@@ -214,6 +214,18 @@ type Message {
   url: String!
 }
 
+type MessageConfig {
+  redirect: String
+  subject: String
+  to: String
+}
+
+input MessageConfigInput {
+  Redirect: String
+  Subject: String
+  to: String
+}
+
 """MessageFilter is a generic type for all subscription filters"""
 type MessageFilter {
   appCode: String!
@@ -2065,11 +2077,13 @@ type Query {
 
 type Receiver {
   emailConfigs: [EmailConfig]
+  messageConfig: MessageConfig
   name: String!
 }
 
 input ReceiverInput {
   emailConfigs: [EmailConfigInput]
+  messageConfig: MessageConfigInput
   name: String!
 }
 

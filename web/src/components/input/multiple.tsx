@@ -21,7 +21,14 @@ export default (props: InputMultipleProps) => {
 
   return <Input
     prefix={<div className={styles.tags} style={props.tagsStyle}>{
-      tags.map((item, index) => <Tag key={index} closable={props.disabled ? false : true}>{item}</Tag>)
+      tags.map((item, index) => <Tag
+        key={index}
+        closable={props.disabled ? false : true}
+        onClose={(e) => {
+          e.preventDefault();
+          setTags(tags.filter((_tag, idx) => idx != index))
+        }}
+      >{item}</Tag>)
     }</div>}
     value={value}
     placeholder={props.placeholder}

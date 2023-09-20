@@ -15,7 +15,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 const documents = {
     "query msgChannelList($first: Int,$orderBy:MsgChannelOrder,$where:MsgChannelWhereInput){\n  msgChannels(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,receiverType,tenantID,comments,status,status,createdAt\n      }\n    }\n  }\n}": types.MsgChannelListDocument,
     "query msgChannelInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgChannel{\n      id,name,receiverType,tenantID,comments,status,status,createdAt\n    }\n  }\n}": types.MsgChannelInfoDocument,
-    "query msgChannelReceiverInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgChannel{\n      id,receiver{\n        name,\n        emailConfigs{\n          authIdentity,authPassword,authSecret,authType,authUsername,from,headers,smartHost,to\n        }\n      }\n    }\n  }\n}": types.MsgChannelReceiverInfoDocument,
+    "query msgChannelReceiverInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgChannel{\n      id,receiver{\n        name,\n        emailConfigs{\n          authIdentity,authPassword,authSecret,authType,authUsername,from,headers,smartHost,to\n        },\n        messageConfig{\n          redirect,subject,to\n        }\n      }\n    }\n  }\n}": types.MsgChannelReceiverInfoDocument,
     "mutation createMsgChannel($input: CreateMsgChannelInput!){\n createMsgChannel(input:$input){id}\n}": types.CreateMsgChannelDocument,
     "mutation updateMsgChannel($id:ID!,$input: UpdateMsgChannelInput!){\n updateMsgChannel(id:$id,input:$input){id}\n}": types.UpdateMsgChannelDocument,
     "mutation delMsgChannel($id:ID!){\n deleteMsgChannel(id:$id)\n}": types.DelMsgChannelDocument,
@@ -88,7 +88,7 @@ export function gql(source: "query msgChannelInfo($gid:GID!){\n  node(id: $gid){
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query msgChannelReceiverInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgChannel{\n      id,receiver{\n        name,\n        emailConfigs{\n          authIdentity,authPassword,authSecret,authType,authUsername,from,headers,smartHost,to\n        }\n      }\n    }\n  }\n}"): (typeof documents)["query msgChannelReceiverInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgChannel{\n      id,receiver{\n        name,\n        emailConfigs{\n          authIdentity,authPassword,authSecret,authType,authUsername,from,headers,smartHost,to\n        }\n      }\n    }\n  }\n}"];
+export function gql(source: "query msgChannelReceiverInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgChannel{\n      id,receiver{\n        name,\n        emailConfigs{\n          authIdentity,authPassword,authSecret,authType,authUsername,from,headers,smartHost,to\n        },\n        messageConfig{\n          redirect,subject,to\n        }\n      }\n    }\n  }\n}"): (typeof documents)["query msgChannelReceiverInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgChannel{\n      id,receiver{\n        name,\n        emailConfigs{\n          authIdentity,authPassword,authSecret,authType,authUsername,from,headers,smartHost,to\n        },\n        messageConfig{\n          redirect,subject,to\n        }\n      }\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

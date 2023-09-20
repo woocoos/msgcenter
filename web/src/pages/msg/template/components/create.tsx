@@ -201,21 +201,21 @@ export default (props: {
         name="to"
         label={t('msg_temp_to')}
       >
-        <InputMultiple decollator=";" placeholder={`${t('please_enter_msg_temp_to')}`} />
+        <InputMultiple decollator="," placeholder={`${t('please_enter_msg_temp_to')}`} />
       </ProFormText>
       <ProFormText
         x-if={props.receiverType === MsgTemplateReceiverType.Email && showCc}
         name="cc"
         label={t('msg_temp_cc')}
       >
-        <InputMultiple decollator=";" placeholder={`${t('please_enter_msg_temp_cc')}`} />
+        <InputMultiple decollator="," placeholder={`${t('please_enter_msg_temp_cc')}`} />
       </ProFormText>
       <ProFormText
         x-if={props.receiverType === MsgTemplateReceiverType.Email && showBcc}
         name="bcc"
         label={t('msg_temp_bcc')}
       >
-        <InputMultiple decollator=";" placeholder={`${t('please_enter_msg_temp_bcc')}`} />
+        <InputMultiple decollator="," placeholder={`${t('please_enter_msg_temp_bcc')}`} />
       </ProFormText>
       <div x-if={props.receiverType === MsgTemplateReceiverType.Email}>
         <Space>
@@ -235,7 +235,7 @@ export default (props: {
         name="from"
         label={t('msg_temp_from')}
       >
-        <InputMultiple decollator=";" placeholder={`${t('please_enter_msg_temp_from')}`} />
+        <InputMultiple decollator="," placeholder={`${t('please_enter_msg_temp_from')}`} />
       </ProFormText>
       <ProFormRadio.Group
         name="format"
