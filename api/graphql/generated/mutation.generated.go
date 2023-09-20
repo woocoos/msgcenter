@@ -2787,7 +2787,7 @@ func (ec *executionContext) unmarshalInputMessageConfigInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"to", "Subject", "Redirect"}
+	fieldsInOrder := [...]string{"to", "subject", "redirect"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -2803,19 +2803,19 @@ func (ec *executionContext) unmarshalInputMessageConfigInput(ctx context.Context
 				return it, err
 			}
 			it.To = data
-		case "Subject":
+		case "subject":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Subject"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subject"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Subject = data
-		case "Redirect":
+		case "redirect":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Redirect"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("redirect"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err

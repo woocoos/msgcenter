@@ -94,6 +94,6 @@ input EmailConfigInput {
 
 input MessageConfigInput {
     to: String
-    Subject: String
-    Redirect: String
+    subject: String
+    redirect: String
 }
