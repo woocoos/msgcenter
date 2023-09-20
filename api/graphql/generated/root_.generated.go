@@ -5209,8 +5209,8 @@ input EmailConfigInput {
 
 input MessageConfigInput {
     to: String
-    Subject: String
-    Redirect: String
+    subject: String
+    redirect: String
 }`, BuiltIn: false},
 	{Name: "../subscription.graphql", Input: `type Subscription {
     # internal message
