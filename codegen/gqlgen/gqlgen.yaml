@@ -83,6 +83,12 @@ models:
   EmailConfigInput:
     model:
       - github.com/woocoos/msgcenter/pkg/profile.EmailConfig
+  MessageConfig:
+    model:
+      - github.com/woocoos/msgcenter/pkg/profile.MessageConfig
+  MessageConfigInput:
+    model:
+      - github.com/woocoos/msgcenter/pkg/profile.MessageConfig
 directives:
   constraint:
     skip_runtime: true

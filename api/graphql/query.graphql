@@ -40,6 +40,7 @@ type Matcher {
 type Receiver {
     name: String!
     emailConfigs: [EmailConfig]
+    messageConfig: MessageConfig
 }
 
 type EmailConfig {
@@ -52,6 +53,12 @@ type EmailConfig {
     authSecret: String!
     authIdentity: String!
     headers: MapString
+}
+
+type MessageConfig {
+    to: String
+    Subject: String
+    Redirect: String
 }
 
 enum RouteStrType {

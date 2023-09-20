@@ -2137,6 +2137,8 @@ func (ec *executionContext) fieldContext_MsgChannel_receiver(ctx context.Context
 				return ec.fieldContext_Receiver_name(ctx, field)
 			case "emailConfigs":
 				return ec.fieldContext_Receiver_emailConfigs(ctx, field)
+			case "messageConfig":
+				return ec.fieldContext_Receiver_messageConfig(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Receiver", field.Name)
 		},

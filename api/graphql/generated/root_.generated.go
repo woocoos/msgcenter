@@ -76,6 +76,12 @@ type ComplexityRoot struct {
 		URL     func(childComplexity int) int
 	}
 
+	MessageConfig struct {
+		Redirect func(childComplexity int) int
+		Subject  func(childComplexity int) int
+		To       func(childComplexity int) int
+	}
+
 	MessageFilter struct {
 		AppCode  func(childComplexity int) int
 		DeviceID func(childComplexity int) int
@@ -391,8 +397,9 @@ type ComplexityRoot struct {
 	}
 
 	Receiver struct {
-		EmailConfigs func(childComplexity int) int
-		Name         func(childComplexity int) int
+		EmailConfigs  func(childComplexity int) int
+		MessageConfig func(childComplexity int) int
+		Name          func(childComplexity int) int
 	}
 
 	Route struct {
@@ -595,6 +602,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Message.URL(childComplexity), true
+
+	case "MessageConfig.Redirect":
+		if e.complexity.MessageConfig.Redirect == nil {
+			break
+		}
+
+		return e.complexity.MessageConfig.Redirect(childComplexity), true
+
+	case "MessageConfig.Subject":
+		if e.complexity.MessageConfig.Subject == nil {
+			break
+		}
+
+		return e.complexity.MessageConfig.Subject(childComplexity), true
+
+	case "MessageConfig.to":
+		if e.complexity.MessageConfig.To == nil {
+			break
+		}
+
+		return e.complexity.MessageConfig.To(childComplexity), true
 
 	case "MessageFilter.appCode":
 		if e.complexity.MessageFilter.AppCode == nil {
@@ -2381,6 +2409,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Receiver.EmailConfigs(childComplexity), true
 
+	case "Receiver.messageConfig":
+		if e.complexity.Receiver.MessageConfig == nil {
+			break
+		}
+
+		return e.complexity.Receiver.MessageConfig(childComplexity), true
+
 	case "Receiver.name":
 		if e.complexity.Receiver.Name == nil {
 			break
@@ -2642,6 +2677,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCreateSilenceInput,
 		ec.unmarshalInputEmailConfigInput,
 		ec.unmarshalInputMatcherInput,
+		ec.unmarshalInputMessageConfigInput,
 		ec.unmarshalInputMsgAlertOrder,
 		ec.unmarshalInputMsgAlertWhereInput,
 		ec.unmarshalInputMsgChannelOrder,
@@ -4951,6 +4987,7 @@ type Matcher {
 type Receiver {
     name: String!
     emailConfigs: [EmailConfig]
+    messageConfig: MessageConfig
 }
 
 type EmailConfig {
@@ -4963,6 +5000,12 @@ type EmailConfig {
     authSecret: String!
     authIdentity: String!
     headers: MapString
+}
+
+type MessageConfig {
+    to: String
+    Subject: String
+    Redirect: String
 }
 
 enum RouteStrType {
@@ -5149,6 +5192,7 @@ input MatcherInput {
 input ReceiverInput {
     name: String!
     emailConfigs: [EmailConfigInput]
+    messageConfig: MessageConfigInput
 }
 
 input EmailConfigInput {
@@ -5161,6 +5205,12 @@ input EmailConfigInput {
     authSecret: String
     authIdentity: String
     headers: MapString
+}
+
+input MessageConfigInput {
+    to: String
+    Subject: String
+    Redirect: String
 }`, BuiltIn: false},
 	{Name: "../subscription.graphql", Input: `type Subscription {
     # internal message

@@ -2780,6 +2780,53 @@ func (ec *executionContext) unmarshalInputMatcherInput(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputMessageConfigInput(ctx context.Context, obj interface{}) (profile.MessageConfig, error) {
+	var it profile.MessageConfig
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"to", "Subject", "Redirect"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "to":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("to"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.To = data
+		case "Subject":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Subject"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Subject = data
+		case "Redirect":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Redirect"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Redirect = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj interface{}) (profile.Receiver, error) {
 	var it profile.Receiver
 	asMap := map[string]interface{}{}
@@ -2787,7 +2834,7 @@ func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "emailConfigs"}
+	fieldsInOrder := [...]string{"name", "emailConfigs", "messageConfig"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -2812,6 +2859,15 @@ func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj
 				return it, err
 			}
 			it.EmailConfigs = data
+		case "messageConfig":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageConfig"))
+			data, err := ec.unmarshalOMessageConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐMessageConfig(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageConfig = data
 		}
 	}
 
@@ -3226,6 +3282,14 @@ func (ec *executionContext) unmarshalOMatcherInput2ᚖgithubᚗcomᚋwoocoosᚋm
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputMatcherInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOMessageConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐMessageConfig(ctx context.Context, v interface{}) (*profile.MessageConfig, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputMessageConfigInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

@@ -77,6 +77,7 @@ input MatcherInput {
 input ReceiverInput {
     name: String!
     emailConfigs: [EmailConfigInput]
+    messageConfig: MessageConfigInput
 }
 
 input EmailConfigInput {
@@ -89,4 +90,10 @@ input EmailConfigInput {
     authSecret: String
     authIdentity: String
     headers: MapString
+}
+
+input MessageConfigInput {
+    to: String
+    Subject: String
+    Redirect: String
 }
