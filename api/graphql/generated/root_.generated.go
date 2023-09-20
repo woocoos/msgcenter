@@ -603,14 +603,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Message.URL(childComplexity), true
 
-	case "MessageConfig.Redirect":
+	case "MessageConfig.redirect":
 		if e.complexity.MessageConfig.Redirect == nil {
 			break
 		}
 
 		return e.complexity.MessageConfig.Redirect(childComplexity), true
 
-	case "MessageConfig.Subject":
+	case "MessageConfig.subject":
 		if e.complexity.MessageConfig.Subject == nil {
 			break
 		}
@@ -5004,8 +5004,8 @@ type EmailConfig {
 
 type MessageConfig {
     to: String
-    Subject: String
-    Redirect: String
+    subject: String
+    redirect: String
 }
 
 enum RouteStrType {

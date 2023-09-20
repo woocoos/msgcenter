@@ -600,8 +600,8 @@ func (ec *executionContext) fieldContext_MessageConfig_to(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _MessageConfig_Subject(ctx context.Context, field graphql.CollectedField, obj *profile.MessageConfig) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_MessageConfig_Subject(ctx, field)
+func (ec *executionContext) _MessageConfig_subject(ctx context.Context, field graphql.CollectedField, obj *profile.MessageConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MessageConfig_subject(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -628,7 +628,7 @@ func (ec *executionContext) _MessageConfig_Subject(ctx context.Context, field gr
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_MessageConfig_Subject(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_MessageConfig_subject(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "MessageConfig",
 		Field:      field,
@@ -641,8 +641,8 @@ func (ec *executionContext) fieldContext_MessageConfig_Subject(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _MessageConfig_Redirect(ctx context.Context, field graphql.CollectedField, obj *profile.MessageConfig) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_MessageConfig_Redirect(ctx, field)
+func (ec *executionContext) _MessageConfig_redirect(ctx context.Context, field graphql.CollectedField, obj *profile.MessageConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MessageConfig_redirect(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -669,7 +669,7 @@ func (ec *executionContext) _MessageConfig_Redirect(ctx context.Context, field g
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_MessageConfig_Redirect(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_MessageConfig_redirect(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "MessageConfig",
 		Field:      field,
@@ -825,10 +825,10 @@ func (ec *executionContext) fieldContext_Receiver_messageConfig(ctx context.Cont
 			switch field.Name {
 			case "to":
 				return ec.fieldContext_MessageConfig_to(ctx, field)
-			case "Subject":
-				return ec.fieldContext_MessageConfig_Subject(ctx, field)
-			case "Redirect":
-				return ec.fieldContext_MessageConfig_Redirect(ctx, field)
+			case "subject":
+				return ec.fieldContext_MessageConfig_subject(ctx, field)
+			case "redirect":
+				return ec.fieldContext_MessageConfig_redirect(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MessageConfig", field.Name)
 		},
@@ -1423,10 +1423,10 @@ func (ec *executionContext) _MessageConfig(ctx context.Context, sel ast.Selectio
 			out.Values[i] = graphql.MarshalString("MessageConfig")
 		case "to":
 			out.Values[i] = ec._MessageConfig_to(ctx, field, obj)
-		case "Subject":
-			out.Values[i] = ec._MessageConfig_Subject(ctx, field, obj)
-		case "Redirect":
-			out.Values[i] = ec._MessageConfig_Redirect(ctx, field, obj)
+		case "subject":
+			out.Values[i] = ec._MessageConfig_subject(ctx, field, obj)
+		case "redirect":
+			out.Values[i] = ec._MessageConfig_redirect(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
