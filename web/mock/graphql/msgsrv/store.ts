@@ -160,7 +160,7 @@ export const initStoreData = (store: IMockStore) => {
     store.get('MsgInternal', 9),
     store.get('MsgInternal', 10),
   ]))
-  store.set('Query', 'ROOT', 'userMessages', listTemp([
+  store.set('Query', 'ROOT', 'userMsgInternalTos', listTemp([
     store.get('MsgInternalTo', 1),
     store.get('MsgInternalTo', 2),
     store.get('MsgInternalTo', 3),

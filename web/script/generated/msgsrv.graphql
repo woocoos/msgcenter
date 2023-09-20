@@ -1716,9 +1716,13 @@ type Mutation {
   """ 启用消息模板 """
   enableMsgTemplate(id: ID!): MsgTemplate!
   """ 删除站内信消息 """
-  markMessageDeleted(ids: [ID!]!): Boolean!
+  markMsgInternalToDeleted(ids: [ID!]!): Boolean!
   """ 设置站内信消息已读未读 """
-  markMessageReadOrUnRead(ids: [ID!]!, read: Boolean!): Boolean!
+  markMsgInternalToReadOrUnRead(ids: [ID!]!, read: Boolean!): Boolean!
+  """ 测试邮件模板 """
+  testSendEmailTpl(annotations: MapString, email: String!, labels: MapString, tplID: ID!): Boolean!
+  """ 测试站内信模板 """
+  testSendMessageTpl(annotations: MapString, labels: MapString, tplID: ID!, userID: ID!): Boolean!
   """ 更新消息通道 """
   updateMsgChannel(id: ID!, input: UpdateMsgChannelInput!): MsgChannel!
   """ 更新消息事件 """
@@ -2050,13 +2054,13 @@ type Query {
   """ 静默消息 """
   silences(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: SilenceOrder, where: SilenceWhereInput): SilenceConnection!
   """获取用户的站内信"""
-  userMessages(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: MsgInternalToOrder, where: MsgInternalToWhereInput): MsgInternalToConnection!
+  userMsgInternalTos(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: MsgInternalToOrder, where: MsgInternalToWhereInput): MsgInternalToConnection!
   """用户订阅的消息分类"""
   userSubMsgCategory: [String!]!
   """用户站内信总未读数"""
-  userUnreadMessages: Int!
+  userUnreadMsgInternals: Int!
   """消息分类站内信未读数"""
-  userUnreadMessagesFromMsgCategory(categories: [String!]!): [Int!]!
+  userUnreadMsgInternalsFromMsgCategory(categories: [String!]!): [Int!]!
 }
 
 type Receiver {

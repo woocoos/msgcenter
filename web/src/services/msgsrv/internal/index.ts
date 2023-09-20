@@ -15,7 +15,7 @@ const queryMsgInternalList = gql(/* GraphQL */`query msgInternalList($first: Int
 }`);
 
 const queryUserMsgInternalList = gql(/* GraphQL */`query userMsgInternalList($first: Int,$orderBy: MsgInternalToOrder,$where:MsgInternalToWhereInput){
-  userMessages(first:$first,orderBy: $orderBy,where: $where){
+  userMsgInternalTos(first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -42,7 +42,7 @@ const queryUserMsgCategory = gql(/* GraphQL */`query userMsgCategory{
 }`);
 
 const queryUserMsgCategoryNum = gql(/* GraphQL */`query userMsgCategoryNum($categories:[String!]!){
-  userUnreadMessagesFromMsgCategory(categories:$categories)
+  userUnreadMsgInternalsFromMsgCategory(categories:$categories)
 }`);
 
 const queryMsgInternalToInfo = gql(/* GraphQL */`query msgInternalToInfo($gid:GID!){
@@ -58,11 +58,11 @@ const queryMsgInternalToInfo = gql(/* GraphQL */`query msgInternalToInfo($gid:GI
 }`);
 
 const mutationMarkMsgRead = gql(/* GraphQL */`mutation markMsgRead($ids:[ID!]!,$read:Boolean!){
-  markMessageReadOrUnRead(ids:$ids,read:$read)
+  markMsgInternalToReadOrUnRead(ids:$ids,read:$read)
 }`);
 
 const mutationDelMarkMsg = gql(/* GraphQL */`mutation delMarkMsg($ids:[ID!]!){
-  markMessageDeleted(ids:$ids)
+  markMsgInternalToDeleted(ids:$ids)
 }`);
 
 /**
@@ -111,16 +111,16 @@ export async function getMsgInternalInfo(msgInternalId: string) {
 
 /**
  * 批量设置已读未读
- * @param msgInternalId
+ * @param msgInternalToIds
  * @returns
  */
-export async function markMsgRead(msgInternalIds: string[], read: boolean) {
+export async function markMsgRead(msgInternalToIds: string[], read: boolean) {
   const result = await mutation(mutationMarkMsgRead, {
-    ids: msgInternalIds,
+    ids: msgInternalToIds,
     read
   })
-  if (result.data?.markMessageReadOrUnRead) {
-    return result.data.markMessageReadOrUnRead
+  if (result.data?.markMsgInternalToReadOrUnRead) {
+    return result.data.markMsgInternalToReadOrUnRead
   }
   return null
 }
@@ -134,8 +134,8 @@ export async function delMarkMsg(msgInternalToIds: string[]) {
   const result = await mutation(mutationDelMarkMsg, {
     ids: msgInternalToIds,
   })
-  if (result.data?.markMessageDeleted) {
-    return result.data.markMessageDeleted
+  if (result.data?.markMsgInternalToDeleted) {
+    return result.data.markMsgInternalToDeleted
   }
   return null
 }
@@ -162,8 +162,8 @@ export async function getUserMsgInternalList(
     },
   }, gather.current || 1);
 
-  if (result.data?.userMessages) {
-    return result.data.userMessages;
+  if (result.data?.userMsgInternalTos) {
+    return result.data.userMsgInternalTos;
   }
   return null;
 }
@@ -177,7 +177,7 @@ export async function getMsgInternalToInfo(msgInternalToId: string) {
   const result = await query(queryMsgInternalToInfo, {
     gid: gid('msg_internal_to', msgInternalToId)
   })
-  if (result.data?.node?.__typename === "MsgInternal") {
+  if (result.data?.node?.__typename === "MsgInternalTo") {
     return result.data.node
   }
   return null
@@ -203,8 +203,8 @@ export async function getUserMsgCategoryNum(categories: string[]) {
   const result = await query(queryUserMsgCategoryNum, {
     categories,
   })
-  if (result.data?.userUnreadMessagesFromMsgCategory) {
-    return result.data.userUnreadMessagesFromMsgCategory
+  if (result.data?.userUnreadMsgInternalsFromMsgCategory) {
+    return result.data.userUnreadMsgInternalsFromMsgCategory
   }
   return null
 }

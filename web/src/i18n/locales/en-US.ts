@@ -173,6 +173,7 @@ export default {
     mark_read: 'Mark read',
     unread_msg: 'Unread message',
     read_msg: 'Read message',
+    station_msg_detail: 'Site message details',
 
     // 创建
     create_msg_type: 'Create message type',

@@ -52,7 +52,7 @@ export default () => {
             <Link to={`/msg/internal/detail?toid=${record.id}`} >
               {t('detail')}
             </Link>
-            <Auth authKey="markMessageDeleted">
+            <Auth authKey="markMsgInternalToDeleted">
               <Popconfirm
                 title={t('delete')}
                 description={`${t('confirm_delete')}：${record.msgInternal.subject}`}
@@ -85,12 +85,13 @@ export default () => {
       const numResult = await getUserMsgCategoryNum(cResult);
       if (Array.isArray(numResult)) {
         for (let i = 0; i < cResult.length; i++) {
+          const curNum = numResult[i] ?? 0;
           cList.push({
             name: cResult[i],
             code: `${i}`,
-            num: numResult[i],
+            num: curNum,
           })
-          allNum += numResult[i];
+          allNum += curNum;
         }
       }
     }
@@ -127,6 +128,7 @@ export default () => {
         rowKey={'id'}
         toolbar={{
           title: <Tabs
+            style={{ maxWidth: '400px' }}
             activeKey={selectCategory}
             items={categorys.map(item => (
               { key: item.code, label: `${item.name}${item.num ? `(${item.num})` : ''} ` }
@@ -164,7 +166,7 @@ export default () => {
                 <DownOutlined />
               </Space>
             </Dropdown>,
-            <Auth authKey="markMessageReadOrUnRead">
+            <Auth authKey="markMsgInternalToReadOrUnRead">
               <Button type="primary" onClick={async () => {
                 if (selectedRowKeys.length) {
                   const result = await markMsgRead(selectedRowKeys, true);

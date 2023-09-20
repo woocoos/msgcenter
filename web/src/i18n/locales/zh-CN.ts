@@ -176,6 +176,7 @@ export default {
     mark_read: '标记已读',
     unread_msg: '未读消息',
     read_msg: '已读消息',
+    station_msg_detail: '站内消息详情',
 
     // 创建
     create_msg_type: '创建消息类型',
