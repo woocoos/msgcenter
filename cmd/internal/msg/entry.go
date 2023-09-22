@@ -73,6 +73,7 @@ func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
 		web.WithGracefulStop(),
 		gql.RegistryMiddleware(),
 		identity.RegistryTenantIDMiddleware(),
+		gqlx.RegisterTokenSignerMiddleware(),
 		//web.RegisterMiddleware(otelweb.NewMiddleware()),
 	)
 	//gql use msg resolver

@@ -5,7 +5,7 @@ go 1.20
 require (
 	entgo.io/contrib v0.4.6-0.20230615102013-704944fdc0f6
 	entgo.io/ent v0.12.4-0.20230702151415-1ec75238037c
-	github.com/99designs/gqlgen v0.17.37
+	github.com/99designs/gqlgen v0.17.38
 	github.com/alicebob/miniredis/v2 v2.30.5
 	github.com/cenkalti/backoff/v4 v4.2.0
 	github.com/gin-gonic/gin v1.9.1
@@ -23,11 +23,11 @@ require (
 	github.com/redis/go-redis/v9 v9.0.5
 	github.com/stretchr/testify v1.8.4
 	github.com/tsingsun/members v0.0.0-20230712074048-c38e433601b8
-	github.com/tsingsun/woocoo v0.3.1-0.20230917150817-4ff6414bcd38
-	github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230917152545-2e3762efe21c
-	github.com/vektah/gqlparser/v2 v2.5.9
+	github.com/tsingsun/woocoo v0.3.1-0.20230922164106-4cb7f13c1506
+	github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230922090437-500dbe1d58de
+	github.com/vektah/gqlparser/v2 v2.5.10
 	github.com/vmihailenco/msgpack/v5 v5.3.5
-	github.com/woocoos/entco v0.0.0-20230917153800-53cfbdd5c883
+	github.com/woocoos/entco v0.0.0-20230922165635-5de4f9d7e73b
 	go.uber.org/zap v1.25.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/sync v0.3.0
