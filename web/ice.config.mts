@@ -36,10 +36,10 @@ export default defineConfig(() => ({
     ],
   },
   plugins: [
+    store(),
     icestark({ type: 'child' }),
     urqlPlugin(),
     request(),
-    store(),
     jsxPlus(),
     antd({
       importStyle: false,

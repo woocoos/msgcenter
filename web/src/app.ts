@@ -13,6 +13,7 @@ import { isInIcestark } from '@ice/stark-app';
 import { setFilesApi, userPermissions } from '@knockout-js/api';
 import { logout, parseSpm } from './services/auth';
 import { User } from '@knockout-js/api/ucenter';
+import { Message } from './generated/msgsrv/graphql';
 
 const ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
   ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
@@ -22,19 +23,8 @@ const ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
   ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
+  ICE_WS_MSGSRV = process.env.ICE_WS_MSGSRV ?? '',
   ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '';
-
-if (NODE_ENV === 'development') {
-  // 无登录项目增加前端缓存内容 方便开发和展示
-  setItem('token', ICE_DEV_TOKEN)
-  setItem('tenantId', ICE_DEV_TID)
-  setItem('user', {
-    id: 1,
-    displayName: 'admin',
-  })
-}
-
-setFilesApi(ICE_API_FILES_PREFIX);
 
 export const icestark = defineChildConfig(() => ({
   mount: (data) => {
@@ -67,6 +57,18 @@ export default defineAppConfig(() => ({
 
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
+  if (NODE_ENV === 'development') {
+    // 开发时使用
+    setItem('token', ICE_DEV_TOKEN)
+    setItem('tenantId', ICE_DEV_TID)
+    setItem('user', {
+      id: 1,
+      displayName: 'admin',
+    })
+  }
+
+  setFilesApi(ICE_API_FILES_PREFIX);
+
   if (!isInIcestark()) {
     const signCid = `sign_cid=${ICE_APP_CODE}`
     if (document.cookie.indexOf(signCid) === -1) {
@@ -74,15 +76,18 @@ export const dataLoader = defineDataLoader(async () => {
       removeItem('refreshToken')
     }
     document.cookie = signCid
+    await parseSpm();
   }
-  const spmData = await parseSpm();
+
   let locale = getItem<string>('locale'),
-    token = spmData.token ?? getItem<string>('token'),
-    refreshToken = spmData.refreshToken ?? getItem<string>('refreshToken'),
-    tenantId = spmData.tenantId ?? getItem<string>('tenantId'),
     darkMode = getItem<string>('darkMode'),
     compactMode = getItem<string>('compactMode'),
-    user = spmData.user ?? getItem<User>('user');
+    handshake = getItem<boolean>('handshake'),
+    message = getItem<Message[]>('message') ?? [],
+    token = getItem<string>('token'),
+    refreshToken = getItem<string>('refreshToken'),
+    tenantId = getItem<string>('tenantId'),
+    user = getItem<User>('user');
 
   if (token) {
     // 增加jwt判断token过期的处理
@@ -104,13 +109,16 @@ export const dataLoader = defineDataLoader(async () => {
       locale,
       darkMode,
       compactMode,
-
     },
     user: {
       token,
       refreshToken,
       tenantId,
       user,
+    },
+    ws: {
+      handshake,
+      message,
     }
   };
 });
@@ -125,18 +133,32 @@ export const urqlConfig = defineUrqlConfig([
       authOpts: {
         store: {
           getState: () => {
-            const { token, tenantId, refreshToken } = store.getModelState('user')
+            const { token, tenantId, refreshToken } = store.getModelState('user');
             return {
-              token, tenantId, refreshToken
+              token: token ?? getItem<string>('token'),
+              tenantId: tenantId ?? getItem<string>('tenantId'),
+              refreshToken: refreshToken ?? getItem<string>('refreshToken'),
             }
           },
           setStateToken: (newToken) => {
-            store.dispatch.user.updateToken(newToken)
+            store.dispatch.user.updateToken(newToken);
           }
         },
         beforeRefreshTime: 5 * 60 * 1000,
         login: ICE_LOGIN_URL,
         refreshApi: `${ICE_API_AUTH_PREFIX}/login/refresh-token`
+      },
+      subOpts: {
+        url: ICE_WS_MSGSRV,
+        store: {
+          getState: () => {
+            const { token, tenantId } = store.getModelState('user');
+            return {
+              token: token ?? getItem<string>('token'),
+              tenantId: tenantId ?? getItem<string>('tenantId'),
+            };
+          },
+        }
       }
     }
   },
@@ -174,11 +196,12 @@ export const authConfig = defineAuthConfig(async (appData) => {
 
 // store数据项
 export const storeConfig = defineStoreConfig(async (appData) => {
-  const { user, app } = appData;
+  const { user, app, ws } = appData;
   return {
     initialStates: {
       user,
       app,
+      ws,
     },
   };
 });
@@ -191,7 +214,8 @@ export const requestConfig = defineRequestConfig({
       getState: () => {
         const { token, tenantId } = store.getModelState('user')
         return {
-          token, tenantId
+          token: token ?? getItem<string>('token'),
+          tenantId: tenantId ?? getItem<string>('tenantId'),
         }
       },
     },

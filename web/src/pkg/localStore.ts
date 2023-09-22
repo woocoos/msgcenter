@@ -1,4 +1,5 @@
-const module = 'msgsrv';
+const module = 'msgsrv',
+  expiresKey = '_expires';
 
 /**
  * 获取持久化数据
@@ -9,7 +10,18 @@ export const getItem = <T>(key: string): T | null => {
   const dataStr = localStorage.getItem(module);
   if (dataStr) {
     const data = JSON.parse(dataStr);
-    return data[key];
+    if (data[key]) {
+      if (typeof data[key] == 'object' && expiresKey in data[key]) {
+        if (Date.now() > data[key][expiresKey]) {
+          removeItem(key);
+          return null;
+        } else {
+          return data[key]['value'];
+        }
+      } else {
+        return data[key];
+      }
+    }
   }
   return null;
 };
@@ -18,16 +30,31 @@ export const getItem = <T>(key: string): T | null => {
  * 数据设置到持久化
  * @param key
  * @param value
+ * @param number 过期时间 单位：秒
  */
-export const setItem = <T>(key: string, value: T) => {
+export const setItem = <T>(key: string, value: T, expires?: number) => {
   const dataStr = localStorage.getItem(module);
   if (dataStr) {
     const data = JSON.parse(dataStr);
-    data[key] = value;
+    if (expires) {
+      data[key] = {
+        value,
+        [expiresKey]: Date.now() + expires * 1000,
+      };
+    } else {
+      data[key] = value;
+    }
     localStorage.setItem(module, JSON.stringify(data));
   } else {
     const data = {};
-    data[key] = value;
+    if (expires) {
+      data[key] = {
+        value,
+        [expiresKey]: Date.now() + expires * 1000,
+      };
+    } else {
+      data[key] = value;
+    }
     localStorage.setItem(module, JSON.stringify(data));
   }
 };

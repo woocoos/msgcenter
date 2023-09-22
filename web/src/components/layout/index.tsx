@@ -11,10 +11,11 @@ import { logout, urlSpm } from '@/services/auth';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import { createFromIconfontCN } from '@ant-design/icons';
 import { getFilesRaw } from '@knockout-js/api';
-import FloatWs from '../ws';
+import FloatMsg from '../floatMsg';
 import { MsgDropdownRef } from '@knockout-js/layout/esm/components/msg-dropdown';
 
 const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
+  ICE_WS_MSGSRV = process.env.ICE_WS_MSGSRV ?? '',
   NODE_ENV = process.env.NODE_ENV ?? '',
   IconFont = createFromIconfontCN({
     scriptUrl: "//at.alicdn.com/t/c/font_4214307_8x56lkek9tu.js"
@@ -23,6 +24,7 @@ const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
 export default () => {
   const [userState, userDispatcher] = store.useModel('user'),
     [appState, appDispatcher] = store.useModel('app'),
+    [, wsDispatcher] = store.useModel('ws'),
     msgRef = useRef<MsgDropdownRef>(null),
     [checkLeave] = useLeavePrompt(),
     location = useLocation(),
@@ -66,6 +68,18 @@ export default () => {
         key: 'locale',
         onChange(value) {
           appDispatcher.updateLocale(value);
+        },
+      },
+      {
+        key: 'handshake',
+        onChange(value) {
+          wsDispatcher.setHandshake(value);
+        },
+      },
+      {
+        key: 'message',
+        onChange(value) {
+          wsDispatcher.setMessage(value);
         },
       },
     ]);
@@ -146,6 +160,13 @@ export default () => {
     }}
   >
     <Outlet />
-    {/* <FloatWs /> */}
+    {ICE_WS_MSGSRV ? <FloatMsg
+      onListenerNewMsg={() => {
+        msgRef.current?.setShowDot();
+      }}
+      onItemClick={(data) => {
+        window.open(`/msg/internal/detail?id=${data.extras.actionID}`);
+      }}
+    /> : <></>}
   </Layout>
 }

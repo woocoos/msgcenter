@@ -37,6 +37,7 @@ const documents = {
     "query msgInternalToInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgInternalTo{\n      id,msgInternalID,createdAt,deleteAt,readAt,userID\n      msgInternal{\n        id,tenantID,createdBy,createdAt,subject,body,format,redirect,category\n      }\n    }\n  }\n}": types.MsgInternalToInfoDocument,
     "mutation markMsgRead($ids:[ID!]!,$read:Boolean!){\n  markMsgInternalToReadOrUnRead(ids:$ids,read:$read)\n}": types.MarkMsgReadDocument,
     "mutation delMarkMsg($ids:[ID!]!){\n  markMsgInternalToDeleted(ids:$ids)\n}": types.DelMarkMsgDocument,
+    "subscription subMsg{\n  message{\n    content,extras,format,sendAt,title,url\n  }\n}": types.SubMsgDocument,
     "query msgAlertList($first: Int,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){\n  msgAlerts(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,startsAt,endsAt,labels,annotations,state,timeout\n      }\n    }\n  }\n}": types.MsgAlertListDocument,
     "query msgAlertLogList($gid:GID!,$first: Int,$orderBy:NlogOrder,$where:NlogWhereInput){\n   node(id: $gid){\n    id\n    ... on MsgAlert{\n      id,\n      nlog(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,sendAt,expiresAt,groupKey,receiver,receiverType\n          }\n        }\n      }\n    }\n  }\n}": types.MsgAlertLogListDocument,
     "query silenceList($first: Int,$orderBy:SilenceOrder,$where:SilenceWhereInput){\n  silences(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,tenantID,comments,createdAt,startsAt,endsAt,state,\n        matchers{\n          type,name,value\n        }\n\n      }\n    }\n  }\n}": types.SilenceListDocument,
@@ -173,6 +174,10 @@ export function gql(source: "mutation markMsgRead($ids:[ID!]!,$read:Boolean!){\n
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation delMarkMsg($ids:[ID!]!){\n  markMsgInternalToDeleted(ids:$ids)\n}"): (typeof documents)["mutation delMarkMsg($ids:[ID!]!){\n  markMsgInternalToDeleted(ids:$ids)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "subscription subMsg{\n  message{\n    content,extras,format,sendAt,title,url\n  }\n}"): (typeof documents)["subscription subMsg{\n  message{\n    content,extras,format,sendAt,title,url\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
