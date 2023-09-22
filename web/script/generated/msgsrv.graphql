@@ -221,8 +221,8 @@ type MessageConfig {
 }
 
 input MessageConfigInput {
-  Redirect: String
-  Subject: String
+  redirect: String
+  subject: String
   to: String
 }
 

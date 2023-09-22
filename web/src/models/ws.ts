@@ -20,7 +20,7 @@ export default createModel({
     },
     setMessage(prevState: ModelState, payload: Message[]) {
       const data = payload ?? []
-      setItem('message', data, 20);
+      setItem('message', data, 28800);
       prevState.message = data;
     },
   },

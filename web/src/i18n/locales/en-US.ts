@@ -69,6 +69,7 @@ export default {
     move: 'move',
     close: 'close',
     open: 'open',
+    test: 'test',
     directory: 'directory',
     domain: 'domain',
     binding: 'binding',
@@ -99,6 +100,10 @@ export default {
     created_at: 'Creation time',
     station_msg: 'Station message',
     all_msg: 'Full message',
+    receive_mail: 'receive mail',
+    receiver: 'receiver',
+    argument: 'argument',
+    default_added: 'Default added',
 
     // 多个字符组成
     confirm_copy: 'confirm copy',
@@ -199,6 +204,7 @@ export default {
     // 详情
 
     // 必填提示
+    please_enter: 'Please enter',
     please_enter_app: 'Please enter application',
     please_enter_category: 'Please enter category',
     please_enter_name: 'Please enter name',

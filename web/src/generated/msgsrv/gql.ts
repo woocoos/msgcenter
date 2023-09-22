@@ -52,6 +52,8 @@ const documents = {
     "mutation delMsgTemplate($id:ID!){\n  deleteMsgTemplate(id:$id)\n}": types.DelMsgTemplateDocument,
     "mutation enableMsgTemplate($id:ID!){\n  enableMsgTemplate(id:$id){id}\n}": types.EnableMsgTemplateDocument,
     "mutation disableMsgTemplate($id:ID!){\n  disableMsgTemplate(id:$id){id}\n}": types.DisableMsgTemplateDocument,
+    "mutation testSendEmailTpl($annotations: MapString, $email: String!, $labels: MapString, $tplID: ID!){\n  testSendEmailTpl(annotations: $annotations, email: $email, labels:$labels, tplID: $tplID)\n}": types.TestSendEmailTplDocument,
+    "mutation testSendMessageTpl($annotations: MapString, $userID: ID!, $labels: MapString, $tplID: ID!){\n  testSendMessageTpl(annotations: $annotations, userID: $userID, labels:$labels, tplID: $tplID)\n}": types.TestSendMessageTplDocument,
     "query msgTypeList($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n      }\n    }\n  }\n}": types.MsgTypeListDocument,
     "query msgTypeInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgType{\n      id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n    }\n  }\n}": types.MsgTypeInfoDocument,
     "mutation createMsgType($input: CreateMsgTypeInput!){\n  createMsgType(input: $input){id}\n}": types.CreateMsgTypeDocument,
@@ -234,6 +236,14 @@ export function gql(source: "mutation enableMsgTemplate($id:ID!){\n  enableMsgTe
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation disableMsgTemplate($id:ID!){\n  disableMsgTemplate(id:$id){id}\n}"): (typeof documents)["mutation disableMsgTemplate($id:ID!){\n  disableMsgTemplate(id:$id){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation testSendEmailTpl($annotations: MapString, $email: String!, $labels: MapString, $tplID: ID!){\n  testSendEmailTpl(annotations: $annotations, email: $email, labels:$labels, tplID: $tplID)\n}"): (typeof documents)["mutation testSendEmailTpl($annotations: MapString, $email: String!, $labels: MapString, $tplID: ID!){\n  testSendEmailTpl(annotations: $annotations, email: $email, labels:$labels, tplID: $tplID)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation testSendMessageTpl($annotations: MapString, $userID: ID!, $labels: MapString, $tplID: ID!){\n  testSendMessageTpl(annotations: $annotations, userID: $userID, labels:$labels, tplID: $tplID)\n}"): (typeof documents)["mutation testSendMessageTpl($annotations: MapString, $userID: ID!, $labels: MapString, $tplID: ID!){\n  testSendMessageTpl(annotations: $annotations, userID: $userID, labels:$labels, tplID: $tplID)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

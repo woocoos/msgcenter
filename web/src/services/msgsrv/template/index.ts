@@ -63,6 +63,16 @@ const mutationDisableMsgTemplate = gql(/* GraphQL */`mutation disableMsgTemplate
 }`);
 
 
+
+const mutationTestSendEmailTpl = gql(/* GraphQL */`mutation testSendEmailTpl($annotations: MapString, $email: String!, $labels: MapString, $tplID: ID!){
+  testSendEmailTpl(annotations: $annotations, email: $email, labels:$labels, tplID: $tplID)
+}`);
+
+const mutationTestSendMessageTpl = gql(/* GraphQL */`mutation testSendMessageTpl($annotations: MapString, $userID: ID!, $labels: MapString, $tplID: ID!){
+  testSendMessageTpl(annotations: $annotations, userID: $userID, labels:$labels, tplID: $tplID)
+}`);
+
+
 /**
  * 消息事件列表
  * @param gather
@@ -179,6 +189,48 @@ export async function enableMsgTemplate(msgTemplateId: string) {
   })
   if (result.data?.enableMsgTemplate.id) {
     return result.data.enableMsgTemplate
+  }
+  return null
+}
+
+/**
+ * 测试邮件
+ * @param tplID
+ * @param email
+ * @param labels
+ * @param annotations
+ * @returns
+ */
+export async function testSendEamil(tplID: string, email: string, labels?: Record<string, string>, annotations?: Record<string, string>) {
+  const result = await mutation(mutationTestSendEmailTpl, {
+    tplID,
+    email,
+    labels,
+    annotations,
+  })
+  if (result.data?.testSendEmailTpl) {
+    return result.data.testSendEmailTpl
+  }
+  return null
+}
+
+/**
+ * 测试站内信发送
+ * @param tplID
+ * @param userID
+ * @param labels
+ * @param annotations
+ * @returns
+ */
+export async function testSendMessage(tplID: string, userID: string, labels?: Record<string, string>, annotations?: Record<string, string>) {
+  const result = await mutation(mutationTestSendMessageTpl, {
+    tplID,
+    userID,
+    labels,
+    annotations,
+  })
+  if (result.data?.testSendMessageTpl) {
+    return result.data.testSendMessageTpl
   }
   return null
 }

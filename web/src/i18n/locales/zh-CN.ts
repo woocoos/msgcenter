@@ -69,6 +69,7 @@ export default {
     move: '移动',
     close: '关闭',
     open: '启动',
+    test: '测试',
     directory: '目录',
     domain: '域',
     binding: '绑定',
@@ -99,6 +100,10 @@ export default {
     created_at: '创建时间',
     station_msg: '站内消息',
     all_msg: '全部消息',
+    receive_mail: '接收邮件',
+    receiver: '接收人',
+    argument: '参数',
+    default_added: '默认已添加',
 
     // 多个字符组成
     confirm_copy: '确定是否复制',
@@ -202,6 +207,7 @@ export default {
     // 详情
 
     // 必填
+    please_enter: '请输入',
     please_enter_org: '请输入组织',
     please_enter_app: '请输入应用',
     please_enter_category: '请输入分类',

@@ -4,13 +4,14 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
 import { Link, useSearchParams } from '@ice/runtime';
-import { MsgEvent, MsgTemplate, MsgTemplateReceiverType, MsgTemplateSimpleStatus, MsgTemplateWhereInput } from '@/generated/msgsrv/graphql';
+import { MsgEvent, MsgTemplate, MsgTemplateFormat, MsgTemplateReceiverType, MsgTemplateSimpleStatus, MsgTemplateWhereInput } from '@/generated/msgsrv/graphql';
 import { EnumMsgTemplateFormat, EnumMsgTemplateReceiverType, EnumMsgTemplateStatus, delMsgTemplate, disableMsgTemplate, enableMsgTemplate, getMsgTemplateList } from '@/services/msgsrv/template';
 import { getMsgEventInfo } from '@/services/msgsrv/event';
 import { DownOutlined } from '@ant-design/icons';
 import Create from './components/create';
 import { getOrgs } from '@knockout-js/api';
 import { Org } from '@knockout-js/api/ucenter';
+import Test from './components/test';
 
 
 export default () => {
@@ -53,21 +54,23 @@ export default () => {
         width: 160,
         render: (text, record) => {
           return (<Space>
-            <Auth authKey="updateMsgTemplate">
-              <a
-                key="editor"
-                onClick={() => {
-                  setModal({
-                    open: true,
-                    title: `${t('edit')}:${record.name}`,
-                    id: record.id,
-                    receiverType: record.receiverType,
-                  });
-                }}
-              >
-                {t('edit')}
-              </a>
-            </Auth>
+            {
+              record.status === MsgTemplateSimpleStatus.Active ? <></> : <Auth authKey="updateMsgTemplate">
+                <a
+                  key="editor"
+                  onClick={() => {
+                    setModal({
+                      open: true,
+                      title: `${t('edit')}:${record.name}`,
+                      id: record.id,
+                      receiverType: record.receiverType,
+                    });
+                  }}
+                >
+                  {t('edit')}
+                </a>
+              </Auth>
+            }
             {
               record.status === MsgTemplateSimpleStatus.Active ? <></> : <Auth authKey="deleteMsgTemplate">
                 <a key="delete" onClick={() => onDel(record)}>
@@ -86,6 +89,18 @@ export default () => {
                 </a>
               </Auth>
             }
+            {
+              record.status === MsgTemplateSimpleStatus.Active && record.receiverType != MsgTemplateReceiverType.Webhook ? <a
+                onClick={() => {
+                  setModal({
+                    open: true,
+                    title: `${t('test')}:${record.name}`,
+                    id: record.id,
+                    type: 'test',
+                  });
+                }}
+              >{t('test')}</a> : <></>
+            }
           </Space>);
         },
       },
@@ -100,6 +115,7 @@ export default () => {
       title: string;
       id: string;
       receiverType?: MsgTemplateReceiverType;
+      type?: 'test'
     }>({
       open: false,
       title: '',
@@ -231,7 +247,7 @@ export default () => {
           type: 'checkbox',
         }}
       />
-      {msgEventInfo ?
+      {msgEventInfo && modal.type != 'test' ?
         <Create
           open={modal.open}
           title={modal.title}
@@ -244,6 +260,16 @@ export default () => {
           }}
           msgEvent={msgEventInfo}
           receiverType={modal.receiverType || MsgTemplateReceiverType.Email}
+        /> : <></>
+      }
+      {
+        modal.type === 'test' ? <Test
+          open={modal.open}
+          title={modal.title}
+          id={modal.id}
+          onClose={(s) => {
+            setModal({ open: false, title: modal.title, id: '' });
+          }}
         /> : <></>
       }
 

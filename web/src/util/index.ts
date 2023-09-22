@@ -271,3 +271,16 @@ export const updateFormat = <T>(target: T, original: Record<string, any>) => {
   }
   return ud as T;
 };
+
+/**
+ * 解析go模板语法
+ * @param str
+ * @returns
+ */
+export const parseGoTempKey = (str: string) => {
+  const all = str.match(/{{(\s)?(\.)(\w)+(\s)?}}/g);
+  if (all?.length) {
+    return all.map(item => item.replaceAll(/[{]|[}]|[.]|[\s]/g, ''));
+  }
+  return null;
+}

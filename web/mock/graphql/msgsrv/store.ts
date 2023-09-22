@@ -135,6 +135,9 @@ export const initStoreData = (store: IMockStore) => {
     store.get('MsgEvent', 1),
   ]))
   store.set('Query', 'ROOT', 'msgTemplates', listTemp([
+    store.get('MsgTemplate', 1),
+    store.get('MsgTemplate', 2),
+    store.get('MsgTemplate', 3),
   ]))
   store.set('Query', 'ROOT', 'msgTypes', listTemp([
     store.get('MsgType', 1),
@@ -173,6 +176,7 @@ export const initStoreData = (store: IMockStore) => {
     store.get('MsgInternalTo', 10),
   ]))
 
+
   // -------------root-end------------------------
 
   // MsgChannel
@@ -205,7 +209,19 @@ export const initStoreData = (store: IMockStore) => {
     id: 1, name: 'MsgEvent1', modes: 'email,webhook', msgType: store.get('MsgType', 1), msgTypeID: 1,
   })
 
-
+  // msgTemplate
+  store.set('MsgTemplate', 1, {
+    id: 1, name: 'msgTemplate1', msgEventID: '1', receiverType: 'email', tenantID: '1', subject: '邮件', format: 'txt', body: "{{.name}}{{.text}}", status: 'active',
+    tpl: "/xxx/test.tmpl", tplFileID: "tmpl", attachments: ['/xxx/test.png', '/xxx/test.jpg'], attachmentsFileIds: ['png', 'jpg']
+  })
+  store.set('MsgTemplate', 2, {
+    id: 2, name: 'msgTemplate2', msgEventID: '1', receiverType: 'message', tenantID: '1', subject: '邮件', format: 'txt', body: "{{.name}}{{.text}}", status: 'active',
+    tpl: "/xxx/test.tmpl", tplFileID: "tmpl", attachments: [], attachmentsFileIds: []
+  })
+  store.set('MsgTemplate', 3, {
+    id: 3, name: 'msgTemplate3', msgEventID: '1', receiverType: 'email', tenantID: '1', subject: '邮件', format: 'html', body: "<div>{{.name}}{{.text}}<div>", status: 'active',
+    tpl: "/xxx/test.tmpl", tplFileID: "tmpl", attachments: ['/xxx/test.png', '/xxx/test.jpg'], attachmentsFileIds: ['png', 'jpg']
+  })
 
   // MsgSubscriber
   store.set('MsgSubscriber', 1, {
