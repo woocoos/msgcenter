@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	entgo.io/contrib v0.4.6-0.20230615102013-704944fdc0f6
-	entgo.io/ent v0.12.4-0.20230702151415-1ec75238037c
+	entgo.io/ent v0.12.4
 	github.com/99designs/gqlgen v0.17.38
 	github.com/alicebob/miniredis/v2 v2.30.5
 	github.com/cenkalti/backoff/v4 v4.2.0
@@ -27,7 +27,7 @@ require (
 	github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230922090437-500dbe1d58de
 	github.com/vektah/gqlparser/v2 v2.5.10
 	github.com/vmihailenco/msgpack/v5 v5.3.5
-	github.com/woocoos/entco v0.0.0-20230922165635-5de4f9d7e73b
+	github.com/woocoos/entco v0.0.0-20230923080449-b28aa5f23540
 	go.uber.org/zap v1.25.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/sync v0.3.0
@@ -36,7 +36,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.12.1-0.20230620155259-b8e83e5e8ad6 // indirect
+	ariga.io/atlas v0.14.1-0.20230918065911-83ad451a4935 // indirect
 	ariga.io/entcache v0.1.1-0.20230620164151-0eb723a11c40 // indirect
 	github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible // indirect
 	github.com/XSAM/otelsql v0.23.0 // indirect
