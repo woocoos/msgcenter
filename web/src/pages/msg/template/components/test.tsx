@@ -120,7 +120,7 @@ export default (props: {
       formRef={formRef}
     >
       {info?.receiverType === MsgTemplateReceiverType.Email ? <ProFormText
-        name="eamil"
+        name="email"
         label={t('receive_mail')}
       /> : <></>}
       {info?.receiverType === MsgTemplateReceiverType.Message ? <ProFormText
