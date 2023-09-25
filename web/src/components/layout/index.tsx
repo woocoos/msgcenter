@@ -11,7 +11,7 @@ import { logout, urlSpm } from '@/services/auth';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import { createFromIconfontCN } from '@ant-design/icons';
 import { getFilesRaw } from '@knockout-js/api';
-import FloatMsg from '../floatMsg';
+import FloatMsg, { WsMsgViewActions } from '../floatMsg';
 import { MsgDropdownRef } from '@knockout-js/layout/esm/components/msg-dropdown';
 
 const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
@@ -165,7 +165,9 @@ export default () => {
         msgRef.current?.setShowDot();
       }}
       onItemClick={(data) => {
-        window.open(`/msg/internal/detail?id=${data.extras.actionID}`);
+        if (data.extras.action === WsMsgViewActions.Internal) {
+          window.open(`/msg/internal/detail?id=${data.extras.actionID}`);
+        }
       }}
     /> : <></>}
   </Layout>

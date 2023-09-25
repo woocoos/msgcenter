@@ -104,6 +104,7 @@ export default {
     receiver: 'receiver',
     argument: 'argument',
     default_added: 'Default added',
+    new_msg: 'Have new news',
 
     // 多个字符组成
     confirm_copy: 'confirm copy',

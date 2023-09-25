@@ -6,6 +6,7 @@ import store from "@/store";
 import { subscription } from "@knockout-js/ice-urql/request";
 import { subMessage } from "@/services/msgsrv/internal/ws";
 import { setItem } from "@/pkg/localStore";
+import { useTranslation } from "react-i18next";
 
 export interface WsMsgProps {
   /**
@@ -25,13 +26,16 @@ export interface WsMsgProps {
   onListenerNewMsg?: () => void;
 }
 
-const actions = ['internal'];
+export enum WsMsgViewActions {
+  Internal = "internal"
+}
 
 /**
  * extras{action,actionID}
  */
 export default (props: WsMsgProps) => {
-  const [unreadNum, setUnreadNum] = useState(0),
+  const { t } = useTranslation(),
+    [unreadNum, setUnreadNum] = useState(0),
     [docHidden, setDocHidden] = useState(document.hidden),
     [api, contextHolder] = notification.useNotification(),
     [showMsg, setShowMsg] = useState(false),
@@ -53,12 +57,12 @@ export default (props: WsMsgProps) => {
           duration: null,
           message: item.title,
           description: getDate(item.sendAt, 'YYYY-MM-DD HH:mm:ss'),
-          btn: <>
+          btn: [WsMsgViewActions.Internal].includes(item.extras.action) ? <>
             <a onClick={() => {
               props.onItemClick?.(item);
               wsDispatch.setMessage(wsState.message.filter(item => item.extras.actionID != key));
-            }}>查看</a>
-          </>,
+            }}>{t('view')}</a>
+          </> : undefined,
           onClose: () => {
             wsDispatch.setMessage(wsState.message.filter(item => item.extras.actionID != key));
           },
@@ -77,14 +81,8 @@ export default (props: WsMsgProps) => {
         if (result.data?.message) {
           const newMsg = result.data?.message as Message,
             newWs = store.getModel('ws');
-          // 判断action是否是支持的action
-          if (actions.includes(newMsg.extras.action)) {
-            // 判断actionID是否已经存在不存在则设置到message中
-            if (!newWs[0].message?.find(item => item.extras.actionID == newMsg.extras.actionID)) {
-              newWs[1].setMessage([newMsg, ...(newWs[0].message ?? [])]);
-              props.onListenerNewMsg?.();
-            }
-          }
+          newWs[1].setMessage([newMsg, ...(newWs[0].message ?? [])]);
+          props.onListenerNewMsg?.();
         }
       })
       window.addEventListener('beforeunload', () => {
@@ -103,7 +101,7 @@ export default (props: WsMsgProps) => {
 
   return <>
     <FloatButton
-      tooltip={!showMsg && unreadNum > 0 ? <div>有新消息</div> : undefined}
+      tooltip={!showMsg && unreadNum > 0 ? <div>{t('new_msg')}</div> : undefined}
       type={showMsg ? "primary" : "default"}
       badge={{ count: unreadNum, color: 'red' }}
       onClick={() => {

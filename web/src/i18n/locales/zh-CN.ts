@@ -104,6 +104,7 @@ export default {
     receiver: '接收人',
     argument: '参数',
     default_added: '默认已添加',
+    new_msg: '有新消息',
 
     // 多个字符组成
     confirm_copy: '确定是否复制',
