@@ -53,6 +53,7 @@ web:
                     - jwt: *jwt
 
 ui:
+  staticDir: "../../app/build"
   server:
     addr: 127.0.0.1:10073
 

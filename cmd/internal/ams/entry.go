@@ -204,7 +204,7 @@ func buildUiServer(cnf *conf.AppConfiguration) *web.Server {
 	uiSrv := web.New(web.WithConfiguration(cnf.Sub("ui")),
 		web.WithGracefulStop(),
 	)
-	uiSrv.Router().StaticFS("/", http.Dir("../../web/build"))
+	uiSrv.Router().StaticFS("/", http.Dir(cnf.String("ui.staticDir")))
 	return uiSrv
 }
 
