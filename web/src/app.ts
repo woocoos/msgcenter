@@ -16,6 +16,7 @@ import { User } from '@knockout-js/api/ucenter';
 import { Message } from './generated/msgsrv/graphql';
 
 const ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
+  ICE_ROUTER_BASENAME = process.env.ICE_ROUTER_BASENAME ?? '/',
   ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
   NODE_ENV = process.env.NODE_ENV ?? '',
   ICE_DEV_TOKEN = process.env.ICE_DEV_TOKEN ?? '',
@@ -53,6 +54,9 @@ export default defineAppConfig(() => ({
   app: {
     rootId: 'app',
   },
+  router: {
+    basename: ICE_ROUTER_BASENAME,
+  }
 }));
 
 // 用来做初始化数据
