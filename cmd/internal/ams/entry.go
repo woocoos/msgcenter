@@ -7,6 +7,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/tsingsun/woocoo"
@@ -33,6 +34,7 @@ import (
 	"github.com/woocoos/msgcenter/service"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -204,8 +206,30 @@ func buildUiServer(cnf *conf.AppConfiguration) *web.Server {
 	uiSrv := web.New(web.WithConfiguration(cnf.Sub("ui")),
 		web.WithGracefulStop(),
 	)
-	uiSrv.Router().StaticFS(cnf.String("ui.relativePath"), http.Dir(cnf.String("ui.staticDir")))
+	uiSrv.Router().Use(RedirectHTMLExtension())
+	//uiSrv.Router().StaticFS(cnf.String("ui.relativePath"), http.Dir(cnf.String("ui.staticDir")))
+	uiSrv.Router().Use(static.Serve(cnf.String("ui.relativePath"), static.LocalFile(cnf.String("ui.staticDir"), false)))
+	uiSrv.Router().StaticFile("/favicon.ico", cnf.String("ui.staticDir")+"/favicon.ico")
 	return uiSrv
+}
+
+func RedirectHTMLExtension() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		requestedPath := c.Request.URL.Path
+
+		// if the requested path is a directory request and abort it
+		if strings.HasSuffix(requestedPath, "/") {
+			c.Abort()
+			return
+		}
+		// If the requested path does not end with ".html"
+		if strings.HasPrefix(requestedPath, "/msg/") {
+			// Append ".html" to the path
+			requestedPath += ".html"
+			c.Request.URL.Path = requestedPath
+		}
+		c.Next()
+	}
 }
 
 func buildHttpClient(cnf *conf.AppConfiguration) *http.Client {
