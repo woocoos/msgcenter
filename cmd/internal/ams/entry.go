@@ -17,6 +17,7 @@ import (
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/tsingsun/woocoo/web"
+	"github.com/tsingsun/woocoo/web/handler/gzip"
 	"github.com/woocoos/entco/ecx"
 	"github.com/woocoos/entco/ecx/oteldriver"
 	"github.com/woocoos/entco/gqlx"
@@ -209,6 +210,9 @@ func buildUiServer(cnf *conf.AppConfiguration) *web.Server {
 	uiSrv := web.New(web.WithConfiguration(cnf.Sub("ui")),
 		web.WithGracefulStop(),
 	)
+	if cnf.IsSet("ui.gzip") {
+		uiSrv.Router().Use(gzip.Gzip().ApplyFunc(cnf.Sub("ui.gzip")))
+	}
 	uiSrv.Router().NoRoute(func(c *gin.Context) {
 		c.File(filepath.Join(staticDir, strings.TrimPrefix(c.Request.URL.Path, relativePath)) + ".html")
 	})

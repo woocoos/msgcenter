@@ -55,6 +55,7 @@ web:
 ui:
   staticDir: "../../web/build"
   relativePath: "/"
+  gzip:
   server:
     addr: 127.0.0.1:10073
 
