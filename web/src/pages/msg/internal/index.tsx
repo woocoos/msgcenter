@@ -4,10 +4,11 @@ import { delMarkMsg, getUserMsgCategory, getUserMsgCategoryNum, getUserMsgIntern
 import { DownOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from "@ant-design/pro-components";
 import { Link } from "@ice/runtime";
-import { KeepAlive } from "@knockout-js/layout";
+import { DictText, KeepAlive } from "@knockout-js/layout";
 import { Badge, Button, Dropdown, Popconfirm, Space, Tabs, message } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import styles from "./index.module.css";
 
 type CategoryTag = {
   name: string,
@@ -34,7 +35,7 @@ export default () => {
       {
         title: t('msg_type_category'), dataIndex: 'category', width: 120,
         renderText(text, record, index, action) {
-          return record.msgInternal.category
+          return <DictText dictCode="MsgCategory" value={record.msgInternal.category} />
         },
       },
       {
@@ -122,16 +123,23 @@ export default () => {
         },
       }}
     >
+      <DictText dictCode="MsgCategory"  />
       <ProTable
         actionRef={proTableRef}
         search={false}
+        className={styles.tableTabs}
         rowKey={'id'}
         toolbar={{
           title: <Tabs
-            style={{ maxWidth: '400px' }}
+            x-if={categorys.length}
             activeKey={selectCategory}
             items={categorys.map(item => (
-              { key: item.code, label: `${item.name}${item.num ? `(${item.num})` : ''} ` }
+              {
+                key: item.code, label: <span key={item.code}>
+                  {item.code === 'all' ? item.name : <DictText dictCode="MsgCategory" value={item.name} />}
+                  {`${item.num ? `(${item.num})` : ''} `}
+                </span>
+              }
             ))}
             onChange={(activeKey) => {
               proTableRef.current?.reload(true);

@@ -61,10 +61,10 @@ const schemaWithMocks = addMocksToSchema({
       msgInternals: relayStylePaginationMock(store),
       userMsgInternalTos: relayStylePaginationMock(store),
       userSubMsgCategory: () => {
-        return ['故障消息', '业务消息', '客户交易','消息1','消息2','消息3'];
+        return ['business', 'malfunction', 'trade','test'];
       },
       msgTypeCategories: () => {
-        return ['故障消息', '业务消息', '客户交易'];
+        return ['business', 'malfunction', 'trade','test'];
       },
       nodes: (_, args) => {
         return args.ids.map(gid => {

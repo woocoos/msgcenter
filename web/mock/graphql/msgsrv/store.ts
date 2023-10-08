@@ -186,7 +186,7 @@ export const initStoreData = (store: IMockStore) => {
 
   // MsgType
   store.set('MsgType', 1, {
-    id: 1, name: 'MsgType1', appID: 1, category: '故障消息',
+    id: 1, name: 'MsgType1', appID: 1, category: 'malfunction',
     subscriberUsers: [
       store.get('MsgSubscriber', 1)
     ],
@@ -198,10 +198,10 @@ export const initStoreData = (store: IMockStore) => {
     ],
   })
   store.set('MsgType', 2, {
-    id: 2, name: 'MsgType2', appID: 1, category: '故障消息'
+    id: 2, name: 'MsgType2', appID: 1, category: 'malfunction'
   })
   store.set('MsgType', 3, {
-    id: 3, name: 'MsgType2', appID: 1, category: '业务消息'
+    id: 3, name: 'MsgType2', appID: 1, category: 'business'
   })
 
   // MsgEvent
@@ -262,10 +262,9 @@ export const initStoreData = (store: IMockStore) => {
   // MsgInternal
   for (let i = 1; i <= 10; i++) {
     store.set('MsgInternal', i, {
-      id: i, tenantID: 1, subject: `主题${i}`, body: `内容${i}`, format: 'text'
+      id: i, tenantID: 1, subject: `主题${i}`, body: `内容${i}`, format: 'text', category: i % 2 ? "business" : "malfunction"
     })
   }
-
 
   // MsgInternalTo
   for (let i = 1; i <= 10; i++) {

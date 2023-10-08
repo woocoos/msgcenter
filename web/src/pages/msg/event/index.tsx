@@ -9,8 +9,7 @@ import Create from './components/create';
 import { Link } from '@ice/runtime';
 import Config from './components/config';
 import ConfigExample from './components/configExample';
-import { KeepAlive } from '@knockout-js/layout';
-import InputCategory from '../type/components/inputCategory';
+import { DictSelect, DictText, KeepAlive } from '@knockout-js/layout';
 
 
 export default () => {
@@ -23,10 +22,10 @@ export default () => {
       {
         title: t('msg_type_category'), dataIndex: 'msgTypeCategory', width: 120,
         renderFormItem() {
-          return <InputCategory />
+          return <DictSelect dictCode="MsgCategory" placeholder={t('please_enter_category')} />
         },
         render(text, record) {
-          return record.msgType.category
+          return <DictText dictCode="MsgCategory" value={record.msgType.category} />
         },
       },
       {

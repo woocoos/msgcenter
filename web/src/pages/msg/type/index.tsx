@@ -6,11 +6,10 @@ import Auth from '@/components/auth';
 import { MsgType, MsgTypeSimpleStatus, MsgTypeWhereInput } from '@/generated/msgsrv/graphql';
 import { EnumMsgTypeStatus, delMsgType, getMsgTypeList } from '@/services/msgsrv/type';
 import Create from './components/create';
-import InputCategory from './components/inputCategory';
 import { AppSelect } from '@knockout-js/org';
 import { getApps } from '@knockout-js/api';
 import { App } from '@knockout-js/api/ucenter';
-import { KeepAlive } from '@knockout-js/layout';
+import { DictSelect, DictText, KeepAlive } from '@knockout-js/layout';
 
 
 export default () => {
@@ -32,8 +31,11 @@ export default () => {
       },
       {
         title: t('category'), dataIndex: 'category', width: 120,
+        renderText(text, record, index, action) {
+          return <DictText dictCode="MsgCategory" value={record.category} />
+        },
         renderFormItem() {
-          return <InputCategory />
+          return <DictSelect dictCode="MsgCategory" placeholder={t('please_enter_category')} />
         },
       },
       { title: t('name'), dataIndex: 'name', width: 120 },

@@ -5,10 +5,9 @@ import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
 import { MsgType, MsgTypeSimpleStatus, MsgTypeWhereInput } from '@/generated/msgsrv/graphql';
 import { getMsgTypeListAndSub } from '@/services/msgsrv/type';
-import InputCategory from '../type/components/inputCategory';
 import Settings from './components/settings';
 import { getOrgRoles, getUsers } from '@knockout-js/api';
-import { KeepAlive } from '@knockout-js/layout';
+import { DictSelect, DictText, KeepAlive } from '@knockout-js/layout';
 
 type ProTableColumnsData = {
   id: string;
@@ -27,12 +26,17 @@ export default () => {
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<ProTableColumnsData>[] = [
       // 有需要排序配置  sorter: true
-      { title: t('msg_type'), dataIndex: 'name', width: 200 },
+      {
+        title: t('msg_type'), dataIndex: 'name', width: 200,
+        renderText(text, record, index, action) {
+          return record.id.indexOf('category-') === 0 ? <DictText dictCode="MsgCategory" value={record.name} /> : record.name
+        },
+      },
       {
         title: t('msg_type_category'), dataIndex: 'msgTypeCategory', hideInTable: true,
-        renderFormItem: () => {
-          return <InputCategory />
-        }
+        renderFormItem() {
+          return <DictSelect dictCode="MsgCategory" placeholder={t('please_enter_category')} />
+        },
       },
       { title: t('receiving_user'), dataIndex: 'receiving_user', width: 120, search: false },
       { title: t('receiving_user_group'), dataIndex: 'receiving_user_group', width: 120, search: false },

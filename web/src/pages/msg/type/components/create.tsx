@@ -4,8 +4,7 @@ import { updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormSwitch } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import InputCategory from './inputCategory';
-import { useLeavePrompt } from '@knockout-js/layout';
+import { DictSelect, useLeavePrompt } from '@knockout-js/layout';
 import { AppSelect } from '@knockout-js/org';
 import { getApp } from '@knockout-js/api';
 import { App } from '@knockout-js/api/ucenter';
@@ -144,7 +143,7 @@ export default (props: {
           { required: true, message: `${t('please_enter_category')}` },
         ]}
       >
-        <InputCategory />
+        <DictSelect dictCode="MsgCategory" />
       </ProFormText>
       <ProFormText
         name="name"

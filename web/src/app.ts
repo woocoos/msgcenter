@@ -10,19 +10,19 @@ import { browserLanguage } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { isInIcestark } from '@ice/stark-app';
-import { setFilesApi, userPermissions } from '@knockout-js/api';
+import { instanceName, setFilesApi, userPermissions } from '@knockout-js/api';
 import { logout, parseSpm } from './services/auth';
 import { User } from '@knockout-js/api/ucenter';
 import { Message } from './generated/msgsrv/graphql';
+import { RequestHeaderAuthorizationMode } from '@knockout-js/ice-urql/request';
 
-const ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
+const NODE_ENV = process.env.NODE_ENV ?? '',
+  ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
   ICE_ROUTER_BASENAME = process.env.ICE_ROUTER_BASENAME ?? '/',
   ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
-  NODE_ENV = process.env.NODE_ENV ?? '',
-  ICE_DEV_TOKEN = process.env.ICE_DEV_TOKEN ?? '',
-  ICE_DEV_TID = process.env.ICE_DEV_TID ?? '',
   ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '',
+  ICE_HTTP_SIGN = process.env.ICE_HTTP_SIGN ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
   ICE_WS_MSGSRV = process.env.ICE_WS_MSGSRV ?? '',
   ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '';
@@ -63,8 +63,8 @@ export default defineAppConfig(() => ({
 export const dataLoader = defineDataLoader(async () => {
   if (NODE_ENV === 'development') {
     // 开发时使用
-    setItem('token', ICE_DEV_TOKEN)
-    setItem('tenantId', ICE_DEV_TID)
+    setItem('token', process.env.ICE_DEV_TOKEN)
+    setItem('tenantId', process.env.ICE_DEV_TID)
     setItem('user', {
       id: 1,
       displayName: 'admin',
@@ -149,6 +149,7 @@ export const urqlConfig = defineUrqlConfig([
           }
         },
         beforeRefreshTime: 5 * 60 * 1000,
+        headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
         login: ICE_LOGIN_URL,
         refreshApi: `${ICE_API_AUTH_PREFIX}/login/refresh-token`
       },
@@ -167,7 +168,7 @@ export const urqlConfig = defineUrqlConfig([
     }
   },
   {
-    instanceName: 'ucenter',
+    instanceName: instanceName.UCENTER,
     url: ICE_API_ADMINX,
   },
 ])
@@ -223,6 +224,7 @@ export const requestConfig = defineRequestConfig({
         }
       },
     },
+    headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
     login: ICE_LOGIN_URL,
   })
 });

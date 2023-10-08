@@ -8,6 +8,7 @@ import { getMsgTypeList } from '@/services/msgsrv/type';
 import { AppSelect } from '@knockout-js/org';
 import { getApps } from '@knockout-js/api';
 import { App } from '@knockout-js/api/ucenter';
+import { DictSelect, DictText } from '@knockout-js/layout';
 
 export default (props: {
   open: boolean;
@@ -29,7 +30,15 @@ export default (props: {
           return record.appID ? app?.name || record.appID : '-';
         },
       },
-      { title: t('category'), dataIndex: 'category', width: 120 },
+      {
+        title: t('category'), dataIndex: 'category', width: 120,
+        renderText(text, record, index, action) {
+          return <DictText dictCode="MsgCategory" value={record.category} />
+        },
+        renderFormItem() {
+          return <DictSelect dictCode="MsgCategory" placeholder={t('please_enter_category')} />
+        },
+      },
       { title: t('name'), dataIndex: 'name', width: 120 },
       { title: t('description'), dataIndex: 'comments', width: 120, search: false },
     ],
