@@ -63,5 +63,5 @@
     "typescript": "^4.9.5"
   },
   "private": true,
-  "packageManager": "pnpm@8.6.0"
+  "packageManager": "pnpm@8.8.0"
 }
