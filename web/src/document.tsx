@@ -1,5 +1,7 @@
 import { Meta, Title, Links, Main, Scripts } from 'ice';
 
+const ICE_STATIC_CDN = process.env.ICE_STATIC_CDN ?? '';
+
 export default function Document() {
   return (
     <html>
@@ -14,6 +16,18 @@ export default function Document() {
       </head>
       <body>
         <Main />
+        {ICE_STATIC_CDN ? <>
+          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/react/18.2.0/index.min.js"></script>
+          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/react-dom/18.2.0/index.min.js"></script>
+          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/i18next/22.5.0/index.min.js"></script>
+          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/react-i18next/12.3.1/index.min.js"></script>
+          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/%40monaco-editor/loader/1.4.0/index.min.js"></script>
+          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/jwt-decode/3.1.2/index.min.js"></script>
+          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/js-yaml/4.1.0/index.min.js "></script>
+          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/dayjs/1.11.8/index.min.js "></script>
+          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/antd/5.6.3/index.min.js"></script>
+          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/%40ant-design/pro-components/2.6.28/index.min.js"></script>
+        </> : <></>}
         <Scripts />
       </body>
     </html>

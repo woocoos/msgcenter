@@ -16,7 +16,7 @@ yarn-error.log*
 pnpm-debug.log*
 
 # dotenv environment variables file
-.env*.local
+.env*
 
 # misc
 .DS_Store

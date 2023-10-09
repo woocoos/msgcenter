@@ -8,7 +8,7 @@ import { getMsgTypeList } from '@/services/msgsrv/type';
 import { AppSelect } from '@knockout-js/org';
 import { getApps } from '@knockout-js/api';
 import { App } from '@knockout-js/api/ucenter';
-import { DictSelect, DictText } from '@knockout-js/layout';
+import { DictSelect, DictText } from '@knockout-js/org';
 
 export default (props: {
   open: boolean;

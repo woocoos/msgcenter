@@ -7,7 +7,8 @@ import { MsgType, MsgTypeSimpleStatus, MsgTypeWhereInput } from '@/generated/msg
 import { getMsgTypeListAndSub } from '@/services/msgsrv/type';
 import Settings from './components/settings';
 import { getOrgRoles, getUsers } from '@knockout-js/api';
-import { DictSelect, DictText, KeepAlive } from '@knockout-js/layout';
+import { KeepAlive } from '@knockout-js/layout';
+import { DictSelect, DictText } from '@knockout-js/org';
 
 type ProTableColumnsData = {
   id: string;

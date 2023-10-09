@@ -4,7 +4,8 @@ import { delMarkMsg, getUserMsgCategory, getUserMsgCategoryNum, getUserMsgIntern
 import { DownOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from "@ant-design/pro-components";
 import { Link } from "@ice/runtime";
-import { DictText, KeepAlive } from "@knockout-js/layout";
+import { KeepAlive } from "@knockout-js/layout";
+import { DictText } from "@knockout-js/org";
 import { Badge, Button, Dropdown, Popconfirm, Space, Tabs, message } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -123,7 +124,7 @@ export default () => {
         },
       }}
     >
-      <DictText dictCode="MsgCategory"  />
+      <DictText dictCode="MsgCategory" />
       <ProTable
         actionRef={proTableRef}
         search={false}

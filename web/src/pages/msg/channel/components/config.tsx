@@ -3,9 +3,9 @@ import { getMsgChannelReceiverInfo, updateMsgChannel } from '@/services/msgsrv/c
 import { DrawerForm, ProFormText } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Editor from '@monaco-editor/react';
 import { useLeavePrompt } from '@knockout-js/layout';
 import * as yaml from 'js-yaml'
+import Editor from '@/components/editor';
 
 type ProFormData = {
   receiver: string;

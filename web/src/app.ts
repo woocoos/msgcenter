@@ -14,7 +14,7 @@ import { instanceName, setFilesApi, userPermissions } from '@knockout-js/api';
 import { logout, parseSpm } from './services/auth';
 import { User } from '@knockout-js/api/ucenter';
 import { Message } from './generated/msgsrv/graphql';
-import { RequestHeaderAuthorizationMode } from '@knockout-js/ice-urql/request';
+import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/request';
 
 const NODE_ENV = process.env.NODE_ENV ?? '',
   ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
@@ -74,12 +74,12 @@ export const dataLoader = defineDataLoader(async () => {
   setFilesApi(ICE_API_FILES_PREFIX);
 
   if (!isInIcestark()) {
-    const signCid = `sign_cid=${ICE_APP_CODE}`
+    const signCid = `sign_cid=${ICE_APP_CODE}`;
     if (document.cookie.indexOf(signCid) === -1) {
-      removeItem('token')
-      removeItem('refreshToken')
+      removeItem('token');
+      removeItem('refreshToken');
     }
-    document.cookie = signCid
+    document.cookie = signCid;
     await parseSpm();
   }
 
@@ -176,13 +176,12 @@ export const urqlConfig = defineUrqlConfig([
 
 // 权限
 export const authConfig = defineAuthConfig(async (appData) => {
-  const { user } = appData,
-    initialAuth = {};
+  const initialAuth = {};
   // 判断路由权限
-  if (user.token) {
+  if (appData?.user?.token) {
     const result = await userPermissions(ICE_APP_CODE, {
-      Authorization: `Bearer ${user.token}`,
-      'X-Tenant-ID': user.tenantId,
+      Authorization: getRequestHeaderAuthorization(appData.user.token, ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined),
+      'X-Tenant-ID': appData.user.tenantId,
     });
     if (result) {
       result.forEach(item => {
@@ -201,12 +200,11 @@ export const authConfig = defineAuthConfig(async (appData) => {
 
 // store数据项
 export const storeConfig = defineStoreConfig(async (appData) => {
-  const { user, app, ws } = appData;
   return {
     initialStates: {
-      user,
-      app,
-      ws,
+      user: appData?.user,
+      app: appData?.app,
+      ws: appData?.ws,
     },
   };
 });

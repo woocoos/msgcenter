@@ -9,7 +9,8 @@ import Create from './components/create';
 import { AppSelect } from '@knockout-js/org';
 import { getApps } from '@knockout-js/api';
 import { App } from '@knockout-js/api/ucenter';
-import { DictSelect, DictText, KeepAlive } from '@knockout-js/layout';
+import { KeepAlive } from '@knockout-js/layout';
+import { DictSelect, DictText } from '@knockout-js/org';
 
 
 export default () => {

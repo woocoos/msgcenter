@@ -9,7 +9,8 @@ import Create from './components/create';
 import { Link } from '@ice/runtime';
 import Config from './components/config';
 import ConfigExample from './components/configExample';
-import { DictSelect, DictText, KeepAlive } from '@knockout-js/layout';
+import { KeepAlive } from '@knockout-js/layout';
+import { DictSelect, DictText } from '@knockout-js/org';
 
 
 export default () => {

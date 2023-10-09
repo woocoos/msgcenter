@@ -30,13 +30,15 @@ const ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '/api-auth',
 export async function logout() {
   const userState = store.getModelState('user');
   if (userState.token) {
-    request.post(`${ICE_API_AUTH_PREFIX}/logout`);
+    try {
+      request.post(`${ICE_API_AUTH_PREFIX}/logout`);
+    } catch (error) { }
   }
   const userDispatcher = store.getModelDispatchers('user')
   userDispatcher.logout();
   if (ICE_LOGIN_URL.toLowerCase().startsWith("http")) {
     const url = new URL(ICE_LOGIN_URL);
-    if (location.pathname !== url.pathname || location.host !== url.host) {
+    if (location.pathname !== url.pathname || location.host != url.host) {
       location.href = `${ICE_LOGIN_URL}?redirect=${encodeURIComponent(location.href)}`
     }
   } else {
@@ -57,11 +59,15 @@ export function refreshToken() {
       const jwt = jwtDcode<JwtPayload>(userState.token);
       if ((jwt.exp || 0) * 1000 - Date.now() < 30 * 60 * 1000) {
         // 小于30分钟的时候需要刷新token
-        const tr = await request.post(`${ICE_API_AUTH_PREFIX}/login/refresh-token`, {
-          refreshToken: userState.refreshToken,
-        });
-        if (tr.accessToken) {
-          store.dispatch.user.updateToken(tr.accessToken);
+        try {
+
+          const tr = await request.post(`${ICE_API_AUTH_PREFIX}/login/refresh-token`, {
+            refreshToken: userState.refreshToken,
+          });
+          if (tr.accessToken) {
+            store.dispatch.user.updateToken(tr.accessToken);
+          }
+        } catch (error) {
         }
       }
     }
@@ -77,12 +83,15 @@ export async function urlSpm(url: string, tenantId?: string) {
   if (url.toLowerCase().startsWith("http")) {
     const u = new URL(url);
     if (u.origin != location.origin) {
-      const result = await request.post(`${ICE_API_AUTH_PREFIX}/spm/create`), userState = store.getModelState("user");
-      if (typeof result === 'string') {
-        u.searchParams.set('spm', result)
-        if (tenantId || userState.tenantId) {
-          u.searchParams.set('tid', tenantId || userState.tenantId)
+      try {
+        const result = await request.post(`${ICE_API_AUTH_PREFIX}/spm/create`), userState = store.getModelState("user");
+        if (typeof result === 'string') {
+          u.searchParams.set('spm', result)
+          if (tenantId || userState.tenantId) {
+            u.searchParams.set('tid', tenantId || userState.tenantId)
+          }
         }
+      } catch (error) {
       }
       return u.href
     }
@@ -107,31 +116,34 @@ export async function parseSpm() {
   parseData.tenantId = u.searchParams.get('tid') ?? undefined;
 
   if (spm) {
-    // 存放在cookie中避免重复读取
-    const ck = `spm=${spm}`;
-    if (document.cookie.indexOf(ck) === -1) {
-      const result: LoginRes = await request.post(`${ICE_API_AUTH_PREFIX}/spm/auth`, {
-        spm,
-      });
-      if (result?.accessToken) {
-        parseData.token = result.accessToken;
-        parseData.refreshToken = result.refreshToken;
-        if (!parseData.tenantId) {
-          parseData.tenantId = result.user?.domains?.[0]?.id
+    try {
+      // 存放在cookie中避免重复读取
+      const ck = `spm=${spm}`;
+      if (document.cookie.indexOf(ck) === -1) {
+        const result: LoginRes = await request.post(`${ICE_API_AUTH_PREFIX}/spm/auth`, {
+          spm,
+        });
+        if (result?.accessToken) {
+          parseData.token = result.accessToken;
+          parseData.refreshToken = result.refreshToken;
+          if (!parseData.tenantId) {
+            parseData.tenantId = result.user?.domains?.[0]?.id
+          }
+          if (result.user) {
+            parseData.user = {
+              id: result.user.id,
+              displayName: result.user.displayName,
+              avatarFileID: result.user.avatarFileId,
+            } as User
+          }
+          setItem('token', parseData.token);
+          setItem('refreshToken', parseData.refreshToken);
+          setItem('tenantId', parseData.tenantId);
+          setItem('user', parseData.user);
         }
-        if (result.user) {
-          parseData.user = {
-            id: result.user.id,
-            displayName: result.user.displayName,
-            avatarFileID: result.user.avatarFileId,
-          } as User
-        }
-        setItem('token', parseData.token);
-        setItem('refreshToken', parseData.refreshToken);
-        setItem('tenantId', parseData.tenantId);
-        setItem('user', parseData.user);
+        document.cookie = ck
       }
-      document.cookie = ck
+    } catch (error) {
     }
   }
   return parseData

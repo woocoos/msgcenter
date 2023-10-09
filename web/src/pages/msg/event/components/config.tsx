@@ -1,12 +1,12 @@
 import { DrawerForm, ProFormText } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Editor from '@monaco-editor/react';
 import { getMsgEventInfoRoute, updateMsgEvent } from '@/services/msgsrv/event';
 import { MatchType, RouteStrType } from '@/generated/msgsrv/graphql';
 import * as yaml from 'js-yaml'
 import { Alert, Typography } from 'antd';
 import { useLeavePrompt } from '@knockout-js/layout';
+import Editor from '@/components/editor';
 
 type ProFormData = {
   route: string;
