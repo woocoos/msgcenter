@@ -9,3 +9,7 @@
   height: 60vh;
   border: 0 none;
 }
+
+.ant-breadcrumb {
+  padding-block-start: 0 !important;
+}
