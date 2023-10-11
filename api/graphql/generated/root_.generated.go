@@ -3200,6 +3200,7 @@ enum MsgChannelSimpleStatus @goModel(model: "github.com/woocoos/entco/schemax/ty
   active
   inactive
   processing
+  disabled
 }
 """
 MsgChannelWhereInput is used for filtering MsgChannel objects.
@@ -3365,6 +3366,7 @@ enum MsgEventSimpleStatus @goModel(model: "github.com/woocoos/entco/schemax/type
   active
   inactive
   processing
+  disabled
 }
 """
 MsgEventWhereInput is used for filtering MsgEvent objects.
@@ -3972,6 +3974,7 @@ enum MsgTemplateSimpleStatus @goModel(model: "github.com/woocoos/entco/schemax/t
   active
   inactive
   processing
+  disabled
 }
 """
 MsgTemplateWhereInput is used for filtering MsgTemplate objects.
@@ -4225,6 +4228,7 @@ enum MsgTypeSimpleStatus @goModel(model: "github.com/woocoos/entco/schemax/typex
   active
   inactive
   processing
+  disabled
 }
 """
 MsgTypeWhereInput is used for filtering MsgType objects.

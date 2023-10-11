@@ -716,12 +716,16 @@ func (u *SilenceUpsertOne) IDX(ctx context.Context) int {
 // SilenceCreateBulk is the builder for creating many Silence entities in bulk.
 type SilenceCreateBulk struct {
 	config
+	err      error
 	builders []*SilenceCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Silence entities in the database.
 func (scb *SilenceCreateBulk) Save(ctx context.Context) ([]*Silence, error) {
+	if scb.err != nil {
+		return nil, scb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(scb.builders))
 	nodes := make([]*Silence, len(scb.builders))
 	mutators := make([]Mutator, len(scb.builders))
@@ -1034,6 +1038,9 @@ func (u *SilenceUpsertBulk) UpdateState() *SilenceUpsertBulk {
 
 // Exec executes the query.
 func (u *SilenceUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the SilenceCreateBulk instead", i)

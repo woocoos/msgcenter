@@ -439,12 +439,16 @@ func (u *OrgRoleUserUpsertOne) IDX(ctx context.Context) int {
 // OrgRoleUserCreateBulk is the builder for creating many OrgRoleUser entities in bulk.
 type OrgRoleUserCreateBulk struct {
 	config
+	err      error
 	builders []*OrgRoleUserCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the OrgRoleUser entities in the database.
 func (orucb *OrgRoleUserCreateBulk) Save(ctx context.Context) ([]*OrgRoleUser, error) {
+	if orucb.err != nil {
+		return nil, orucb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(orucb.builders))
 	nodes := make([]*OrgRoleUser, len(orucb.builders))
 	mutators := make([]Mutator, len(orucb.builders))
@@ -698,6 +702,9 @@ func (u *OrgRoleUserUpsertBulk) UpdateUserID() *OrgRoleUserUpsertBulk {
 
 // Exec executes the query.
 func (u *OrgRoleUserUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the OrgRoleUserCreateBulk instead", i)

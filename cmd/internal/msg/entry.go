@@ -47,7 +47,7 @@ func NewServer(cnf *conf.AppConfiguration) *Server {
 
 func (s *Server) buildEntClient() {
 	pd := oteldriver.BuildOTELDriver(s.appCnf, "store.msgcenter")
-	pd = ecx.BuildEntCacheDriver(s.appCnf, pd)
+	pd, _ = ecx.BuildEntCacheDriver(s.appCnf.Sub("entcache"), pd)
 	scfg := ent.AlternateSchema(ent.SchemaConfig{
 		User:        "portal",
 		OrgRoleUser: "portal",
@@ -107,7 +107,6 @@ func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
 		Cache: lru.New(100),
 	})
 
-	gqlsrv.AroundResponses(gqlx.ContextCache())
 	gqlsrv.AroundResponses(gqlx.SimplePagination())
 	// mutation事务
 	gqlsrv.Use(entgql.Transactioner{TxOpener: s.dbClient})

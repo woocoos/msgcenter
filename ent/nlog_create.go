@@ -667,12 +667,16 @@ func (u *NlogUpsertOne) IDX(ctx context.Context) int {
 // NlogCreateBulk is the builder for creating many Nlog entities in bulk.
 type NlogCreateBulk struct {
 	config
+	err      error
 	builders []*NlogCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the Nlog entities in the database.
 func (ncb *NlogCreateBulk) Save(ctx context.Context) ([]*Nlog, error) {
+	if ncb.err != nil {
+		return nil, ncb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ncb.builders))
 	nodes := make([]*Nlog, len(ncb.builders))
 	mutators := make([]Mutator, len(ncb.builders))
@@ -961,6 +965,9 @@ func (u *NlogUpsertBulk) UpdateExpiresAt() *NlogUpsertBulk {
 
 // Exec executes the query.
 func (u *NlogUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the NlogCreateBulk instead", i)

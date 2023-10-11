@@ -5,6 +5,7 @@ import (
 	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/log"
+	"github.com/woocoos/entco/ecx"
 	"github.com/woocoos/msgcenter/cmd/internal/ams"
 	"github.com/woocoos/msgcenter/cmd/internal/msg"
 )
@@ -29,6 +30,7 @@ func main() {
 	msgSvr := msg.NewServer(msgcnf)
 	app.RegisterServer(msgSvr)
 
+	app.RegisterServer(ecx.ChangeSet)
 	if err := app.Run(); err != nil {
 		log.Panic(err)
 	}

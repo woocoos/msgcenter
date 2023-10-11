@@ -736,12 +736,16 @@ func (u *MsgSubscriberUpsertOne) IDX(ctx context.Context) int {
 // MsgSubscriberCreateBulk is the builder for creating many MsgSubscriber entities in bulk.
 type MsgSubscriberCreateBulk struct {
 	config
+	err      error
 	builders []*MsgSubscriberCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the MsgSubscriber entities in the database.
 func (mscb *MsgSubscriberCreateBulk) Save(ctx context.Context) ([]*MsgSubscriber, error) {
+	if mscb.err != nil {
+		return nil, mscb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(mscb.builders))
 	nodes := make([]*MsgSubscriber, len(mscb.builders))
 	mutators := make([]Mutator, len(mscb.builders))
@@ -1072,6 +1076,9 @@ func (u *MsgSubscriberUpsertBulk) ClearExclude() *MsgSubscriberUpsertBulk {
 
 // Exec executes the query.
 func (u *MsgSubscriberUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MsgSubscriberCreateBulk instead", i)

@@ -479,12 +479,16 @@ func (u *MsgInternalToUpsertOne) IDX(ctx context.Context) int {
 // MsgInternalToCreateBulk is the builder for creating many MsgInternalTo entities in bulk.
 type MsgInternalToCreateBulk struct {
 	config
+	err      error
 	builders []*MsgInternalToCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the MsgInternalTo entities in the database.
 func (mitcb *MsgInternalToCreateBulk) Save(ctx context.Context) ([]*MsgInternalTo, error) {
+	if mitcb.err != nil {
+		return nil, mitcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(mitcb.builders))
 	nodes := make([]*MsgInternalTo, len(mitcb.builders))
 	mutators := make([]Mutator, len(mitcb.builders))
@@ -709,6 +713,9 @@ func (u *MsgInternalToUpsertBulk) ClearDeleteAt() *MsgInternalToUpsertBulk {
 
 // Exec executes the query.
 func (u *MsgInternalToUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MsgInternalToCreateBulk instead", i)

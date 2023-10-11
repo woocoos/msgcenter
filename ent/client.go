@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"reflect"
 
 	"github.com/woocoos/msgcenter/ent/migrate"
 
@@ -14,6 +15,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/woocoos/entcache"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -159,11 +161,14 @@ func Open(driverName, dataSourceName string, options ...Option) (*Client, error)
 	}
 }
 
+// ErrTxStarted is returned when trying to start a new transaction from a transactional client.
+var ErrTxStarted = errors.New("ent: cannot start a transaction within a transaction")
+
 // Tx returns a new transactional client. The provided context
 // is used until the transaction is committed or rolled back.
 func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	if _, ok := c.driver.(*txDriver); ok {
-		return nil, errors.New("ent: cannot start a transaction within a transaction")
+		return nil, ErrTxStarted
 	}
 	tx, err := newTx(ctx, c.driver)
 	if err != nil {
@@ -335,6 +340,21 @@ func (c *MsgAlertClient) CreateBulk(builders ...*MsgAlertCreate) *MsgAlertCreate
 	return &MsgAlertCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MsgAlertClient) MapCreateBulk(slice any, setFunc func(*MsgAlertCreate, int)) *MsgAlertCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MsgAlertCreateBulk{err: fmt.Errorf("calling to MsgAlertClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MsgAlertCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MsgAlertCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for MsgAlert.
 func (c *MsgAlertClient) Update() *MsgAlertUpdate {
 	mutation := newMsgAlertMutation(c.config, OpUpdate)
@@ -383,7 +403,7 @@ func (c *MsgAlertClient) Query() *MsgAlertQuery {
 
 // Get returns a MsgAlert entity by its id.
 func (c *MsgAlertClient) Get(ctx context.Context, id int) (*MsgAlert, error) {
-	return c.Query().Where(msgalert.ID(id)).Only(ctx)
+	return c.Query().Where(msgalert.ID(id)).Only(entcache.WithEntryKey(ctx, "MsgAlert", id))
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -493,6 +513,21 @@ func (c *MsgChannelClient) CreateBulk(builders ...*MsgChannelCreate) *MsgChannel
 	return &MsgChannelCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MsgChannelClient) MapCreateBulk(slice any, setFunc func(*MsgChannelCreate, int)) *MsgChannelCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MsgChannelCreateBulk{err: fmt.Errorf("calling to MsgChannelClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MsgChannelCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MsgChannelCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for MsgChannel.
 func (c *MsgChannelClient) Update() *MsgChannelUpdate {
 	mutation := newMsgChannelMutation(c.config, OpUpdate)
@@ -541,7 +576,7 @@ func (c *MsgChannelClient) Query() *MsgChannelQuery {
 
 // Get returns a MsgChannel entity by its id.
 func (c *MsgChannelClient) Get(ctx context.Context, id int) (*MsgChannel, error) {
-	return c.Query().Where(msgchannel.ID(id)).Only(ctx)
+	return c.Query().Where(msgchannel.ID(id)).Only(entcache.WithEntryKey(ctx, "MsgChannel", id))
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -612,6 +647,21 @@ func (c *MsgEventClient) CreateBulk(builders ...*MsgEventCreate) *MsgEventCreate
 	return &MsgEventCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MsgEventClient) MapCreateBulk(slice any, setFunc func(*MsgEventCreate, int)) *MsgEventCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MsgEventCreateBulk{err: fmt.Errorf("calling to MsgEventClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MsgEventCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MsgEventCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for MsgEvent.
 func (c *MsgEventClient) Update() *MsgEventUpdate {
 	mutation := newMsgEventMutation(c.config, OpUpdate)
@@ -660,7 +710,7 @@ func (c *MsgEventClient) Query() *MsgEventQuery {
 
 // Get returns a MsgEvent entity by its id.
 func (c *MsgEventClient) Get(ctx context.Context, id int) (*MsgEvent, error) {
-	return c.Query().Where(msgevent.ID(id)).Only(ctx)
+	return c.Query().Where(msgevent.ID(id)).Only(entcache.WithEntryKey(ctx, "MsgEvent", id))
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -769,6 +819,21 @@ func (c *MsgInternalClient) CreateBulk(builders ...*MsgInternalCreate) *MsgInter
 	return &MsgInternalCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MsgInternalClient) MapCreateBulk(slice any, setFunc func(*MsgInternalCreate, int)) *MsgInternalCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MsgInternalCreateBulk{err: fmt.Errorf("calling to MsgInternalClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MsgInternalCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MsgInternalCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for MsgInternal.
 func (c *MsgInternalClient) Update() *MsgInternalUpdate {
 	mutation := newMsgInternalMutation(c.config, OpUpdate)
@@ -817,7 +882,7 @@ func (c *MsgInternalClient) Query() *MsgInternalQuery {
 
 // Get returns a MsgInternal entity by its id.
 func (c *MsgInternalClient) Get(ctx context.Context, id int) (*MsgInternal, error) {
-	return c.Query().Where(msginternal.ID(id)).Only(ctx)
+	return c.Query().Where(msginternal.ID(id)).Only(entcache.WithEntryKey(ctx, "MsgInternal", id))
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -908,6 +973,21 @@ func (c *MsgInternalToClient) CreateBulk(builders ...*MsgInternalToCreate) *MsgI
 	return &MsgInternalToCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MsgInternalToClient) MapCreateBulk(slice any, setFunc func(*MsgInternalToCreate, int)) *MsgInternalToCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MsgInternalToCreateBulk{err: fmt.Errorf("calling to MsgInternalToClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MsgInternalToCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MsgInternalToCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for MsgInternalTo.
 func (c *MsgInternalToClient) Update() *MsgInternalToUpdate {
 	mutation := newMsgInternalToMutation(c.config, OpUpdate)
@@ -956,7 +1036,7 @@ func (c *MsgInternalToClient) Query() *MsgInternalToQuery {
 
 // Get returns a MsgInternalTo entity by its id.
 func (c *MsgInternalToClient) Get(ctx context.Context, id int) (*MsgInternalTo, error) {
-	return c.Query().Where(msginternalto.ID(id)).Only(ctx)
+	return c.Query().Where(msginternalto.ID(id)).Only(entcache.WithEntryKey(ctx, "MsgInternalTo", id))
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -1066,6 +1146,21 @@ func (c *MsgSubscriberClient) CreateBulk(builders ...*MsgSubscriberCreate) *MsgS
 	return &MsgSubscriberCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MsgSubscriberClient) MapCreateBulk(slice any, setFunc func(*MsgSubscriberCreate, int)) *MsgSubscriberCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MsgSubscriberCreateBulk{err: fmt.Errorf("calling to MsgSubscriberClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MsgSubscriberCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MsgSubscriberCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for MsgSubscriber.
 func (c *MsgSubscriberClient) Update() *MsgSubscriberUpdate {
 	mutation := newMsgSubscriberMutation(c.config, OpUpdate)
@@ -1114,7 +1209,7 @@ func (c *MsgSubscriberClient) Query() *MsgSubscriberQuery {
 
 // Get returns a MsgSubscriber entity by its id.
 func (c *MsgSubscriberClient) Get(ctx context.Context, id int) (*MsgSubscriber, error) {
-	return c.Query().Where(msgsubscriber.ID(id)).Only(ctx)
+	return c.Query().Where(msgsubscriber.ID(id)).Only(entcache.WithEntryKey(ctx, "MsgSubscriber", id))
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -1223,6 +1318,21 @@ func (c *MsgTemplateClient) CreateBulk(builders ...*MsgTemplateCreate) *MsgTempl
 	return &MsgTemplateCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MsgTemplateClient) MapCreateBulk(slice any, setFunc func(*MsgTemplateCreate, int)) *MsgTemplateCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MsgTemplateCreateBulk{err: fmt.Errorf("calling to MsgTemplateClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MsgTemplateCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MsgTemplateCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for MsgTemplate.
 func (c *MsgTemplateClient) Update() *MsgTemplateUpdate {
 	mutation := newMsgTemplateMutation(c.config, OpUpdate)
@@ -1271,7 +1381,7 @@ func (c *MsgTemplateClient) Query() *MsgTemplateQuery {
 
 // Get returns a MsgTemplate entity by its id.
 func (c *MsgTemplateClient) Get(ctx context.Context, id int) (*MsgTemplate, error) {
-	return c.Query().Where(msgtemplate.ID(id)).Only(ctx)
+	return c.Query().Where(msgtemplate.ID(id)).Only(entcache.WithEntryKey(ctx, "MsgTemplate", id))
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -1361,6 +1471,21 @@ func (c *MsgTypeClient) CreateBulk(builders ...*MsgTypeCreate) *MsgTypeCreateBul
 	return &MsgTypeCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MsgTypeClient) MapCreateBulk(slice any, setFunc func(*MsgTypeCreate, int)) *MsgTypeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MsgTypeCreateBulk{err: fmt.Errorf("calling to MsgTypeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MsgTypeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MsgTypeCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for MsgType.
 func (c *MsgTypeClient) Update() *MsgTypeUpdate {
 	mutation := newMsgTypeMutation(c.config, OpUpdate)
@@ -1409,7 +1534,7 @@ func (c *MsgTypeClient) Query() *MsgTypeQuery {
 
 // Get returns a MsgType entity by its id.
 func (c *MsgTypeClient) Get(ctx context.Context, id int) (*MsgType, error) {
-	return c.Query().Where(msgtype.ID(id)).Only(ctx)
+	return c.Query().Where(msgtype.ID(id)).Only(entcache.WithEntryKey(ctx, "MsgType", id))
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -1518,6 +1643,21 @@ func (c *NlogClient) CreateBulk(builders ...*NlogCreate) *NlogCreateBulk {
 	return &NlogCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *NlogClient) MapCreateBulk(slice any, setFunc func(*NlogCreate, int)) *NlogCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &NlogCreateBulk{err: fmt.Errorf("calling to NlogClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*NlogCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &NlogCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for Nlog.
 func (c *NlogClient) Update() *NlogUpdate {
 	mutation := newNlogMutation(c.config, OpUpdate)
@@ -1566,7 +1706,7 @@ func (c *NlogClient) Query() *NlogQuery {
 
 // Get returns a Nlog entity by its id.
 func (c *NlogClient) Get(ctx context.Context, id int) (*Nlog, error) {
-	return c.Query().Where(nlog.ID(id)).Only(ctx)
+	return c.Query().Where(nlog.ID(id)).Only(entcache.WithEntryKey(ctx, "Nlog", id))
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -1676,6 +1816,21 @@ func (c *NlogAlertClient) CreateBulk(builders ...*NlogAlertCreate) *NlogAlertCre
 	return &NlogAlertCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *NlogAlertClient) MapCreateBulk(slice any, setFunc func(*NlogAlertCreate, int)) *NlogAlertCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &NlogAlertCreateBulk{err: fmt.Errorf("calling to NlogAlertClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*NlogAlertCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &NlogAlertCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for NlogAlert.
 func (c *NlogAlertClient) Update() *NlogAlertUpdate {
 	mutation := newNlogAlertMutation(c.config, OpUpdate)
@@ -1724,7 +1879,7 @@ func (c *NlogAlertClient) Query() *NlogAlertQuery {
 
 // Get returns a NlogAlert entity by its id.
 func (c *NlogAlertClient) Get(ctx context.Context, id int) (*NlogAlert, error) {
-	return c.Query().Where(nlogalert.ID(id)).Only(ctx)
+	return c.Query().Where(nlogalert.ID(id)).Only(entcache.WithEntryKey(ctx, "NlogAlert", id))
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -1832,6 +1987,21 @@ func (c *OrgRoleUserClient) CreateBulk(builders ...*OrgRoleUserCreate) *OrgRoleU
 	return &OrgRoleUserCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OrgRoleUserClient) MapCreateBulk(slice any, setFunc func(*OrgRoleUserCreate, int)) *OrgRoleUserCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OrgRoleUserCreateBulk{err: fmt.Errorf("calling to OrgRoleUserClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OrgRoleUserCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OrgRoleUserCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for OrgRoleUser.
 func (c *OrgRoleUserClient) Update() *OrgRoleUserUpdate {
 	mutation := newOrgRoleUserMutation(c.config, OpUpdate)
@@ -1880,7 +2050,7 @@ func (c *OrgRoleUserClient) Query() *OrgRoleUserQuery {
 
 // Get returns a OrgRoleUser entity by its id.
 func (c *OrgRoleUserClient) Get(ctx context.Context, id int) (*OrgRoleUser, error) {
-	return c.Query().Where(orgroleuser.ID(id)).Only(ctx)
+	return c.Query().Where(orgroleuser.ID(id)).Only(entcache.WithEntryKey(ctx, "OrgRoleUser", id))
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -1951,6 +2121,21 @@ func (c *SilenceClient) CreateBulk(builders ...*SilenceCreate) *SilenceCreateBul
 	return &SilenceCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SilenceClient) MapCreateBulk(slice any, setFunc func(*SilenceCreate, int)) *SilenceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SilenceCreateBulk{err: fmt.Errorf("calling to SilenceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SilenceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SilenceCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for Silence.
 func (c *SilenceClient) Update() *SilenceUpdate {
 	mutation := newSilenceMutation(c.config, OpUpdate)
@@ -1999,7 +2184,7 @@ func (c *SilenceClient) Query() *SilenceQuery {
 
 // Get returns a Silence entity by its id.
 func (c *SilenceClient) Get(ctx context.Context, id int) (*Silence, error) {
-	return c.Query().Where(silence.ID(id)).Only(ctx)
+	return c.Query().Where(silence.ID(id)).Only(entcache.WithEntryKey(ctx, "Silence", id))
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -2090,6 +2275,21 @@ func (c *UserClient) CreateBulk(builders ...*UserCreate) *UserCreateBulk {
 	return &UserCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserClient) MapCreateBulk(slice any, setFunc func(*UserCreate, int)) *UserCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserCreateBulk{err: fmt.Errorf("calling to UserClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for User.
 func (c *UserClient) Update() *UserUpdate {
 	mutation := newUserMutation(c.config, OpUpdate)
@@ -2138,7 +2338,7 @@ func (c *UserClient) Query() *UserQuery {
 
 // Get returns a User entity by its id.
 func (c *UserClient) Get(ctx context.Context, id int) (*User, error) {
-	return c.Query().Where(user.ID(id)).Only(ctx)
+	return c.Query().Where(user.ID(id)).Only(entcache.WithEntryKey(ctx, "User", id))
 }
 
 // GetX is like Get, but panics if an error occurs.

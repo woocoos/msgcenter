@@ -771,12 +771,16 @@ func (u *MsgEventUpsertOne) IDX(ctx context.Context) int {
 // MsgEventCreateBulk is the builder for creating many MsgEvent entities in bulk.
 type MsgEventCreateBulk struct {
 	config
+	err      error
 	builders []*MsgEventCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the MsgEvent entities in the database.
 func (mecb *MsgEventCreateBulk) Save(ctx context.Context) ([]*MsgEvent, error) {
+	if mecb.err != nil {
+		return nil, mecb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(mecb.builders))
 	nodes := make([]*MsgEvent, len(mecb.builders))
 	mutators := make([]Mutator, len(mecb.builders))
@@ -1107,6 +1111,9 @@ func (u *MsgEventUpsertBulk) UpdateModes() *MsgEventUpsertBulk {
 
 // Exec executes the query.
 func (u *MsgEventUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MsgEventCreateBulk instead", i)

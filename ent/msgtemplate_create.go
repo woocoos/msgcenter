@@ -1410,12 +1410,16 @@ func (u *MsgTemplateUpsertOne) IDX(ctx context.Context) int {
 // MsgTemplateCreateBulk is the builder for creating many MsgTemplate entities in bulk.
 type MsgTemplateCreateBulk struct {
 	config
+	err      error
 	builders []*MsgTemplateCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the MsgTemplate entities in the database.
 func (mtcb *MsgTemplateCreateBulk) Save(ctx context.Context) ([]*MsgTemplate, error) {
+	if mtcb.err != nil {
+		return nil, mtcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(mtcb.builders))
 	nodes := make([]*MsgTemplate, len(mtcb.builders))
 	mutators := make([]Mutator, len(mtcb.builders))
@@ -1998,6 +2002,9 @@ func (u *MsgTemplateUpsertBulk) ClearComments() *MsgTemplateUpsertBulk {
 
 // Exec executes the query.
 func (u *MsgTemplateUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MsgTemplateCreateBulk instead", i)

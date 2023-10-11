@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/hashicorp/go-multierror"
+	"github.com/woocoos/entcache"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -159,7 +160,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgAlert", id))
 		if err != nil {
 			return nil, err
 		}
@@ -171,7 +172,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgChannel", id))
 		if err != nil {
 			return nil, err
 		}
@@ -183,7 +184,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgEvent", id))
 		if err != nil {
 			return nil, err
 		}
@@ -195,7 +196,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgInternal", id))
 		if err != nil {
 			return nil, err
 		}
@@ -207,7 +208,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgInternalTo", id))
 		if err != nil {
 			return nil, err
 		}
@@ -219,7 +220,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgSubscriber", id))
 		if err != nil {
 			return nil, err
 		}
@@ -231,7 +232,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgTemplate", id))
 		if err != nil {
 			return nil, err
 		}
@@ -243,7 +244,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgType", id))
 		if err != nil {
 			return nil, err
 		}
@@ -255,7 +256,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "Nlog", id))
 		if err != nil {
 			return nil, err
 		}
@@ -267,7 +268,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "NlogAlert", id))
 		if err != nil {
 			return nil, err
 		}
@@ -279,7 +280,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "Silence", id))
 		if err != nil {
 			return nil, err
 		}
@@ -291,7 +292,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "User", id))
 		if err != nil {
 			return nil, err
 		}

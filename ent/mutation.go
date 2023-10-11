@@ -2911,6 +2911,7 @@ func (m *MsgEventMutation) ResetModes() {
 // ClearMsgType clears the "msg_type" edge to the MsgType entity.
 func (m *MsgEventMutation) ClearMsgType() {
 	m.clearedmsg_type = true
+	m.clearedFields[msgevent.FieldMsgTypeID] = struct{}{}
 }
 
 // MsgTypeCleared reports if the "msg_type" edge to the MsgType entity was cleared.
@@ -4917,6 +4918,7 @@ func (m *MsgInternalToMutation) ResetCreatedAt() {
 // ClearMsgInternal clears the "msg_internal" edge to the MsgInternal entity.
 func (m *MsgInternalToMutation) ClearMsgInternal() {
 	m.clearedmsg_internal = true
+	m.clearedFields[msginternalto.FieldMsgInternalID] = struct{}{}
 }
 
 // MsgInternalCleared reports if the "msg_internal" edge to the MsgInternal entity was cleared.
@@ -4943,6 +4945,7 @@ func (m *MsgInternalToMutation) ResetMsgInternal() {
 // ClearUser clears the "user" edge to the User entity.
 func (m *MsgInternalToMutation) ClearUser() {
 	m.cleareduser = true
+	m.clearedFields[msginternalto.FieldUserID] = struct{}{}
 }
 
 // UserCleared reports if the "user" edge to the User entity was cleared.
@@ -5909,6 +5912,7 @@ func (m *MsgSubscriberMutation) ResetExclude() {
 // ClearMsgType clears the "msg_type" edge to the MsgType entity.
 func (m *MsgSubscriberMutation) ClearMsgType() {
 	m.clearedmsg_type = true
+	m.clearedFields[msgsubscriber.FieldMsgTypeID] = struct{}{}
 }
 
 // MsgTypeCleared reports if the "msg_type" edge to the MsgType entity was cleared.
@@ -5935,6 +5939,7 @@ func (m *MsgSubscriberMutation) ResetMsgType() {
 // ClearUser clears the "user" edge to the User entity.
 func (m *MsgSubscriberMutation) ClearUser() {
 	m.cleareduser = true
+	m.clearedFields[msgsubscriber.FieldUserID] = struct{}{}
 }
 
 // UserCleared reports if the "user" edge to the User entity was cleared.
@@ -7663,6 +7668,7 @@ func (m *MsgTemplateMutation) SetEventID(id int) {
 // ClearEvent clears the "event" edge to the MsgEvent entity.
 func (m *MsgTemplateMutation) ClearEvent() {
 	m.clearedevent = true
+	m.clearedFields[msgtemplate.FieldMsgEventID] = struct{}{}
 }
 
 // EventCleared reports if the "event" edge to the MsgEvent entity was cleared.
@@ -10951,6 +10957,7 @@ func (m *NlogAlertMutation) ResetCreatedAt() {
 // ClearNlog clears the "nlog" edge to the Nlog entity.
 func (m *NlogAlertMutation) ClearNlog() {
 	m.clearednlog = true
+	m.clearedFields[nlogalert.FieldNlogID] = struct{}{}
 }
 
 // NlogCleared reports if the "nlog" edge to the Nlog entity was cleared.
@@ -10977,6 +10984,7 @@ func (m *NlogAlertMutation) ResetNlog() {
 // ClearAlert clears the "alert" edge to the MsgAlert entity.
 func (m *NlogAlertMutation) ClearAlert() {
 	m.clearedalert = true
+	m.clearedFields[nlogalert.FieldAlertID] = struct{}{}
 }
 
 // AlertCleared reports if the "alert" edge to the MsgAlert entity was cleared.
@@ -12496,6 +12504,7 @@ func (m *SilenceMutation) SetUserID(id int) {
 // ClearUser clears the "user" edge to the User entity.
 func (m *SilenceMutation) ClearUser() {
 	m.cleareduser = true
+	m.clearedFields[silence.FieldCreatedBy] = struct{}{}
 }
 
 // UserCleared reports if the "user" edge to the User entity was cleared.

@@ -54,7 +54,9 @@ web:
 
 ui:
   staticDir: "../../web/build"
-  relativePath: "/"
+  enabled: true
+  server:
+    addr: :10073
   engine:
     routerGroups:
       - default:
@@ -62,8 +64,6 @@ ui:
             - recovery:
             - errorHandle:
             - gzip:
-  server:
-    addr: 127.0.0.1:10073
 
 store:
   msgcenter:
@@ -75,7 +75,7 @@ store:
     db: 1
 
 entcache:
-  level: context
+  hashQueryTTL: 5s
 
 alertManager:
   # 集群配置,如无配置表示单机模式

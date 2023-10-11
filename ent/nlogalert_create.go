@@ -371,12 +371,16 @@ func (u *NlogAlertUpsertOne) IDX(ctx context.Context) int {
 // NlogAlertCreateBulk is the builder for creating many NlogAlert entities in bulk.
 type NlogAlertCreateBulk struct {
 	config
+	err      error
 	builders []*NlogAlertCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the NlogAlert entities in the database.
 func (nacb *NlogAlertCreateBulk) Save(ctx context.Context) ([]*NlogAlert, error) {
+	if nacb.err != nil {
+		return nil, nacb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(nacb.builders))
 	nodes := make([]*NlogAlert, len(nacb.builders))
 	mutators := make([]Mutator, len(nacb.builders))
@@ -572,6 +576,9 @@ func (u *NlogAlertUpsertBulk) UpdateAlertID() *NlogAlertUpsertBulk {
 
 // Exec executes the query.
 func (u *NlogAlertUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the NlogAlertCreateBulk instead", i)

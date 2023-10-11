@@ -8,6 +8,7 @@ require (
 	github.com/99designs/gqlgen v0.17.38
 	github.com/alicebob/miniredis/v2 v2.30.5
 	github.com/cenkalti/backoff/v4 v4.2.0
+	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/golang-jwt/jwt/v4 v4.5.0
@@ -23,11 +24,12 @@ require (
 	github.com/redis/go-redis/v9 v9.0.5
 	github.com/stretchr/testify v1.8.4
 	github.com/tsingsun/members v0.0.0-20230712074048-c38e433601b8
-	github.com/tsingsun/woocoo v0.3.1-0.20230922164106-4cb7f13c1506
+	github.com/tsingsun/woocoo v0.4.1-0.20231007104131-727c230deab0
 	github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230922090437-500dbe1d58de
 	github.com/vektah/gqlparser/v2 v2.5.10
 	github.com/vmihailenco/msgpack/v5 v5.3.5
-	github.com/woocoos/entco v0.0.0-20230923080449-b28aa5f23540
+	github.com/woocoos/entcache v0.0.0-20231009085009-0e2ea3b3cf40
+	github.com/woocoos/entco v0.0.0-20231009085332-d98430a298be
 	go.uber.org/zap v1.25.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/sync v0.3.0
@@ -37,7 +39,6 @@ require (
 
 require (
 	ariga.io/atlas v0.14.1-0.20230918065911-83ad451a4935 // indirect
-	ariga.io/entcache v0.1.1-0.20230620164151-0eb723a11c40 // indirect
 	github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible // indirect
 	github.com/XSAM/otelsql v0.23.0 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
@@ -58,7 +59,6 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/gin-contrib/cors v1.4.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/gin-contrib/static v0.0.1 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
@@ -67,7 +67,6 @@ require (
 	github.com/go-playground/validator/v10 v10.14.0 // indirect
 	github.com/go-test/deep v1.0.8 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
-	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/btree v0.0.0-20180813153112-4030bb1f1f0c // indirect
 	github.com/google/go-cmp v0.5.9 // indirect

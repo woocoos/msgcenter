@@ -74,11 +74,3 @@ func NewSchema(opts ...Option) graphql.ExecutableSchema {
 		Resolvers: NewResolver(opts...),
 	})
 }
-
-func MessageFilterFromContext(ctx context.Context) *model.MessageFilter {
-	return ctx.Value(wsFilterCtxKey).(*model.MessageFilter)
-}
-
-func WithMessageFilter(ctx context.Context, filter model.MessageFilter) context.Context {
-	return context.WithValue(ctx, wsFilterCtxKey, &filter)
-}

@@ -728,12 +728,16 @@ func (u *MsgChannelUpsertOne) IDX(ctx context.Context) int {
 // MsgChannelCreateBulk is the builder for creating many MsgChannel entities in bulk.
 type MsgChannelCreateBulk struct {
 	config
+	err      error
 	builders []*MsgChannelCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the MsgChannel entities in the database.
 func (mccb *MsgChannelCreateBulk) Save(ctx context.Context) ([]*MsgChannel, error) {
+	if mccb.err != nil {
+		return nil, mccb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(mccb.builders))
 	nodes := make([]*MsgChannel, len(mccb.builders))
 	mutators := make([]Mutator, len(mccb.builders))
@@ -1071,6 +1075,9 @@ func (u *MsgChannelUpsertBulk) ClearComments() *MsgChannelUpsertBulk {
 
 // Exec executes the query.
 func (u *MsgChannelUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MsgChannelCreateBulk instead", i)

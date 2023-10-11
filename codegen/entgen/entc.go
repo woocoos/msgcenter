@@ -6,6 +6,7 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
+	entcachegen "github.com/woocoos/entcache/gen"
 	"github.com/woocoos/entco/genx"
 	"log"
 	"os"
@@ -13,6 +14,7 @@ import (
 
 func main() {
 	ex, err := entgql.NewExtension(
+		genx.WithGqlWithTemplates(),
 		entgql.WithSchemaGenerator(),
 		entgql.WithWhereInputs(true),
 		entgql.WithConfigPath("codegen/gqlgen/gqlgen.yaml"),
@@ -27,6 +29,7 @@ func main() {
 		entc.Extensions(ex),
 		genx.GlobalID(),
 		genx.SimplePagination(),
+		entcachegen.QueryCache(),
 	}
 	err = entc.Generate("./codegen/entgen/schema", &gen.Config{
 		Package: "github.com/woocoos/msgcenter/ent",

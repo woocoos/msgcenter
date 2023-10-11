@@ -874,12 +874,16 @@ func (u *MsgAlertUpsertOne) IDX(ctx context.Context) int {
 // MsgAlertCreateBulk is the builder for creating many MsgAlert entities in bulk.
 type MsgAlertCreateBulk struct {
 	config
+	err      error
 	builders []*MsgAlertCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the MsgAlert entities in the database.
 func (macb *MsgAlertCreateBulk) Save(ctx context.Context) ([]*MsgAlert, error) {
+	if macb.err != nil {
+		return nil, macb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(macb.builders))
 	nodes := make([]*MsgAlert, len(macb.builders))
 	mutators := make([]Mutator, len(macb.builders))
@@ -1231,6 +1235,9 @@ func (u *MsgAlertUpsertBulk) UpdateDeleted() *MsgAlertUpsertBulk {
 
 // Exec executes the query.
 func (u *MsgAlertUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MsgAlertCreateBulk instead", i)

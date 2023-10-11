@@ -35,7 +35,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -144,7 +143,7 @@ func (s *Server) Stop(ctx context.Context) error {
 
 func (s *Server) buildEntClient() {
 	pd := oteldriver.BuildOTELDriver(s.appCnf, "store.msgcenter")
-	pd = ecx.BuildEntCacheDriver(s.appCnf, pd)
+	pd, _ = ecx.BuildEntCacheDriver(s.appCnf.Sub("entcache"), pd)
 	scfg := ent.AlternateSchema(ent.SchemaConfig{
 		User:        "portal",
 		OrgRoleUser: "portal",
@@ -183,7 +182,6 @@ func (s *Server) buildApiService(cnf *conf.AppConfiguration, ws *server.Service,
 		Cache: lru.New(100),
 	})
 
-	gqlsrv.AroundResponses(gqlx.ContextCache())
 	gqlsrv.AroundResponses(gqlx.SimplePagination())
 	// mutation事务
 	gqlsrv.Use(entgql.Transactioner{TxOpener: s.dbClient})
@@ -204,16 +202,14 @@ func (s *Server) buildPushService() {
 }
 
 func buildUiServer(cnf *conf.AppConfiguration) *web.Server {
-	relativePath := cnf.String("ui.relativePath")
 	staticDir := cnf.String("ui.staticDir")
 	uiSrv := web.New(web.WithConfiguration(cnf.Sub("ui")),
 		web.WithGracefulStop(),
 	)
 	uiSrv.Router().NoRoute(func(c *gin.Context) {
-		c.File(filepath.Join(staticDir, strings.TrimPrefix(c.Request.URL.Path, relativePath)) + ".html")
+		c.File(filepath.Join(staticDir, c.Request.URL.Path+".html"))
 	})
-	uiSrv.Router().Use(static.Serve(relativePath, static.LocalFile(staticDir, false)))
-	uiSrv.Router().StaticFile("/favicon.ico", filepath.Join(staticDir, "/favicon.ico"))
+	uiSrv.Router().Use(static.Serve("/", static.LocalFile(staticDir, false)))
 	return uiSrv
 }
 
