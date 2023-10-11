@@ -24,12 +24,12 @@ require (
 	github.com/redis/go-redis/v9 v9.0.5
 	github.com/stretchr/testify v1.8.4
 	github.com/tsingsun/members v0.0.0-20230712074048-c38e433601b8
-	github.com/tsingsun/woocoo v0.4.1-0.20231007104131-727c230deab0
+	github.com/tsingsun/woocoo v0.4.1-0.20231011102622-cc6dfc96a30c
 	github.com/tsingsun/woocoo/contrib/gql v0.0.0-20230922090437-500dbe1d58de
 	github.com/vektah/gqlparser/v2 v2.5.10
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	github.com/woocoos/entcache v0.0.0-20231009085009-0e2ea3b3cf40
-	github.com/woocoos/entco v0.0.0-20231009085332-d98430a298be
+	github.com/woocoos/entco v0.0.0-20231011103354-866ff2ff4eee
 	go.uber.org/zap v1.25.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/sync v0.3.0

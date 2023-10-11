@@ -61,8 +61,6 @@ ui:
     routerGroups:
       - default:
           middlewares:
-            - recovery:
-            - errorHandle:
             - gzip:
 
 store:
