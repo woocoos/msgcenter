@@ -55,7 +55,13 @@ web:
 ui:
   staticDir: "../../web/build"
   relativePath: "/"
-  gzip:
+  engine:
+    routerGroups:
+      - default:
+          middlewares:
+            - recovery:
+            - errorHandle:
+            - gzip:
   server:
     addr: 127.0.0.1:10073
 
