@@ -219,11 +219,33 @@ export const authConfig = defineAuthConfig(async (appData) => {
 
 // store数据项
 export const storeConfig = defineStoreConfig(async (appData) => {
+  const locale = appData?.app?.locale ?? getItem<string>('locale'),
+    darkMode = appData?.app?.darkMode ?? getItem<string>('darkMode'),
+    compactMode = appData?.app?.compactMode ?? getItem<string>('compactMode'),
+    token = appData?.user?.token ?? getItem<string>('token'),
+    refreshToken = appData?.user?.refreshToken ?? getItem<string>('refreshToken'),
+    tenantId = appData?.user?.tenantId ?? getItem<string>('tenantId'),
+    user = appData?.user?.user ?? getItem<User>('user'),
+    handshake = appData?.ws?.handshake ?? getItem<boolean>('handshake'),
+    message = appData?.ws?.message ?? getItem<Message[]>('message') ?? [];
+
   return {
     initialStates: {
-      user: appData?.user,
-      app: appData?.app,
-      ws: appData?.ws,
+      app: {
+        locale,
+        darkMode,
+        compactMode,
+      },
+      user: {
+        token,
+        refreshToken,
+        tenantId,
+        user,
+      },
+      ws: {
+        handshake,
+        message,
+      },
     },
   };
 });
