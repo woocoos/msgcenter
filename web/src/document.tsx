@@ -17,14 +17,14 @@ export default function Document() {
       <body>
         <Main />
         {ICE_STATIC_CDN ? <>
-          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/react/18.2.0/index.min.js"></script>
-          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/react-dom/18.2.0/index.min.js"></script>
-          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/i18next/22.5.0/index.min.js"></script>
-          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/react-i18next/12.3.1/index.min.js"></script>
-          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/js-yaml/4.1.0/index.min.js"></script>
+          <script crossOrigin="" src="https://jsd.onmicrosoft.cn/npm/react@18.2.0/umd/react.production.min.js"></script>
+          <script crossOrigin="" src="https://jsd.onmicrosoft.cn/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+          <script crossOrigin="" src="https://jsd.onmicrosoft.cn/npm/i18next@22.5.0/i18next.min.js"></script>
+          <script crossOrigin="" src="https://jsd.onmicrosoft.cn/npm/react-i18next@12.3.1/react-i18next.min.js"></script>
+          <script crossOrigin="" src="https://jsd.onmicrosoft.cn/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
           <script crossOrigin="" src="https://jsd.onmicrosoft.cn/npm/dayjs@1.11.10/dayjs.min.js"></script>
-          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/antd/5.6.3/index.min.js"></script>
-          <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/%40ant-design/pro-components/2.6.28/index.min.js"></script>
+          <script crossOrigin="" src="https://jsd.onmicrosoft.cn/npm/antd@5.6.3/dist/antd.min.js"></script>
+          <script crossOrigin="" src="https://jsd.onmicrosoft.cn/npm/@ant-design/pro-components@2.6.28/dist/pro-components.min.js"></script>
         </> : <></>}
         <Scripts />
       </body>
