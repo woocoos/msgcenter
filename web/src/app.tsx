@@ -139,11 +139,15 @@ export const urqlConfig = defineUrqlConfig([
       authOpts: {
         store: {
           getState: () => {
-            const { token, tenantId, refreshToken } = store.getModelState('user');
+            const userState = store.getModelState('user'),
+              token = userState.token ? userState.token : getItem<string>('token') as string,
+              tenantId = userState.tenantId ? userState.tenantId : getItem<string>('tenantId') as string,
+              refreshToken = userState.refreshToken ? userState.refreshToken : getItem<string>('refreshToken') as string;
+
             return {
-              token: token ?? getItem<string>('token'),
-              tenantId: tenantId ?? getItem<string>('tenantId'),
-              refreshToken: refreshToken ?? getItem<string>('refreshToken'),
+              token: token,
+              tenantId: tenantId,
+              refreshToken: refreshToken,
             }
           },
           setStateToken: (newToken) => {
@@ -159,10 +163,13 @@ export const urqlConfig = defineUrqlConfig([
         url: ICE_WS_MSGSRV,
         store: {
           getState: () => {
-            const { token, tenantId } = store.getModelState('user');
+            const userState = store.getModelState('user'),
+              token = userState.token ? userState.token : getItem<string>('token') as string,
+              tenantId = userState.tenantId ? userState.tenantId : getItem<string>('tenantId') as string;
+
             return {
-              token: token ?? getItem<string>('token'),
-              tenantId: tenantId ?? getItem<string>('tenantId'),
+              token: token,
+              tenantId: tenantId,
             };
           },
         }
@@ -178,12 +185,14 @@ export const urqlConfig = defineUrqlConfig([
 
 // 权限
 export const authConfig = defineAuthConfig(async (appData) => {
-  const initialAuth = {};
+  const initialAuth = {},
+    token = appData?.user?.token ? appData.user.token : getItem<string>('token'),
+    tenantId = appData?.user?.tenantId ? appData.user.tenantId : getItem<string>('tenantId');
   // 判断路由权限
   if (appData?.user?.token) {
     const result = await userPermissions(ICE_APP_CODE, {
-      Authorization: getRequestHeaderAuthorization(appData.user.token, ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined),
-      'X-Tenant-ID': appData.user.tenantId,
+      Authorization: getRequestHeaderAuthorization(token, ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined),
+      'X-Tenant-ID': tenantId,
     });
     if (result) {
       result.forEach(item => {
@@ -225,10 +234,12 @@ export const requestConfig = defineRequestConfig({
   interceptors: requestInterceptor({
     store: {
       getState: () => {
-        const { token, tenantId } = store.getModelState('user')
+        const userState = store.getModelState('user'),
+          token = userState.token ? userState.token : getItem<string>('token') as string,
+          tenantId = userState.tenantId ? userState.tenantId : getItem<string>('tenantId') as string;
         return {
-          token: token ?? getItem<string>('token'),
-          tenantId: tenantId ?? getItem<string>('tenantId'),
+          token: token,
+          tenantId: tenantId,
         }
       },
     },
