@@ -11,6 +11,7 @@ import Config from './components/config';
 import ConfigExample from './components/configExample';
 import { KeepAlive } from '@knockout-js/layout';
 import { DictSelect, DictText } from '@knockout-js/org';
+import { definePageConfig } from 'ice';
 
 
 export default () => {
@@ -273,3 +274,8 @@ export default () => {
     </KeepAlive>
   );
 };
+
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/msg/event'],
+}));

@@ -28,6 +28,7 @@ const externals = {
   'react-i18next': 'ReactI18next',
   'i18next': 'i18next',
   '@ant-design/pro-components': 'ProComponents',
+  'dayjs': 'dayjs',
   'antd': 'antd',
   'js-yaml': 'jsyaml',
 }

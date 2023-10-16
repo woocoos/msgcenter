@@ -184,6 +184,7 @@ export default {
     read_msg: '已读消息',
     station_msg_detail: '站内消息详情',
     msg_event_config_example: '配置示例',
+    page_403: "对不起，您没有权限访问此页面",
 
     // 创建
     create_msg_type: '创建消息类型',

@@ -181,6 +181,7 @@ export default {
     read_msg: 'Read message',
     station_msg_detail: 'Site message details',
     msg_event_config_example: 'Configuration example',
+    page_403: "Sorry, you are not authorized to access this page",
 
     // 创建
     create_msg_type: 'Create message type',

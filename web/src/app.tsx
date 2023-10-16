@@ -15,6 +15,8 @@ import { logout, parseSpm } from './services/auth';
 import { User } from '@knockout-js/api/ucenter';
 import { Message } from './generated/msgsrv/graphql';
 import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/request';
+import { useTranslation } from 'react-i18next';
+import { Result } from 'antd';
 
 const NODE_ENV = process.env.NODE_ENV ?? '',
   ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
@@ -195,6 +197,14 @@ export const authConfig = defineAuthConfig(async (appData) => {
   }
   return {
     initialAuth,
+    NoAuthFallback: () => {
+      const { t } = useTranslation()
+      return (
+        <Result status="403"
+          title="403"
+          subTitle={t('page_403')} />
+      )
+    }
   };
 });
 

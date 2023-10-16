@@ -10,6 +10,7 @@ import { Badge, Button, Dropdown, Popconfirm, Space, Tabs, message } from "antd"
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./index.module.css";
+import { definePageConfig } from "ice";
 
 type CategoryTag = {
   name: string,
@@ -231,3 +232,7 @@ export default () => {
     </PageContainer>
   </KeepAlive>
 }
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/msg/internal'],
+}));

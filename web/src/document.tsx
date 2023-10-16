@@ -22,6 +22,7 @@ export default function Document() {
           <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/i18next/22.5.0/index.min.js"></script>
           <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/react-i18next/12.3.1/index.min.js"></script>
           <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/js-yaml/4.1.0/index.min.js"></script>
+          <script crossOrigin="" src="https://jsd.onmicrosoft.cn/npm/dayjs@1.11.10/dayjs.min.js"></script>
           <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/antd/5.6.3/index.min.js"></script>
           <script crossOrigin="" src="https://qlcdn.oss-cn-shenzhen.aliyuncs.com/cdn/%40ant-design/pro-components/2.6.28/index.min.js"></script>
         </> : <></>}

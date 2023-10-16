@@ -7,7 +7,7 @@ import i18n from '@/i18n';
 import { MenuDataItem, useToken } from '@ant-design/pro-components';
 import { monitorKeyChange } from '@/pkg/localStore';
 import { Layout, useLeavePrompt } from '@knockout-js/layout';
-import { logout, urlSpm } from '@/services/auth';
+import { getAppDeployConfig, logout, urlSpm } from '@/services/auth';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import { createFromIconfontCN } from '@ant-design/icons';
 import { getFilesRaw } from '@knockout-js/api';
@@ -25,6 +25,7 @@ export default () => {
   const [userState, userDispatcher] = store.useModel('user'),
     [appState, appDispatcher] = store.useModel('app'),
     [, wsDispatcher] = store.useModel('ws'),
+    [open, setOpen] = useState(false),
     msgRef = useRef<MsgDropdownRef>(null),
     [checkLeave] = useLeavePrompt(),
     location = useLocation(),
@@ -133,6 +134,30 @@ export default () => {
       onChange: (value) => {
         appDispatcher.updateDarkMode(value);
       },
+    }}
+    aggregateMenuProps={{
+      open: open,
+      onChangeOpen: setOpen,
+      onClick: async (menuItem, app, isOpen) => {
+        if (checkLeave()) {
+          let url = menuItem.route ?? '';
+          const appDeployConfig = await getAppDeployConfig();
+          if (appDeployConfig) {
+            const adcData = appDeployConfig.find(adc => adc.appCode == app.code);
+            if (adcData) {
+              url = `${adcData.entry}${menuItem.route}`.replaceAll('//', '/');
+            }
+          }
+          if (url) {
+            if (isOpen) {
+              window.open(await urlSpm(url));
+            } else {
+              history?.push(await urlSpm(url));
+            }
+          }
+          setOpen(false);
+        }
+      }
     }}
     proLayoutProps={{
       token: {

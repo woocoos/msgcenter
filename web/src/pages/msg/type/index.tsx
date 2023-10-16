@@ -11,7 +11,7 @@ import { getApps } from '@knockout-js/api';
 import { App } from '@knockout-js/api/ucenter';
 import { KeepAlive } from '@knockout-js/layout';
 import { DictSelect, DictText } from '@knockout-js/org';
-
+import { definePageConfig } from 'ice';
 
 export default () => {
   const { token } = useToken(),
@@ -212,3 +212,7 @@ export default () => {
     </KeepAlive>
   );
 };
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/msg/type'],
+}));

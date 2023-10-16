@@ -12,6 +12,7 @@ import { OrgSelect } from '@knockout-js/org';
 import { OrgKind, Org } from '@knockout-js/api/ucenter';
 import { KeepAlive } from '@knockout-js/layout';
 import ConfigExample from './components/configExample';
+import { definePageConfig } from 'ice';
 
 
 export default () => {
@@ -260,3 +261,7 @@ export default () => {
     </KeepAlive>
   );
 };
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/msg/channel'],
+}));

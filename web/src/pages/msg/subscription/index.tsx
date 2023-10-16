@@ -9,6 +9,7 @@ import Settings from './components/settings';
 import { getOrgRoles, getUsers } from '@knockout-js/api';
 import { KeepAlive } from '@knockout-js/layout';
 import { DictSelect, DictText } from '@knockout-js/org';
+import { definePageConfig } from 'ice';
 
 type ProTableColumnsData = {
   id: string;
@@ -210,3 +211,7 @@ export default () => {
     </KeepAlive>
   );
 };
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/msg/subscription'],
+}));

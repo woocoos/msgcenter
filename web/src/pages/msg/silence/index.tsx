@@ -10,6 +10,7 @@ import { EnumSilenceMatchType, EnumSilenceStatus, delSilence, getSilenceList } f
 import { OrgSelect } from '@knockout-js/org';
 import { Org, OrgKind } from '@knockout-js/api/ucenter';
 import { KeepAlive } from '@knockout-js/layout';
+import { definePageConfig } from 'ice';
 
 
 export default () => {
@@ -212,3 +213,8 @@ export default () => {
     </KeepAlive>
   );
 };
+
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/msg/silence'],
+}));

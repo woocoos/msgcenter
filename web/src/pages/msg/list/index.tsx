@@ -6,6 +6,7 @@ import { OrgKind } from "@knockout-js/api/ucenter";
 import { KeepAlive } from "@knockout-js/layout";
 import { OrgSelect } from "@knockout-js/org";
 import { Space } from "antd";
+import { definePageConfig } from "ice";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -125,3 +126,7 @@ export default () => {
     </PageContainer>
   </KeepAlive>
 }
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/msg/list'],
+}));

@@ -178,9 +178,13 @@ export const initStoreData = (store: IMockStore) => {
   store.set('App', 2, { id: 2, name: 'app2', code: 'app2' })
 
   // AppAction
-  store.set('AppAction', 1, { id: 1, name: 'app1Action1', method: 'read', appID: 1, app: store.get('App', 1) })
-  store.set('AppAction', 2, { id: 2, name: 'app1Action2', method: 'write', appID: 1, app: store.get('App', 1) })
-  store.set('AppAction', 3, { id: 3, name: 'app1Action3', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 1, { id: 1, name: '/msg/type', method: 'read', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 2, { id: 2, name: '/msg/event', method: 'write', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 3, { id: 3, name: '/msg/channel', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 4, { id: 4, name: '/msg/subscription', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 5, { id: 5, name: '/msg/silence', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 6, { id: 6, name: '/msg/list', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 7, { id: 7, name: '/msg/internal', method: 'list', appID: 1, app: store.get('App', 1) })
 
   // AppPolicy
   store.set('AppPolicy', 1, {
@@ -252,16 +256,16 @@ export const initStoreData = (store: IMockStore) => {
 
   // AppDictItem
   store.set('AppDictItem', 1, {
-    id: 1, code: "business", name: '业务消息', dictID: "1", dict: store.get('AppDict', 1)
+    id: 1, code: "business", name: '业务消息', dictID: "1", refCode: "resource:MsgCategory", dict: store.get('AppDict', 1)
   })
   store.set('AppDictItem', 2, {
-    id: 2, code: "malfunction", name: '故障消息', dictID: "1", dict: store.get('AppDict', 1)
+    id: 2, code: "malfunction", name: '故障消息', dictID: "1", refCode: "resource:MsgCategory", dict: store.get('AppDict', 1)
   })
   store.set('AppDictItem', 3, {
-    id: 3, code: "trade", name: '客户交易', dictID: "1", dict: store.get('AppDict', 1)
+    id: 3, code: "trade", name: '客户交易', dictID: "1", refCode: "resource:MsgCategory", dict: store.get('AppDict', 1)
   })
   store.set('AppDictItem', 4, {
-    id: 4, code: "test", name: '测试消息', dictID: "1", dict: store.get('AppDict', 1)
+    id: 4, code: "test", name: '测试消息', dictID: "1", refCode: "resource:MsgCategory", dict: store.get('AppDict', 1)
   })
 
 }
