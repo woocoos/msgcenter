@@ -149,10 +149,15 @@ export default () => {
             }
           }
           if (url) {
+            url = await urlSpm(url)
             if (isOpen) {
-              window.open(await urlSpm(url));
+              window.open(url);
             } else {
-              history?.push(await urlSpm(url));
+              if (url.toLowerCase().startsWith("http")) {
+                window.location.href = url;
+              } else {
+                history?.push(url);
+              }
             }
           }
           setOpen(false);

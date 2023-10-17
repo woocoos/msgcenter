@@ -101,9 +101,11 @@ export const dataLoader = defineDataLoader(async () => {
       const jwt = jwtDcode<JwtPayload>(token);
       if ((jwt.exp || 0) * 1000 < Date.now()) {
         token = '';
+        removeItem('token');
       }
     } catch (err) {
       token = '';
+      removeItem('token');
     }
   }
   if (!locale) {
@@ -219,33 +221,11 @@ export const authConfig = defineAuthConfig(async (appData) => {
 
 // store数据项
 export const storeConfig = defineStoreConfig(async (appData) => {
-  const locale = appData?.app?.locale ?? getItem<string>('locale'),
-    darkMode = appData?.app?.darkMode ?? getItem<string>('darkMode'),
-    compactMode = appData?.app?.compactMode ?? getItem<string>('compactMode'),
-    token = appData?.user?.token ?? getItem<string>('token'),
-    refreshToken = appData?.user?.refreshToken ?? getItem<string>('refreshToken'),
-    tenantId = appData?.user?.tenantId ?? getItem<string>('tenantId'),
-    user = appData?.user?.user ?? getItem<User>('user'),
-    handshake = appData?.ws?.handshake ?? getItem<boolean>('handshake'),
-    message = appData?.ws?.message ?? getItem<Message[]>('message') ?? [];
-
   return {
     initialStates: {
-      app: {
-        locale,
-        darkMode,
-        compactMode,
-      },
-      user: {
-        token,
-        refreshToken,
-        tenantId,
-        user,
-      },
-      ws: {
-        handshake,
-        message,
-      },
+      app: appData?.app,
+      user: appData?.user,
+      ws: appData?.ws,
     },
   };
 });
