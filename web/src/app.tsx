@@ -9,14 +9,14 @@ import { getItem, removeItem, setItem } from '@/pkg/localStore';
 import { browserLanguage } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
-import { isInIcestark } from '@ice/stark-app';
 import { instanceName, setFilesApi, userPermissions } from '@knockout-js/api';
-import { logout, parseSpm } from './services/auth';
+import { logout } from './services/auth';
 import { User } from '@knockout-js/api/ucenter';
 import { Message } from './generated/msgsrv/graphql';
 import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/request';
 import { useTranslation } from 'react-i18next';
-import { Result } from 'antd';
+import { Result, message } from 'antd';
+import { parseSpm } from './services/auth/noStore';
 
 const NODE_ENV = process.env.NODE_ENV ?? '',
   ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
@@ -75,15 +75,13 @@ export const dataLoader = defineDataLoader(async () => {
 
   setFilesApi(ICE_API_FILES_PREFIX);
 
-  if (!isInIcestark()) {
-    const signCid = `sign_cid=${ICE_APP_CODE}`;
-    if (document.cookie.indexOf(signCid) === -1) {
-      removeItem('token');
-      removeItem('refreshToken');
-    }
-    document.cookie = signCid;
-    await parseSpm();
+  const signCid = `sign_cid=${ICE_APP_CODE}`;
+  if (document.cookie.indexOf(signCid) === -1) {
+    removeItem('token');
+    removeItem('refreshToken');
   }
+  document.cookie = signCid;
+  await parseSpm();
 
   let locale = getItem<string>('locale'),
     darkMode = getItem<string>('darkMode'),
@@ -155,6 +153,12 @@ export const urqlConfig = defineUrqlConfig([
           setStateToken: (newToken) => {
             store.dispatch.user.updateToken(newToken);
           }
+        },
+        error: (err, errstr) => {
+          if (errstr) {
+            message.error(errstr)
+          }
+          return false;
         },
         beforeRefreshTime: 5 * 60 * 1000,
         headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
@@ -236,9 +240,8 @@ export const requestConfig = defineRequestConfig({
   interceptors: requestInterceptor({
     store: {
       getState: () => {
-        const userState = store.getModelState('user'),
-          token = userState.token ? userState.token : getItem<string>('token') as string,
-          tenantId = userState.tenantId ? userState.tenantId : getItem<string>('tenantId') as string;
+        const token = getItem<string>('token') as string,
+          tenantId = getItem<string>('tenantId') as string;
         return {
           token: token,
           tenantId: tenantId,
@@ -247,6 +250,11 @@ export const requestConfig = defineRequestConfig({
     },
     headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
     login: ICE_LOGIN_URL,
+    error: (err, str) => {
+      if (str) {
+        window.antd.message.error(str)
+      }
+    }
   })
 });
 

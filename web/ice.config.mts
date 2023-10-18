@@ -11,7 +11,6 @@ import urqlPlugin from '@knockout-js/ice-urql';
 const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '',
   ICE_DEV_PUBLIC_PATH = process.env.ICE_DEV_PUBLIC_PATH ?? '',
   NODE_ENV = process.env.NODE_ENV ?? '',
-  ICE_STATIC_CDN = process.env.ICE_STATIC_CDN ?? '',
   ICE_PROXY_ADMINX = process.env.ICE_PROXY_ADMINX ?? '',
   ICE_PROXY_FILES = process.env.ICE_PROXY_FILES ?? '',
   ICE_PROXY_AUTH = process.env.ICE_PROXY_AUTH ?? '',
@@ -21,17 +20,6 @@ const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '',
   ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '',
   ICE_API_MSGSRV_PREFIX = process.env.ICE_API_MSGSRV_PREFIX ?? '',
   minify = process.env.NODE_ENV === 'production' ? 'swc' : false;
-
-const externals = {
-  'react': 'React',
-  'react-dom': 'ReactDOM',
-  'react-i18next': 'ReactI18next',
-  'i18next': 'i18next',
-  '@ant-design/pro-components': 'ProComponents',
-  'dayjs': 'dayjs',
-  'antd': 'antd',
-  'js-yaml': 'jsyaml',
-}
 
 export default defineConfig(() => ({
   ssg: false,
@@ -47,7 +35,15 @@ export default defineConfig(() => ({
       '**/components/**',   // 添加此配置忽略components被解析成路由组件
     ],
   },
-  externals: ICE_STATIC_CDN ? externals : {},
+  externals: {
+    'react': 'React',
+    'react-dom': 'ReactDOM',
+    'react-i18next': 'ReactI18next',
+    'i18next': 'i18next',
+    'js-yaml': 'jsyaml',
+    'antd': 'antd',
+    '@ant-design/pro-components': 'ProComponents',
+  },
   plugins: [
     icestark({ type: 'child' }),
     urqlPlugin(),

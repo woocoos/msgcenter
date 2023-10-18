@@ -18,7 +18,7 @@
     "@ant-design/icons": "^5.2.5",
     "@ant-design/pro-components": "^2.6.28",
     "@knockout-js/api": "0.1.5",
-    "@knockout-js/ice-urql": "0.1.3",
+    "@knockout-js/ice-urql": "0.1.4",
     "@knockout-js/layout": "0.1.3",
     "@knockout-js/org": "0.1.4",
     "@monaco-editor/react": "^4.5.1",
