@@ -8,7 +8,7 @@ import (
 	"github.com/tsingsun/members"
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/log"
-	"github.com/woocoos/entco/pkg/snowflake"
+	"github.com/woocoos/knockout-go/pkg/snowflake"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/metrics"

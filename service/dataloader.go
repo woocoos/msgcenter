@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"github.com/woocoos/entco/schemax"
+	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/pkg/alert"

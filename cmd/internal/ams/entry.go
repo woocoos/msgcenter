@@ -17,10 +17,8 @@ import (
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/tsingsun/woocoo/web"
-	"github.com/woocoos/entco/ecx"
-	"github.com/woocoos/entco/ecx/oteldriver"
-	"github.com/woocoos/entco/gqlx"
-	"github.com/woocoos/entco/pkg/identity"
+	"github.com/woocoos/knockout-go/pkg/koapp"
+	"github.com/woocoos/knockout-go/pkg/middleware"
 	"github.com/woocoos/msgcenter/api/graphql"
 	"github.com/woocoos/msgcenter/api/oas/server"
 	"github.com/woocoos/msgcenter/dispatch"
@@ -55,6 +53,7 @@ func NewServer(cnf *conf.AppConfiguration) *Server {
 		appCnf: cnf,
 	}
 	s.buildEntClient()
+
 	alertManagerCnf := cnf.Sub("alertManager")
 	dataDir := alertManagerCnf.String("storage.path")
 	if err := os.MkdirAll(dataDir, os.ModePerm); err != nil {
@@ -142,24 +141,25 @@ func (s *Server) Stop(ctx context.Context) error {
 }
 
 func (s *Server) buildEntClient() {
-	pd := oteldriver.BuildOTELDriver(s.appCnf, "store.msgcenter")
-	pd, _ = ecx.BuildEntCacheDriver(s.appCnf.Sub("entcache"), pd)
+	ents := koapp.BuildEntComponents(s.appCnf)
+	drv := ents["msgcenter"]
+
 	scfg := ent.AlternateSchema(ent.SchemaConfig{
 		User:        "portal",
 		OrgRoleUser: "portal",
 	})
 	if s.appCnf.Development {
-		s.dbClient = ent.NewClient(ent.Driver(pd), ent.Debug(), scfg)
+		s.dbClient = ent.NewClient(ent.Driver(drv), ent.Debug(), scfg)
 	} else {
-		s.dbClient = ent.NewClient(ent.Driver(pd), scfg)
+		s.dbClient = ent.NewClient(ent.Driver(drv), scfg)
 	}
 }
 
 func (s *Server) buildApiService(cnf *conf.AppConfiguration, ws *server.Service, amopt *server.Options) {
 	webSrv := web.New(web.WithConfiguration(cnf.Sub("web")),
 		web.WithGracefulStop(),
-		gql.RegistryMiddleware(),
-		identity.RegistryTenantIDMiddleware(),
+		gql.RegisterMiddleware(),
+		middleware.RegisterTenantID(),
 		//web.RegisterMiddleware(otelweb.NewMiddleware()),
 	)
 	server.RegisterHandlers(webSrv.Router().FindGroup("/api/v2").Group, ws)
@@ -182,7 +182,7 @@ func (s *Server) buildApiService(cnf *conf.AppConfiguration, ws *server.Service,
 		Cache: lru.New(100),
 	})
 
-	gqlsrv.AroundResponses(gqlx.SimplePagination())
+	gqlsrv.AroundResponses(middleware.SimplePagination())
 	// mutation事务
 	gqlsrv.Use(entgql.Transactioner{TxOpener: s.dbClient})
 	if err := gql.RegisterGraphqlServer(webSrv, gqlsrv); err != nil {

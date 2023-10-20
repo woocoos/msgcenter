@@ -8,11 +8,12 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
-	"github.com/woocoos/entco/schemax"
+	"github.com/woocoos/knockout-go/ent/schemax"
 	gen "github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/intercept"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
+	"github.com/woocoos/msgcenter/version"
 	"time"
 )
 
@@ -33,7 +34,7 @@ func (MsgAlert) Annotations() []schema.Annotation {
 func (MsgAlert) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		schemax.IntID{},
-		schemax.NewTenantMixin[intercept.Query, *gen.Client](intercept.NewQuery),
+		schemax.NewTenantMixin[intercept.Query, *gen.Client](version.AppCode, intercept.NewQuery),
 	}
 }
 

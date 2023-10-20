@@ -10,7 +10,7 @@ import (
 	"fmt"
 
 	"entgo.io/contrib/entgql"
-	"github.com/woocoos/entco/pkg/identity"
+	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"

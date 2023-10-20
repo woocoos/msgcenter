@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/tsingsun/woocoo/web"
-	"github.com/woocoos/entco/schemax"
+	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/msgcenter/api/oas"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgalert"

@@ -15,7 +15,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/vektah/gqlparser/v2/ast"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
@@ -2081,7 +2081,7 @@ func (ec *executionContext) _MsgChannel_status(ctx context.Context, field graphq
 	}
 	res := resTmp.(typex.SimpleStatus)
 	fc.Result = res
-	return ec.marshalOMsgChannelSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, field.Selections, res)
+	return ec.marshalOMsgChannelSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MsgChannel_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2768,7 +2768,7 @@ func (ec *executionContext) _MsgEvent_status(ctx context.Context, field graphql.
 	}
 	res := resTmp.(typex.SimpleStatus)
 	fc.Result = res
-	return ec.marshalOMsgEventSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, field.Selections, res)
+	return ec.marshalOMsgEventSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MsgEvent_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5958,7 +5958,7 @@ func (ec *executionContext) _MsgTemplate_status(ctx context.Context, field graph
 	}
 	res := resTmp.(typex.SimpleStatus)
 	fc.Result = res
-	return ec.marshalOMsgTemplateSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, field.Selections, res)
+	return ec.marshalOMsgTemplateSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MsgTemplate_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7235,7 +7235,7 @@ func (ec *executionContext) _MsgType_status(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(typex.SimpleStatus)
 	fc.Result = res
-	return ec.marshalOMsgTypeSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, field.Selections, res)
+	return ec.marshalOMsgTypeSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MsgType_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11794,7 +11794,7 @@ func (ec *executionContext) unmarshalInputCreateMsgTypeInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOMsgTypeSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
+			data, err := ec.unmarshalOMsgTypeSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13531,7 +13531,7 @@ func (ec *executionContext) unmarshalInputMsgChannelWhereInput(ctx context.Conte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOMsgChannelSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
+			data, err := ec.unmarshalOMsgChannelSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13540,7 +13540,7 @@ func (ec *executionContext) unmarshalInputMsgChannelWhereInput(ctx context.Conte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNEQ"))
-			data, err := ec.unmarshalOMsgChannelSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
+			data, err := ec.unmarshalOMsgChannelSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13549,7 +13549,7 @@ func (ec *executionContext) unmarshalInputMsgChannelWhereInput(ctx context.Conte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusIn"))
-			data, err := ec.unmarshalOMsgChannelSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
+			data, err := ec.unmarshalOMsgChannelSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13558,7 +13558,7 @@ func (ec *executionContext) unmarshalInputMsgChannelWhereInput(ctx context.Conte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNotIn"))
-			data, err := ec.unmarshalOMsgChannelSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
+			data, err := ec.unmarshalOMsgChannelSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14358,7 +14358,7 @@ func (ec *executionContext) unmarshalInputMsgEventWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOMsgEventSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
+			data, err := ec.unmarshalOMsgEventSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14367,7 +14367,7 @@ func (ec *executionContext) unmarshalInputMsgEventWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNEQ"))
-			data, err := ec.unmarshalOMsgEventSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
+			data, err := ec.unmarshalOMsgEventSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14376,7 +14376,7 @@ func (ec *executionContext) unmarshalInputMsgEventWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusIn"))
-			data, err := ec.unmarshalOMsgEventSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
+			data, err := ec.unmarshalOMsgEventSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14385,7 +14385,7 @@ func (ec *executionContext) unmarshalInputMsgEventWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNotIn"))
-			data, err := ec.unmarshalOMsgEventSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
+			data, err := ec.unmarshalOMsgEventSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17774,7 +17774,7 @@ func (ec *executionContext) unmarshalInputMsgTemplateWhereInput(ctx context.Cont
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOMsgTemplateSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
+			data, err := ec.unmarshalOMsgTemplateSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17783,7 +17783,7 @@ func (ec *executionContext) unmarshalInputMsgTemplateWhereInput(ctx context.Cont
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNEQ"))
-			data, err := ec.unmarshalOMsgTemplateSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
+			data, err := ec.unmarshalOMsgTemplateSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17792,7 +17792,7 @@ func (ec *executionContext) unmarshalInputMsgTemplateWhereInput(ctx context.Cont
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusIn"))
-			data, err := ec.unmarshalOMsgTemplateSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
+			data, err := ec.unmarshalOMsgTemplateSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17801,7 +17801,7 @@ func (ec *executionContext) unmarshalInputMsgTemplateWhereInput(ctx context.Cont
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNotIn"))
-			data, err := ec.unmarshalOMsgTemplateSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
+			data, err := ec.unmarshalOMsgTemplateSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19402,7 +19402,7 @@ func (ec *executionContext) unmarshalInputMsgTypeWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOMsgTypeSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
+			data, err := ec.unmarshalOMsgTypeSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19411,7 +19411,7 @@ func (ec *executionContext) unmarshalInputMsgTypeWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNEQ"))
-			data, err := ec.unmarshalOMsgTypeSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
+			data, err := ec.unmarshalOMsgTypeSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19420,7 +19420,7 @@ func (ec *executionContext) unmarshalInputMsgTypeWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusIn"))
-			data, err := ec.unmarshalOMsgTypeSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
+			data, err := ec.unmarshalOMsgTypeSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19429,7 +19429,7 @@ func (ec *executionContext) unmarshalInputMsgTypeWhereInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("statusNotIn"))
-			data, err := ec.unmarshalOMsgTypeSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
+			data, err := ec.unmarshalOMsgTypeSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22019,7 +22019,7 @@ func (ec *executionContext) unmarshalInputUpdateMsgTypeInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOMsgTypeSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
+			data, err := ec.unmarshalOMsgTypeSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25472,13 +25472,13 @@ func (ec *executionContext) marshalNMsgChannelReceiverType2githubᚗcomᚋwoocoo
 	return v
 }
 
-func (ec *executionContext) unmarshalNMsgChannelSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalNMsgChannelSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
 	var res typex.SimpleStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNMsgChannelSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNMsgChannelSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
 	return v
 }
 
@@ -25531,13 +25531,13 @@ func (ec *executionContext) marshalNMsgEventOrderField2ᚖgithubᚗcomᚋwoocoos
 	return v
 }
 
-func (ec *executionContext) unmarshalNMsgEventSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalNMsgEventSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
 	var res typex.SimpleStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNMsgEventSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNMsgEventSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
 	return v
 }
 
@@ -25775,13 +25775,13 @@ func (ec *executionContext) marshalNMsgTemplateReceiverType2githubᚗcomᚋwooco
 	return v
 }
 
-func (ec *executionContext) unmarshalNMsgTemplateSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalNMsgTemplateSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
 	var res typex.SimpleStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNMsgTemplateSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNMsgTemplateSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
 	return v
 }
 
@@ -25834,13 +25834,13 @@ func (ec *executionContext) marshalNMsgTypeOrderField2ᚖgithubᚗcomᚋwoocoos�
 	return v
 }
 
-func (ec *executionContext) unmarshalNMsgTypeSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalNMsgTypeSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
 	var res typex.SimpleStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNMsgTypeSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNMsgTypeSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
 	return v
 }
 
@@ -26475,17 +26475,17 @@ func (ec *executionContext) marshalOMsgChannelReceiverType2ᚖgithubᚗcomᚋwoo
 	return v
 }
 
-func (ec *executionContext) unmarshalOMsgChannelSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalOMsgChannelSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
 	var res typex.SimpleStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOMsgChannelSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOMsgChannelSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalOMsgChannelSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, v interface{}) ([]typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalOMsgChannelSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, v interface{}) ([]typex.SimpleStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -26497,7 +26497,7 @@ func (ec *executionContext) unmarshalOMsgChannelSimpleStatus2ᚕgithubᚗcomᚋw
 	res := make([]typex.SimpleStatus, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNMsgChannelSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNMsgChannelSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -26505,7 +26505,7 @@ func (ec *executionContext) unmarshalOMsgChannelSimpleStatus2ᚕgithubᚗcomᚋw
 	return res, nil
 }
 
-func (ec *executionContext) marshalOMsgChannelSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOMsgChannelSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []typex.SimpleStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -26532,7 +26532,7 @@ func (ec *executionContext) marshalOMsgChannelSimpleStatus2ᚕgithubᚗcomᚋwoo
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNMsgChannelSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, sel, v[i])
+			ret[i] = ec.marshalNMsgChannelSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -26552,7 +26552,7 @@ func (ec *executionContext) marshalOMsgChannelSimpleStatus2ᚕgithubᚗcomᚋwoo
 	return ret
 }
 
-func (ec *executionContext) unmarshalOMsgChannelSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (*typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalOMsgChannelSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (*typex.SimpleStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -26561,7 +26561,7 @@ func (ec *executionContext) unmarshalOMsgChannelSimpleStatus2ᚖgithubᚗcomᚋw
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOMsgChannelSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v *typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOMsgChannelSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v *typex.SimpleStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -26706,17 +26706,17 @@ func (ec *executionContext) unmarshalOMsgEventOrder2ᚖgithubᚗcomᚋwoocoosᚋ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOMsgEventSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalOMsgEventSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
 	var res typex.SimpleStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOMsgEventSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOMsgEventSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalOMsgEventSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, v interface{}) ([]typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalOMsgEventSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, v interface{}) ([]typex.SimpleStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -26728,7 +26728,7 @@ func (ec *executionContext) unmarshalOMsgEventSimpleStatus2ᚕgithubᚗcomᚋwoo
 	res := make([]typex.SimpleStatus, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNMsgEventSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNMsgEventSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -26736,7 +26736,7 @@ func (ec *executionContext) unmarshalOMsgEventSimpleStatus2ᚕgithubᚗcomᚋwoo
 	return res, nil
 }
 
-func (ec *executionContext) marshalOMsgEventSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOMsgEventSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []typex.SimpleStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -26763,7 +26763,7 @@ func (ec *executionContext) marshalOMsgEventSimpleStatus2ᚕgithubᚗcomᚋwooco
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNMsgEventSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, sel, v[i])
+			ret[i] = ec.marshalNMsgEventSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -26783,7 +26783,7 @@ func (ec *executionContext) marshalOMsgEventSimpleStatus2ᚕgithubᚗcomᚋwooco
 	return ret
 }
 
-func (ec *executionContext) unmarshalOMsgEventSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (*typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalOMsgEventSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (*typex.SimpleStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -26792,7 +26792,7 @@ func (ec *executionContext) unmarshalOMsgEventSimpleStatus2ᚖgithubᚗcomᚋwoo
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOMsgEventSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v *typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOMsgEventSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v *typex.SimpleStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -27407,17 +27407,17 @@ func (ec *executionContext) marshalOMsgTemplateReceiverType2ᚖgithubᚗcomᚋwo
 	return v
 }
 
-func (ec *executionContext) unmarshalOMsgTemplateSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalOMsgTemplateSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
 	var res typex.SimpleStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOMsgTemplateSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOMsgTemplateSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalOMsgTemplateSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, v interface{}) ([]typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalOMsgTemplateSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, v interface{}) ([]typex.SimpleStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -27429,7 +27429,7 @@ func (ec *executionContext) unmarshalOMsgTemplateSimpleStatus2ᚕgithubᚗcomᚋ
 	res := make([]typex.SimpleStatus, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNMsgTemplateSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNMsgTemplateSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -27437,7 +27437,7 @@ func (ec *executionContext) unmarshalOMsgTemplateSimpleStatus2ᚕgithubᚗcomᚋ
 	return res, nil
 }
 
-func (ec *executionContext) marshalOMsgTemplateSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOMsgTemplateSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []typex.SimpleStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -27464,7 +27464,7 @@ func (ec *executionContext) marshalOMsgTemplateSimpleStatus2ᚕgithubᚗcomᚋwo
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNMsgTemplateSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, sel, v[i])
+			ret[i] = ec.marshalNMsgTemplateSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -27484,7 +27484,7 @@ func (ec *executionContext) marshalOMsgTemplateSimpleStatus2ᚕgithubᚗcomᚋwo
 	return ret
 }
 
-func (ec *executionContext) unmarshalOMsgTemplateSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (*typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalOMsgTemplateSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (*typex.SimpleStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -27493,7 +27493,7 @@ func (ec *executionContext) unmarshalOMsgTemplateSimpleStatus2ᚖgithubᚗcomᚋ
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOMsgTemplateSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v *typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOMsgTemplateSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v *typex.SimpleStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -27591,17 +27591,17 @@ func (ec *executionContext) unmarshalOMsgTypeOrder2ᚖgithubᚗcomᚋwoocoosᚋm
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOMsgTypeSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalOMsgTypeSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (typex.SimpleStatus, error) {
 	var res typex.SimpleStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOMsgTypeSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOMsgTypeSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v typex.SimpleStatus) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalOMsgTypeSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, v interface{}) ([]typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalOMsgTypeSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, v interface{}) ([]typex.SimpleStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -27613,7 +27613,7 @@ func (ec *executionContext) unmarshalOMsgTypeSimpleStatus2ᚕgithubᚗcomᚋwooc
 	res := make([]typex.SimpleStatus, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNMsgTypeSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNMsgTypeSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -27621,7 +27621,7 @@ func (ec *executionContext) unmarshalOMsgTypeSimpleStatus2ᚕgithubᚗcomᚋwooc
 	return res, nil
 }
 
-func (ec *executionContext) marshalOMsgTypeSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOMsgTypeSimpleStatus2ᚕgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []typex.SimpleStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -27648,7 +27648,7 @@ func (ec *executionContext) marshalOMsgTypeSimpleStatus2ᚕgithubᚗcomᚋwoocoo
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNMsgTypeSimpleStatus2githubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx, sel, v[i])
+			ret[i] = ec.marshalNMsgTypeSimpleStatus2githubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -27668,7 +27668,7 @@ func (ec *executionContext) marshalOMsgTypeSimpleStatus2ᚕgithubᚗcomᚋwoocoo
 	return ret
 }
 
-func (ec *executionContext) unmarshalOMsgTypeSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (*typex.SimpleStatus, error) {
+func (ec *executionContext) unmarshalOMsgTypeSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, v interface{}) (*typex.SimpleStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -27677,7 +27677,7 @@ func (ec *executionContext) unmarshalOMsgTypeSimpleStatus2ᚖgithubᚗcomᚋwooc
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOMsgTypeSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋentcoᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v *typex.SimpleStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOMsgTypeSimpleStatus2ᚖgithubᚗcomᚋwoocoosᚋknockoutᚑgoᚋentᚋschemaxᚋtypexᚐSimpleStatus(ctx context.Context, sel ast.SelectionSet, v *typex.SimpleStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

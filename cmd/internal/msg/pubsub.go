@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 	"github.com/tsingsun/woocoo/pkg/log"
-	"github.com/woocoos/entco/pkg/identity"
+	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql"
 	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/pkg/push"

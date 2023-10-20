@@ -3196,7 +3196,7 @@ enum MsgChannelReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/pr
   webhook
 }
 """MsgChannelSimpleStatus is enum for the field status"""
-enum MsgChannelSimpleStatus @goModel(model: "github.com/woocoos/entco/schemax/typex.SimpleStatus") {
+enum MsgChannelSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   inactive
   processing
@@ -3362,7 +3362,7 @@ enum MsgEventOrderField {
   createdAt
 }
 """MsgEventSimpleStatus is enum for the field status"""
-enum MsgEventSimpleStatus @goModel(model: "github.com/woocoos/entco/schemax/typex.SimpleStatus") {
+enum MsgEventSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   inactive
   processing
@@ -3970,7 +3970,7 @@ enum MsgTemplateReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/p
   webhook
 }
 """MsgTemplateSimpleStatus is enum for the field status"""
-enum MsgTemplateSimpleStatus @goModel(model: "github.com/woocoos/entco/schemax/typex.SimpleStatus") {
+enum MsgTemplateSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   inactive
   processing
@@ -4224,7 +4224,7 @@ enum MsgTypeOrderField {
   createdAt
 }
 """MsgTypeSimpleStatus is enum for the field status"""
-enum MsgTypeSimpleStatus @goModel(model: "github.com/woocoos/entco/schemax/typex.SimpleStatus") {
+enum MsgTypeSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   inactive
   processing

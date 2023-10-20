@@ -5,7 +5,7 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/woocoos/entco/genx"
+	"github.com/woocoos/knockout-go/codegen/entx"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/migrate"
 	"log"
@@ -32,7 +32,7 @@ func main() {
 		migrate.WithDropIndex(true),
 		migrate.WithDropColumn(true),
 		migrate.WithForeignKeys(false),
-		genx.SkipTablesDiffHook("user", "org_role_user"),
+		entx.SkipTablesDiffHook("user", "org_role_user"),
 	)
 	if err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
