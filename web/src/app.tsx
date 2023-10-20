@@ -6,7 +6,7 @@ import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/type
 import store from '@/store';
 import '@/assets/styles/index.css';
 import { getItem, removeItem, setItem } from '@/pkg/localStore';
-import { browserLanguage } from './util';
+import { browserLanguage, getMenuAppActions } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { instanceName, setFilesApi, userPermissions } from '@knockout-js/api';
@@ -191,7 +191,7 @@ export const urqlConfig = defineUrqlConfig([
 
 // 权限
 export const authConfig = defineAuthConfig(async (appData) => {
-  const initialAuth = {},
+  const initialAuth = getMenuAppActions(),
     token = appData?.user?.token ? appData.user.token : getItem<string>('token'),
     tenantId = appData?.user?.tenantId ? appData.user.tenantId : getItem<string>('tenantId');
   // 判断路由权限

@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { ReactNode } from 'react';
+import menuJson from '../components/layout/menu.json';
 
 export type TreeDataState<T> = {
   key: string;
@@ -283,4 +284,34 @@ export const parseGoTempKey = (str: string) => {
     return all.map(item => item.replaceAll(/[{]|[}]|[.]|[\s]/g, ''));
   }
   return null;
+}
+
+type MenuJsonData = {
+  name: string;
+  icon?: string;
+  children?: MenuJsonData[];
+  path?: string;
+}
+
+/**
+ * 开发的时候方便设置好权限信息
+ * @returns
+ */
+export const getMenuAppActions = (list?: MenuJsonData[]) => {
+  const initialAuth: Record<string, true> = {},
+    menuJsonList: MenuJsonData[] = list?.length ? list : menuJson;
+  if (process.env.NODE_ENV === 'development') {
+    menuJsonList?.forEach((item: MenuJsonData) => {
+      if (item.path) {
+        initialAuth[item.path] = true;
+      }
+      if (item.children) {
+        const childAuth = getMenuAppActions(item.children);
+        for (let key in childAuth) {
+          initialAuth[key] = true;
+        }
+      }
+    });
+  }
+  return initialAuth;
 }
