@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: Alertmanager API
-  description: API of the Knockout Message (https://github.com/prometheus/alertmanager)
+  description: API of the Knockout Message (https://github.com/woocoos/msgcenter)
   license:
     name: GNU Affero General Public License v3.0
     url: https://www.gnu.org/licenses

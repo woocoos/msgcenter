@@ -5,14 +5,26 @@ package oas
 import "time"
 
 type Alert struct {
-	GeneratorURL string   `binding:"omitempty,uri" json:"generatorURL,omitempty"`
-	Labels       LabelSet `binding:"required" json:"labels"`
+	GeneratorURL string `binding:"omitempty,uri" json:"generatorURL,omitempty"`
+	// Labels A set of labels. Labels are key/value pairs that are attached to
+	// alerts. Labels are used to specify identifying attributes of alerts,
+	// such as their tenant, user , instance, and job.
+	// tenant: specific tenant id.
+	// user: specific user id. the user is the notify target. Some notification need info from user, such as email address.
+	// alertname: the name of alert.it is also the event name.
+	Labels LabelSet `binding:"required" json:"labels"`
 }
 
 type AlertGroup struct {
-	Alerts   []*GettableAlert `binding:"required" json:"alerts"`
-	Labels   LabelSet         `binding:"required" json:"labels"`
-	Receiver Receiver         `binding:"required" json:"receiver"`
+	Alerts []*GettableAlert `binding:"required" json:"alerts"`
+	// Labels A set of labels. Labels are key/value pairs that are attached to
+	// alerts. Labels are used to specify identifying attributes of alerts,
+	// such as their tenant, user , instance, and job.
+	// tenant: specific tenant id.
+	// user: specific user id. the user is the notify target. Some notification need info from user, such as email address.
+	// alertname: the name of alert.it is also the event name.
+	Labels   LabelSet `binding:"required" json:"labels"`
+	Receiver Receiver `binding:"required" json:"receiver"`
 }
 
 type AlertGroups []*AlertGroup
@@ -41,7 +53,13 @@ type ClusterStatus struct {
 }
 
 type GettableAlert struct {
-	*Alert      `json:",inline"`
+	*Alert `json:",inline"`
+	// Annotations A set of labels. Labels are key/value pairs that are attached to
+	// alerts. Labels are used to specify identifying attributes of alerts,
+	// such as their tenant, user , instance, and job.
+	// tenant: specific tenant id.
+	// user: specific user id. the user is the notify target. Some notification need info from user, such as email address.
+	// alertname: the name of alert.it is also the event name.
 	Annotations LabelSet    `binding:"required" json:"annotations"`
 	EndsAt      time.Time   `binding:"required" json:"endsAt" time_format:"2006-01-02T15:04:05Z07:00"`
 	Fingerprint string      `binding:"required" json:"fingerprint"`
@@ -62,6 +80,12 @@ type GettableSilence struct {
 
 type GettableSilences []*GettableSilence
 
+// LabelSet A set of labels. Labels are key/value pairs that are attached to
+// alerts. Labels are used to specify identifying attributes of alerts,
+// such as their tenant, user , instance, and job.
+// tenant: specific tenant id.
+// user: specific user id. the user is the notify target. Some notification need info from user, such as email address.
+// alertname: the name of alert.it is also the event name.
 type LabelSet map[string]string
 
 type Matcher struct {
@@ -79,7 +103,13 @@ type PeerStatus struct {
 }
 
 type PostableAlert struct {
-	*Alert      `json:",inline"`
+	*Alert `json:",inline"`
+	// Annotations A set of labels. Labels are key/value pairs that are attached to
+	// alerts. Labels are used to specify identifying attributes of alerts,
+	// such as their tenant, user , instance, and job.
+	// tenant: specific tenant id.
+	// user: specific user id. the user is the notify target. Some notification need info from user, such as email address.
+	// alertname: the name of alert.it is also the event name.
 	Annotations LabelSet  `json:"annotations,omitempty"`
 	EndsAt      time.Time `json:"endsAt,omitempty" time_format:"2006-01-02T15:04:05Z07:00"`
 	StartsAt    time.Time `json:"startsAt,omitempty" time_format:"2006-01-02T15:04:05Z07:00"`

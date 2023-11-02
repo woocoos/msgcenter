@@ -49,24 +49,24 @@ func (r *msgAlertResolver) NlogAlerts(ctx context.Context, obj *ent.MsgAlert) ([
 
 // Node is the resolver for the node field.
 func (r *queryResolver) Node(ctx context.Context, id string) (ent.Noder, error) {
-	return r.Client.NoderEx(ctx, id)
+	return r.client.NoderEx(ctx, id)
 }
 
 // Nodes is the resolver for the nodes field.
 func (r *queryResolver) Nodes(ctx context.Context, ids []string) ([]ent.Noder, error) {
-	return r.Client.NodersEx(ctx, ids)
+	return r.client.NodersEx(ctx, ids)
 }
 
 // MsgInternals is the resolver for the msgInternals field.
 func (r *queryResolver) MsgInternals(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalOrder, where *ent.MsgInternalWhereInput) (*ent.MsgInternalConnection, error) {
-	return r.Client.MsgInternal.Query().Paginate(ctx, after, first, before, last,
+	return r.client.MsgInternal.Query().Paginate(ctx, after, first, before, last,
 		ent.WithMsgInternalOrder(orderBy),
 		ent.WithMsgInternalFilter(where.Filter))
 }
 
 // MsgInternalTos is the resolver for the msgInternalTos field.
 func (r *queryResolver) MsgInternalTos(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) (*ent.MsgInternalToConnection, error) {
-	return r.Client.MsgInternalTo.Query().Paginate(ctx, after, first, before, last,
+	return r.client.MsgInternalTo.Query().Paginate(ctx, after, first, before, last,
 		ent.WithMsgInternalToOrder(orderBy),
 		ent.WithMsgInternalToFilter(where.Filter))
 }

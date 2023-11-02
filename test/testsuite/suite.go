@@ -30,17 +30,17 @@ var (
 
 type BaseSuite struct {
 	suite.Suite
-	Cnf               *conf.AppConfiguration
-	DSN, DriverName   string
-	Client            *ent.Client
-	AlertManager      *service.AlertManager
-	ConfigCoordinator *service.Coordinator
-	redis             *miniredis.Miniredis
+	App             *woocoo.App
+	Cnf             *conf.AppConfiguration
+	DSN, DriverName string
+	Client          *ent.Client
+	AlertManager    *service.AlertManager
+	redis           *miniredis.Miniredis
 }
 
 func (o *BaseSuite) Setup() error {
-	app := initTestApp()
-	o.Cnf = app.AppConfiguration()
+	o.App = initTestApp()
+	o.Cnf = o.App.AppConfiguration()
 	o.redis = initMiniRedis(o.Cnf)
 
 	if o.DSN == "" && o.DriverName == "" {
@@ -57,11 +57,8 @@ func (o *BaseSuite) Setup() error {
 	// alert
 	metrics.BuildGlobal()
 
-	alertManagerCnf := o.Cnf.Sub("alertManager")
-	o.AlertManager, err = service.DefaultAlertManager(alertManagerCnf, service.WithClient(o.Client))
+	o.AlertManager, err = service.NewAlertManager(o.App, service.WithClient(o.Client))
 	o.Require().NoError(err)
-	o.ConfigCoordinator = service.NewCoordinator(alertManagerCnf)
-	o.ConfigCoordinator.SetDBClient(o.Client)
 	return nil
 }
 
@@ -81,7 +78,7 @@ func initTestApp() *woocoo.App {
 	}
 
 	app := woocoo.New(woocoo.WithAppConfiguration(
-		conf.NewFromBytes(bs, conf.WithBaseDir(test.BaseDir())).AsGlobal()),
+		conf.NewFromBytes(bs, conf.WithBaseDir(test.BaseDir()), conf.WithGlobal(true))),
 	)
 	cnf := app.AppConfiguration()
 	cnf.Parser().Set("alertManager.storage.path", filepath.Join(test.BaseDir(), "testdata", "tmp"))

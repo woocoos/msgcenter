@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cenkalti/backoff/v4"
+	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/pkg/gds/timeinterval"
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/woocoos/msgcenter/inhibit"
@@ -37,6 +38,7 @@ type Notifier interface {
 
 // NotificationLog is the interface for the notification log. It provides methods to persist and query notifications.
 type NotificationLog interface {
+	woocoo.Server
 	Log(ctx context.Context, r *profile.ReceiverKey, gkey string, firingAlerts, resolvedAlerts []uint64, expiry time.Duration) error
 	Query(params ...EntryQuery) ([]*LogEntry, error)
 }

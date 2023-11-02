@@ -5,17 +5,9 @@ log:
   withTraceID: true
   traceIDKey: "traceId"
   cores:
-    - level: debug
-      outputPaths:
-        - stdout
-      encoderConfig:
-        timeKey: "@timestamp"
-        messageKey: "message"
-        callerKey: "file"
+    - level: info
+
   rotate:
-    maxsize: 10
-    maxage: 10
-    maxbackups: 20
     localtime: true
 
 jwt: &jwt
@@ -67,7 +59,8 @@ store:
   msgcenter:
     driverName: mysql
     dsn: "root:@tcp(localhost:3306)/msgcenter?parseTime=true&loc=Local"
-  redis: &redis
+  # push service.
+  redis:
     addrs:
       - 127.0.0.1:6379
     db: 1
@@ -107,17 +100,33 @@ prometheus:
   server:
     addr: 127.0.0.1:9093
 
-oauth-with-cache:
-  timeout: 2s
-  oauth2:
-    clientID: 206734260394752
-    clientSecret: T2UlqISVFq4DR9InXamj3l74iWdu3Tyr
-    endpoint:
-      tokenURL: http://127.0.0.1:10070/token
-    scopes:
-    cache:
-      type: redis
-      <<: *redis
-      local:
-        size: 1000
-        ttl: 100s
+cache:
+  local:
+    driverName: memory
+    size: 1000
+    ttl: 100s
+
+kosdk:
+  client:
+    timeout: 2s
+    oauth2:
+      clientID: 206734260394752
+      clientSecret: T2UlqISVFq4DR9InXamj3l74iWdu3Tyr
+      endpoint:
+        tokenURL: http://127.0.0.1:10070/token
+      scopes:
+      storeKey: memory
+  signer:
+    authScheme: "KO-HMAC-SHA1"
+    authHeaders: [ "timestamp", "nonce" ]
+    signedLookups:
+      accessToken: "header:authorization>bearer"
+      timestamp:
+      nonce:
+      url: CanonicalUri
+    nonceLen: 12
+  plugin:
+    msg:
+      baseUrl: "http://127.0.0.1:10072"
+    file:
+      baseUrl: "http://127.0.0.1:10071"

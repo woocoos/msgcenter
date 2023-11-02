@@ -6,17 +6,6 @@ log:
   traceIDKey: "traceId"
   cores:
     - level: debug
-      outputPaths:
-        - stdout
-      encoderConfig:
-        timeKey: "@timestamp"
-        messageKey: "message"
-        callerKey: "file"
-  rotate:
-    maxsize: 10
-    maxage: 10
-    maxbackups: 20
-    localtime: true
 
 web:
   server:
@@ -26,7 +15,6 @@ web:
       - alertmanager:
           basePath: "/api/v2"
           middlewares:
-            - accessLog:
             - recovery:
             - errorHandle:
 

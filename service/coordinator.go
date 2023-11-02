@@ -12,7 +12,6 @@ import (
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/knockout-go/pkg/identity"
-	"github.com/woocoos/msgcenter/api/oas"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -42,7 +41,7 @@ const (
 	TempRelativePathAttachment = "attachment"
 )
 
-// Coordinator helps the Alert Manager collaborate with external components
+// Coordinator helps the Alert Manager collaborate with external components.
 type Coordinator struct {
 	configuration *conf.Configuration
 	// Protects profile and reloadHooks
@@ -50,14 +49,12 @@ type Coordinator struct {
 	profile     *profile.Config
 	reloadHooks []func(*profile.Config) error
 
-	ActiveReceivers map[string]int // receiver name -> number of Notifier
+	ActiveReceivers map[string]int // receiver name -> number of Notifiers
 	Template        *template.Template
 
-	db        *ent.Client
-	Subscribe *UserSubscribe
+	db *ent.Client
 	// knockout http client
-	KOClient    *http.Client
-	AlertServer oas.AlertServer
+	KOClient *http.Client
 
 	TempOptions TempOptions
 }
@@ -79,7 +76,6 @@ func NewCoordinator(cnf *conf.Configuration) *Coordinator {
 	c := &Coordinator{
 		configuration:   cnf,
 		ActiveReceivers: make(map[string]int),
-		Subscribe:       &UserSubscribe{},
 	}
 
 	tempOptions := TempOptions{}
@@ -89,19 +85,6 @@ func NewCoordinator(cnf *conf.Configuration) *Coordinator {
 	}
 	c.TempOptions = tempOptions
 	return c
-}
-
-func (c *Coordinator) SetDBClient(db *ent.Client) {
-	c.db = db
-	c.Subscribe.DB = db
-}
-
-func (c *Coordinator) SetHttpClient(httpClient *http.Client) {
-	c.KOClient = httpClient
-}
-
-func (c *Coordinator) SetAlertServer(server oas.AlertServer) {
-	c.AlertServer = server
 }
 
 func (c *Coordinator) ProfileString() string {
@@ -500,34 +483,6 @@ func (c *Coordinator) GetTplDataPath(tempPath string) string {
 func (c *Coordinator) GetTplTempPath(tempPath string) string {
 	tpldir := c.configuration.Abs(c.TempOptions.Path)
 	return c.configuration.Abs(filepath.Join(tpldir, tempPath))
-}
-
-// ReportFileRefCount 文件引用上报
-func (c *Coordinator) ReportFileRefCount(ctx context.Context, newFileIDs, oldFileIDs []int) error {
-	tid, err := identity.TenantIDFromContext(ctx)
-	if err != nil {
-		return err
-	}
-	params := ""
-	for _, v := range newFileIDs {
-		params = params + fmt.Sprintf(`{ "fileId": %d, "opType": "plus" },`, v)
-	}
-	for _, v := range oldFileIDs {
-		params = params + fmt.Sprintf(`{ "fileId": %d, "opType": "minus" },`, v)
-	}
-	if params == "" {
-		return nil
-	}
-	params = strings.TrimSuffix(params, ",")
-	body := strings.NewReader(fmt.Sprintf(`{ "inputs": [%s] }`, params))
-	req, err := http.NewRequest("POST", c.TempOptions.FileBaseUrl+"/files/report-ref-count", body)
-	if err != nil {
-		return err
-	}
-	req.Header.Add("X-Tenant-ID", strconv.Itoa(tid))
-	req.Header.Add("Content-Type", "application/json")
-	_, err = c.KOClient.Do(req)
-	return err
 }
 
 // EnableTplDataFile 启用模板文件

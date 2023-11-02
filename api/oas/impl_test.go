@@ -1,4 +1,4 @@
-package server
+package oas
 
 import (
 	"context"
@@ -9,12 +9,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"github.com/tsingsun/woocoo/pkg/log"
-	"github.com/tsingsun/woocoo/web"
 	"github.com/woocoos/knockout-go/ent/schemax"
-	"github.com/woocoos/msgcenter/api/oas"
-	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgalert"
+	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/notify/webhook"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -34,30 +31,11 @@ import (
 	_ "github.com/woocoos/msgcenter/ent/runtime"
 )
 
-var ()
-
-func open(ctx context.Context) *ent.Client {
-	client, err := ent.Open("sqlite3", "file:msgcenter?mode=memory&cache=shared&_fk=1",
-		ent.Debug(), ent.AlternateSchema(ent.SchemaConfig{
-			User:        "portal",
-			OrgRoleUser: "portal",
-		}),
-	)
-	if err != nil {
-		log.Fatalf("failed opening connection to sqlite: %v", err)
-	}
-	// Run the auto migration tool.
-	if err := client.Schema.Create(ctx); err != nil {
-		log.Fatalf("failed creating schema resources: %v", err)
-	}
-	return client
-}
-
 // ServiceSuite is the service test suite
 type serviceSuite struct {
 	testsuite.BaseSuite
-	Service   *Service
-	server    *web.Server
+
+	server    *ServerImpl
 	shutdowns []func()
 	maildev   maildev.MailDev
 
@@ -109,23 +87,15 @@ func (s *serviceSuite) SetupSuite() {
 	err := s.BaseSuite.Setup()
 	s.Require().NoError(err)
 
-	s.server = web.New(web.WithConfiguration(s.Cnf.Sub("web")))
-	s.Service, err = NewService(
-		&Options{
-			Coordinator: s.ConfigCoordinator,
-			Alerts:      s.AlertManager.Alerts,
-			Silences:    s.AlertManager.Silences,
-			StatusFunc:  s.AlertManager.Marker.Status,
-			GroupFunc:   s.AlertManager.Dispatcher.Groups,
-		})
+	s.server, err = NewServer(s.App, s.AlertManager, nil)
 	s.Require().NoError(err)
 
-	s.ConfigCoordinator.ReloadHooks(func(c *profile.Config) error {
-		s.ConfigCoordinator.Template.ExternalURL, err = url.Parse("http://localhost:9093")
+	s.AlertManager.Coordinator.ReloadHooks(func(c *profile.Config) error {
+		s.AlertManager.Coordinator.Template.ExternalURL, err = url.Parse("http://localhost:9093")
 		s.Require().NoError(err)
-		s.Require().NoError(s.AlertManager.Start(s.ConfigCoordinator, c))
+		s.Require().NoError(s.AlertManager.Start(s.AlertManager.Coordinator, c))
 
-		s.Service.Update(c, func(labels label.LabelSet) {
+		s.server.Update(c, func(labels label.LabelSet) {
 			s.AlertManager.Inhibitor.Mutes(labels)
 			s.AlertManager.Silencer.Mutes(labels)
 		})
@@ -133,7 +103,7 @@ func (s *serviceSuite) SetupSuite() {
 		return nil
 	})
 
-	err = s.ConfigCoordinator.Reload()
+	err = s.AlertManager.Coordinator.Reload()
 	s.Require().NoError(err)
 	alerts := s.AlertManager.Alerts.(*mem.Alerts)
 	go alerts.Start(nil)
@@ -153,9 +123,9 @@ func (s *serviceSuite) TearDownSuite() {
 // test postalerts
 func (s *serviceSuite) TestPostAlerts() {
 	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
-	req := oas.PostableAlerts{
+	req := PostableAlerts{
 		{
-			Alert: &oas.Alert{
+			Alert: &Alert{
 				Labels: map[string]string{
 					"alertname": "test",
 				},
@@ -167,7 +137,7 @@ func (s *serviceSuite) TestPostAlerts() {
 			StartsAt: time.Now(),
 		},
 	}
-	s.Require().NoError(s.Service.PostAlerts(ctx, &oas.PostAlertsRequest{PostableAlerts: req}))
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
 	time.Sleep(time.Second * 2)
 	mail, err := s.maildev.GetLastEmail()
 	s.Require().NoError(err)
@@ -181,9 +151,9 @@ func (s *serviceSuite) TestPostAlertsWithTenant() {
 	// rand a string
 	to := fmt.Sprintf("%d@localhost", rand.Intn(10000000))
 	// route: default
-	req := oas.PostableAlerts{
+	req := PostableAlerts{
 		{
-			Alert: &oas.Alert{
+			Alert: &Alert{
 				Labels: map[string]string{
 					"receiver":           "email|webhook",
 					label.AlertNameLabel: "noSubscribe",
@@ -199,7 +169,7 @@ func (s *serviceSuite) TestPostAlertsWithTenant() {
 			StartsAt: time.Now(),
 		},
 	}
-	s.Require().NoError(s.Service.PostAlerts(ctx, &oas.PostAlertsRequest{PostableAlerts: req}))
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
 	time.Sleep(time.Second * 3)
 	mail, err := s.maildev.GetLastEmail()
 	s.Require().NoError(err)
@@ -211,9 +181,9 @@ func (s *serviceSuite) TestPostAlertsWithTenant() {
 func (s *serviceSuite) TestUserSubscribe() {
 	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
 	// route: default
-	req := oas.PostableAlerts{
+	req := PostableAlerts{
 		{
-			Alert: &oas.Alert{
+			Alert: &Alert{
 				Labels: map[string]string{
 					"receiver":           "email|webhook",
 					label.AlertNameLabel: testsuite.SubEventName,
@@ -228,7 +198,7 @@ func (s *serviceSuite) TestUserSubscribe() {
 			StartsAt: time.Now(),
 		},
 	}
-	s.Require().NoError(s.Service.PostAlerts(ctx, &oas.PostAlertsRequest{PostableAlerts: req}))
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
 	time.Sleep(time.Second * 3)
 	mail, err := s.maildev.GetLastEmail()
 	s.Require().NoError(err)
@@ -258,9 +228,9 @@ func (s *serviceSuite) TestWebhook() {
 			return
 		}
 	})
-	req := oas.PostableAlerts{
+	req := PostableAlerts{
 		{
-			Alert: &oas.Alert{
+			Alert: &Alert{
 				Labels: map[string]string{
 					"event":    "app:approve",
 					"receiver": "webhook",
@@ -274,7 +244,7 @@ func (s *serviceSuite) TestWebhook() {
 			EndsAt:   time.Now().Add(time.Hour),
 		},
 	}
-	s.Require().NoError(s.Service.PostAlerts(ctx, &oas.PostAlertsRequest{PostableAlerts: req}))
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
 	time.Sleep(time.Second * 2)
 	s.Require().NotNil(got.Data)
 	s.Require().Equal("webhook test", got.Data.CommonAnnotations["summary"])
@@ -291,9 +261,9 @@ func (s *serviceSuite) TestWebhook_CustomTpl_DingTalk() {
 		}
 		got = string(body)
 	})
-	req := oas.PostableAlerts{
+	req := PostableAlerts{
 		{
-			Alert: &oas.Alert{
+			Alert: &Alert{
 				Labels: map[string]string{
 					label.AlertNameLabel: testsuite.WebhookEventName,
 					"event":              "app:approve",
@@ -310,16 +280,16 @@ func (s *serviceSuite) TestWebhook_CustomTpl_DingTalk() {
 			StartsAt: time.Now().Add(time.Second * 5),
 		},
 	}
-	s.Require().NoError(s.Service.PostAlerts(ctx, &oas.PostAlertsRequest{PostableAlerts: req}))
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
 	time.Sleep(time.Second * 2)
 	s.Require().Contains(got, "webhook template test")
 }
 
 func (s *serviceSuite) TestMessage() {
 	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
-	req := oas.PostableAlerts{
+	req := PostableAlerts{
 		{
-			Alert: &oas.Alert{
+			Alert: &Alert{
 				Labels: map[string]string{
 					"tenant":  "1",
 					"event":   "app:message",
@@ -334,9 +304,11 @@ func (s *serviceSuite) TestMessage() {
 			EndsAt:   time.Now().Add(time.Hour),
 		},
 	}
-	s.Require().NoError(s.Service.PostAlerts(ctx, &oas.PostAlertsRequest{PostableAlerts: req}))
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
 	time.Sleep(time.Second * 2)
-	mis, err := s.Client.MsgInternal.Query().All(schemax.SkipTenantPrivacy(context.Background()))
+	// init test has insert 2 message
+	mis, err := s.Client.MsgInternal.Query().Where(msginternal.IDGT(2)).
+		All(schemax.SkipTenantPrivacy(context.Background()))
 	s.Require().NoError(err)
 	s.Len(mis, 1)
 	mist, err := mis[0].MsgInternalTo(schemax.SkipTenantPrivacy(context.Background()))
@@ -347,13 +319,13 @@ func (s *serviceSuite) TestMessage() {
 func (s *serviceSuite) TestPostSilence() {
 	w := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(w)
-	req := oas.PostableSilence{
-		Silence: &oas.Silence{
+	req := PostableSilence{
+		Silence: &Silence{
 			Comment:   "test",
 			CreatedBy: 1,
 			StartsAt:  time.Now(),
 			EndsAt:    time.Now().Add(time.Hour),
-			Matchers: []*oas.Matcher{
+			Matchers: []*Matcher{
 				{
 					Name:  "alertname",
 					Value: "test",
@@ -361,7 +333,7 @@ func (s *serviceSuite) TestPostSilence() {
 			},
 		},
 	}
-	res, err := s.Service.PostSilences(ctx, &oas.PostSilencesRequest{PostableSilence: req})
+	res, err := s.server.PostSilences(ctx, &PostSilencesRequest{PostableSilence: req})
 	s.Require().NoError(err)
 	s.NotZero(res.SilenceID)
 }

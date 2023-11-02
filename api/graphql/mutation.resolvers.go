@@ -7,14 +7,13 @@ package graphql
 import (
 	"context"
 	"fmt"
+	"github.com/woocoos/knockout-go/api/msg"
 	"strconv"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
-	"github.com/woocoos/msgcenter/api/oas"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -79,13 +78,13 @@ func (r *mutationResolver) UpdateMsgEvent(ctx context.Context, id int, input ent
 	// 修改route，同步更新NamedRoute
 	if input.Route != nil && me.Status == typex.SimpleStatusActive {
 		// 移除
-		if err = r.Coordinator.RemoveNamedRoute([]string{profile.AppRouteName(strconv.Itoa(ome.Edges.MsgType.AppID), ome.Name)}); err != nil {
+		if err = r.coordinator.RemoveNamedRoute([]string{profile.AppRouteName(strconv.Itoa(ome.Edges.MsgType.AppID), ome.Name)}); err != nil {
 			return nil, err
 		}
 		// 添加
 		route := *me.Route
 		route.Name = profile.AppRouteName(strconv.Itoa(mt.AppID), me.Name)
-		if err = r.Coordinator.AddNamedRoute([]*profile.Route{&route}); err != nil {
+		if err = r.coordinator.AddNamedRoute([]*profile.Route{&route}); err != nil {
 			return nil, err
 		}
 	}
@@ -119,7 +118,7 @@ func (r *mutationResolver) EnableMsgEvent(ctx context.Context, id int) (*ent.Msg
 		return nil, fmt.Errorf("route cannot nil")
 	}
 	event.Route.Name = profile.AppRouteName(strconv.Itoa(event.Edges.MsgType.AppID), event.Name)
-	if err = r.Coordinator.AddNamedRoute([]*profile.Route{event.Route}); err != nil {
+	if err = r.coordinator.AddNamedRoute([]*profile.Route{event.Route}); err != nil {
 		return nil, err
 	}
 	return event.Update().SetStatus(typex.SimpleStatusActive).Save(ctx)
@@ -131,7 +130,7 @@ func (r *mutationResolver) DisableMsgEvent(ctx context.Context, id int) (*ent.Ms
 	if err != nil {
 		return nil, err
 	}
-	if err = r.Coordinator.RemoveNamedRoute([]string{profile.AppRouteName(strconv.Itoa(event.Edges.MsgType.AppID), event.Name)}); err != nil {
+	if err = r.coordinator.RemoveNamedRoute([]string{profile.AppRouteName(strconv.Itoa(event.Edges.MsgType.AppID), event.Name)}); err != nil {
 		return nil, err
 	}
 	return event.Update().SetStatus(typex.SimpleStatusInactive).Save(ctx)
@@ -156,13 +155,13 @@ func (r *mutationResolver) UpdateMsgChannel(ctx context.Context, id int, input e
 	// 修改receiver，同步修改TenantReceiver
 	if input.Receiver != nil && mc.Status == typex.SimpleStatusActive {
 		// 移除
-		if err = r.Coordinator.RemoveTenantReceiver([]string{profile.TenantReceiverName(strconv.Itoa(omc.TenantID), omc.Name)}); err != nil {
+		if err = r.coordinator.RemoveTenantReceiver([]string{profile.TenantReceiverName(strconv.Itoa(omc.TenantID), omc.Name)}); err != nil {
 			return nil, err
 		}
 		// 添加
 		receiver := *mc.Receiver
 		receiver.Name = profile.TenantReceiverName(strconv.Itoa(mc.TenantID), mc.Receiver.Name)
-		if err = r.Coordinator.AddTenantReceiver([]*profile.Receiver{&receiver}); err != nil {
+		if err = r.coordinator.AddTenantReceiver([]*profile.Receiver{&receiver}); err != nil {
 			return nil, err
 		}
 	}
@@ -191,7 +190,7 @@ func (r *mutationResolver) EnableMsgChannel(ctx context.Context, id int) (*ent.M
 		return nil, fmt.Errorf("receiver cannot nil")
 	}
 	channel.Receiver.Name = profile.TenantReceiverName(strconv.Itoa(channel.TenantID), channel.Receiver.Name)
-	if err = r.Coordinator.AddTenantReceiver([]*profile.Receiver{channel.Receiver}); err != nil {
+	if err = r.coordinator.AddTenantReceiver([]*profile.Receiver{channel.Receiver}); err != nil {
 		return nil, err
 	}
 	return channel.Update().SetStatus(typex.SimpleStatusActive).Save(ctx)
@@ -203,7 +202,7 @@ func (r *mutationResolver) DisableMsgChannel(ctx context.Context, id int) (*ent.
 	if err != nil {
 		return nil, err
 	}
-	if err = r.Coordinator.RemoveTenantReceiver([]string{profile.TenantReceiverName(strconv.Itoa(channel.TenantID), channel.Name)}); err != nil {
+	if err = r.coordinator.RemoveTenantReceiver([]string{profile.TenantReceiverName(strconv.Itoa(channel.TenantID), channel.Name)}); err != nil {
 		return nil, err
 	}
 	return channel.Update().SetStatus(typex.SimpleStatusInactive).Save(ctx)
@@ -222,7 +221,7 @@ func (r *mutationResolver) CreateMsgTemplate(ctx context.Context, input ent.Crea
 	newFileIDs := make([]int, 0)
 	// 验证模板路径
 	if input.Tpl != nil {
-		err := r.Coordinator.ValidateFilePath(ctx, *input.Tpl, service.TempRelativePathTplTemp)
+		err := r.coordinator.ValidateFilePath(ctx, *input.Tpl, service.TempRelativePathTplTemp)
 		if err != nil {
 			return nil, err
 		}
@@ -231,7 +230,7 @@ func (r *mutationResolver) CreateMsgTemplate(ctx context.Context, input ent.Crea
 	// 验证附件路径
 	if input.Attachments != nil {
 		for _, att := range input.Attachments {
-			err := r.Coordinator.ValidateFilePath(ctx, att, service.TempRelativePathAttachment)
+			err := r.coordinator.ValidateFilePath(ctx, att, service.TempRelativePathAttachment)
 			if err != nil {
 				return nil, err
 			}
@@ -243,7 +242,7 @@ func (r *mutationResolver) CreateMsgTemplate(ctx context.Context, input ent.Crea
 		return nil, err
 	}
 	// 上报文件引用次数
-	err = r.Coordinator.ReportFileRefCount(ctx, newFileIDs, nil)
+	err = r.ReportFileRefCount(ctx, newFileIDs, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -267,7 +266,7 @@ func (r *mutationResolver) UpdateMsgTemplate(ctx context.Context, id int, input 
 	oldFileIDs := make([]int, 0)
 	// 验证模板路径
 	if input.Tpl != nil {
-		err := r.Coordinator.ValidateFilePath(ctx, *input.Tpl, service.TempRelativePathTplTemp)
+		err := r.coordinator.ValidateFilePath(ctx, *input.Tpl, service.TempRelativePathTplTemp)
 		if err != nil {
 			return nil, err
 		}
@@ -280,7 +279,7 @@ func (r *mutationResolver) UpdateMsgTemplate(ctx context.Context, id int, input 
 	// 验证附件路径
 	if input.Attachments != nil && len(input.Attachments) > 0 {
 		for _, att := range input.Attachments {
-			err := r.Coordinator.ValidateFilePath(ctx, att, service.TempRelativePathAttachment)
+			err := r.coordinator.ValidateFilePath(ctx, att, service.TempRelativePathAttachment)
 			if err != nil {
 				return nil, err
 			}
@@ -300,18 +299,18 @@ func (r *mutationResolver) UpdateMsgTemplate(ctx context.Context, id int, input 
 	// 模板文件更新，则删除旧模板文件
 	if input.Tpl != nil && input.TplFileID != nil && temp.Status == typex.SimpleStatusActive {
 		// 移除data下的旧模板
-		err = r.Coordinator.RemoveTplDataFile(otemp.Tpl)
+		err = r.coordinator.RemoveTplDataFile(otemp.Tpl)
 		if err != nil {
 			return nil, err
 		}
 		// 启用新模板
-		err = r.Coordinator.EnableTplDataFile(temp.Tpl)
+		err = r.coordinator.EnableTplDataFile(temp.Tpl)
 		if err != nil {
 			return nil, err
 		}
 	}
 	// 上报文件引用次数
-	err = r.Coordinator.ReportFileRefCount(ctx, newFileIDs, oldFileIDs)
+	err = r.ReportFileRefCount(ctx, newFileIDs, oldFileIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -345,7 +344,7 @@ func (r *mutationResolver) DeleteMsgTemplate(ctx context.Context, id int) (bool,
 	if otemp.AttachmentsFileIds != nil {
 		oldFileIDs = append(oldFileIDs, otemp.AttachmentsFileIds...)
 	}
-	err = r.Coordinator.ReportFileRefCount(ctx, nil, oldFileIDs)
+	err = r.ReportFileRefCount(ctx, nil, oldFileIDs)
 	if err != nil {
 		return false, err
 	}
@@ -363,7 +362,7 @@ func (r *mutationResolver) EnableMsgTemplate(ctx context.Context, id int) (*ent.
 		return nil, err
 	}
 	// 启用模板
-	err = r.Coordinator.EnableTplDataFile(temp.Tpl)
+	err = r.coordinator.EnableTplDataFile(temp.Tpl)
 	if err != nil {
 		return nil, err
 	}
@@ -380,7 +379,7 @@ func (r *mutationResolver) DisableMsgTemplate(ctx context.Context, id int) (*ent
 		return nil, err
 	}
 	// 移除data目录模板
-	err = r.Coordinator.RemoveTplDataFile(temp.Tpl)
+	err = r.coordinator.RemoveTplDataFile(temp.Tpl)
 	if err != nil {
 		return nil, err
 	}
@@ -570,10 +569,10 @@ func (r *mutationResolver) TestSendEmailTpl(ctx context.Context, tplID int, emai
 	}
 	maps.Copy(annotations, defaultAnnotations)
 	// 发送邮件
-	err = r.Coordinator.AlertServer.PostAlerts(ctx.Value(gin.ContextKey).(*gin.Context), &oas.PostAlertsRequest{
-		PostableAlerts: oas.PostableAlerts{
+	_, err = r.kosdk.Msg().AlertAPI.PostAlerts(ctx, &msg.PostAlertsRequest{
+		PostableAlerts: msg.PostableAlerts{
 			{
-				Alert: &oas.Alert{
+				Alert: &msg.Alert{
 					Labels: labels,
 				},
 				Annotations: annotations,
@@ -584,7 +583,13 @@ func (r *mutationResolver) TestSendEmailTpl(ctx context.Context, tplID int, emai
 }
 
 // TestSendMessageTpl is the resolver for the testSendMessageTpl field.
-func (r *mutationResolver) TestSendMessageTpl(ctx context.Context, tplID int, userID int, labels map[string]string, annotations map[string]string) (bool, error) {
+func (r *mutationResolver) TestSendMessageTpl(
+	ctx context.Context,
+	tplID int,
+	userID int,
+	labels map[string]string,
+	annotations map[string]string,
+) (bool, error) {
 	client := ent.FromContext(ctx)
 	temp, err := client.MsgTemplate.Query().Where(msgtemplate.ID(tplID)).WithEvent().Only(ctx)
 	if err != nil {
@@ -616,10 +621,10 @@ func (r *mutationResolver) TestSendMessageTpl(ctx context.Context, tplID int, us
 	}
 	maps.Copy(annotations, defaultAnnotations)
 	// 发送站内信
-	err = r.Coordinator.AlertServer.PostAlerts(ctx.Value(gin.ContextKey).(*gin.Context), &oas.PostAlertsRequest{
-		PostableAlerts: oas.PostableAlerts{
+	_, err = r.kosdk.Msg().AlertAPI.PostAlerts(ctx, &msg.PostAlertsRequest{
+		PostableAlerts: msg.PostableAlerts{
 			{
-				Alert: &oas.Alert{
+				Alert: &msg.Alert{
 					Labels: labels,
 				},
 				Annotations: annotations,

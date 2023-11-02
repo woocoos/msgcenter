@@ -57,7 +57,7 @@ func (a *Alerts) Resolved() prometheus.Counter { return a.resolved }
 // Invalid returns a counter of invalid alerts.
 func (a *Alerts) Invalid() prometheus.Counter { return a.invalid }
 
-// CoordinatorMetrics is a metrics for config.Coordinator
+// CoordinatorMetrics is a metrics for config.coordinator
 type CoordinatorMetrics struct {
 	ConfigSuccess          prometheus.Gauge
 	ConfigSuccessTime      prometheus.Gauge

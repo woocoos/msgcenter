@@ -10,38 +10,47 @@ import (
 
 // GeneralServer is the server API for General service.
 type GeneralServer interface {
+	// GetStatus Get current status of an Alertmanager instance and its cluster
 	// (GET /status)
 	GetStatus(*gin.Context) (*AlertmanagerStatus, error)
 }
 
 // ReceiverServer is the server API for Receiver service.
 type ReceiverServer interface {
+	// GetReceivers Get list of all receivers (name of notification integrations)
 	// (GET /receivers)
 	GetReceivers(*gin.Context) ([]*Receiver, error)
 }
 
 // SilenceServer is the server API for Silence service.
 type SilenceServer interface {
+	// DeleteSilence Delete a silence by its ID
 	// (DELETE /silence/{silenceID})
 	DeleteSilence(*gin.Context, *DeleteSilenceRequest) error
+	// GetSilence Get a silence by its ID
 	// (GET /silence/{silenceID})
 	GetSilence(*gin.Context, *GetSilenceRequest) (*GettableSilence, error)
+	// GetSilences Get a list of silences
 	// (GET /silences)
 	GetSilences(*gin.Context, *GetSilencesRequest) (GettableSilences, error)
+	// PostSilences Post a new silence or update an existing one
 	// (POST /silences)
 	PostSilences(*gin.Context, *PostSilencesRequest) (*PostSilencesResponse, error)
 }
 
 // AlertServer is the server API for Alert service.
 type AlertServer interface {
+	// GetAlerts Get a list of alerts
 	// (GET /alerts)
 	GetAlerts(*gin.Context, *GetAlertsRequest) (GettableAlerts, error)
+	// PostAlerts Create new Alerts
 	// (POST /alerts)
 	PostAlerts(*gin.Context, *PostAlertsRequest) error
 }
 
 // PushServer is the server API for Push service.
 type PushServer interface {
+	// PostPush push data to message queue for notify message client
 	// (POST /push)
 	PostPush(*gin.Context, *PostPushRequest) error
 }

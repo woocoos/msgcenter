@@ -24,12 +24,13 @@ require (
 	github.com/redis/go-redis/v9 v9.0.5
 	github.com/stretchr/testify v1.8.4
 	github.com/tsingsun/members v0.0.0-20231020035013-99de08e2d5dd
-	github.com/tsingsun/woocoo v0.4.2-0.20231020013458-23888f008da8
-	github.com/tsingsun/woocoo/contrib/gql v0.0.0-20231020013458-23888f008da8
+	github.com/tsingsun/woocoo v0.4.3-0.20231101035132-910828c6d763
+	github.com/tsingsun/woocoo/contrib/gql v0.0.1
+	github.com/tsingsun/woocoo/contrib/telemetry v0.1.3
 	github.com/vektah/gqlparser/v2 v2.5.10
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	github.com/woocoos/entcache v0.0.0-20231018132617-2a6c9fb4ee1a
-	github.com/woocoos/knockout-go v0.0.0-20231020015525-efb08e0b38ac
+	github.com/woocoos/knockout-go v0.0.0-20231102080245-1a17927d41fb
 	go.uber.org/zap v1.26.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/sync v0.4.0
@@ -110,7 +111,6 @@ require (
 	github.com/tidwall/gjson v1.14.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
-	github.com/tsingsun/woocoo/contrib/telemetry v0.1.2 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/vmihailenco/go-tinylfu v0.2.2 // indirect

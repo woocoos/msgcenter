@@ -1,19 +1,23 @@
-package server
+package oas
 
 import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/tsingsun/woocoo"
+	"github.com/tsingsun/woocoo/contrib/telemetry/otelweb"
 	"github.com/tsingsun/woocoo/pkg/conf"
-	"github.com/tsingsun/woocoo/pkg/log"
+	"github.com/tsingsun/woocoo/pkg/store/redisx"
+	"github.com/tsingsun/woocoo/web"
 	"github.com/tsingsun/woocoo/web/handler"
-	"github.com/woocoos/msgcenter/api/oas"
 	"github.com/woocoos/msgcenter/dispatch"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/provider"
+	"github.com/woocoos/msgcenter/service"
 	"github.com/woocoos/msgcenter/silence"
 	"net/http"
 	"regexp"
@@ -28,57 +32,82 @@ type (
 	setAlertStatusFn func(label.LabelSet)
 )
 
-var (
-	logger = log.Component("api")
-)
-
-type Service struct {
-	*Options
-
-	uptime time.Time
-
-	// mtx protects config, setAlertStatus and route.
-	mtx sync.RWMutex
-
+type ServerImpl struct {
+	uptime         time.Time
 	route          *dispatch.Route
+	metric         *metrics.Alerts
+	statusFunc     getAlertStatusFn
 	setAlertStatus setAlertStatusFn
 
-	m *metrics.Alerts
+	// from alertManager
+	coordinator *service.Coordinator
+	alerts      provider.Alerts
+	silences    *silence.Silences
+
+	webServer *web.Server
+	// mu protects config, setAlertStatus and route.
+	mu sync.RWMutex
 }
 
-func RegisterHandlers(router *gin.RouterGroup, srv *Service) {
+func RegisterHandlers(router *gin.RouterGroup, srv *ServerImpl) {
 	RegisterGeneralHandlers(router, srv)
 	RegisterReceiverHandlers(router, srv)
 	RegisterSilenceHandlers(router, srv)
 	RegisterAlertHandlers(router, srv)
 }
 
-func NewService(opts *Options) (*Service, error) {
-	if err := opts.Validate(); err != nil {
-		return nil, fmt.Errorf("invalid API options: %s", err)
+func NewServer(app *woocoo.App, am *service.AlertManager, web *web.Server) (*ServerImpl, error) {
+	s := &ServerImpl{
+		uptime:      time.Now(),
+		coordinator: am.Coordinator,
+		alerts:      am.Alerts,
+		silences:    am.Silences,
+		statusFunc:  am.Marker.Status,
+		metric:      metrics.NewAlerts("v2"),
+		webServer:   web,
 	}
-	s := &Service{
-		Options: opts,
-		uptime:  time.Now(),
-		m:       metrics.NewAlerts("v2"),
+	s.buildWebServer(app)
+	if web == nil {
+		app.RegisterServer(s.webServer)
 	}
 	return s, nil
 }
 
-func (s *Service) Update(cfg *profile.Config, fn func(label.LabelSet)) {
-	s.mtx.Lock()
-	defer s.mtx.Unlock()
+func (s *ServerImpl) buildWebServer(app *woocoo.App) *web.Server {
+	if s.webServer == nil {
+		s.webServer = web.New(web.WithConfiguration(app.AppConfiguration().Sub("web")),
+			web.WithGracefulStop(),
+			otelweb.RegisterMiddleware(),
+		)
+	}
+	// default group is '/api/v2'
+	rg := s.webServer.Router().FindGroup("/api/v2").Group
+
+	RegisterHandlers(rg, s)
+
+	cli, err := redisx.NewClient(app.AppConfiguration().Sub("store.redis"))
+	if err != nil {
+		panic(err)
+	}
+	RegisterPushHandlers(rg, NewPushService(cli.UniversalClient))
+
+	return s.webServer
+}
+
+func (s *ServerImpl) Update(cfg *profile.Config, fn func(label.LabelSet)) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.setAlertStatus = fn
 	s.route = dispatch.NewRoute(cfg.Route, nil)
 }
 
 // GetStatus returns the status of the Alertmanager.
 // Notice: return all config include all tenants,so it's not safe for production
-func (s *Service) GetStatus(c *gin.Context) (resp *oas.AlertmanagerStatus, err error) {
-	original := s.Coordinator.ProfileString()
-	resp = &oas.AlertmanagerStatus{
+func (s *ServerImpl) GetStatus(c *gin.Context) (resp *AlertmanagerStatus, err error) {
+	original := s.coordinator.ProfileString()
+	resp = &AlertmanagerStatus{
 		Uptime: s.uptime,
-		VersionInfo: oas.VersionInfo{
+		VersionInfo: VersionInfo{
 			Version:   conf.Global().Version(),
 			Revision:  "",
 			Branch:    "",
@@ -86,44 +115,44 @@ func (s *Service) GetStatus(c *gin.Context) (resp *oas.AlertmanagerStatus, err e
 			BuildDate: "",
 			GoVersion: runtime.Version(),
 		},
-		Config: oas.AlertmanagerConfig{Original: original},
+		Config: AlertmanagerConfig{Original: original},
 	}
 	return
 }
 
-func (s *Service) GetReceivers(c *gin.Context) ([]*oas.Receiver, error) {
-	pr := s.Coordinator.GetReceivers()
-	receivers := make([]*oas.Receiver, 0, len(pr))
+func (s *ServerImpl) GetReceivers(c *gin.Context) ([]*Receiver, error) {
+	pr := s.coordinator.GetReceivers()
+	receivers := make([]*Receiver, 0, len(pr))
 	for i := range pr {
-		receivers = append(receivers, &oas.Receiver{Name: pr[i].Name})
+		receivers = append(receivers, &Receiver{Name: pr[i].Name})
 	}
 	return receivers, nil
 }
 
-func (s *Service) GetAlerts(c *gin.Context, request *oas.GetAlertsRequest) (res oas.GettableAlerts, err error) {
+func (s *ServerImpl) GetAlerts(c *gin.Context, request *GetAlertsRequest) (res GettableAlerts, err error) {
 	var (
 		receiverFilter *regexp.Regexp
 	)
 
-	matchers, err := parseFilter(request.Body.Filter)
+	matchers, err := parseFilter(request.Filter)
 	if err != nil {
 		return nil, err
 	}
 
-	if request.Body.Receiver != "" {
-		receiverFilter, err = regexp.Compile("^(?:" + request.Body.Receiver + ")$")
+	if request.Receiver != nil {
+		receiverFilter, err = regexp.Compile("^(?:" + *request.Receiver + ")$")
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	alerts := s.Alerts.GetPending()
+	alerts := s.alerts.GetPending()
 	defer alerts.Close()
 
-	alertFilter := s.alertFilter(matchers, request.Body.Silenced, request.Body.Inhibited, request.Body.Active)
+	alertFilter := s.alertFilter(matchers, *request.Silenced, *request.Inhibited, *request.Active)
 	now := time.Now()
 
-	s.mtx.RLock()
+	s.mu.RLock()
 	for a := range alerts.Next() {
 		if err = alerts.Err(); err != nil {
 			break
@@ -143,11 +172,11 @@ func (s *Service) GetAlerts(c *gin.Context, request *oas.GetAlertsRequest) (res 
 			continue
 		}
 
-		alert := AlertToOpenAPIAlert(a, s.StatusFunc(a.Fingerprint()), receivers)
+		alert := AlertToOpenAPIAlert(a, s.statusFunc(a.Fingerprint()), receivers)
 
 		res = append(res, alert)
 	}
-	s.mtx.RUnlock()
+	s.mu.RUnlock()
 
 	if err != nil {
 		return
@@ -158,7 +187,7 @@ func (s *Service) GetAlerts(c *gin.Context, request *oas.GetAlertsRequest) (res 
 	return
 }
 
-func (s *Service) alertFilter(matchers []*label.Matcher, silenced, inhibited, active bool) func(a *alert.Alert, now time.Time) bool {
+func (s *ServerImpl) alertFilter(matchers []*label.Matcher, silenced, inhibited, active bool) func(a *alert.Alert, now time.Time) bool {
 	return func(a *alert.Alert, now time.Time) bool {
 		if !a.EndsAt.IsZero() && a.EndsAt.Before(now) {
 			return false
@@ -168,7 +197,7 @@ func (s *Service) alertFilter(matchers []*label.Matcher, silenced, inhibited, ac
 		s.setAlertStatus(a.Labels)
 
 		// Get alert's current status after seeing if it is suppressed.
-		status := s.StatusFunc(a.Fingerprint())
+		status := s.statusFunc(a.Fingerprint())
 
 		if !active && status.State == alert.AlertStateActive {
 			return false
@@ -244,11 +273,11 @@ func receiversMatchFilter(receivers []string, filter *regexp.Regexp) bool {
 	return false
 }
 
-func (s *Service) PostAlerts(c *gin.Context, req *oas.PostAlertsRequest) error {
+func (s *ServerImpl) PostAlerts(c *gin.Context, req *PostAlertsRequest) error {
 	alerts := OpenAPIAlertsToAlerts(req.PostableAlerts)
 	now := time.Now()
 
-	resolveTimeout := s.Coordinator.ResolveTimeout()
+	resolveTimeout := s.coordinator.ResolveTimeout()
 
 	for _, alert := range alerts {
 		alert.UpdatedAt = now
@@ -268,9 +297,9 @@ func (s *Service) PostAlerts(c *gin.Context, req *oas.PostAlertsRequest) error {
 			alert.EndsAt = now.Add(resolveTimeout)
 		}
 		if alert.EndsAt.After(time.Now()) {
-			s.m.Firing().Inc()
+			s.metric.Firing().Inc()
 		} else {
-			s.m.Resolved().Inc()
+			s.metric.Resolved().Inc()
 		}
 	}
 
@@ -282,12 +311,12 @@ func (s *Service) PostAlerts(c *gin.Context, req *oas.PostAlertsRequest) error {
 		removeEmptyLabels(a.Labels)
 		if err := a.Validate(); err != nil {
 			c.Error(err)
-			s.m.Invalid().Inc()
+			s.metric.Invalid().Inc()
 			continue
 		}
 		validAlerts = append(validAlerts, a)
 	}
-	if err := s.Alerts.Put(validAlerts...); err != nil {
+	if err := s.alerts.Put(validAlerts...); err != nil {
 		return err
 	}
 
@@ -302,8 +331,8 @@ func removeEmptyLabels(ls label.LabelSet) {
 	}
 }
 
-func (s *Service) DeleteSilence(c *gin.Context, req *oas.DeleteSilenceRequest) error {
-	if err := s.Silences.Expire(req.UriParams.SilenceID); err != nil {
+func (s *ServerImpl) DeleteSilence(c *gin.Context, req *DeleteSilenceRequest) error {
+	if err := s.silences.Expire(req.SilenceID); err != nil {
 		if errors.Is(err, silence.ErrNotFound) {
 			c.Status(http.StatusNotFound)
 			return nil
@@ -313,8 +342,8 @@ func (s *Service) DeleteSilence(c *gin.Context, req *oas.DeleteSilenceRequest) e
 	return nil
 }
 
-func (s *Service) GetSilence(c *gin.Context, req *oas.GetSilenceRequest) (*oas.GettableSilence, error) {
-	sils, _, err := s.Silences.Query(silence.QIDs([]int{req.UriParams.SilenceID}))
+func (s *ServerImpl) GetSilence(c *gin.Context, req *GetSilenceRequest) (*GettableSilence, error) {
+	sils, _, err := s.silences.Query(silence.QIDs([]int{req.SilenceID}))
 	if err != nil {
 		return nil, err
 	}
@@ -330,7 +359,7 @@ func (s *Service) GetSilence(c *gin.Context, req *oas.GetSilenceRequest) (*oas.G
 	return sil, nil
 }
 
-func (s *Service) GetSilences(c *gin.Context, req *oas.GetSilencesRequest) (vals oas.GettableSilences, err error) {
+func (s *ServerImpl) GetSilences(c *gin.Context, req *GetSilencesRequest) (vals GettableSilences, err error) {
 	var matchers []*label.Matcher
 	for _, matcherStr := range req.Filter {
 		matcher, err := label.ParseMatcher(matcherStr)
@@ -339,11 +368,11 @@ func (s *Service) GetSilences(c *gin.Context, req *oas.GetSilencesRequest) (vals
 		}
 		matchers = append(matchers, matcher)
 	}
-	psils, _, err := s.Silences.Query()
+	psils, _, err := s.silences.Query()
 	if err != nil {
 		return nil, err
 	}
-	vals = make([]*oas.GettableSilence, 0, len(psils))
+	vals = make([]*GettableSilence, 0, len(psils))
 	for _, sil := range psils {
 		if !CheckSilenceMatchesFilterLabels(sil, matchers) {
 			continue
@@ -358,13 +387,13 @@ func (s *Service) GetSilences(c *gin.Context, req *oas.GetSilencesRequest) (vals
 	return
 }
 
-func (s *Service) PostSilences(c *gin.Context, req *oas.PostSilencesRequest) (res *oas.PostSilencesResponse, err error) {
+func (s *ServerImpl) PostSilences(c *gin.Context, req *PostSilencesRequest) (res *PostSilencesResponse, err error) {
 	sil, err := PostableSilenceToEnt(&req.PostableSilence)
 	if err != nil {
 		return nil, err
 	}
 
-	sid, err := s.Silences.Set(&silence.Entry{
+	sid, err := s.silences.Set(&silence.Entry{
 		ID:        sil.ID,
 		UpdatedAt: sil.UpdatedAt,
 		Matchers:  sil.Matchers,
@@ -380,21 +409,21 @@ func (s *Service) PostSilences(c *gin.Context, req *oas.PostSilencesRequest) (re
 		return nil, err
 	}
 
-	res = &oas.PostSilencesResponse{
+	res = &PostSilencesResponse{
 		SilenceID: sid,
 	}
 	return
 }
 
 // AlertToOpenAPIAlert converts internal alerts, alert types, and receivers to *open_api_models.GettableAlert.
-func AlertToOpenAPIAlert(alert *alert.Alert, status alert.MarkerStatus, receivers []string) *oas.GettableAlert {
-	apiReceivers := make([]*oas.Receiver, 0, len(receivers))
+func AlertToOpenAPIAlert(alert *alert.Alert, status alert.MarkerStatus, receivers []string) *GettableAlert {
+	apiReceivers := make([]*Receiver, 0, len(receivers))
 	for i := range receivers {
-		apiReceivers = append(apiReceivers, &oas.Receiver{Name: receivers[i]})
+		apiReceivers = append(apiReceivers, &Receiver{Name: receivers[i]})
 	}
 
-	aa := &oas.GettableAlert{
-		Alert: &oas.Alert{
+	aa := &GettableAlert{
+		Alert: &Alert{
 			GeneratorURL: alert.GeneratorURL,
 			Labels:       ModelLabelSetToAPILabelSet(alert.Labels),
 		},
@@ -404,7 +433,7 @@ func AlertToOpenAPIAlert(alert *alert.Alert, status alert.MarkerStatus, receiver
 		EndsAt:      alert.EndsAt,
 		Fingerprint: alert.Fingerprint().String(),
 		Receivers:   apiReceivers,
-		Status: oas.AlertStatus{
+		Status: AlertStatus{
 			State:       string(status.State),
 			SilencedBy:  status.SilencedBy,
 			InhibitedBy: status.InhibitedBy,
@@ -414,7 +443,7 @@ func AlertToOpenAPIAlert(alert *alert.Alert, status alert.MarkerStatus, receiver
 }
 
 // OpenAPIAlertsToAlerts converts open_api_models.PostableAlerts to []*types.Alert.
-func OpenAPIAlertsToAlerts(apiAlerts oas.PostableAlerts) []*alert.Alert {
+func OpenAPIAlertsToAlerts(apiAlerts PostableAlerts) []*alert.Alert {
 	alerts := []*alert.Alert{}
 	for _, apiAlert := range apiAlerts {
 		a := alert.Alert{
@@ -431,8 +460,8 @@ func OpenAPIAlertsToAlerts(apiAlerts oas.PostableAlerts) []*alert.Alert {
 }
 
 // ModelLabelSetToAPILabelSet converts prometheus_model.LabelSet to open_api_models.LabelSet.
-func ModelLabelSetToAPILabelSet(modelLabelSet label.LabelSet) oas.LabelSet {
-	apiLabelSet := oas.LabelSet{}
+func ModelLabelSetToAPILabelSet(modelLabelSet label.LabelSet) LabelSet {
+	apiLabelSet := LabelSet{}
 	for key, value := range modelLabelSet {
 		apiLabelSet[string(key)] = value
 	}
@@ -441,7 +470,7 @@ func ModelLabelSetToAPILabelSet(modelLabelSet label.LabelSet) oas.LabelSet {
 }
 
 // APILabelSetToModelLabelSet converts open_api_models.LabelSet to prometheus_model.LabelSet.
-func APILabelSetToModelLabelSet(apiLabelSet oas.LabelSet) label.LabelSet {
+func APILabelSetToModelLabelSet(apiLabelSet LabelSet) label.LabelSet {
 	modelLabelSet := label.LabelSet{}
 	for key, value := range apiLabelSet {
 		modelLabelSet[label.LabelName(key)] = value
@@ -451,7 +480,7 @@ func APILabelSetToModelLabelSet(apiLabelSet oas.LabelSet) label.LabelSet {
 }
 
 // PostableSilenceToEnt converts *open_api_models.PostableSilenc to *silencepb.Silence.
-func PostableSilenceToEnt(s *oas.PostableSilence) (*ent.Silence, error) {
+func PostableSilenceToEnt(s *PostableSilence) (*ent.Silence, error) {
 	sil := &ent.Silence{
 		ID:        s.ID,
 		StartsAt:  s.StartsAt,
@@ -471,13 +500,13 @@ func PostableSilenceToEnt(s *oas.PostableSilence) (*ent.Silence, error) {
 }
 
 // GettableSilenceFromProto converts *silencepb.Silence to open_api_models.GettableSilence.
-func GettableSilenceFromProto(s *silence.Entry) (*oas.GettableSilence, error) {
+func GettableSilenceFromProto(s *silence.Entry) (*GettableSilence, error) {
 	start := s.StartsAt
 	end := s.EndsAt
 	updated := s.UpdatedAt
 	state := string(alert.CalcSilenceState(start, end))
-	sil := &oas.GettableSilence{
-		Silence: &oas.Silence{
+	sil := &GettableSilence{
+		Silence: &Silence{
 			StartsAt: start,
 			EndsAt:   end,
 			//Comment:   s.Comments,
@@ -485,13 +514,13 @@ func GettableSilenceFromProto(s *silence.Entry) (*oas.GettableSilence, error) {
 		},
 		ID:        s.ID,
 		UpdatedAt: updated,
-		Status: oas.SilenceStatus{
+		Status: SilenceStatus{
 			State: state,
 		},
 	}
 
 	for _, m := range s.Matchers {
-		matcher := &oas.Matcher{
+		matcher := &Matcher{
 			Name:  m.Name,
 			Value: m.Value,
 		}
@@ -559,7 +588,7 @@ var silenceStateOrder = map[alert.SilenceState]int{
 // active silences should show the next to expire first
 // pending silences are ordered based on which one starts next
 // expired are ordered based on which one expired most recently
-func SortSilences(sils oas.GettableSilences) {
+func SortSilences(sils GettableSilences) {
 	sort.Slice(sils, func(i, j int) bool {
 		state1 := alert.SilenceState(sils[i].Status.State)
 		state2 := alert.SilenceState(sils[j].Status.State)

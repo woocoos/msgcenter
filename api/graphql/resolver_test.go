@@ -44,8 +44,8 @@ func (s *resolverSuite) SetupSuite() {
 	s.Require().NoError(err)
 	s.server = web.New(web.WithConfiguration(s.Cnf.Sub("web")))
 	s.resolver = &Resolver{
-		Coordinator: s.ConfigCoordinator,
-		Client:      s.Client,
+		coordinator: s.AlertManager.Coordinator,
+		client:      s.Client,
 		Silences:    s.AlertManager.Silences,
 	}
 	s.mr = &mutationResolver{
@@ -55,14 +55,14 @@ func (s *resolverSuite) SetupSuite() {
 		Resolver: s.resolver,
 	}
 
-	s.ConfigCoordinator.ReloadHooks(func(c *profile.Config) error {
-		s.ConfigCoordinator.Template.ExternalURL, err = url.Parse("http://localhost:9093")
+	s.AlertManager.Coordinator.ReloadHooks(func(c *profile.Config) error {
+		s.AlertManager.Coordinator.Template.ExternalURL, err = url.Parse("http://localhost:9093")
 		s.Require().NoError(err)
-		s.Require().NoError(s.AlertManager.Start(s.ConfigCoordinator, c))
+		s.Require().NoError(s.AlertManager.Start(s.AlertManager.Coordinator, c))
 		return nil
 	})
 
-	err = s.ConfigCoordinator.Reload()
+	err = s.AlertManager.Coordinator.Reload()
 	s.Require().NoError(err)
 	alerts := s.AlertManager.Alerts.(*mem.Alerts)
 	go alerts.Start(nil)
@@ -104,37 +104,36 @@ func (s *resolverSuite) TestUserSubMsgCategory() {
 	s.Require().Equal(category[0], "订阅类型")
 }
 
-func (s *resolverSuite) TestUserUnreadMessagesFromMsgCategory() {
-	ctx := s.NewTestCtx()
-	nums, err := s.qr.UserUnreadMsgInternalsFromMsgCategory(ctx, []string{"订阅类型"})
-	s.Require().NoError(err)
-	s.Require().NotEmpty(nums)
-	s.Require().Equal(nums[0], 2)
-}
-
-func (s *resolverSuite) TestUserUnreadMessages() {
-	ctx := s.NewTestCtx()
-	num, err := s.qr.UserUnreadMsgInternals(ctx)
-	s.Require().NoError(err)
-	s.Require().Equal(num, 2)
-}
-
-func (s *resolverSuite) TestMarkMessageReaOrUnRead() {
-	ctx := s.NewTestCtx()
-	suc, err := s.mr.MarkMsgInternalToReadOrUnRead(ctx, []int{1}, true)
-	s.Require().NoError(err)
-	s.Require().True(suc)
-	has, err := s.Client.MsgInternalTo.Query().Where(msginternalto.IDIn(1), msginternalto.ReadAtNotNil()).Exist(ctx)
-	s.Require().NoError(err)
-	s.Require().True(has)
-}
-
-func (s *resolverSuite) TestMarkMessageDeleted() {
-	ctx := s.NewTestCtx()
-	suc, err := s.mr.MarkMsgInternalToDeleted(ctx, []int{2})
-	s.Require().NoError(err)
-	s.Require().True(suc)
-	has, err := s.Client.MsgInternalTo.Query().Where(msginternalto.IDIn(2), msginternalto.DeleteAtNotNil()).Exist(ctx)
-	s.Require().NoError(err)
-	s.Require().True(has)
+func (s *resolverSuite) TestMessageHandler() {
+	s.Run("UserUnreadMessages", func() {
+		ctx := s.NewTestCtx()
+		num, err := s.qr.UserUnreadMsgInternals(ctx)
+		s.Require().NoError(err)
+		s.Require().Equal(2, num)
+	})
+	s.Run("UserUnreadMessagesFromMsgCategory", func() {
+		ctx := s.NewTestCtx()
+		nums, err := s.qr.UserUnreadMsgInternalsFromMsgCategory(ctx, []string{"订阅类型"})
+		s.Require().NoError(err)
+		s.Require().NotEmpty(nums)
+		s.Require().Equal(2, nums[0])
+	})
+	s.Run("MarkMessageReaOrUnRead", func() {
+		ctx := s.NewTestCtx()
+		suc, err := s.mr.MarkMsgInternalToReadOrUnRead(ctx, []int{1}, true)
+		s.Require().NoError(err)
+		s.Require().True(suc)
+		has, err := s.Client.MsgInternalTo.Query().Where(msginternalto.IDIn(1), msginternalto.ReadAtNotNil()).Exist(ctx)
+		s.Require().NoError(err)
+		s.Require().True(has)
+	})
+	s.Run("MarkMessageDeleted", func() {
+		ctx := s.NewTestCtx()
+		suc, err := s.mr.MarkMsgInternalToDeleted(ctx, []int{2})
+		s.Require().NoError(err)
+		s.Require().True(suc)
+		has, err := s.Client.MsgInternalTo.Query().Where(msginternalto.IDIn(2), msginternalto.DeleteAtNotNil()).Exist(ctx)
+		s.Require().NoError(err)
+		s.Require().True(has)
+	})
 }

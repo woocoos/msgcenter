@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"github.com/tsingsun/woocoo"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 )
@@ -53,6 +54,7 @@ func (ai alertIterator) Close()     { close(ai.done) }
 
 // Alerts gives access to a set of alerts. All methods are goroutine-safe.
 type Alerts interface {
+	woocoo.Server
 	// Subscribe returns an iterator over active alerts that have not been
 	// resolved and successfully notified about.
 	// They are not guaranteed to be in chronological order.

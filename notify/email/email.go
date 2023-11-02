@@ -112,9 +112,21 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 				}
 			}
 		case "cc":
-			email.AddCc(strings.Split(t, ",")...)
+			value, err := n.tmpl.ExecuteTextString(t, data)
+			if err != nil {
+				return false, fmt.Errorf("execute %q header template: %w", header, err)
+			}
+			if value != "" {
+				email.AddCc(strings.Split(value, ",")...)
+			}
 		case "bcc":
-			email.AddBcc(strings.Split(t, ",")...)
+			value, err := n.tmpl.ExecuteTextString(t, data)
+			if err != nil {
+				return false, fmt.Errorf("execute %q header template: %w", header, err)
+			}
+			if value != "" {
+				email.AddBcc(strings.Split(value, ",")...)
+			}
 		default:
 			value, err := n.tmpl.ExecuteTextString(t, data)
 			if err != nil {
