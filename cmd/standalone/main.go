@@ -38,6 +38,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer func() {
+		am.Stop()
+	}()
 
 	adm, err := graphql.NewServer(app, am)
 	if err != nil {
@@ -76,17 +79,15 @@ func main() {
 			panic(err)
 		}
 	}
-	defer func() {
-		am.Stop()
-	}()
 
 	msgc := conf.New(conf.WithBaseDir(*msgConfig), conf.WithGlobal(false)).Load()
 	msgcnf := &conf.AppConfiguration{Configuration: msgc}
 	koapp.BuildCacheComponents(msgcnf)
 	msgSvr := msg.NewServer(msgcnf)
 	app.RegisterServer(msgSvr)
-
-	app.RegisterServer(clientx.ChangeSet)
+	if clientx.ChangeSet != nil {
+		app.RegisterServer(clientx.ChangeSet)
+	}
 	if err := app.Run(); err != nil {
 		log.Panic(err)
 	}

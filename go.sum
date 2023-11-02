@@ -341,10 +341,10 @@ github.com/vmihailenco/tagparser/v2 v2.0.0 h1:y09buUbR+b5aycVFQs/g70pqKVZNBmxwAh
 github.com/vmihailenco/tagparser/v2 v2.0.0/go.mod h1:Wri+At7QHww0WTrCBeu4J6bNtoV6mEfg5OIWRZA9qds=
 github.com/woocoos/casbin-ent-adapter v0.0.0-20230404005858-cd33f1b0b92e h1:GbxL4wa7cs+l7Bi6L2mjfkFiqDK9t6N2oyOrNp+yV1U=
 github.com/woocoos/casbin-ent-adapter v0.0.0-20230404005858-cd33f1b0b92e/go.mod h1:44V48kYKt7r9gWei7Ld+QaL0qVIBlOWrhkNTVMpnx3I=
-github.com/woocoos/entcache v0.0.0-20231018132617-2a6c9fb4ee1a h1:r3r0B2lh0LcYSy/NuHwpKFQvAGk//iXxKRgp8h0MItA=
-github.com/woocoos/entcache v0.0.0-20231018132617-2a6c9fb4ee1a/go.mod h1:zNKzfOB5I4gHoDDZrrsE/9AWVGm4wfKJkm7DxTl+aNc=
-github.com/woocoos/knockout-go v0.0.0-20231102080245-1a17927d41fb h1:Rbldp+KX19lZyOq9QJZhESjYHDP2sjVb9ftfA1vX/6A=
-github.com/woocoos/knockout-go v0.0.0-20231102080245-1a17927d41fb/go.mod h1:fRv31KHR/FjsOcQ8nKGu4ARze78YcVwwu9TtIIGUYW4=
+github.com/woocoos/entcache v0.0.0-20231102091828-d02f8358dfa9 h1:9JhCMsJVW9M98B5zhMuvlJ1WeV1+u2Kc7wgGdhYrmM4=
+github.com/woocoos/entcache v0.0.0-20231102091828-d02f8358dfa9/go.mod h1:zNKzfOB5I4gHoDDZrrsE/9AWVGm4wfKJkm7DxTl+aNc=
+github.com/woocoos/knockout-go v0.0.0-20231102093145-d208627a6a42 h1:Kq0N/zoEVvLp1+yHtmm/0+oy5LG89uQ7SvO9Kgo4sUY=
+github.com/woocoos/knockout-go v0.0.0-20231102093145-d208627a6a42/go.mod h1:q/8WL1Ud6lEfLbntXwjBQV1qer1xw5koe7taiJIDCws=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/gopher-lua v1.1.0 h1:BojcDhfyDWgU2f2TOzYK/g5p2gxMrku8oupLDqlnSqE=

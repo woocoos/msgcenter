@@ -29,8 +29,8 @@ require (
 	github.com/tsingsun/woocoo/contrib/telemetry v0.1.3
 	github.com/vektah/gqlparser/v2 v2.5.10
 	github.com/vmihailenco/msgpack/v5 v5.3.5
-	github.com/woocoos/entcache v0.0.0-20231018132617-2a6c9fb4ee1a
-	github.com/woocoos/knockout-go v0.0.0-20231102080245-1a17927d41fb
+	github.com/woocoos/entcache v0.0.0-20231102091828-d02f8358dfa9
+	github.com/woocoos/knockout-go v0.0.0-20231102093145-d208627a6a42
 	go.uber.org/zap v1.26.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/sync v0.4.0

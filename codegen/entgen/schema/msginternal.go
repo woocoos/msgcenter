@@ -32,6 +32,7 @@ func (MsgInternal) Mixin() []ent.Mixin {
 		schemax.IntID{},
 		schemax.NewTenantMixin[intercept.Query, *gen.Client](version.AppCode, intercept.NewQuery),
 		schemax.AuditMixin{},
+		schemax.NotifyMixin{},
 	}
 }
 

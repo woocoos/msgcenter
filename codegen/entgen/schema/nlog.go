@@ -34,6 +34,7 @@ func (Nlog) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		schemax.IntID{},
 		schemax.NewTenantMixin[intercept.Query, *gen.Client](version.AppCode, intercept.NewQuery),
+		schemax.NotifyMixin{},
 	}
 }
 

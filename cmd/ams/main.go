@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/woocoos/knockout-go/ent/clientx"
 	"github.com/woocoos/knockout-go/pkg/koapp"
 	"github.com/woocoos/msgcenter/api/graphql"
 	"github.com/woocoos/msgcenter/api/oas"
@@ -25,6 +26,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer func() {
+		am.Stop()
+	}()
 
 	adm, err := graphql.NewServer(app, am)
 	if err != nil {
@@ -63,9 +67,10 @@ func main() {
 			panic(err)
 		}
 	}
-	defer func() {
-		am.Stop()
-	}()
+
+	if clientx.ChangeSet != nil {
+		app.RegisterServer(clientx.ChangeSet)
+	}
 	if err := app.Run(); err != nil {
 		panic(err)
 	}

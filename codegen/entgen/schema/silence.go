@@ -34,6 +34,7 @@ func (Silence) Mixin() []ent.Mixin {
 		schemax.SnowFlakeID{},
 		schemax.AuditMixin{},
 		schemax.NewTenantMixin[intercept.Query, *gen.Client](version.AppCode, intercept.NewQuery),
+		schemax.NotifyMixin{},
 	}
 }
 
