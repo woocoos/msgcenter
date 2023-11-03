@@ -2,8 +2,6 @@ package service
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,7 +9,6 @@ import (
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
-	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -23,27 +20,17 @@ import (
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/template"
 	"go.uber.org/zap"
-	"io"
-	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 )
 
 var logger = log.Component("config")
 
-const (
-	TempRelativePathTplTemp    = "tplTemp"
-	TempRelativePathTplData    = "tplData"
-	TempRelativePathAttachment = "attachment"
-)
-
 // Coordinator helps the Alert Manager collaborate with external components.
 type Coordinator struct {
-	configuration *conf.Configuration
+	cnf *conf.Configuration
 	// Protects profile and reloadHooks
 	mutex       sync.RWMutex
 	profile     *profile.Config
@@ -53,20 +40,6 @@ type Coordinator struct {
 	Template        *template.Template
 
 	db *ent.Client
-	// knockout http client
-	KOClient *http.Client
-
-	TempOptions TempOptions
-}
-
-type TempOptions struct {
-	Path         string `yaml:"path"`
-	FileBaseUrl  string `yaml:"fileBaseUrl"`
-	RelativePath struct {
-		TplTemp    string `yaml:"tplTemp"`
-		TplData    string `yaml:"tplData"`
-		Attachment string `yaml:"attachment"`
-	} `yaml:"relativePath"`
 }
 
 // NewCoordinator returns a new coordinator with the given configuration for alert manager.
@@ -74,16 +47,10 @@ type TempOptions struct {
 // `Reload()`.
 func NewCoordinator(cnf *conf.Configuration) *Coordinator {
 	c := &Coordinator{
-		configuration:   cnf,
+		cnf:             cnf,
 		ActiveReceivers: make(map[string]int),
 	}
 
-	tempOptions := TempOptions{}
-	err := cnf.Sub("template").Unmarshal(&tempOptions)
-	if err != nil {
-		log.Fatal(err)
-	}
-	c.TempOptions = tempOptions
 	return c
 }
 
@@ -129,7 +96,7 @@ func (c *Coordinator) Reload() error {
 	// clear active receivers,if error occurs, also clear it
 	c.ActiveReceivers = make(map[string]int)
 
-	configFilePath := c.configuration.String("config.file")
+	configFilePath := c.cnf.String("config.file")
 	logger.Info("loading configuration file", zap.String("file", configFilePath))
 
 	if err := c.loadFromFile(); err != nil {
@@ -182,29 +149,28 @@ func (c *Coordinator) WalkReceivers(visit func(receiver profile.Receiver) error)
 	return nil
 }
 
-func (c *Coordinator) TempParseFiles(filenames ...string) error {
-	_, err := c.Template.ParseFiles(filenames...)
-	return err
-}
-
 // loadTemplates loading template files
 func (c *Coordinator) loadTemplates() error {
-	if tmpl, err := template.New(); err != nil {
+	tmpl, err := template.New()
+	if err != nil {
 		return fmt.Errorf("failed to parse templates %w", err)
-	} else {
-		c.Template = tmpl
-		for _, ptn := range c.profile.Templates {
-			if _, err := c.Template.ParseGlob(c.configuration.Abs(ptn)); err != nil {
-				return err
-			}
+	}
+	c.Template = tmpl
+	for _, ptn := range c.profile.Templates {
+		if _, err := c.Template.ParseGlob(c.cnf.Abs(ptn)); err != nil {
+			return err
 		}
 	}
-	return nil
+	if err := c.cnf.Sub("template").Unmarshal(&c.Template); err != nil {
+		return err
+	}
+	c.Template.BaseDir, err = filepath.Abs(c.Template.BaseDir)
+	return err
 }
 
 // loadFromFile triggers a configuration load, discarding the old configuration.
 func (c *Coordinator) loadFromFile() error {
-	config, err := profile.NewConfig(c.configuration)
+	config, err := profile.NewConfig(c.cnf)
 	if err != nil {
 		return err
 	}
@@ -388,7 +354,7 @@ func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *templ
 		integrations = append(integrations, notify.NewIntegration(n, name, i))
 	}
 	var ()
-	tpldir := c.configuration.Abs(c.TempOptions.Path)
+	tpldir := c.cnf.Abs(c.Template.DataDir)
 	for i, cfg := range nc.EmailConfigs {
 		add("email", i, func() (notify.Notifier, error) {
 			return email.New(cfg, tmpl, overrideEmailConfig(tpldir, c.db))
@@ -400,7 +366,7 @@ func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *templ
 		})
 	}
 	if nc.MessageConfig != nil {
-		cli, err := redisx.NewClient(c.configuration.Root().Sub("store.redis"))
+		cli, err := redisx.NewClient(c.cnf.Root().Sub("store.redis"))
 		if err != nil {
 			return nil, err
 		}
@@ -413,112 +379,4 @@ func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *templ
 		return nil, errs
 	}
 	return integrations, nil
-}
-
-func md5HashAsMetricValue(data []byte) float64 {
-	sum := md5.Sum(data)
-	// We only want 48 bits as a float64 only has a 53 bit mantissa.
-	smallSum := sum[0:6]
-	bytes := make([]byte, 8)
-	copy(bytes, smallSum)
-	return float64(binary.LittleEndian.Uint64(bytes))
-}
-
-// ValidateFilePath 验证路径是否符合规则
-// dir:tplData、tplTemp、attachment
-func (c *Coordinator) ValidateFilePath(ctx context.Context, path, dir string) error {
-	tid, err := identity.TenantIDFromContext(ctx)
-	if err != nil {
-		return err
-	}
-	path = filepath.Join(path)
-	p := strings.TrimPrefix(path, "/")
-	rp := ""
-	if dir == TempRelativePathTplData {
-		rp = c.TempOptions.RelativePath.TplData
-	} else if dir == TempRelativePathTplTemp {
-		rp = c.TempOptions.RelativePath.TplTemp
-	} else if dir == TempRelativePathAttachment {
-		rp = c.TempOptions.RelativePath.Attachment
-	}
-	prefixPath := filepath.Join(rp, strconv.Itoa(tid))
-	if !strings.HasPrefix(p, strings.TrimPrefix(prefixPath, "/")) {
-		return fmt.Errorf("invalid path: %s,must be like:%s/xxx", path, prefixPath)
-	}
-	return nil
-}
-
-func (c *Coordinator) CopyFile(dstName, srcName string) (written int64, err error) {
-	src, err := os.Open(srcName)
-	if err != nil {
-		return
-	}
-	defer src.Close()
-	dst, err := os.OpenFile(dstName, os.O_CREATE|os.O_EXCL|os.O_WRONLY, os.ModePerm)
-	if err != nil {
-		return
-	}
-	defer dst.Close()
-	return io.Copy(dst, src)
-}
-
-// GetTplDataPath 将tpl临时文件路径转为正式存储路径
-func (c *Coordinator) GetTplDataPath(tempPath string) string {
-	tpldir := c.TempOptions.Path
-	data := c.TempOptions.RelativePath.TplData
-	temp := c.TempOptions.RelativePath.TplTemp
-	return c.configuration.Abs(
-		filepath.Join(
-			tpldir,
-			data,
-			strings.TrimPrefix(
-				strings.TrimPrefix(tempPath, "/"),
-				strings.TrimPrefix(temp, "/"),
-			),
-		),
-	)
-}
-
-// GetTplTempPath 获取tpl正式文件路径
-func (c *Coordinator) GetTplTempPath(tempPath string) string {
-	tpldir := c.configuration.Abs(c.TempOptions.Path)
-	return c.configuration.Abs(filepath.Join(tpldir, tempPath))
-}
-
-// EnableTplDataFile 启用模板文件
-// tplPath 为temp文件路径
-func (c *Coordinator) EnableTplDataFile(tplPath string) error {
-	if tplPath == "" {
-		return nil
-	}
-	// 将temp文件复制到data目录下
-	distName := c.GetTplDataPath(tplPath)
-	_, err := c.CopyFile(distName, c.GetTplTempPath(tplPath))
-	if err != nil {
-		return err
-	}
-	// 加载模板
-	err = c.TempParseFiles(distName)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// RemoveTplDataFile 移除data目录模板
-// tplPath 为temp文件路径
-func (c *Coordinator) RemoveTplDataFile(tplPath string) error {
-	if tplPath == "" {
-		return nil
-	}
-	// 将文件从data目录下删除
-	dataPath := c.GetTplDataPath(tplPath)
-	_, err := os.Stat(dataPath)
-	if err == nil {
-		err = os.Remove(dataPath)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }

@@ -3,12 +3,9 @@ version: 0.0.1
 development: true
 log:
   withTraceID: true
-  traceIDKey: "traceId"
   cores:
     - level: info
-
   rotate:
-    localtime: true
 
 jwt: &jwt
   signingMethod: "HS256"
@@ -22,8 +19,8 @@ web:
       - default:
           middlewares:
             - cors:
-                allowOrigins: ['*']
-                allowHeaders: ["*"]
+                allowOrigins: [ '*' ]
+                allowHeaders: [ "*" ]
             - accessLog:
                 exclude:
                   - IntrospectionQuery
@@ -73,13 +70,13 @@ alertManager:
   cluster:
     options:
       # 指定集群中的节点,可以是服务名或者IP
-      known: ["localhost"]
+      known: [ "localhost" ]
     memberList:
       bindAddr: 0.0.0.0
       bindPort: 7946
   config:
     # 如果指定租户，则只能访问指定租户的配置
-    tenants: [1,2,3]
+    tenants: [ 1,2,3 ]
     file: etc/alertmanager.yaml
   storage:
     path: data
@@ -89,12 +86,10 @@ alertManager:
   alerts:
     gcInterval: 30m
   template:
-    path: ../../test/testdata/files # path for custom template
-    fileBaseUrl: "http://127.0.0.1:10071"
-    relativePath:
-      tplTemp: "/msg/tpl/temp" # 模板临时路径
-      tplData: "/msg/tpl/data" # 模板正式路径
-      attachment: "/msg/att" # 附件存储路径
+    baseDir: ../../test/testdata/files # path for custom template
+    tmpDir: "/msg/tpl/tmp" # 模板临时路径
+    dataDir: "/msg/tpl/data" # 模板正式路径
+    attachmentDir: "/msg/att" # 附件存储路径
 
 prometheus:
   server:

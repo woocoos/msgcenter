@@ -11,7 +11,7 @@ import (
 	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/service"
-	"github.com/woocoos/msgcenter/silence"
+	"github.com/woocoos/msgcenter/service/silence"
 )
 
 var (

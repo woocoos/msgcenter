@@ -2,6 +2,7 @@ package profile
 
 import (
 	"encoding/json"
+	jsonparse "github.com/knadh/koanf/parsers/json"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tsingsun/woocoo/pkg/conf"
@@ -83,11 +84,6 @@ httpConfig:
     endpoint:
       tokenURL: http://127.0.0.1:5001/token
     scopes:
-    cache:
-      type: redis
-      addrs:
-        - 127.0.0.1:6379
-      db: 1
 `,
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
 				wc := i[0].(*WebhookConfig)
@@ -109,10 +105,14 @@ httpConfig:
 		t.Run(tt.name, func(t *testing.T) {
 			var config = DefaultWebhookConfig
 			cfg := conf.NewFromBytes([]byte(tt.cfgStr))
-			err := cfg.Unmarshal(&config)
+			bs, err := cfg.Parser().ToBytes(jsonparse.Parser())
 			require.NoError(t, err)
-			err = config.Validate()
-			tt.wantErr(t, err, &config)
+			if err = json.Unmarshal(bs, &config); err != nil {
+				tt.wantErr(t, err)
+			} else {
+				err = config.Validate()
+				tt.wantErr(t, err, &config)
+			}
 		})
 	}
 }

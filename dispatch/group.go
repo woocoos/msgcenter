@@ -6,7 +6,7 @@ import (
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
-	"github.com/woocoos/msgcenter/store"
+	"github.com/woocoos/msgcenter/service/store"
 	"go.uber.org/zap"
 	"sort"
 	"sync"

@@ -1,11 +1,6 @@
 appName: alertmanager
 version: 0.0.1
 development: true
-log:
-  withTraceID: true
-  traceIDKey: "traceId"
-  cores:
-    - level: debug
 
 web:
   server:
@@ -35,8 +30,7 @@ alertManager:
   alerts:
     gcInterval: 30m
   template:
-    path: testdata/files # path for custom template
-    relativePath:
-      tplTemp: "/msg/tpl/temp" # 模板临时路径
-      tplData: "/msg/tpl/data" # 模板正式路径
-      attachment: "/msg/att" # 附件存储路径
+    baseDir: testdata/files # path for custom template
+    tmpDir: "msg/tpl/tmp" # 模板临时路径
+    dataDir: "msg/tpl/data" # 模板正式路径
+    attachmentDir: "msg/att" # 附件存储路径

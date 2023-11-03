@@ -37,7 +37,7 @@ type serviceSuite struct {
 
 	server    *ServerImpl
 	shutdowns []func()
-	maildev   maildev.MailDev
+	maildev   *maildev.MailDev
 
 	webhook        *httptest.Server
 	webhookHandler http.Handler
@@ -46,12 +46,7 @@ type serviceSuite struct {
 // TestServiceSuite runs the service test suite
 func TestServiceSuite(t *testing.T) {
 	s := &serviceSuite{
-		maildev: maildev.MailDev{
-			URL: &url.URL{
-				Host:   "localhost:8025",
-				Scheme: "http",
-			},
-		},
+		maildev: maildev.DefaultServer(),
 	}
 	s.DSN = "file:msgcenter?mode=memory&cache=shared&_fk=1"
 	s.DriverName = "sqlite3"

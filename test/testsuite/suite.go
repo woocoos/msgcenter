@@ -78,7 +78,7 @@ func initTestApp() *woocoo.App {
 	}
 
 	app := woocoo.New(woocoo.WithAppConfiguration(
-		conf.NewFromBytes(bs, conf.WithBaseDir(test.BaseDir()), conf.WithGlobal(true))),
+		conf.NewFromBytes(bs, conf.WithBaseDir(test.BaseDir()))),
 	)
 	cnf := app.AppConfiguration()
 	cnf.Parser().Set("alertManager.storage.path", filepath.Join(test.BaseDir(), "testdata", "tmp"))

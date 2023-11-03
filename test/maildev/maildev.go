@@ -10,6 +10,11 @@ import (
 	"time"
 )
 
+const (
+	Scheme = "http"
+	Host   = "localhost:8025"
+)
+
 // MailDev is a client for the MailDev server.
 type (
 	MailDev struct {
@@ -29,6 +34,15 @@ type (
 		To          []map[string]string
 	}
 )
+
+func DefaultServer() *MailDev {
+	return &MailDev{
+		URL: &url.URL{
+			Scheme: Scheme,
+			Host:   Host,
+		},
+	}
+}
 
 // GetLastEmail returns the last received email.
 func (m *MailDev) GetLastEmail() (*MailDevEmail, error) {
@@ -52,9 +66,9 @@ func (m *MailDev) GetLastEmail() (*MailDevEmail, error) {
 	return &emails.Messages[0], nil
 }
 
-// deleteAllEmails deletes all emails.
-func (m *MailDev) deleteAllEmails() error {
-	_, _, err := m.doEmailRequest(http.MethodDelete, "/email/all")
+// DeleteAllEmails deletes all emails.
+func (m *MailDev) DeleteAllEmails() error {
+	_, _, err := m.doEmailRequest(http.MethodDelete, "/api/v1/messages")
 	return err
 }
 
@@ -70,6 +84,9 @@ func (m *MailDev) doEmailRequest(method, path string) (int, []byte, error) {
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return 0, nil, err
+	}
+	if res.StatusCode != 200 {
+		return res.StatusCode, nil, fmt.Errorf("expected status OK, got %d", res.StatusCode)
 	}
 	defer res.Body.Close()
 	b, err := io.ReadAll(res.Body)

@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/woocoos/knockout-go/api/msg"
+	"github.com/woocoos/msgcenter/template"
 	"strconv"
 	"time"
 
@@ -23,8 +24,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
-	"github.com/woocoos/msgcenter/service"
-	"github.com/woocoos/msgcenter/silence"
+	"github.com/woocoos/msgcenter/service/silence"
 	"golang.org/x/exp/maps"
 )
 
@@ -219,9 +219,9 @@ func (r *mutationResolver) CreateMsgTemplate(ctx context.Context, input ent.Crea
 		return nil, fmt.Errorf("attachments and attachmentsFileIds is required and lengths must be same")
 	}
 	newFileIDs := make([]int, 0)
-	// 验证模板路径
+	// validate tpl file path is correct.
 	if input.Tpl != nil {
-		err := r.coordinator.ValidateFilePath(ctx, *input.Tpl, service.TempRelativePathTplTemp)
+		err := r.coordinator.Template.ValidateFilePath(ctx, *input.Tpl, template.TplPathKindData)
 		if err != nil {
 			return nil, err
 		}
@@ -230,7 +230,7 @@ func (r *mutationResolver) CreateMsgTemplate(ctx context.Context, input ent.Crea
 	// 验证附件路径
 	if input.Attachments != nil {
 		for _, att := range input.Attachments {
-			err := r.coordinator.ValidateFilePath(ctx, att, service.TempRelativePathAttachment)
+			err := r.coordinator.Template.ValidateFilePath(ctx, att, template.TplPathKindAttachment)
 			if err != nil {
 				return nil, err
 			}
@@ -266,7 +266,7 @@ func (r *mutationResolver) UpdateMsgTemplate(ctx context.Context, id int, input 
 	oldFileIDs := make([]int, 0)
 	// 验证模板路径
 	if input.Tpl != nil {
-		err := r.coordinator.ValidateFilePath(ctx, *input.Tpl, service.TempRelativePathTplTemp)
+		err := r.coordinator.Template.ValidateFilePath(ctx, *input.Tpl, template.TplPathKindTmp)
 		if err != nil {
 			return nil, err
 		}
@@ -279,7 +279,7 @@ func (r *mutationResolver) UpdateMsgTemplate(ctx context.Context, id int, input 
 	// 验证附件路径
 	if input.Attachments != nil && len(input.Attachments) > 0 {
 		for _, att := range input.Attachments {
-			err := r.coordinator.ValidateFilePath(ctx, att, service.TempRelativePathAttachment)
+			err := r.coordinator.Template.ValidateFilePath(ctx, att, template.TplPathKindAttachment)
 			if err != nil {
 				return nil, err
 			}
@@ -299,12 +299,12 @@ func (r *mutationResolver) UpdateMsgTemplate(ctx context.Context, id int, input 
 	// 模板文件更新，则删除旧模板文件
 	if input.Tpl != nil && input.TplFileID != nil && temp.Status == typex.SimpleStatusActive {
 		// 移除data下的旧模板
-		err = r.coordinator.RemoveTplDataFile(otemp.Tpl)
+		err = r.coordinator.Template.RemoveTplDataFile(otemp.Tpl)
 		if err != nil {
 			return nil, err
 		}
 		// 启用新模板
-		err = r.coordinator.EnableTplDataFile(temp.Tpl)
+		err = r.coordinator.Template.EnableTplDataFile(temp.Tpl)
 		if err != nil {
 			return nil, err
 		}
@@ -362,7 +362,7 @@ func (r *mutationResolver) EnableMsgTemplate(ctx context.Context, id int) (*ent.
 		return nil, err
 	}
 	// 启用模板
-	err = r.coordinator.EnableTplDataFile(temp.Tpl)
+	err = r.coordinator.Template.EnableTplDataFile(temp.Tpl)
 	if err != nil {
 		return nil, err
 	}
@@ -379,7 +379,7 @@ func (r *mutationResolver) DisableMsgTemplate(ctx context.Context, id int) (*ent
 		return nil, err
 	}
 	// 移除data目录模板
-	err = r.coordinator.RemoveTplDataFile(temp.Tpl)
+	err = r.coordinator.Template.RemoveTplDataFile(temp.Tpl)
 	if err != nil {
 		return nil, err
 	}

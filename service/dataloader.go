@@ -6,7 +6,7 @@ import (
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/pkg/alert"
-	sil "github.com/woocoos/msgcenter/silence"
+	sil "github.com/woocoos/msgcenter/service/silence"
 	"time"
 )
 

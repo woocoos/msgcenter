@@ -18,7 +18,7 @@ import (
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/provider"
 	"github.com/woocoos/msgcenter/service"
-	"github.com/woocoos/msgcenter/silence"
+	"github.com/woocoos/msgcenter/service/silence"
 	"net/http"
 	"regexp"
 	"runtime"

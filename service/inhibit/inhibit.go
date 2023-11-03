@@ -9,7 +9,7 @@ import (
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/provider"
-	"github.com/woocoos/msgcenter/store"
+	"github.com/woocoos/msgcenter/service/store"
 	"go.uber.org/zap"
 	"sync"
 )
@@ -77,7 +77,7 @@ func (ih *Inhibitor) Start(ctx context.Context) error {
 	ih.mtx.Lock()
 	ih.cancel = stop
 	ih.mtx.Unlock()
-	if err := run; err != nil {
+	if err := run(); err != nil {
 		return fmt.Errorf("error running inhibitor: %w", err)
 	}
 	return nil

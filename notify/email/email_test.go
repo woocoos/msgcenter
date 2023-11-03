@@ -1,31 +1,14 @@
-// Some tests require a running mail catcher. We use MailDev for this purpose,
-// it can work without or with authentication (LOGIN only). It exposes a REST
-// API which we use to retrieve and check the sent emails.
-//
-// Those tests are only executed when specific environment variables are set,
-// otherwise they are skipped. The tests must be run by the CI.
-//
-// To run the tests locally, you should start 2 MailDev containers:
-//
-// $ docker run --rm -p 10080:1080 -p 1025:1025 -p 10090:1090 --entrypoint bin/maildev djfarrelly/maildev -v -w 1090
-// $ docker run --rm -p 10081:1080 -p 1026:1025 -p 10091:1090 --entrypoint bin/maildev djfarrelly/maildev --incoming-user user --incoming-pass pass -v -w 1090
-//
-// $ EMAIL_NO_AUTH_CONFIG=testdata/noauth.yml EMAIL_AUTH_CONFIG=testdata/auth.yml make
-//
-// See also https://github.com/djfarrelly/MailDev for more details.
 package email
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/suite"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/template"
-	"io"
-	"net/http"
+	"github.com/woocoos/msgcenter/test/maildev"
 	"net/url"
 	"os"
 	"testing"
@@ -53,66 +36,13 @@ type email struct {
 	Headers map[string]string
 }
 
-// mailDev is a client for the MailDev server.
-type mailDev struct {
-	*url.URL
-}
-
-// getLastEmail returns the last received email.
-func (m *mailDev) getLastEmail() (*email, error) {
-	code, b, err := m.doEmailRequest(http.MethodGet, "/email")
-	if err != nil {
-		return nil, err
-	}
-	if code != http.StatusOK {
-		return nil, fmt.Errorf("expected status OK, got %d", code)
-	}
-
-	var emails []email
-	err = json.Unmarshal(b, &emails)
-	if err != nil {
-		return nil, err
-	}
-	if len(emails) == 0 {
-		return nil, nil
-	}
-	return &emails[len(emails)-1], nil
-}
-
-// deleteAllEmails deletes all emails.
-func (m *mailDev) deleteAllEmails() error {
-	_, _, err := m.doEmailRequest(http.MethodDelete, "/email/all")
-	return err
-}
-
-// doEmailRequest makes a request to the MailDev API.
-func (m *mailDev) doEmailRequest(method, path string) (int, []byte, error) {
-	req, err := http.NewRequest(method, fmt.Sprintf("%s://%s%s", m.Scheme, m.Host, path), nil)
-	if err != nil {
-		return 0, nil, err
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	req = req.WithContext(ctx)
-	defer cancel()
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return 0, nil, err
-	}
-	defer res.Body.Close()
-	b, err := io.ReadAll(res.Body)
-	if err != nil {
-		return 0, nil, err
-	}
-	return res.StatusCode, b, nil
-}
-
-func notifyEmail(cfg *profile.EmailConfig, server *mailDev) (*email, bool, error) {
+func notifyEmail(cfg *profile.EmailConfig, server *maildev.MailDev) (*maildev.MailDevEmail, bool, error) {
 	return notifyEmailWithContext(context.Background(), cfg, server)
 }
 
 // notifyEmailWithContext sends a notification with one firing alert and retrieves the
 // email from the SMTP server if the notification has been successfully delivered.
-func notifyEmailWithContext(ctx context.Context, cfg *profile.EmailConfig, server *mailDev) (*email, bool, error) {
+func notifyEmailWithContext(ctx context.Context, cfg *profile.EmailConfig, server *maildev.MailDev) (*maildev.MailDevEmail, bool, error) {
 	if cfg.Headers == nil {
 		cfg.Headers = make(map[string]string)
 	}
@@ -121,7 +51,7 @@ func notifyEmailWithContext(ctx context.Context, cfg *profile.EmailConfig, serve
 		StartsAt: time.Now(),
 		EndsAt:   time.Now().Add(time.Hour),
 	}
-	err := server.deleteAllEmails()
+	err := server.DeleteAllEmails()
 	if err != nil {
 		return nil, false, err
 	}
@@ -138,7 +68,7 @@ func notifyEmailWithContext(ctx context.Context, cfg *profile.EmailConfig, serve
 		return nil, retry, err
 	}
 
-	e, err := server.getLastEmail()
+	e, err := server.GetLastEmail()
 	if err != nil {
 		return nil, retry, err
 	} else if e == nil {
@@ -149,8 +79,7 @@ func notifyEmailWithContext(ctx context.Context, cfg *profile.EmailConfig, serve
 
 type EmailSuite struct {
 	suite.Suite
-	authMailDev   *mailDev
-	noAuthMailDev *mailDev
+	noAuthMailDev *maildev.MailDev
 }
 
 func (ts *EmailSuite) SetupSuite() {
@@ -158,12 +87,11 @@ func (ts *EmailSuite) SetupSuite() {
 	if host == "" {
 		host = emailNoAuthHost
 	}
-	ts.noAuthMailDev = &mailDev{URL: &url.URL{Scheme: "http", Host: host}}
+	ts.noAuthMailDev = maildev.DefaultServer()
 	host = os.Getenv(emailAuthConfigVar)
 	if host == "" {
 		host = emailAuthHost
 	}
-	ts.authMailDev = &mailDev{URL: &url.URL{Scheme: "http", Host: host}}
 }
 
 func TestEmailSuite(t *testing.T) {
@@ -223,12 +151,12 @@ func (ts *EmailSuite) TestEmailNotifyWithErrors() {
 		{
 			title: "invalid 'html' template",
 			updateCfg: func(cfg *profile.EmailConfig) {
+				cfg.Text = ""
 				cfg.HTML = `{{ template "invalid" }}`
 			},
 			errMsg: `execute html template:`,
 		},
 	} {
-		tc := tc
 		ts.Run(tc.title, func() {
 			if len(tc.errMsg) == 0 {
 				ts.T().Fatal("please define the expected error message")
@@ -254,7 +182,7 @@ func (ts *EmailSuite) TestEmailNotifyWithErrors() {
 			ts.Require().Contains(err.Error(), tc.errMsg)
 			ts.Require().Equal(false, retry)
 
-			e, err := ts.noAuthMailDev.getLastEmail()
+			e, err := ts.noAuthMailDev.GetLastEmail()
 			ts.Require().NoError(err)
 			if tc.hasEmail {
 				ts.Require().NotNil(e)

@@ -10,7 +10,7 @@ global:
     proxy_url: 'http://127.0.0.1:1025'
 # The directory from which notification templates are read.
 templates:
-  - '/etc/alertmanager/template/*.tmpl'
+  - '../files/msg/tpl/data/*.tmpl'
 # The root route on which each incoming alert enters.
 route:
   # The labels by which incoming alerts are grouped together. For example,

@@ -3,19 +3,9 @@ version: 0.0.1
 development: true
 log:
   withTraceID: true
-  traceIDKey: "traceId"
   cores:
     - level: info
-      disableStacktrace: true
-      encoderConfig:
-        timeKey: "@timestamp"
-        messageKey: "message"
-        callerKey: "file"
   rotate:
-    maxsize: 10
-    maxage: 10
-    maxbackups: 20
-    localtime: true
 
 jwt: &jwt
   signingMethod: "HS256"

@@ -22,8 +22,7 @@ import (
 )
 
 var (
-	logger               = log.Component("silence")
-	_      members.Shard = (*Silences)(nil)
+	logger = log.Component("silence")
 )
 
 var (
@@ -60,6 +59,8 @@ func (c matcherCache) add(s *Entry) (label.Matchers, error) {
 	c[s] = ms
 	return ms, nil
 }
+
+var _ members.Shard = (*Silences)(nil)
 
 // Silencer binds together a Marker and a Silences to implement the Muter
 // interface.

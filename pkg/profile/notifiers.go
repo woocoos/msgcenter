@@ -127,7 +127,7 @@ func (c *EmailConfig) Validate() error {
 type WebhookConfig struct {
 	SendResolved bool `yaml:"sendResolved" json:"sendResolved"`
 	// HTTPConfig configures the HTTP client used to send the webhook. Unmarshalled by custom logic.
-	HTTPConfig    *httpx.ClientConfig `yaml:"-" json:"-"`
+	HTTPConfig    *httpx.ClientConfig `yaml:"httpConfig" json:"httpConfig"`
 	HttpConfigOri *conf.Configuration `yaml:"-" json:"-"`
 	// URL to send POST request to.
 	URL *URL `yaml:"url" json:"url"`
@@ -169,9 +169,14 @@ func (c *WebhookConfig) UnmarshalJSON(data []byte) error {
 	if err := p.Unmarshal("", c); err != nil {
 		return err
 	}
-
-	c.HttpConfigOri = conf.NewFromParse(p)
-	c.HTTPConfig, err = httpx.NewClientConfig(c.HttpConfigOri)
+	if p.IsSet("httpConfig") {
+		hp, err := p.Sub("httpConfig")
+		if err != nil {
+			return err
+		}
+		c.HttpConfigOri = conf.NewFromParse(hp)
+		c.HTTPConfig, err = httpx.NewClientConfig(c.HttpConfigOri)
+	}
 	if err := c.Validate(); err != nil {
 		return err
 	}

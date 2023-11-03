@@ -22,8 +22,21 @@ var (
 	templateDir embed.FS
 )
 
+// Config stores configuration for template.
+type Config struct {
+	// path for custom template
+	BaseDir string
+	// path for temporary template
+	TmpDir string
+	// path for active template dir
+	DataDir string
+	// path for attachment
+	AttachmentDir string
+}
+
 // Template bundles a text and a html template instance.
 type Template struct {
+	Config
 	text *tmpltext.Template
 	html *tmplhtml.Template
 
