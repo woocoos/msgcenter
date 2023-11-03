@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -266,6 +266,7 @@ func (mec *MsgEventCreate) createSpec() (*MsgEvent, *sqlgraph.CreateSpec) {
 		_node = &MsgEvent{config: mec.config}
 		_spec = sqlgraph.NewCreateSpec(msgevent.Table, sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt))
 	)
+	_spec.Schema = mec.schemaConfig.MsgEvent
 	_spec.OnConflict = mec.conflict
 	if id, ok := mec.mutation.ID(); ok {
 		_node.ID = id
@@ -318,6 +319,7 @@ func (mec *MsgEventCreate) createSpec() (*MsgEvent, *sqlgraph.CreateSpec) {
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mec.schemaConfig.MsgEvent
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -335,6 +337,7 @@ func (mec *MsgEventCreate) createSpec() (*MsgEvent, *sqlgraph.CreateSpec) {
 				IDSpec: sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mec.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -768,12 +771,16 @@ func (u *MsgEventUpsertOne) IDX(ctx context.Context) int {
 // MsgEventCreateBulk is the builder for creating many MsgEvent entities in bulk.
 type MsgEventCreateBulk struct {
 	config
+	err      error
 	builders []*MsgEventCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the MsgEvent entities in the database.
 func (mecb *MsgEventCreateBulk) Save(ctx context.Context) ([]*MsgEvent, error) {
+	if mecb.err != nil {
+		return nil, mecb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(mecb.builders))
 	nodes := make([]*MsgEvent, len(mecb.builders))
 	mutators := make([]Mutator, len(mecb.builders))
@@ -1104,6 +1111,9 @@ func (u *MsgEventUpsertBulk) UpdateModes() *MsgEventUpsertBulk {
 
 // Exec executes the query.
 func (u *MsgEventUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MsgEventCreateBulk instead", i)

@@ -11,12 +11,14 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/profile"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // MsgEventUpdate is the builder for updating MsgEvent entities.
@@ -313,6 +315,7 @@ func (meu *MsgEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = meu.schemaConfig.MsgEvent
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := meu.mutation.MsgTypeIDs(); len(nodes) > 0 {
@@ -326,6 +329,7 @@ func (meu *MsgEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = meu.schemaConfig.MsgEvent
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -342,6 +346,7 @@ func (meu *MsgEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = meu.schemaConfig.MsgTemplate
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := meu.mutation.RemovedCustomerTemplateIDs(); len(nodes) > 0 && !meu.mutation.CustomerTemplateCleared() {
@@ -355,6 +360,7 @@ func (meu *MsgEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = meu.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -371,11 +377,14 @@ func (meu *MsgEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = meu.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	_spec.Node.Schema = meu.schemaConfig.MsgEvent
+	ctx = internal.NewSchemaConfigContext(ctx, meu.schemaConfig)
 	if n, err = sqlgraph.UpdateNodes(ctx, meu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgevent.Label}
@@ -707,6 +716,7 @@ func (meuo *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, er
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = meuo.schemaConfig.MsgEvent
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := meuo.mutation.MsgTypeIDs(); len(nodes) > 0 {
@@ -720,6 +730,7 @@ func (meuo *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, er
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = meuo.schemaConfig.MsgEvent
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -736,6 +747,7 @@ func (meuo *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, er
 				IDSpec: sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = meuo.schemaConfig.MsgTemplate
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := meuo.mutation.RemovedCustomerTemplateIDs(); len(nodes) > 0 && !meuo.mutation.CustomerTemplateCleared() {
@@ -749,6 +761,7 @@ func (meuo *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, er
 				IDSpec: sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = meuo.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -765,11 +778,14 @@ func (meuo *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, er
 				IDSpec: sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = meuo.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	_spec.Node.Schema = meuo.schemaConfig.MsgEvent
+	ctx = internal.NewSchemaConfigContext(ctx, meuo.schemaConfig)
 	_node = &MsgEvent{config: meuo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

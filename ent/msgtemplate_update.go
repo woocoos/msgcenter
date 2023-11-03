@@ -10,12 +10,15 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/profile"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // MsgTemplateUpdate is the builder for updating MsgTemplate entities.
@@ -288,23 +291,66 @@ func (mtu *MsgTemplateUpdate) ClearTpl() *MsgTemplateUpdate {
 	return mtu
 }
 
+// SetTplFileID sets the "tpl_file_id" field.
+func (mtu *MsgTemplateUpdate) SetTplFileID(i int) *MsgTemplateUpdate {
+	mtu.mutation.ResetTplFileID()
+	mtu.mutation.SetTplFileID(i)
+	return mtu
+}
+
+// SetNillableTplFileID sets the "tpl_file_id" field if the given value is not nil.
+func (mtu *MsgTemplateUpdate) SetNillableTplFileID(i *int) *MsgTemplateUpdate {
+	if i != nil {
+		mtu.SetTplFileID(*i)
+	}
+	return mtu
+}
+
+// AddTplFileID adds i to the "tpl_file_id" field.
+func (mtu *MsgTemplateUpdate) AddTplFileID(i int) *MsgTemplateUpdate {
+	mtu.mutation.AddTplFileID(i)
+	return mtu
+}
+
+// ClearTplFileID clears the value of the "tpl_file_id" field.
+func (mtu *MsgTemplateUpdate) ClearTplFileID() *MsgTemplateUpdate {
+	mtu.mutation.ClearTplFileID()
+	return mtu
+}
+
 // SetAttachments sets the "attachments" field.
-func (mtu *MsgTemplateUpdate) SetAttachments(s string) *MsgTemplateUpdate {
+func (mtu *MsgTemplateUpdate) SetAttachments(s []string) *MsgTemplateUpdate {
 	mtu.mutation.SetAttachments(s)
 	return mtu
 }
 
-// SetNillableAttachments sets the "attachments" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableAttachments(s *string) *MsgTemplateUpdate {
-	if s != nil {
-		mtu.SetAttachments(*s)
-	}
+// AppendAttachments appends s to the "attachments" field.
+func (mtu *MsgTemplateUpdate) AppendAttachments(s []string) *MsgTemplateUpdate {
+	mtu.mutation.AppendAttachments(s)
 	return mtu
 }
 
 // ClearAttachments clears the value of the "attachments" field.
 func (mtu *MsgTemplateUpdate) ClearAttachments() *MsgTemplateUpdate {
 	mtu.mutation.ClearAttachments()
+	return mtu
+}
+
+// SetAttachmentsFileIds sets the "attachments_file_ids" field.
+func (mtu *MsgTemplateUpdate) SetAttachmentsFileIds(i []int) *MsgTemplateUpdate {
+	mtu.mutation.SetAttachmentsFileIds(i)
+	return mtu
+}
+
+// AppendAttachmentsFileIds appends i to the "attachments_file_ids" field.
+func (mtu *MsgTemplateUpdate) AppendAttachmentsFileIds(i []int) *MsgTemplateUpdate {
+	mtu.mutation.AppendAttachmentsFileIds(i)
+	return mtu
+}
+
+// ClearAttachmentsFileIds clears the value of the "attachments_file_ids" field.
+func (mtu *MsgTemplateUpdate) ClearAttachmentsFileIds() *MsgTemplateUpdate {
+	mtu.mutation.ClearAttachmentsFileIds()
 	return mtu
 }
 
@@ -501,11 +547,36 @@ func (mtu *MsgTemplateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if mtu.mutation.TplCleared() {
 		_spec.ClearField(msgtemplate.FieldTpl, field.TypeString)
 	}
+	if value, ok := mtu.mutation.TplFileID(); ok {
+		_spec.SetField(msgtemplate.FieldTplFileID, field.TypeInt, value)
+	}
+	if value, ok := mtu.mutation.AddedTplFileID(); ok {
+		_spec.AddField(msgtemplate.FieldTplFileID, field.TypeInt, value)
+	}
+	if mtu.mutation.TplFileIDCleared() {
+		_spec.ClearField(msgtemplate.FieldTplFileID, field.TypeInt)
+	}
 	if value, ok := mtu.mutation.Attachments(); ok {
-		_spec.SetField(msgtemplate.FieldAttachments, field.TypeString, value)
+		_spec.SetField(msgtemplate.FieldAttachments, field.TypeJSON, value)
+	}
+	if value, ok := mtu.mutation.AppendedAttachments(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, msgtemplate.FieldAttachments, value)
+		})
 	}
 	if mtu.mutation.AttachmentsCleared() {
-		_spec.ClearField(msgtemplate.FieldAttachments, field.TypeString)
+		_spec.ClearField(msgtemplate.FieldAttachments, field.TypeJSON)
+	}
+	if value, ok := mtu.mutation.AttachmentsFileIds(); ok {
+		_spec.SetField(msgtemplate.FieldAttachmentsFileIds, field.TypeJSON, value)
+	}
+	if value, ok := mtu.mutation.AppendedAttachmentsFileIds(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, msgtemplate.FieldAttachmentsFileIds, value)
+		})
+	}
+	if mtu.mutation.AttachmentsFileIdsCleared() {
+		_spec.ClearField(msgtemplate.FieldAttachmentsFileIds, field.TypeJSON)
 	}
 	if value, ok := mtu.mutation.Comments(); ok {
 		_spec.SetField(msgtemplate.FieldComments, field.TypeString, value)
@@ -524,6 +595,7 @@ func (mtu *MsgTemplateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtu.schemaConfig.MsgTemplate
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := mtu.mutation.EventIDs(); len(nodes) > 0 {
@@ -537,11 +609,14 @@ func (mtu *MsgTemplateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtu.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	_spec.Node.Schema = mtu.schemaConfig.MsgTemplate
+	ctx = internal.NewSchemaConfigContext(ctx, mtu.schemaConfig)
 	if n, err = sqlgraph.UpdateNodes(ctx, mtu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgtemplate.Label}
@@ -819,23 +894,66 @@ func (mtuo *MsgTemplateUpdateOne) ClearTpl() *MsgTemplateUpdateOne {
 	return mtuo
 }
 
+// SetTplFileID sets the "tpl_file_id" field.
+func (mtuo *MsgTemplateUpdateOne) SetTplFileID(i int) *MsgTemplateUpdateOne {
+	mtuo.mutation.ResetTplFileID()
+	mtuo.mutation.SetTplFileID(i)
+	return mtuo
+}
+
+// SetNillableTplFileID sets the "tpl_file_id" field if the given value is not nil.
+func (mtuo *MsgTemplateUpdateOne) SetNillableTplFileID(i *int) *MsgTemplateUpdateOne {
+	if i != nil {
+		mtuo.SetTplFileID(*i)
+	}
+	return mtuo
+}
+
+// AddTplFileID adds i to the "tpl_file_id" field.
+func (mtuo *MsgTemplateUpdateOne) AddTplFileID(i int) *MsgTemplateUpdateOne {
+	mtuo.mutation.AddTplFileID(i)
+	return mtuo
+}
+
+// ClearTplFileID clears the value of the "tpl_file_id" field.
+func (mtuo *MsgTemplateUpdateOne) ClearTplFileID() *MsgTemplateUpdateOne {
+	mtuo.mutation.ClearTplFileID()
+	return mtuo
+}
+
 // SetAttachments sets the "attachments" field.
-func (mtuo *MsgTemplateUpdateOne) SetAttachments(s string) *MsgTemplateUpdateOne {
+func (mtuo *MsgTemplateUpdateOne) SetAttachments(s []string) *MsgTemplateUpdateOne {
 	mtuo.mutation.SetAttachments(s)
 	return mtuo
 }
 
-// SetNillableAttachments sets the "attachments" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableAttachments(s *string) *MsgTemplateUpdateOne {
-	if s != nil {
-		mtuo.SetAttachments(*s)
-	}
+// AppendAttachments appends s to the "attachments" field.
+func (mtuo *MsgTemplateUpdateOne) AppendAttachments(s []string) *MsgTemplateUpdateOne {
+	mtuo.mutation.AppendAttachments(s)
 	return mtuo
 }
 
 // ClearAttachments clears the value of the "attachments" field.
 func (mtuo *MsgTemplateUpdateOne) ClearAttachments() *MsgTemplateUpdateOne {
 	mtuo.mutation.ClearAttachments()
+	return mtuo
+}
+
+// SetAttachmentsFileIds sets the "attachments_file_ids" field.
+func (mtuo *MsgTemplateUpdateOne) SetAttachmentsFileIds(i []int) *MsgTemplateUpdateOne {
+	mtuo.mutation.SetAttachmentsFileIds(i)
+	return mtuo
+}
+
+// AppendAttachmentsFileIds appends i to the "attachments_file_ids" field.
+func (mtuo *MsgTemplateUpdateOne) AppendAttachmentsFileIds(i []int) *MsgTemplateUpdateOne {
+	mtuo.mutation.AppendAttachmentsFileIds(i)
+	return mtuo
+}
+
+// ClearAttachmentsFileIds clears the value of the "attachments_file_ids" field.
+func (mtuo *MsgTemplateUpdateOne) ClearAttachmentsFileIds() *MsgTemplateUpdateOne {
+	mtuo.mutation.ClearAttachmentsFileIds()
 	return mtuo
 }
 
@@ -1062,11 +1180,36 @@ func (mtuo *MsgTemplateUpdateOne) sqlSave(ctx context.Context) (_node *MsgTempla
 	if mtuo.mutation.TplCleared() {
 		_spec.ClearField(msgtemplate.FieldTpl, field.TypeString)
 	}
+	if value, ok := mtuo.mutation.TplFileID(); ok {
+		_spec.SetField(msgtemplate.FieldTplFileID, field.TypeInt, value)
+	}
+	if value, ok := mtuo.mutation.AddedTplFileID(); ok {
+		_spec.AddField(msgtemplate.FieldTplFileID, field.TypeInt, value)
+	}
+	if mtuo.mutation.TplFileIDCleared() {
+		_spec.ClearField(msgtemplate.FieldTplFileID, field.TypeInt)
+	}
 	if value, ok := mtuo.mutation.Attachments(); ok {
-		_spec.SetField(msgtemplate.FieldAttachments, field.TypeString, value)
+		_spec.SetField(msgtemplate.FieldAttachments, field.TypeJSON, value)
+	}
+	if value, ok := mtuo.mutation.AppendedAttachments(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, msgtemplate.FieldAttachments, value)
+		})
 	}
 	if mtuo.mutation.AttachmentsCleared() {
-		_spec.ClearField(msgtemplate.FieldAttachments, field.TypeString)
+		_spec.ClearField(msgtemplate.FieldAttachments, field.TypeJSON)
+	}
+	if value, ok := mtuo.mutation.AttachmentsFileIds(); ok {
+		_spec.SetField(msgtemplate.FieldAttachmentsFileIds, field.TypeJSON, value)
+	}
+	if value, ok := mtuo.mutation.AppendedAttachmentsFileIds(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, msgtemplate.FieldAttachmentsFileIds, value)
+		})
+	}
+	if mtuo.mutation.AttachmentsFileIdsCleared() {
+		_spec.ClearField(msgtemplate.FieldAttachmentsFileIds, field.TypeJSON)
 	}
 	if value, ok := mtuo.mutation.Comments(); ok {
 		_spec.SetField(msgtemplate.FieldComments, field.TypeString, value)
@@ -1085,6 +1228,7 @@ func (mtuo *MsgTemplateUpdateOne) sqlSave(ctx context.Context) (_node *MsgTempla
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtuo.schemaConfig.MsgTemplate
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := mtuo.mutation.EventIDs(); len(nodes) > 0 {
@@ -1098,11 +1242,14 @@ func (mtuo *MsgTemplateUpdateOne) sqlSave(ctx context.Context) (_node *MsgTempla
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtuo.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	_spec.Node.Schema = mtuo.schemaConfig.MsgTemplate
+	ctx = internal.NewSchemaConfigContext(ctx, mtuo.schemaConfig)
 	_node = &MsgTemplate{config: mtuo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

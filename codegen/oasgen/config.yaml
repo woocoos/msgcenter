@@ -3,3 +3,5 @@ target: "./api/oas"
 models:
   UUID:
     model: github.com/google/uuid.UUID
+  '#/components/schemas/pushData':
+    model: github.com/woocoos/msgcenter/pkg/push.Data

@@ -7,8 +7,8 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/entco/schemax"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/knockout-go/ent/schemax"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
 
@@ -20,6 +20,7 @@ type MsgTemplate struct {
 func (MsgTemplate) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entsql.Annotation{Table: "msg_template"},
+		entgql.RelayConnection(),
 		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 		schemax.TenantField("tenant_id"),
 	}
@@ -29,18 +30,19 @@ func (MsgTemplate) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		schemax.IntID{},
 		schemax.AuditMixin{},
+		schemax.NotifyMixin{},
 	}
 }
 
 // Fields of the MsgTemplate.
 func (MsgTemplate) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("msg_type_id").Comment("应用消息类型ID"),
-		field.Int("msg_event_id").Comment("消息事件ID"),
-		field.Int("tenant_id").Comment("组织ID"),
+		field.Int("msg_type_id").Comment("应用消息类型ID").SchemaType(schemax.IntID{}.SchemaType()),
+		field.Int("msg_event_id").Comment("消息事件ID").SchemaType(schemax.IntID{}.SchemaType()),
+		field.Int("tenant_id").Comment("组织ID").Annotations(entgql.Type("ID")),
 		field.String("name").MaxLen(45).Comment("消息模板名称"),
-		field.Enum("status").GoType(typex.SimpleStatus("")).Default(typex.SimpleStatusActive.String()).
-			Optional().Comment("状态"),
+		field.Enum("status").GoType(typex.SimpleStatus("")).Default(typex.SimpleStatusInactive.String()).
+			Optional().Comment("状态").Annotations(entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput)),
 		field.Enum("receiver_type").Comment("消息模式:站内信,app推送,邮件,短信,微信等").
 			GoType(profile.ReceiverType("")),
 		field.Enum("format").Values("txt", "html").Comment("消息类型:文本,网页,需要结合mod确定支持的格式"),
@@ -49,12 +51,16 @@ func (MsgTemplate) Fields() []ent.Field {
 		field.String("to").Optional().Comment("收件人"),
 		field.String("cc").Optional().Comment("抄送"),
 		field.String("bcc").Optional().Comment("密送"),
-		field.String("body").Optional().Comment("消息体").Annotations(
+		field.Text("body").Optional().Comment("消息体").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
-		field.Text("tpl").Optional().Comment("模板地址").Annotations(
+		field.Text("tpl").Optional().Comment("模板地址。key：/msg/tpl/temp/1/xxx").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
-		field.Text("attachments").Optional().Comment("附件地址,多个附件用逗号分隔").Annotations(
+		field.Int("tpl_file_id").Optional().Nillable().Comment("模板地址").Annotations(
+			entgql.Skip(entgql.SkipWhereInput), entgql.Type("ID")),
+		field.Strings("attachments").Optional().Comment("附件地址。key：/msg/att/1/xxx").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
+		field.Ints("attachments_file_ids").Optional().Comment("附件ids").Annotations(
+			entgql.Skip(entgql.SkipWhereInput), entgql.Type("[ID!]")),
 		field.String("comments").Optional().Comment("备注").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
 	}

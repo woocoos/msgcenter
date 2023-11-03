@@ -3,8 +3,12 @@
 package ent
 
 import (
-	"github.com/woocoos/entco/schemax/typex"
+	"time"
+
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
+	"github.com/woocoos/msgcenter/pkg/alert"
+	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
 
@@ -41,8 +45,7 @@ type UpdateMsgChannelInput struct {
 	Name          *string
 	TenantID      *int
 	ReceiverType  *profile.ReceiverType
-	ClearStatus   bool
-	Status        *typex.SimpleStatus
+	ClearReceiver bool
 	Receiver      *profile.Receiver
 	ClearComments bool
 	Comments      *string
@@ -59,11 +62,8 @@ func (i *UpdateMsgChannelInput) Mutate(m *MsgChannelMutation) {
 	if v := i.ReceiverType; v != nil {
 		m.SetReceiverType(*v)
 	}
-	if i.ClearStatus {
-		m.ClearStatus()
-	}
-	if v := i.Status; v != nil {
-		m.SetStatus(*v)
+	if i.ClearReceiver {
+		m.ClearReceiver()
 	}
 	if v := i.Receiver; v != nil {
 		m.SetReceiver(v)
@@ -119,8 +119,6 @@ func (c *MsgEventCreate) SetInput(i CreateMsgEventInput) *MsgEventCreate {
 // UpdateMsgEventInput represents a mutation input for updating msgevents.
 type UpdateMsgEventInput struct {
 	Name          *string
-	ClearStatus   bool
-	Status        *typex.SimpleStatus
 	ClearComments bool
 	Comments      *string
 	ClearRoute    bool
@@ -133,12 +131,6 @@ type UpdateMsgEventInput struct {
 func (i *UpdateMsgEventInput) Mutate(m *MsgEventMutation) {
 	if v := i.Name; v != nil {
 		m.SetName(*v)
-	}
-	if i.ClearStatus {
-		m.ClearStatus()
-	}
-	if v := i.Status; v != nil {
-		m.SetStatus(*v)
 	}
 	if i.ClearComments {
 		m.ClearComments()
@@ -175,19 +167,25 @@ func (c *MsgEventUpdateOne) SetInput(i UpdateMsgEventInput) *MsgEventUpdateOne {
 // CreateMsgSubscriberInput represents a mutation input for creating msgsubscribers.
 type CreateMsgSubscriberInput struct {
 	TenantID  int
-	UserID    int
+	OrgRoleID *int
 	Exclude   *bool
 	MsgTypeID int
+	UserID    *int
 }
 
 // Mutate applies the CreateMsgSubscriberInput on the MsgSubscriberMutation builder.
 func (i *CreateMsgSubscriberInput) Mutate(m *MsgSubscriberMutation) {
 	m.SetTenantID(i.TenantID)
-	m.SetUserID(i.UserID)
+	if v := i.OrgRoleID; v != nil {
+		m.SetOrgRoleID(*v)
+	}
 	if v := i.Exclude; v != nil {
 		m.SetExclude(*v)
 	}
 	m.SetMsgTypeID(i.MsgTypeID)
+	if v := i.UserID; v != nil {
+		m.SetUserID(*v)
+	}
 }
 
 // SetInput applies the change-set in the CreateMsgSubscriberInput on the MsgSubscriberCreate builder.
@@ -198,11 +196,14 @@ func (c *MsgSubscriberCreate) SetInput(i CreateMsgSubscriberInput) *MsgSubscribe
 
 // UpdateMsgSubscriberInput represents a mutation input for updating msgsubscribers.
 type UpdateMsgSubscriberInput struct {
-	TenantID     *int
-	UserID       *int
-	ClearExclude bool
-	Exclude      *bool
-	MsgTypeID    *int
+	TenantID       *int
+	ClearOrgRoleID bool
+	OrgRoleID      *int
+	ClearExclude   bool
+	Exclude        *bool
+	MsgTypeID      *int
+	ClearUser      bool
+	UserID         *int
 }
 
 // Mutate applies the UpdateMsgSubscriberInput on the MsgSubscriberMutation builder.
@@ -210,8 +211,11 @@ func (i *UpdateMsgSubscriberInput) Mutate(m *MsgSubscriberMutation) {
 	if v := i.TenantID; v != nil {
 		m.SetTenantID(*v)
 	}
-	if v := i.UserID; v != nil {
-		m.SetUserID(*v)
+	if i.ClearOrgRoleID {
+		m.ClearOrgRoleID()
+	}
+	if v := i.OrgRoleID; v != nil {
+		m.SetOrgRoleID(*v)
 	}
 	if i.ClearExclude {
 		m.ClearExclude()
@@ -221,6 +225,12 @@ func (i *UpdateMsgSubscriberInput) Mutate(m *MsgSubscriberMutation) {
 	}
 	if v := i.MsgTypeID; v != nil {
 		m.SetMsgTypeID(*v)
+	}
+	if i.ClearUser {
+		m.ClearUser()
+	}
+	if v := i.UserID; v != nil {
+		m.SetUserID(*v)
 	}
 }
 
@@ -238,22 +248,23 @@ func (c *MsgSubscriberUpdateOne) SetInput(i UpdateMsgSubscriberInput) *MsgSubscr
 
 // CreateMsgTemplateInput represents a mutation input for creating msgtemplates.
 type CreateMsgTemplateInput struct {
-	MsgTypeID    int
-	TenantID     int
-	Name         string
-	Status       *typex.SimpleStatus
-	ReceiverType profile.ReceiverType
-	Format       msgtemplate.Format
-	Subject      *string
-	From         *string
-	To           *string
-	Cc           *string
-	Bcc          *string
-	Body         *string
-	Tpl          *string
-	Attachments  *string
-	Comments     *string
-	EventID      int
+	MsgTypeID          int
+	TenantID           int
+	Name               string
+	ReceiverType       profile.ReceiverType
+	Format             msgtemplate.Format
+	Subject            *string
+	From               *string
+	To                 *string
+	Cc                 *string
+	Bcc                *string
+	Body               *string
+	Tpl                *string
+	TplFileID          *int
+	Attachments        []string
+	AttachmentsFileIds []int
+	Comments           *string
+	EventID            int
 }
 
 // Mutate applies the CreateMsgTemplateInput on the MsgTemplateMutation builder.
@@ -261,9 +272,6 @@ func (i *CreateMsgTemplateInput) Mutate(m *MsgTemplateMutation) {
 	m.SetMsgTypeID(i.MsgTypeID)
 	m.SetTenantID(i.TenantID)
 	m.SetName(i.Name)
-	if v := i.Status; v != nil {
-		m.SetStatus(*v)
-	}
 	m.SetReceiverType(i.ReceiverType)
 	m.SetFormat(i.Format)
 	if v := i.Subject; v != nil {
@@ -287,8 +295,14 @@ func (i *CreateMsgTemplateInput) Mutate(m *MsgTemplateMutation) {
 	if v := i.Tpl; v != nil {
 		m.SetTpl(*v)
 	}
+	if v := i.TplFileID; v != nil {
+		m.SetTplFileID(*v)
+	}
 	if v := i.Attachments; v != nil {
-		m.SetAttachments(*v)
+		m.SetAttachments(v)
+	}
+	if v := i.AttachmentsFileIds; v != nil {
+		m.SetAttachmentsFileIds(v)
 	}
 	if v := i.Comments; v != nil {
 		m.SetComments(*v)
@@ -304,32 +318,36 @@ func (c *MsgTemplateCreate) SetInput(i CreateMsgTemplateInput) *MsgTemplateCreat
 
 // UpdateMsgTemplateInput represents a mutation input for updating msgtemplates.
 type UpdateMsgTemplateInput struct {
-	MsgTypeID        *int
-	TenantID         *int
-	Name             *string
-	ClearStatus      bool
-	Status           *typex.SimpleStatus
-	ReceiverType     *profile.ReceiverType
-	Format           *msgtemplate.Format
-	ClearSubject     bool
-	Subject          *string
-	ClearFrom        bool
-	From             *string
-	ClearTo          bool
-	To               *string
-	ClearCc          bool
-	Cc               *string
-	ClearBcc         bool
-	Bcc              *string
-	ClearBody        bool
-	Body             *string
-	ClearTpl         bool
-	Tpl              *string
-	ClearAttachments bool
-	Attachments      *string
-	ClearComments    bool
-	Comments         *string
-	EventID          *int
+	MsgTypeID                *int
+	TenantID                 *int
+	Name                     *string
+	ReceiverType             *profile.ReceiverType
+	Format                   *msgtemplate.Format
+	ClearSubject             bool
+	Subject                  *string
+	ClearFrom                bool
+	From                     *string
+	ClearTo                  bool
+	To                       *string
+	ClearCc                  bool
+	Cc                       *string
+	ClearBcc                 bool
+	Bcc                      *string
+	ClearBody                bool
+	Body                     *string
+	ClearTpl                 bool
+	Tpl                      *string
+	ClearTplFileID           bool
+	TplFileID                *int
+	ClearAttachments         bool
+	Attachments              []string
+	AppendAttachments        []string
+	ClearAttachmentsFileIds  bool
+	AttachmentsFileIds       []int
+	AppendAttachmentsFileIds []int
+	ClearComments            bool
+	Comments                 *string
+	EventID                  *int
 }
 
 // Mutate applies the UpdateMsgTemplateInput on the MsgTemplateMutation builder.
@@ -342,12 +360,6 @@ func (i *UpdateMsgTemplateInput) Mutate(m *MsgTemplateMutation) {
 	}
 	if v := i.Name; v != nil {
 		m.SetName(*v)
-	}
-	if i.ClearStatus {
-		m.ClearStatus()
-	}
-	if v := i.Status; v != nil {
-		m.SetStatus(*v)
 	}
 	if v := i.ReceiverType; v != nil {
 		m.SetReceiverType(*v)
@@ -397,11 +409,29 @@ func (i *UpdateMsgTemplateInput) Mutate(m *MsgTemplateMutation) {
 	if v := i.Tpl; v != nil {
 		m.SetTpl(*v)
 	}
+	if i.ClearTplFileID {
+		m.ClearTplFileID()
+	}
+	if v := i.TplFileID; v != nil {
+		m.SetTplFileID(*v)
+	}
 	if i.ClearAttachments {
 		m.ClearAttachments()
 	}
 	if v := i.Attachments; v != nil {
-		m.SetAttachments(*v)
+		m.SetAttachments(v)
+	}
+	if i.AppendAttachments != nil {
+		m.AppendAttachments(i.Attachments)
+	}
+	if i.ClearAttachmentsFileIds {
+		m.ClearAttachmentsFileIds()
+	}
+	if v := i.AttachmentsFileIds; v != nil {
+		m.SetAttachmentsFileIds(v)
+	}
+	if i.AppendAttachmentsFileIds != nil {
+		m.AppendAttachmentsFileIds(i.AttachmentsFileIds)
 	}
 	if i.ClearComments {
 		m.ClearComments()
@@ -528,6 +558,90 @@ func (c *MsgTypeUpdate) SetInput(i UpdateMsgTypeInput) *MsgTypeUpdate {
 
 // SetInput applies the change-set in the UpdateMsgTypeInput on the MsgTypeUpdateOne builder.
 func (c *MsgTypeUpdateOne) SetInput(i UpdateMsgTypeInput) *MsgTypeUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateSilenceInput represents a mutation input for creating silences.
+type CreateSilenceInput struct {
+	TenantID int
+	Matchers []*label.Matcher
+	StartsAt time.Time
+	EndsAt   time.Time
+	Comments *string
+	State    *alert.SilenceState
+}
+
+// Mutate applies the CreateSilenceInput on the SilenceMutation builder.
+func (i *CreateSilenceInput) Mutate(m *SilenceMutation) {
+	m.SetTenantID(i.TenantID)
+	if v := i.Matchers; v != nil {
+		m.SetMatchers(v)
+	}
+	m.SetStartsAt(i.StartsAt)
+	m.SetEndsAt(i.EndsAt)
+	if v := i.Comments; v != nil {
+		m.SetComments(*v)
+	}
+	if v := i.State; v != nil {
+		m.SetState(*v)
+	}
+}
+
+// SetInput applies the change-set in the CreateSilenceInput on the SilenceCreate builder.
+func (c *SilenceCreate) SetInput(i CreateSilenceInput) *SilenceCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateSilenceInput represents a mutation input for updating silences.
+type UpdateSilenceInput struct {
+	ClearMatchers  bool
+	Matchers       []*label.Matcher
+	AppendMatchers []*label.Matcher
+	StartsAt       *time.Time
+	EndsAt         *time.Time
+	ClearComments  bool
+	Comments       *string
+	State          *alert.SilenceState
+}
+
+// Mutate applies the UpdateSilenceInput on the SilenceMutation builder.
+func (i *UpdateSilenceInput) Mutate(m *SilenceMutation) {
+	if i.ClearMatchers {
+		m.ClearMatchers()
+	}
+	if v := i.Matchers; v != nil {
+		m.SetMatchers(v)
+	}
+	if i.AppendMatchers != nil {
+		m.AppendMatchers(i.Matchers)
+	}
+	if v := i.StartsAt; v != nil {
+		m.SetStartsAt(*v)
+	}
+	if v := i.EndsAt; v != nil {
+		m.SetEndsAt(*v)
+	}
+	if i.ClearComments {
+		m.ClearComments()
+	}
+	if v := i.Comments; v != nil {
+		m.SetComments(*v)
+	}
+	if v := i.State; v != nil {
+		m.SetState(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateSilenceInput on the SilenceUpdate builder.
+func (c *SilenceUpdate) SetInput(i UpdateSilenceInput) *SilenceUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateSilenceInput on the SilenceUpdateOne builder.
+func (c *SilenceUpdateOne) SetInput(i UpdateSilenceInput) *SilenceUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }

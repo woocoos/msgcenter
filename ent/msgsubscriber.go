@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/user"
 )
 
 // MsgSubscriber is the model entity for the MsgSubscriber schema.
@@ -32,6 +33,8 @@ type MsgSubscriber struct {
 	TenantID int `json:"tenant_id,omitempty"`
 	// 用户ID
 	UserID int `json:"user_id,omitempty"`
+	// 用户组ID
+	OrgRoleID int `json:"org_role_id,omitempty"`
 	// 是否排除
 	Exclude bool `json:"exclude,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -44,11 +47,13 @@ type MsgSubscriber struct {
 type MsgSubscriberEdges struct {
 	// MsgType holds the value of the msg_type edge.
 	MsgType *MsgType `json:"msg_type,omitempty"`
+	// User holds the value of the user edge.
+	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [2]map[string]int
 }
 
 // MsgTypeOrErr returns the MsgType value or an error if the edge
@@ -64,6 +69,19 @@ func (e MsgSubscriberEdges) MsgTypeOrErr() (*MsgType, error) {
 	return nil, &NotLoadedError{edge: "msg_type"}
 }
 
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MsgSubscriberEdges) UserOrErr() (*User, error) {
+	if e.loadedTypes[1] {
+		if e.User == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
+		return e.User, nil
+	}
+	return nil, &NotLoadedError{edge: "user"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*MsgSubscriber) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -71,7 +89,7 @@ func (*MsgSubscriber) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case msgsubscriber.FieldExclude:
 			values[i] = new(sql.NullBool)
-		case msgsubscriber.FieldID, msgsubscriber.FieldCreatedBy, msgsubscriber.FieldUpdatedBy, msgsubscriber.FieldMsgTypeID, msgsubscriber.FieldTenantID, msgsubscriber.FieldUserID:
+		case msgsubscriber.FieldID, msgsubscriber.FieldCreatedBy, msgsubscriber.FieldUpdatedBy, msgsubscriber.FieldMsgTypeID, msgsubscriber.FieldTenantID, msgsubscriber.FieldUserID, msgsubscriber.FieldOrgRoleID:
 			values[i] = new(sql.NullInt64)
 		case msgsubscriber.FieldCreatedAt, msgsubscriber.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -138,6 +156,12 @@ func (ms *MsgSubscriber) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				ms.UserID = int(value.Int64)
 			}
+		case msgsubscriber.FieldOrgRoleID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field org_role_id", values[i])
+			} else if value.Valid {
+				ms.OrgRoleID = int(value.Int64)
+			}
 		case msgsubscriber.FieldExclude:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field exclude", values[i])
@@ -160,6 +184,11 @@ func (ms *MsgSubscriber) Value(name string) (ent.Value, error) {
 // QueryMsgType queries the "msg_type" edge of the MsgSubscriber entity.
 func (ms *MsgSubscriber) QueryMsgType() *MsgTypeQuery {
 	return NewMsgSubscriberClient(ms.config).QueryMsgType(ms)
+}
+
+// QueryUser queries the "user" edge of the MsgSubscriber entity.
+func (ms *MsgSubscriber) QueryUser() *UserQuery {
+	return NewMsgSubscriberClient(ms.config).QueryUser(ms)
 }
 
 // Update returns a builder for updating this MsgSubscriber.
@@ -205,6 +234,9 @@ func (ms *MsgSubscriber) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("user_id=")
 	builder.WriteString(fmt.Sprintf("%v", ms.UserID))
+	builder.WriteString(", ")
+	builder.WriteString("org_role_id=")
+	builder.WriteString(fmt.Sprintf("%v", ms.OrgRoleID))
 	builder.WriteString(", ")
 	builder.WriteString("exclude=")
 	builder.WriteString(fmt.Sprintf("%v", ms.Exclude))

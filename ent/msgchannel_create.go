@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
@@ -213,9 +213,6 @@ func (mcc *MsgChannelCreate) check() error {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "MsgChannel.status": %w`, err)}
 		}
 	}
-	if _, ok := mcc.mutation.Receiver(); !ok {
-		return &ValidationError{Name: "receiver", err: errors.New(`ent: missing required field "MsgChannel.receiver"`)}
-	}
 	return nil
 }
 
@@ -244,6 +241,7 @@ func (mcc *MsgChannelCreate) createSpec() (*MsgChannel, *sqlgraph.CreateSpec) {
 		_node = &MsgChannel{config: mcc.config}
 		_spec = sqlgraph.NewCreateSpec(msgchannel.Table, sqlgraph.NewFieldSpec(msgchannel.FieldID, field.TypeInt))
 	)
+	_spec.Schema = mcc.schemaConfig.MsgChannel
 	_spec.OnConflict = mcc.conflict
 	if id, ok := mcc.mutation.ID(); ok {
 		_node.ID = id
@@ -455,6 +453,12 @@ func (u *MsgChannelUpsert) UpdateReceiver() *MsgChannelUpsert {
 	return u
 }
 
+// ClearReceiver clears the value of the "receiver" field.
+func (u *MsgChannelUpsert) ClearReceiver() *MsgChannelUpsert {
+	u.SetNull(msgchannel.FieldReceiver)
+	return u
+}
+
 // SetComments sets the "comments" field.
 func (u *MsgChannelUpsert) SetComments(v string) *MsgChannelUpsert {
 	u.Set(msgchannel.FieldComments, v)
@@ -660,6 +664,13 @@ func (u *MsgChannelUpsertOne) UpdateReceiver() *MsgChannelUpsertOne {
 	})
 }
 
+// ClearReceiver clears the value of the "receiver" field.
+func (u *MsgChannelUpsertOne) ClearReceiver() *MsgChannelUpsertOne {
+	return u.Update(func(s *MsgChannelUpsert) {
+		s.ClearReceiver()
+	})
+}
+
 // SetComments sets the "comments" field.
 func (u *MsgChannelUpsertOne) SetComments(v string) *MsgChannelUpsertOne {
 	return u.Update(func(s *MsgChannelUpsert) {
@@ -717,12 +728,16 @@ func (u *MsgChannelUpsertOne) IDX(ctx context.Context) int {
 // MsgChannelCreateBulk is the builder for creating many MsgChannel entities in bulk.
 type MsgChannelCreateBulk struct {
 	config
+	err      error
 	builders []*MsgChannelCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the MsgChannel entities in the database.
 func (mccb *MsgChannelCreateBulk) Save(ctx context.Context) ([]*MsgChannel, error) {
+	if mccb.err != nil {
+		return nil, mccb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(mccb.builders))
 	nodes := make([]*MsgChannel, len(mccb.builders))
 	mutators := make([]Mutator, len(mccb.builders))
@@ -1030,6 +1045,13 @@ func (u *MsgChannelUpsertBulk) UpdateReceiver() *MsgChannelUpsertBulk {
 	})
 }
 
+// ClearReceiver clears the value of the "receiver" field.
+func (u *MsgChannelUpsertBulk) ClearReceiver() *MsgChannelUpsertBulk {
+	return u.Update(func(s *MsgChannelUpsert) {
+		s.ClearReceiver()
+	})
+}
+
 // SetComments sets the "comments" field.
 func (u *MsgChannelUpsertBulk) SetComments(v string) *MsgChannelUpsertBulk {
 	return u.Update(func(s *MsgChannelUpsert) {
@@ -1053,6 +1075,9 @@ func (u *MsgChannelUpsertBulk) ClearComments() *MsgChannelUpsertBulk {
 
 // Exec executes the query.
 func (u *MsgChannelUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MsgChannelCreateBulk instead", i)

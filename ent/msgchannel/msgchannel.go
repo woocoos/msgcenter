@@ -9,7 +9,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
 
@@ -73,7 +73,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/woocoos/msgcenter/ent/runtime"
 var (
-	Hooks [1]ent.Hook
+	Hooks [3]ent.Hook
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -83,7 +83,7 @@ var (
 // ReceiverTypeValidator is a validator for the "receiver_type" field enum values. It is called by the builders before save.
 func ReceiverTypeValidator(rt profile.ReceiverType) error {
 	switch rt.String() {
-	case "email", "webhook":
+	case "email", "message", "webhook":
 		return nil
 	default:
 		return fmt.Errorf("msgchannel: invalid enum value for receiver_type field: %q", rt)
@@ -95,7 +95,7 @@ const DefaultStatus typex.SimpleStatus = "inactive"
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s typex.SimpleStatus) error {
 	switch s.String() {
-	case "active", "inactive", "processing":
+	case "active", "inactive", "processing", "disabled":
 		return nil
 	default:
 		return fmt.Errorf("msgchannel: invalid enum value for status field: %q", s)

@@ -1,0 +1,10 @@
+{{/* gotype: github.com/woocoos/msgcenter/template.Data */}}
+
+{{ define "1.subevent.txt"}}
+    {{- with .CommonAnnotations }}
+        Dear {{.nickname}} !
+
+        这是一封中文测试邮件.由您订阅事件触发.
+    {{- end }}
+
+{{end}}

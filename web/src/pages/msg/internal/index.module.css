@@ -1,0 +1,9 @@
+.tableTabs :global {
+  .ant-pro-table-list-toolbar-left {
+    width: calc(100% - 300px);
+  }
+
+  .ant-pro-table-list-toolbar-left>div {
+    width: 100%;
+  }
+}

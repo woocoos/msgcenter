@@ -1,0 +1,27 @@
+type Subscription {
+    # internal message
+    message: Message
+}
+
+"""
+SubscriptionAction is a generic type for all subscription actions
+"""
+type Message {
+    topic: String!
+    title: String!
+    content: String!
+    format: String!
+    url: String!
+    sendAt: Time!
+    extras: MapString!
+}
+
+"""
+MessageFilter is a generic type for all subscription filters
+"""
+type MessageFilter {
+    tenantId: ID!
+    appCode: String!
+    userId: ID!
+    deviceId:String!
+}

@@ -14,11 +14,19 @@ import (
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/hashicorp/go-multierror"
+	"github.com/woocoos/entcache"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msginternal"
+	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/nlog"
+	"github.com/woocoos/msgcenter/ent/nlogalert"
+	"github.com/woocoos/msgcenter/ent/silence"
+	"github.com/woocoos/msgcenter/ent/user"
 	"golang.org/x/sync/semaphore"
 )
 
@@ -27,20 +35,65 @@ type Noder interface {
 	IsNode()
 }
 
-// IsNode implements the Node interface check for GQLGen.
-func (n *MsgChannel) IsNode() {}
+var msgalertImplementors = []string{"MsgAlert", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *MsgEvent) IsNode() {}
+func (*MsgAlert) IsNode() {}
+
+var msgchannelImplementors = []string{"MsgChannel", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *MsgSubscriber) IsNode() {}
+func (*MsgChannel) IsNode() {}
+
+var msgeventImplementors = []string{"MsgEvent", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *MsgTemplate) IsNode() {}
+func (*MsgEvent) IsNode() {}
+
+var msginternalImplementors = []string{"MsgInternal", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *MsgType) IsNode() {}
+func (*MsgInternal) IsNode() {}
+
+var msginternaltoImplementors = []string{"MsgInternalTo", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*MsgInternalTo) IsNode() {}
+
+var msgsubscriberImplementors = []string{"MsgSubscriber", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*MsgSubscriber) IsNode() {}
+
+var msgtemplateImplementors = []string{"MsgTemplate", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*MsgTemplate) IsNode() {}
+
+var msgtypeImplementors = []string{"MsgType", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*MsgType) IsNode() {}
+
+var nlogImplementors = []string{"Nlog", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*Nlog) IsNode() {}
+
+var nlogalertImplementors = []string{"NlogAlert", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*NlogAlert) IsNode() {}
+
+var silenceImplementors = []string{"Silence", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*Silence) IsNode() {}
+
+var userImplementors = []string{"User", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*User) IsNode() {}
 
 var errNodeInvalidID = &NotFoundError{"node"}
 
@@ -100,14 +153,26 @@ func (c *Client) Noder(ctx context.Context, id int, opts ...NodeOption) (_ Noder
 
 func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error) {
 	switch table {
-	case msgchannel.Table:
-		query := c.MsgChannel.Query().
-			Where(msgchannel.ID(id))
-		query, err := query.CollectFields(ctx, "MsgChannel")
+	case msgalert.Table:
+		query := c.MsgAlert.Query().
+			Where(msgalert.ID(id))
+		query, err := query.CollectFields(ctx, msgalertImplementors...)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgAlert", id))
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case msgchannel.Table:
+		query := c.MsgChannel.Query().
+			Where(msgchannel.ID(id))
+		query, err := query.CollectFields(ctx, msgchannelImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgChannel", id))
 		if err != nil {
 			return nil, err
 		}
@@ -115,11 +180,35 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 	case msgevent.Table:
 		query := c.MsgEvent.Query().
 			Where(msgevent.ID(id))
-		query, err := query.CollectFields(ctx, "MsgEvent")
+		query, err := query.CollectFields(ctx, msgeventImplementors...)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgEvent", id))
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case msginternal.Table:
+		query := c.MsgInternal.Query().
+			Where(msginternal.ID(id))
+		query, err := query.CollectFields(ctx, msginternalImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgInternal", id))
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case msginternalto.Table:
+		query := c.MsgInternalTo.Query().
+			Where(msginternalto.ID(id))
+		query, err := query.CollectFields(ctx, msginternaltoImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgInternalTo", id))
 		if err != nil {
 			return nil, err
 		}
@@ -127,11 +216,11 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 	case msgsubscriber.Table:
 		query := c.MsgSubscriber.Query().
 			Where(msgsubscriber.ID(id))
-		query, err := query.CollectFields(ctx, "MsgSubscriber")
+		query, err := query.CollectFields(ctx, msgsubscriberImplementors...)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgSubscriber", id))
 		if err != nil {
 			return nil, err
 		}
@@ -139,11 +228,11 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 	case msgtemplate.Table:
 		query := c.MsgTemplate.Query().
 			Where(msgtemplate.ID(id))
-		query, err := query.CollectFields(ctx, "MsgTemplate")
+		query, err := query.CollectFields(ctx, msgtemplateImplementors...)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgTemplate", id))
 		if err != nil {
 			return nil, err
 		}
@@ -151,11 +240,59 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 	case msgtype.Table:
 		query := c.MsgType.Query().
 			Where(msgtype.ID(id))
-		query, err := query.CollectFields(ctx, "MsgType")
+		query, err := query.CollectFields(ctx, msgtypeImplementors...)
 		if err != nil {
 			return nil, err
 		}
-		n, err := query.Only(ctx)
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "MsgType", id))
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case nlog.Table:
+		query := c.Nlog.Query().
+			Where(nlog.ID(id))
+		query, err := query.CollectFields(ctx, nlogImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "Nlog", id))
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case nlogalert.Table:
+		query := c.NlogAlert.Query().
+			Where(nlogalert.ID(id))
+		query, err := query.CollectFields(ctx, nlogalertImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "NlogAlert", id))
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case silence.Table:
+		query := c.Silence.Query().
+			Where(silence.ID(id))
+		query, err := query.CollectFields(ctx, silenceImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "Silence", id))
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case user.Table:
+		query := c.User.Query().
+			Where(user.ID(id))
+		query, err := query.CollectFields(ctx, userImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(entcache.WithRefEntryKey(ctx, "User", id))
 		if err != nil {
 			return nil, err
 		}
@@ -233,10 +370,26 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		idmap[id] = append(idmap[id], &noders[i])
 	}
 	switch table {
+	case msgalert.Table:
+		query := c.MsgAlert.Query().
+			Where(msgalert.IDIn(ids...))
+		query, err := query.CollectFields(ctx, msgalertImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	case msgchannel.Table:
 		query := c.MsgChannel.Query().
 			Where(msgchannel.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "MsgChannel")
+		query, err := query.CollectFields(ctx, msgchannelImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -252,7 +405,39 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case msgevent.Table:
 		query := c.MsgEvent.Query().
 			Where(msgevent.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "MsgEvent")
+		query, err := query.CollectFields(ctx, msgeventImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case msginternal.Table:
+		query := c.MsgInternal.Query().
+			Where(msginternal.IDIn(ids...))
+		query, err := query.CollectFields(ctx, msginternalImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case msginternalto.Table:
+		query := c.MsgInternalTo.Query().
+			Where(msginternalto.IDIn(ids...))
+		query, err := query.CollectFields(ctx, msginternaltoImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -268,7 +453,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case msgsubscriber.Table:
 		query := c.MsgSubscriber.Query().
 			Where(msgsubscriber.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "MsgSubscriber")
+		query, err := query.CollectFields(ctx, msgsubscriberImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -284,7 +469,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case msgtemplate.Table:
 		query := c.MsgTemplate.Query().
 			Where(msgtemplate.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "MsgTemplate")
+		query, err := query.CollectFields(ctx, msgtemplateImplementors...)
 		if err != nil {
 			return nil, err
 		}
@@ -300,7 +485,71 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 	case msgtype.Table:
 		query := c.MsgType.Query().
 			Where(msgtype.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "MsgType")
+		query, err := query.CollectFields(ctx, msgtypeImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case nlog.Table:
+		query := c.Nlog.Query().
+			Where(nlog.IDIn(ids...))
+		query, err := query.CollectFields(ctx, nlogImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case nlogalert.Table:
+		query := c.NlogAlert.Query().
+			Where(nlogalert.IDIn(ids...))
+		query, err := query.CollectFields(ctx, nlogalertImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case silence.Table:
+		query := c.Silence.Query().
+			Where(silence.IDIn(ids...))
+		query, err := query.CollectFields(ctx, silenceImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case user.Table:
+		query := c.User.Query().
+			Where(user.IDIn(ids...))
+		query, err := query.CollectFields(ctx, userImplementors...)
 		if err != nil {
 			return nil, err
 		}

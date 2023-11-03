@@ -1,12 +1,20 @@
+""" time duration: RFCXXX duration string, e.g. 1h30m """
 scalar Duration
+""" utf8 string """
 scalar LabelName
+""" map[string]string JSON Raw """
 scalar MapString
+""" host:port """
 scalar HostPort
 
 enum MatchType {
+    """ = """
     MatchEqual
+    """ != """
     MatchNotEqual
+    """ =~ """
     MatchRegexp
+    """ !~ """
     MatchNotRegexp
 }
 
@@ -32,9 +40,12 @@ type Matcher {
 type Receiver {
     name: String!
     emailConfigs: [EmailConfig]
+    messageConfig: MessageConfig
 }
 
 type EmailConfig {
+    to: String!
+    from: String
     smartHost: HostPort!
     authType: String!
     authUsername: String!
@@ -42,4 +53,116 @@ type EmailConfig {
     authSecret: String!
     authIdentity: String!
     headers: MapString
+}
+
+type MessageConfig {
+    to: String
+    subject: String
+    redirect: String
+}
+
+enum RouteStrType {
+    Json
+    Yaml
+}
+
+extend type MsgType {
+    """ 订阅的用户 """
+    subscriberUsers:[MsgSubscriber!]!
+    """ 订阅的用户组 """
+    subscriberRoles:[MsgSubscriber!]!
+    """ 排除的用户 """
+    excludeSubscriberUsers:[MsgSubscriber!]!
+}
+
+extend type MsgEvent {
+    routeStr(type: RouteStrType!): String!
+}
+
+extend type MsgInternal {
+    """消息发送的用户数"""
+    toSendCounts:Int!
+    """消息已读的用户数"""
+    hasReadCounts:Int!
+}
+
+extend type Query {
+    """ 消息通道列表 """
+    msgChannels(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgChannelOrder
+        where: MsgChannelWhereInput
+    ): MsgChannelConnection!
+
+    """ 消息类型列表 """
+    msgTypes(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgTypeOrder
+        where: MsgTypeWhereInput
+    ): MsgTypeConnection!
+
+    """ 消息类型分类 """
+    msgTypeCategories(keyword:String,appID:ID): [String!]!
+
+    """ 消息事件列表 """
+    msgEvents(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgEventOrder
+        where: MsgEventWhereInput
+    ): MsgEventConnection!
+
+    """ 消息模板列表 """
+    msgTemplates(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgTemplateOrder
+        where: MsgTemplateWhereInput
+    ): MsgTemplateConnection!
+
+    """ 静默消息 """
+    silences(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: SilenceOrder
+        where: SilenceWhereInput
+    ):SilenceConnection!
+
+    """消息列表"""
+    msgAlerts(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgAlertOrder
+        where: MsgAlertWhereInput
+    ):MsgAlertConnection!
+
+    """获取用户的站内信"""
+    userMsgInternalTos(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgInternalToOrder
+        where: MsgInternalToWhereInput
+    ):MsgInternalToConnection!
+    """用户订阅的消息分类"""
+    userSubMsgCategory:[String!]!
+    """消息分类站内信未读数"""
+    userUnreadMsgInternalsFromMsgCategory(categories: [String!]!):[Int!]!
+    """用户站内信总未读数"""
+    userUnreadMsgInternals:Int!
 }

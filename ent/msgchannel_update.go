@@ -11,10 +11,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/profile"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // MsgChannelUpdate is the builder for updating MsgChannel entities.
@@ -125,6 +127,12 @@ func (mcu *MsgChannelUpdate) ClearStatus() *MsgChannelUpdate {
 // SetReceiver sets the "receiver" field.
 func (mcu *MsgChannelUpdate) SetReceiver(pr *profile.Receiver) *MsgChannelUpdate {
 	mcu.mutation.SetReceiver(pr)
+	return mcu
+}
+
+// ClearReceiver clears the value of the "receiver" field.
+func (mcu *MsgChannelUpdate) ClearReceiver() *MsgChannelUpdate {
+	mcu.mutation.ClearReceiver()
 	return mcu
 }
 
@@ -248,12 +256,17 @@ func (mcu *MsgChannelUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := mcu.mutation.Receiver(); ok {
 		_spec.SetField(msgchannel.FieldReceiver, field.TypeJSON, value)
 	}
+	if mcu.mutation.ReceiverCleared() {
+		_spec.ClearField(msgchannel.FieldReceiver, field.TypeJSON)
+	}
 	if value, ok := mcu.mutation.Comments(); ok {
 		_spec.SetField(msgchannel.FieldComments, field.TypeString, value)
 	}
 	if mcu.mutation.CommentsCleared() {
 		_spec.ClearField(msgchannel.FieldComments, field.TypeString)
 	}
+	_spec.Node.Schema = mcu.schemaConfig.MsgChannel
+	ctx = internal.NewSchemaConfigContext(ctx, mcu.schemaConfig)
 	if n, err = sqlgraph.UpdateNodes(ctx, mcu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgchannel.Label}
@@ -369,6 +382,12 @@ func (mcuo *MsgChannelUpdateOne) ClearStatus() *MsgChannelUpdateOne {
 // SetReceiver sets the "receiver" field.
 func (mcuo *MsgChannelUpdateOne) SetReceiver(pr *profile.Receiver) *MsgChannelUpdateOne {
 	mcuo.mutation.SetReceiver(pr)
+	return mcuo
+}
+
+// ClearReceiver clears the value of the "receiver" field.
+func (mcuo *MsgChannelUpdateOne) ClearReceiver() *MsgChannelUpdateOne {
+	mcuo.mutation.ClearReceiver()
 	return mcuo
 }
 
@@ -522,12 +541,17 @@ func (mcuo *MsgChannelUpdateOne) sqlSave(ctx context.Context) (_node *MsgChannel
 	if value, ok := mcuo.mutation.Receiver(); ok {
 		_spec.SetField(msgchannel.FieldReceiver, field.TypeJSON, value)
 	}
+	if mcuo.mutation.ReceiverCleared() {
+		_spec.ClearField(msgchannel.FieldReceiver, field.TypeJSON)
+	}
 	if value, ok := mcuo.mutation.Comments(); ok {
 		_spec.SetField(msgchannel.FieldComments, field.TypeString, value)
 	}
 	if mcuo.mutation.CommentsCleared() {
 		_spec.ClearField(msgchannel.FieldComments, field.TypeString)
 	}
+	_spec.Node.Schema = mcuo.schemaConfig.MsgChannel
+	ctx = internal.NewSchemaConfigContext(ctx, mcuo.schemaConfig)
 	_node = &MsgChannel{config: mcuo.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues

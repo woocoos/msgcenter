@@ -6,6 +6,7 @@ import (
 	kfjson "github.com/knadh/koanf/parsers/json"
 	"github.com/knadh/koanf/providers/rawbytes"
 	"github.com/knadh/koanf/v2"
+	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/gds/timeinterval"
 	"io"
 	"net"
@@ -14,12 +15,12 @@ import (
 
 // NewJsonParse returns a new Koanf instance with the JSON parser loaded.
 // Use koanf for unmarshalling JSON data to map[string]interface{}.
-func NewJsonParse(jsonData []byte) (*koanf.Koanf, error) {
+func NewJsonParse(jsonData []byte) (*conf.Parser, error) {
 	k := koanf.New(".")
 	if err := k.Load(rawbytes.Provider(jsonData), kfjson.Parser()); err != nil {
 		return nil, err
 	}
-	return k, nil
+	return conf.NewParserFromOperator(k), nil
 }
 
 // HostPort represents a "host:port" network address.
@@ -53,7 +54,7 @@ func (h *HostPort) String() string {
 	if h.Host == "" && h.Port == "" {
 		return ""
 	}
-	return fmt.Sprintf("%s:%s", h.Host, h.Port)
+	return fmt.Sprintf(`"%s:%s"`, h.Host, h.Port)
 }
 
 type URL url.URL

@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
 
@@ -57,8 +57,12 @@ const (
 	FieldBody = "body"
 	// FieldTpl holds the string denoting the tpl field in the database.
 	FieldTpl = "tpl"
+	// FieldTplFileID holds the string denoting the tpl_file_id field in the database.
+	FieldTplFileID = "tpl_file_id"
 	// FieldAttachments holds the string denoting the attachments field in the database.
 	FieldAttachments = "attachments"
+	// FieldAttachmentsFileIds holds the string denoting the attachments_file_ids field in the database.
+	FieldAttachmentsFileIds = "attachments_file_ids"
 	// FieldComments holds the string denoting the comments field in the database.
 	FieldComments = "comments"
 	// EdgeEvent holds the string denoting the event edge name in mutations.
@@ -95,7 +99,9 @@ var Columns = []string{
 	FieldBcc,
 	FieldBody,
 	FieldTpl,
+	FieldTplFileID,
 	FieldAttachments,
+	FieldAttachmentsFileIds,
 	FieldComments,
 }
 
@@ -115,19 +121,19 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/woocoos/msgcenter/ent/runtime"
 var (
-	Hooks [1]ent.Hook
+	Hooks [2]ent.Hook
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 )
 
-const DefaultStatus typex.SimpleStatus = "active"
+const DefaultStatus typex.SimpleStatus = "inactive"
 
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s typex.SimpleStatus) error {
 	switch s.String() {
-	case "active", "inactive", "processing":
+	case "active", "inactive", "processing", "disabled":
 		return nil
 	default:
 		return fmt.Errorf("msgtemplate: invalid enum value for status field: %q", s)
@@ -137,7 +143,7 @@ func StatusValidator(s typex.SimpleStatus) error {
 // ReceiverTypeValidator is a validator for the "receiver_type" field enum values. It is called by the builders before save.
 func ReceiverTypeValidator(rt profile.ReceiverType) error {
 	switch rt.String() {
-	case "email", "webhook":
+	case "email", "message", "webhook":
 		return nil
 	default:
 		return fmt.Errorf("msgtemplate: invalid enum value for receiver_type field: %q", rt)
@@ -265,9 +271,9 @@ func ByTpl(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTpl, opts...).ToFunc()
 }
 
-// ByAttachments orders the results by the attachments field.
-func ByAttachments(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAttachments, opts...).ToFunc()
+// ByTplFileID orders the results by the tpl_file_id field.
+func ByTplFileID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTplFileID, opts...).ToFunc()
 }
 
 // ByComments orders the results by the comments field.

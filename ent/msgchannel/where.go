@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
@@ -446,6 +446,16 @@ func StatusNotNil() predicate.MsgChannel {
 	return predicate.MsgChannel(sql.FieldNotNull(FieldStatus))
 }
 
+// ReceiverIsNil applies the IsNil predicate on the "receiver" field.
+func ReceiverIsNil() predicate.MsgChannel {
+	return predicate.MsgChannel(sql.FieldIsNull(FieldReceiver))
+}
+
+// ReceiverNotNil applies the NotNil predicate on the "receiver" field.
+func ReceiverNotNil() predicate.MsgChannel {
+	return predicate.MsgChannel(sql.FieldNotNull(FieldReceiver))
+}
+
 // CommentsEQ applies the EQ predicate on the "comments" field.
 func CommentsEQ(v string) predicate.MsgChannel {
 	return predicate.MsgChannel(sql.FieldEQ(FieldComments, v))
@@ -523,32 +533,15 @@ func CommentsContainsFold(v string) predicate.MsgChannel {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.MsgChannel) predicate.MsgChannel {
-	return predicate.MsgChannel(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.MsgChannel(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.MsgChannel) predicate.MsgChannel {
-	return predicate.MsgChannel(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.MsgChannel(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.MsgChannel) predicate.MsgChannel {
-	return predicate.MsgChannel(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.MsgChannel(sql.NotPredicates(p))
 }

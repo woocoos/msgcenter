@@ -5,6 +5,7 @@ import (
 	"github.com/woocoos/msgcenter/pkg/label"
 	"sort"
 	"strings"
+	"time"
 )
 
 // Data is the data passed to notification templates and webhook pushes.
@@ -12,9 +13,9 @@ import (
 // End-users should not be exposed to Go's type system, as this will confuse them and prevent
 // simple things like simple equality checks to fail. Map everything to float64/string.
 type Data struct {
-	Receiver string        `json:"receiver"`
-	Status   string        `json:"status"`
-	Alerts   []alert.Alert `json:"alerts"`
+	Receiver string `json:"receiver"`
+	Status   string `json:"status"`
+	Alerts   Alerts `json:"alerts"`
 
 	GroupLabels       KV `json:"groupLabels"`
 	CommonLabels      KV `json:"commonLabels"`
@@ -23,10 +24,24 @@ type Data struct {
 	ExternalURL string `json:"externalURL"`
 }
 
+// Alert holds one alert for notification templates.
+type Alert struct {
+	Status       string    `json:"status"`
+	Labels       KV        `json:"labels"`
+	Annotations  KV        `json:"annotations"`
+	StartsAt     time.Time `json:"startsAt"`
+	EndsAt       time.Time `json:"endsAt"`
+	GeneratorURL string    `json:"generatorURL"`
+	Fingerprint  string    `json:"fingerprint"`
+}
+
+// Alerts is a list of Alert objects.
+type Alerts []Alert
+
 // Firing returns the subset of alerts that are firing.
-func (d Data) Firing() (res []alert.Alert) {
-	for _, a := range d.Alerts {
-		if a.Status() == alert.AlertFiring {
+func (as Alerts) Firing() (res []Alert) {
+	for _, a := range as {
+		if a.Status == string(alert.AlertFiring) {
 			res = append(res, a)
 		}
 	}
@@ -34,9 +49,9 @@ func (d Data) Firing() (res []alert.Alert) {
 }
 
 // Resolved returns the subset of alerts that are resolved.
-func (d Data) Resolved() (res []alert.Alert) {
-	for _, a := range d.Alerts {
-		if a.Status() == alert.AlertResolved {
+func (as Alerts) Resolved() (res []Alert) {
+	for _, a := range as {
+		if a.Status == string(alert.AlertResolved) {
 			res = append(res, a)
 		}
 	}

@@ -8,8 +8,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
+	"github.com/woocoos/msgcenter/ent/msgtype"
 )
 
 // MsgTypeDelete is the builder for deleting a MsgType entity.
@@ -41,6 +43,8 @@ func (mtd *MsgTypeDelete) ExecX(ctx context.Context) int {
 
 func (mtd *MsgTypeDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(msgtype.Table, sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt))
+	_spec.Node.Schema = mtd.schemaConfig.MsgType
+	ctx = internal.NewSchemaConfigContext(ctx, mtd.schemaConfig)
 	if ps := mtd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

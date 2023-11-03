@@ -3,15 +3,43 @@ package alert
 import (
 	"fmt"
 	"github.com/woocoos/msgcenter/pkg/label"
+	"io"
+	"strconv"
 	"time"
 )
 
 type AlertStatus string
 
 const (
+	AlertNone     AlertStatus = "none"
 	AlertFiring   AlertStatus = "firing"
 	AlertResolved AlertStatus = "resolved"
 )
+
+func (a *AlertStatus) UnmarshalGQL(v interface{}) error {
+	if v, ok := v.(string); ok {
+		switch v {
+		case string(AlertNone):
+			*a = AlertNone
+		case string(AlertFiring):
+			*a = AlertFiring
+		case string(AlertResolved):
+			*a = AlertResolved
+		default:
+			return fmt.Errorf("invalid AlertStatus %s", v)
+		}
+		return nil
+	}
+	return fmt.Errorf("%T is not a string", v)
+}
+
+func (a AlertStatus) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(string(a)))
+}
+
+func (a AlertStatus) Values() []string {
+	return []string{string(AlertNone), string(AlertFiring), string(AlertResolved)}
+}
 
 // Alert is a single alert. it is a copy of the Alert struct from the Alertmanager
 type Alert struct {
@@ -37,12 +65,12 @@ func (a *Alert) Name() string {
 	return a.Labels[label.AlertNameLabel]
 }
 
-// Resolved returns true iff the activity interval ended in the past.
+// Resolved returns true if the activity interval ended in the past.
 func (a *Alert) Resolved() bool {
 	return a.ResolvedAt(time.Now())
 }
 
-// ResolvedAt returns true off the activity interval ended before
+// ResolvedAt returns true if the activity interval ended before
 // the given timestamp.
 func (a *Alert) ResolvedAt(ts time.Time) bool {
 	if a.EndsAt.IsZero() {

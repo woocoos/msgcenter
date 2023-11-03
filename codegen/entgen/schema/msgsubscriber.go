@@ -1,13 +1,16 @@
 package schema
 
 import (
+	"context"
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/entco/schemax"
+	"github.com/woocoos/knockout-go/ent/schemax"
+	gen "github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/hook"
 )
 
 // MsgSubscriber holds the schema definition for the MsgSubscriber entity.
@@ -27,15 +30,17 @@ func (MsgSubscriber) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		schemax.IntID{},
 		schemax.AuditMixin{},
+		schemax.NotifyMixin{},
 	}
 }
 
 // Fields of the MsgSubscriber.
 func (MsgSubscriber) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("msg_type_id").Comment("应用消息类型ID"),
-		field.Int("tenant_id").Comment("组织ID"),
-		field.Int("user_id").Comment("用户ID"),
+		field.Int("msg_type_id").Comment("应用消息类型ID").SchemaType(schemax.IntID{}.SchemaType()),
+		field.Int("tenant_id").Comment("组织ID").Annotations(entgql.Type("ID")),
+		field.Int("user_id").Optional().Comment("用户ID"),
+		field.Int("org_role_id").Optional().Comment("用户组ID").Annotations(entgql.Type("ID")),
 		field.Bool("exclude").Optional().Default(false).Comment("是否排除"),
 	}
 }
@@ -44,5 +49,22 @@ func (MsgSubscriber) Fields() []ent.Field {
 func (MsgSubscriber) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("msg_type", MsgType.Type).Ref("subscribers").Required().Unique().Field("msg_type_id"),
+		edge.To("user", User.Type).Unique().Field("user_id"),
+	}
+}
+
+func (MsgSubscriber) Hooks() []ent.Hook {
+	return []ent.Hook{
+		hook.On(
+			func(next ent.Mutator) ent.Mutator {
+				// 限制用户和用户组只能存在一个
+				return hook.MsgSubscriberFunc(func(ctx context.Context, m *gen.MsgSubscriberMutation) (ent.Value, error) {
+					if uid, ok := m.OrgRoleID(); ok && uid != 0 {
+						m.ClearUserID()
+					}
+					return next.Mutate(ctx, m)
+				})
+			}, ent.OpCreate|ent.OpUpdate|ent.OpUpdateOne,
+		),
 	}
 }

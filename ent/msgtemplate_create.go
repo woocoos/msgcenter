@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -221,17 +221,29 @@ func (mtc *MsgTemplateCreate) SetNillableTpl(s *string) *MsgTemplateCreate {
 	return mtc
 }
 
+// SetTplFileID sets the "tpl_file_id" field.
+func (mtc *MsgTemplateCreate) SetTplFileID(i int) *MsgTemplateCreate {
+	mtc.mutation.SetTplFileID(i)
+	return mtc
+}
+
+// SetNillableTplFileID sets the "tpl_file_id" field if the given value is not nil.
+func (mtc *MsgTemplateCreate) SetNillableTplFileID(i *int) *MsgTemplateCreate {
+	if i != nil {
+		mtc.SetTplFileID(*i)
+	}
+	return mtc
+}
+
 // SetAttachments sets the "attachments" field.
-func (mtc *MsgTemplateCreate) SetAttachments(s string) *MsgTemplateCreate {
+func (mtc *MsgTemplateCreate) SetAttachments(s []string) *MsgTemplateCreate {
 	mtc.mutation.SetAttachments(s)
 	return mtc
 }
 
-// SetNillableAttachments sets the "attachments" field if the given value is not nil.
-func (mtc *MsgTemplateCreate) SetNillableAttachments(s *string) *MsgTemplateCreate {
-	if s != nil {
-		mtc.SetAttachments(*s)
-	}
+// SetAttachmentsFileIds sets the "attachments_file_ids" field.
+func (mtc *MsgTemplateCreate) SetAttachmentsFileIds(i []int) *MsgTemplateCreate {
+	mtc.mutation.SetAttachmentsFileIds(i)
 	return mtc
 }
 
@@ -394,6 +406,7 @@ func (mtc *MsgTemplateCreate) createSpec() (*MsgTemplate, *sqlgraph.CreateSpec) 
 		_node = &MsgTemplate{config: mtc.config}
 		_spec = sqlgraph.NewCreateSpec(msgtemplate.Table, sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt))
 	)
+	_spec.Schema = mtc.schemaConfig.MsgTemplate
 	_spec.OnConflict = mtc.conflict
 	if id, ok := mtc.mutation.ID(); ok {
 		_node.ID = id
@@ -467,9 +480,17 @@ func (mtc *MsgTemplateCreate) createSpec() (*MsgTemplate, *sqlgraph.CreateSpec) 
 		_spec.SetField(msgtemplate.FieldTpl, field.TypeString, value)
 		_node.Tpl = value
 	}
+	if value, ok := mtc.mutation.TplFileID(); ok {
+		_spec.SetField(msgtemplate.FieldTplFileID, field.TypeInt, value)
+		_node.TplFileID = &value
+	}
 	if value, ok := mtc.mutation.Attachments(); ok {
-		_spec.SetField(msgtemplate.FieldAttachments, field.TypeString, value)
+		_spec.SetField(msgtemplate.FieldAttachments, field.TypeJSON, value)
 		_node.Attachments = value
+	}
+	if value, ok := mtc.mutation.AttachmentsFileIds(); ok {
+		_spec.SetField(msgtemplate.FieldAttachmentsFileIds, field.TypeJSON, value)
+		_node.AttachmentsFileIds = value
 	}
 	if value, ok := mtc.mutation.Comments(); ok {
 		_spec.SetField(msgtemplate.FieldComments, field.TypeString, value)
@@ -486,6 +507,7 @@ func (mtc *MsgTemplateCreate) createSpec() (*MsgTemplate, *sqlgraph.CreateSpec) 
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtc.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -814,8 +836,32 @@ func (u *MsgTemplateUpsert) ClearTpl() *MsgTemplateUpsert {
 	return u
 }
 
+// SetTplFileID sets the "tpl_file_id" field.
+func (u *MsgTemplateUpsert) SetTplFileID(v int) *MsgTemplateUpsert {
+	u.Set(msgtemplate.FieldTplFileID, v)
+	return u
+}
+
+// UpdateTplFileID sets the "tpl_file_id" field to the value that was provided on create.
+func (u *MsgTemplateUpsert) UpdateTplFileID() *MsgTemplateUpsert {
+	u.SetExcluded(msgtemplate.FieldTplFileID)
+	return u
+}
+
+// AddTplFileID adds v to the "tpl_file_id" field.
+func (u *MsgTemplateUpsert) AddTplFileID(v int) *MsgTemplateUpsert {
+	u.Add(msgtemplate.FieldTplFileID, v)
+	return u
+}
+
+// ClearTplFileID clears the value of the "tpl_file_id" field.
+func (u *MsgTemplateUpsert) ClearTplFileID() *MsgTemplateUpsert {
+	u.SetNull(msgtemplate.FieldTplFileID)
+	return u
+}
+
 // SetAttachments sets the "attachments" field.
-func (u *MsgTemplateUpsert) SetAttachments(v string) *MsgTemplateUpsert {
+func (u *MsgTemplateUpsert) SetAttachments(v []string) *MsgTemplateUpsert {
 	u.Set(msgtemplate.FieldAttachments, v)
 	return u
 }
@@ -829,6 +875,24 @@ func (u *MsgTemplateUpsert) UpdateAttachments() *MsgTemplateUpsert {
 // ClearAttachments clears the value of the "attachments" field.
 func (u *MsgTemplateUpsert) ClearAttachments() *MsgTemplateUpsert {
 	u.SetNull(msgtemplate.FieldAttachments)
+	return u
+}
+
+// SetAttachmentsFileIds sets the "attachments_file_ids" field.
+func (u *MsgTemplateUpsert) SetAttachmentsFileIds(v []int) *MsgTemplateUpsert {
+	u.Set(msgtemplate.FieldAttachmentsFileIds, v)
+	return u
+}
+
+// UpdateAttachmentsFileIds sets the "attachments_file_ids" field to the value that was provided on create.
+func (u *MsgTemplateUpsert) UpdateAttachmentsFileIds() *MsgTemplateUpsert {
+	u.SetExcluded(msgtemplate.FieldAttachmentsFileIds)
+	return u
+}
+
+// ClearAttachmentsFileIds clears the value of the "attachments_file_ids" field.
+func (u *MsgTemplateUpsert) ClearAttachmentsFileIds() *MsgTemplateUpsert {
+	u.SetNull(msgtemplate.FieldAttachmentsFileIds)
 	return u
 }
 
@@ -1219,8 +1283,36 @@ func (u *MsgTemplateUpsertOne) ClearTpl() *MsgTemplateUpsertOne {
 	})
 }
 
+// SetTplFileID sets the "tpl_file_id" field.
+func (u *MsgTemplateUpsertOne) SetTplFileID(v int) *MsgTemplateUpsertOne {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.SetTplFileID(v)
+	})
+}
+
+// AddTplFileID adds v to the "tpl_file_id" field.
+func (u *MsgTemplateUpsertOne) AddTplFileID(v int) *MsgTemplateUpsertOne {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.AddTplFileID(v)
+	})
+}
+
+// UpdateTplFileID sets the "tpl_file_id" field to the value that was provided on create.
+func (u *MsgTemplateUpsertOne) UpdateTplFileID() *MsgTemplateUpsertOne {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.UpdateTplFileID()
+	})
+}
+
+// ClearTplFileID clears the value of the "tpl_file_id" field.
+func (u *MsgTemplateUpsertOne) ClearTplFileID() *MsgTemplateUpsertOne {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.ClearTplFileID()
+	})
+}
+
 // SetAttachments sets the "attachments" field.
-func (u *MsgTemplateUpsertOne) SetAttachments(v string) *MsgTemplateUpsertOne {
+func (u *MsgTemplateUpsertOne) SetAttachments(v []string) *MsgTemplateUpsertOne {
 	return u.Update(func(s *MsgTemplateUpsert) {
 		s.SetAttachments(v)
 	})
@@ -1237,6 +1329,27 @@ func (u *MsgTemplateUpsertOne) UpdateAttachments() *MsgTemplateUpsertOne {
 func (u *MsgTemplateUpsertOne) ClearAttachments() *MsgTemplateUpsertOne {
 	return u.Update(func(s *MsgTemplateUpsert) {
 		s.ClearAttachments()
+	})
+}
+
+// SetAttachmentsFileIds sets the "attachments_file_ids" field.
+func (u *MsgTemplateUpsertOne) SetAttachmentsFileIds(v []int) *MsgTemplateUpsertOne {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.SetAttachmentsFileIds(v)
+	})
+}
+
+// UpdateAttachmentsFileIds sets the "attachments_file_ids" field to the value that was provided on create.
+func (u *MsgTemplateUpsertOne) UpdateAttachmentsFileIds() *MsgTemplateUpsertOne {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.UpdateAttachmentsFileIds()
+	})
+}
+
+// ClearAttachmentsFileIds clears the value of the "attachments_file_ids" field.
+func (u *MsgTemplateUpsertOne) ClearAttachmentsFileIds() *MsgTemplateUpsertOne {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.ClearAttachmentsFileIds()
 	})
 }
 
@@ -1297,12 +1410,16 @@ func (u *MsgTemplateUpsertOne) IDX(ctx context.Context) int {
 // MsgTemplateCreateBulk is the builder for creating many MsgTemplate entities in bulk.
 type MsgTemplateCreateBulk struct {
 	config
+	err      error
 	builders []*MsgTemplateCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the MsgTemplate entities in the database.
 func (mtcb *MsgTemplateCreateBulk) Save(ctx context.Context) ([]*MsgTemplate, error) {
+	if mtcb.err != nil {
+		return nil, mtcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(mtcb.builders))
 	nodes := make([]*MsgTemplate, len(mtcb.builders))
 	mutators := make([]Mutator, len(mtcb.builders))
@@ -1792,8 +1909,36 @@ func (u *MsgTemplateUpsertBulk) ClearTpl() *MsgTemplateUpsertBulk {
 	})
 }
 
+// SetTplFileID sets the "tpl_file_id" field.
+func (u *MsgTemplateUpsertBulk) SetTplFileID(v int) *MsgTemplateUpsertBulk {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.SetTplFileID(v)
+	})
+}
+
+// AddTplFileID adds v to the "tpl_file_id" field.
+func (u *MsgTemplateUpsertBulk) AddTplFileID(v int) *MsgTemplateUpsertBulk {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.AddTplFileID(v)
+	})
+}
+
+// UpdateTplFileID sets the "tpl_file_id" field to the value that was provided on create.
+func (u *MsgTemplateUpsertBulk) UpdateTplFileID() *MsgTemplateUpsertBulk {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.UpdateTplFileID()
+	})
+}
+
+// ClearTplFileID clears the value of the "tpl_file_id" field.
+func (u *MsgTemplateUpsertBulk) ClearTplFileID() *MsgTemplateUpsertBulk {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.ClearTplFileID()
+	})
+}
+
 // SetAttachments sets the "attachments" field.
-func (u *MsgTemplateUpsertBulk) SetAttachments(v string) *MsgTemplateUpsertBulk {
+func (u *MsgTemplateUpsertBulk) SetAttachments(v []string) *MsgTemplateUpsertBulk {
 	return u.Update(func(s *MsgTemplateUpsert) {
 		s.SetAttachments(v)
 	})
@@ -1810,6 +1955,27 @@ func (u *MsgTemplateUpsertBulk) UpdateAttachments() *MsgTemplateUpsertBulk {
 func (u *MsgTemplateUpsertBulk) ClearAttachments() *MsgTemplateUpsertBulk {
 	return u.Update(func(s *MsgTemplateUpsert) {
 		s.ClearAttachments()
+	})
+}
+
+// SetAttachmentsFileIds sets the "attachments_file_ids" field.
+func (u *MsgTemplateUpsertBulk) SetAttachmentsFileIds(v []int) *MsgTemplateUpsertBulk {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.SetAttachmentsFileIds(v)
+	})
+}
+
+// UpdateAttachmentsFileIds sets the "attachments_file_ids" field to the value that was provided on create.
+func (u *MsgTemplateUpsertBulk) UpdateAttachmentsFileIds() *MsgTemplateUpsertBulk {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.UpdateAttachmentsFileIds()
+	})
+}
+
+// ClearAttachmentsFileIds clears the value of the "attachments_file_ids" field.
+func (u *MsgTemplateUpsertBulk) ClearAttachmentsFileIds() *MsgTemplateUpsertBulk {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.ClearAttachmentsFileIds()
 	})
 }
 
@@ -1836,6 +2002,9 @@ func (u *MsgTemplateUpsertBulk) ClearComments() *MsgTemplateUpsertBulk {
 
 // Exec executes the query.
 func (u *MsgTemplateUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MsgTemplateCreateBulk instead", i)

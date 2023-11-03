@@ -5,16 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cenkalti/backoff/v4"
+	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/pkg/gds/timeinterval"
 	"github.com/tsingsun/woocoo/pkg/log"
-	"github.com/woocoos/msgcenter/inhibit"
-	"github.com/woocoos/msgcenter/metrics"
-	"github.com/woocoos/msgcenter/nflog"
-	"github.com/woocoos/msgcenter/nflog/nflogpb"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
+	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/pkg/profile"
-	"github.com/woocoos/msgcenter/silence"
+	"github.com/woocoos/msgcenter/service/inhibit"
+	"github.com/woocoos/msgcenter/service/provider"
+	"github.com/woocoos/msgcenter/service/silence"
 	"go.uber.org/zap"
 	"sync"
 	"time"
@@ -31,27 +31,34 @@ type ResolvedSender interface {
 // returns an error if unsuccessful and a flag whether the error is
 // recoverable. This information is useful for a retry logic.
 type Notifier interface {
+	ResolvedSender
+	// Notify sends notifications for the given alerts. Returns a bool value whether retrying
 	Notify(context.Context, ...*alert.Alert) (bool, error)
+}
+
+// NotificationLog is the interface for the notification log. It provides methods to persist and query notifications.
+type NotificationLog interface {
+	woocoo.Server
+	Log(ctx context.Context, r *profile.ReceiverKey, gkey string, firingAlerts, resolvedAlerts []uint64, expiry time.Duration) error
+	Query(params ...EntryQuery) ([]*LogEntry, error)
 }
 
 // CustomerConfigFunc is a function that can be overridden by out component.
 // the function constrained the original configuration cannot be modified
-type CustomerConfigFunc[T profile.ReceiverConfigs] func(context.Context, T, label.LabelSet) (T, error)
+type CustomerConfigFunc[T profile.ReceiverConfigs] func(context.Context, *T, label.LabelSet) error
 
 // Integration wraps a notifier and its configuration to be uniquely identified
 // by name and index from its origin in the configuration.
 type Integration struct {
 	notifier Notifier
-	rs       ResolvedSender
 	name     string
 	idx      int
 }
 
 // NewIntegration returns a new integration.
-func NewIntegration(notifier Notifier, rs ResolvedSender, name string, idx int) Integration {
+func NewIntegration(notifier Notifier, name string, idx int) Integration {
 	return Integration{
 		notifier: notifier,
-		rs:       rs,
 		name:     name,
 		idx:      idx,
 	}
@@ -64,7 +71,7 @@ func (i *Integration) Notify(ctx context.Context, alerts ...*alert.Alert) (bool,
 
 // SendResolved implements the ResolvedSender interface.
 func (i *Integration) SendResolved() bool {
-	return i.rs.SendResolved()
+	return i.notifier.SendResolved()
 }
 
 // Name returns the name of the integration.
@@ -82,129 +89,6 @@ func (i *Integration) String() string {
 	return fmt.Sprintf("%s[%d]", i.name, i.idx)
 }
 
-// notifyKey defines a custom type with which a context is populated to
-// avoid accidental collisions.
-type notifyKey int
-
-const (
-	keyReceiverName notifyKey = iota
-	keyRepeatInterval
-	keyGroupLabels
-	keyGroupKey
-	keyFiringAlerts
-	keyResolvedAlerts
-	keyNow
-	keyMuteTimeIntervals
-	keyActiveTimeIntervals
-)
-
-// WithReceiverName populates a context with a receiver name.
-func WithReceiverName(ctx context.Context, rcv string) context.Context {
-	return context.WithValue(ctx, keyReceiverName, rcv)
-}
-
-// WithGroupKey populates a context with a group key.
-func WithGroupKey(ctx context.Context, s string) context.Context {
-	return context.WithValue(ctx, keyGroupKey, s)
-}
-
-// WithFiringAlerts populates a context with a slice of firing alerts.
-func WithFiringAlerts(ctx context.Context, alerts []uint64) context.Context {
-	return context.WithValue(ctx, keyFiringAlerts, alerts)
-}
-
-// WithResolvedAlerts populates a context with a slice of resolved alerts.
-func WithResolvedAlerts(ctx context.Context, alerts []uint64) context.Context {
-	return context.WithValue(ctx, keyResolvedAlerts, alerts)
-}
-
-// WithGroupLabels populates a context with grouping labels.
-func WithGroupLabels(ctx context.Context, lset label.LabelSet) context.Context {
-	return context.WithValue(ctx, keyGroupLabels, lset)
-}
-
-// WithNow populates a context with a now timestamp.
-func WithNow(ctx context.Context, t time.Time) context.Context {
-	return context.WithValue(ctx, keyNow, t)
-}
-
-// WithRepeatInterval populates a context with a repeat interval.
-func WithRepeatInterval(ctx context.Context, t time.Duration) context.Context {
-	return context.WithValue(ctx, keyRepeatInterval, t)
-}
-
-// WithMuteTimeIntervals populates a context with a slice of mute time names.
-func WithMuteTimeIntervals(ctx context.Context, mt []string) context.Context {
-	return context.WithValue(ctx, keyMuteTimeIntervals, mt)
-}
-
-func WithActiveTimeIntervals(ctx context.Context, at []string) context.Context {
-	return context.WithValue(ctx, keyActiveTimeIntervals, at)
-}
-
-// RepeatInterval extracts a repeat interval from the context. Iff none exists, the
-// second argument is false.
-func RepeatInterval(ctx context.Context) (time.Duration, bool) {
-	v, ok := ctx.Value(keyRepeatInterval).(time.Duration)
-	return v, ok
-}
-
-// ReceiverName extracts a receiver name from the context. Iff none exists, the
-// second argument is false.
-func ReceiverName(ctx context.Context) (string, bool) {
-	v, ok := ctx.Value(keyReceiverName).(string)
-	return v, ok
-}
-
-// GroupKey extracts a group key from the context. Iff none exists, the
-// second argument is false.
-func GroupKey(ctx context.Context) (string, bool) {
-	v, ok := ctx.Value(keyGroupKey).(string)
-	return v, ok
-}
-
-// GroupLabels extracts grouping label set from the context. Iff none exists, the
-// second argument is false.
-func GroupLabels(ctx context.Context) (label.LabelSet, bool) {
-	v, ok := ctx.Value(keyGroupLabels).(label.LabelSet)
-	return v, ok
-}
-
-// Now extracts a now timestamp from the context. Iff none exists, the
-// second argument is false.
-func Now(ctx context.Context) (time.Time, bool) {
-	v, ok := ctx.Value(keyNow).(time.Time)
-	return v, ok
-}
-
-// FiringAlerts extracts a slice of firing alerts from the context.
-// Iff none exists, the second argument is false.
-func FiringAlerts(ctx context.Context) ([]uint64, bool) {
-	v, ok := ctx.Value(keyFiringAlerts).([]uint64)
-	return v, ok
-}
-
-// ResolvedAlerts extracts a slice of firing alerts from the context.
-// Iff none exists, the second argument is false.
-func ResolvedAlerts(ctx context.Context) ([]uint64, bool) {
-	v, ok := ctx.Value(keyResolvedAlerts).([]uint64)
-	return v, ok
-}
-
-// MuteTimeIntervalNames extracts a slice of mute time names from the context. If and only if none exists, the
-// second argument is false.
-func MuteTimeIntervalNames(ctx context.Context) ([]string, bool) {
-	v, ok := ctx.Value(keyMuteTimeIntervals).([]string)
-	return v, ok
-}
-
-// ActiveTimeIntervalNames extracts a slice of active time names from the context. If none exists, the
-// second argument is false.
-func ActiveTimeIntervalNames(ctx context.Context) ([]string, bool) {
-	v, ok := ctx.Value(keyActiveTimeIntervals).([]string)
-	return v, ok
-}
-
 // A Stage processes alerts under the constraints of the given context.
 type Stage interface {
 	Exec(ctx context.Context, alerts ...*alert.Alert) (context.Context, []*alert.Alert, error)
@@ -216,11 +100,6 @@ type StageFunc func(ctx context.Context, alerts ...*alert.Alert) (context.Contex
 // Exec implements Stage interface.
 func (f StageFunc) Exec(ctx context.Context, alerts ...*alert.Alert) (context.Context, []*alert.Alert, error) {
 	return f(ctx, alerts...)
-}
-
-type NotificationLog interface {
-	Log(r *nflogpb.Receiver, gkey string, firingAlerts, resolvedAlerts []uint64, expiry time.Duration) error
-	Query(params ...nflog.QueryParam) ([]*nflogpb.Entry, error)
 }
 
 type PipelineBuilder struct {
@@ -238,6 +117,8 @@ func (pb *PipelineBuilder) New(
 	silencer *silence.Silencer,
 	times map[string][]timeinterval.TimeInterval,
 	notificationLog NotificationLog,
+	alerts provider.Alerts,
+	subscriber Subscriber,
 ) RoutingStage {
 	rs := make(RoutingStage, len(receivers))
 
@@ -247,7 +128,7 @@ func (pb *PipelineBuilder) New(
 	ss := NewMuteStage(silencer)
 
 	for name := range receivers {
-		st := createReceiverStage(name, receivers[name], wait, notificationLog)
+		st := createReceiverStage(name, receivers[name], wait, notificationLog, alerts, subscriber)
 		rs[name] = MultiStage{is, tas, tms, ss, st}
 	}
 	return rs
@@ -259,17 +140,20 @@ func createReceiverStage(
 	integrations []Integration,
 	wait func() time.Duration,
 	notificationLog NotificationLog,
+	alerts provider.Alerts,
+	subscriber Subscriber,
 ) Stage {
 	var fs FanoutStage
 	for i := range integrations {
-		recv := &nflogpb.Receiver{
-			GroupName:   name,
+		recv := &profile.ReceiverKey{
+			Name:        name,
 			Integration: integrations[i].Name(),
-			Idx:         uint32(integrations[i].Index()),
+			Index:       uint32(integrations[i].Index()),
 		}
 		var s MultiStage
 		s = append(s, NewWaitStage(wait))
 		s = append(s, NewDedupStage(&integrations[i], notificationLog, recv))
+		s = append(s, NewEventSubscribeStage(alerts, subscriber))
 		s = append(s, NewRetryStage(integrations[i], name))
 		s = append(s, NewSetNotifiesStage(notificationLog, recv))
 
@@ -291,6 +175,7 @@ func (rs RoutingStage) Exec(ctx context.Context, alerts ...*alert.Alert) (contex
 	// check if tenant in group
 	if gl, ok := GroupLabels(ctx); ok {
 		if tid, ok := gl[label.TenantLabel]; ok {
+			ctx = WithTenant(ctx, tid)
 			tr := profile.TenantReceiverName(tid, receiver)
 			if _, ok := rs[tr]; ok {
 				receiver = tr
@@ -405,32 +290,28 @@ func (ws *WaitStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.
 type DedupStage struct {
 	rs    ResolvedSender
 	nflog NotificationLog
-	recv  *nflogpb.Receiver
+	recv  *profile.ReceiverKey
 
 	now  func() time.Time
 	hash func(*alert.Alert) uint64
 }
 
 // NewDedupStage wraps a DedupStage that runs against the given notification log.
-func NewDedupStage(rs ResolvedSender, l NotificationLog, recv *nflogpb.Receiver) *DedupStage {
+func NewDedupStage(rs ResolvedSender, l NotificationLog, recv *profile.ReceiverKey) *DedupStage {
 	return &DedupStage{
 		rs:    rs,
 		nflog: l,
 		recv:  recv,
-		now:   utcNow,
+		now:   time.Now,
 		hash:  hashAlert,
 	}
-}
-
-func utcNow() time.Time {
-	return time.Now().UTC()
 }
 
 func hashAlert(a *alert.Alert) uint64 {
 	return uint64(a.Labels.Fingerprint())
 }
 
-func (n *DedupStage) needsUpdate(entry *nflogpb.Entry, firing, resolved map[uint64]struct{}, repeat time.Duration) bool {
+func (n *DedupStage) needsUpdate(entry *LogEntry, firing, resolved map[uint64]struct{}, repeat time.Duration) bool {
 	// If we haven't notified about the alert group before, notify right away
 	// unless we only have resolved alerts.
 	if entry == nil {
@@ -457,7 +338,7 @@ func (n *DedupStage) needsUpdate(entry *nflogpb.Entry, firing, resolved map[uint
 	}
 
 	// Nothing changed, only notify if the repeat interval has passed.
-	return entry.Timestamp.AsTime().Before(n.now().Add(-repeat))
+	return entry.UpdatedAt.Before(n.now().Add(-repeat))
 }
 
 // Exec implements the Stage interface.
@@ -472,12 +353,14 @@ func (n *DedupStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.
 		return ctx, nil, errors.New("repeat interval missing")
 	}
 
-	firingSet := map[uint64]struct{}{}
-	resolvedSet := map[uint64]struct{}{}
-	firing := []uint64{}
-	resolved := []uint64{}
+	var (
+		firingSet   = make(map[uint64]struct{})
+		resolvedSet = make(map[uint64]struct{})
+		firing      = make([]uint64, 0, len(alerts))
+		resolved    = make([]uint64, 0, len(alerts))
+		hash        uint64
+	)
 
-	var hash uint64
 	for _, a := range alerts {
 		hash = n.hash(a)
 		if a.Resolved() {
@@ -492,12 +375,12 @@ func (n *DedupStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.
 	ctx = WithFiringAlerts(ctx, firing)
 	ctx = WithResolvedAlerts(ctx, resolved)
 
-	entries, err := n.nflog.Query(nflog.QGroupKey(gkey), nflog.QReceiver(n.recv))
-	if err != nil && err != nflog.ErrNotFound {
+	entries, err := n.nflog.Query(QGroupKey(gkey), QReceiver(n.recv))
+	if err != nil {
 		return ctx, nil, err
 	}
 
-	var entry *nflogpb.Entry
+	var entry *LogEntry
 	switch len(entries) {
 	case 0:
 	case 1:
@@ -626,11 +509,11 @@ func (r RetryStage) exec(ctx context.Context, alerts ...*alert.Alert) (context.C
 // passed alerts should have already been sent to the receivers.
 type SetNotifiesStage struct {
 	nflog NotificationLog
-	recv  *nflogpb.Receiver
+	recv  *profile.ReceiverKey
 }
 
 // NewSetNotifiesStage returns a new instance of a SetNotifiesStage.
-func NewSetNotifiesStage(l NotificationLog, recv *nflogpb.Receiver) *SetNotifiesStage {
+func NewSetNotifiesStage(l NotificationLog, recv *profile.ReceiverKey) *SetNotifiesStage {
 	return &SetNotifiesStage{
 		nflog: l,
 		recv:  recv,
@@ -660,7 +543,7 @@ func (n SetNotifiesStage) Exec(ctx context.Context, alerts ...*alert.Alert) (con
 	}
 	expiry := 2 * repeat
 
-	return ctx, alerts, n.nflog.Log(n.recv, gkey, firing, resolved, expiry)
+	return ctx, alerts, n.nflog.Log(ctx, n.recv, gkey, firing, resolved, expiry)
 }
 
 type timeStage struct {

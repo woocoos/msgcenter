@@ -7,9 +7,11 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/profile"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // ID filters vertices based on their ID field.
@@ -132,9 +134,9 @@ func Tpl(v string) predicate.MsgTemplate {
 	return predicate.MsgTemplate(sql.FieldEQ(FieldTpl, v))
 }
 
-// Attachments applies equality check predicate on the "attachments" field. It's identical to AttachmentsEQ.
-func Attachments(v string) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldEQ(FieldAttachments, v))
+// TplFileID applies equality check predicate on the "tpl_file_id" field. It's identical to TplFileIDEQ.
+func TplFileID(v int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldEQ(FieldTplFileID, v))
 }
 
 // Comments applies equality check predicate on the "comments" field. It's identical to CommentsEQ.
@@ -1102,59 +1104,54 @@ func TplContainsFold(v string) predicate.MsgTemplate {
 	return predicate.MsgTemplate(sql.FieldContainsFold(FieldTpl, v))
 }
 
-// AttachmentsEQ applies the EQ predicate on the "attachments" field.
-func AttachmentsEQ(v string) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldEQ(FieldAttachments, v))
+// TplFileIDEQ applies the EQ predicate on the "tpl_file_id" field.
+func TplFileIDEQ(v int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldEQ(FieldTplFileID, v))
 }
 
-// AttachmentsNEQ applies the NEQ predicate on the "attachments" field.
-func AttachmentsNEQ(v string) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldNEQ(FieldAttachments, v))
+// TplFileIDNEQ applies the NEQ predicate on the "tpl_file_id" field.
+func TplFileIDNEQ(v int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldNEQ(FieldTplFileID, v))
 }
 
-// AttachmentsIn applies the In predicate on the "attachments" field.
-func AttachmentsIn(vs ...string) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldIn(FieldAttachments, vs...))
+// TplFileIDIn applies the In predicate on the "tpl_file_id" field.
+func TplFileIDIn(vs ...int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldIn(FieldTplFileID, vs...))
 }
 
-// AttachmentsNotIn applies the NotIn predicate on the "attachments" field.
-func AttachmentsNotIn(vs ...string) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldNotIn(FieldAttachments, vs...))
+// TplFileIDNotIn applies the NotIn predicate on the "tpl_file_id" field.
+func TplFileIDNotIn(vs ...int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldNotIn(FieldTplFileID, vs...))
 }
 
-// AttachmentsGT applies the GT predicate on the "attachments" field.
-func AttachmentsGT(v string) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldGT(FieldAttachments, v))
+// TplFileIDGT applies the GT predicate on the "tpl_file_id" field.
+func TplFileIDGT(v int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldGT(FieldTplFileID, v))
 }
 
-// AttachmentsGTE applies the GTE predicate on the "attachments" field.
-func AttachmentsGTE(v string) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldGTE(FieldAttachments, v))
+// TplFileIDGTE applies the GTE predicate on the "tpl_file_id" field.
+func TplFileIDGTE(v int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldGTE(FieldTplFileID, v))
 }
 
-// AttachmentsLT applies the LT predicate on the "attachments" field.
-func AttachmentsLT(v string) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldLT(FieldAttachments, v))
+// TplFileIDLT applies the LT predicate on the "tpl_file_id" field.
+func TplFileIDLT(v int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldLT(FieldTplFileID, v))
 }
 
-// AttachmentsLTE applies the LTE predicate on the "attachments" field.
-func AttachmentsLTE(v string) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldLTE(FieldAttachments, v))
+// TplFileIDLTE applies the LTE predicate on the "tpl_file_id" field.
+func TplFileIDLTE(v int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldLTE(FieldTplFileID, v))
 }
 
-// AttachmentsContains applies the Contains predicate on the "attachments" field.
-func AttachmentsContains(v string) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldContains(FieldAttachments, v))
+// TplFileIDIsNil applies the IsNil predicate on the "tpl_file_id" field.
+func TplFileIDIsNil() predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldIsNull(FieldTplFileID))
 }
 
-// AttachmentsHasPrefix applies the HasPrefix predicate on the "attachments" field.
-func AttachmentsHasPrefix(v string) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldHasPrefix(FieldAttachments, v))
-}
-
-// AttachmentsHasSuffix applies the HasSuffix predicate on the "attachments" field.
-func AttachmentsHasSuffix(v string) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldHasSuffix(FieldAttachments, v))
+// TplFileIDNotNil applies the NotNil predicate on the "tpl_file_id" field.
+func TplFileIDNotNil() predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldNotNull(FieldTplFileID))
 }
 
 // AttachmentsIsNil applies the IsNil predicate on the "attachments" field.
@@ -1167,14 +1164,14 @@ func AttachmentsNotNil() predicate.MsgTemplate {
 	return predicate.MsgTemplate(sql.FieldNotNull(FieldAttachments))
 }
 
-// AttachmentsEqualFold applies the EqualFold predicate on the "attachments" field.
-func AttachmentsEqualFold(v string) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldEqualFold(FieldAttachments, v))
+// AttachmentsFileIdsIsNil applies the IsNil predicate on the "attachments_file_ids" field.
+func AttachmentsFileIdsIsNil() predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldIsNull(FieldAttachmentsFileIds))
 }
 
-// AttachmentsContainsFold applies the ContainsFold predicate on the "attachments" field.
-func AttachmentsContainsFold(v string) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldContainsFold(FieldAttachments, v))
+// AttachmentsFileIdsNotNil applies the NotNil predicate on the "attachments_file_ids" field.
+func AttachmentsFileIdsNotNil() predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldNotNull(FieldAttachmentsFileIds))
 }
 
 // CommentsEQ applies the EQ predicate on the "comments" field.
@@ -1259,6 +1256,9 @@ func HasEvent() predicate.MsgTemplate {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, EventTable, EventColumn),
 		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgEvent
+		step.Edge.Schema = schemaConfig.MsgTemplate
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
@@ -1267,6 +1267,9 @@ func HasEvent() predicate.MsgTemplate {
 func HasEventWith(preds ...predicate.MsgEvent) predicate.MsgTemplate {
 	return predicate.MsgTemplate(func(s *sql.Selector) {
 		step := newEventStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgEvent
+		step.Edge.Schema = schemaConfig.MsgTemplate
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -1277,32 +1280,15 @@ func HasEventWith(preds ...predicate.MsgEvent) predicate.MsgTemplate {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.MsgTemplate) predicate.MsgTemplate {
-	return predicate.MsgTemplate(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.MsgTemplate(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.MsgTemplate) predicate.MsgTemplate {
-	return predicate.MsgTemplate(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.MsgTemplate(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.MsgTemplate) predicate.MsgTemplate {
-	return predicate.MsgTemplate(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.MsgTemplate(sql.NotPredicates(p))
 }

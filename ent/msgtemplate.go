@@ -3,13 +3,14 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -54,10 +55,14 @@ type MsgTemplate struct {
 	Bcc string `json:"bcc,omitempty"`
 	// 消息体
 	Body string `json:"body,omitempty"`
-	// 模板地址
+	// 模板地址。key：/msg/tpl/temp/1/xxx
 	Tpl string `json:"tpl,omitempty"`
-	// 附件地址,多个附件用逗号分隔
-	Attachments string `json:"attachments,omitempty"`
+	// 模板地址
+	TplFileID *int `json:"tpl_file_id,omitempty"`
+	// 附件地址。key：/msg/att/1/xxx
+	Attachments []string `json:"attachments,omitempty"`
+	// 附件ids
+	AttachmentsFileIds []int `json:"attachments_file_ids,omitempty"`
 	// 备注
 	Comments string `json:"comments,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -95,9 +100,11 @@ func (*MsgTemplate) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case msgtemplate.FieldID, msgtemplate.FieldCreatedBy, msgtemplate.FieldUpdatedBy, msgtemplate.FieldMsgTypeID, msgtemplate.FieldMsgEventID, msgtemplate.FieldTenantID:
+		case msgtemplate.FieldAttachments, msgtemplate.FieldAttachmentsFileIds:
+			values[i] = new([]byte)
+		case msgtemplate.FieldID, msgtemplate.FieldCreatedBy, msgtemplate.FieldUpdatedBy, msgtemplate.FieldMsgTypeID, msgtemplate.FieldMsgEventID, msgtemplate.FieldTenantID, msgtemplate.FieldTplFileID:
 			values[i] = new(sql.NullInt64)
-		case msgtemplate.FieldName, msgtemplate.FieldStatus, msgtemplate.FieldReceiverType, msgtemplate.FieldFormat, msgtemplate.FieldSubject, msgtemplate.FieldFrom, msgtemplate.FieldTo, msgtemplate.FieldCc, msgtemplate.FieldBcc, msgtemplate.FieldBody, msgtemplate.FieldTpl, msgtemplate.FieldAttachments, msgtemplate.FieldComments:
+		case msgtemplate.FieldName, msgtemplate.FieldStatus, msgtemplate.FieldReceiverType, msgtemplate.FieldFormat, msgtemplate.FieldSubject, msgtemplate.FieldFrom, msgtemplate.FieldTo, msgtemplate.FieldCc, msgtemplate.FieldBcc, msgtemplate.FieldBody, msgtemplate.FieldTpl, msgtemplate.FieldComments:
 			values[i] = new(sql.NullString)
 		case msgtemplate.FieldCreatedAt, msgtemplate.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -230,11 +237,28 @@ func (mt *MsgTemplate) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				mt.Tpl = value.String
 			}
-		case msgtemplate.FieldAttachments:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field attachments", values[i])
+		case msgtemplate.FieldTplFileID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field tpl_file_id", values[i])
 			} else if value.Valid {
-				mt.Attachments = value.String
+				mt.TplFileID = new(int)
+				*mt.TplFileID = int(value.Int64)
+			}
+		case msgtemplate.FieldAttachments:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field attachments", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &mt.Attachments); err != nil {
+					return fmt.Errorf("unmarshal field attachments: %w", err)
+				}
+			}
+		case msgtemplate.FieldAttachmentsFileIds:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field attachments_file_ids", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &mt.AttachmentsFileIds); err != nil {
+					return fmt.Errorf("unmarshal field attachments_file_ids: %w", err)
+				}
 			}
 		case msgtemplate.FieldComments:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -337,8 +361,16 @@ func (mt *MsgTemplate) String() string {
 	builder.WriteString("tpl=")
 	builder.WriteString(mt.Tpl)
 	builder.WriteString(", ")
+	if v := mt.TplFileID; v != nil {
+		builder.WriteString("tpl_file_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
 	builder.WriteString("attachments=")
-	builder.WriteString(mt.Attachments)
+	builder.WriteString(fmt.Sprintf("%v", mt.Attachments))
+	builder.WriteString(", ")
+	builder.WriteString("attachments_file_ids=")
+	builder.WriteString(fmt.Sprintf("%v", mt.AttachmentsFileIds))
 	builder.WriteString(", ")
 	builder.WriteString("comments=")
 	builder.WriteString(mt.Comments)

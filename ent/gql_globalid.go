@@ -12,40 +12,77 @@ import (
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/hashicorp/go-multierror"
-	"github.com/woocoos/msgcenter/ent/msgchannel"
-	"github.com/woocoos/msgcenter/ent/msgevent"
-	"github.com/woocoos/msgcenter/ent/msgsubscriber"
-	"github.com/woocoos/msgcenter/ent/msgtemplate"
-	"github.com/woocoos/msgcenter/ent/msgtype"
 )
+
+// GlobalID returns the global identifier for the given MsgAlert node.
+func (ma *MsgAlert) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("MsgAlert:%d", ma.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
 
 // GlobalID returns the global identifier for the given MsgChannel node.
 func (mc *MsgChannel) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("%s:%d", msgchannel.Table, mc.ID)
+	id := fmt.Sprintf("MsgChannel:%d", mc.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
 // GlobalID returns the global identifier for the given MsgEvent node.
 func (me *MsgEvent) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("%s:%d", msgevent.Table, me.ID)
+	id := fmt.Sprintf("MsgEvent:%d", me.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
+// GlobalID returns the global identifier for the given MsgInternal node.
+func (mi *MsgInternal) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("MsgInternal:%d", mi.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
+// GlobalID returns the global identifier for the given MsgInternalTo node.
+func (mit *MsgInternalTo) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("MsgInternalTo:%d", mit.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
 // GlobalID returns the global identifier for the given MsgSubscriber node.
 func (ms *MsgSubscriber) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("%s:%d", msgsubscriber.Table, ms.ID)
+	id := fmt.Sprintf("MsgSubscriber:%d", ms.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
 // GlobalID returns the global identifier for the given MsgTemplate node.
 func (mt *MsgTemplate) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("%s:%d", msgtemplate.Table, mt.ID)
+	id := fmt.Sprintf("MsgTemplate:%d", mt.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
 // GlobalID returns the global identifier for the given MsgType node.
 func (mt *MsgType) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("%s:%d", msgtype.Table, mt.ID)
+	id := fmt.Sprintf("MsgType:%d", mt.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
+// GlobalID returns the global identifier for the given Nlog node.
+func (n *Nlog) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("Nlog:%d", n.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
+// GlobalID returns the global identifier for the given NlogAlert node.
+func (na *NlogAlert) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("NlogAlert:%d", na.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
+// GlobalID returns the global identifier for the given Silence node.
+func (s *Silence) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("Silence:%d", s.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
+// GlobalID returns the global identifier for the given User node.
+func (u *User) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("User:%d", u.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
@@ -66,15 +103,29 @@ func FromGlobalID(s string) (*ResolvedGlobal, error) {
 // GlobalID returns the global identifier for the given type and id.
 func GlobalID(tp, id string) (string, error) {
 	switch tp {
-	case msgchannel.Table:
+	case "MsgAlert":
 		break
-	case msgevent.Table:
+	case "MsgChannel":
 		break
-	case msgsubscriber.Table:
+	case "MsgEvent":
 		break
-	case msgtemplate.Table:
+	case "MsgInternal":
 		break
-	case msgtype.Table:
+	case "MsgInternalTo":
+		break
+	case "MsgSubscriber":
+		break
+	case "MsgTemplate":
+		break
+	case "MsgType":
+		break
+	case "Nlog":
+		break
+	case "NlogAlert":
+		break
+	case "Silence":
+		break
+	case "User":
 		break
 	default:
 		return "", fmt.Errorf("invalid type %q", tp)

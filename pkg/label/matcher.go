@@ -56,7 +56,22 @@ func (m *MatchType) UnmarshalGQL(v interface{}) error {
 }
 
 func (m MatchType) MarshalGQL(w io.Writer) {
-	w.Write([]byte(strconv.Quote(m.String())))
+	gqlM := ""
+	switch m {
+	case MatchEqual:
+		gqlM = "MatchEqual"
+	case MatchNotEqual:
+		gqlM = "MatchNotEqual"
+	case MatchRegexp:
+		gqlM = "MatchRegexp"
+	case MatchNotRegexp:
+		gqlM = "MatchNotRegexp"
+	}
+	w.Write([]byte(strconv.Quote(gqlM)))
+}
+
+func (m MatchType) MarshalYAML() (interface{}, error) {
+	return m.String(), nil
 }
 
 type Matcher struct {
@@ -109,6 +124,11 @@ func (m *Matcher) UnmarshalText(in []byte) error {
 	}
 	*m = *tmp
 	return nil
+}
+
+func (m *Matcher) UnmarshalJSON(data []byte) error {
+	type cm Matcher
+	return json.Unmarshal(data, (*cm)(m))
 }
 
 // openMetricsEscape is similar to the usual string escaping, but more

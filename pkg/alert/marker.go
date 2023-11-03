@@ -1,8 +1,12 @@
 package alert
 
 import (
+	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/woocoos/msgcenter/pkg/label"
+	"github.com/woocoos/msgcenter/pkg/metrics"
+	"io"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -16,7 +20,7 @@ type Marker interface {
 	// complete set of relevant silences. If no active silence IDs are provided and
 	// InhibitedBy is already empty, it sets the provided alert to AlertStateActive.
 	// Otherwise, it sets the provided alert to AlertStateSuppressed.
-	SetActiveOrSilenced(alert label.Fingerprint, version int, activeSilenceIDs, pendingSilenceIDs []string)
+	SetActiveOrSilenced(alert label.Fingerprint, version int, activeSilenceIDs, pendingSilenceIDs []int)
 	// SetInhibited replaces the previous InhibitedBy by the provided IDs of
 	// alerts. In contrast to SetActiveOrSilenced, the set of provided IDs is not
 	// expected to represent the complete set of inhibiting alerts. (In
@@ -43,7 +47,7 @@ type Marker interface {
 	// result is based on.
 	Unprocessed(label.Fingerprint) bool
 	Active(label.Fingerprint) bool
-	Silenced(label.Fingerprint) (activeIDs, pendingIDs []string, version int, silenced bool)
+	Silenced(label.Fingerprint) (activeIDs, pendingIDs []int, version int, silenced bool)
 	Inhibited(label.Fingerprint) ([]string, bool)
 }
 
@@ -65,11 +69,11 @@ const (
 // in the future.)
 type MarkerStatus struct {
 	State       AlertState `json:"state"`
-	SilencedBy  []string   `json:"silencedBy"`
+	SilencedBy  []int      `json:"silencedBy"`
 	InhibitedBy []string   `json:"inhibitedBy"`
 
 	// For internal tracking, not exposed in the API.
-	pendingSilences []string
+	pendingSilences []int
 	silencesVersion int
 }
 
@@ -78,8 +82,11 @@ func NewMarker(r prometheus.Registerer) Marker {
 	m := &memMarker{
 		m: map[label.Fingerprint]*MarkerStatus{},
 	}
-
-	m.registerMetrics(r)
+	if metrics.Marker == nil {
+		metrics.Marker = metrics.NewMarkerMetrics(r, func(state string) float64 {
+			return float64(m.Count(AlertState(state)))
+		})
+	}
 
 	return m
 }
@@ -88,29 +95,6 @@ type memMarker struct {
 	m map[label.Fingerprint]*MarkerStatus
 
 	mtx sync.RWMutex
-}
-
-func (m *memMarker) registerMetrics(r prometheus.Registerer) {
-	newMarkedAlertMetricByState := func(st AlertState) prometheus.GaugeFunc {
-		return prometheus.NewGaugeFunc(
-			prometheus.GaugeOpts{
-				Name:        "alertmanager_marked_alerts",
-				Help:        "How many alerts by state are currently marked in the Alertmanager regardless of their expiry.",
-				ConstLabels: prometheus.Labels{"state": string(st)},
-			},
-			func() float64 {
-				return float64(m.Count(st))
-			},
-		)
-	}
-
-	alertsActive := newMarkedAlertMetricByState(AlertStateActive)
-	alertsSuppressed := newMarkedAlertMetricByState(AlertStateSuppressed)
-	alertStateUnprocessed := newMarkedAlertMetricByState(AlertStateUnprocessed)
-
-	r.MustRegister(alertsActive)
-	r.MustRegister(alertsSuppressed)
-	r.MustRegister(alertStateUnprocessed)
 }
 
 // Count implements Marker.
@@ -134,7 +118,7 @@ func (m *memMarker) Count(states ...AlertState) int {
 }
 
 // SetActiveOrSilenced implements Marker.
-func (m *memMarker) SetActiveOrSilenced(alert label.Fingerprint, version int, activeIDs, pendingIDs []string) {
+func (m *memMarker) SetActiveOrSilenced(alert label.Fingerprint, version int, activeIDs, pendingIDs []int) {
 	m.mtx.Lock()
 	defer m.mtx.Unlock()
 
@@ -191,7 +175,7 @@ func (m *memMarker) Status(alert label.Fingerprint) MarkerStatus {
 	}
 	return MarkerStatus{
 		State:       AlertStateUnprocessed,
-		SilencedBy:  []string{},
+		SilencedBy:  []int{},
 		InhibitedBy: []string{},
 	}
 }
@@ -224,7 +208,7 @@ func (m *memMarker) Inhibited(alert label.Fingerprint) ([]string, bool) {
 // Silenced returns whether the alert for the given Fingerprint is in the
 // Silenced state, any associated silence IDs, and the silences state version
 // the result is based on.
-func (m *memMarker) Silenced(alert label.Fingerprint) (activeIDs, pendingIDs []string, version int, silenced bool) {
+func (m *memMarker) Silenced(alert label.Fingerprint) (activeIDs, pendingIDs []int, version int, silenced bool) {
 	s := m.Status(alert)
 	return s.SilencedBy, s.pendingSilences, s.silencesVersion,
 		s.State == AlertStateSuppressed && len(s.SilencedBy) > 0
@@ -243,42 +227,6 @@ type MuteFunc func(label.LabelSet) bool
 // Mutes implements the Muter interface.
 func (f MuteFunc) Mutes(lset label.LabelSet) bool { return f(lset) }
 
-// A Silence determines whether a given label set is muted.
-type Silence struct {
-	// A unique identifier across all connected instances.
-	ID string `json:"id"`
-	// A set of matchers determining if a label set is affected
-	// by the silence.
-	Matchers label.Matchers `json:"matchers"`
-
-	// Time range of the silence.
-	//
-	// * StartsAt must not be before creation time
-	// * EndsAt must be after StartsAt
-	// * Deleting a silence means to set EndsAt to now
-	// * Time range must not be modified in different ways
-	//
-	// TODO(fabxc): this may potentially be extended by
-	// creation and update timestamps.
-	StartsAt time.Time `json:"startsAt"`
-	EndsAt   time.Time `json:"endsAt"`
-
-	// The last time the silence was updated.
-	UpdatedAt time.Time `json:"updatedAt"`
-
-	// Information about who created the silence for which reason.
-	CreatedBy string `json:"createdBy"`
-	Comment   string `json:"comment,omitempty"`
-
-	Status SilenceStatus `json:"status"`
-}
-
-// Expired return if the silence is expired
-// meaning that both StartsAt and EndsAt are equal
-func (s *Silence) Expired() bool {
-	return s.StartsAt.Equal(s.EndsAt)
-}
-
 // SilenceStatus stores the state of a silence.
 type SilenceStatus struct {
 	State SilenceState `json:"state"`
@@ -293,6 +241,43 @@ const (
 	SilenceStateActive  SilenceState = "active"
 	SilenceStatePending SilenceState = "pending"
 )
+
+func (s *SilenceState) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", v)
+	}
+	*s = SilenceState(str)
+	if !s.IsValid() {
+		return fmt.Errorf("%s is not a valid SilenceState", str)
+	}
+	return nil
+}
+
+func (s SilenceState) IsValid() bool {
+	switch s {
+	case SilenceStateExpired, SilenceStateActive, SilenceStatePending:
+		return true
+	}
+	return false
+}
+
+func (s SilenceState) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(s.String()))
+}
+
+func (s SilenceState) Values() []string {
+	return []string{
+		string(SilenceStateExpired),
+		string(SilenceStateActive),
+		string(SilenceStatePending),
+	}
+}
+
+// String implements fmt.Stringer.
+func (s SilenceState) String() string {
+	return string(s)
+}
 
 // CalcSilenceState returns the SilenceState that a silence with the given start
 // and end time would have right now.

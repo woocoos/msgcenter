@@ -8,7 +8,7 @@ import (
 
 // A Route is a node that contains definitions of how to handle alerts.
 type Route struct {
-	Name                string            `yaml:"-" json:"-"`
+	Name                string            `yaml:"name,omitempty" json:"name,omitempty"`
 	Receiver            string            `yaml:"receiver,omitempty" json:"receiver,omitempty"`
 	GroupBy             []label.LabelName `yaml:"groupBy,omitempty" json:"groupBy,omitempty"`
 	GroupByAll          bool              `yaml:"-" json:"-"`

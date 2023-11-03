@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 	tmplhtml "html/template"
 	"io/fs"
 	"net/url"
@@ -20,39 +18,25 @@ import (
 )
 
 var (
-	//go:embed *
+	//go:embed tpl/*.tmpl
 	templateDir embed.FS
 )
 
-var DefaultFuncs = map[string]any{
-	"toUpper": strings.ToUpper,
-	"toLower": strings.ToLower,
-	"title": func(text string) string {
-		// Casers should not be shared between goroutines, instead
-		// create a new caser each time this function is called.
-		return cases.Title(language.AmericanEnglish).String(text)
-	},
-	"trimSpace": strings.TrimSpace,
-	// join is equal to strings.Join but inverts the argument order
-	// for easier pipelining in templates.
-	"join": func(sep string, s []string) string {
-		return strings.Join(s, sep)
-	},
-	"match": regexp.MatchString,
-	"safeHtml": func(text string) tmplhtml.HTML {
-		return tmplhtml.HTML(text)
-	},
-	"reReplaceAll": func(pattern, repl, text string) string {
-		re := regexp.MustCompile(pattern)
-		return re.ReplaceAllString(text, repl)
-	},
-	"stringSlice": func(s ...string) []string {
-		return s
-	},
+// Config stores configuration for template.
+type Config struct {
+	// path for custom template
+	BaseDir string
+	// path for temporary template
+	TmpDir string
+	// path for active template dir
+	DataDir string
+	// path for attachment
+	AttachmentDir string
 }
 
 // Template bundles a text and a html template instance.
 type Template struct {
+	Config
 	text *tmpltext.Template
 	html *tmplhtml.Template
 
@@ -76,7 +60,7 @@ func New(options ...Option) (*Template, error) {
 	}
 	t.text.Funcs(DefaultFuncs)
 	t.html.Funcs(DefaultFuncs)
-	MustParse(t.ParseFS(templateDir, "*.tmpl"))
+	MustParse(t.ParseFS(templateDir, "tpl/*.tmpl"))
 	return t, nil
 }
 
@@ -203,7 +187,7 @@ func (t *Template) Data(recv string, groupLabels label.LabelSet, alerts ...*aler
 	data := &Data{
 		Receiver:          regexp.QuoteMeta(recv),
 		Status:            string(alert.Alerts(alerts).Status()),
-		Alerts:            make([]alert.Alert, 0, len(alerts)),
+		Alerts:            make(Alerts, 0, len(alerts)),
 		GroupLabels:       KV{},
 		CommonLabels:      KV{},
 		CommonAnnotations: KV{},
@@ -213,11 +197,26 @@ func (t *Template) Data(recv string, groupLabels label.LabelSet, alerts ...*aler
 	}
 
 	for _, a := range alerts {
-		data.Alerts = append(data.Alerts, *a.Clone())
+		da := Alert{
+			Status:       string(a.Status()),
+			Labels:       make(KV, len(a.Labels)),
+			Annotations:  make(KV, len(a.Annotations)),
+			StartsAt:     a.StartsAt,
+			EndsAt:       a.EndsAt,
+			GeneratorURL: a.GeneratorURL,
+			Fingerprint:  a.Fingerprint().String(),
+		}
+		for k, v := range a.Labels {
+			da.Labels[string(k)] = v
+		}
+		for k, v := range a.Annotations {
+			da.Annotations[string(k)] = v
+		}
+		data.Alerts = append(data.Alerts, da)
 	}
 
 	for k, v := range groupLabels {
-		data.GroupLabels[string(k)] = string(v)
+		data.GroupLabels[string(k)] = v
 	}
 
 	if len(alerts) >= 1 {
@@ -241,10 +240,10 @@ func (t *Template) Data(recv string, groupLabels label.LabelSet, alerts ...*aler
 			}
 		}
 		for k, v := range commonLabels {
-			data.CommonLabels[string(k)] = string(v)
+			data.CommonLabels[string(k)] = v
 		}
 		for k, v := range commonAnnotations {
-			data.CommonAnnotations[string(k)] = string(v)
+			data.CommonAnnotations[string(k)] = v
 		}
 	}
 

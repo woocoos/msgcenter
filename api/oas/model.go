@@ -5,21 +5,33 @@ package oas
 import "time"
 
 type Alert struct {
-	GeneratorURL string   `binding:"uri,omitempty" json:"generatorURL,omitempty"`
-	Labels       LabelSet `binding:"required" json:"labels"`
+	GeneratorURL string `binding:"omitempty,uri" json:"generatorURL,omitempty"`
+	// Labels A set of labels. Labels are key/value pairs that are attached to
+	// alerts. Labels are used to specify identifying attributes of alerts,
+	// such as their tenant, user , instance, and job.
+	// tenant: specific tenant id.
+	// user: specific user id. the user is the notify target. Some notification need info from user, such as email address.
+	// alertname: the name of alert.it is also the event name.
+	Labels LabelSet `binding:"required" json:"labels"`
 }
 
 type AlertGroup struct {
-	Alerts   []*GettableAlert `binding:"required" json:"alerts"`
-	Labels   LabelSet         `binding:"required" json:"labels"`
-	Receiver Receiver         `binding:"required" json:"receiver"`
+	Alerts []*GettableAlert `binding:"required" json:"alerts"`
+	// Labels A set of labels. Labels are key/value pairs that are attached to
+	// alerts. Labels are used to specify identifying attributes of alerts,
+	// such as their tenant, user , instance, and job.
+	// tenant: specific tenant id.
+	// user: specific user id. the user is the notify target. Some notification need info from user, such as email address.
+	// alertname: the name of alert.it is also the event name.
+	Labels   LabelSet `binding:"required" json:"labels"`
+	Receiver Receiver `binding:"required" json:"receiver"`
 }
 
 type AlertGroups []*AlertGroup
 
 type AlertStatus struct {
 	InhibitedBy []string `binding:"required" json:"inhibitedBy"`
-	SilencedBy  []string `binding:"required" json:"silencedBy"`
+	SilencedBy  []int    `binding:"required" json:"silencedBy"`
 	State       string   `binding:"required" json:"state"`
 }
 
@@ -30,7 +42,7 @@ type AlertmanagerConfig struct {
 type AlertmanagerStatus struct {
 	Cluster     ClusterStatus      `binding:"required" json:"cluster"`
 	Config      AlertmanagerConfig `json:"config"`
-	Uptime      time.Time          `time_format:"2006-01-02T15:04:05Z07:00" binding:"required" json:"uptime"`
+	Uptime      time.Time          `binding:"required" json:"uptime" time_format:"2006-01-02T15:04:05Z07:00"`
 	VersionInfo VersionInfo        `binding:"required" json:"versionInfo"`
 }
 
@@ -41,27 +53,39 @@ type ClusterStatus struct {
 }
 
 type GettableAlert struct {
-	*Alert      `json:",inline"`
+	*Alert `json:",inline"`
+	// Annotations A set of labels. Labels are key/value pairs that are attached to
+	// alerts. Labels are used to specify identifying attributes of alerts,
+	// such as their tenant, user , instance, and job.
+	// tenant: specific tenant id.
+	// user: specific user id. the user is the notify target. Some notification need info from user, such as email address.
+	// alertname: the name of alert.it is also the event name.
 	Annotations LabelSet    `binding:"required" json:"annotations"`
-	EndsAt      time.Time   `time_format:"2006-01-02T15:04:05Z07:00" binding:"required" json:"endsAt"`
+	EndsAt      time.Time   `binding:"required" json:"endsAt" time_format:"2006-01-02T15:04:05Z07:00"`
 	Fingerprint string      `binding:"required" json:"fingerprint"`
 	Receivers   []*Receiver `binding:"required" json:"receivers"`
-	StartsAt    time.Time   `time_format:"2006-01-02T15:04:05Z07:00" binding:"required" json:"startsAt"`
+	StartsAt    time.Time   `binding:"required" json:"startsAt" time_format:"2006-01-02T15:04:05Z07:00"`
 	Status      AlertStatus `json:"status"`
-	UpdatedAt   time.Time   `time_format:"2006-01-02T15:04:05Z07:00" binding:"required" json:"updatedAt"`
+	UpdatedAt   time.Time   `binding:"required" json:"updatedAt" time_format:"2006-01-02T15:04:05Z07:00"`
 }
 
 type GettableAlerts []*GettableAlert
 
 type GettableSilence struct {
 	*Silence  `json:",inline"`
-	ID        string        `binding:"required" json:"id"`
+	ID        int           `binding:"required" json:"id"`
 	Status    SilenceStatus `binding:"required" json:"status"`
-	UpdatedAt time.Time     `time_format:"2006-01-02T15:04:05Z07:00" binding:"required" json:"updatedAt"`
+	UpdatedAt time.Time     `binding:"required" json:"updatedAt" time_format:"2006-01-02T15:04:05Z07:00"`
 }
 
 type GettableSilences []*GettableSilence
 
+// LabelSet A set of labels. Labels are key/value pairs that are attached to
+// alerts. Labels are used to specify identifying attributes of alerts,
+// such as their tenant, user , instance, and job.
+// tenant: specific tenant id.
+// user: specific user id. the user is the notify target. Some notification need info from user, such as email address.
+// alertname: the name of alert.it is also the event name.
 type LabelSet map[string]string
 
 type Matcher struct {
@@ -79,17 +103,23 @@ type PeerStatus struct {
 }
 
 type PostableAlert struct {
-	*Alert      `json:",inline"`
+	*Alert `json:",inline"`
+	// Annotations A set of labels. Labels are key/value pairs that are attached to
+	// alerts. Labels are used to specify identifying attributes of alerts,
+	// such as their tenant, user , instance, and job.
+	// tenant: specific tenant id.
+	// user: specific user id. the user is the notify target. Some notification need info from user, such as email address.
+	// alertname: the name of alert.it is also the event name.
 	Annotations LabelSet  `json:"annotations,omitempty"`
-	EndsAt      time.Time `time_format:"2006-01-02T15:04:05Z07:00" json:"endsAt,omitempty"`
-	StartsAt    time.Time `time_format:"2006-01-02T15:04:05Z07:00" json:"startsAt,omitempty"`
+	EndsAt      time.Time `json:"endsAt,omitempty" time_format:"2006-01-02T15:04:05Z07:00"`
+	StartsAt    time.Time `json:"startsAt,omitempty" time_format:"2006-01-02T15:04:05Z07:00"`
 }
 
 type PostableAlerts []*PostableAlert
 
 type PostableSilence struct {
 	*Silence `json:",inline"`
-	ID       string `json:"id,omitempty"`
+	ID       int `json:"id,omitempty"`
 }
 
 type Receiver struct {
@@ -98,10 +128,11 @@ type Receiver struct {
 
 type Silence struct {
 	Comment   string    `binding:"required" json:"comment"`
-	CreatedBy string    `binding:"required" json:"createdBy"`
-	EndsAt    time.Time `time_format:"2006-01-02T15:04:05Z07:00" binding:"gt,required" json:"endsAt"`
-	Matchers  Matchers  `binding:"min=1,omitempty" json:"matchers"`
-	StartsAt  time.Time `time_format:"2006-01-02T15:04:05Z07:00" binding:"ltfield=EndsAt,required" json:"startsAt"`
+	CreatedBy int       `binding:"required" json:"createdBy"`
+	EndsAt    time.Time `binding:"gt,required" json:"endsAt" time_format:"2006-01-02T15:04:05Z07:00"`
+	Matchers  Matchers  `binding:"omitempty,min=1" json:"matchers"`
+	StartsAt  time.Time `binding:"ltfield=EndsAt,required" json:"startsAt" time_format:"2006-01-02T15:04:05Z07:00"`
+	TenantID  int       `binding:"required" json:"tenantID"`
 }
 
 type SilenceStatus struct {

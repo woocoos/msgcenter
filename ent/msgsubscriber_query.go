@@ -13,6 +13,9 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
+	"github.com/woocoos/msgcenter/ent/user"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // MsgSubscriberQuery is the builder for querying MsgSubscriber entities.
@@ -23,6 +26,7 @@ type MsgSubscriberQuery struct {
 	inters      []Interceptor
 	predicates  []predicate.MsgSubscriber
 	withMsgType *MsgTypeQuery
+	withUser    *UserQuery
 	modifiers   []func(*sql.Selector)
 	loadTotal   []func(context.Context, []*MsgSubscriber) error
 	// intermediate query (i.e. traversal path).
@@ -77,6 +81,34 @@ func (msq *MsgSubscriberQuery) QueryMsgType() *MsgTypeQuery {
 			sqlgraph.To(msgtype.Table, msgtype.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, msgsubscriber.MsgTypeTable, msgsubscriber.MsgTypeColumn),
 		)
+		schemaConfig := msq.schemaConfig
+		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgSubscriber
+		fromU = sqlgraph.SetNeighbors(msq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryUser chains the current query on the "user" edge.
+func (msq *MsgSubscriberQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: msq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := msq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := msq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msgsubscriber.Table, msgsubscriber.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, msgsubscriber.UserTable, msgsubscriber.UserColumn),
+		)
+		schemaConfig := msq.schemaConfig
+		step.To.Schema = schemaConfig.User
+		step.Edge.Schema = schemaConfig.MsgSubscriber
 		fromU = sqlgraph.SetNeighbors(msq.driver.Dialect(), step)
 		return fromU, nil
 	}
@@ -276,6 +308,7 @@ func (msq *MsgSubscriberQuery) Clone() *MsgSubscriberQuery {
 		inters:      append([]Interceptor{}, msq.inters...),
 		predicates:  append([]predicate.MsgSubscriber{}, msq.predicates...),
 		withMsgType: msq.withMsgType.Clone(),
+		withUser:    msq.withUser.Clone(),
 		// clone intermediate query.
 		sql:  msq.sql.Clone(),
 		path: msq.path,
@@ -290,6 +323,17 @@ func (msq *MsgSubscriberQuery) WithMsgType(opts ...func(*MsgTypeQuery)) *MsgSubs
 		opt(query)
 	}
 	msq.withMsgType = query
+	return msq
+}
+
+// WithUser tells the query-builder to eager-load the nodes that are connected to
+// the "user" edge. The optional arguments are used to configure the query builder of the edge.
+func (msq *MsgSubscriberQuery) WithUser(opts ...func(*UserQuery)) *MsgSubscriberQuery {
+	query := (&UserClient{config: msq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	msq.withUser = query
 	return msq
 }
 
@@ -371,8 +415,9 @@ func (msq *MsgSubscriberQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 	var (
 		nodes       = []*MsgSubscriber{}
 		_spec       = msq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			msq.withMsgType != nil,
+			msq.withUser != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -384,6 +429,8 @@ func (msq *MsgSubscriberQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	_spec.Node.Schema = msq.schemaConfig.MsgSubscriber
+	ctx = internal.NewSchemaConfigContext(ctx, msq.schemaConfig)
 	if len(msq.modifiers) > 0 {
 		_spec.Modifiers = msq.modifiers
 	}
@@ -399,6 +446,12 @@ func (msq *MsgSubscriberQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 	if query := msq.withMsgType; query != nil {
 		if err := msq.loadMsgType(ctx, query, nodes, nil,
 			func(n *MsgSubscriber, e *MsgType) { n.Edges.MsgType = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := msq.withUser; query != nil {
+		if err := msq.loadUser(ctx, query, nodes, nil,
+			func(n *MsgSubscriber, e *User) { n.Edges.User = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -439,9 +492,40 @@ func (msq *MsgSubscriberQuery) loadMsgType(ctx context.Context, query *MsgTypeQu
 	}
 	return nil
 }
+func (msq *MsgSubscriberQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*MsgSubscriber, init func(*MsgSubscriber), assign func(*MsgSubscriber, *User)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*MsgSubscriber)
+	for i := range nodes {
+		fk := nodes[i].UserID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(user.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "user_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
 func (msq *MsgSubscriberQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := msq.querySpec()
+	_spec.Node.Schema = msq.schemaConfig.MsgSubscriber
+	ctx = internal.NewSchemaConfigContext(ctx, msq.schemaConfig)
 	if len(msq.modifiers) > 0 {
 		_spec.Modifiers = msq.modifiers
 	}
@@ -470,6 +554,9 @@ func (msq *MsgSubscriberQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if msq.withMsgType != nil {
 			_spec.Node.AddColumnOnce(msgsubscriber.FieldMsgTypeID)
+		}
+		if msq.withUser != nil {
+			_spec.Node.AddColumnOnce(msgsubscriber.FieldUserID)
 		}
 	}
 	if ps := msq.predicates; len(ps) > 0 {
@@ -510,6 +597,9 @@ func (msq *MsgSubscriberQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if msq.ctx.Unique != nil && *msq.ctx.Unique {
 		selector.Distinct()
 	}
+	t1.Schema(msq.schemaConfig.MsgSubscriber)
+	ctx = internal.NewSchemaConfigContext(ctx, msq.schemaConfig)
+	selector.WithContext(ctx)
 	for _, p := range msq.predicates {
 		p(selector)
 	}

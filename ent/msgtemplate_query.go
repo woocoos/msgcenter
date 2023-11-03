@@ -13,6 +13,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // MsgTemplateQuery is the builder for querying MsgTemplate entities.
@@ -77,6 +79,9 @@ func (mtq *MsgTemplateQuery) QueryEvent() *MsgEventQuery {
 			sqlgraph.To(msgevent.Table, msgevent.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, msgtemplate.EventTable, msgtemplate.EventColumn),
 		)
+		schemaConfig := mtq.schemaConfig
+		step.To.Schema = schemaConfig.MsgEvent
+		step.Edge.Schema = schemaConfig.MsgTemplate
 		fromU = sqlgraph.SetNeighbors(mtq.driver.Dialect(), step)
 		return fromU, nil
 	}
@@ -384,6 +389,8 @@ func (mtq *MsgTemplateQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	_spec.Node.Schema = mtq.schemaConfig.MsgTemplate
+	ctx = internal.NewSchemaConfigContext(ctx, mtq.schemaConfig)
 	if len(mtq.modifiers) > 0 {
 		_spec.Modifiers = mtq.modifiers
 	}
@@ -442,6 +449,8 @@ func (mtq *MsgTemplateQuery) loadEvent(ctx context.Context, query *MsgEventQuery
 
 func (mtq *MsgTemplateQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := mtq.querySpec()
+	_spec.Node.Schema = mtq.schemaConfig.MsgTemplate
+	ctx = internal.NewSchemaConfigContext(ctx, mtq.schemaConfig)
 	if len(mtq.modifiers) > 0 {
 		_spec.Modifiers = mtq.modifiers
 	}
@@ -510,6 +519,9 @@ func (mtq *MsgTemplateQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if mtq.ctx.Unique != nil && *mtq.ctx.Unique {
 		selector.Distinct()
 	}
+	t1.Schema(mtq.schemaConfig.MsgTemplate)
+	ctx = internal.NewSchemaConfigContext(ctx, mtq.schemaConfig)
+	selector.WithContext(ctx)
 	for _, p := range mtq.predicates {
 		p(selector)
 	}

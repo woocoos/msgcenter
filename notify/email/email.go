@@ -13,26 +13,35 @@ import (
 	"strings"
 )
 
-type Email struct {
+// Notifier email notifier
+//
+// tmpl include all of receiver's template.
+type Notifier struct {
 	config        *profile.EmailConfig
 	tmpl          *template.Template
 	hostname      string
 	customTplFunc notify.CustomerConfigFunc[profile.EmailConfig]
 }
 
-func NewEmail(c *profile.EmailConfig, tmpl *template.Template, fn notify.CustomerConfigFunc[profile.EmailConfig]) *Email {
-	return &Email{
-		config:        c,
-		tmpl:          tmpl,
-		customTplFunc: fn,
-	}
+func (n *Notifier) SendResolved() bool {
+	return n.config.SendResolved
 }
 
-func (n *Email) getPassword() (string, error) {
+func New(cfg *profile.EmailConfig, tmpl *template.Template, fn notify.CustomerConfigFunc[profile.EmailConfig],
+) (*Notifier, error) {
+	return &Notifier{
+		config:        cfg,
+		tmpl:          tmpl,
+		customTplFunc: fn,
+	}, nil
+}
+
+func (n *Notifier) getPassword() (string, error) {
 	return n.config.AuthPassword, nil
 }
 
-func (n *Email) CustomConfig(ctx context.Context) (*profile.EmailConfig, error) {
+// CustomConfig returns a custom config for the notifier.
+func (n *Notifier) CustomConfig(ctx context.Context) (*profile.EmailConfig, error) {
 	if n.customTplFunc == nil {
 		return n.config, nil
 	}
@@ -40,14 +49,19 @@ func (n *Email) CustomConfig(ctx context.Context) (*profile.EmailConfig, error) 
 	if !ok {
 		return n.config, nil
 	}
-	cfg, err := n.customTplFunc(ctx, n.config.Clone(), labels)
+	cfg := n.config.Clone()
+	err := n.customTplFunc(ctx, cfg, labels)
 	if err != nil {
 		return nil, err
 	}
-	return &cfg, nil
+	return cfg, nil
 }
 
-func (n *Email) Notify(ctx context.Context, alerts ...*alert.Alert) (ok bool, err error) {
+// Notify implements the Notifier interface.
+//
+// It should load customer config from DB and render the template every called.
+// See service.overrideEmailConfig for more details
+func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bool, err error) {
 	email := mail.NewEmailMsg()
 	data := notify.GetTemplateData(ctx, n.tmpl, alerts)
 	tmpl := notify.TmplText(n.tmpl, data, &err)
@@ -66,7 +80,7 @@ func (n *Email) Notify(ctx context.Context, alerts ...*alert.Alert) (ok bool, er
 	if err != nil {
 		return false, fmt.Errorf("execute 'to' template: %w", err)
 	}
-	email.AddTo(to)
+	email.AddTo(strings.Split(to, ",")...)
 
 	sub := tmpl(config.Subject)
 	if err != nil {
@@ -96,6 +110,22 @@ func (n *Email) Notify(ctx context.Context, alerts ...*alert.Alert) (ok bool, er
 				if _, err = email.AttachFile(a); err != nil {
 					return false, err
 				}
+			}
+		case "cc":
+			value, err := n.tmpl.ExecuteTextString(t, data)
+			if err != nil {
+				return false, fmt.Errorf("execute %q header template: %w", header, err)
+			}
+			if value != "" {
+				email.AddCc(strings.Split(value, ",")...)
+			}
+		case "bcc":
+			value, err := n.tmpl.ExecuteTextString(t, data)
+			if err != nil {
+				return false, fmt.Errorf("execute %q header template: %w", header, err)
+			}
+			if value != "" {
+				email.AddBcc(strings.Split(value, ",")...)
 			}
 		default:
 			value, err := n.tmpl.ExecuteTextString(t, data)

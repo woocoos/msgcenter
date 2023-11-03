@@ -1,0 +1,14 @@
+projects:
+  msgsrv:
+    schema: "web/script/generated/msgsrv.graphql"
+    documents:
+      - "web/src/services/msgsrv/**/*.ts"
+      - "web/script/generated/msgsrv.graphql"
+    extensions:
+      endpoints:
+        default:
+          schema: "api/graphql/*.graphql"
+  main:
+    schema: "api/graphql/*.graphql"
+    documents:
+      - "api/graphql/*.graphql"

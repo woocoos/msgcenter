@@ -7,12 +7,19 @@ import (
 	"fmt"
 	"github.com/tsingsun/woocoo/pkg/gds"
 	"sort"
+	"strconv"
 	"unicode/utf8"
 )
 
 const (
+	// AlertNameLabel is the label name for the alert name which called event name.
 	AlertNameLabel = "alertname"
-	TenantLabel    = "tenant"
+	// TenantLabel is the label name for the tenant id.
+	TenantLabel = "tenant"
+	// ToUserIDLabel is the label name for the user id. The alert belong to the user.It could be multiple users split by comma.
+	ToUserIDLabel = "user"
+	// SkipSubscribeLabel indicates if the alert is from Event Subs or skip Event Subs.
+	SkipSubscribeLabel = "skipSub"
 )
 
 type LabelName string
@@ -159,6 +166,22 @@ type Fingerprint uint64
 
 func (f Fingerprint) String() string {
 	return fmt.Sprintf("%016x", uint64(f))
+}
+
+func (f *Fingerprint) Parse(s string) error {
+	v, err := strconv.ParseUint(s, 16, 64)
+	if err != nil {
+		return err
+	}
+	*f = Fingerprint(v)
+	return nil
+}
+
+// StringToFingerprint parses a string representation of a Fingerprint.
+func StringToFingerprint(s string) (Fingerprint, error) {
+	var f Fingerprint
+	err := f.Parse(s)
+	return f, err
 }
 
 // labelSetToFingerprint works exactly as LabelsToSignature but takes a LabelSet as

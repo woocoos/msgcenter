@@ -8,8 +8,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
+	"github.com/woocoos/msgcenter/ent/msgchannel"
 )
 
 // MsgChannelDelete is the builder for deleting a MsgChannel entity.
@@ -41,6 +43,8 @@ func (mcd *MsgChannelDelete) ExecX(ctx context.Context) int {
 
 func (mcd *MsgChannelDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(msgchannel.Table, sqlgraph.NewFieldSpec(msgchannel.FieldID, field.TypeInt))
+	_spec.Node.Schema = mcd.schemaConfig.MsgChannel
+	ctx = internal.NewSchemaConfigContext(ctx, mcd.schemaConfig)
 	if ps := mcd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

@@ -8,6 +8,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // ID filters vertices based on their ID field.
@@ -88,6 +90,11 @@ func TenantID(v int) predicate.MsgSubscriber {
 // UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
 func UserID(v int) predicate.MsgSubscriber {
 	return predicate.MsgSubscriber(sql.FieldEQ(FieldUserID, v))
+}
+
+// OrgRoleID applies equality check predicate on the "org_role_id" field. It's identical to OrgRoleIDEQ.
+func OrgRoleID(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldEQ(FieldOrgRoleID, v))
 }
 
 // Exclude applies equality check predicate on the "exclude" field. It's identical to ExcludeEQ.
@@ -355,24 +362,64 @@ func UserIDNotIn(vs ...int) predicate.MsgSubscriber {
 	return predicate.MsgSubscriber(sql.FieldNotIn(FieldUserID, vs...))
 }
 
-// UserIDGT applies the GT predicate on the "user_id" field.
-func UserIDGT(v int) predicate.MsgSubscriber {
-	return predicate.MsgSubscriber(sql.FieldGT(FieldUserID, v))
+// UserIDIsNil applies the IsNil predicate on the "user_id" field.
+func UserIDIsNil() predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldIsNull(FieldUserID))
 }
 
-// UserIDGTE applies the GTE predicate on the "user_id" field.
-func UserIDGTE(v int) predicate.MsgSubscriber {
-	return predicate.MsgSubscriber(sql.FieldGTE(FieldUserID, v))
+// UserIDNotNil applies the NotNil predicate on the "user_id" field.
+func UserIDNotNil() predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldNotNull(FieldUserID))
 }
 
-// UserIDLT applies the LT predicate on the "user_id" field.
-func UserIDLT(v int) predicate.MsgSubscriber {
-	return predicate.MsgSubscriber(sql.FieldLT(FieldUserID, v))
+// OrgRoleIDEQ applies the EQ predicate on the "org_role_id" field.
+func OrgRoleIDEQ(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldEQ(FieldOrgRoleID, v))
 }
 
-// UserIDLTE applies the LTE predicate on the "user_id" field.
-func UserIDLTE(v int) predicate.MsgSubscriber {
-	return predicate.MsgSubscriber(sql.FieldLTE(FieldUserID, v))
+// OrgRoleIDNEQ applies the NEQ predicate on the "org_role_id" field.
+func OrgRoleIDNEQ(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldNEQ(FieldOrgRoleID, v))
+}
+
+// OrgRoleIDIn applies the In predicate on the "org_role_id" field.
+func OrgRoleIDIn(vs ...int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldIn(FieldOrgRoleID, vs...))
+}
+
+// OrgRoleIDNotIn applies the NotIn predicate on the "org_role_id" field.
+func OrgRoleIDNotIn(vs ...int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldNotIn(FieldOrgRoleID, vs...))
+}
+
+// OrgRoleIDGT applies the GT predicate on the "org_role_id" field.
+func OrgRoleIDGT(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldGT(FieldOrgRoleID, v))
+}
+
+// OrgRoleIDGTE applies the GTE predicate on the "org_role_id" field.
+func OrgRoleIDGTE(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldGTE(FieldOrgRoleID, v))
+}
+
+// OrgRoleIDLT applies the LT predicate on the "org_role_id" field.
+func OrgRoleIDLT(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldLT(FieldOrgRoleID, v))
+}
+
+// OrgRoleIDLTE applies the LTE predicate on the "org_role_id" field.
+func OrgRoleIDLTE(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldLTE(FieldOrgRoleID, v))
+}
+
+// OrgRoleIDIsNil applies the IsNil predicate on the "org_role_id" field.
+func OrgRoleIDIsNil() predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldIsNull(FieldOrgRoleID))
+}
+
+// OrgRoleIDNotNil applies the NotNil predicate on the "org_role_id" field.
+func OrgRoleIDNotNil() predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldNotNull(FieldOrgRoleID))
 }
 
 // ExcludeEQ applies the EQ predicate on the "exclude" field.
@@ -402,6 +449,9 @@ func HasMsgType() predicate.MsgSubscriber {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, MsgTypeTable, MsgTypeColumn),
 		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgSubscriber
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
@@ -410,6 +460,38 @@ func HasMsgType() predicate.MsgSubscriber {
 func HasMsgTypeWith(preds ...predicate.MsgType) predicate.MsgSubscriber {
 	return predicate.MsgSubscriber(func(s *sql.Selector) {
 		step := newMsgTypeStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgSubscriber
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasUser applies the HasEdge predicate on the "user" edge.
+func HasUser() predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, UserTable, UserColumn),
+		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.User
+		step.Edge.Schema = schemaConfig.MsgSubscriber
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
+func HasUserWith(preds ...predicate.User) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(func(s *sql.Selector) {
+		step := newUserStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.User
+		step.Edge.Schema = schemaConfig.MsgSubscriber
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -420,32 +502,15 @@ func HasMsgTypeWith(preds ...predicate.MsgType) predicate.MsgSubscriber {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.MsgSubscriber) predicate.MsgSubscriber {
-	return predicate.MsgSubscriber(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.MsgSubscriber(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.MsgSubscriber) predicate.MsgSubscriber {
-	return predicate.MsgSubscriber(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.MsgSubscriber(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.MsgSubscriber) predicate.MsgSubscriber {
-	return predicate.MsgSubscriber(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.MsgSubscriber(sql.NotPredicates(p))
 }

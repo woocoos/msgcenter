@@ -6,11 +6,14 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"sync/atomic"
 
+	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
+	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
 )
 
@@ -30,9 +33,14 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	MsgAlert() MsgAlertResolver
+	MsgEvent() MsgEventResolver
+	MsgInternal() MsgInternalResolver
+	MsgType() MsgTypeResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 	Route() RouteResolver
+	Subscription() SubscriptionResolver
 	RouteInput() RouteInputResolver
 }
 
@@ -46,14 +54,68 @@ type ComplexityRoot struct {
 		AuthSecret   func(childComplexity int) int
 		AuthType     func(childComplexity int) int
 		AuthUsername func(childComplexity int) int
+		From         func(childComplexity int) int
 		Headers      func(childComplexity int) int
 		SmartHost    func(childComplexity int) int
+		To           func(childComplexity int) int
 	}
 
 	Matcher struct {
 		Name  func(childComplexity int) int
 		Type  func(childComplexity int) int
 		Value func(childComplexity int) int
+	}
+
+	Message struct {
+		Content func(childComplexity int) int
+		Extras  func(childComplexity int) int
+		Format  func(childComplexity int) int
+		SendAt  func(childComplexity int) int
+		Title   func(childComplexity int) int
+		Topic   func(childComplexity int) int
+		URL     func(childComplexity int) int
+	}
+
+	MessageConfig struct {
+		Redirect func(childComplexity int) int
+		Subject  func(childComplexity int) int
+		To       func(childComplexity int) int
+	}
+
+	MessageFilter struct {
+		AppCode  func(childComplexity int) int
+		DeviceID func(childComplexity int) int
+		TenantID func(childComplexity int) int
+		UserID   func(childComplexity int) int
+	}
+
+	MsgAlert struct {
+		Annotations func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		Deleted     func(childComplexity int) int
+		EndsAt      func(childComplexity int) int
+		Fingerprint func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Labels      func(childComplexity int) int
+		Nlog        func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.NlogOrder, where *ent.NlogWhereInput) int
+		NlogAlerts  func(childComplexity int) int
+		StartsAt    func(childComplexity int) int
+		State       func(childComplexity int) int
+		TenantID    func(childComplexity int) int
+		Timeout     func(childComplexity int) int
+		URL         func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
+	}
+
+	MsgAlertConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgAlertEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
 	}
 
 	MsgChannel struct {
@@ -70,6 +132,17 @@ type ComplexityRoot struct {
 		UpdatedBy    func(childComplexity int) int
 	}
 
+	MsgChannelConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgChannelEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
 	MsgEvent struct {
 		Comments         func(childComplexity int) int
 		CreatedAt        func(childComplexity int) int
@@ -81,9 +154,72 @@ type ComplexityRoot struct {
 		MsgTypeID        func(childComplexity int) int
 		Name             func(childComplexity int) int
 		Route            func(childComplexity int) int
+		RouteStr         func(childComplexity int, typeArg model.RouteStrType) int
 		Status           func(childComplexity int) int
 		UpdatedAt        func(childComplexity int) int
 		UpdatedBy        func(childComplexity int) int
+	}
+
+	MsgEventConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgEventEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	MsgInternal struct {
+		Body          func(childComplexity int) int
+		Category      func(childComplexity int) int
+		CreatedAt     func(childComplexity int) int
+		CreatedBy     func(childComplexity int) int
+		Format        func(childComplexity int) int
+		HasReadCounts func(childComplexity int) int
+		ID            func(childComplexity int) int
+		MsgInternalTo func(childComplexity int) int
+		Redirect      func(childComplexity int) int
+		Subject       func(childComplexity int) int
+		TenantID      func(childComplexity int) int
+		ToSendCounts  func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
+		UpdatedBy     func(childComplexity int) int
+	}
+
+	MsgInternalConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgInternalEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	MsgInternalTo struct {
+		CreatedAt     func(childComplexity int) int
+		DeleteAt      func(childComplexity int) int
+		ID            func(childComplexity int) int
+		MsgInternal   func(childComplexity int) int
+		MsgInternalID func(childComplexity int) int
+		ReadAt        func(childComplexity int) int
+		TenantID      func(childComplexity int) int
+		User          func(childComplexity int) int
+		UserID        func(childComplexity int) int
+	}
+
+	MsgInternalToConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgInternalToEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
 	}
 
 	MsgSubscriber struct {
@@ -93,66 +229,146 @@ type ComplexityRoot struct {
 		ID        func(childComplexity int) int
 		MsgType   func(childComplexity int) int
 		MsgTypeID func(childComplexity int) int
+		OrgRoleID func(childComplexity int) int
 		TenantID  func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 		UpdatedBy func(childComplexity int) int
+		User      func(childComplexity int) int
 		UserID    func(childComplexity int) int
 	}
 
 	MsgTemplate struct {
-		Attachments  func(childComplexity int) int
-		Bcc          func(childComplexity int) int
-		Body         func(childComplexity int) int
-		Cc           func(childComplexity int) int
-		Comments     func(childComplexity int) int
-		CreatedAt    func(childComplexity int) int
-		CreatedBy    func(childComplexity int) int
-		Event        func(childComplexity int) int
-		Format       func(childComplexity int) int
-		From         func(childComplexity int) int
-		ID           func(childComplexity int) int
-		MsgEventID   func(childComplexity int) int
-		MsgTypeID    func(childComplexity int) int
-		Name         func(childComplexity int) int
-		ReceiverType func(childComplexity int) int
-		Status       func(childComplexity int) int
-		Subject      func(childComplexity int) int
-		TenantID     func(childComplexity int) int
-		To           func(childComplexity int) int
-		Tpl          func(childComplexity int) int
-		UpdatedAt    func(childComplexity int) int
-		UpdatedBy    func(childComplexity int) int
+		Attachments        func(childComplexity int) int
+		AttachmentsFileIds func(childComplexity int) int
+		Bcc                func(childComplexity int) int
+		Body               func(childComplexity int) int
+		Cc                 func(childComplexity int) int
+		Comments           func(childComplexity int) int
+		CreatedAt          func(childComplexity int) int
+		CreatedBy          func(childComplexity int) int
+		Event              func(childComplexity int) int
+		Format             func(childComplexity int) int
+		From               func(childComplexity int) int
+		ID                 func(childComplexity int) int
+		MsgEventID         func(childComplexity int) int
+		MsgTypeID          func(childComplexity int) int
+		Name               func(childComplexity int) int
+		ReceiverType       func(childComplexity int) int
+		Status             func(childComplexity int) int
+		Subject            func(childComplexity int) int
+		TenantID           func(childComplexity int) int
+		To                 func(childComplexity int) int
+		Tpl                func(childComplexity int) int
+		TplFileID          func(childComplexity int) int
+		UpdatedAt          func(childComplexity int) int
+		UpdatedBy          func(childComplexity int) int
+	}
+
+	MsgTemplateConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgTemplateEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
 	}
 
 	MsgType struct {
-		AppID       func(childComplexity int) int
-		CanCustom   func(childComplexity int) int
-		CanSubs     func(childComplexity int) int
-		Category    func(childComplexity int) int
-		Comments    func(childComplexity int) int
-		CreatedAt   func(childComplexity int) int
-		CreatedBy   func(childComplexity int) int
-		Events      func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Name        func(childComplexity int) int
-		Status      func(childComplexity int) int
-		Subscribers func(childComplexity int) int
-		UpdatedAt   func(childComplexity int) int
-		UpdatedBy   func(childComplexity int) int
+		AppID                  func(childComplexity int) int
+		CanCustom              func(childComplexity int) int
+		CanSubs                func(childComplexity int) int
+		Category               func(childComplexity int) int
+		Comments               func(childComplexity int) int
+		CreatedAt              func(childComplexity int) int
+		CreatedBy              func(childComplexity int) int
+		Events                 func(childComplexity int) int
+		ExcludeSubscriberUsers func(childComplexity int) int
+		ID                     func(childComplexity int) int
+		Name                   func(childComplexity int) int
+		Status                 func(childComplexity int) int
+		SubscriberRoles        func(childComplexity int) int
+		SubscriberUsers        func(childComplexity int) int
+		Subscribers            func(childComplexity int) int
+		UpdatedAt              func(childComplexity int) int
+		UpdatedBy              func(childComplexity int) int
+	}
+
+	MsgTypeConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgTypeEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
 	}
 
 	Mutation struct {
-		CreateMsgChannel func(childComplexity int, input ent.CreateMsgChannelInput) int
-		CreateMsgEvent   func(childComplexity int, input ent.CreateMsgEventInput) int
-		CreateMsgType    func(childComplexity int, input ent.CreateMsgTypeInput) int
-		DeleteMsgChannel func(childComplexity int, id int) int
-		DeleteMsgEvent   func(childComplexity int, id int) int
-		DeleteMsgType    func(childComplexity int, id int) int
-		EnableMsgChannel func(childComplexity int, id int) int
-		EnableMsgEvent   func(childComplexity int, id int) int
-		UpdateMsgChannel func(childComplexity int, id int, input ent.UpdateMsgChannelInput) int
-		UpdateMsgEvent   func(childComplexity int, id int, input ent.UpdateMsgEventInput) int
-		UpdateMsgType    func(childComplexity int, id int, input ent.UpdateMsgTypeInput) int
+		CreateMsgChannel              func(childComplexity int, input ent.CreateMsgChannelInput) int
+		CreateMsgEvent                func(childComplexity int, input ent.CreateMsgEventInput) int
+		CreateMsgSubscriber           func(childComplexity int, inputs []*ent.CreateMsgSubscriberInput) int
+		CreateMsgTemplate             func(childComplexity int, input ent.CreateMsgTemplateInput) int
+		CreateMsgType                 func(childComplexity int, input ent.CreateMsgTypeInput) int
+		CreateSilence                 func(childComplexity int, input ent.CreateSilenceInput) int
+		DeleteMsgChannel              func(childComplexity int, id int) int
+		DeleteMsgEvent                func(childComplexity int, id int) int
+		DeleteMsgSubscriber           func(childComplexity int, ids []int) int
+		DeleteMsgTemplate             func(childComplexity int, id int) int
+		DeleteMsgType                 func(childComplexity int, id int) int
+		DeleteSilence                 func(childComplexity int, id int) int
+		DisableMsgChannel             func(childComplexity int, id int) int
+		DisableMsgEvent               func(childComplexity int, id int) int
+		DisableMsgTemplate            func(childComplexity int, id int) int
+		EnableMsgChannel              func(childComplexity int, id int) int
+		EnableMsgEvent                func(childComplexity int, id int) int
+		EnableMsgTemplate             func(childComplexity int, id int) int
+		MarkMsgInternalToDeleted      func(childComplexity int, ids []int) int
+		MarkMsgInternalToReadOrUnRead func(childComplexity int, ids []int, read bool) int
+		TestSendEmailTpl              func(childComplexity int, tplID int, email string, labels map[string]string, annotations map[string]string) int
+		TestSendMessageTpl            func(childComplexity int, tplID int, userID int, labels map[string]string, annotations map[string]string) int
+		UpdateMsgChannel              func(childComplexity int, id int, input ent.UpdateMsgChannelInput) int
+		UpdateMsgEvent                func(childComplexity int, id int, input ent.UpdateMsgEventInput) int
+		UpdateMsgTemplate             func(childComplexity int, id int, input ent.UpdateMsgTemplateInput) int
+		UpdateMsgType                 func(childComplexity int, id int, input ent.UpdateMsgTypeInput) int
+		UpdateSilence                 func(childComplexity int, id int, input ent.UpdateSilenceInput) int
+	}
+
+	Nlog struct {
+		Alerts       func(childComplexity int) int
+		CreatedAt    func(childComplexity int) int
+		ExpiresAt    func(childComplexity int) int
+		GroupKey     func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Idx          func(childComplexity int) int
+		NlogAlert    func(childComplexity int) int
+		Receiver     func(childComplexity int) int
+		ReceiverType func(childComplexity int) int
+		SendAt       func(childComplexity int) int
+		TenantID     func(childComplexity int) int
+		UpdatedAt    func(childComplexity int) int
+	}
+
+	NlogAlert struct {
+		Alert     func(childComplexity int) int
+		AlertID   func(childComplexity int) int
+		CreatedAt func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Nlog      func(childComplexity int) int
+		NlogID    func(childComplexity int) int
+	}
+
+	NlogConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	NlogEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
 	}
 
 	PageInfo struct {
@@ -163,13 +379,27 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Node  func(childComplexity int, id string) int
-		Nodes func(childComplexity int, ids []string) int
+		MsgAlerts                             func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) int
+		MsgChannels                           func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgChannelOrder, where *ent.MsgChannelWhereInput) int
+		MsgEvents                             func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) int
+		MsgInternalTos                        func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) int
+		MsgInternals                          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalOrder, where *ent.MsgInternalWhereInput) int
+		MsgTemplates                          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) int
+		MsgTypeCategories                     func(childComplexity int, keyword *string, appID *int) int
+		MsgTypes                              func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTypeOrder, where *ent.MsgTypeWhereInput) int
+		Node                                  func(childComplexity int, id string) int
+		Nodes                                 func(childComplexity int, ids []string) int
+		Silences                              func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SilenceOrder, where *ent.SilenceWhereInput) int
+		UserMsgInternalTos                    func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) int
+		UserSubMsgCategory                    func(childComplexity int) int
+		UserUnreadMsgInternals                func(childComplexity int) int
+		UserUnreadMsgInternalsFromMsgCategory func(childComplexity int, categories []string) int
 	}
 
 	Receiver struct {
-		EmailConfigs func(childComplexity int) int
-		Name         func(childComplexity int) int
+		EmailConfigs  func(childComplexity int) int
+		MessageConfig func(childComplexity int) int
+		Name          func(childComplexity int) int
 	}
 
 	Route struct {
@@ -184,6 +414,45 @@ type ComplexityRoot struct {
 		RepeatInterval      func(childComplexity int) int
 		Routes              func(childComplexity int) int
 	}
+
+	Silence struct {
+		Comments  func(childComplexity int) int
+		CreatedAt func(childComplexity int) int
+		CreatedBy func(childComplexity int) int
+		EndsAt    func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Matchers  func(childComplexity int) int
+		StartsAt  func(childComplexity int) int
+		State     func(childComplexity int) int
+		TenantID  func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+		UpdatedBy func(childComplexity int) int
+		User      func(childComplexity int) int
+	}
+
+	SilenceConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	SilenceEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	Subscription struct {
+		Message func(childComplexity int) int
+	}
+
+	User struct {
+		DisplayName   func(childComplexity int) int
+		Email         func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Mobile        func(childComplexity int) int
+		PrincipalName func(childComplexity int) int
+		Silences      func(childComplexity int) int
+	}
 }
 
 type executableSchema struct {
@@ -197,7 +466,7 @@ func (e *executableSchema) Schema() *ast.Schema {
 }
 
 func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]interface{}) (int, bool) {
-	ec := executionContext{nil, e}
+	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
 
@@ -236,6 +505,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.EmailConfig.AuthUsername(childComplexity), true
 
+	case "EmailConfig.from":
+		if e.complexity.EmailConfig.From == nil {
+			break
+		}
+
+		return e.complexity.EmailConfig.From(childComplexity), true
+
 	case "EmailConfig.headers":
 		if e.complexity.EmailConfig.Headers == nil {
 			break
@@ -249,6 +525,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.EmailConfig.SmartHost(childComplexity), true
+
+	case "EmailConfig.to":
+		if e.complexity.EmailConfig.To == nil {
+			break
+		}
+
+		return e.complexity.EmailConfig.To(childComplexity), true
 
 	case "Matcher.name":
 		if e.complexity.Matcher.Name == nil {
@@ -270,6 +553,249 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Matcher.Value(childComplexity), true
+
+	case "Message.content":
+		if e.complexity.Message.Content == nil {
+			break
+		}
+
+		return e.complexity.Message.Content(childComplexity), true
+
+	case "Message.extras":
+		if e.complexity.Message.Extras == nil {
+			break
+		}
+
+		return e.complexity.Message.Extras(childComplexity), true
+
+	case "Message.format":
+		if e.complexity.Message.Format == nil {
+			break
+		}
+
+		return e.complexity.Message.Format(childComplexity), true
+
+	case "Message.sendAt":
+		if e.complexity.Message.SendAt == nil {
+			break
+		}
+
+		return e.complexity.Message.SendAt(childComplexity), true
+
+	case "Message.title":
+		if e.complexity.Message.Title == nil {
+			break
+		}
+
+		return e.complexity.Message.Title(childComplexity), true
+
+	case "Message.topic":
+		if e.complexity.Message.Topic == nil {
+			break
+		}
+
+		return e.complexity.Message.Topic(childComplexity), true
+
+	case "Message.url":
+		if e.complexity.Message.URL == nil {
+			break
+		}
+
+		return e.complexity.Message.URL(childComplexity), true
+
+	case "MessageConfig.redirect":
+		if e.complexity.MessageConfig.Redirect == nil {
+			break
+		}
+
+		return e.complexity.MessageConfig.Redirect(childComplexity), true
+
+	case "MessageConfig.subject":
+		if e.complexity.MessageConfig.Subject == nil {
+			break
+		}
+
+		return e.complexity.MessageConfig.Subject(childComplexity), true
+
+	case "MessageConfig.to":
+		if e.complexity.MessageConfig.To == nil {
+			break
+		}
+
+		return e.complexity.MessageConfig.To(childComplexity), true
+
+	case "MessageFilter.appCode":
+		if e.complexity.MessageFilter.AppCode == nil {
+			break
+		}
+
+		return e.complexity.MessageFilter.AppCode(childComplexity), true
+
+	case "MessageFilter.deviceId":
+		if e.complexity.MessageFilter.DeviceID == nil {
+			break
+		}
+
+		return e.complexity.MessageFilter.DeviceID(childComplexity), true
+
+	case "MessageFilter.tenantId":
+		if e.complexity.MessageFilter.TenantID == nil {
+			break
+		}
+
+		return e.complexity.MessageFilter.TenantID(childComplexity), true
+
+	case "MessageFilter.userId":
+		if e.complexity.MessageFilter.UserID == nil {
+			break
+		}
+
+		return e.complexity.MessageFilter.UserID(childComplexity), true
+
+	case "MsgAlert.annotations":
+		if e.complexity.MsgAlert.Annotations == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.Annotations(childComplexity), true
+
+	case "MsgAlert.createdAt":
+		if e.complexity.MsgAlert.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.CreatedAt(childComplexity), true
+
+	case "MsgAlert.deleted":
+		if e.complexity.MsgAlert.Deleted == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.Deleted(childComplexity), true
+
+	case "MsgAlert.endsAt":
+		if e.complexity.MsgAlert.EndsAt == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.EndsAt(childComplexity), true
+
+	case "MsgAlert.fingerprint":
+		if e.complexity.MsgAlert.Fingerprint == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.Fingerprint(childComplexity), true
+
+	case "MsgAlert.id":
+		if e.complexity.MsgAlert.ID == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.ID(childComplexity), true
+
+	case "MsgAlert.labels":
+		if e.complexity.MsgAlert.Labels == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.Labels(childComplexity), true
+
+	case "MsgAlert.nlog":
+		if e.complexity.MsgAlert.Nlog == nil {
+			break
+		}
+
+		args, err := ec.field_MsgAlert_nlog_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.MsgAlert.Nlog(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.NlogOrder), args["where"].(*ent.NlogWhereInput)), true
+
+	case "MsgAlert.nlogAlerts":
+		if e.complexity.MsgAlert.NlogAlerts == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.NlogAlerts(childComplexity), true
+
+	case "MsgAlert.startsAt":
+		if e.complexity.MsgAlert.StartsAt == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.StartsAt(childComplexity), true
+
+	case "MsgAlert.state":
+		if e.complexity.MsgAlert.State == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.State(childComplexity), true
+
+	case "MsgAlert.tenantID":
+		if e.complexity.MsgAlert.TenantID == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.TenantID(childComplexity), true
+
+	case "MsgAlert.timeout":
+		if e.complexity.MsgAlert.Timeout == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.Timeout(childComplexity), true
+
+	case "MsgAlert.url":
+		if e.complexity.MsgAlert.URL == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.URL(childComplexity), true
+
+	case "MsgAlert.updatedAt":
+		if e.complexity.MsgAlert.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.UpdatedAt(childComplexity), true
+
+	case "MsgAlertConnection.edges":
+		if e.complexity.MsgAlertConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgAlertConnection.Edges(childComplexity), true
+
+	case "MsgAlertConnection.pageInfo":
+		if e.complexity.MsgAlertConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgAlertConnection.PageInfo(childComplexity), true
+
+	case "MsgAlertConnection.totalCount":
+		if e.complexity.MsgAlertConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgAlertConnection.TotalCount(childComplexity), true
+
+	case "MsgAlertEdge.cursor":
+		if e.complexity.MsgAlertEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgAlertEdge.Cursor(childComplexity), true
+
+	case "MsgAlertEdge.node":
+		if e.complexity.MsgAlertEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgAlertEdge.Node(childComplexity), true
 
 	case "MsgChannel.comments":
 		if e.complexity.MsgChannel.Comments == nil {
@@ -348,6 +874,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgChannel.UpdatedBy(childComplexity), true
 
+	case "MsgChannelConnection.edges":
+		if e.complexity.MsgChannelConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgChannelConnection.Edges(childComplexity), true
+
+	case "MsgChannelConnection.pageInfo":
+		if e.complexity.MsgChannelConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgChannelConnection.PageInfo(childComplexity), true
+
+	case "MsgChannelConnection.totalCount":
+		if e.complexity.MsgChannelConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgChannelConnection.TotalCount(childComplexity), true
+
+	case "MsgChannelEdge.cursor":
+		if e.complexity.MsgChannelEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgChannelEdge.Cursor(childComplexity), true
+
+	case "MsgChannelEdge.node":
+		if e.complexity.MsgChannelEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgChannelEdge.Node(childComplexity), true
+
 	case "MsgEvent.comments":
 		if e.complexity.MsgEvent.Comments == nil {
 			break
@@ -418,6 +979,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgEvent.Route(childComplexity), true
 
+	case "MsgEvent.routeStr":
+		if e.complexity.MsgEvent.RouteStr == nil {
+			break
+		}
+
+		args, err := ec.field_MsgEvent_routeStr_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.MsgEvent.RouteStr(childComplexity, args["type"].(model.RouteStrType)), true
+
 	case "MsgEvent.status":
 		if e.complexity.MsgEvent.Status == nil {
 			break
@@ -438,6 +1011,272 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgEvent.UpdatedBy(childComplexity), true
+
+	case "MsgEventConnection.edges":
+		if e.complexity.MsgEventConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgEventConnection.Edges(childComplexity), true
+
+	case "MsgEventConnection.pageInfo":
+		if e.complexity.MsgEventConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgEventConnection.PageInfo(childComplexity), true
+
+	case "MsgEventConnection.totalCount":
+		if e.complexity.MsgEventConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgEventConnection.TotalCount(childComplexity), true
+
+	case "MsgEventEdge.cursor":
+		if e.complexity.MsgEventEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgEventEdge.Cursor(childComplexity), true
+
+	case "MsgEventEdge.node":
+		if e.complexity.MsgEventEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgEventEdge.Node(childComplexity), true
+
+	case "MsgInternal.body":
+		if e.complexity.MsgInternal.Body == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.Body(childComplexity), true
+
+	case "MsgInternal.category":
+		if e.complexity.MsgInternal.Category == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.Category(childComplexity), true
+
+	case "MsgInternal.createdAt":
+		if e.complexity.MsgInternal.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.CreatedAt(childComplexity), true
+
+	case "MsgInternal.createdBy":
+		if e.complexity.MsgInternal.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.CreatedBy(childComplexity), true
+
+	case "MsgInternal.format":
+		if e.complexity.MsgInternal.Format == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.Format(childComplexity), true
+
+	case "MsgInternal.hasReadCounts":
+		if e.complexity.MsgInternal.HasReadCounts == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.HasReadCounts(childComplexity), true
+
+	case "MsgInternal.id":
+		if e.complexity.MsgInternal.ID == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.ID(childComplexity), true
+
+	case "MsgInternal.msgInternalTo":
+		if e.complexity.MsgInternal.MsgInternalTo == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.MsgInternalTo(childComplexity), true
+
+	case "MsgInternal.redirect":
+		if e.complexity.MsgInternal.Redirect == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.Redirect(childComplexity), true
+
+	case "MsgInternal.subject":
+		if e.complexity.MsgInternal.Subject == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.Subject(childComplexity), true
+
+	case "MsgInternal.tenantID":
+		if e.complexity.MsgInternal.TenantID == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.TenantID(childComplexity), true
+
+	case "MsgInternal.toSendCounts":
+		if e.complexity.MsgInternal.ToSendCounts == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.ToSendCounts(childComplexity), true
+
+	case "MsgInternal.updatedAt":
+		if e.complexity.MsgInternal.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.UpdatedAt(childComplexity), true
+
+	case "MsgInternal.updatedBy":
+		if e.complexity.MsgInternal.UpdatedBy == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.UpdatedBy(childComplexity), true
+
+	case "MsgInternalConnection.edges":
+		if e.complexity.MsgInternalConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalConnection.Edges(childComplexity), true
+
+	case "MsgInternalConnection.pageInfo":
+		if e.complexity.MsgInternalConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalConnection.PageInfo(childComplexity), true
+
+	case "MsgInternalConnection.totalCount":
+		if e.complexity.MsgInternalConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalConnection.TotalCount(childComplexity), true
+
+	case "MsgInternalEdge.cursor":
+		if e.complexity.MsgInternalEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalEdge.Cursor(childComplexity), true
+
+	case "MsgInternalEdge.node":
+		if e.complexity.MsgInternalEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalEdge.Node(childComplexity), true
+
+	case "MsgInternalTo.createdAt":
+		if e.complexity.MsgInternalTo.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.CreatedAt(childComplexity), true
+
+	case "MsgInternalTo.deleteAt":
+		if e.complexity.MsgInternalTo.DeleteAt == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.DeleteAt(childComplexity), true
+
+	case "MsgInternalTo.id":
+		if e.complexity.MsgInternalTo.ID == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.ID(childComplexity), true
+
+	case "MsgInternalTo.msgInternal":
+		if e.complexity.MsgInternalTo.MsgInternal == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.MsgInternal(childComplexity), true
+
+	case "MsgInternalTo.msgInternalID":
+		if e.complexity.MsgInternalTo.MsgInternalID == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.MsgInternalID(childComplexity), true
+
+	case "MsgInternalTo.readAt":
+		if e.complexity.MsgInternalTo.ReadAt == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.ReadAt(childComplexity), true
+
+	case "MsgInternalTo.tenantID":
+		if e.complexity.MsgInternalTo.TenantID == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.TenantID(childComplexity), true
+
+	case "MsgInternalTo.user":
+		if e.complexity.MsgInternalTo.User == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.User(childComplexity), true
+
+	case "MsgInternalTo.userID":
+		if e.complexity.MsgInternalTo.UserID == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalTo.UserID(childComplexity), true
+
+	case "MsgInternalToConnection.edges":
+		if e.complexity.MsgInternalToConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalToConnection.Edges(childComplexity), true
+
+	case "MsgInternalToConnection.pageInfo":
+		if e.complexity.MsgInternalToConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalToConnection.PageInfo(childComplexity), true
+
+	case "MsgInternalToConnection.totalCount":
+		if e.complexity.MsgInternalToConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalToConnection.TotalCount(childComplexity), true
+
+	case "MsgInternalToEdge.cursor":
+		if e.complexity.MsgInternalToEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalToEdge.Cursor(childComplexity), true
+
+	case "MsgInternalToEdge.node":
+		if e.complexity.MsgInternalToEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgInternalToEdge.Node(childComplexity), true
 
 	case "MsgSubscriber.createdAt":
 		if e.complexity.MsgSubscriber.CreatedAt == nil {
@@ -481,6 +1320,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgSubscriber.MsgTypeID(childComplexity), true
 
+	case "MsgSubscriber.orgRoleID":
+		if e.complexity.MsgSubscriber.OrgRoleID == nil {
+			break
+		}
+
+		return e.complexity.MsgSubscriber.OrgRoleID(childComplexity), true
+
 	case "MsgSubscriber.tenantID":
 		if e.complexity.MsgSubscriber.TenantID == nil {
 			break
@@ -502,6 +1348,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgSubscriber.UpdatedBy(childComplexity), true
 
+	case "MsgSubscriber.user":
+		if e.complexity.MsgSubscriber.User == nil {
+			break
+		}
+
+		return e.complexity.MsgSubscriber.User(childComplexity), true
+
 	case "MsgSubscriber.userID":
 		if e.complexity.MsgSubscriber.UserID == nil {
 			break
@@ -515,6 +1368,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgTemplate.Attachments(childComplexity), true
+
+	case "MsgTemplate.attachmentsFileIds":
+		if e.complexity.MsgTemplate.AttachmentsFileIds == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplate.AttachmentsFileIds(childComplexity), true
 
 	case "MsgTemplate.bcc":
 		if e.complexity.MsgTemplate.Bcc == nil {
@@ -649,6 +1509,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgTemplate.Tpl(childComplexity), true
 
+	case "MsgTemplate.tplFileID":
+		if e.complexity.MsgTemplate.TplFileID == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplate.TplFileID(childComplexity), true
+
 	case "MsgTemplate.updatedAt":
 		if e.complexity.MsgTemplate.UpdatedAt == nil {
 			break
@@ -662,6 +1529,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgTemplate.UpdatedBy(childComplexity), true
+
+	case "MsgTemplateConnection.edges":
+		if e.complexity.MsgTemplateConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplateConnection.Edges(childComplexity), true
+
+	case "MsgTemplateConnection.pageInfo":
+		if e.complexity.MsgTemplateConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplateConnection.PageInfo(childComplexity), true
+
+	case "MsgTemplateConnection.totalCount":
+		if e.complexity.MsgTemplateConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplateConnection.TotalCount(childComplexity), true
+
+	case "MsgTemplateEdge.cursor":
+		if e.complexity.MsgTemplateEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplateEdge.Cursor(childComplexity), true
+
+	case "MsgTemplateEdge.node":
+		if e.complexity.MsgTemplateEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplateEdge.Node(childComplexity), true
 
 	case "MsgType.appID":
 		if e.complexity.MsgType.AppID == nil {
@@ -719,6 +1621,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgType.Events(childComplexity), true
 
+	case "MsgType.excludeSubscriberUsers":
+		if e.complexity.MsgType.ExcludeSubscriberUsers == nil {
+			break
+		}
+
+		return e.complexity.MsgType.ExcludeSubscriberUsers(childComplexity), true
+
 	case "MsgType.id":
 		if e.complexity.MsgType.ID == nil {
 			break
@@ -740,6 +1649,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgType.Status(childComplexity), true
 
+	case "MsgType.subscriberRoles":
+		if e.complexity.MsgType.SubscriberRoles == nil {
+			break
+		}
+
+		return e.complexity.MsgType.SubscriberRoles(childComplexity), true
+
+	case "MsgType.subscriberUsers":
+		if e.complexity.MsgType.SubscriberUsers == nil {
+			break
+		}
+
+		return e.complexity.MsgType.SubscriberUsers(childComplexity), true
+
 	case "MsgType.subscribers":
 		if e.complexity.MsgType.Subscribers == nil {
 			break
@@ -760,6 +1683,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgType.UpdatedBy(childComplexity), true
+
+	case "MsgTypeConnection.edges":
+		if e.complexity.MsgTypeConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgTypeConnection.Edges(childComplexity), true
+
+	case "MsgTypeConnection.pageInfo":
+		if e.complexity.MsgTypeConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgTypeConnection.PageInfo(childComplexity), true
+
+	case "MsgTypeConnection.totalCount":
+		if e.complexity.MsgTypeConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgTypeConnection.TotalCount(childComplexity), true
+
+	case "MsgTypeEdge.cursor":
+		if e.complexity.MsgTypeEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgTypeEdge.Cursor(childComplexity), true
+
+	case "MsgTypeEdge.node":
+		if e.complexity.MsgTypeEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgTypeEdge.Node(childComplexity), true
 
 	case "Mutation.createMsgChannel":
 		if e.complexity.Mutation.CreateMsgChannel == nil {
@@ -785,6 +1743,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateMsgEvent(childComplexity, args["input"].(ent.CreateMsgEventInput)), true
 
+	case "Mutation.createMsgSubscriber":
+		if e.complexity.Mutation.CreateMsgSubscriber == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createMsgSubscriber_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateMsgSubscriber(childComplexity, args["inputs"].([]*ent.CreateMsgSubscriberInput)), true
+
+	case "Mutation.createMsgTemplate":
+		if e.complexity.Mutation.CreateMsgTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createMsgTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateMsgTemplate(childComplexity, args["input"].(ent.CreateMsgTemplateInput)), true
+
 	case "Mutation.createMsgType":
 		if e.complexity.Mutation.CreateMsgType == nil {
 			break
@@ -796,6 +1778,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateMsgType(childComplexity, args["input"].(ent.CreateMsgTypeInput)), true
+
+	case "Mutation.createSilence":
+		if e.complexity.Mutation.CreateSilence == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createSilence_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateSilence(childComplexity, args["input"].(ent.CreateSilenceInput)), true
 
 	case "Mutation.deleteMsgChannel":
 		if e.complexity.Mutation.DeleteMsgChannel == nil {
@@ -821,6 +1815,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteMsgEvent(childComplexity, args["id"].(int)), true
 
+	case "Mutation.deleteMsgSubscriber":
+		if e.complexity.Mutation.DeleteMsgSubscriber == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteMsgSubscriber_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteMsgSubscriber(childComplexity, args["ids"].([]int)), true
+
+	case "Mutation.deleteMsgTemplate":
+		if e.complexity.Mutation.DeleteMsgTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteMsgTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteMsgTemplate(childComplexity, args["id"].(int)), true
+
 	case "Mutation.deleteMsgType":
 		if e.complexity.Mutation.DeleteMsgType == nil {
 			break
@@ -832,6 +1850,54 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteMsgType(childComplexity, args["id"].(int)), true
+
+	case "Mutation.deleteSilence":
+		if e.complexity.Mutation.DeleteSilence == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteSilence_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteSilence(childComplexity, args["id"].(int)), true
+
+	case "Mutation.disableMsgChannel":
+		if e.complexity.Mutation.DisableMsgChannel == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_disableMsgChannel_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DisableMsgChannel(childComplexity, args["id"].(int)), true
+
+	case "Mutation.disableMsgEvent":
+		if e.complexity.Mutation.DisableMsgEvent == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_disableMsgEvent_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DisableMsgEvent(childComplexity, args["id"].(int)), true
+
+	case "Mutation.disableMsgTemplate":
+		if e.complexity.Mutation.DisableMsgTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_disableMsgTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DisableMsgTemplate(childComplexity, args["id"].(int)), true
 
 	case "Mutation.enableMsgChannel":
 		if e.complexity.Mutation.EnableMsgChannel == nil {
@@ -857,6 +1923,66 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.EnableMsgEvent(childComplexity, args["id"].(int)), true
 
+	case "Mutation.enableMsgTemplate":
+		if e.complexity.Mutation.EnableMsgTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_enableMsgTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.EnableMsgTemplate(childComplexity, args["id"].(int)), true
+
+	case "Mutation.markMsgInternalToDeleted":
+		if e.complexity.Mutation.MarkMsgInternalToDeleted == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_markMsgInternalToDeleted_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MarkMsgInternalToDeleted(childComplexity, args["ids"].([]int)), true
+
+	case "Mutation.markMsgInternalToReadOrUnRead":
+		if e.complexity.Mutation.MarkMsgInternalToReadOrUnRead == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_markMsgInternalToReadOrUnRead_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MarkMsgInternalToReadOrUnRead(childComplexity, args["ids"].([]int), args["read"].(bool)), true
+
+	case "Mutation.testSendEmailTpl":
+		if e.complexity.Mutation.TestSendEmailTpl == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_testSendEmailTpl_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.TestSendEmailTpl(childComplexity, args["tplID"].(int), args["email"].(string), args["labels"].(map[string]string), args["annotations"].(map[string]string)), true
+
+	case "Mutation.testSendMessageTpl":
+		if e.complexity.Mutation.TestSendMessageTpl == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_testSendMessageTpl_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.TestSendMessageTpl(childComplexity, args["tplID"].(int), args["userID"].(int), args["labels"].(map[string]string), args["annotations"].(map[string]string)), true
+
 	case "Mutation.updateMsgChannel":
 		if e.complexity.Mutation.UpdateMsgChannel == nil {
 			break
@@ -881,6 +2007,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateMsgEvent(childComplexity, args["id"].(int), args["input"].(ent.UpdateMsgEventInput)), true
 
+	case "Mutation.updateMsgTemplate":
+		if e.complexity.Mutation.UpdateMsgTemplate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateMsgTemplate_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateMsgTemplate(childComplexity, args["id"].(int), args["input"].(ent.UpdateMsgTemplateInput)), true
+
 	case "Mutation.updateMsgType":
 		if e.complexity.Mutation.UpdateMsgType == nil {
 			break
@@ -892,6 +2030,179 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateMsgType(childComplexity, args["id"].(int), args["input"].(ent.UpdateMsgTypeInput)), true
+
+	case "Mutation.updateSilence":
+		if e.complexity.Mutation.UpdateSilence == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateSilence_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateSilence(childComplexity, args["id"].(int), args["input"].(ent.UpdateSilenceInput)), true
+
+	case "Nlog.alerts":
+		if e.complexity.Nlog.Alerts == nil {
+			break
+		}
+
+		return e.complexity.Nlog.Alerts(childComplexity), true
+
+	case "Nlog.createdAt":
+		if e.complexity.Nlog.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Nlog.CreatedAt(childComplexity), true
+
+	case "Nlog.expiresAt":
+		if e.complexity.Nlog.ExpiresAt == nil {
+			break
+		}
+
+		return e.complexity.Nlog.ExpiresAt(childComplexity), true
+
+	case "Nlog.groupKey":
+		if e.complexity.Nlog.GroupKey == nil {
+			break
+		}
+
+		return e.complexity.Nlog.GroupKey(childComplexity), true
+
+	case "Nlog.id":
+		if e.complexity.Nlog.ID == nil {
+			break
+		}
+
+		return e.complexity.Nlog.ID(childComplexity), true
+
+	case "Nlog.idx":
+		if e.complexity.Nlog.Idx == nil {
+			break
+		}
+
+		return e.complexity.Nlog.Idx(childComplexity), true
+
+	case "Nlog.nlogAlert":
+		if e.complexity.Nlog.NlogAlert == nil {
+			break
+		}
+
+		return e.complexity.Nlog.NlogAlert(childComplexity), true
+
+	case "Nlog.receiver":
+		if e.complexity.Nlog.Receiver == nil {
+			break
+		}
+
+		return e.complexity.Nlog.Receiver(childComplexity), true
+
+	case "Nlog.receiverType":
+		if e.complexity.Nlog.ReceiverType == nil {
+			break
+		}
+
+		return e.complexity.Nlog.ReceiverType(childComplexity), true
+
+	case "Nlog.sendAt":
+		if e.complexity.Nlog.SendAt == nil {
+			break
+		}
+
+		return e.complexity.Nlog.SendAt(childComplexity), true
+
+	case "Nlog.tenantID":
+		if e.complexity.Nlog.TenantID == nil {
+			break
+		}
+
+		return e.complexity.Nlog.TenantID(childComplexity), true
+
+	case "Nlog.updatedAt":
+		if e.complexity.Nlog.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Nlog.UpdatedAt(childComplexity), true
+
+	case "NlogAlert.alert":
+		if e.complexity.NlogAlert.Alert == nil {
+			break
+		}
+
+		return e.complexity.NlogAlert.Alert(childComplexity), true
+
+	case "NlogAlert.alertID":
+		if e.complexity.NlogAlert.AlertID == nil {
+			break
+		}
+
+		return e.complexity.NlogAlert.AlertID(childComplexity), true
+
+	case "NlogAlert.createdAt":
+		if e.complexity.NlogAlert.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.NlogAlert.CreatedAt(childComplexity), true
+
+	case "NlogAlert.id":
+		if e.complexity.NlogAlert.ID == nil {
+			break
+		}
+
+		return e.complexity.NlogAlert.ID(childComplexity), true
+
+	case "NlogAlert.nlog":
+		if e.complexity.NlogAlert.Nlog == nil {
+			break
+		}
+
+		return e.complexity.NlogAlert.Nlog(childComplexity), true
+
+	case "NlogAlert.nlogID":
+		if e.complexity.NlogAlert.NlogID == nil {
+			break
+		}
+
+		return e.complexity.NlogAlert.NlogID(childComplexity), true
+
+	case "NlogConnection.edges":
+		if e.complexity.NlogConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.NlogConnection.Edges(childComplexity), true
+
+	case "NlogConnection.pageInfo":
+		if e.complexity.NlogConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.NlogConnection.PageInfo(childComplexity), true
+
+	case "NlogConnection.totalCount":
+		if e.complexity.NlogConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.NlogConnection.TotalCount(childComplexity), true
+
+	case "NlogEdge.cursor":
+		if e.complexity.NlogEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.NlogEdge.Cursor(childComplexity), true
+
+	case "NlogEdge.node":
+		if e.complexity.NlogEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.NlogEdge.Node(childComplexity), true
 
 	case "PageInfo.endCursor":
 		if e.complexity.PageInfo.EndCursor == nil {
@@ -921,6 +2232,102 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PageInfo.StartCursor(childComplexity), true
 
+	case "Query.msgAlerts":
+		if e.complexity.Query.MsgAlerts == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgAlerts_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgAlerts(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgAlertOrder), args["where"].(*ent.MsgAlertWhereInput)), true
+
+	case "Query.msgChannels":
+		if e.complexity.Query.MsgChannels == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgChannels_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgChannels(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgChannelOrder), args["where"].(*ent.MsgChannelWhereInput)), true
+
+	case "Query.msgEvents":
+		if e.complexity.Query.MsgEvents == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgEvents_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgEvents(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgEventOrder), args["where"].(*ent.MsgEventWhereInput)), true
+
+	case "Query.msgInternalTos":
+		if e.complexity.Query.MsgInternalTos == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgInternalTos_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgInternalTos(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgInternalToOrder), args["where"].(*ent.MsgInternalToWhereInput)), true
+
+	case "Query.msgInternals":
+		if e.complexity.Query.MsgInternals == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgInternals_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgInternals(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgInternalOrder), args["where"].(*ent.MsgInternalWhereInput)), true
+
+	case "Query.msgTemplates":
+		if e.complexity.Query.MsgTemplates == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgTemplates_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgTemplates(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgTemplateOrder), args["where"].(*ent.MsgTemplateWhereInput)), true
+
+	case "Query.msgTypeCategories":
+		if e.complexity.Query.MsgTypeCategories == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgTypeCategories_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgTypeCategories(childComplexity, args["keyword"].(*string), args["appID"].(*int)), true
+
+	case "Query.msgTypes":
+		if e.complexity.Query.MsgTypes == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgTypes_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgTypes(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgTypeOrder), args["where"].(*ent.MsgTypeWhereInput)), true
+
 	case "Query.node":
 		if e.complexity.Query.Node == nil {
 			break
@@ -945,12 +2352,69 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Nodes(childComplexity, args["ids"].([]string)), true
 
+	case "Query.silences":
+		if e.complexity.Query.Silences == nil {
+			break
+		}
+
+		args, err := ec.field_Query_silences_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Silences(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.SilenceOrder), args["where"].(*ent.SilenceWhereInput)), true
+
+	case "Query.userMsgInternalTos":
+		if e.complexity.Query.UserMsgInternalTos == nil {
+			break
+		}
+
+		args, err := ec.field_Query_userMsgInternalTos_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.UserMsgInternalTos(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgInternalToOrder), args["where"].(*ent.MsgInternalToWhereInput)), true
+
+	case "Query.userSubMsgCategory":
+		if e.complexity.Query.UserSubMsgCategory == nil {
+			break
+		}
+
+		return e.complexity.Query.UserSubMsgCategory(childComplexity), true
+
+	case "Query.userUnreadMsgInternals":
+		if e.complexity.Query.UserUnreadMsgInternals == nil {
+			break
+		}
+
+		return e.complexity.Query.UserUnreadMsgInternals(childComplexity), true
+
+	case "Query.userUnreadMsgInternalsFromMsgCategory":
+		if e.complexity.Query.UserUnreadMsgInternalsFromMsgCategory == nil {
+			break
+		}
+
+		args, err := ec.field_Query_userUnreadMsgInternalsFromMsgCategory_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.UserUnreadMsgInternalsFromMsgCategory(childComplexity, args["categories"].([]string)), true
+
 	case "Receiver.emailConfigs":
 		if e.complexity.Receiver.EmailConfigs == nil {
 			break
 		}
 
 		return e.complexity.Receiver.EmailConfigs(childComplexity), true
+
+	case "Receiver.messageConfig":
+		if e.complexity.Receiver.MessageConfig == nil {
+			break
+		}
+
+		return e.complexity.Receiver.MessageConfig(childComplexity), true
 
 	case "Receiver.name":
 		if e.complexity.Receiver.Name == nil {
@@ -1029,56 +2493,254 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Route.Routes(childComplexity), true
 
+	case "Silence.comments":
+		if e.complexity.Silence.Comments == nil {
+			break
+		}
+
+		return e.complexity.Silence.Comments(childComplexity), true
+
+	case "Silence.createdAt":
+		if e.complexity.Silence.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Silence.CreatedAt(childComplexity), true
+
+	case "Silence.createdBy":
+		if e.complexity.Silence.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.Silence.CreatedBy(childComplexity), true
+
+	case "Silence.endsAt":
+		if e.complexity.Silence.EndsAt == nil {
+			break
+		}
+
+		return e.complexity.Silence.EndsAt(childComplexity), true
+
+	case "Silence.id":
+		if e.complexity.Silence.ID == nil {
+			break
+		}
+
+		return e.complexity.Silence.ID(childComplexity), true
+
+	case "Silence.matchers":
+		if e.complexity.Silence.Matchers == nil {
+			break
+		}
+
+		return e.complexity.Silence.Matchers(childComplexity), true
+
+	case "Silence.startsAt":
+		if e.complexity.Silence.StartsAt == nil {
+			break
+		}
+
+		return e.complexity.Silence.StartsAt(childComplexity), true
+
+	case "Silence.state":
+		if e.complexity.Silence.State == nil {
+			break
+		}
+
+		return e.complexity.Silence.State(childComplexity), true
+
+	case "Silence.tenantID":
+		if e.complexity.Silence.TenantID == nil {
+			break
+		}
+
+		return e.complexity.Silence.TenantID(childComplexity), true
+
+	case "Silence.updatedAt":
+		if e.complexity.Silence.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Silence.UpdatedAt(childComplexity), true
+
+	case "Silence.updatedBy":
+		if e.complexity.Silence.UpdatedBy == nil {
+			break
+		}
+
+		return e.complexity.Silence.UpdatedBy(childComplexity), true
+
+	case "Silence.user":
+		if e.complexity.Silence.User == nil {
+			break
+		}
+
+		return e.complexity.Silence.User(childComplexity), true
+
+	case "SilenceConnection.edges":
+		if e.complexity.SilenceConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.SilenceConnection.Edges(childComplexity), true
+
+	case "SilenceConnection.pageInfo":
+		if e.complexity.SilenceConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.SilenceConnection.PageInfo(childComplexity), true
+
+	case "SilenceConnection.totalCount":
+		if e.complexity.SilenceConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.SilenceConnection.TotalCount(childComplexity), true
+
+	case "SilenceEdge.cursor":
+		if e.complexity.SilenceEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.SilenceEdge.Cursor(childComplexity), true
+
+	case "SilenceEdge.node":
+		if e.complexity.SilenceEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.SilenceEdge.Node(childComplexity), true
+
+	case "Subscription.message":
+		if e.complexity.Subscription.Message == nil {
+			break
+		}
+
+		return e.complexity.Subscription.Message(childComplexity), true
+
+	case "User.displayName":
+		if e.complexity.User.DisplayName == nil {
+			break
+		}
+
+		return e.complexity.User.DisplayName(childComplexity), true
+
+	case "User.email":
+		if e.complexity.User.Email == nil {
+			break
+		}
+
+		return e.complexity.User.Email(childComplexity), true
+
+	case "User.id":
+		if e.complexity.User.ID == nil {
+			break
+		}
+
+		return e.complexity.User.ID(childComplexity), true
+
+	case "User.mobile":
+		if e.complexity.User.Mobile == nil {
+			break
+		}
+
+		return e.complexity.User.Mobile(childComplexity), true
+
+	case "User.principalName":
+		if e.complexity.User.PrincipalName == nil {
+			break
+		}
+
+		return e.complexity.User.PrincipalName(childComplexity), true
+
+	case "User.silences":
+		if e.complexity.User.Silences == nil {
+			break
+		}
+
+		return e.complexity.User.Silences(childComplexity), true
+
 	}
 	return 0, false
 }
 
 func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
-	ec := executionContext{rc, e}
+	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateMsgChannelInput,
 		ec.unmarshalInputCreateMsgEventInput,
 		ec.unmarshalInputCreateMsgSubscriberInput,
 		ec.unmarshalInputCreateMsgTemplateInput,
 		ec.unmarshalInputCreateMsgTypeInput,
+		ec.unmarshalInputCreateSilenceInput,
 		ec.unmarshalInputEmailConfigInput,
 		ec.unmarshalInputMatcherInput,
+		ec.unmarshalInputMessageConfigInput,
+		ec.unmarshalInputMsgAlertOrder,
+		ec.unmarshalInputMsgAlertWhereInput,
 		ec.unmarshalInputMsgChannelOrder,
 		ec.unmarshalInputMsgChannelWhereInput,
 		ec.unmarshalInputMsgEventOrder,
 		ec.unmarshalInputMsgEventWhereInput,
+		ec.unmarshalInputMsgInternalOrder,
+		ec.unmarshalInputMsgInternalToOrder,
+		ec.unmarshalInputMsgInternalToWhereInput,
+		ec.unmarshalInputMsgInternalWhereInput,
 		ec.unmarshalInputMsgSubscriberOrder,
 		ec.unmarshalInputMsgSubscriberWhereInput,
 		ec.unmarshalInputMsgTemplateOrder,
 		ec.unmarshalInputMsgTemplateWhereInput,
 		ec.unmarshalInputMsgTypeOrder,
 		ec.unmarshalInputMsgTypeWhereInput,
+		ec.unmarshalInputNlogAlertOrder,
+		ec.unmarshalInputNlogAlertWhereInput,
+		ec.unmarshalInputNlogOrder,
+		ec.unmarshalInputNlogWhereInput,
 		ec.unmarshalInputReceiverInput,
 		ec.unmarshalInputRouteInput,
+		ec.unmarshalInputSilenceOrder,
+		ec.unmarshalInputSilenceWhereInput,
 		ec.unmarshalInputUpdateMsgChannelInput,
 		ec.unmarshalInputUpdateMsgEventInput,
 		ec.unmarshalInputUpdateMsgSubscriberInput,
 		ec.unmarshalInputUpdateMsgTemplateInput,
 		ec.unmarshalInputUpdateMsgTypeInput,
+		ec.unmarshalInputUpdateSilenceInput,
 	)
 	first := true
 
 	switch rc.Operation.Operation {
 	case ast.Query:
 		return func(ctx context.Context) *graphql.Response {
-			if !first {
-				return nil
+			var response graphql.Response
+			var data graphql.Marshaler
+			if first {
+				first = false
+				ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
+				data = ec._Query(ctx, rc.Operation.SelectionSet)
+			} else {
+				if atomic.LoadInt32(&ec.pendingDeferred) > 0 {
+					result := <-ec.deferredResults
+					atomic.AddInt32(&ec.pendingDeferred, -1)
+					data = result.Result
+					response.Path = result.Path
+					response.Label = result.Label
+					response.Errors = result.Errors
+				} else {
+					return nil
+				}
 			}
-			first = false
-			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-			data := ec._Query(ctx, rc.Operation.SelectionSet)
 			var buf bytes.Buffer
 			data.MarshalGQL(&buf)
-
-			return &graphql.Response{
-				Data: buf.Bytes(),
+			response.Data = buf.Bytes()
+			if atomic.LoadInt32(&ec.deferred) > 0 {
+				hasNext := atomic.LoadInt32(&ec.pendingDeferred) > 0
+				response.HasNext = &hasNext
 			}
+
+			return &response
 		}
 	case ast.Mutation:
 		return func(ctx context.Context) *graphql.Response {
@@ -1095,6 +2757,23 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 				Data: buf.Bytes(),
 			}
 		}
+	case ast.Subscription:
+		next := ec._Subscription(ctx, rc.Operation.SelectionSet)
+
+		var buf bytes.Buffer
+		return func(ctx context.Context) *graphql.Response {
+			buf.Reset()
+			data := next(ctx)
+
+			if data == nil {
+				return nil
+			}
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
+		}
 
 	default:
 		return graphql.OneShot(graphql.ErrorResponse(ctx, "unsupported GraphQL operation"))
@@ -1104,6 +2783,28 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 type executionContext struct {
 	*graphql.OperationContext
 	*executableSchema
+	deferred        int32
+	pendingDeferred int32
+	deferredResults chan graphql.DeferredResult
+}
+
+func (ec *executionContext) processDeferredGroup(dg graphql.DeferredGroup) {
+	atomic.AddInt32(&ec.pendingDeferred, 1)
+	go func() {
+		ctx := graphql.WithFreshResponseContext(dg.Context)
+		dg.FieldSet.Dispatch(ctx)
+		ds := graphql.DeferredResult{
+			Path:   dg.Path,
+			Label:  dg.Label,
+			Result: dg.FieldSet,
+			Errors: graphql.GetErrors(ctx),
+		}
+		// null fields should bubble up
+		if dg.FieldSet.Invalids > 0 {
+			ds.Result = graphql.Null
+		}
+		ec.deferredResults <- ds
+	}()
 }
 
 func (ec *executionContext) introspectSchema() (*introspection.Schema, error) {
@@ -1131,11 +2832,11 @@ input CreateMsgChannelInput {
   """消息通道名称"""
   name: String!
   """组织ID"""
-  tenantID: Int!
+  tenantID: ID!
   """支持的消息模式:站内信,app推送,邮件,短信,微信等"""
   receiverType: MsgChannelReceiverType!
   """通道配置Json格式"""
-  receiver: ReceiverInput!
+  receiver: ReceiverInput
   """备注"""
   comments: String
 }
@@ -1160,12 +2861,13 @@ Input was generated by ent.
 """
 input CreateMsgSubscriberInput {
   """组织ID"""
-  tenantID: Int!
-  """用户ID"""
-  userID: Int!
+  tenantID: ID!
+  """用户组ID"""
+  orgRoleID: ID
   """是否排除"""
   exclude: Boolean
   msgTypeID: ID!
+  userID: ID
 }
 """
 CreateMsgTemplateInput is used for create MsgTemplate object.
@@ -1175,11 +2877,9 @@ input CreateMsgTemplateInput {
   """应用消息类型ID"""
   msgTypeID: Int!
   """组织ID"""
-  tenantID: Int!
+  tenantID: ID!
   """消息模板名称"""
   name: String!
-  """状态"""
-  status: MsgTemplateSimpleStatus
   """消息模式:站内信,app推送,邮件,短信,微信等"""
   receiverType: MsgTemplateReceiverType!
   """消息类型:文本,网页,需要结合mod确定支持的格式"""
@@ -1196,10 +2896,14 @@ input CreateMsgTemplateInput {
   bcc: String
   """消息体"""
   body: String
-  """模板地址"""
+  """模板地址。key：/msg/tpl/temp/1/xxx"""
   tpl: String
-  """附件地址,多个附件用逗号分隔"""
-  attachments: String
+  """模板地址"""
+  tplFileID: ID
+  """附件地址。key：/msg/att/1/xxx"""
+  attachments: [String!]
+  """附件ids"""
+  attachmentsFileIds: [ID!]
   """备注"""
   comments: String
   eventID: ID!
@@ -1210,7 +2914,7 @@ Input was generated by ent.
 """
 input CreateMsgTypeInput {
   """应用ID"""
-  appID: Int
+  appID: ID
   """消息类型分类"""
   category: String!
   """消息类型名称,应用内唯一"""
@@ -1225,12 +2929,220 @@ input CreateMsgTypeInput {
   canCustom: Boolean
 }
 """
+CreateSilenceInput is used for create Silence object.
+Input was generated by ent.
+"""
+input CreateSilenceInput {
+  tenantID: Int!
+  """应用ID"""
+  matchers: [MatcherInput]
+  """开始时间"""
+  startsAt: Time!
+  """结束时间"""
+  endsAt: Time!
+  """备注"""
+  comments: String
+  """状态"""
+  state: SilenceSilenceState
+}
+"""
 Define a Relay Cursor type:
 https://relay.dev/graphql/connections.htm#sec-Cursor
 """
 scalar Cursor
-"""An object with an Global ID,for using in Noder interface."""
+"""An object with a Global ID,for using in Noder interface."""
 scalar GID
+type MsgAlert implements Node {
+  id: ID!
+  tenantID: Int!
+  """标签"""
+  labels: MapString
+  """注解"""
+  annotations: MapString
+  """开始时间"""
+  startsAt: Time!
+  """结束时间"""
+  endsAt: Time
+  """generatorURL"""
+  url: String
+  """状态"""
+  timeout: Boolean!
+  """指纹hash值"""
+  fingerprint: String!
+  """通知状态,firing: 触发通知,resolved: 已处理过"""
+  state: MsgAlertAlertStatus!
+  createdAt: Time!
+  updatedAt: Time
+  """是否移除"""
+  deleted: Boolean!
+  nlog(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for Nlogs returned from the connection."""
+    orderBy: NlogOrder
+
+    """Filtering options for Nlogs returned from the connection."""
+    where: NlogWhereInput
+  ): NlogConnection!
+  nlogAlerts: [NlogAlert!]
+}
+"""MsgAlertAlertStatus is enum for the field state"""
+enum MsgAlertAlertStatus @goModel(model: "github.com/woocoos/msgcenter/pkg/alert.AlertStatus") {
+  none
+  firing
+  resolved
+}
+"""A connection to a list of items."""
+type MsgAlertConnection {
+  """A list of edges."""
+  edges: [MsgAlertEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type MsgAlertEdge {
+  """The item at the end of the edge."""
+  node: MsgAlert
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
+"""Ordering options for MsgAlert connections"""
+input MsgAlertOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order MsgAlerts."""
+  field: MsgAlertOrderField!
+}
+"""Properties by which MsgAlert connections can be ordered."""
+enum MsgAlertOrderField {
+  createdAt
+}
+"""
+MsgAlertWhereInput is used for filtering MsgAlert objects.
+Input was generated by ent.
+"""
+input MsgAlertWhereInput {
+  not: MsgAlertWhereInput
+  and: [MsgAlertWhereInput!]
+  or: [MsgAlertWhereInput!]
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  """tenant_id field predicates"""
+  tenantID: Int
+  tenantIDNEQ: Int
+  tenantIDIn: [Int!]
+  tenantIDNotIn: [Int!]
+  tenantIDGT: Int
+  tenantIDGTE: Int
+  tenantIDLT: Int
+  tenantIDLTE: Int
+  """starts_at field predicates"""
+  startsAt: Time
+  startsAtNEQ: Time
+  startsAtIn: [Time!]
+  startsAtNotIn: [Time!]
+  startsAtGT: Time
+  startsAtGTE: Time
+  startsAtLT: Time
+  startsAtLTE: Time
+  """ends_at field predicates"""
+  endsAt: Time
+  endsAtNEQ: Time
+  endsAtIn: [Time!]
+  endsAtNotIn: [Time!]
+  endsAtGT: Time
+  endsAtGTE: Time
+  endsAtLT: Time
+  endsAtLTE: Time
+  endsAtIsNil: Boolean
+  endsAtNotNil: Boolean
+  """url field predicates"""
+  url: String
+  urlNEQ: String
+  urlIn: [String!]
+  urlNotIn: [String!]
+  urlGT: String
+  urlGTE: String
+  urlLT: String
+  urlLTE: String
+  urlContains: String
+  urlHasPrefix: String
+  urlHasSuffix: String
+  urlIsNil: Boolean
+  urlNotNil: Boolean
+  urlEqualFold: String
+  urlContainsFold: String
+  """timeout field predicates"""
+  timeout: Boolean
+  timeoutNEQ: Boolean
+  """fingerprint field predicates"""
+  fingerprint: String
+  fingerprintNEQ: String
+  fingerprintIn: [String!]
+  fingerprintNotIn: [String!]
+  fingerprintGT: String
+  fingerprintGTE: String
+  fingerprintLT: String
+  fingerprintLTE: String
+  fingerprintContains: String
+  fingerprintHasPrefix: String
+  fingerprintHasSuffix: String
+  fingerprintEqualFold: String
+  fingerprintContainsFold: String
+  """state field predicates"""
+  state: MsgAlertAlertStatus
+  stateNEQ: MsgAlertAlertStatus
+  stateIn: [MsgAlertAlertStatus!]
+  stateNotIn: [MsgAlertAlertStatus!]
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtIsNil: Boolean
+  updatedAtNotNil: Boolean
+  """deleted field predicates"""
+  deleted: Boolean
+  deletedNEQ: Boolean
+  """nlog edge predicates"""
+  hasNlog: Boolean
+  hasNlogWith: [NlogWhereInput!]
+  """nlog_alerts edge predicates"""
+  hasNlogAlerts: Boolean
+  hasNlogAlertsWith: [NlogAlertWhereInput!]
+}
 type MsgChannel implements Node {
   id: ID!
   createdBy: Int!
@@ -1240,15 +3152,31 @@ type MsgChannel implements Node {
   """消息通道名称"""
   name: String!
   """组织ID"""
-  tenantID: Int!
+  tenantID: ID!
   """支持的消息模式:站内信,app推送,邮件,短信,微信等"""
   receiverType: MsgChannelReceiverType!
   """状态"""
   status: MsgChannelSimpleStatus
   """通道配置Json格式"""
-  receiver: Receiver!
+  receiver: Receiver
   """备注"""
   comments: String
+}
+"""A connection to a list of items."""
+type MsgChannelConnection {
+  """A list of edges."""
+  edges: [MsgChannelEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type MsgChannelEdge {
+  """The item at the end of the edge."""
+  node: MsgChannel
+  """A cursor for use in pagination."""
+  cursor: Cursor!
 }
 """Ordering options for MsgChannel connections"""
 input MsgChannelOrder {
@@ -1264,13 +3192,15 @@ enum MsgChannelOrderField {
 """MsgChannelReceiverType is enum for the field receiver_type"""
 enum MsgChannelReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
   email
+  message
   webhook
 }
 """MsgChannelSimpleStatus is enum for the field status"""
-enum MsgChannelSimpleStatus @goModel(model: "github.com/woocoos/entco/schemax/typex.SimpleStatus") {
+enum MsgChannelSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   inactive
   processing
+  disabled
 }
 """
 MsgChannelWhereInput is used for filtering MsgChannel objects.
@@ -1344,14 +3274,14 @@ input MsgChannelWhereInput {
   nameEqualFold: String
   nameContainsFold: String
   """tenant_id field predicates"""
-  tenantID: Int
-  tenantIDNEQ: Int
-  tenantIDIn: [Int!]
-  tenantIDNotIn: [Int!]
-  tenantIDGT: Int
-  tenantIDGTE: Int
-  tenantIDLT: Int
-  tenantIDLTE: Int
+  tenantID: ID
+  tenantIDNEQ: ID
+  tenantIDIn: [ID!]
+  tenantIDNotIn: [ID!]
+  tenantIDGT: ID
+  tenantIDGTE: ID
+  tenantIDLT: ID
+  tenantIDLTE: ID
   """receiver_type field predicates"""
   receiverType: MsgChannelReceiverType
   receiverTypeNEQ: MsgChannelReceiverType
@@ -1404,6 +3334,22 @@ type MsgEvent implements Node {
   """自定义的消息模板"""
   customerTemplate: [MsgTemplate!]
 }
+"""A connection to a list of items."""
+type MsgEventConnection {
+  """A list of edges."""
+  edges: [MsgEventEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type MsgEventEdge {
+  """The item at the end of the edge."""
+  node: MsgEvent
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
 """Ordering options for MsgEvent connections"""
 input MsgEventOrder {
   """The ordering direction."""
@@ -1416,10 +3362,11 @@ enum MsgEventOrderField {
   createdAt
 }
 """MsgEventSimpleStatus is enum for the field status"""
-enum MsgEventSimpleStatus @goModel(model: "github.com/woocoos/entco/schemax/typex.SimpleStatus") {
+enum MsgEventSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   inactive
   processing
+  disabled
 }
 """
 MsgEventWhereInput is used for filtering MsgEvent objects.
@@ -1525,6 +3472,293 @@ input MsgEventWhereInput {
   hasCustomerTemplate: Boolean
   hasCustomerTemplateWith: [MsgTemplateWhereInput!]
 }
+type MsgInternal implements Node {
+  id: ID!
+  tenantID: Int!
+  createdBy: Int!
+  createdAt: Time!
+  updatedBy: Int
+  updatedAt: Time
+  """消息类型分类"""
+  category: String!
+  """标题"""
+  subject: String!
+  """消息体"""
+  body: String
+  """内容类型: html,txt"""
+  format: String!
+  """消息跳转"""
+  redirect: String
+  msgInternalTo: [MsgInternalTo!]
+}
+"""A connection to a list of items."""
+type MsgInternalConnection {
+  """A list of edges."""
+  edges: [MsgInternalEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type MsgInternalEdge {
+  """The item at the end of the edge."""
+  node: MsgInternal
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
+"""Ordering options for MsgInternal connections"""
+input MsgInternalOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order MsgInternals."""
+  field: MsgInternalOrderField!
+}
+"""Properties by which MsgInternal connections can be ordered."""
+enum MsgInternalOrderField {
+  createdAt
+}
+type MsgInternalTo implements Node {
+  id: ID!
+  tenantID: Int!
+  """站内信ID"""
+  msgInternalID: ID!
+  """用户ID"""
+  userID: ID!
+  """阅读时间"""
+  readAt: Time
+  """删除时间"""
+  deleteAt: Time
+  createdAt: Time!
+  msgInternal: MsgInternal!
+  user: User!
+}
+"""A connection to a list of items."""
+type MsgInternalToConnection {
+  """A list of edges."""
+  edges: [MsgInternalToEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type MsgInternalToEdge {
+  """The item at the end of the edge."""
+  node: MsgInternalTo
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
+"""Ordering options for MsgInternalTo connections"""
+input MsgInternalToOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order MsgInternalTos."""
+  field: MsgInternalToOrderField!
+}
+"""Properties by which MsgInternalTo connections can be ordered."""
+enum MsgInternalToOrderField {
+  createdAt
+}
+"""
+MsgInternalToWhereInput is used for filtering MsgInternalTo objects.
+Input was generated by ent.
+"""
+input MsgInternalToWhereInput {
+  not: MsgInternalToWhereInput
+  and: [MsgInternalToWhereInput!]
+  or: [MsgInternalToWhereInput!]
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  """tenant_id field predicates"""
+  tenantID: Int
+  tenantIDNEQ: Int
+  tenantIDIn: [Int!]
+  tenantIDNotIn: [Int!]
+  tenantIDGT: Int
+  tenantIDGTE: Int
+  tenantIDLT: Int
+  tenantIDLTE: Int
+  """msg_internal_id field predicates"""
+  msgInternalID: ID
+  msgInternalIDNEQ: ID
+  msgInternalIDIn: [ID!]
+  msgInternalIDNotIn: [ID!]
+  """user_id field predicates"""
+  userID: ID
+  userIDNEQ: ID
+  userIDIn: [ID!]
+  userIDNotIn: [ID!]
+  """read_at field predicates"""
+  readAt: Time
+  readAtNEQ: Time
+  readAtIn: [Time!]
+  readAtNotIn: [Time!]
+  readAtGT: Time
+  readAtGTE: Time
+  readAtLT: Time
+  readAtLTE: Time
+  readAtIsNil: Boolean
+  readAtNotNil: Boolean
+  """delete_at field predicates"""
+  deleteAt: Time
+  deleteAtNEQ: Time
+  deleteAtIn: [Time!]
+  deleteAtNotIn: [Time!]
+  deleteAtGT: Time
+  deleteAtGTE: Time
+  deleteAtLT: Time
+  deleteAtLTE: Time
+  deleteAtIsNil: Boolean
+  deleteAtNotNil: Boolean
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  """msg_internal edge predicates"""
+  hasMsgInternal: Boolean
+  hasMsgInternalWith: [MsgInternalWhereInput!]
+}
+"""
+MsgInternalWhereInput is used for filtering MsgInternal objects.
+Input was generated by ent.
+"""
+input MsgInternalWhereInput {
+  not: MsgInternalWhereInput
+  and: [MsgInternalWhereInput!]
+  or: [MsgInternalWhereInput!]
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  """tenant_id field predicates"""
+  tenantID: Int
+  tenantIDNEQ: Int
+  tenantIDIn: [Int!]
+  tenantIDNotIn: [Int!]
+  tenantIDGT: Int
+  tenantIDGTE: Int
+  tenantIDLT: Int
+  tenantIDLTE: Int
+  """created_by field predicates"""
+  createdBy: Int
+  createdByNEQ: Int
+  createdByIn: [Int!]
+  createdByNotIn: [Int!]
+  createdByGT: Int
+  createdByGTE: Int
+  createdByLT: Int
+  createdByLTE: Int
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  """updated_by field predicates"""
+  updatedBy: Int
+  updatedByNEQ: Int
+  updatedByIn: [Int!]
+  updatedByNotIn: [Int!]
+  updatedByGT: Int
+  updatedByGTE: Int
+  updatedByLT: Int
+  updatedByLTE: Int
+  updatedByIsNil: Boolean
+  updatedByNotNil: Boolean
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtIsNil: Boolean
+  updatedAtNotNil: Boolean
+  """category field predicates"""
+  category: String
+  categoryNEQ: String
+  categoryIn: [String!]
+  categoryNotIn: [String!]
+  categoryGT: String
+  categoryGTE: String
+  categoryLT: String
+  categoryLTE: String
+  categoryContains: String
+  categoryHasPrefix: String
+  categoryHasSuffix: String
+  categoryEqualFold: String
+  categoryContainsFold: String
+  """subject field predicates"""
+  subject: String
+  subjectNEQ: String
+  subjectIn: [String!]
+  subjectNotIn: [String!]
+  subjectGT: String
+  subjectGTE: String
+  subjectLT: String
+  subjectLTE: String
+  subjectContains: String
+  subjectHasPrefix: String
+  subjectHasSuffix: String
+  subjectEqualFold: String
+  subjectContainsFold: String
+  """format field predicates"""
+  format: String
+  formatNEQ: String
+  formatIn: [String!]
+  formatNotIn: [String!]
+  formatGT: String
+  formatGTE: String
+  formatLT: String
+  formatLTE: String
+  formatContains: String
+  formatHasPrefix: String
+  formatHasSuffix: String
+  formatEqualFold: String
+  formatContainsFold: String
+  """redirect field predicates"""
+  redirect: String
+  redirectNEQ: String
+  redirectIn: [String!]
+  redirectNotIn: [String!]
+  redirectGT: String
+  redirectGTE: String
+  redirectLT: String
+  redirectLTE: String
+  redirectContains: String
+  redirectHasPrefix: String
+  redirectHasSuffix: String
+  redirectIsNil: Boolean
+  redirectNotNil: Boolean
+  redirectEqualFold: String
+  redirectContainsFold: String
+  """msg_internal_to edge predicates"""
+  hasMsgInternalTo: Boolean
+  hasMsgInternalToWith: [MsgInternalToWhereInput!]
+}
 type MsgSubscriber implements Node {
   id: ID!
   createdBy: Int!
@@ -1534,12 +3768,15 @@ type MsgSubscriber implements Node {
   """应用消息类型ID"""
   msgTypeID: ID!
   """组织ID"""
-  tenantID: Int!
+  tenantID: ID!
   """用户ID"""
-  userID: Int!
+  userID: ID
+  """用户组ID"""
+  orgRoleID: ID
   """是否排除"""
   exclude: Boolean
   msgType: MsgType!
+  user: User
 }
 """Ordering options for MsgSubscriber connections"""
 input MsgSubscriberOrder {
@@ -1615,23 +3852,32 @@ input MsgSubscriberWhereInput {
   msgTypeIDIn: [ID!]
   msgTypeIDNotIn: [ID!]
   """tenant_id field predicates"""
-  tenantID: Int
-  tenantIDNEQ: Int
-  tenantIDIn: [Int!]
-  tenantIDNotIn: [Int!]
-  tenantIDGT: Int
-  tenantIDGTE: Int
-  tenantIDLT: Int
-  tenantIDLTE: Int
+  tenantID: ID
+  tenantIDNEQ: ID
+  tenantIDIn: [ID!]
+  tenantIDNotIn: [ID!]
+  tenantIDGT: ID
+  tenantIDGTE: ID
+  tenantIDLT: ID
+  tenantIDLTE: ID
   """user_id field predicates"""
-  userID: Int
-  userIDNEQ: Int
-  userIDIn: [Int!]
-  userIDNotIn: [Int!]
-  userIDGT: Int
-  userIDGTE: Int
-  userIDLT: Int
-  userIDLTE: Int
+  userID: ID
+  userIDNEQ: ID
+  userIDIn: [ID!]
+  userIDNotIn: [ID!]
+  userIDIsNil: Boolean
+  userIDNotNil: Boolean
+  """org_role_id field predicates"""
+  orgRoleID: ID
+  orgRoleIDNEQ: ID
+  orgRoleIDIn: [ID!]
+  orgRoleIDNotIn: [ID!]
+  orgRoleIDGT: ID
+  orgRoleIDGTE: ID
+  orgRoleIDLT: ID
+  orgRoleIDLTE: ID
+  orgRoleIDIsNil: Boolean
+  orgRoleIDNotNil: Boolean
   """exclude field predicates"""
   exclude: Boolean
   excludeNEQ: Boolean
@@ -1652,7 +3898,7 @@ type MsgTemplate implements Node {
   """消息事件ID"""
   msgEventID: ID!
   """组织ID"""
-  tenantID: Int!
+  tenantID: ID!
   """消息模板名称"""
   name: String!
   """状态"""
@@ -1673,13 +3919,33 @@ type MsgTemplate implements Node {
   bcc: String
   """消息体"""
   body: String
-  """模板地址"""
+  """模板地址。key：/msg/tpl/temp/1/xxx"""
   tpl: String
-  """附件地址,多个附件用逗号分隔"""
-  attachments: String
+  """模板地址"""
+  tplFileID: ID
+  """附件地址。key：/msg/att/1/xxx"""
+  attachments: [String!]
+  """附件ids"""
+  attachmentsFileIds: [ID!]
   """备注"""
   comments: String
   event: MsgEvent!
+}
+"""A connection to a list of items."""
+type MsgTemplateConnection {
+  """A list of edges."""
+  edges: [MsgTemplateEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type MsgTemplateEdge {
+  """The item at the end of the edge."""
+  node: MsgTemplate
+  """A cursor for use in pagination."""
+  cursor: Cursor!
 }
 """MsgTemplateFormat is enum for the field format"""
 enum MsgTemplateFormat @goModel(model: "github.com/woocoos/msgcenter/ent/msgtemplate.Format") {
@@ -1700,13 +3966,15 @@ enum MsgTemplateOrderField {
 """MsgTemplateReceiverType is enum for the field receiver_type"""
 enum MsgTemplateReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
   email
+  message
   webhook
 }
 """MsgTemplateSimpleStatus is enum for the field status"""
-enum MsgTemplateSimpleStatus @goModel(model: "github.com/woocoos/entco/schemax/typex.SimpleStatus") {
+enum MsgTemplateSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   inactive
   processing
+  disabled
 }
 """
 MsgTemplateWhereInput is used for filtering MsgTemplate objects.
@@ -1780,14 +4048,14 @@ input MsgTemplateWhereInput {
   msgEventIDIn: [ID!]
   msgEventIDNotIn: [ID!]
   """tenant_id field predicates"""
-  tenantID: Int
-  tenantIDNEQ: Int
-  tenantIDIn: [Int!]
-  tenantIDNotIn: [Int!]
-  tenantIDGT: Int
-  tenantIDGTE: Int
-  tenantIDLT: Int
-  tenantIDLTE: Int
+  tenantID: ID
+  tenantIDNEQ: ID
+  tenantIDIn: [ID!]
+  tenantIDNotIn: [ID!]
+  tenantIDGT: ID
+  tenantIDGTE: ID
+  tenantIDLT: ID
+  tenantIDLTE: ID
   """name field predicates"""
   name: String
   nameNEQ: String
@@ -1910,7 +4178,7 @@ type MsgType implements Node {
   updatedBy: Int
   updatedAt: Time
   """应用ID"""
-  appID: Int
+  appID: ID
   """消息类型分类"""
   category: String!
   """消息类型名称,应用内唯一"""
@@ -1928,6 +4196,22 @@ type MsgType implements Node {
   """订阅者"""
   subscribers: [MsgSubscriber!]
 }
+"""A connection to a list of items."""
+type MsgTypeConnection {
+  """A list of edges."""
+  edges: [MsgTypeEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type MsgTypeEdge {
+  """The item at the end of the edge."""
+  node: MsgType
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
 """Ordering options for MsgType connections"""
 input MsgTypeOrder {
   """The ordering direction."""
@@ -1940,10 +4224,11 @@ enum MsgTypeOrderField {
   createdAt
 }
 """MsgTypeSimpleStatus is enum for the field status"""
-enum MsgTypeSimpleStatus @goModel(model: "github.com/woocoos/entco/schemax/typex.SimpleStatus") {
+enum MsgTypeSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   inactive
   processing
+  disabled
 }
 """
 MsgTypeWhereInput is used for filtering MsgType objects.
@@ -2003,14 +4288,14 @@ input MsgTypeWhereInput {
   updatedAtIsNil: Boolean
   updatedAtNotNil: Boolean
   """app_id field predicates"""
-  appID: Int
-  appIDNEQ: Int
-  appIDIn: [Int!]
-  appIDNotIn: [Int!]
-  appIDGT: Int
-  appIDGTE: Int
-  appIDLT: Int
-  appIDLTE: Int
+  appID: ID
+  appIDNEQ: ID
+  appIDIn: [ID!]
+  appIDNotIn: [ID!]
+  appIDGT: ID
+  appIDGTE: ID
+  appIDLT: ID
+  appIDLTE: ID
   appIDIsNil: Boolean
   appIDNotNil: Boolean
   """category field predicates"""
@@ -2065,6 +4350,220 @@ input MsgTypeWhereInput {
   hasSubscribers: Boolean
   hasSubscribersWith: [MsgSubscriberWhereInput!]
 }
+type Nlog implements Node {
+  id: ID!
+  tenantID: Int!
+  """分组键"""
+  groupKey: String!
+  """接收组名称"""
+  receiver: String!
+  """支持的消息模式:站内信,app推送,邮件,短信,微信等"""
+  receiverType: NlogReceiverType!
+  """通道的索引位置"""
+  idx: Int!
+  """发送时间"""
+  sendAt: Time!
+  createdAt: Time!
+  updatedAt: Time
+  """过期时间"""
+  expiresAt: Time!
+  alerts: [MsgAlert!]
+  nlogAlert: [NlogAlert!]
+}
+type NlogAlert implements Node {
+  id: ID!
+  """nlog id"""
+  nlogID: ID!
+  """alert id"""
+  alertID: ID!
+  createdAt: Time!
+  nlog: Nlog!
+  alert: MsgAlert!
+}
+"""Ordering options for NlogAlert connections"""
+input NlogAlertOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order NlogAlerts."""
+  field: NlogAlertOrderField!
+}
+"""Properties by which NlogAlert connections can be ordered."""
+enum NlogAlertOrderField {
+  createdAt
+}
+"""
+NlogAlertWhereInput is used for filtering NlogAlert objects.
+Input was generated by ent.
+"""
+input NlogAlertWhereInput {
+  not: NlogAlertWhereInput
+  and: [NlogAlertWhereInput!]
+  or: [NlogAlertWhereInput!]
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+}
+"""A connection to a list of items."""
+type NlogConnection {
+  """A list of edges."""
+  edges: [NlogEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type NlogEdge {
+  """The item at the end of the edge."""
+  node: Nlog
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
+"""Ordering options for Nlog connections"""
+input NlogOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order Nlogs."""
+  field: NlogOrderField!
+}
+"""Properties by which Nlog connections can be ordered."""
+enum NlogOrderField {
+  createdAt
+}
+"""NlogReceiverType is enum for the field receiver_type"""
+enum NlogReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
+  email
+  message
+  webhook
+}
+"""
+NlogWhereInput is used for filtering Nlog objects.
+Input was generated by ent.
+"""
+input NlogWhereInput {
+  not: NlogWhereInput
+  and: [NlogWhereInput!]
+  or: [NlogWhereInput!]
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  """tenant_id field predicates"""
+  tenantID: Int
+  tenantIDNEQ: Int
+  tenantIDIn: [Int!]
+  tenantIDNotIn: [Int!]
+  tenantIDGT: Int
+  tenantIDGTE: Int
+  tenantIDLT: Int
+  tenantIDLTE: Int
+  """group_key field predicates"""
+  groupKey: String
+  groupKeyNEQ: String
+  groupKeyIn: [String!]
+  groupKeyNotIn: [String!]
+  groupKeyGT: String
+  groupKeyGTE: String
+  groupKeyLT: String
+  groupKeyLTE: String
+  groupKeyContains: String
+  groupKeyHasPrefix: String
+  groupKeyHasSuffix: String
+  groupKeyEqualFold: String
+  groupKeyContainsFold: String
+  """receiver field predicates"""
+  receiver: String
+  receiverNEQ: String
+  receiverIn: [String!]
+  receiverNotIn: [String!]
+  receiverGT: String
+  receiverGTE: String
+  receiverLT: String
+  receiverLTE: String
+  receiverContains: String
+  receiverHasPrefix: String
+  receiverHasSuffix: String
+  receiverEqualFold: String
+  receiverContainsFold: String
+  """receiver_type field predicates"""
+  receiverType: NlogReceiverType
+  receiverTypeNEQ: NlogReceiverType
+  receiverTypeIn: [NlogReceiverType!]
+  receiverTypeNotIn: [NlogReceiverType!]
+  """idx field predicates"""
+  idx: Int
+  idxNEQ: Int
+  idxIn: [Int!]
+  idxNotIn: [Int!]
+  idxGT: Int
+  idxGTE: Int
+  idxLT: Int
+  idxLTE: Int
+  """send_at field predicates"""
+  sendAt: Time
+  sendAtNEQ: Time
+  sendAtIn: [Time!]
+  sendAtNotIn: [Time!]
+  sendAtGT: Time
+  sendAtGTE: Time
+  sendAtLT: Time
+  sendAtLTE: Time
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtIsNil: Boolean
+  updatedAtNotNil: Boolean
+  """expires_at field predicates"""
+  expiresAt: Time
+  expiresAtNEQ: Time
+  expiresAtIn: [Time!]
+  expiresAtNotIn: [Time!]
+  expiresAtGT: Time
+  expiresAtGTE: Time
+  expiresAtLT: Time
+  expiresAtLTE: Time
+  """alerts edge predicates"""
+  hasAlerts: Boolean
+  hasAlertsWith: [MsgAlertWhereInput!]
+  """nlog_alert edge predicates"""
+  hasNlogAlert: Boolean
+  hasNlogAlertWith: [NlogAlertWhereInput!]
+}
 """
 An object with an ID.
 Follows the [Relay Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm)
@@ -2105,6 +4604,185 @@ type Query {
     """The list of node IDs."""
     ids: [GID!]!
   ): [Node]!
+  """站内信查询"""
+  msgInternals(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for MsgInternals returned from the connection."""
+    orderBy: MsgInternalOrder
+
+    """Filtering options for MsgInternals returned from the connection."""
+    where: MsgInternalWhereInput
+  ): MsgInternalConnection!
+  """站内信明细查询"""
+  msgInternalTos(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for MsgInternalTos returned from the connection."""
+    orderBy: MsgInternalToOrder
+
+    """Filtering options for MsgInternalTos returned from the connection."""
+    where: MsgInternalToWhereInput
+  ): MsgInternalToConnection!
+}
+type Silence implements Node {
+  id: ID!
+  createdBy: ID!
+  createdAt: Time!
+  updatedBy: Int
+  updatedAt: Time
+  tenantID: Int!
+  """应用ID"""
+  matchers: [Matcher]
+  """开始时间"""
+  startsAt: Time!
+  """结束时间"""
+  endsAt: Time!
+  """备注"""
+  comments: String
+  """状态"""
+  state: SilenceSilenceState!
+  """创建人"""
+  user: User!
+}
+"""A connection to a list of items."""
+type SilenceConnection {
+  """A list of edges."""
+  edges: [SilenceEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type SilenceEdge {
+  """The item at the end of the edge."""
+  node: Silence
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
+"""Ordering options for Silence connections"""
+input SilenceOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order Silences."""
+  field: SilenceOrderField!
+}
+"""Properties by which Silence connections can be ordered."""
+enum SilenceOrderField {
+  createdAt
+}
+"""SilenceSilenceState is enum for the field state"""
+enum SilenceSilenceState @goModel(model: "github.com/woocoos/msgcenter/pkg/alert.SilenceState") {
+  expired
+  active
+  pending
+}
+"""
+SilenceWhereInput is used for filtering Silence objects.
+Input was generated by ent.
+"""
+input SilenceWhereInput {
+  not: SilenceWhereInput
+  and: [SilenceWhereInput!]
+  or: [SilenceWhereInput!]
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  """created_by field predicates"""
+  createdBy: ID
+  createdByNEQ: ID
+  createdByIn: [ID!]
+  createdByNotIn: [ID!]
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  """updated_by field predicates"""
+  updatedBy: Int
+  updatedByNEQ: Int
+  updatedByIn: [Int!]
+  updatedByNotIn: [Int!]
+  updatedByGT: Int
+  updatedByGTE: Int
+  updatedByLT: Int
+  updatedByLTE: Int
+  updatedByIsNil: Boolean
+  updatedByNotNil: Boolean
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtIsNil: Boolean
+  updatedAtNotNil: Boolean
+  """tenant_id field predicates"""
+  tenantID: Int
+  tenantIDNEQ: Int
+  tenantIDIn: [Int!]
+  tenantIDNotIn: [Int!]
+  tenantIDGT: Int
+  tenantIDGTE: Int
+  tenantIDLT: Int
+  tenantIDLTE: Int
+  """starts_at field predicates"""
+  startsAt: Time
+  startsAtNEQ: Time
+  startsAtIn: [Time!]
+  startsAtNotIn: [Time!]
+  startsAtGT: Time
+  startsAtGTE: Time
+  startsAtLT: Time
+  startsAtLTE: Time
+  """ends_at field predicates"""
+  endsAt: Time
+  endsAtNEQ: Time
+  endsAtIn: [Time!]
+  endsAtNotIn: [Time!]
+  endsAtGT: Time
+  endsAtGTE: Time
+  endsAtLT: Time
+  endsAtLTE: Time
+  """state field predicates"""
+  state: SilenceSilenceState
+  stateNEQ: SilenceSilenceState
+  stateIn: [SilenceSilenceState!]
+  stateNotIn: [SilenceSilenceState!]
 }
 """The builtin Time type"""
 scalar Time
@@ -2116,14 +4794,12 @@ input UpdateMsgChannelInput {
   """消息通道名称"""
   name: String
   """组织ID"""
-  tenantID: Int
+  tenantID: ID
   """支持的消息模式:站内信,app推送,邮件,短信,微信等"""
   receiverType: MsgChannelReceiverType
-  """状态"""
-  status: MsgChannelSimpleStatus
-  clearStatus: Boolean
   """通道配置Json格式"""
   receiver: ReceiverInput
+  clearReceiver: Boolean
   """备注"""
   comments: String
   clearComments: Boolean
@@ -2135,9 +4811,6 @@ Input was generated by ent.
 input UpdateMsgEventInput {
   """消息事件名称,应用内唯一"""
   name: String
-  """状态"""
-  status: MsgEventSimpleStatus
-  clearStatus: Boolean
   """备注"""
   comments: String
   clearComments: Boolean
@@ -2154,13 +4827,16 @@ Input was generated by ent.
 """
 input UpdateMsgSubscriberInput {
   """组织ID"""
-  tenantID: Int
-  """用户ID"""
-  userID: Int
+  tenantID: ID
+  """用户组ID"""
+  orgRoleID: ID
+  clearOrgRoleID: Boolean
   """是否排除"""
   exclude: Boolean
   clearExclude: Boolean
   msgTypeID: ID
+  userID: ID
+  clearUser: Boolean
 }
 """
 UpdateMsgTemplateInput is used for update MsgTemplate object.
@@ -2170,12 +4846,9 @@ input UpdateMsgTemplateInput {
   """应用消息类型ID"""
   msgTypeID: Int
   """组织ID"""
-  tenantID: Int
+  tenantID: ID
   """消息模板名称"""
   name: String
-  """状态"""
-  status: MsgTemplateSimpleStatus
-  clearStatus: Boolean
   """消息模式:站内信,app推送,邮件,短信,微信等"""
   receiverType: MsgTemplateReceiverType
   """消息类型:文本,网页,需要结合mod确定支持的格式"""
@@ -2198,12 +4871,20 @@ input UpdateMsgTemplateInput {
   """消息体"""
   body: String
   clearBody: Boolean
-  """模板地址"""
+  """模板地址。key：/msg/tpl/temp/1/xxx"""
   tpl: String
   clearTpl: Boolean
-  """附件地址,多个附件用逗号分隔"""
-  attachments: String
+  """模板地址"""
+  tplFileID: ID
+  clearTplFileID: Boolean
+  """附件地址。key：/msg/att/1/xxx"""
+  attachments: [String!]
+  appendAttachments: [String!]
   clearAttachments: Boolean
+  """附件ids"""
+  attachmentsFileIds: [ID!]
+  appendAttachmentsFileIds: [ID!]
+  clearAttachmentsFileIds: Boolean
   """备注"""
   comments: String
   clearComments: Boolean
@@ -2215,7 +4896,7 @@ Input was generated by ent.
 """
 input UpdateMsgTypeInput {
   """应用ID"""
-  appID: Int
+  appID: ID
   clearAppID: Boolean
   """消息类型分类"""
   category: String
@@ -2234,16 +4915,57 @@ input UpdateMsgTypeInput {
   canCustom: Boolean
   clearCanCustom: Boolean
 }
+"""
+UpdateSilenceInput is used for update Silence object.
+Input was generated by ent.
+"""
+input UpdateSilenceInput {
+  """应用ID"""
+  matchers: [MatcherInput]
+  appendMatchers: [MatcherInput]
+  clearMatchers: Boolean
+  """开始时间"""
+  startsAt: Time
+  """结束时间"""
+  endsAt: Time
+  """备注"""
+  comments: String
+  clearComments: Boolean
+  """状态"""
+  state: SilenceSilenceState
+}
+type User implements Node {
+  """ID"""
+  id: ID!
+  """登陆名称"""
+  principalName: String!
+  """显示名"""
+  displayName: String!
+  """邮箱"""
+  email: String
+  """手机"""
+  mobile: String
+  """静默"""
+  silences: [Silence!]
+}
 `, BuiltIn: false},
-	{Name: "../query.graphql", Input: `scalar Duration
+	{Name: "../query.graphql", Input: `""" time duration: RFCXXX duration string, e.g. 1h30m """
+scalar Duration
+""" utf8 string """
 scalar LabelName
+""" map[string]string JSON Raw """
 scalar MapString
+""" host:port """
 scalar HostPort
 
 enum MatchType {
+    """ = """
     MatchEqual
+    """ != """
     MatchNotEqual
+    """ =~ """
     MatchRegexp
+    """ !~ """
     MatchNotRegexp
 }
 
@@ -2269,9 +4991,12 @@ type Matcher {
 type Receiver {
     name: String!
     emailConfigs: [EmailConfig]
+    messageConfig: MessageConfig
 }
 
 type EmailConfig {
+    to: String!
+    from: String
     smartHost: HostPort!
     authType: String!
     authUsername: String!
@@ -2279,30 +5004,174 @@ type EmailConfig {
     authSecret: String!
     authIdentity: String!
     headers: MapString
+}
+
+type MessageConfig {
+    to: String
+    subject: String
+    redirect: String
+}
+
+enum RouteStrType {
+    Json
+    Yaml
+}
+
+extend type MsgType {
+    """ 订阅的用户 """
+    subscriberUsers:[MsgSubscriber!]!
+    """ 订阅的用户组 """
+    subscriberRoles:[MsgSubscriber!]!
+    """ 排除的用户 """
+    excludeSubscriberUsers:[MsgSubscriber!]!
+}
+
+extend type MsgEvent {
+    routeStr(type: RouteStrType!): String!
+}
+
+extend type MsgInternal {
+    """消息发送的用户数"""
+    toSendCounts:Int!
+    """消息已读的用户数"""
+    hasReadCounts:Int!
+}
+
+extend type Query {
+    """ 消息通道列表 """
+    msgChannels(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgChannelOrder
+        where: MsgChannelWhereInput
+    ): MsgChannelConnection!
+
+    """ 消息类型列表 """
+    msgTypes(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgTypeOrder
+        where: MsgTypeWhereInput
+    ): MsgTypeConnection!
+
+    """ 消息类型分类 """
+    msgTypeCategories(keyword:String,appID:ID): [String!]!
+
+    """ 消息事件列表 """
+    msgEvents(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgEventOrder
+        where: MsgEventWhereInput
+    ): MsgEventConnection!
+
+    """ 消息模板列表 """
+    msgTemplates(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgTemplateOrder
+        where: MsgTemplateWhereInput
+    ): MsgTemplateConnection!
+
+    """ 静默消息 """
+    silences(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: SilenceOrder
+        where: SilenceWhereInput
+    ):SilenceConnection!
+
+    """消息列表"""
+    msgAlerts(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgAlertOrder
+        where: MsgAlertWhereInput
+    ):MsgAlertConnection!
+
+    """获取用户的站内信"""
+    userMsgInternalTos(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgInternalToOrder
+        where: MsgInternalToWhereInput
+    ):MsgInternalToConnection!
+    """用户订阅的消息分类"""
+    userSubMsgCategory:[String!]!
+    """消息分类站内信未读数"""
+    userUnreadMsgInternalsFromMsgCategory(categories: [String!]!):[Int!]!
+    """用户站内信总未读数"""
+    userUnreadMsgInternals:Int!
 }`, BuiltIn: false},
 	{Name: "../mutation.graphql", Input: `type Mutation {
-    # 创建消息类型
+    """ 创建消息类型 """
     createMsgType(input: CreateMsgTypeInput!): MsgType!
-    # 更新消息类型
+    """ 更新消息类型 """
     updateMsgType(id: ID!,input: UpdateMsgTypeInput!): MsgType!
-    # 删除消息类型
+    """ 删除消息类型 """
     deleteMsgType(id: ID!): Boolean!
-    # 创建消息事件
+    """ 创建消息事件 """
     createMsgEvent(input: CreateMsgEventInput!): MsgEvent!
-    # 更新消息事件
+    """ 更新消息事件 """
     updateMsgEvent(id:ID!,input: UpdateMsgEventInput!): MsgEvent!
-    # 删除消息事件
+    """ 删除消息事件 """
     deleteMsgEvent(id: ID!): Boolean!
-    # 启用消息事件
+    """ 启用消息事件 """
     enableMsgEvent(id: ID!): MsgEvent!
-    # 创建消息通道
+    """ 禁用消息事件 """
+    disableMsgEvent(id: ID!): MsgEvent!
+    """ 创建消息通道 """
     createMsgChannel(input: CreateMsgChannelInput!): MsgChannel!
-    # 更新消息通道
+    """ 更新消息通道 """
     updateMsgChannel(id: ID!,input: UpdateMsgChannelInput!): MsgChannel!
-    # 删除消息通道
+    """ 删除消息通道 """
     deleteMsgChannel(id: ID!): Boolean!
-    # 启用消息通道
+    """ 启用消息通道 """
     enableMsgChannel(id: ID!): MsgChannel!
+    """ 禁用消息通道 """
+    disableMsgChannel(id: ID!): MsgChannel!
+    """ 创建消息模板 """
+    createMsgTemplate(input: CreateMsgTemplateInput!): MsgTemplate!
+    """ 更新消息模板 """
+    updateMsgTemplate(id: ID!, input: UpdateMsgTemplateInput!): MsgTemplate!
+    """ 删除消息模板 """
+    deleteMsgTemplate(id: ID!): Boolean!
+    """ 启用消息模板 """
+    enableMsgTemplate(id: ID!): MsgTemplate!
+    """ 禁用消息模板 """
+    disableMsgTemplate(id: ID!): MsgTemplate!
+    """ 消息订阅 """
+    createMsgSubscriber(inputs: [CreateMsgSubscriberInput!]!): [MsgSubscriber!]!
+    """ 删除订阅 """
+    deleteMsgSubscriber(ids: [ID!]!): Boolean!
+    """ 创建静默 """
+    createSilence(input: CreateSilenceInput!): Silence!
+    """ 更新静默 """
+    updateSilence(id: ID!, input: UpdateSilenceInput!): Silence!
+    """ 删除静默 """
+    deleteSilence(id: ID!): Boolean!
+    """ 设置站内信消息已读未读 """
+    markMsgInternalToReadOrUnRead(ids: [ID!]!, read: Boolean!): Boolean!
+    """ 删除站内信消息 """
+    markMsgInternalToDeleted(ids: [ID!]!): Boolean!
+    """ 测试邮件模板 """
+    testSendEmailTpl(tplID: ID!, email: String!, labels: MapString, annotations: MapString): Boolean!
+    """ 测试站内信模板 """
+    testSendMessageTpl(tplID: ID!, userID: ID!, labels: MapString, annotations: MapString): Boolean!
 }
 
 input RouteInput  {
@@ -2314,7 +5183,7 @@ input RouteInput  {
     continue: Boolean
     routes: [RouteInput]
     groupWait: Duration
-    GroupInterval: Duration
+    groupInterval: Duration
     repeatInterval: Duration
 }
 
@@ -2327,16 +5196,52 @@ input MatcherInput {
 input ReceiverInput {
     name: String!
     emailConfigs: [EmailConfigInput]
+    messageConfig: MessageConfigInput
 }
 
 input EmailConfigInput {
+    to: String!
+    from: String
     smartHost: HostPort!
     authType: String!
-    authUsername: String!
-    authPassword: String!
-    authSecret: String!
-    authIdentity: String!
+    authUsername: String
+    authPassword: String
+    authSecret: String
+    authIdentity: String
     headers: MapString
+}
+
+input MessageConfigInput {
+    to: String
+    subject: String
+    redirect: String
+}`, BuiltIn: false},
+	{Name: "../subscription.graphql", Input: `type Subscription {
+    # internal message
+    message: Message
+}
+
+"""
+SubscriptionAction is a generic type for all subscription actions
+"""
+type Message {
+    topic: String!
+    title: String!
+    content: String!
+    format: String!
+    url: String!
+    sendAt: Time!
+    extras: MapString!
+}
+
+"""
+MessageFilter is a generic type for all subscription filters
+"""
+type MessageFilter {
+    tenantId: ID!
+    appCode: String!
+    userId: ID!
+    deviceId:String!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)

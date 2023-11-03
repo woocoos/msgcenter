@@ -8,8 +8,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
+	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 )
 
 // MsgSubscriberDelete is the builder for deleting a MsgSubscriber entity.
@@ -41,6 +43,8 @@ func (msd *MsgSubscriberDelete) ExecX(ctx context.Context) int {
 
 func (msd *MsgSubscriberDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(msgsubscriber.Table, sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt))
+	_spec.Node.Schema = msd.schemaConfig.MsgSubscriber
+	ctx = internal.NewSchemaConfigContext(ctx, msd.schemaConfig)
 	if ps := msd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

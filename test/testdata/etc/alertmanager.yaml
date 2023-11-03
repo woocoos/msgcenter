@@ -8,8 +8,8 @@ global:
 
 # 模板文件位置
 templates:
-  - 'testdata/tpl/*.tmpl'
-  - 'testdata/tpl/**/*.tmpl'
+  - 'testdata/files/msg/tpl/data/*.tmpl'
+  - 'testdata/files/msg/tpl/data/**/*.tmpl'
 
 # 根路由规则
 route:
@@ -17,7 +17,7 @@ route:
   # 将传入警报分组在一起的标签。例如,多个警报进入集群=A和alertname=LatencyHigh将被分成一组.
 
   # 所有可能的聚合标签，可使用“…”指示所有的标签.
-  groupBy: ['alertname', 'tenant', 'user']
+  groupBy: [ 'alertname', 'tenant','user']
 
   # 当收到新的警报创建一组新的警报时,等待 'groupWait' 来发送初始通知。
   # 这样可以确保对于在首次通知后不久开始触发的同一组的多个警报可以批量处理。
@@ -49,6 +49,9 @@ route:
             - receiver =~"webhook"
           receiver: webhook
     - matchers:
+        - event="app:message"
+      receiver: internal
+    - matchers:
         - service="files"
       receiver: team-Y-mails
 
@@ -63,7 +66,7 @@ route:
         - service="database"
       receiver: team-DB-pager
       # Also group alerts by affected database.
-      groupBy: [alertname, cluster, database]
+      groupBy: [ alertname, cluster, database ]
       routes:
         - matchers:
             - owner="team-X"
@@ -79,14 +82,14 @@ route:
 # We use this to mute any warning-level notifications if the same alert is
 # already critical.
 inhibitRules:
-  - sourceMatchers: [severity="critical"]
-    targetMatchers: [severity="warning"]
+  - sourceMatchers: [ severity="critical" ]
+    targetMatchers: [ severity="warning" ]
     # Apply inhibition if the alertname is the same.
     # CAUTION:
     #   If all label names listed in `equal` are missing
     #   from both the source and target alerts,
     #   the inhibition rule will apply!
-    equal: [alertname, cluster, service]
+    equal: [ alertname, cluster, service ]
 
 receivers:
   - name: 'email'
@@ -97,12 +100,28 @@ receivers:
         requireTLS: false
         smarthost: localhost:1025
         to: alerts@example.com
-  - name: 'internal'
-    webhookConfigs:
-      - url: "http://127.0.0.1:5001/"
   - name: 'webhook'
     webhookConfigs:
-      - url: "http://127.0.0.1:5001/"
+      - url: "http://127.0.0.1:5001/webhook"
+        httpConfig: &knockout
+          timeout: 1s
+          oauth2:
+            clientID: 206734260394752
+            clientSecret: T2UlqISVFq4DR9InXamj3l74iWdu3Tyr
+            endpoint:
+              tokenURL: http://127.0.0.1:5001/token
+            scopes:
+            cache:
+              type: redis
+              addrs:
+                - 127.0.0.1:6379
+              db: 1
+              local:
+                size: 1000
+                ttl: 100s
+  - name: 'internal'
+    messageConfig:
+      sendResolved: false
   - name: 'team-X-pager'
     emailConfigs:
       - to: 'team-X+alerts-critical@example.org'

@@ -2,43 +2,41 @@ package service
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/log"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/tsingsun/woocoo/pkg/store/redisx"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
-	"github.com/woocoos/msgcenter/ent/msgtemplate"
-	"github.com/woocoos/msgcenter/metrics"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/notify/email"
-	"github.com/woocoos/msgcenter/pkg/label"
+	"github.com/woocoos/msgcenter/notify/message"
+	"github.com/woocoos/msgcenter/notify/webhook"
+	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/template"
 	"go.uber.org/zap"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 )
 
 var logger = log.Component("config")
 
-// Coordinator helps the Alert Manager collaborate with external components
+// Coordinator helps the Alert Manager collaborate with external components.
 type Coordinator struct {
-	configuration *conf.Configuration
-	// Protects profile and subscribers
+	cnf *conf.Configuration
+	// Protects profile and reloadHooks
 	mutex       sync.RWMutex
 	profile     *profile.Config
-	subscribers []func(*profile.Config) error
+	reloadHooks []func(*profile.Config) error
 
-	ActiveReceivers map[string]int // receiver name -> number of Notifier
+	ActiveReceivers map[string]int // receiver name -> number of Notifiers
 	Template        *template.Template
 
 	db *ent.Client
@@ -49,15 +47,11 @@ type Coordinator struct {
 // `Reload()`.
 func NewCoordinator(cnf *conf.Configuration) *Coordinator {
 	c := &Coordinator{
-		configuration:   cnf,
+		cnf:             cnf,
 		ActiveReceivers: make(map[string]int),
 	}
 
 	return c
-}
-
-func (c *Coordinator) SetDBClient(db *ent.Client) {
-	c.db = db
 }
 
 func (c *Coordinator) ProfileString() string {
@@ -76,16 +70,16 @@ func (c *Coordinator) ResolveTimeout() time.Duration {
 	return c.profile.Global.ResolveTimeout
 }
 
-// Subscribe subscribes the given Subscribers to configuration changes.
-func (c *Coordinator) Subscribe(ss ...func(*profile.Config) error) {
+// ReloadHooks subscribes the given Subscribers to configuration changes.
+func (c *Coordinator) ReloadHooks(ss ...func(*profile.Config) error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	c.subscribers = append(c.subscribers, ss...)
+	c.reloadHooks = append(c.reloadHooks, ss...)
 }
 
 func (c *Coordinator) notifySubscribers() error {
-	for _, s := range c.subscribers {
+	for _, s := range c.reloadHooks {
 		if err := s(c.profile); err != nil {
 			return err
 		}
@@ -95,14 +89,14 @@ func (c *Coordinator) notifySubscribers() error {
 }
 
 // Reload triggers a configuration reload from file and notifies all
-// configuration change subscribers.
+// configuration change reloadHooks.
 func (c *Coordinator) Reload() error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	// clear active receivers,if error occurs, also clear it
 	c.ActiveReceivers = make(map[string]int)
 
-	configFilePath := c.configuration.String("config.file")
+	configFilePath := c.cnf.String("config.file")
 	logger.Info("loading configuration file", zap.String("file", configFilePath))
 
 	if err := c.loadFromFile(); err != nil {
@@ -117,21 +111,14 @@ func (c *Coordinator) Reload() error {
 	}
 	logger.Info("completed loading configuration file", zap.String("file", configFilePath))
 
-	if tmpl, err := template.New(); err != nil {
-		return fmt.Errorf("failed to parse templates %w", err)
-	} else {
-		c.Template = tmpl
-		for _, ptn := range c.profile.Templates {
-			if _, err := c.Template.ParseGlob(c.configuration.Abs(ptn)); err != nil {
-				logger.Error("Error loading template file", zap.Error(err))
-				metrics.Coordinator.ConfigSuccess.Set(0)
-				return err
-			}
-		}
+	if err := c.loadTemplates(); err != nil {
+		logger.Error("Error loading template file", zap.Error(err))
+		metrics.Coordinator.ConfigSuccess.Set(0)
+		return err
 	}
 
 	if err := c.notifySubscribers(); err != nil {
-		logger.Error("one or more config change subscribers failed to apply new config", zap.Error(err))
+		logger.Error("one or more config change reloadHooks failed to apply new config", zap.Error(err))
 		metrics.Coordinator.ConfigSuccess.Set(0)
 		return err
 	}
@@ -162,9 +149,28 @@ func (c *Coordinator) WalkReceivers(visit func(receiver profile.Receiver) error)
 	return nil
 }
 
+// loadTemplates loading template files
+func (c *Coordinator) loadTemplates() error {
+	tmpl, err := template.New()
+	if err != nil {
+		return fmt.Errorf("failed to parse templates %w", err)
+	}
+	c.Template = tmpl
+	for _, ptn := range c.profile.Templates {
+		if _, err := c.Template.ParseGlob(c.cnf.Abs(ptn)); err != nil {
+			return err
+		}
+	}
+	if err := c.cnf.Sub("template").Unmarshal(&c.Template); err != nil {
+		return err
+	}
+	c.Template.BaseDir, err = filepath.Abs(c.Template.BaseDir)
+	return err
+}
+
 // loadFromFile triggers a configuration load, discarding the old configuration.
 func (c *Coordinator) loadFromFile() error {
-	config, err := profile.NewConfig(c.configuration)
+	config, err := profile.NewConfig(c.cnf)
 	if err != nil {
 		return err
 	}
@@ -188,13 +194,17 @@ func (c *Coordinator) loadFromDB() error {
 		receivers[i] = cn.Receiver
 	}
 	// load routes
-	evs, err := c.db.MsgEvent.Query().Where(msgevent.StatusEQ(typex.SimpleStatusActive)).All(context.Background())
+	evs, err := c.db.MsgEvent.Query().Where(msgevent.StatusEQ(typex.SimpleStatusActive)).WithMsgType().All(context.Background())
 	if err != nil {
 		return err
 	}
-	routes := make([]*profile.Route, len(evs))
-	for i, ev := range evs {
-		routes[i] = ev.Route
+	routes := make([]*profile.Route, 0, len(evs))
+	for _, ev := range evs {
+		if ev.Route == nil {
+			continue
+		}
+		ev.Route.Name = profile.AppRouteName(strconv.Itoa(ev.Edges.MsgType.AppID), ev.Name)
+		routes = append(routes, ev.Route)
 	}
 	if err = c.addTenantReceiver(receivers); err != nil {
 		return err
@@ -211,7 +221,7 @@ func (c *Coordinator) AddNamedRoute(input []*profile.Route) error {
 	return c.addNamedRoute(input)
 }
 
-// AddNamedRoute adds a route to the current configuration.
+// AddNamedRoute adds a route to the current configuration. Notice: it is unsafe to call this method concurrently.
 func (c *Coordinator) addNamedRoute(input []*profile.Route) error {
 	rs, err := json.Marshal(input)
 	if err != nil {
@@ -227,7 +237,7 @@ func (c *Coordinator) addNamedRoute(input []*profile.Route) error {
 	if err != nil {
 		return err
 	}
-	for _, route := range routes {
+	for _, route := range input {
 		index := -1
 		for i, r := range vc.Route.Routes {
 			if r.Name == route.Name {
@@ -247,6 +257,24 @@ func (c *Coordinator) addNamedRoute(input []*profile.Route) error {
 			c.profile.Route.Routes = append(c.profile.Route.Routes, route)
 		}
 	}
+	return nil
+}
+
+func (c *Coordinator) RemoveNamedRoute(routeNames []string) error {
+	rs := c.profile.Route.Routes
+	for _, v := range routeNames {
+		if v == "" {
+			continue
+		}
+		nrs := make([]*profile.Route, 0)
+		for _, r := range rs {
+			if r.Name != v {
+				nrs = append(nrs, r)
+			}
+		}
+		rs = nrs
+	}
+	c.profile.Route.Routes = rs
 	return nil
 }
 
@@ -296,96 +324,59 @@ func (c *Coordinator) addTenantReceiver(input []*profile.Receiver) error {
 	return nil
 }
 
+func (c *Coordinator) RemoveTenantReceiver(receiverNames []string) error {
+	rs := c.profile.Receivers
+	for _, v := range receiverNames {
+		if v == "" {
+			continue
+		}
+		nrs := make([]profile.Receiver, 0)
+		for _, r := range rs {
+			if r.Name != v {
+				nrs = append(nrs, r)
+			}
+		}
+		rs = nrs
+	}
+	c.profile.Receivers = rs
+	return nil
+}
+
 // buildReceiverIntegrations builds a list of integration notifiers off of a
 // receiver config.
 func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *template.Template) (integrations []notify.Integration, errs error) {
-	add := func(name string, i int, rs notify.ResolvedSender, f func() (notify.Notifier, error)) {
+	add := func(name string, i int, f func() (notify.Notifier, error)) {
 		n, err := f()
 		if err != nil {
 			errs = errors.Join(err)
 			return
 		}
-		integrations = append(integrations, notify.NewIntegration(n, rs, name, i))
+		integrations = append(integrations, notify.NewIntegration(n, name, i))
 	}
 	var ()
-	tpldir := c.configuration.Abs(c.configuration.String("template.path"))
+	tpldir := c.cnf.Abs(c.Template.DataDir)
 	for i, cfg := range nc.EmailConfigs {
-		add("email", i, cfg, func() (notify.Notifier, error) {
-			return email.NewEmail(cfg, tmpl, overrideEmailConfig(tpldir, c.db)), nil
+		add("email", i, func() (notify.Notifier, error) {
+			return email.New(cfg, tmpl, overrideEmailConfig(tpldir, c.db))
 		})
 	}
-
+	for i, cfg := range nc.WebhookConfigs {
+		add("webhook", i, func() (notify.Notifier, error) {
+			return webhook.New(cfg, tmpl, overrideWebHookConfig(tpldir, c.db))
+		})
+	}
+	if nc.MessageConfig != nil {
+		cli, err := redisx.NewClient(c.cnf.Root().Sub("store.redis"))
+		if err != nil {
+			return nil, err
+		}
+		add("message", 0, func() (notify.Notifier, error) {
+			return message.New(nc.MessageConfig, tmpl, c.db, cli.UniversalClient,
+				overrideMessageConfig(tpldir, c.db))
+		})
+	}
 	if errs != nil {
 		return nil, errs
 	}
 	return integrations, nil
-}
-
-func md5HashAsMetricValue(data []byte) float64 {
-	sum := md5.Sum(data)
-	// We only want 48 bits as a float64 only has a 53 bit mantissa.
-	smallSum := sum[0:6]
-	bytes := make([]byte, 8)
-	copy(bytes, smallSum)
-	return float64(binary.LittleEndian.Uint64(bytes))
-}
-
-func overrideEmailConfig(basedir string, client *ent.Client) notify.CustomerConfigFunc[profile.EmailConfig] {
-	return func(ctx context.Context, cfg profile.EmailConfig, set label.LabelSet,
-	) (profile.EmailConfig, error) {
-		data, err := findTemplate(ctx, basedir, client, profile.ReceiverEmail, set)
-		if err != nil {
-			if ent.IsNotFound(err) {
-				return cfg, nil
-			}
-			return cfg, err
-		}
-		cfg.To = data.To
-		cfg.From = data.From
-		cfg.Subject = data.Subject
-		if data.Format == msgtemplate.FormatHTML {
-			cfg.HTML = data.Body
-		} else {
-			cfg.Text = data.Body
-		}
-		for k, _ := range cfg.Headers {
-			switch strings.ToLower(k) {
-			case "cc":
-				cfg.Headers[k] = data.Cc
-			case "bcc":
-				cfg.Headers[k] = data.Bcc
-			}
-		}
-		if data.Attachments != "" {
-			cfg.Headers["Attachments"] = data.Attachments
-		}
-		return cfg, nil
-	}
-}
-
-func findTemplate(ctx context.Context, basedir string, client *ent.Client, rt profile.ReceiverType, labels label.LabelSet) (*ent.MsgTemplate, error) {
-	tid, ok := labels[label.TenantLabel]
-	if !ok {
-		return nil, nil
-	}
-	tenantID, err := strconv.Atoi(tid)
-	if err != nil {
-		return nil, err
-	}
-	en := labels[label.AlertNameLabel]
-	event, err := client.MsgTemplate.Query().Where(msgtemplate.TenantID(tenantID), msgtemplate.HasEventWith(
-		msgevent.Name(en), msgevent.StatusEQ(typex.SimpleStatusActive)), msgtemplate.ReceiverTypeEQ(rt),
-	).Only(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if event == nil {
-		return nil, nil
-	}
-	as := strings.Split(event.Attachments, ",")
-	for i, attacher := range as {
-		as[i] = filepath.Join(basedir, attacher)
-	}
-	event.Attachments = strings.Join(as, ",")
-	return event, nil
 }

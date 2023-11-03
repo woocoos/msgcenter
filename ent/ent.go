@@ -12,11 +12,19 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msginternal"
+	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/nlog"
+	"github.com/woocoos/msgcenter/ent/nlogalert"
+	"github.com/woocoos/msgcenter/ent/orgroleuser"
+	"github.com/woocoos/msgcenter/ent/silence"
+	"github.com/woocoos/msgcenter/ent/user"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -77,11 +85,19 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			msgalert.Table:      msgalert.ValidColumn,
 			msgchannel.Table:    msgchannel.ValidColumn,
 			msgevent.Table:      msgevent.ValidColumn,
+			msginternal.Table:   msginternal.ValidColumn,
+			msginternalto.Table: msginternalto.ValidColumn,
 			msgsubscriber.Table: msgsubscriber.ValidColumn,
 			msgtemplate.Table:   msgtemplate.ValidColumn,
 			msgtype.Table:       msgtype.ValidColumn,
+			nlog.Table:          nlog.ValidColumn,
+			nlogalert.Table:     nlogalert.ValidColumn,
+			orgroleuser.Table:   orgroleuser.ValidColumn,
+			silence.Table:       silence.ValidColumn,
+			user.Table:          user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

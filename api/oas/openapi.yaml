@@ -1,23 +1,25 @@
 openapi: 3.0.1
 info:
   title: Alertmanager API
-  description: API of the Prometheus Alertmanager (https://github.com/prometheus/alertmanager)
+  description: API of the Knockout Message (https://github.com/woocoos/msgcenter)
   license:
     name: GNU Affero General Public License v3.0
     url: https://www.gnu.org/licenses
   version: 0.0.1
 servers:
-  - url: http://localhost:10070/api/v2/
+  - url: http://localhost:10072/api/v2/
 
 tags:
   - name: general
-    description: General Alertmanager operations
+    description: General operations
   - name: receiver
-    description: Everything related to Alertmanager receivers
+    description: Everything related to receivers
   - name: silence
-    description: Everything related to Alertmanager silences
+    description: Everything related to silences
   - name: alert
-    description: Everything related to Alertmanager alerts
+    description: Everything related to alerts
+  - name: push
+    description: Everything related to push
 paths:
   /status:
     get:
@@ -97,7 +99,7 @@ paths:
                 type: object
                 properties:
                   silenceID:
-                    type: string
+                    type: integer
         400:
           description: Bad request
           content:
@@ -123,8 +125,7 @@ paths:
           description: ID of the silence to get
           required: true
           schema:
-            type: string
-            format: uuid
+            type: integer
       responses:
         200:
           description: Get silence response
@@ -152,8 +153,7 @@ paths:
           description: ID of the silence to get
           required: true
           schema:
-            type: string
-            format: uuid
+            type: integer
       responses:
         200:
           description: Delete silence response
@@ -317,6 +317,33 @@ paths:
             application/json:
               schema:
                 type: string
+  /push:
+    post:
+      tags:
+        - push
+      description: push data to message queue for notify message client
+      operationId: postPush
+      requestBody:
+        description: The push data to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pushData'
+      responses:
+        200:
+          description: Create push response
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: string
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: string
 components:
   schemas:
     alertmanagerStatus:
@@ -399,6 +426,7 @@ components:
         - endsAt
         - matchers
         - startsAt
+        - tenantID
       type: object
       properties:
         matchers:
@@ -412,9 +440,11 @@ components:
           format: date-time
           x-go-tag-validator: "gt"
         createdBy:
-          type: string
+          type: integer
         comment:
           type: string
+        tenantID:
+          type: integer
     gettableSilence:
       allOf:
         - required:
@@ -424,7 +454,7 @@ components:
           type: object
           properties:
             id:
-              type: string
+              type: integer
             status:
               $ref: '#/components/schemas/silenceStatus'
             updatedAt:
@@ -436,7 +466,7 @@ components:
         - type: object
           properties:
             id:
-              type: string
+              type: integer
         - $ref: '#/components/schemas/silence'
     silenceStatus:
       required:
@@ -572,7 +602,7 @@ components:
         silencedBy:
           type: array
           items:
-            type: string
+            type: integer
         inhibitedBy:
           type: array
           items:
@@ -586,8 +616,18 @@ components:
           type: string
     labelSet:
       type: object
+      description: |
+        A set of labels. Labels are key/value pairs that are attached to
+        alerts. Labels are used to specify identifying attributes of alerts,
+        such as their tenant, user , instance, and job.
+        tenant: specific tenant id.
+        user: specific user id. the user is the notify target. Some notification need info from user, such as email address.
+        alertname: the name of alert.it is also the event name.
       additionalProperties:
         type: string
+    pushData:
+      type: object
+      description: Push data is for notify clients.
   responses:
     BadRequest:
       description: Bad request

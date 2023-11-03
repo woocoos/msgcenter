@@ -15,6 +15,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // MsgEventQuery is the builder for querying MsgEvent entities.
@@ -81,6 +83,9 @@ func (meq *MsgEventQuery) QueryMsgType() *MsgTypeQuery {
 			sqlgraph.To(msgtype.Table, msgtype.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, msgevent.MsgTypeTable, msgevent.MsgTypeColumn),
 		)
+		schemaConfig := meq.schemaConfig
+		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgEvent
 		fromU = sqlgraph.SetNeighbors(meq.driver.Dialect(), step)
 		return fromU, nil
 	}
@@ -103,6 +108,9 @@ func (meq *MsgEventQuery) QueryCustomerTemplate() *MsgTemplateQuery {
 			sqlgraph.To(msgtemplate.Table, msgtemplate.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, msgevent.CustomerTemplateTable, msgevent.CustomerTemplateColumn),
 		)
+		schemaConfig := meq.schemaConfig
+		step.To.Schema = schemaConfig.MsgTemplate
+		step.Edge.Schema = schemaConfig.MsgTemplate
 		fromU = sqlgraph.SetNeighbors(meq.driver.Dialect(), step)
 		return fromU, nil
 	}
@@ -423,6 +431,8 @@ func (meq *MsgEventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ms
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	_spec.Node.Schema = meq.schemaConfig.MsgEvent
+	ctx = internal.NewSchemaConfigContext(ctx, meq.schemaConfig)
 	if len(meq.modifiers) > 0 {
 		_spec.Modifiers = meq.modifiers
 	}
@@ -525,6 +535,8 @@ func (meq *MsgEventQuery) loadCustomerTemplate(ctx context.Context, query *MsgTe
 
 func (meq *MsgEventQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := meq.querySpec()
+	_spec.Node.Schema = meq.schemaConfig.MsgEvent
+	ctx = internal.NewSchemaConfigContext(ctx, meq.schemaConfig)
 	if len(meq.modifiers) > 0 {
 		_spec.Modifiers = meq.modifiers
 	}
@@ -593,6 +605,9 @@ func (meq *MsgEventQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if meq.ctx.Unique != nil && *meq.ctx.Unique {
 		selector.Distinct()
 	}
+	t1.Schema(meq.schemaConfig.MsgEvent)
+	ctx = internal.NewSchemaConfigContext(ctx, meq.schemaConfig)
+	selector.WithContext(ctx)
 	for _, p := range meq.predicates {
 		p(selector)
 	}

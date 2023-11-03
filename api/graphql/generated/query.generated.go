@@ -8,11 +8,13 @@ import (
 	"fmt"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/vektah/gqlparser/v2/ast"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
+	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
@@ -34,6 +36,91 @@ type RouteResolver interface {
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _EmailConfig_to(ctx context.Context, field graphql.CollectedField, obj *profile.EmailConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EmailConfig_to(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.To, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EmailConfig_to(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EmailConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _EmailConfig_from(ctx context.Context, field graphql.CollectedField, obj *profile.EmailConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EmailConfig_from(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.From, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EmailConfig_from(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EmailConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _EmailConfig_smartHost(ctx context.Context, field graphql.CollectedField, obj *profile.EmailConfig) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_EmailConfig_smartHost(ctx, field)
@@ -472,6 +559,129 @@ func (ec *executionContext) fieldContext_Matcher_value(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _MessageConfig_to(ctx context.Context, field graphql.CollectedField, obj *profile.MessageConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MessageConfig_to(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.To, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MessageConfig_to(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MessageConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MessageConfig_subject(ctx context.Context, field graphql.CollectedField, obj *profile.MessageConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MessageConfig_subject(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subject, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MessageConfig_subject(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MessageConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MessageConfig_redirect(ctx context.Context, field graphql.CollectedField, obj *profile.MessageConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MessageConfig_redirect(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Redirect, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MessageConfig_redirect(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MessageConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Receiver_name(ctx context.Context, field graphql.CollectedField, obj *profile.Receiver) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Receiver_name(ctx, field)
 	if err != nil {
@@ -552,6 +762,10 @@ func (ec *executionContext) fieldContext_Receiver_emailConfigs(ctx context.Conte
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "to":
+				return ec.fieldContext_EmailConfig_to(ctx, field)
+			case "from":
+				return ec.fieldContext_EmailConfig_from(ctx, field)
 			case "smartHost":
 				return ec.fieldContext_EmailConfig_smartHost(ctx, field)
 			case "authType":
@@ -568,6 +782,55 @@ func (ec *executionContext) fieldContext_Receiver_emailConfigs(ctx context.Conte
 				return ec.fieldContext_EmailConfig_headers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type EmailConfig", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Receiver_messageConfig(ctx context.Context, field graphql.CollectedField, obj *profile.Receiver) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Receiver_messageConfig(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MessageConfig, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*profile.MessageConfig)
+	fc.Result = res
+	return ec.marshalOMessageConfig2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐMessageConfig(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Receiver_messageConfig(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Receiver",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "to":
+				return ec.fieldContext_MessageConfig_to(ctx, field)
+			case "subject":
+				return ec.fieldContext_MessageConfig_subject(ctx, field)
+			case "redirect":
+				return ec.fieldContext_MessageConfig_redirect(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MessageConfig", field.Name)
 		},
 	}
 	return fc, nil
@@ -1029,66 +1292,72 @@ var emailConfigImplementors = []string{"EmailConfig"}
 
 func (ec *executionContext) _EmailConfig(ctx context.Context, sel ast.SelectionSet, obj *profile.EmailConfig) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, emailConfigImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("EmailConfig")
-		case "smartHost":
-
-			out.Values[i] = ec._EmailConfig_smartHost(ctx, field, obj)
-
+		case "to":
+			out.Values[i] = ec._EmailConfig_to(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
+			}
+		case "from":
+			out.Values[i] = ec._EmailConfig_from(ctx, field, obj)
+		case "smartHost":
+			out.Values[i] = ec._EmailConfig_smartHost(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
 			}
 		case "authType":
-
 			out.Values[i] = ec._EmailConfig_authType(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "authUsername":
-
 			out.Values[i] = ec._EmailConfig_authUsername(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "authPassword":
-
 			out.Values[i] = ec._EmailConfig_authPassword(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "authSecret":
-
 			out.Values[i] = ec._EmailConfig_authSecret(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "authIdentity":
-
 			out.Values[i] = ec._EmailConfig_authIdentity(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "headers":
-
 			out.Values[i] = ec._EmailConfig_headers(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -1096,41 +1365,88 @@ var matcherImplementors = []string{"Matcher"}
 
 func (ec *executionContext) _Matcher(ctx context.Context, sel ast.SelectionSet, obj *label.Matcher) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, matcherImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Matcher")
 		case "type":
-
 			out.Values[i] = ec._Matcher_type(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "name":
-
 			out.Values[i] = ec._Matcher_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "value":
-
 			out.Values[i] = ec._Matcher_value(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var messageConfigImplementors = []string{"MessageConfig"}
+
+func (ec *executionContext) _MessageConfig(ctx context.Context, sel ast.SelectionSet, obj *profile.MessageConfig) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, messageConfigImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MessageConfig")
+		case "to":
+			out.Values[i] = ec._MessageConfig_to(ctx, field, obj)
+		case "subject":
+			out.Values[i] = ec._MessageConfig_subject(ctx, field, obj)
+		case "redirect":
+			out.Values[i] = ec._MessageConfig_redirect(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -1138,31 +1454,42 @@ var receiverImplementors = []string{"Receiver"}
 
 func (ec *executionContext) _Receiver(ctx context.Context, sel ast.SelectionSet, obj *profile.Receiver) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, receiverImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Receiver")
 		case "name":
-
 			out.Values[i] = ec._Receiver_name(ctx, field, obj)
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "emailConfigs":
-
 			out.Values[i] = ec._Receiver_emailConfigs(ctx, field, obj)
-
+		case "messageConfig":
+			out.Values[i] = ec._Receiver_messageConfig(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -1170,24 +1497,21 @@ var routeImplementors = []string{"Route"}
 
 func (ec *executionContext) _Route(ctx context.Context, sel ast.SelectionSet, obj *profile.Route) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, routeImplementors)
+
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Route")
 		case "receiver":
-
 			out.Values[i] = ec._Route_receiver(ctx, field, obj)
-
 		case "groupBy":
-
 			out.Values[i] = ec._Route_groupBy(ctx, field, obj)
-
 		case "matchers":
 			field := field
 
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
@@ -1197,46 +1521,60 @@ func (ec *executionContext) _Route(ctx context.Context, sel ast.SelectionSet, ob
 				return res
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
 
-			})
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "muteTimeIntervals":
-
 			out.Values[i] = ec._Route_muteTimeIntervals(ctx, field, obj)
-
 		case "activeTimeIntervals":
-
 			out.Values[i] = ec._Route_activeTimeIntervals(ctx, field, obj)
-
 		case "continue":
-
 			out.Values[i] = ec._Route_continue(ctx, field, obj)
-
 		case "routes":
-
 			out.Values[i] = ec._Route_routes(ctx, field, obj)
-
 		case "groupWait":
-
 			out.Values[i] = ec._Route_groupWait(ctx, field, obj)
-
 		case "GroupInterval":
-
 			out.Values[i] = ec._Route_GroupInterval(ctx, field, obj)
-
 		case "repeatInterval":
-
 			out.Values[i] = ec._Route_repeatInterval(ctx, field, obj)
-
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
@@ -1254,6 +1592,27 @@ func (ec *executionContext) marshalNHostPort2githubᚗcomᚋwoocoosᚋmsgcenter�
 	return v
 }
 
+func (ec *executionContext) unmarshalNMapString2map(ctx context.Context, v interface{}) (map[string]string, error) {
+	res, err := typex.UnmarshalMapString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNMapString2map(ctx context.Context, sel ast.SelectionSet, v map[string]string) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	res := typex.MarshalMapString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNMatchType2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐMatchType(ctx context.Context, v interface{}) (label.MatchType, error) {
 	var res label.MatchType
 	err := res.UnmarshalGQL(v)
@@ -1264,14 +1623,14 @@ func (ec *executionContext) marshalNMatchType2githubᚗcomᚋwoocoosᚋmsgcenter
 	return v
 }
 
-func (ec *executionContext) marshalNReceiver2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiver(ctx context.Context, sel ast.SelectionSet, v *profile.Receiver) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Receiver(ctx, sel, v)
+func (ec *executionContext) unmarshalNRouteStrType2githubᚗcomᚋwoocoosᚋmsgcenterᚋapiᚋgraphqlᚋmodelᚐRouteStrType(ctx context.Context, v interface{}) (model.RouteStrType, error) {
+	var res model.RouteStrType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNRouteStrType2githubᚗcomᚋwoocoosᚋmsgcenterᚋapiᚋgraphqlᚋmodelᚐRouteStrType(ctx context.Context, sel ast.SelectionSet, v model.RouteStrType) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) unmarshalODuration2ᚖtimeᚐDuration(ctx context.Context, v interface{}) (*time.Duration, error) {
@@ -1443,6 +1802,20 @@ func (ec *executionContext) marshalOMatcher2ᚖgithubᚗcomᚋwoocoosᚋmsgcente
 		return graphql.Null
 	}
 	return ec._Matcher(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOMessageConfig2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐMessageConfig(ctx context.Context, sel ast.SelectionSet, v *profile.MessageConfig) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._MessageConfig(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOReceiver2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiver(ctx context.Context, sel ast.SelectionSet, v *profile.Receiver) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Receiver(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalORoute2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐRoute(ctx context.Context, sel ast.SelectionSet, v []*profile.Route) graphql.Marshaler {

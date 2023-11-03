@@ -1,0 +1,55 @@
+appName: msgcenter
+version: 0.0.1
+development: true
+log:
+  withTraceID: true
+  cores:
+    - level: info
+  rotate:
+
+jwt: &jwt
+  signingMethod: "HS256"
+  signingKey: "secret"
+
+web:
+  server:
+    addr: 127.0.0.1:10074
+  engine:
+    routerGroups:
+      - default:
+          middlewares:
+            - cors:
+                allowOrigins: ['*']
+                allowHeaders: ["*"]
+            - accessLog:
+                exclude:
+                  - IntrospectionQuery
+            - recovery:
+            - errorHandle:
+      - graphql:
+          basePath: "/graphql"
+          middlewares:
+            - graphql:
+                group: "/graphql"
+                withAuthorization: false
+                appCode: "msg"
+                middlewares:
+                  operation:
+                    - tenant:
+                    - jwt: *jwt
+                    - tokenSign: # 利用IDE开发时,可注释
+                header: ## dev mode, remove in production, set the value in your .env.local
+                  X-Tenant-ID: ${TENANT}
+                  Authorization: "${AUTHORIZATION}"
+
+store:
+  msgcenter:
+    driverName: mysql
+    dsn: "root:@tcp(localhost:3306)/msgcenter?parseTime=true&loc=Local"
+  redis: &redis
+    addrs:
+      - 127.0.0.1:6379
+    db: 1
+
+# 消息WebSocket
+webSocket:

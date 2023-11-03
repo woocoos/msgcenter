@@ -1,34 +1,23 @@
 appName: alertmanager
 version: 0.0.1
 development: true
-log:
-  withTraceID: true
-  traceIDKey: "traceId"
-  cores:
-    - level: debug
-      outputPaths:
-        - stdout
-      encoderConfig:
-        timeKey: "@timestamp"
-        messageKey: "message"
-        callerKey: "file"
-  rotate:
-    maxsize: 10
-    maxage: 10
-    maxbackups: 20
-    localtime: true
 
 web:
   server:
-    addr: 127.0.0.1:10070
+    addr: 127.0.0.1:10072
   engine:
     routerGroups:
       - alertmanager:
           basePath: "/api/v2"
           middlewares:
-            - accessLog:
             - recovery:
             - errorHandle:
+
+store:
+  redis:
+    addrs:
+      - 127.0.0.1:6379
+    db: 1
 
 alertManager:
   config:
@@ -41,4 +30,7 @@ alertManager:
   alerts:
     gcInterval: 30m
   template:
-    path: testdata/tpl # path for custom template
+    baseDir: testdata/files # path for custom template
+    tmpDir: "msg/tpl/tmp" # 模板临时路径
+    dataDir: "msg/tpl/data" # 模板正式路径
+    attachmentDir: "msg/att" # 附件存储路径

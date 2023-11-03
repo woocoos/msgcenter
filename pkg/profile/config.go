@@ -61,7 +61,7 @@ func NewConfig(cfg *conf.Configuration) (c *Config, err error) {
 		return nil, fmt.Errorf("no config file specified")
 	}
 	// read config file by filename
-	bytes, err := os.ReadFile(filename)
+	bytes, err := os.ReadFile(cfg.Abs(filename))
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,24 @@ func Load(bytes []byte) (c *Config, err error) {
 	if c.Route.Continue {
 		return nil, errors.New("cannot have continue in root route")
 	}
+	if !checkRouteName([]*Route{c.Route}) {
+		return nil, errors.New("cannot have route name")
+	}
 	return c, nil
+}
+
+func checkRouteName(rs []*Route) bool {
+	for _, v := range rs {
+		if v.Name != "" {
+			return false
+		}
+		if v.Routes == nil {
+			continue
+		} else if !checkRouteName(v.Routes) {
+			return false
+		}
+	}
+	return true
 }
 
 func (c *Config) Validate() error {

@@ -3,17 +3,21 @@ package service
 import (
 	"context"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/tsingsun/members"
+	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/gds/timeinterval"
+	"github.com/woocoos/knockout-go/pkg/koapp"
 	"github.com/woocoos/msgcenter/dispatch"
-	"github.com/woocoos/msgcenter/inhibit"
-	"github.com/woocoos/msgcenter/nflog"
+	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/profile"
-	"github.com/woocoos/msgcenter/provider"
-	"github.com/woocoos/msgcenter/provider/mem"
-	"github.com/woocoos/msgcenter/silence"
+	"github.com/woocoos/msgcenter/service/inhibit"
+	"github.com/woocoos/msgcenter/service/provider"
+	"github.com/woocoos/msgcenter/service/provider/mem"
+	"github.com/woocoos/msgcenter/service/silence"
+	"os"
 	"time"
 )
 
@@ -21,8 +25,23 @@ import (
 // to a notification pipeline.
 const NotifyMinTimeout = 10 * time.Second
 
+type AmOption func(*AlertManager)
+
+func WithClient(client *ent.Client) AmOption {
+	return func(am *AlertManager) {
+		am.DB = client
+	}
+}
+
+func WithPeer(p *members.Peer) AmOption {
+	return func(am *AlertManager) {
+		am.Peer = p
+	}
+}
+
 type AlertManager struct {
-	Cnf             *conf.Configuration
+	cnf             *conf.Configuration
+	Coordinator     *Coordinator
 	NotificationLog notify.NotificationLog
 	Silences        *silence.Silences
 	Marker          alert.Marker
@@ -30,25 +49,93 @@ type AlertManager struct {
 	Dispatcher      *dispatch.Dispatcher
 	Inhibitor       *inhibit.Inhibitor
 	Silencer        *silence.Silencer
+	Subscribe       *UserSubscribe
+	DB              *ent.Client
+	Peer            *members.Peer
 }
 
-func DefaultAlertManager(cnf *conf.Configuration) (am *AlertManager, err error) {
-	am = &AlertManager{Cnf: cnf}
-	am.NotificationLog, err = nflog.NewFromConfiguration(cnf)
+func NewAlertManager(app *woocoo.App, opts ...AmOption) (*AlertManager, error) {
+	am := &AlertManager{
+		cnf:       app.AppConfiguration().Sub("alertManager"),
+		Subscribe: &UserSubscribe{},
+	}
+	for _, opt := range opts {
+		opt(am)
+	}
+	if am.DB == nil {
+		am.buildDBClient(app.AppConfiguration())
+	}
+	if err := am.Members(); err != nil {
+		return nil, err
+	} else {
+		app.RegisterServer(am.Peer)
+	}
+
+	err := am.Apply(am.cnf)
 	if err != nil {
 		return nil, err
 	}
-	am.Silences, err = silence.NewFromConfiguration(cnf)
+
+	am.Coordinator = NewCoordinator(am.cnf)
+	am.Coordinator.db = am.DB
+	am.Subscribe.DB = am.DB
+
+	app.RegisterServer(am.Alerts, am.NotificationLog, am.Silences)
+
+	return am, nil
+}
+
+func (am *AlertManager) Apply(cnf *conf.Configuration) error {
+	dataDir := cnf.String("storage.path")
+	err := os.MkdirAll(dataDir, os.ModePerm)
 	if err != nil {
-		return nil, err
+		return err
 	}
+
+	if nflog, err := notify.NewLog(cnf); err != nil {
+		return err
+	} else {
+		if am.Peer != nil {
+			if nflog.Spreader, err = am.Peer.AddShard(nflog); err != nil {
+				return err
+			}
+		}
+		nflog.NLogCallback = NlogCallback{db: am.DB}
+		am.NotificationLog = nflog
+	}
+
+	am.Silences, err = silence.NewFromConfiguration(cnf, silence.WithDataLoader(SilencesDataLoad(am.DB)))
+	if err != nil {
+		return err
+	}
+	if am.Peer != nil {
+		if am.Silences.Spreader, err = am.Peer.AddShard(am.Silences); err != nil {
+			return err
+		}
+	}
+
 	am.Marker = alert.NewMarker(prometheus.DefaultRegisterer)
 	am.Alerts, err = mem.NewAlerts(context.Background(), am.Marker,
-		am.Cnf.Duration("alerts.gcInterval"), nil)
+		am.cnf.Duration("alerts.gcInterval"), &AlertCallback{db: am.DB})
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return am, nil
+
+	return nil
+}
+
+func (am *AlertManager) buildDBClient(cnf *conf.AppConfiguration) {
+	ents := koapp.BuildEntComponents(cnf)
+	drv := ents["msgcenter"]
+	scfg := ent.AlternateSchema(ent.SchemaConfig{
+		User:        "portal",
+		OrgRoleUser: "portal",
+	})
+	if cnf.Development {
+		am.DB = ent.NewClient(ent.Driver(drv), ent.Debug(), scfg)
+	} else {
+		am.DB = ent.NewClient(ent.Driver(drv), scfg)
+	}
 }
 
 func (am *AlertManager) Start(co *Coordinator, config *profile.Config) error {
@@ -100,9 +187,11 @@ func (am *AlertManager) Start(co *Coordinator, config *profile.Config) error {
 		am.Silencer,
 		timeIntervals,
 		am.NotificationLog,
+		am.Alerts,
+		am.Subscribe,
 	)
 	am.Dispatcher = dispatch.NewDispatcher(am.Alerts, routes, pipeline, am.Marker, timeoutFunc)
-	routes.Apply(am.Cnf)
+	routes.Apply(am.cnf)
 
 	go am.Dispatcher.Run()
 	go am.Inhibitor.Start(context.Background())
@@ -113,4 +202,20 @@ func (am *AlertManager) Start(co *Coordinator, config *profile.Config) error {
 func (am *AlertManager) Stop() {
 	am.Dispatcher.Stop()
 	am.Inhibitor.Stop(context.Background())
+	am.DB.Close()
+}
+
+func (am *AlertManager) Members() error {
+	if !am.cnf.IsSet("cluster") {
+		return nil
+	}
+	cnf := am.cnf.Sub("cluster")
+	peer, err := members.NewPeer(members.WithConfiguration(cnf))
+	if err != nil {
+		return err
+	}
+
+	am.Peer = peer
+
+	return nil
 }

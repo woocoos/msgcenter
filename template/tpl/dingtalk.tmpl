@@ -1,0 +1,27 @@
+{{/* gotype: github.com/woocoos/msgcenter/template.Data */}}
+{{/* Default */}}
+{{ define "dingtalk.title" }}{{ template "__subject" . }}{{ end }}
+{{ define "dingtalk.content" }}#### \[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}\] **[{{ index .GroupLabels "alertname" }}]({{ template "__alertmanagerURL" . }})**
+{{ if gt (len .Alerts.Firing) 0 -}}
+    **Alerts Firing**
+    {{ template "dingtalk.__text_alert_list" .Alerts.Firing }}
+{{/*    {{ range .AtMobiles }}@{{ . }}{{ end }}*/}}
+{{- end }}
+{{ if gt (len .Alerts.Resolved) 0 -}}
+    **Alerts Resolved**
+    {{ template "dingtalk.__text_alert_list" .Alerts.Resolved }}
+{{/*    {{ range .AtMobiles }}@{{ . }}{{ end }}*/}}
+{{- end }}
+{{- end }}
+
+{{ define "dingtalk.__text_alert_list" }}{{ range . }}
+    #### \[{{ .Labels.severity | toUpper }}\] {{ .Annotations.summary }}
+
+    **Description:** {{ .Annotations.description }}
+
+    **Graph:** [📈]({{ .GeneratorURL }})
+
+    **Details:**
+    {{ range .Labels.SortedPairs }}{{ if and (ne (.Name) "severity") (ne (.Name) "summary") }}> - {{ .Name }}: {{ .Value | markdown | html }}
+    {{ end }}{{ end }}
+{{ end }}{{ end }}

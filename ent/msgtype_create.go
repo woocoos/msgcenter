@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/entco/schemax/typex"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -307,6 +307,7 @@ func (mtc *MsgTypeCreate) createSpec() (*MsgType, *sqlgraph.CreateSpec) {
 		_node = &MsgType{config: mtc.config}
 		_spec = sqlgraph.NewCreateSpec(msgtype.Table, sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt))
 	)
+	_spec.Schema = mtc.schemaConfig.MsgType
 	_spec.OnConflict = mtc.conflict
 	if id, ok := mtc.mutation.ID(); ok {
 		_node.ID = id
@@ -367,6 +368,7 @@ func (mtc *MsgTypeCreate) createSpec() (*MsgType, *sqlgraph.CreateSpec) {
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtc.schemaConfig.MsgEvent
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -383,6 +385,7 @@ func (mtc *MsgTypeCreate) createSpec() (*MsgType, *sqlgraph.CreateSpec) {
 				IDSpec: sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt),
 			},
 		}
+		edge.Schema = mtc.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -881,12 +884,16 @@ func (u *MsgTypeUpsertOne) IDX(ctx context.Context) int {
 // MsgTypeCreateBulk is the builder for creating many MsgType entities in bulk.
 type MsgTypeCreateBulk struct {
 	config
+	err      error
 	builders []*MsgTypeCreate
 	conflict []sql.ConflictOption
 }
 
 // Save creates the MsgType entities in the database.
 func (mtcb *MsgTypeCreateBulk) Save(ctx context.Context) ([]*MsgType, error) {
+	if mtcb.err != nil {
+		return nil, mtcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(mtcb.builders))
 	nodes := make([]*MsgType, len(mtcb.builders))
 	mutators := make([]Mutator, len(mtcb.builders))
@@ -1252,6 +1259,9 @@ func (u *MsgTypeUpsertBulk) ClearCanCustom() *MsgTypeUpsertBulk {
 
 // Exec executes the query.
 func (u *MsgTypeUpsertBulk) Exec(ctx context.Context) error {
+	if u.create.err != nil {
+		return u.create.err
+	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
 			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MsgTypeCreateBulk instead", i)

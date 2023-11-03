@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"sync/atomic"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -25,10 +26,26 @@ type MutationResolver interface {
 	UpdateMsgEvent(ctx context.Context, id int, input ent.UpdateMsgEventInput) (*ent.MsgEvent, error)
 	DeleteMsgEvent(ctx context.Context, id int) (bool, error)
 	EnableMsgEvent(ctx context.Context, id int) (*ent.MsgEvent, error)
+	DisableMsgEvent(ctx context.Context, id int) (*ent.MsgEvent, error)
 	CreateMsgChannel(ctx context.Context, input ent.CreateMsgChannelInput) (*ent.MsgChannel, error)
 	UpdateMsgChannel(ctx context.Context, id int, input ent.UpdateMsgChannelInput) (*ent.MsgChannel, error)
 	DeleteMsgChannel(ctx context.Context, id int) (bool, error)
 	EnableMsgChannel(ctx context.Context, id int) (*ent.MsgChannel, error)
+	DisableMsgChannel(ctx context.Context, id int) (*ent.MsgChannel, error)
+	CreateMsgTemplate(ctx context.Context, input ent.CreateMsgTemplateInput) (*ent.MsgTemplate, error)
+	UpdateMsgTemplate(ctx context.Context, id int, input ent.UpdateMsgTemplateInput) (*ent.MsgTemplate, error)
+	DeleteMsgTemplate(ctx context.Context, id int) (bool, error)
+	EnableMsgTemplate(ctx context.Context, id int) (*ent.MsgTemplate, error)
+	DisableMsgTemplate(ctx context.Context, id int) (*ent.MsgTemplate, error)
+	CreateMsgSubscriber(ctx context.Context, inputs []*ent.CreateMsgSubscriberInput) ([]*ent.MsgSubscriber, error)
+	DeleteMsgSubscriber(ctx context.Context, ids []int) (bool, error)
+	CreateSilence(ctx context.Context, input ent.CreateSilenceInput) (*ent.Silence, error)
+	UpdateSilence(ctx context.Context, id int, input ent.UpdateSilenceInput) (*ent.Silence, error)
+	DeleteSilence(ctx context.Context, id int) (bool, error)
+	MarkMsgInternalToReadOrUnRead(ctx context.Context, ids []int, read bool) (bool, error)
+	MarkMsgInternalToDeleted(ctx context.Context, ids []int) (bool, error)
+	TestSendEmailTpl(ctx context.Context, tplID int, email string, labels map[string]string, annotations map[string]string) (bool, error)
+	TestSendMessageTpl(ctx context.Context, tplID int, userID int, labels map[string]string, annotations map[string]string) (bool, error)
 }
 
 type RouteInputResolver interface {
@@ -69,6 +86,36 @@ func (ec *executionContext) field_Mutation_createMsgEvent_args(ctx context.Conte
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createMsgSubscriber_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []*ent.CreateMsgSubscriberInput
+	if tmp, ok := rawArgs["inputs"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inputs"))
+		arg0, err = ec.unmarshalNCreateMsgSubscriberInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐCreateMsgSubscriberInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["inputs"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createMsgTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 ent.CreateMsgTemplateInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNCreateMsgTemplateInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐCreateMsgTemplateInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createMsgType_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -76,6 +123,21 @@ func (ec *executionContext) field_Mutation_createMsgType_args(ctx context.Contex
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNCreateMsgTypeInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐCreateMsgTypeInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createSilence_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 ent.CreateSilenceInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNCreateSilenceInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐCreateSilenceInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -114,7 +176,97 @@ func (ec *executionContext) field_Mutation_deleteMsgEvent_args(ctx context.Conte
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteMsgSubscriber_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []int
+	if tmp, ok := rawArgs["ids"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ids"))
+		arg0, err = ec.unmarshalNID2ᚕintᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["ids"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteMsgTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteMsgType_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteSilence_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_disableMsgChannel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_disableMsgEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_disableMsgTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 int
@@ -156,6 +308,144 @@ func (ec *executionContext) field_Mutation_enableMsgEvent_args(ctx context.Conte
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_enableMsgTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_markMsgInternalToDeleted_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []int
+	if tmp, ok := rawArgs["ids"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ids"))
+		arg0, err = ec.unmarshalNID2ᚕintᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["ids"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_markMsgInternalToReadOrUnRead_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []int
+	if tmp, ok := rawArgs["ids"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ids"))
+		arg0, err = ec.unmarshalNID2ᚕintᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["ids"] = arg0
+	var arg1 bool
+	if tmp, ok := rawArgs["read"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("read"))
+		arg1, err = ec.unmarshalNBoolean2bool(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["read"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_testSendEmailTpl_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["tplID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tplID"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["tplID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["email"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["email"] = arg1
+	var arg2 map[string]string
+	if tmp, ok := rawArgs["labels"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
+		arg2, err = ec.unmarshalOMapString2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["labels"] = arg2
+	var arg3 map[string]string
+	if tmp, ok := rawArgs["annotations"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("annotations"))
+		arg3, err = ec.unmarshalOMapString2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["annotations"] = arg3
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_testSendMessageTpl_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["tplID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tplID"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["tplID"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["userID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+		arg1, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["userID"] = arg1
+	var arg2 map[string]string
+	if tmp, ok := rawArgs["labels"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("labels"))
+		arg2, err = ec.unmarshalOMapString2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["labels"] = arg2
+	var arg3 map[string]string
+	if tmp, ok := rawArgs["annotations"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("annotations"))
+		arg3, err = ec.unmarshalOMapString2map(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["annotations"] = arg3
 	return args, nil
 }
 
@@ -207,6 +497,30 @@ func (ec *executionContext) field_Mutation_updateMsgEvent_args(ctx context.Conte
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateMsgTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 ent.UpdateMsgTemplateInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdateMsgTemplateInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐUpdateMsgTemplateInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updateMsgType_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -223,6 +537,30 @@ func (ec *executionContext) field_Mutation_updateMsgType_args(ctx context.Contex
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg1, err = ec.unmarshalNUpdateMsgTypeInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐUpdateMsgTypeInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateSilence_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	var arg1 ent.UpdateSilenceInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNUpdateSilenceInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐUpdateSilenceInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -306,6 +644,12 @@ func (ec *executionContext) fieldContext_Mutation_createMsgType(ctx context.Cont
 				return ec.fieldContext_MsgType_events(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_MsgType_subscribers(ctx, field)
+			case "subscriberUsers":
+				return ec.fieldContext_MsgType_subscriberUsers(ctx, field)
+			case "subscriberRoles":
+				return ec.fieldContext_MsgType_subscriberRoles(ctx, field)
+			case "excludeSubscriberUsers":
+				return ec.fieldContext_MsgType_excludeSubscriberUsers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgType", field.Name)
 		},
@@ -319,7 +663,7 @@ func (ec *executionContext) fieldContext_Mutation_createMsgType(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createMsgType_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -391,6 +735,12 @@ func (ec *executionContext) fieldContext_Mutation_updateMsgType(ctx context.Cont
 				return ec.fieldContext_MsgType_events(ctx, field)
 			case "subscribers":
 				return ec.fieldContext_MsgType_subscribers(ctx, field)
+			case "subscriberUsers":
+				return ec.fieldContext_MsgType_subscriberUsers(ctx, field)
+			case "subscriberRoles":
+				return ec.fieldContext_MsgType_subscriberRoles(ctx, field)
+			case "excludeSubscriberUsers":
+				return ec.fieldContext_MsgType_excludeSubscriberUsers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgType", field.Name)
 		},
@@ -404,7 +754,7 @@ func (ec *executionContext) fieldContext_Mutation_updateMsgType(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateMsgType_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -459,7 +809,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteMsgType(ctx context.Cont
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteMsgType_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -529,6 +879,8 @@ func (ec *executionContext) fieldContext_Mutation_createMsgEvent(ctx context.Con
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
+			case "routeStr":
+				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -542,7 +894,7 @@ func (ec *executionContext) fieldContext_Mutation_createMsgEvent(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createMsgEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -612,6 +964,8 @@ func (ec *executionContext) fieldContext_Mutation_updateMsgEvent(ctx context.Con
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
+			case "routeStr":
+				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -625,7 +979,7 @@ func (ec *executionContext) fieldContext_Mutation_updateMsgEvent(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateMsgEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -680,7 +1034,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteMsgEvent(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteMsgEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -750,6 +1104,8 @@ func (ec *executionContext) fieldContext_Mutation_enableMsgEvent(ctx context.Con
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
+			case "routeStr":
+				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -763,7 +1119,92 @@ func (ec *executionContext) fieldContext_Mutation_enableMsgEvent(ctx context.Con
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_enableMsgEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_disableMsgEvent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_disableMsgEvent(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DisableMsgEvent(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgEvent)
+	fc.Result = res
+	return ec.marshalNMsgEvent2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEvent(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_disableMsgEvent(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgEvent_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgEvent_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgEvent_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgEvent_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgEvent_updatedAt(ctx, field)
+			case "msgTypeID":
+				return ec.fieldContext_MsgEvent_msgTypeID(ctx, field)
+			case "name":
+				return ec.fieldContext_MsgEvent_name(ctx, field)
+			case "status":
+				return ec.fieldContext_MsgEvent_status(ctx, field)
+			case "comments":
+				return ec.fieldContext_MsgEvent_comments(ctx, field)
+			case "route":
+				return ec.fieldContext_MsgEvent_route(ctx, field)
+			case "modes":
+				return ec.fieldContext_MsgEvent_modes(ctx, field)
+			case "msgType":
+				return ec.fieldContext_MsgEvent_msgType(ctx, field)
+			case "customerTemplate":
+				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
+			case "routeStr":
+				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_disableMsgEvent_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -842,7 +1283,7 @@ func (ec *executionContext) fieldContext_Mutation_createMsgChannel(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createMsgChannel_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -921,7 +1362,7 @@ func (ec *executionContext) fieldContext_Mutation_updateMsgChannel(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateMsgChannel_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -976,7 +1417,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteMsgChannel(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteMsgChannel_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
 	}
 	return fc, nil
 }
@@ -1055,7 +1496,1134 @@ func (ec *executionContext) fieldContext_Mutation_enableMsgChannel(ctx context.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_enableMsgChannel_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_disableMsgChannel(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_disableMsgChannel(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DisableMsgChannel(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgChannel)
+	fc.Result = res
+	return ec.marshalNMsgChannel2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannel(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_disableMsgChannel(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgChannel_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgChannel_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgChannel_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgChannel_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgChannel_updatedAt(ctx, field)
+			case "name":
+				return ec.fieldContext_MsgChannel_name(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgChannel_tenantID(ctx, field)
+			case "receiverType":
+				return ec.fieldContext_MsgChannel_receiverType(ctx, field)
+			case "status":
+				return ec.fieldContext_MsgChannel_status(ctx, field)
+			case "receiver":
+				return ec.fieldContext_MsgChannel_receiver(ctx, field)
+			case "comments":
+				return ec.fieldContext_MsgChannel_comments(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgChannel", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_disableMsgChannel_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createMsgTemplate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createMsgTemplate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateMsgTemplate(rctx, fc.Args["input"].(ent.CreateMsgTemplateInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgTemplate)
+	fc.Result = res
+	return ec.marshalNMsgTemplate2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createMsgTemplate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgTemplate_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgTemplate_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgTemplate_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgTemplate_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgTemplate_updatedAt(ctx, field)
+			case "msgTypeID":
+				return ec.fieldContext_MsgTemplate_msgTypeID(ctx, field)
+			case "msgEventID":
+				return ec.fieldContext_MsgTemplate_msgEventID(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgTemplate_tenantID(ctx, field)
+			case "name":
+				return ec.fieldContext_MsgTemplate_name(ctx, field)
+			case "status":
+				return ec.fieldContext_MsgTemplate_status(ctx, field)
+			case "receiverType":
+				return ec.fieldContext_MsgTemplate_receiverType(ctx, field)
+			case "format":
+				return ec.fieldContext_MsgTemplate_format(ctx, field)
+			case "subject":
+				return ec.fieldContext_MsgTemplate_subject(ctx, field)
+			case "from":
+				return ec.fieldContext_MsgTemplate_from(ctx, field)
+			case "to":
+				return ec.fieldContext_MsgTemplate_to(ctx, field)
+			case "cc":
+				return ec.fieldContext_MsgTemplate_cc(ctx, field)
+			case "bcc":
+				return ec.fieldContext_MsgTemplate_bcc(ctx, field)
+			case "body":
+				return ec.fieldContext_MsgTemplate_body(ctx, field)
+			case "tpl":
+				return ec.fieldContext_MsgTemplate_tpl(ctx, field)
+			case "tplFileID":
+				return ec.fieldContext_MsgTemplate_tplFileID(ctx, field)
+			case "attachments":
+				return ec.fieldContext_MsgTemplate_attachments(ctx, field)
+			case "attachmentsFileIds":
+				return ec.fieldContext_MsgTemplate_attachmentsFileIds(ctx, field)
+			case "comments":
+				return ec.fieldContext_MsgTemplate_comments(ctx, field)
+			case "event":
+				return ec.fieldContext_MsgTemplate_event(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgTemplate", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createMsgTemplate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateMsgTemplate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateMsgTemplate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateMsgTemplate(rctx, fc.Args["id"].(int), fc.Args["input"].(ent.UpdateMsgTemplateInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgTemplate)
+	fc.Result = res
+	return ec.marshalNMsgTemplate2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateMsgTemplate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgTemplate_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgTemplate_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgTemplate_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgTemplate_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgTemplate_updatedAt(ctx, field)
+			case "msgTypeID":
+				return ec.fieldContext_MsgTemplate_msgTypeID(ctx, field)
+			case "msgEventID":
+				return ec.fieldContext_MsgTemplate_msgEventID(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgTemplate_tenantID(ctx, field)
+			case "name":
+				return ec.fieldContext_MsgTemplate_name(ctx, field)
+			case "status":
+				return ec.fieldContext_MsgTemplate_status(ctx, field)
+			case "receiverType":
+				return ec.fieldContext_MsgTemplate_receiverType(ctx, field)
+			case "format":
+				return ec.fieldContext_MsgTemplate_format(ctx, field)
+			case "subject":
+				return ec.fieldContext_MsgTemplate_subject(ctx, field)
+			case "from":
+				return ec.fieldContext_MsgTemplate_from(ctx, field)
+			case "to":
+				return ec.fieldContext_MsgTemplate_to(ctx, field)
+			case "cc":
+				return ec.fieldContext_MsgTemplate_cc(ctx, field)
+			case "bcc":
+				return ec.fieldContext_MsgTemplate_bcc(ctx, field)
+			case "body":
+				return ec.fieldContext_MsgTemplate_body(ctx, field)
+			case "tpl":
+				return ec.fieldContext_MsgTemplate_tpl(ctx, field)
+			case "tplFileID":
+				return ec.fieldContext_MsgTemplate_tplFileID(ctx, field)
+			case "attachments":
+				return ec.fieldContext_MsgTemplate_attachments(ctx, field)
+			case "attachmentsFileIds":
+				return ec.fieldContext_MsgTemplate_attachmentsFileIds(ctx, field)
+			case "comments":
+				return ec.fieldContext_MsgTemplate_comments(ctx, field)
+			case "event":
+				return ec.fieldContext_MsgTemplate_event(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgTemplate", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateMsgTemplate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteMsgTemplate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteMsgTemplate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteMsgTemplate(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteMsgTemplate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteMsgTemplate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_enableMsgTemplate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_enableMsgTemplate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().EnableMsgTemplate(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgTemplate)
+	fc.Result = res
+	return ec.marshalNMsgTemplate2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_enableMsgTemplate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgTemplate_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgTemplate_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgTemplate_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgTemplate_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgTemplate_updatedAt(ctx, field)
+			case "msgTypeID":
+				return ec.fieldContext_MsgTemplate_msgTypeID(ctx, field)
+			case "msgEventID":
+				return ec.fieldContext_MsgTemplate_msgEventID(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgTemplate_tenantID(ctx, field)
+			case "name":
+				return ec.fieldContext_MsgTemplate_name(ctx, field)
+			case "status":
+				return ec.fieldContext_MsgTemplate_status(ctx, field)
+			case "receiverType":
+				return ec.fieldContext_MsgTemplate_receiverType(ctx, field)
+			case "format":
+				return ec.fieldContext_MsgTemplate_format(ctx, field)
+			case "subject":
+				return ec.fieldContext_MsgTemplate_subject(ctx, field)
+			case "from":
+				return ec.fieldContext_MsgTemplate_from(ctx, field)
+			case "to":
+				return ec.fieldContext_MsgTemplate_to(ctx, field)
+			case "cc":
+				return ec.fieldContext_MsgTemplate_cc(ctx, field)
+			case "bcc":
+				return ec.fieldContext_MsgTemplate_bcc(ctx, field)
+			case "body":
+				return ec.fieldContext_MsgTemplate_body(ctx, field)
+			case "tpl":
+				return ec.fieldContext_MsgTemplate_tpl(ctx, field)
+			case "tplFileID":
+				return ec.fieldContext_MsgTemplate_tplFileID(ctx, field)
+			case "attachments":
+				return ec.fieldContext_MsgTemplate_attachments(ctx, field)
+			case "attachmentsFileIds":
+				return ec.fieldContext_MsgTemplate_attachmentsFileIds(ctx, field)
+			case "comments":
+				return ec.fieldContext_MsgTemplate_comments(ctx, field)
+			case "event":
+				return ec.fieldContext_MsgTemplate_event(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgTemplate", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_enableMsgTemplate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_disableMsgTemplate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_disableMsgTemplate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DisableMsgTemplate(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgTemplate)
+	fc.Result = res
+	return ec.marshalNMsgTemplate2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplate(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_disableMsgTemplate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgTemplate_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgTemplate_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgTemplate_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgTemplate_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgTemplate_updatedAt(ctx, field)
+			case "msgTypeID":
+				return ec.fieldContext_MsgTemplate_msgTypeID(ctx, field)
+			case "msgEventID":
+				return ec.fieldContext_MsgTemplate_msgEventID(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgTemplate_tenantID(ctx, field)
+			case "name":
+				return ec.fieldContext_MsgTemplate_name(ctx, field)
+			case "status":
+				return ec.fieldContext_MsgTemplate_status(ctx, field)
+			case "receiverType":
+				return ec.fieldContext_MsgTemplate_receiverType(ctx, field)
+			case "format":
+				return ec.fieldContext_MsgTemplate_format(ctx, field)
+			case "subject":
+				return ec.fieldContext_MsgTemplate_subject(ctx, field)
+			case "from":
+				return ec.fieldContext_MsgTemplate_from(ctx, field)
+			case "to":
+				return ec.fieldContext_MsgTemplate_to(ctx, field)
+			case "cc":
+				return ec.fieldContext_MsgTemplate_cc(ctx, field)
+			case "bcc":
+				return ec.fieldContext_MsgTemplate_bcc(ctx, field)
+			case "body":
+				return ec.fieldContext_MsgTemplate_body(ctx, field)
+			case "tpl":
+				return ec.fieldContext_MsgTemplate_tpl(ctx, field)
+			case "tplFileID":
+				return ec.fieldContext_MsgTemplate_tplFileID(ctx, field)
+			case "attachments":
+				return ec.fieldContext_MsgTemplate_attachments(ctx, field)
+			case "attachmentsFileIds":
+				return ec.fieldContext_MsgTemplate_attachmentsFileIds(ctx, field)
+			case "comments":
+				return ec.fieldContext_MsgTemplate_comments(ctx, field)
+			case "event":
+				return ec.fieldContext_MsgTemplate_event(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgTemplate", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_disableMsgTemplate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createMsgSubscriber(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createMsgSubscriber(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateMsgSubscriber(rctx, fc.Args["inputs"].([]*ent.CreateMsgSubscriberInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.MsgSubscriber)
+	fc.Result = res
+	return ec.marshalNMsgSubscriber2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgSubscriberᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createMsgSubscriber(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgSubscriber_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgSubscriber_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgSubscriber_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgSubscriber_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgSubscriber_updatedAt(ctx, field)
+			case "msgTypeID":
+				return ec.fieldContext_MsgSubscriber_msgTypeID(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgSubscriber_tenantID(ctx, field)
+			case "userID":
+				return ec.fieldContext_MsgSubscriber_userID(ctx, field)
+			case "orgRoleID":
+				return ec.fieldContext_MsgSubscriber_orgRoleID(ctx, field)
+			case "exclude":
+				return ec.fieldContext_MsgSubscriber_exclude(ctx, field)
+			case "msgType":
+				return ec.fieldContext_MsgSubscriber_msgType(ctx, field)
+			case "user":
+				return ec.fieldContext_MsgSubscriber_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgSubscriber", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createMsgSubscriber_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteMsgSubscriber(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteMsgSubscriber(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteMsgSubscriber(rctx, fc.Args["ids"].([]int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteMsgSubscriber(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteMsgSubscriber_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createSilence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createSilence(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateSilence(rctx, fc.Args["input"].(ent.CreateSilenceInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Silence)
+	fc.Result = res
+	return ec.marshalNSilence2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilence(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createSilence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Silence_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Silence_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Silence_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Silence_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Silence_updatedAt(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_Silence_tenantID(ctx, field)
+			case "matchers":
+				return ec.fieldContext_Silence_matchers(ctx, field)
+			case "startsAt":
+				return ec.fieldContext_Silence_startsAt(ctx, field)
+			case "endsAt":
+				return ec.fieldContext_Silence_endsAt(ctx, field)
+			case "comments":
+				return ec.fieldContext_Silence_comments(ctx, field)
+			case "state":
+				return ec.fieldContext_Silence_state(ctx, field)
+			case "user":
+				return ec.fieldContext_Silence_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Silence", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createSilence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateSilence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateSilence(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateSilence(rctx, fc.Args["id"].(int), fc.Args["input"].(ent.UpdateSilenceInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Silence)
+	fc.Result = res
+	return ec.marshalNSilence2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilence(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateSilence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Silence_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Silence_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Silence_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_Silence_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Silence_updatedAt(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_Silence_tenantID(ctx, field)
+			case "matchers":
+				return ec.fieldContext_Silence_matchers(ctx, field)
+			case "startsAt":
+				return ec.fieldContext_Silence_startsAt(ctx, field)
+			case "endsAt":
+				return ec.fieldContext_Silence_endsAt(ctx, field)
+			case "comments":
+				return ec.fieldContext_Silence_comments(ctx, field)
+			case "state":
+				return ec.fieldContext_Silence_state(ctx, field)
+			case "user":
+				return ec.fieldContext_Silence_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Silence", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateSilence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteSilence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteSilence(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteSilence(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteSilence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteSilence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_markMsgInternalToReadOrUnRead(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_markMsgInternalToReadOrUnRead(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().MarkMsgInternalToReadOrUnRead(rctx, fc.Args["ids"].([]int), fc.Args["read"].(bool))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_markMsgInternalToReadOrUnRead(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_markMsgInternalToReadOrUnRead_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_markMsgInternalToDeleted(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_markMsgInternalToDeleted(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().MarkMsgInternalToDeleted(rctx, fc.Args["ids"].([]int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_markMsgInternalToDeleted(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_markMsgInternalToDeleted_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_testSendEmailTpl(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_testSendEmailTpl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().TestSendEmailTpl(rctx, fc.Args["tplID"].(int), fc.Args["email"].(string), fc.Args["labels"].(map[string]string), fc.Args["annotations"].(map[string]string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_testSendEmailTpl(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_testSendEmailTpl_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_testSendMessageTpl(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_testSendMessageTpl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().TestSendMessageTpl(rctx, fc.Args["tplID"].(int), fc.Args["userID"].(int), fc.Args["labels"].(map[string]string), fc.Args["annotations"].(map[string]string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_testSendMessageTpl(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_testSendMessageTpl_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -1071,13 +2639,31 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"smartHost", "authType", "authUsername", "authPassword", "authSecret", "authIdentity", "headers"}
+	fieldsInOrder := [...]string{"to", "from", "smartHost", "authType", "authUsername", "authPassword", "authSecret", "authIdentity", "headers"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "to":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("to"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.To = data
+		case "from":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("from"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.From = data
 		case "smartHost":
 			var err error
 
@@ -1100,7 +2686,7 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authUsername"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -1109,7 +2695,7 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authPassword"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -1118,7 +2704,7 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authSecret"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -1127,7 +2713,7 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authIdentity"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -1194,6 +2780,53 @@ func (ec *executionContext) unmarshalInputMatcherInput(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputMessageConfigInput(ctx context.Context, obj interface{}) (profile.MessageConfig, error) {
+	var it profile.MessageConfig
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"to", "subject", "redirect"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "to":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("to"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.To = data
+		case "subject":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subject"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Subject = data
+		case "redirect":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("redirect"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Redirect = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj interface{}) (profile.Receiver, error) {
 	var it profile.Receiver
 	asMap := map[string]interface{}{}
@@ -1201,7 +2834,7 @@ func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "emailConfigs"}
+	fieldsInOrder := [...]string{"name", "emailConfigs", "messageConfig"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -1226,6 +2859,15 @@ func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj
 				return it, err
 			}
 			it.EmailConfigs = data
+		case "messageConfig":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageConfig"))
+			data, err := ec.unmarshalOMessageConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐMessageConfig(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageConfig = data
 		}
 	}
 
@@ -1239,7 +2881,7 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj in
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"receiver", "groupBy", "matchers", "muteTimeIntervals", "activeTimeIntervals", "continue", "routes", "groupWait", "GroupInterval", "repeatInterval"}
+	fieldsInOrder := [...]string{"receiver", "groupBy", "matchers", "muteTimeIntervals", "activeTimeIntervals", "continue", "routes", "groupWait", "groupInterval", "repeatInterval"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -1320,10 +2962,10 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj in
 				return it, err
 			}
 			it.GroupWait = data
-		case "GroupInterval":
+		case "groupInterval":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("GroupInterval"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("groupInterval"))
 			data, err := ec.unmarshalODuration2ᚖtimeᚐDuration(ctx, v)
 			if err != nil {
 				return it, err
@@ -1361,7 +3003,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	})
 
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
+	deferred := make(map[string]*graphql.FieldSet)
 	for i, field := range fields {
 		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
 			Object: field.Name,
@@ -1372,123 +3014,220 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "createMsgType":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createMsgType(ctx, field)
 			})
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updateMsgType":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateMsgType(ctx, field)
 			})
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "deleteMsgType":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteMsgType(ctx, field)
 			})
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "createMsgEvent":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createMsgEvent(ctx, field)
 			})
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updateMsgEvent":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateMsgEvent(ctx, field)
 			})
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "deleteMsgEvent":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteMsgEvent(ctx, field)
 			})
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "enableMsgEvent":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_enableMsgEvent(ctx, field)
 			})
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
+			}
+		case "disableMsgEvent":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_disableMsgEvent(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
 			}
 		case "createMsgChannel":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createMsgChannel(ctx, field)
 			})
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "updateMsgChannel":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateMsgChannel(ctx, field)
 			})
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "deleteMsgChannel":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteMsgChannel(ctx, field)
 			})
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
 			}
 		case "enableMsgChannel":
-
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_enableMsgChannel(ctx, field)
 			})
-
 			if out.Values[i] == graphql.Null {
-				invalids++
+				out.Invalids++
+			}
+		case "disableMsgChannel":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_disableMsgChannel(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createMsgTemplate":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createMsgTemplate(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateMsgTemplate":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateMsgTemplate(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteMsgTemplate":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteMsgTemplate(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "enableMsgTemplate":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_enableMsgTemplate(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "disableMsgTemplate":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_disableMsgTemplate(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createMsgSubscriber":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createMsgSubscriber(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteMsgSubscriber":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteMsgSubscriber(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createSilence":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createSilence(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateSilence":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateSilence(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteSilence":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteSilence(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "markMsgInternalToReadOrUnRead":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_markMsgInternalToReadOrUnRead(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "markMsgInternalToDeleted":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_markMsgInternalToDeleted(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "testSendEmailTpl":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_testSendEmailTpl(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "testSendMessageTpl":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_testSendMessageTpl(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-	out.Dispatch()
-	if invalids > 0 {
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
 		return graphql.Null
 	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
 	return out
 }
 
 // endregion **************************** object.gotpl ****************************
 
 // region    ***************************** type.gotpl *****************************
-
-func (ec *executionContext) unmarshalNReceiverInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiver(ctx context.Context, v interface{}) (*profile.Receiver, error) {
-	res, err := ec.unmarshalInputReceiverInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
 
 func (ec *executionContext) unmarshalOEmailConfigInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐEmailConfig(ctx context.Context, v interface{}) ([]*profile.EmailConfig, error) {
 	if v == nil {
@@ -1543,6 +3282,14 @@ func (ec *executionContext) unmarshalOMatcherInput2ᚖgithubᚗcomᚋwoocoosᚋm
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputMatcherInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOMessageConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐMessageConfig(ctx context.Context, v interface{}) (*profile.MessageConfig, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputMessageConfigInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

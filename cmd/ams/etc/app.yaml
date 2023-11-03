@@ -1,0 +1,127 @@
+appName: msgcenter
+version: 0.0.1
+development: true
+log:
+  withTraceID: true
+  cores:
+    - level: info
+  rotate:
+
+jwt: &jwt
+  signingMethod: "HS256"
+  signingKey: "secret"
+
+web:
+  server:
+    addr: 127.0.0.1:10072
+  engine:
+    routerGroups:
+      - default:
+          middlewares:
+            - cors:
+                allowOrigins: [ '*' ]
+                allowHeaders: [ "*" ]
+            - accessLog:
+                exclude:
+                  - IntrospectionQuery
+            - recovery:
+            - errorHandle:
+      - alertmanager:
+          basePath: "/api/v2"
+          middlewares:
+      - graphql:
+          basePath: "/graphql"
+          middlewares:
+            - graphql:
+                group: "/graphql"
+                withAuthorization: false
+                appCode: "msg"
+                middlewares:
+                  operation:
+                    - tenant:
+                    - jwt: *jwt
+
+ui:
+  staticDir: "../../web/build"
+  enabled: true
+  server:
+    addr: :10073
+  engine:
+    routerGroups:
+      - default:
+          middlewares:
+            - gzip:
+
+store:
+  msgcenter:
+    driverName: mysql
+    dsn: "root:@tcp(localhost:3306)/msgcenter?parseTime=true&loc=Local"
+  # push service.
+  redis:
+    addrs:
+      - 127.0.0.1:6379
+    db: 1
+
+entcache:
+  hashQueryTTL: 5s
+
+alertManager:
+  # 集群配置,如无配置表示单机模式
+  cluster:
+    options:
+      # 指定集群中的节点,可以是服务名或者IP
+      known: [ "localhost" ]
+    memberList:
+      bindAddr: 0.0.0.0
+      bindPort: 7946
+  config:
+    # 如果指定租户，则只能访问指定租户的配置
+    tenants: [ 1,2,3 ]
+    file: etc/alertmanager.yaml
+  storage:
+    path: data
+  data:
+    retention: 120h
+    maintenanceInterval: 15m
+  alerts:
+    gcInterval: 30m
+  template:
+    baseDir: ../../test/testdata/files # path for custom template
+    tmpDir: "/msg/tpl/tmp" # 模板临时路径
+    dataDir: "/msg/tpl/data" # 模板正式路径
+    attachmentDir: "/msg/att" # 附件存储路径
+
+prometheus:
+  server:
+    addr: 127.0.0.1:9093
+
+cache:
+  local:
+    driverName: memory
+    size: 1000
+    ttl: 100s
+
+kosdk:
+  client:
+    timeout: 2s
+    oauth2:
+      clientID: 206734260394752
+      clientSecret: T2UlqISVFq4DR9InXamj3l74iWdu3Tyr
+      endpoint:
+        tokenURL: http://127.0.0.1:10070/token
+      scopes:
+      storeKey: memory
+  signer:
+    authScheme: "KO-HMAC-SHA1"
+    authHeaders: [ "timestamp", "nonce" ]
+    signedLookups:
+      accessToken: "header:authorization>bearer"
+      timestamp:
+      nonce:
+      url: CanonicalUri
+    nonceLen: 12
+  plugin:
+    msg:
+      baseUrl: "http://127.0.0.1:10072"
+    file:
+      baseUrl: "http://127.0.0.1:10071"

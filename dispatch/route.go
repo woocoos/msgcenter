@@ -198,7 +198,7 @@ func (ro *RouteOpts) String() string {
 	for ln := range ro.GroupBy {
 		labels = append(labels, ln)
 	}
-	return fmt.Sprintf("<RouteOpts send_to:%q group_by:%q group_by_all:%t timers:%q|%q>",
+	return fmt.Sprintf("RouteOpts send_to:%q group_by:%q group_by_all:%t timers:%q|%q>",
 		ro.Receiver, labels, ro.GroupByAll, ro.GroupWait, ro.GroupInterval)
 }
 

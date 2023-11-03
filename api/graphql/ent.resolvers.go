@@ -6,22 +6,88 @@ package graphql
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 
+	"entgo.io/contrib/entgql"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/ent"
 )
 
+// Labels is the resolver for the labels field.
+func (r *msgAlertResolver) Labels(ctx context.Context, obj *ent.MsgAlert) (map[string]string, error) {
+	val, err := json.Marshal(obj.Labels)
+	if err != nil {
+		return nil, err
+	}
+	var data map[string]string
+	err = json.Unmarshal(val, &data)
+	if err != nil {
+		return nil, err
+	}
+	return data, err
+}
+
+// Annotations is the resolver for the annotations field.
+func (r *msgAlertResolver) Annotations(ctx context.Context, obj *ent.MsgAlert) (map[string]string, error) {
+	val, err := json.Marshal(obj.Annotations)
+	if err != nil {
+		return nil, err
+	}
+	var data map[string]string
+	err = json.Unmarshal(val, &data)
+	if err != nil {
+		return nil, err
+	}
+	return data, err
+}
+
+// NlogAlerts is the resolver for the nlogAlerts field.
+func (r *msgAlertResolver) NlogAlerts(ctx context.Context, obj *ent.MsgAlert) ([]*ent.NlogAlert, error) {
+	panic(fmt.Errorf("not implemented: NlogAlerts - nlogAlerts"))
+}
+
 // Node is the resolver for the node field.
 func (r *queryResolver) Node(ctx context.Context, id string) (ent.Noder, error) {
-	return r.Client.NoderEx(ctx, id)
+	return r.client.NoderEx(ctx, id)
 }
 
 // Nodes is the resolver for the nodes field.
 func (r *queryResolver) Nodes(ctx context.Context, ids []string) ([]ent.Noder, error) {
-	return r.Client.NodersEx(ctx, ids)
+	return r.client.NodersEx(ctx, ids)
 }
+
+// MsgInternals is the resolver for the msgInternals field.
+func (r *queryResolver) MsgInternals(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalOrder, where *ent.MsgInternalWhereInput) (*ent.MsgInternalConnection, error) {
+	return r.client.MsgInternal.Query().Paginate(ctx, after, first, before, last,
+		ent.WithMsgInternalOrder(orderBy),
+		ent.WithMsgInternalFilter(where.Filter))
+}
+
+// MsgInternalTos is the resolver for the msgInternalTos field.
+func (r *queryResolver) MsgInternalTos(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) (*ent.MsgInternalToConnection, error) {
+	return r.client.MsgInternalTo.Query().Paginate(ctx, after, first, before, last,
+		ent.WithMsgInternalToOrder(orderBy),
+		ent.WithMsgInternalToFilter(where.Filter))
+}
+
+// MsgAlert returns generated.MsgAlertResolver implementation.
+func (r *Resolver) MsgAlert() generated.MsgAlertResolver { return &msgAlertResolver{r} }
+
+// MsgEvent returns generated.MsgEventResolver implementation.
+func (r *Resolver) MsgEvent() generated.MsgEventResolver { return &msgEventResolver{r} }
+
+// MsgInternal returns generated.MsgInternalResolver implementation.
+func (r *Resolver) MsgInternal() generated.MsgInternalResolver { return &msgInternalResolver{r} }
+
+// MsgType returns generated.MsgTypeResolver implementation.
+func (r *Resolver) MsgType() generated.MsgTypeResolver { return &msgTypeResolver{r} }
 
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+type msgAlertResolver struct{ *Resolver }
+type msgEventResolver struct{ *Resolver }
+type msgInternalResolver struct{ *Resolver }
+type msgTypeResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

@@ -3,11 +3,11 @@ package dispatch
 import (
 	"context"
 	"github.com/tsingsun/woocoo/pkg/log"
-	"github.com/woocoos/msgcenter/metrics"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
-	"github.com/woocoos/msgcenter/provider"
+	"github.com/woocoos/msgcenter/pkg/metrics"
+	"github.com/woocoos/msgcenter/service/provider"
 	"go.uber.org/zap"
 	"sort"
 	"sync"
@@ -96,16 +96,16 @@ func (d *Dispatcher) run(it provider.AlertIterator) {
 			if !ok {
 				// Iterator exhausted for some reason.
 				if err := it.Err(); err != nil {
-					logger.Error("Error on alert update", zap.Error(err))
+					logger.Error("error on alert update", zap.Error(err))
 				}
 				return
 			}
 
-			logger.Debug("Received alert", zap.Any("alert", alt))
+			logger.Debug("received alert", zap.Any("alert", alt))
 
 			// Log errors but keep trying.
 			if err := it.Err(); err != nil {
-				logger.Error("Error on alert update", zap.Error(err))
+				logger.Error("error on alert update", zap.Error(err))
 				continue
 			}
 
@@ -248,7 +248,7 @@ func (d *Dispatcher) processAlert(alt *alert.Alert, route *Route) {
 	// If the group does not exist, create it. But check the limit first.
 	if limit := d.limits.MaxNumberOfAggregationGroups(); limit > 0 && d.aggrGroupsNum >= limit {
 		d.metrics.AggrGroupLimitReached.Inc()
-		logger.Error("Too many aggregation groups, cannot create new group for alert",
+		logger.Error("too many aggregation groups, cannot create new group for alert",
 			zap.Int("groups", d.aggrGroupsNum), zap.Int("limit", limit), zap.String("alert", alt.Name()))
 		return
 	}
@@ -266,7 +266,7 @@ func (d *Dispatcher) processAlert(alt *alert.Alert, route *Route) {
 	go ag.run(func(ctx context.Context, alerts ...*alert.Alert) bool {
 		_, _, err := d.stage.Exec(ctx, alerts...)
 		if err != nil {
-			msg := "Notify for alerts failed"
+			msg := "notify for alerts failed"
 			fs := []zap.Field{zap.Int("num_alerts", len(alerts)), zap.Error(err)}
 			if ctx.Err() == context.Canceled {
 				// It is expected for the context to be canceled on

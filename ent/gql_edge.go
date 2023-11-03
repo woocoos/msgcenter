@@ -8,6 +8,48 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
+func (ma *MsgAlert) Nlog(
+	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *NlogOrder, where *NlogWhereInput,
+) (*NlogConnection, error) {
+	opts := []NlogPaginateOption{
+		WithNlogOrder(orderBy),
+		WithNlogFilter(where.Filter),
+	}
+	alias := graphql.GetFieldContext(ctx).Field.Alias
+	totalCount, hasTotalCount := ma.Edges.totalCount[0][alias]
+	if nodes, err := ma.NamedNlog(alias); err == nil || hasTotalCount {
+		pager, err := newNlogPager(opts, last != nil)
+		if err != nil {
+			return nil, err
+		}
+		conn := &NlogConnection{Edges: []*NlogEdge{}, TotalCount: totalCount}
+		conn.build(nodes, pager, after, first, before, last)
+		return conn, nil
+	}
+	return ma.QueryNlog().Paginate(ctx, after, first, before, last, opts...)
+}
+
+func (ma *MsgAlert) NlogAlerts(
+	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *NlogAlertOrder, where *NlogAlertWhereInput,
+) (*NlogAlertConnection, error) {
+	opts := []NlogAlertPaginateOption{
+		WithNlogAlertOrder(orderBy),
+		WithNlogAlertFilter(where.Filter),
+	}
+	alias := graphql.GetFieldContext(ctx).Field.Alias
+	totalCount, hasTotalCount := ma.Edges.totalCount[1][alias]
+	if nodes, err := ma.NamedNlogAlerts(alias); err == nil || hasTotalCount {
+		pager, err := newNlogAlertPager(opts, last != nil)
+		if err != nil {
+			return nil, err
+		}
+		conn := &NlogAlertConnection{Edges: []*NlogAlertEdge{}, TotalCount: totalCount}
+		conn.build(nodes, pager, after, first, before, last)
+		return conn, nil
+	}
+	return ma.QueryNlogAlerts().Paginate(ctx, after, first, before, last, opts...)
+}
+
 func (me *MsgEvent) MsgType(ctx context.Context) (*MsgType, error) {
 	result, err := me.Edges.MsgTypeOrErr()
 	if IsNotLoaded(err) {
@@ -28,12 +70,48 @@ func (me *MsgEvent) CustomerTemplate(ctx context.Context) (result []*MsgTemplate
 	return result, err
 }
 
+func (mi *MsgInternal) MsgInternalTo(ctx context.Context) (result []*MsgInternalTo, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = mi.NamedMsgInternalTo(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = mi.Edges.MsgInternalToOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = mi.QueryMsgInternalTo().All(ctx)
+	}
+	return result, err
+}
+
+func (mit *MsgInternalTo) MsgInternal(ctx context.Context) (*MsgInternal, error) {
+	result, err := mit.Edges.MsgInternalOrErr()
+	if IsNotLoaded(err) {
+		result, err = mit.QueryMsgInternal().Only(ctx)
+	}
+	return result, err
+}
+
+func (mit *MsgInternalTo) User(ctx context.Context) (*User, error) {
+	result, err := mit.Edges.UserOrErr()
+	if IsNotLoaded(err) {
+		result, err = mit.QueryUser().Only(ctx)
+	}
+	return result, err
+}
+
 func (ms *MsgSubscriber) MsgType(ctx context.Context) (*MsgType, error) {
 	result, err := ms.Edges.MsgTypeOrErr()
 	if IsNotLoaded(err) {
 		result, err = ms.QueryMsgType().Only(ctx)
 	}
 	return result, err
+}
+
+func (ms *MsgSubscriber) User(ctx context.Context) (*User, error) {
+	result, err := ms.Edges.UserOrErr()
+	if IsNotLoaded(err) {
+		result, err = ms.QueryUser().Only(ctx)
+	}
+	return result, MaskNotFound(err)
 }
 
 func (mt *MsgTemplate) Event(ctx context.Context) (*MsgEvent, error) {
@@ -64,6 +142,66 @@ func (mt *MsgType) Subscribers(ctx context.Context) (result []*MsgSubscriber, er
 	}
 	if IsNotLoaded(err) {
 		result, err = mt.QuerySubscribers().All(ctx)
+	}
+	return result, err
+}
+
+func (n *Nlog) Alerts(ctx context.Context) (result []*MsgAlert, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = n.NamedAlerts(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = n.Edges.AlertsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = n.QueryAlerts().All(ctx)
+	}
+	return result, err
+}
+
+func (n *Nlog) NlogAlert(ctx context.Context) (result []*NlogAlert, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = n.NamedNlogAlert(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = n.Edges.NlogAlertOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = n.QueryNlogAlert().All(ctx)
+	}
+	return result, err
+}
+
+func (na *NlogAlert) Nlog(ctx context.Context) (*Nlog, error) {
+	result, err := na.Edges.NlogOrErr()
+	if IsNotLoaded(err) {
+		result, err = na.QueryNlog().Only(ctx)
+	}
+	return result, err
+}
+
+func (na *NlogAlert) Alert(ctx context.Context) (*MsgAlert, error) {
+	result, err := na.Edges.AlertOrErr()
+	if IsNotLoaded(err) {
+		result, err = na.QueryAlert().Only(ctx)
+	}
+	return result, err
+}
+
+func (s *Silence) User(ctx context.Context) (*User, error) {
+	result, err := s.Edges.UserOrErr()
+	if IsNotLoaded(err) {
+		result, err = s.QueryUser().Only(ctx)
+	}
+	return result, err
+}
+
+func (u *User) Silences(ctx context.Context) (result []*Silence, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = u.NamedSilences(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = u.Edges.SilencesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = u.QuerySilences().All(ctx)
 	}
 	return result, err
 }

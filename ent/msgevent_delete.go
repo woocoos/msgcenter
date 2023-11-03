@@ -8,8 +8,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
+	"github.com/woocoos/msgcenter/ent/msgevent"
 )
 
 // MsgEventDelete is the builder for deleting a MsgEvent entity.
@@ -41,6 +43,8 @@ func (med *MsgEventDelete) ExecX(ctx context.Context) int {
 
 func (med *MsgEventDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(msgevent.Table, sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt))
+	_spec.Node.Schema = med.schemaConfig.MsgEvent
+	ctx = internal.NewSchemaConfigContext(ctx, med.schemaConfig)
 	if ps := med.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

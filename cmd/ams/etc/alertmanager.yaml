@@ -1,0 +1,37 @@
+route:
+  groupBy: [...]
+  receiver: "email"
+  # 调试时,可以将以下值调低
+  groupWait: 5s
+  groupInterval: 3m
+  repeatInterval: 1h
+# 模板文件位置
+templates:
+  - '../../test/testdata/files/msg/tpl/data/*.tmpl'
+  - '../../test/testdata/files/msg/tpl/data/**/*.tmpl'
+
+receivers:
+  - name: "internal"
+    webhookConfigs:
+      - url: "http://127.0.0.1:5001/"
+  - name: dingtalk-webhook-config
+    webhookConfigs:
+      - sendResolved: false
+        url: http://192.168.0.13:30536/dingtalk/webhook1/send
+  - name: email
+    emailConfigs:
+      - authPassword:
+        authUsername:
+        from: alertmanager@example.com
+        requireTLS: false
+        smarthost: localhost:1025
+        to: alerts@example.com
+  - name: message
+    messageConfig:
+      sendResolved: false
+inhibit_rules:
+  - source_match:
+      severity: "critical"
+    target_match:
+      severity: "warning"
+    equal: ["alertname", "dev", "instance"]
