@@ -10,7 +10,7 @@ import (
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
-	"github.com/woocoos/msgcenter/provider/mem"
+	"github.com/woocoos/msgcenter/service/provider/mem"
 	"go.uber.org/zap"
 	"strconv"
 	"time"

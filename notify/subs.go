@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
-	"github.com/woocoos/msgcenter/provider"
+	"github.com/woocoos/msgcenter/service/provider"
 )
 
 // UserInfo include base user notify info for event type alert which not specify the recipient.

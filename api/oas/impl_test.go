@@ -15,7 +15,7 @@ import (
 	"github.com/woocoos/msgcenter/notify/webhook"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
-	"github.com/woocoos/msgcenter/provider/mem"
+	"github.com/woocoos/msgcenter/service/provider/mem"
 	"github.com/woocoos/msgcenter/test/maildev"
 	"github.com/woocoos/msgcenter/test/testsuite"
 	"io"
