@@ -1,22 +1,22 @@
-import { defineAppConfig, defineDataLoader } from 'ice';
-import { defineAuthConfig } from '@ice/plugin-auth/esm/types';
-import { defineStoreConfig } from '@ice/plugin-store/esm/types';
-import { defineRequestConfig } from '@ice/plugin-request/esm/types';
-import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/types";
-import store from '@/store';
 import '@/assets/styles/index.css';
 import { getItem, removeItem, setItem } from '@/pkg/localStore';
-import { browserLanguage, getMenuAppActions } from './util';
-import jwtDcode, { JwtPayload } from 'jwt-decode';
+import store from '@/store';
+import { defineAuthConfig } from '@ice/plugin-auth/esm/types';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
+import { defineRequestConfig } from '@ice/plugin-request/esm/types';
+import { defineStoreConfig } from '@ice/plugin-store/esm/types';
 import { instanceName, setFilesApi, userPermissions } from '@knockout-js/api';
-import { logout } from './services/auth';
 import { User } from '@knockout-js/api/ucenter';
-import { Message } from './generated/msgsrv/graphql';
 import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/request';
-import { useTranslation } from 'react-i18next';
+import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/types";
 import { Result, message } from 'antd';
+import { defineAppConfig, defineDataLoader } from 'ice';
+import jwtDcode, { JwtPayload } from 'jwt-decode';
+import { useTranslation } from 'react-i18next';
+import { Message } from './generated/msgsrv/graphql';
+import { logout } from './services/auth';
 import { parseSpm } from './services/auth/noStore';
+import { browserLanguage, getMenuAppActions } from './util';
 
 const NODE_ENV = process.env.NODE_ENV ?? '',
   ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
@@ -75,12 +75,12 @@ export const dataLoader = defineDataLoader(async () => {
 
   setFilesApi(ICE_API_FILES_PREFIX);
 
-  const signCid = `sign_cid=${ICE_APP_CODE}`;
-  if (document.cookie.indexOf(signCid) === -1) {
+  const sign = `sign_cid=y`
+  if (document.cookie.indexOf(sign) === -1) {
     removeItem('token');
     removeItem('refreshToken');
   }
-  document.cookie = signCid;
+  document.cookie = `${sign}; path=/`;
   await parseSpm();
 
   let locale = getItem<string>('locale'),

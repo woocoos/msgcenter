@@ -1,7 +1,7 @@
 import { setItem } from '@/pkg/localStore';
+import { User } from '@knockout-js/api/ucenter';
 import { request } from 'ice';
 import { LoginRes } from '.';
-import { User } from '@knockout-js/api/ucenter';
 
 const ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '/api-auth'
 
@@ -47,7 +47,7 @@ export async function parseSpm() {
           setItem('user', parseData.user);
         }
 
-        document.cookie = ck
+        document.cookie = `${ck}; path=/`
       }
     } catch (error) {
     }
