@@ -14,7 +14,10 @@ func main() {
 	app := woocoo.New()
 	msgSvr := msg.NewServer(app.AppConfiguration())
 
-	app.RegisterServer(msgSvr, clientx.ChangeSet)
+	app.RegisterServer(msgSvr)
+	if clientx.ChangeSet != nil {
+		app.RegisterServer(clientx.ChangeSet)
+	}
 
 	if err := app.Run(); err != nil {
 		log.Panic(err)

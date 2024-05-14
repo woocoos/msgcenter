@@ -72,7 +72,8 @@ func (ih *Inhibitor) Start(ctx context.Context) error {
 	for _, rule := range ih.rules {
 		srcs = append(srcs, rule.scache)
 	}
-	srcs = append(srcs, ih)
+	// TODO ih加进去会导致死循环，先注释处理
+	//srcs = append(srcs, ih)
 	run, stop := woocoo.MiniApp(ctx, 0, srcs...)
 	ih.mtx.Lock()
 	ih.cancel = stop
