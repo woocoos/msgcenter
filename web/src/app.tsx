@@ -5,7 +5,7 @@ import { defineAuthConfig } from '@ice/plugin-auth/esm/types';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { defineRequestConfig } from '@ice/plugin-request/esm/types';
 import { defineStoreConfig } from '@ice/plugin-store/esm/types';
-import { instanceName, setFilesApi, userPermissions } from '@knockout-js/api';
+import { instanceName, userPermissions } from '@knockout-js/api';
 import { User } from '@knockout-js/api/ucenter';
 import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/request';
 import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/types";
@@ -72,8 +72,6 @@ export const dataLoader = defineDataLoader(async () => {
       displayName: 'admin',
     })
   }
-
-  setFilesApi(ICE_API_FILES_PREFIX);
 
   const sign = `sign_cid=y`
   if (document.cookie.indexOf(sign) === -1) {

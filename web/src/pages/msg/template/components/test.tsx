@@ -6,8 +6,8 @@ import { getMsgTemplateInfo, testSendEamil, testSendMessage } from '@/services/m
 import { useLeavePrompt } from '@knockout-js/layout';
 import StringRecord from '@/components/input/stringRecord';
 import { UserSelect } from '@knockout-js/org';
-import { getFilesRaw } from '@knockout-js/api';
 import { parseGoTempKey } from '@/util';
+import { getFileRaw, parseStorageData } from '@knockout-js/api';
 
 type ProFormData = {
   userID?: string;
@@ -50,15 +50,19 @@ export default (props: {
       setSaveDisabled(true);
       const result = await getMsgTemplateInfo(props.id), keys: string[] = [];
       if (result?.id) {
-        if (result.tplFileID) {
-          const file = await getFilesRaw(result.tplFileID);
-          if (file && typeof file !== "string") {
-            const r = new FileReader()
-            r.readAsText(file, 'utf-8')
-            r.onload = () => {
-              const pgkeys = parseGoTempKey(r.result as string);
-              if (pgkeys) {
-                setTplParams(pgkeys)
+        if (result.tpl) {
+          const tplData = await parseStorageData(result.tpl)
+          if (tplData?.path) {
+            const fileRaw = await getFileRaw(tplData.path);
+            if (fileRaw) {
+              const c = await fileRaw.Body?.transformToString('utf-8')
+              const r = new FileReader()
+              r.readAsText(new Blob([c ?? '']), 'utf-8')
+              r.onload = () => {
+                const pgkeys = parseGoTempKey(r.result as string);
+                if (pgkeys) {
+                  setTplParams(pgkeys)
+                }
               }
             }
           }

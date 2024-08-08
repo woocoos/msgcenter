@@ -27,7 +27,6 @@ const schemaWithMocks = addMocksToSchema({
   preserveResolvers,
   resolvers: {
     App: {
-      logoFileID: () => 'png',
       menus: relayStylePaginationMock(store),
       actions: relayStylePaginationMock(store),
       resources: relayStylePaginationMock(store),
@@ -40,10 +39,13 @@ const schemaWithMocks = addMocksToSchema({
       apps: relayStylePaginationMock(store),
     },
     User: {
-      avatarFileID: () => 'png',
       permissions: relayStylePaginationMock(store),
     },
     Query: {
+      fileIdentitiesForOrg: () => [
+        store.get('OrgFileIdentity', 1),
+      ],
+      appAccess: () => true,
       apps: relayStylePaginationMock(store),
       organizations: (_, { where }) => {
         if (where.kind === 'org') {

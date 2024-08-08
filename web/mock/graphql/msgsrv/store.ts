@@ -212,16 +212,17 @@ export const initStoreData = (store: IMockStore) => {
   // msgTemplate
   store.set('MsgTemplate', 1, {
     id: 1, name: 'msgTemplate1', msgEventID: '1', receiverType: 'email', tenantID: '1', subject: '邮件', format: 'txt', body: "{{.name}}{{.text}}", status: 'active',
-    tpl: "/xxx/test.tmpl", tplFileID: "tmpl", attachments: ['/xxx/test.png', '/xxx/test.jpg'], attachmentsFileIds: ['png', 'jpg']
+    tpl: 'http://127.0.0.1:9000/test1/msg/tpl/temp/1/0zurgicstvv.tmpl', attachments: ['http://127.0.0.1:9000/test1/msg/att/1/bkakbhf5cvn.doc']
   })
   store.set('MsgTemplate', 2, {
     id: 2, name: 'msgTemplate2', msgEventID: '1', receiverType: 'message', tenantID: '1', subject: '邮件', format: 'txt', body: "{{.name}}{{.text}}", status: 'active',
-    tpl: "/xxx/test.tmpl", tplFileID: "tmpl", attachments: [], attachmentsFileIds: []
+    tpl: 'http://127.0.0.1:9000/test1/msg/tpl/temp/1/1dicn4jy07g.tmpl', attachments: [],
   })
   store.set('MsgTemplate', 3, {
-    id: 3, name: 'msgTemplate3', msgEventID: '1', receiverType: 'email', tenantID: '1', subject: '邮件', format: 'html', body: "<div>{{.name}}{{.text}}<div>", status: 'active',
-    tpl: "/xxx/test.tmpl", tplFileID: "tmpl", attachments: ['/xxx/test.png', '/xxx/test.jpg'], attachmentsFileIds: ['png', 'jpg']
+    id: 3, name: '测试key-value的读取', msgEventID: '1', receiverType: 'email', tenantID: '1', subject: '邮件', format: 'html', body: "<div>{{.name}}{{.text}}<div>", status: 'active',
+    tpl: 'http://127.0.0.1:9000/test1/msg/tpl/temp/1/xla31nebvdi.tmpl', attachments: []
   })
+
 
   // MsgSubscriber
   store.set('MsgSubscriber', 1, {

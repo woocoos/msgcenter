@@ -38,7 +38,7 @@ export async function parseSpm() {
             parseData.user = {
               id: result.user.id,
               displayName: result.user.displayName,
-              avatarFileID: result.user.avatarFileId,
+              avatar: result.user.avatar,
             } as User
           }
           setItem('token', parseData.token);

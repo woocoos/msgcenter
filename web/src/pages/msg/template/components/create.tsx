@@ -23,10 +23,8 @@ type ProFormData = {
   bcc?: string;
   format: MsgTemplateFormat;
   body?: string;
-  tplFileID?: string;
   tpl?: string;
   attachments?: string[];
-  attachmentsFileIds?: string[];
 };
 
 export default (props: {
@@ -42,8 +40,6 @@ export default (props: {
     [userState] = store.useModel('user'),
     [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [info, setInfo] = useState<MsgTemplate>(),
-    [tpl, setTpl] = useState<string>(),
-    [attachments, setAttachments] = useState<string[]>(),
     [showCc, setShowCc] = useState(false),
     [showBcc, setShowBcc] = useState(false),
     [saveLoading, setSaveLoading] = useState(false),
@@ -86,12 +82,8 @@ export default (props: {
           initData.cc = result.cc || undefined;
           initData.bcc = result.bcc || undefined;
           initData.body = result.body || undefined;
-          initData.tplFileID = result.tplFileID || undefined;
-          initData.attachmentsFileIds = result.attachmentsFileIds || undefined;
           initData.tpl = result.tpl || undefined;
           initData.attachments = result.attachments || undefined;
-          setTpl(initData.tpl)
-          setAttachments(initData.attachments)
         }
       }
       setShowCc(!!initData.cc)
@@ -113,14 +105,12 @@ export default (props: {
         tenantID: values.org?.id ? values.org.id : "",
         subject: values.subject,
         body: values.body,
-        tpl: tpl,
-        tplFileID: values.tplFileID,
+        tpl: values.tpl,
         comments: values.comments,
       }
 
       if (props.receiverType === MsgTemplateReceiverType.Email) {
-        input.attachments = attachments;
-        input.attachmentsFileIds = values.attachmentsFileIds;
+        input.attachments = values.attachments;
         input.cc = showCc ? values.cc : undefined;
         input.bcc = showBcc ? values.bcc : undefined;
         input.to = values.to;
@@ -253,25 +243,21 @@ export default (props: {
           rows: 6,
         }}
       />
-      <ProFormText name="tplFileID">
+      <ProFormText name="tpl">
         <UploadTemp
           accept=".tmpl"
-          forceDirectory
           directory={`/msg/tpl/temp/${userState.tenantId}`}
-          onChangePath={setTpl}
         />
       </ProFormText>
       <ProFormText
         x-if={props.receiverType === MsgTemplateReceiverType.Email}
-        name="attachmentsFileIds"
+        name="attachments"
         label={t('attachments')}
         tooltip={t('attachments_tip')}
       >
         <UploadMultiple
           accept=".doc,.docx,.jpg,.jpeg,.png,.pdf"
-          forceDirectory
           directory={`/msg/att/${userState.tenantId}`}
-          onChangePath={setAttachments}
         />
       </ProFormText>
     </DrawerForm>

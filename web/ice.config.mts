@@ -12,7 +12,6 @@ const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '',
   ICE_DEV_PUBLIC_PATH = process.env.ICE_DEV_PUBLIC_PATH ?? '',
   NODE_ENV = process.env.NODE_ENV ?? '',
   ICE_PROXY_ADMINX = process.env.ICE_PROXY_ADMINX ?? '',
-  ICE_PROXY_FILES = process.env.ICE_PROXY_FILES ?? '',
   ICE_PROXY_AUTH = process.env.ICE_PROXY_AUTH ?? '',
   ICE_PROXY_MSGSRV = process.env.ICE_PROXY_MSGSRV ?? '',
   ICE_API_ADMINX_PREFIX = process.env.ICE_API_ADMINX_PREFIX ?? '',
@@ -28,7 +27,7 @@ export default defineConfig(() => ({
   codeSplitting: 'page',
   devPublicPath: ICE_DEV_PUBLIC_PATH,
   publicPath: ICE_BUILD_PUBLIC_PATH,
-  compileDependencies: NODE_ENV === 'development' ? [/@urql\/core/] : true,
+  compileDependencies: NODE_ENV === 'development' ? [/@urql\/core/, /@smithy\/*/] : true,
   hash: NODE_ENV === 'development' ? false : true,
   routes: {
     ignoreFiles: [
@@ -72,7 +71,7 @@ export default defineConfig(() => ({
       pathRewrite: { [`^${ICE_API_AUTH_PREFIX}`]: '' },
     },
     [ICE_API_FILES_PREFIX]: {
-      target: ICE_PROXY_FILES,
+      target: ICE_PROXY_AUTH,
       changeOrigin: true,
       pathRewrite: { [`^${ICE_API_FILES_PREFIX}`]: '' },
     },

@@ -1,6 +1,4 @@
-import { setItem } from '@/pkg/localStore';
 import store from '@/store';
-import { User } from '@knockout-js/api/ucenter';
 import { request } from 'ice';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 
@@ -13,7 +11,7 @@ export interface LoginRes {
   user?: {
     id: string;
     displayName: string;
-    avatarFileId: string;
+    avatar: string;
     domains: {
       id: string;
       name: string;

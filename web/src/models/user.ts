@@ -6,7 +6,7 @@ import { User } from '@knockout-js/api/ucenter';
 type UserState = {
   id: string;
   displayName: string;
-  avatarFileId?: string;
+  avatar?: string;
 };
 
 type ModelState = {
@@ -72,7 +72,7 @@ export default createModel({
           this.saveUser({
             id: payload.user.id,
             displayName: payload.user.displayName,
-            avatarFileID: payload.user?.avatarFileId || '',
+            avatar: payload.user?.avatar || '',
           } as User)
           if (payload.user.domains?.length) {
             const tenantId = getItem<string>('tenantId')
@@ -102,7 +102,7 @@ export default createModel({
       this.updateUser({
         id: user.id,
         displayName: user.displayName,
-        avatarFileId: user.avatarFileID || undefined,
+        avatar: user.avatar || undefined,
       });
     },
     /**
