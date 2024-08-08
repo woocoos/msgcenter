@@ -246,7 +246,7 @@ export default (props: {
       <ProFormText name="tpl">
         <UploadTemp
           accept=".tmpl"
-          directory={`/msg/tpl/temp/${userState.tenantId}`}
+          directory={`${userState.tenantId}/msg/tpl`}
         />
       </ProFormText>
       <ProFormText
@@ -257,7 +257,7 @@ export default (props: {
       >
         <UploadMultiple
           accept=".doc,.docx,.jpg,.jpeg,.png,.pdf"
-          directory={`/msg/att/${userState.tenantId}`}
+          directory={`${userState.tenantId}/msg/att`}
         />
       </ProFormText>
     </DrawerForm>
