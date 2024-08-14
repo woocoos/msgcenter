@@ -6,6 +6,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// FileIdentity is the predicate function for fileidentity builders.
+type FileIdentity func(*sql.Selector)
+
+// FileSource is the predicate function for filesource builders.
+type FileSource func(*sql.Selector)
+
 // MsgAlert is the predicate function for msgalert builders.
 type MsgAlert func(*sql.Selector)
 

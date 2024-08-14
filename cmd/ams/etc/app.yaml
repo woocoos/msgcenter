@@ -86,10 +86,9 @@ alertManager:
   alerts:
     gcInterval: 30m
   template:
-    baseDir: ../../test/testdata/files # path for custom template
-    tmpDir: "/msg/tpl/tmp" # 模板临时路径
-    dataDir: "/msg/tpl/data" # 模板正式路径
-    attachmentDir: "/msg/att" # 附件存储路径
+    baseDir: "files" # 相对于程序运行目录
+    dataDir: "tpl" # 模板正式路径
+    attachmentDir: "att" # 附件存储路径
 
 prometheus:
   server:
@@ -122,6 +121,5 @@ kosdk:
     nonceLen: 12
   plugin:
     msg:
-      baseUrl: "http://127.0.0.1:10072"
-    file:
-      baseUrl: "http://127.0.0.1:10071"
+      basePath: "http://127.0.0.1:10072/api/v2"
+    fs:

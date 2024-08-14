@@ -233,7 +233,7 @@ func (sc *SilenceCreate) check() error {
 			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "Silence.state": %w`, err)}
 		}
 	}
-	if _, ok := sc.mutation.UserID(); !ok {
+	if len(sc.mutation.UserIDs()) == 0 {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Silence.user"`)}
 	}
 	return nil

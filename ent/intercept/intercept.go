@@ -8,6 +8,8 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/fileidentity"
+	"github.com/woocoos/msgcenter/ent/filesource"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -78,6 +80,60 @@ func (f TraverseFunc) Traverse(ctx context.Context, q ent.Query) error {
 		return err
 	}
 	return f(ctx, query)
+}
+
+// The FileIdentityFunc type is an adapter to allow the use of ordinary function as a Querier.
+type FileIdentityFunc func(context.Context, *ent.FileIdentityQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f FileIdentityFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.FileIdentityQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.FileIdentityQuery", q)
+}
+
+// The TraverseFileIdentity type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseFileIdentity func(context.Context, *ent.FileIdentityQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseFileIdentity) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseFileIdentity) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.FileIdentityQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.FileIdentityQuery", q)
+}
+
+// The FileSourceFunc type is an adapter to allow the use of ordinary function as a Querier.
+type FileSourceFunc func(context.Context, *ent.FileSourceQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f FileSourceFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.FileSourceQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.FileSourceQuery", q)
+}
+
+// The TraverseFileSource type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseFileSource func(context.Context, *ent.FileSourceQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseFileSource) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseFileSource) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.FileSourceQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.FileSourceQuery", q)
 }
 
 // The MsgAlertFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -434,6 +490,10 @@ func (f TraverseUser) Traverse(ctx context.Context, q ent.Query) error {
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
+	case *ent.FileIdentityQuery:
+		return &query[*ent.FileIdentityQuery, predicate.FileIdentity, fileidentity.OrderOption]{typ: ent.TypeFileIdentity, tq: q}, nil
+	case *ent.FileSourceQuery:
+		return &query[*ent.FileSourceQuery, predicate.FileSource, filesource.OrderOption]{typ: ent.TypeFileSource, tq: q}, nil
 	case *ent.MsgAlertQuery:
 		return &query[*ent.MsgAlertQuery, predicate.MsgAlert, msgalert.OrderOption]{typ: ent.TypeMsgAlert, tq: q}, nil
 	case *ent.MsgChannelQuery:

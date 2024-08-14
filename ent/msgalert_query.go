@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -121,7 +122,7 @@ func (maq *MsgAlertQuery) QueryNlogAlerts() *NlogAlertQuery {
 // First returns the first MsgAlert entity from the query.
 // Returns a *NotFoundError when no MsgAlert was found.
 func (maq *MsgAlertQuery) First(ctx context.Context) (*MsgAlert, error) {
-	nodes, err := maq.Limit(1).All(setContextOp(ctx, maq.ctx, "First"))
+	nodes, err := maq.Limit(1).All(setContextOp(ctx, maq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +145,7 @@ func (maq *MsgAlertQuery) FirstX(ctx context.Context) *MsgAlert {
 // Returns a *NotFoundError when no MsgAlert ID was found.
 func (maq *MsgAlertQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = maq.Limit(1).IDs(setContextOp(ctx, maq.ctx, "FirstID")); err != nil {
+	if ids, err = maq.Limit(1).IDs(setContextOp(ctx, maq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -167,7 +168,7 @@ func (maq *MsgAlertQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one MsgAlert entity is found.
 // Returns a *NotFoundError when no MsgAlert entities are found.
 func (maq *MsgAlertQuery) Only(ctx context.Context) (*MsgAlert, error) {
-	nodes, err := maq.Limit(2).All(setContextOp(ctx, maq.ctx, "Only"))
+	nodes, err := maq.Limit(2).All(setContextOp(ctx, maq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +196,7 @@ func (maq *MsgAlertQuery) OnlyX(ctx context.Context) *MsgAlert {
 // Returns a *NotFoundError when no entities are found.
 func (maq *MsgAlertQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = maq.Limit(2).IDs(setContextOp(ctx, maq.ctx, "OnlyID")); err != nil {
+	if ids, err = maq.Limit(2).IDs(setContextOp(ctx, maq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -220,7 +221,7 @@ func (maq *MsgAlertQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of MsgAlerts.
 func (maq *MsgAlertQuery) All(ctx context.Context) ([]*MsgAlert, error) {
-	ctx = setContextOp(ctx, maq.ctx, "All")
+	ctx = setContextOp(ctx, maq.ctx, ent.OpQueryAll)
 	if err := maq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -242,7 +243,7 @@ func (maq *MsgAlertQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if maq.ctx.Unique == nil && maq.path != nil {
 		maq.Unique(true)
 	}
-	ctx = setContextOp(ctx, maq.ctx, "IDs")
+	ctx = setContextOp(ctx, maq.ctx, ent.OpQueryIDs)
 	if err = maq.Select(msgalert.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -260,7 +261,7 @@ func (maq *MsgAlertQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (maq *MsgAlertQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, maq.ctx, "Count")
+	ctx = setContextOp(ctx, maq.ctx, ent.OpQueryCount)
 	if err := maq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -278,7 +279,7 @@ func (maq *MsgAlertQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (maq *MsgAlertQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, maq.ctx, "Exist")
+	ctx = setContextOp(ctx, maq.ctx, ent.OpQueryExist)
 	switch _, err := maq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -706,7 +707,7 @@ func (magb *MsgAlertGroupBy) Aggregate(fns ...AggregateFunc) *MsgAlertGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (magb *MsgAlertGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, magb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, magb.build.ctx, ent.OpQueryGroupBy)
 	if err := magb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -754,7 +755,7 @@ func (mas *MsgAlertSelect) Aggregate(fns ...AggregateFunc) *MsgAlertSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (mas *MsgAlertSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mas.ctx, "Select")
+	ctx = setContextOp(ctx, mas.ctx, ent.OpQuerySelect)
 	if err := mas.prepareQuery(ctx); err != nil {
 		return err
 	}

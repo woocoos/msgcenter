@@ -7,12 +7,14 @@ import (
 	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/gds/timeinterval"
+	"github.com/woocoos/knockout-go/api"
 	"github.com/woocoos/knockout-go/pkg/koapp"
 	"github.com/woocoos/msgcenter/dispatch"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/service/fsclient"
 	"github.com/woocoos/msgcenter/service/inhibit"
 	"github.com/woocoos/msgcenter/service/provider"
 	"github.com/woocoos/msgcenter/service/provider/mem"
@@ -76,9 +78,19 @@ func NewAlertManager(app *woocoo.App, opts ...AmOption) (*AlertManager, error) {
 		return nil, err
 	}
 
+	kosdk, err := api.NewSDK(app.AppConfiguration().Sub("kosdk"))
+	if err != nil {
+		return nil, err
+	}
+	fs, err := fsclient.NewClient(am.DB, kosdk)
+	if err != nil {
+		return nil, err
+	}
 	am.Coordinator = NewCoordinator(am.cnf)
 	am.Coordinator.db = am.DB
 	am.Subscribe.DB = am.DB
+	am.Coordinator.KOSdk = kosdk
+	am.Coordinator.FSClient = fs
 
 	app.RegisterServer(am.Alerts, am.NotificationLog, am.Silences)
 
@@ -128,8 +140,10 @@ func (am *AlertManager) buildDBClient(cnf *conf.AppConfiguration) {
 	ents := koapp.BuildEntComponents(cnf)
 	drv := ents["msgcenter"]
 	scfg := ent.AlternateSchema(ent.SchemaConfig{
-		User:        "portal",
-		OrgRoleUser: "portal",
+		User:         "portal",
+		OrgRoleUser:  "portal",
+		FileIdentity: "portal",
+		FileSource:   "portal",
 	})
 	if cnf.Development {
 		am.DB = ent.NewClient(ent.Driver(drv), ent.Debug(), scfg)

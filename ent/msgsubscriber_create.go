@@ -207,7 +207,7 @@ func (msc *MsgSubscriberCreate) check() error {
 	if _, ok := msc.mutation.TenantID(); !ok {
 		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "MsgSubscriber.tenant_id"`)}
 	}
-	if _, ok := msc.mutation.MsgTypeID(); !ok {
+	if len(msc.mutation.MsgTypeIDs()) == 0 {
 		return &ValidationError{Name: "msg_type", err: errors.New(`ent: missing required edge "MsgSubscriber.msg_type"`)}
 	}
 	return nil

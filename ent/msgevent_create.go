@@ -235,7 +235,7 @@ func (mec *MsgEventCreate) check() error {
 	if _, ok := mec.mutation.Modes(); !ok {
 		return &ValidationError{Name: "modes", err: errors.New(`ent: missing required field "MsgEvent.modes"`)}
 	}
-	if _, ok := mec.mutation.MsgTypeID(); !ok {
+	if len(mec.mutation.MsgTypeIDs()) == 0 {
 		return &ValidationError{Name: "msg_type", err: errors.New(`ent: missing required edge "MsgEvent.msg_type"`)}
 	}
 	return nil

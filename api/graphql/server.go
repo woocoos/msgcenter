@@ -11,7 +11,6 @@ import (
 	"github.com/tsingsun/woocoo/contrib/gql"
 	"github.com/tsingsun/woocoo/contrib/telemetry/otelweb"
 	"github.com/tsingsun/woocoo/web"
-	"github.com/woocoos/knockout-go/api"
 	"github.com/woocoos/knockout-go/pkg/middleware"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/service"
@@ -48,16 +47,12 @@ func (s *Server) buildWebEngine(app *woocoo.App, am *service.AlertManager) {
 		otelweb.RegisterMiddleware(),
 	)
 
-	kosdk, err := api.NewSDK(app.AppConfiguration().Sub("kosdk"))
-	if err != nil {
-		panic(err)
-	}
 	//gql without websocket
 	gqlsrv := handler.New(NewSchema(
 		WithClient(s.DB),
 		WithCoordinator(am.Coordinator),
 		WithSilences(am.Silences),
-		WithKOClient(kosdk),
+		WithKOClient(am.Coordinator.KOSdk),
 	))
 
 	gqlsrv.AddTransport(transport.Options{})

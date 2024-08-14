@@ -53,12 +53,10 @@ type MsgInternalToEdges struct {
 // MsgInternalOrErr returns the MsgInternal value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e MsgInternalToEdges) MsgInternalOrErr() (*MsgInternal, error) {
-	if e.loadedTypes[0] {
-		if e.MsgInternal == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: msginternal.Label}
-		}
+	if e.MsgInternal != nil {
 		return e.MsgInternal, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: msginternal.Label}
 	}
 	return nil, &NotLoadedError{edge: "msg_internal"}
 }
@@ -66,12 +64,10 @@ func (e MsgInternalToEdges) MsgInternalOrErr() (*MsgInternal, error) {
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e MsgInternalToEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[1] {
-		if e.User == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
+	if e.User != nil {
 		return e.User, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "user"}
 }

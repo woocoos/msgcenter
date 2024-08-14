@@ -47,12 +47,10 @@ type NlogAlertEdges struct {
 // NlogOrErr returns the Nlog value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e NlogAlertEdges) NlogOrErr() (*Nlog, error) {
-	if e.loadedTypes[0] {
-		if e.Nlog == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: nlog.Label}
-		}
+	if e.Nlog != nil {
 		return e.Nlog, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: nlog.Label}
 	}
 	return nil, &NotLoadedError{edge: "nlog"}
 }
@@ -60,12 +58,10 @@ func (e NlogAlertEdges) NlogOrErr() (*Nlog, error) {
 // AlertOrErr returns the Alert value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e NlogAlertEdges) AlertOrErr() (*MsgAlert, error) {
-	if e.loadedTypes[1] {
-		if e.Alert == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: msgalert.Label}
-		}
+	if e.Alert != nil {
 		return e.Alert, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: msgalert.Label}
 	}
 	return nil, &NotLoadedError{edge: "alert"}
 }

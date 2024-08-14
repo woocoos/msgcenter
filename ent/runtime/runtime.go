@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/woocoos/msgcenter/codegen/entgen/schema"
+	"github.com/woocoos/msgcenter/ent/fileidentity"
+	"github.com/woocoos/msgcenter/ent/filesource"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -25,6 +27,58 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	fileidentityHooks := schema.FileIdentity{}.Hooks()
+	fileidentity.Hooks[0] = fileidentityHooks[0]
+	fileidentityFields := schema.FileIdentity{}.Fields()
+	_ = fileidentityFields
+	// fileidentityDescAccessKeyID is the schema descriptor for access_key_id field.
+	fileidentityDescAccessKeyID := fileidentityFields[2].Descriptor()
+	// fileidentity.AccessKeyIDValidator is a validator for the "access_key_id" field. It is called by the builders before save.
+	fileidentity.AccessKeyIDValidator = fileidentityDescAccessKeyID.Validators[0].(func(string) error)
+	// fileidentityDescAccessKeySecret is the schema descriptor for access_key_secret field.
+	fileidentityDescAccessKeySecret := fileidentityFields[3].Descriptor()
+	// fileidentity.AccessKeySecretValidator is a validator for the "access_key_secret" field. It is called by the builders before save.
+	fileidentity.AccessKeySecretValidator = fileidentityDescAccessKeySecret.Validators[0].(func(string) error)
+	// fileidentityDescRoleArn is the schema descriptor for role_arn field.
+	fileidentityDescRoleArn := fileidentityFields[5].Descriptor()
+	// fileidentity.RoleArnValidator is a validator for the "role_arn" field. It is called by the builders before save.
+	fileidentity.RoleArnValidator = fileidentityDescRoleArn.Validators[0].(func(string) error)
+	// fileidentityDescDurationSeconds is the schema descriptor for duration_seconds field.
+	fileidentityDescDurationSeconds := fileidentityFields[7].Descriptor()
+	// fileidentity.DefaultDurationSeconds holds the default value on creation for the duration_seconds field.
+	fileidentity.DefaultDurationSeconds = fileidentityDescDurationSeconds.Default.(int)
+	// fileidentityDescIsDefault is the schema descriptor for is_default field.
+	fileidentityDescIsDefault := fileidentityFields[8].Descriptor()
+	// fileidentity.DefaultIsDefault holds the default value on creation for the is_default field.
+	fileidentity.DefaultIsDefault = fileidentityDescIsDefault.Default.(bool)
+	filesourceHooks := schema.FileSource{}.Hooks()
+	filesource.Hooks[0] = filesourceHooks[0]
+	filesourceFields := schema.FileSource{}.Fields()
+	_ = filesourceFields
+	// filesourceDescEndpoint is the schema descriptor for endpoint field.
+	filesourceDescEndpoint := filesourceFields[3].Descriptor()
+	// filesource.EndpointValidator is a validator for the "endpoint" field. It is called by the builders before save.
+	filesource.EndpointValidator = filesourceDescEndpoint.Validators[0].(func(string) error)
+	// filesourceDescEndpointImmutable is the schema descriptor for endpoint_immutable field.
+	filesourceDescEndpointImmutable := filesourceFields[4].Descriptor()
+	// filesource.DefaultEndpointImmutable holds the default value on creation for the endpoint_immutable field.
+	filesource.DefaultEndpointImmutable = filesourceDescEndpointImmutable.Default.(bool)
+	// filesourceDescStsEndpoint is the schema descriptor for sts_endpoint field.
+	filesourceDescStsEndpoint := filesourceFields[5].Descriptor()
+	// filesource.StsEndpointValidator is a validator for the "sts_endpoint" field. It is called by the builders before save.
+	filesource.StsEndpointValidator = filesourceDescStsEndpoint.Validators[0].(func(string) error)
+	// filesourceDescRegion is the schema descriptor for region field.
+	filesourceDescRegion := filesourceFields[6].Descriptor()
+	// filesource.RegionValidator is a validator for the "region" field. It is called by the builders before save.
+	filesource.RegionValidator = filesourceDescRegion.Validators[0].(func(string) error)
+	// filesourceDescBucket is the schema descriptor for bucket field.
+	filesourceDescBucket := filesourceFields[7].Descriptor()
+	// filesource.BucketValidator is a validator for the "bucket" field. It is called by the builders before save.
+	filesource.BucketValidator = filesourceDescBucket.Validators[0].(func(string) error)
+	// filesourceDescBucketURL is the schema descriptor for bucket_url field.
+	filesourceDescBucketURL := filesourceFields[8].Descriptor()
+	// filesource.BucketURLValidator is a validator for the "bucket_url" field. It is called by the builders before save.
+	filesource.BucketURLValidator = filesourceDescBucketURL.Validators[0].(func(string) error)
 	msgalertMixin := schema.MsgAlert{}.Mixin()
 	msgalertMixinHooks1 := msgalertMixin[1].Hooks()
 	msgalert.Hooks[0] = msgalertMixinHooks1[0]
@@ -259,6 +313,6 @@ func init() {
 }
 
 const (
-	Version = "v0.12.4"                                         // Version of ent codegen.
-	Sum     = "h1:LddPnAyxls/O7DTXZvUGDj0NZIdGSu317+aoNLJWbD8=" // Sum of ent codegen.
+	Version = "v0.14.0"                                         // Version of ent codegen.
+	Sum     = "h1:EO3Z9aZ5bXJatJeGqu/EVdnNr6K4mRq3rWe5owt0MC4=" // Sum of ent codegen.
 )

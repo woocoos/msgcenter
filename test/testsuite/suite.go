@@ -3,7 +3,7 @@ package testsuite
 import (
 	"context"
 	"github.com/alicebob/miniredis/v2"
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/suite"
 	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/pkg/conf"
@@ -89,8 +89,10 @@ func initTestApp() *woocoo.App {
 func open(ctx context.Context, driverName, dsn string) (*ent.Client, error) {
 	client, err := ent.Open(driverName, dsn,
 		ent.Debug(), ent.AlternateSchema(ent.SchemaConfig{
-			User:        "portal",
-			OrgRoleUser: "portal",
+			User:         "portal",
+			OrgRoleUser:  "portal",
+			FileIdentity: "portal",
+			FileSource:   "portal",
 		}),
 	)
 	if err != nil {

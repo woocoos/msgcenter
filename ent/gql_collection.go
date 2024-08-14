@@ -1205,20 +1205,10 @@ func (mt *MsgTemplateQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 				selectedFields = append(selectedFields, msgtemplate.FieldTpl)
 				fieldSeen[msgtemplate.FieldTpl] = struct{}{}
 			}
-		case "tplFileID":
-			if _, ok := fieldSeen[msgtemplate.FieldTplFileID]; !ok {
-				selectedFields = append(selectedFields, msgtemplate.FieldTplFileID)
-				fieldSeen[msgtemplate.FieldTplFileID] = struct{}{}
-			}
 		case "attachments":
 			if _, ok := fieldSeen[msgtemplate.FieldAttachments]; !ok {
 				selectedFields = append(selectedFields, msgtemplate.FieldAttachments)
 				fieldSeen[msgtemplate.FieldAttachments] = struct{}{}
-			}
-		case "attachmentsFileIds":
-			if _, ok := fieldSeen[msgtemplate.FieldAttachmentsFileIds]; !ok {
-				selectedFields = append(selectedFields, msgtemplate.FieldAttachmentsFileIds)
-				fieldSeen[msgtemplate.FieldAttachmentsFileIds] = struct{}{}
 			}
 		case "comments":
 			if _, ok := fieldSeen[msgtemplate.FieldComments]; !ok {

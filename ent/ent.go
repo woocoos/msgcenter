@@ -12,6 +12,8 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/woocoos/msgcenter/ent/fileidentity"
+	"github.com/woocoos/msgcenter/ent/filesource"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -81,10 +83,12 @@ var (
 	columnCheck sql.ColumnCheck
 )
 
-// columnChecker checks if the column exists in the given table.
+// checkColumn checks if the column exists in the given table.
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			fileidentity.Table:  fileidentity.ValidColumn,
+			filesource.Table:    filesource.ValidColumn,
 			msgalert.Table:      msgalert.ValidColumn,
 			msgchannel.Table:    msgchannel.ValidColumn,
 			msgevent.Table:      msgevent.ValidColumn,

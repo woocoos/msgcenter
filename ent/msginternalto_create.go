@@ -161,10 +161,10 @@ func (mitc *MsgInternalToCreate) check() error {
 	if _, ok := mitc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "MsgInternalTo.created_at"`)}
 	}
-	if _, ok := mitc.mutation.MsgInternalID(); !ok {
+	if len(mitc.mutation.MsgInternalIDs()) == 0 {
 		return &ValidationError{Name: "msg_internal", err: errors.New(`ent: missing required edge "MsgInternalTo.msg_internal"`)}
 	}
-	if _, ok := mitc.mutation.UserID(); !ok {
+	if len(mitc.mutation.UserIDs()) == 0 {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "MsgInternalTo.user"`)}
 	}
 	return nil

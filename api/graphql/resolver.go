@@ -6,7 +6,6 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/redis/go-redis/v9"
 	"github.com/woocoos/knockout-go/api"
-	"github.com/woocoos/knockout-go/api/file"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
@@ -84,27 +83,6 @@ func NewSchema(opts ...Option) graphql.ExecutableSchema {
 	return generated.NewExecutableSchema(generated.Config{
 		Resolvers: NewResolver(opts...),
 	})
-}
-
-// ReportFileRefCount 文件引用上报
-func (r *Resolver) ReportFileRefCount(ctx context.Context, newFileIDs, oldFileIDs []int) error {
-	var inputs = make([]*file.FileRefInput, len(newFileIDs)+len(oldFileIDs))
-	for i, v := range newFileIDs {
-		inputs[i] = &file.FileRefInput{
-			FileId: v,
-			OpType: "plus",
-		}
-	}
-	for i, v := range oldFileIDs {
-		inputs[i+len(newFileIDs)] = &file.FileRefInput{
-			FileId: v,
-			OpType: "minus",
-		}
-	}
-	_, _, err := r.kosdk.File().FileAPI.ReportRefCount(ctx, &file.ReportRefCountRequest{
-		Inputs: inputs,
-	})
-	return err
 }
 
 // RemoveDuplicateElement 去重

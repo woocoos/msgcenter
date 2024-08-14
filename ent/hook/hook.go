@@ -9,6 +9,30 @@ import (
 	"github.com/woocoos/msgcenter/ent"
 )
 
+// The FileIdentityFunc type is an adapter to allow the use of ordinary
+// function as FileIdentity mutator.
+type FileIdentityFunc func(context.Context, *ent.FileIdentityMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f FileIdentityFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.FileIdentityMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FileIdentityMutation", m)
+}
+
+// The FileSourceFunc type is an adapter to allow the use of ordinary
+// function as FileSource mutator.
+type FileSourceFunc func(context.Context, *ent.FileSourceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f FileSourceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.FileSourceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FileSourceMutation", m)
+}
+
 // The MsgAlertFunc type is an adapter to allow the use of ordinary
 // function as MsgAlert mutator.
 type MsgAlertFunc func(context.Context, *ent.MsgAlertMutation) (ent.Value, error)

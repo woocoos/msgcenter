@@ -8,16 +8,19 @@ import (
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
+	"github.com/woocoos/knockout-go/api"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/notify/email"
 	"github.com/woocoos/msgcenter/notify/message"
 	"github.com/woocoos/msgcenter/notify/webhook"
 	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/service/fsclient"
 	"github.com/woocoos/msgcenter/template"
 	"go.uber.org/zap"
 	"path/filepath"
@@ -40,6 +43,10 @@ type Coordinator struct {
 	Template        *template.Template
 
 	db *ent.Client
+	// knockout sdk
+	KOSdk *api.SDK
+	// file client
+	FSClient *fsclient.Client
 }
 
 // NewCoordinator returns a new coordinator with the given configuration for alert manager.
@@ -155,17 +162,61 @@ func (c *Coordinator) loadTemplates() error {
 	if err != nil {
 		return fmt.Errorf("failed to parse templates %w", err)
 	}
+	tmpl.FSClient = c.FSClient
 	c.Template = tmpl
-	for _, ptn := range c.profile.Templates {
-		if _, err := c.Template.ParseGlob(c.cnf.Abs(ptn)); err != nil {
-			return err
-		}
-	}
 	if err := c.cnf.Sub("template").Unmarshal(&c.Template); err != nil {
 		return err
 	}
 	c.Template.BaseDir, err = filepath.Abs(c.Template.BaseDir)
-	return err
+	if err != nil {
+		return err
+	}
+	// 远程下载文件
+	if err := c.downloadTempFromRemote(); err != nil {
+		logger.Error("Error loading remote template file", zap.Error(err))
+		metrics.Coordinator.ConfigSuccess.Set(0)
+		return err
+	}
+	for _, ptn := range c.profile.Templates {
+		// 如果根目录未创建则跳过
+		if !fsclient.FileExists(c.Template.BaseDir) {
+			continue
+		}
+		if _, err := c.Template.ParseGlob(c.cnf.Abs(ptn)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// loadTempFromRemote 从远程下载模板文件
+func (c *Coordinator) downloadTempFromRemote() error {
+	// 获取租户的模板文件
+	tpls, err := c.db.MsgTemplate.Query().Where(msgtemplate.StatusEQ(typex.SimpleStatusActive)).All(context.Background())
+	if err != nil {
+		return err
+	}
+	for _, tpl := range tpls {
+		// 下载模板文件
+		if tpl.Tpl != "" {
+			provider := c.FSClient.GetProvider(tpl.TenantID)
+			_, err = provider.DefaultDownloadObject(tpl.Tpl, c.Template.BaseDir, c.Template.DataDir)
+			if err != nil {
+				return err
+			}
+		}
+		// 下载附件
+		if len(tpl.Attachments) != 0 {
+			for _, att := range tpl.Attachments {
+				provider := c.FSClient.GetProvider(tpl.TenantID)
+				_, err = provider.DefaultDownloadObject(att, c.Template.BaseDir, c.Template.AttachmentDir)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
 }
 
 // loadFromFile triggers a configuration load, discarding the old configuration.
@@ -354,15 +405,16 @@ func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *templ
 		integrations = append(integrations, notify.NewIntegration(n, name, i))
 	}
 	var ()
-	tpldir := c.cnf.Abs(c.Template.DataDir)
+	basedir := c.Template.BaseDir
+	attdir := c.Template.AttachmentDir
 	for i, cfg := range nc.EmailConfigs {
 		add("email", i, func() (notify.Notifier, error) {
-			return email.New(cfg, tmpl, overrideEmailConfig(tpldir, c.db))
+			return email.New(cfg, tmpl, overrideEmailConfig(basedir, attdir, c.db))
 		})
 	}
 	for i, cfg := range nc.WebhookConfigs {
 		add("webhook", i, func() (notify.Notifier, error) {
-			return webhook.New(cfg, tmpl, overrideWebHookConfig(tpldir, c.db))
+			return webhook.New(cfg, tmpl, overrideWebHookConfig(basedir, attdir, c.db))
 		})
 	}
 	if nc.MessageConfig != nil {
@@ -372,7 +424,7 @@ func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *templ
 		}
 		add("message", 0, func() (notify.Notifier, error) {
 			return message.New(nc.MessageConfig, tmpl, c.db, cli.UniversalClient,
-				overrideMessageConfig(tpldir, c.db))
+				overrideMessageConfig(basedir, attdir, c.db))
 		})
 	}
 	if errs != nil {

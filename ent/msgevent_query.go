@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -120,7 +121,7 @@ func (meq *MsgEventQuery) QueryCustomerTemplate() *MsgTemplateQuery {
 // First returns the first MsgEvent entity from the query.
 // Returns a *NotFoundError when no MsgEvent was found.
 func (meq *MsgEventQuery) First(ctx context.Context) (*MsgEvent, error) {
-	nodes, err := meq.Limit(1).All(setContextOp(ctx, meq.ctx, "First"))
+	nodes, err := meq.Limit(1).All(setContextOp(ctx, meq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +144,7 @@ func (meq *MsgEventQuery) FirstX(ctx context.Context) *MsgEvent {
 // Returns a *NotFoundError when no MsgEvent ID was found.
 func (meq *MsgEventQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = meq.Limit(1).IDs(setContextOp(ctx, meq.ctx, "FirstID")); err != nil {
+	if ids, err = meq.Limit(1).IDs(setContextOp(ctx, meq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -166,7 +167,7 @@ func (meq *MsgEventQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one MsgEvent entity is found.
 // Returns a *NotFoundError when no MsgEvent entities are found.
 func (meq *MsgEventQuery) Only(ctx context.Context) (*MsgEvent, error) {
-	nodes, err := meq.Limit(2).All(setContextOp(ctx, meq.ctx, "Only"))
+	nodes, err := meq.Limit(2).All(setContextOp(ctx, meq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +195,7 @@ func (meq *MsgEventQuery) OnlyX(ctx context.Context) *MsgEvent {
 // Returns a *NotFoundError when no entities are found.
 func (meq *MsgEventQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = meq.Limit(2).IDs(setContextOp(ctx, meq.ctx, "OnlyID")); err != nil {
+	if ids, err = meq.Limit(2).IDs(setContextOp(ctx, meq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -219,7 +220,7 @@ func (meq *MsgEventQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of MsgEvents.
 func (meq *MsgEventQuery) All(ctx context.Context) ([]*MsgEvent, error) {
-	ctx = setContextOp(ctx, meq.ctx, "All")
+	ctx = setContextOp(ctx, meq.ctx, ent.OpQueryAll)
 	if err := meq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -241,7 +242,7 @@ func (meq *MsgEventQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if meq.ctx.Unique == nil && meq.path != nil {
 		meq.Unique(true)
 	}
-	ctx = setContextOp(ctx, meq.ctx, "IDs")
+	ctx = setContextOp(ctx, meq.ctx, ent.OpQueryIDs)
 	if err = meq.Select(msgevent.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -259,7 +260,7 @@ func (meq *MsgEventQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (meq *MsgEventQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, meq.ctx, "Count")
+	ctx = setContextOp(ctx, meq.ctx, ent.OpQueryCount)
 	if err := meq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -277,7 +278,7 @@ func (meq *MsgEventQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (meq *MsgEventQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, meq.ctx, "Exist")
+	ctx = setContextOp(ctx, meq.ctx, ent.OpQueryExist)
 	switch _, err := meq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -653,7 +654,7 @@ func (megb *MsgEventGroupBy) Aggregate(fns ...AggregateFunc) *MsgEventGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (megb *MsgEventGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, megb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, megb.build.ctx, ent.OpQueryGroupBy)
 	if err := megb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -701,7 +702,7 @@ func (mes *MsgEventSelect) Aggregate(fns ...AggregateFunc) *MsgEventSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (mes *MsgEventSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mes.ctx, "Select")
+	ctx = setContextOp(ctx, mes.ctx, ent.OpQuerySelect)
 	if err := mes.prepareQuery(ctx); err != nil {
 		return err
 	}

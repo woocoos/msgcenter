@@ -104,9 +104,25 @@ func (su *SilenceUpdate) SetStartsAt(t time.Time) *SilenceUpdate {
 	return su
 }
 
+// SetNillableStartsAt sets the "starts_at" field if the given value is not nil.
+func (su *SilenceUpdate) SetNillableStartsAt(t *time.Time) *SilenceUpdate {
+	if t != nil {
+		su.SetStartsAt(*t)
+	}
+	return su
+}
+
 // SetEndsAt sets the "ends_at" field.
 func (su *SilenceUpdate) SetEndsAt(t time.Time) *SilenceUpdate {
 	su.mutation.SetEndsAt(t)
+	return su
+}
+
+// SetNillableEndsAt sets the "ends_at" field if the given value is not nil.
+func (su *SilenceUpdate) SetNillableEndsAt(t *time.Time) *SilenceUpdate {
+	if t != nil {
+		su.SetEndsAt(*t)
+	}
 	return su
 }
 
@@ -183,7 +199,7 @@ func (su *SilenceUpdate) check() error {
 			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "Silence.state": %w`, err)}
 		}
 	}
-	if _, ok := su.mutation.UserID(); su.mutation.UserCleared() && !ok {
+	if su.mutation.UserCleared() && len(su.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Silence.user"`)
 	}
 	return nil
@@ -335,9 +351,25 @@ func (suo *SilenceUpdateOne) SetStartsAt(t time.Time) *SilenceUpdateOne {
 	return suo
 }
 
+// SetNillableStartsAt sets the "starts_at" field if the given value is not nil.
+func (suo *SilenceUpdateOne) SetNillableStartsAt(t *time.Time) *SilenceUpdateOne {
+	if t != nil {
+		suo.SetStartsAt(*t)
+	}
+	return suo
+}
+
 // SetEndsAt sets the "ends_at" field.
 func (suo *SilenceUpdateOne) SetEndsAt(t time.Time) *SilenceUpdateOne {
 	suo.mutation.SetEndsAt(t)
+	return suo
+}
+
+// SetNillableEndsAt sets the "ends_at" field if the given value is not nil.
+func (suo *SilenceUpdateOne) SetNillableEndsAt(t *time.Time) *SilenceUpdateOne {
+	if t != nil {
+		suo.SetEndsAt(*t)
+	}
 	return suo
 }
 
@@ -427,7 +459,7 @@ func (suo *SilenceUpdateOne) check() error {
 			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "Silence.state": %w`, err)}
 		}
 	}
-	if _, ok := suo.mutation.UserID(); suo.mutation.UserCleared() && !ok {
+	if suo.mutation.UserCleared() && len(suo.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Silence.user"`)
 	}
 	return nil

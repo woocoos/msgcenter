@@ -248,23 +248,21 @@ func (c *MsgSubscriberUpdateOne) SetInput(i UpdateMsgSubscriberInput) *MsgSubscr
 
 // CreateMsgTemplateInput represents a mutation input for creating msgtemplates.
 type CreateMsgTemplateInput struct {
-	MsgTypeID          int
-	TenantID           int
-	Name               string
-	ReceiverType       profile.ReceiverType
-	Format             msgtemplate.Format
-	Subject            *string
-	From               *string
-	To                 *string
-	Cc                 *string
-	Bcc                *string
-	Body               *string
-	Tpl                *string
-	TplFileID          *int
-	Attachments        []string
-	AttachmentsFileIds []int
-	Comments           *string
-	EventID            int
+	MsgTypeID    int
+	TenantID     int
+	Name         string
+	ReceiverType profile.ReceiverType
+	Format       msgtemplate.Format
+	Subject      *string
+	From         *string
+	To           *string
+	Cc           *string
+	Bcc          *string
+	Body         *string
+	Tpl          *string
+	Attachments  []string
+	Comments     *string
+	EventID      int
 }
 
 // Mutate applies the CreateMsgTemplateInput on the MsgTemplateMutation builder.
@@ -295,14 +293,8 @@ func (i *CreateMsgTemplateInput) Mutate(m *MsgTemplateMutation) {
 	if v := i.Tpl; v != nil {
 		m.SetTpl(*v)
 	}
-	if v := i.TplFileID; v != nil {
-		m.SetTplFileID(*v)
-	}
 	if v := i.Attachments; v != nil {
 		m.SetAttachments(v)
-	}
-	if v := i.AttachmentsFileIds; v != nil {
-		m.SetAttachmentsFileIds(v)
 	}
 	if v := i.Comments; v != nil {
 		m.SetComments(*v)
@@ -318,36 +310,31 @@ func (c *MsgTemplateCreate) SetInput(i CreateMsgTemplateInput) *MsgTemplateCreat
 
 // UpdateMsgTemplateInput represents a mutation input for updating msgtemplates.
 type UpdateMsgTemplateInput struct {
-	MsgTypeID                *int
-	TenantID                 *int
-	Name                     *string
-	ReceiverType             *profile.ReceiverType
-	Format                   *msgtemplate.Format
-	ClearSubject             bool
-	Subject                  *string
-	ClearFrom                bool
-	From                     *string
-	ClearTo                  bool
-	To                       *string
-	ClearCc                  bool
-	Cc                       *string
-	ClearBcc                 bool
-	Bcc                      *string
-	ClearBody                bool
-	Body                     *string
-	ClearTpl                 bool
-	Tpl                      *string
-	ClearTplFileID           bool
-	TplFileID                *int
-	ClearAttachments         bool
-	Attachments              []string
-	AppendAttachments        []string
-	ClearAttachmentsFileIds  bool
-	AttachmentsFileIds       []int
-	AppendAttachmentsFileIds []int
-	ClearComments            bool
-	Comments                 *string
-	EventID                  *int
+	MsgTypeID         *int
+	TenantID          *int
+	Name              *string
+	ReceiverType      *profile.ReceiverType
+	Format            *msgtemplate.Format
+	ClearSubject      bool
+	Subject           *string
+	ClearFrom         bool
+	From              *string
+	ClearTo           bool
+	To                *string
+	ClearCc           bool
+	Cc                *string
+	ClearBcc          bool
+	Bcc               *string
+	ClearBody         bool
+	Body              *string
+	ClearTpl          bool
+	Tpl               *string
+	ClearAttachments  bool
+	Attachments       []string
+	AppendAttachments []string
+	ClearComments     bool
+	Comments          *string
+	EventID           *int
 }
 
 // Mutate applies the UpdateMsgTemplateInput on the MsgTemplateMutation builder.
@@ -409,12 +396,6 @@ func (i *UpdateMsgTemplateInput) Mutate(m *MsgTemplateMutation) {
 	if v := i.Tpl; v != nil {
 		m.SetTpl(*v)
 	}
-	if i.ClearTplFileID {
-		m.ClearTplFileID()
-	}
-	if v := i.TplFileID; v != nil {
-		m.SetTplFileID(*v)
-	}
 	if i.ClearAttachments {
 		m.ClearAttachments()
 	}
@@ -423,15 +404,6 @@ func (i *UpdateMsgTemplateInput) Mutate(m *MsgTemplateMutation) {
 	}
 	if i.AppendAttachments != nil {
 		m.AppendAttachments(i.Attachments)
-	}
-	if i.ClearAttachmentsFileIds {
-		m.ClearAttachmentsFileIds()
-	}
-	if v := i.AttachmentsFileIds; v != nil {
-		m.SetAttachmentsFileIds(v)
-	}
-	if i.AppendAttachmentsFileIds != nil {
-		m.AppendAttachmentsFileIds(i.AttachmentsFileIds)
 	}
 	if i.ClearComments {
 		m.ClearComments()

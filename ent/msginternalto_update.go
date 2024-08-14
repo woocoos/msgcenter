@@ -104,10 +104,10 @@ func (mitu *MsgInternalToUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mitu *MsgInternalToUpdate) check() error {
-	if _, ok := mitu.mutation.MsgInternalID(); mitu.mutation.MsgInternalCleared() && !ok {
+	if mitu.mutation.MsgInternalCleared() && len(mitu.mutation.MsgInternalIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgInternalTo.msg_internal"`)
 	}
-	if _, ok := mitu.mutation.UserID(); mitu.mutation.UserCleared() && !ok {
+	if mitu.mutation.UserCleared() && len(mitu.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgInternalTo.user"`)
 	}
 	return nil
@@ -246,10 +246,10 @@ func (mituo *MsgInternalToUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mituo *MsgInternalToUpdateOne) check() error {
-	if _, ok := mituo.mutation.MsgInternalID(); mituo.mutation.MsgInternalCleared() && !ok {
+	if mituo.mutation.MsgInternalCleared() && len(mituo.mutation.MsgInternalIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgInternalTo.msg_internal"`)
 	}
-	if _, ok := mituo.mutation.UserID(); mituo.mutation.UserCleared() && !ok {
+	if mituo.mutation.UserCleared() && len(mituo.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgInternalTo.user"`)
 	}
 	return nil

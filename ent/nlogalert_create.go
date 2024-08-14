@@ -112,10 +112,10 @@ func (nac *NlogAlertCreate) check() error {
 	if _, ok := nac.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "NlogAlert.created_at"`)}
 	}
-	if _, ok := nac.mutation.NlogID(); !ok {
+	if len(nac.mutation.NlogIDs()) == 0 {
 		return &ValidationError{Name: "nlog", err: errors.New(`ent: missing required edge "NlogAlert.nlog"`)}
 	}
-	if _, ok := nac.mutation.AlertID(); !ok {
+	if len(nac.mutation.AlertIDs()) == 0 {
 		return &ValidationError{Name: "alert", err: errors.New(`ent: missing required edge "NlogAlert.alert"`)}
 	}
 	return nil

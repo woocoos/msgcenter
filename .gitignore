@@ -16,6 +16,7 @@ test/tmp
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 cmd/msgsrv/data/
+cmd/ams/files
 
 *.idea/
 .run

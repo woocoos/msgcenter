@@ -57,12 +57,8 @@ const (
 	FieldBody = "body"
 	// FieldTpl holds the string denoting the tpl field in the database.
 	FieldTpl = "tpl"
-	// FieldTplFileID holds the string denoting the tpl_file_id field in the database.
-	FieldTplFileID = "tpl_file_id"
 	// FieldAttachments holds the string denoting the attachments field in the database.
 	FieldAttachments = "attachments"
-	// FieldAttachmentsFileIds holds the string denoting the attachments_file_ids field in the database.
-	FieldAttachmentsFileIds = "attachments_file_ids"
 	// FieldComments holds the string denoting the comments field in the database.
 	FieldComments = "comments"
 	// EdgeEvent holds the string denoting the event edge name in mutations.
@@ -99,9 +95,7 @@ var Columns = []string{
 	FieldBcc,
 	FieldBody,
 	FieldTpl,
-	FieldTplFileID,
 	FieldAttachments,
-	FieldAttachmentsFileIds,
 	FieldComments,
 }
 
@@ -269,11 +263,6 @@ func ByBody(opts ...sql.OrderTermOption) OrderOption {
 // ByTpl orders the results by the tpl field.
 func ByTpl(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTpl, opts...).ToFunc()
-}
-
-// ByTplFileID orders the results by the tpl_file_id field.
-func ByTplFileID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTplFileID, opts...).ToFunc()
 }
 
 // ByComments orders the results by the comments field.

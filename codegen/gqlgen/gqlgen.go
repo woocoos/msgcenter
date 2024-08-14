@@ -1,4 +1,4 @@
-//go:build ignore
+////go:build ignore
 
 package main
 
@@ -45,7 +45,7 @@ func main() {
 	}
 
 	err = api.Generate(cfg, api.ReplacePlugin(&p),
-		api.AddPlugin(gqlx.NewResolverPlugin(gqlx.WithRelayNodeEx())),
+		api.AddPlugin(gqlx.NewResolverPlugin(gqlx.WithRelayNodeEx(), gqlx.WithConfig(cfg))),
 	)
 
 	if err != nil {

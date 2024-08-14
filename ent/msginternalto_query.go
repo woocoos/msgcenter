@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -118,7 +119,7 @@ func (mitq *MsgInternalToQuery) QueryUser() *UserQuery {
 // First returns the first MsgInternalTo entity from the query.
 // Returns a *NotFoundError when no MsgInternalTo was found.
 func (mitq *MsgInternalToQuery) First(ctx context.Context) (*MsgInternalTo, error) {
-	nodes, err := mitq.Limit(1).All(setContextOp(ctx, mitq.ctx, "First"))
+	nodes, err := mitq.Limit(1).All(setContextOp(ctx, mitq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +142,7 @@ func (mitq *MsgInternalToQuery) FirstX(ctx context.Context) *MsgInternalTo {
 // Returns a *NotFoundError when no MsgInternalTo ID was found.
 func (mitq *MsgInternalToQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = mitq.Limit(1).IDs(setContextOp(ctx, mitq.ctx, "FirstID")); err != nil {
+	if ids, err = mitq.Limit(1).IDs(setContextOp(ctx, mitq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -164,7 +165,7 @@ func (mitq *MsgInternalToQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one MsgInternalTo entity is found.
 // Returns a *NotFoundError when no MsgInternalTo entities are found.
 func (mitq *MsgInternalToQuery) Only(ctx context.Context) (*MsgInternalTo, error) {
-	nodes, err := mitq.Limit(2).All(setContextOp(ctx, mitq.ctx, "Only"))
+	nodes, err := mitq.Limit(2).All(setContextOp(ctx, mitq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +193,7 @@ func (mitq *MsgInternalToQuery) OnlyX(ctx context.Context) *MsgInternalTo {
 // Returns a *NotFoundError when no entities are found.
 func (mitq *MsgInternalToQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = mitq.Limit(2).IDs(setContextOp(ctx, mitq.ctx, "OnlyID")); err != nil {
+	if ids, err = mitq.Limit(2).IDs(setContextOp(ctx, mitq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -217,7 +218,7 @@ func (mitq *MsgInternalToQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of MsgInternalTos.
 func (mitq *MsgInternalToQuery) All(ctx context.Context) ([]*MsgInternalTo, error) {
-	ctx = setContextOp(ctx, mitq.ctx, "All")
+	ctx = setContextOp(ctx, mitq.ctx, ent.OpQueryAll)
 	if err := mitq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -239,7 +240,7 @@ func (mitq *MsgInternalToQuery) IDs(ctx context.Context) (ids []int, err error) 
 	if mitq.ctx.Unique == nil && mitq.path != nil {
 		mitq.Unique(true)
 	}
-	ctx = setContextOp(ctx, mitq.ctx, "IDs")
+	ctx = setContextOp(ctx, mitq.ctx, ent.OpQueryIDs)
 	if err = mitq.Select(msginternalto.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -257,7 +258,7 @@ func (mitq *MsgInternalToQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (mitq *MsgInternalToQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, mitq.ctx, "Count")
+	ctx = setContextOp(ctx, mitq.ctx, ent.OpQueryCount)
 	if err := mitq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -275,7 +276,7 @@ func (mitq *MsgInternalToQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (mitq *MsgInternalToQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, mitq.ctx, "Exist")
+	ctx = setContextOp(ctx, mitq.ctx, ent.OpQueryExist)
 	switch _, err := mitq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -631,7 +632,7 @@ func (mitgb *MsgInternalToGroupBy) Aggregate(fns ...AggregateFunc) *MsgInternalT
 
 // Scan applies the selector query and scans the result into the given value.
 func (mitgb *MsgInternalToGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mitgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, mitgb.build.ctx, ent.OpQueryGroupBy)
 	if err := mitgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -679,7 +680,7 @@ func (mits *MsgInternalToSelect) Aggregate(fns ...AggregateFunc) *MsgInternalToS
 
 // Scan applies the selector query and scans the result into the given value.
 func (mits *MsgInternalToSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mits.ctx, "Select")
+	ctx = setContextOp(ctx, mits.ctx, ent.OpQuerySelect)
 	if err := mits.prepareQuery(ctx); err != nil {
 		return err
 	}

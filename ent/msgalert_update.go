@@ -64,6 +64,14 @@ func (mau *MsgAlertUpdate) SetStartsAt(t time.Time) *MsgAlertUpdate {
 	return mau
 }
 
+// SetNillableStartsAt sets the "starts_at" field if the given value is not nil.
+func (mau *MsgAlertUpdate) SetNillableStartsAt(t *time.Time) *MsgAlertUpdate {
+	if t != nil {
+		mau.SetStartsAt(*t)
+	}
+	return mau
+}
+
 // SetEndsAt sets the "ends_at" field.
 func (mau *MsgAlertUpdate) SetEndsAt(t time.Time) *MsgAlertUpdate {
 	mau.mutation.SetEndsAt(t)
@@ -121,6 +129,14 @@ func (mau *MsgAlertUpdate) SetNillableTimeout(b *bool) *MsgAlertUpdate {
 // SetFingerprint sets the "fingerprint" field.
 func (mau *MsgAlertUpdate) SetFingerprint(s string) *MsgAlertUpdate {
 	mau.mutation.SetFingerprint(s)
+	return mau
+}
+
+// SetNillableFingerprint sets the "fingerprint" field if the given value is not nil.
+func (mau *MsgAlertUpdate) SetNillableFingerprint(s *string) *MsgAlertUpdate {
+	if s != nil {
+		mau.SetFingerprint(*s)
+	}
 	return mau
 }
 
@@ -513,6 +529,14 @@ func (mauo *MsgAlertUpdateOne) SetStartsAt(t time.Time) *MsgAlertUpdateOne {
 	return mauo
 }
 
+// SetNillableStartsAt sets the "starts_at" field if the given value is not nil.
+func (mauo *MsgAlertUpdateOne) SetNillableStartsAt(t *time.Time) *MsgAlertUpdateOne {
+	if t != nil {
+		mauo.SetStartsAt(*t)
+	}
+	return mauo
+}
+
 // SetEndsAt sets the "ends_at" field.
 func (mauo *MsgAlertUpdateOne) SetEndsAt(t time.Time) *MsgAlertUpdateOne {
 	mauo.mutation.SetEndsAt(t)
@@ -570,6 +594,14 @@ func (mauo *MsgAlertUpdateOne) SetNillableTimeout(b *bool) *MsgAlertUpdateOne {
 // SetFingerprint sets the "fingerprint" field.
 func (mauo *MsgAlertUpdateOne) SetFingerprint(s string) *MsgAlertUpdateOne {
 	mauo.mutation.SetFingerprint(s)
+	return mauo
+}
+
+// SetNillableFingerprint sets the "fingerprint" field if the given value is not nil.
+func (mauo *MsgAlertUpdateOne) SetNillableFingerprint(s *string) *MsgAlertUpdateOne {
+	if s != nil {
+		mauo.SetFingerprint(*s)
+	}
 	return mauo
 }
 

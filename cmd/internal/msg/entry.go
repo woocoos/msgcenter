@@ -49,8 +49,10 @@ func (s *Server) buildEntClient() {
 	drv := ents["msgcenter"]
 
 	scfg := ent.AlternateSchema(ent.SchemaConfig{
-		User:        "portal",
-		OrgRoleUser: "portal",
+		User:         "portal",
+		OrgRoleUser:  "portal",
+		FileIdentity: "portal",
+		FileSource:   "portal",
 	})
 	if s.appCnf.Development {
 		s.dbClient = ent.NewClient(ent.Driver(drv), ent.Debug(), scfg)
@@ -116,24 +118,24 @@ func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
 }
 
 // websocket 初始化连接,只做了简单的验证,根据需求.看是否需要提前验证.
-func (s *Server) wsInit(ctx context.Context, initPayload transport.InitPayload) (context.Context, error) {
+func (s *Server) wsInit(ctx context.Context, initPayload transport.InitPayload) (context.Context, *transport.InitPayload, error) {
 	bearer := initPayload.Authorization()
 	if bearer == "" {
-		return nil, errors.New("authorization required")
+		return nil, nil, errors.New("authorization required")
 	}
 	gctx, err := gql.FromIncomingContext(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	gctx.Request.Header.Set("Authorization", bearer)
 	tidstr := initPayload.GetString(identity.TenantHeaderKey)
 	tid, _ := strconv.Atoi(tidstr)
 	if tid == 0 {
-		return nil, identity.ErrMisTenantID
+		return nil, nil, identity.ErrMisTenantID
 	}
 	gctx.Request.Header.Set(identity.TenantHeaderKey, tidstr)
 	ctx = context.WithValue(ctx, connectionIDKey, uuid.New())
-	return ctx, nil
+	return ctx, &initPayload, nil
 }
 
 func (s *Server) wsClose(ctx context.Context, code int) {

@@ -16,6 +16,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/woocoos/entcache"
+	"github.com/woocoos/msgcenter/ent/fileidentity"
+	"github.com/woocoos/msgcenter/ent/filesource"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -38,6 +40,10 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// FileIdentity is the client for interacting with the FileIdentity builders.
+	FileIdentity *FileIdentityClient
+	// FileSource is the client for interacting with the FileSource builders.
+	FileSource *FileSourceClient
 	// MsgAlert is the client for interacting with the MsgAlert builders.
 	MsgAlert *MsgAlertClient
 	// MsgChannel is the client for interacting with the MsgChannel builders.
@@ -70,15 +76,15 @@ type Client struct {
 
 // NewClient creates a new client configured with the given options.
 func NewClient(opts ...Option) *Client {
-	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
-	cfg.options(opts...)
-	client := &Client{config: cfg}
+	client := &Client{config: newConfig(opts...)}
 	client.init()
 	return client
 }
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.FileIdentity = NewFileIdentityClient(c.config)
+	c.FileSource = NewFileSourceClient(c.config)
 	c.MsgAlert = NewMsgAlertClient(c.config)
 	c.MsgChannel = NewMsgChannelClient(c.config)
 	c.MsgEvent = NewMsgEventClient(c.config)
@@ -113,6 +119,13 @@ type (
 	// Option function to configure the client.
 	Option func(*config)
 )
+
+// newConfig creates a new config for the client.
+func newConfig(opts ...Option) config {
+	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
+	cfg.options(opts...)
+	return cfg
+}
 
 // options applies the options on the config object.
 func (c *config) options(opts ...Option) {
@@ -179,6 +192,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:           ctx,
 		config:        cfg,
+		FileIdentity:  NewFileIdentityClient(cfg),
+		FileSource:    NewFileSourceClient(cfg),
 		MsgAlert:      NewMsgAlertClient(cfg),
 		MsgChannel:    NewMsgChannelClient(cfg),
 		MsgEvent:      NewMsgEventClient(cfg),
@@ -211,6 +226,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:           ctx,
 		config:        cfg,
+		FileIdentity:  NewFileIdentityClient(cfg),
+		FileSource:    NewFileSourceClient(cfg),
 		MsgAlert:      NewMsgAlertClient(cfg),
 		MsgChannel:    NewMsgChannelClient(cfg),
 		MsgEvent:      NewMsgEventClient(cfg),
@@ -230,7 +247,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		MsgAlert.
+//		FileIdentity.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -253,9 +270,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal, c.MsgInternalTo,
-		c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert, c.OrgRoleUser,
-		c.Silence, c.User,
+		c.FileIdentity, c.FileSource, c.MsgAlert, c.MsgChannel, c.MsgEvent,
+		c.MsgInternal, c.MsgInternalTo, c.MsgSubscriber, c.MsgTemplate, c.MsgType,
+		c.Nlog, c.NlogAlert, c.OrgRoleUser, c.Silence, c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -265,9 +282,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal, c.MsgInternalTo,
-		c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert, c.OrgRoleUser,
-		c.Silence, c.User,
+		c.FileIdentity, c.FileSource, c.MsgAlert, c.MsgChannel, c.MsgEvent,
+		c.MsgInternal, c.MsgInternalTo, c.MsgSubscriber, c.MsgTemplate, c.MsgType,
+		c.Nlog, c.NlogAlert, c.OrgRoleUser, c.Silence, c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -276,6 +293,10 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *FileIdentityMutation:
+		return c.FileIdentity.mutate(ctx, m)
+	case *FileSourceMutation:
+		return c.FileSource.mutate(ctx, m)
 	case *MsgAlertMutation:
 		return c.MsgAlert.mutate(ctx, m)
 	case *MsgChannelMutation:
@@ -304,6 +325,312 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.User.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// FileIdentityClient is a client for the FileIdentity schema.
+type FileIdentityClient struct {
+	config
+}
+
+// NewFileIdentityClient returns a client for the FileIdentity from the given config.
+func NewFileIdentityClient(c config) *FileIdentityClient {
+	return &FileIdentityClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `fileidentity.Hooks(f(g(h())))`.
+func (c *FileIdentityClient) Use(hooks ...Hook) {
+	c.hooks.FileIdentity = append(c.hooks.FileIdentity, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `fileidentity.Intercept(f(g(h())))`.
+func (c *FileIdentityClient) Intercept(interceptors ...Interceptor) {
+	c.inters.FileIdentity = append(c.inters.FileIdentity, interceptors...)
+}
+
+// Create returns a builder for creating a FileIdentity entity.
+func (c *FileIdentityClient) Create() *FileIdentityCreate {
+	mutation := newFileIdentityMutation(c.config, OpCreate)
+	return &FileIdentityCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of FileIdentity entities.
+func (c *FileIdentityClient) CreateBulk(builders ...*FileIdentityCreate) *FileIdentityCreateBulk {
+	return &FileIdentityCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *FileIdentityClient) MapCreateBulk(slice any, setFunc func(*FileIdentityCreate, int)) *FileIdentityCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &FileIdentityCreateBulk{err: fmt.Errorf("calling to FileIdentityClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*FileIdentityCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &FileIdentityCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for FileIdentity.
+func (c *FileIdentityClient) Update() *FileIdentityUpdate {
+	mutation := newFileIdentityMutation(c.config, OpUpdate)
+	return &FileIdentityUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *FileIdentityClient) UpdateOne(fi *FileIdentity) *FileIdentityUpdateOne {
+	mutation := newFileIdentityMutation(c.config, OpUpdateOne, withFileIdentity(fi))
+	return &FileIdentityUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *FileIdentityClient) UpdateOneID(id int) *FileIdentityUpdateOne {
+	mutation := newFileIdentityMutation(c.config, OpUpdateOne, withFileIdentityID(id))
+	return &FileIdentityUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for FileIdentity.
+func (c *FileIdentityClient) Delete() *FileIdentityDelete {
+	mutation := newFileIdentityMutation(c.config, OpDelete)
+	return &FileIdentityDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *FileIdentityClient) DeleteOne(fi *FileIdentity) *FileIdentityDeleteOne {
+	return c.DeleteOneID(fi.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *FileIdentityClient) DeleteOneID(id int) *FileIdentityDeleteOne {
+	builder := c.Delete().Where(fileidentity.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &FileIdentityDeleteOne{builder}
+}
+
+// Query returns a query builder for FileIdentity.
+func (c *FileIdentityClient) Query() *FileIdentityQuery {
+	return &FileIdentityQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeFileIdentity},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a FileIdentity entity by its id.
+func (c *FileIdentityClient) Get(ctx context.Context, id int) (*FileIdentity, error) {
+	return c.Query().Where(fileidentity.ID(id)).Only(entcache.WithEntryKey(ctx, "FileIdentity", id))
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *FileIdentityClient) GetX(ctx context.Context, id int) *FileIdentity {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QuerySource queries the source edge of a FileIdentity.
+func (c *FileIdentityClient) QuerySource(fi *FileIdentity) *FileSourceQuery {
+	query := (&FileSourceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := fi.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(fileidentity.Table, fileidentity.FieldID, id),
+			sqlgraph.To(filesource.Table, filesource.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, fileidentity.SourceTable, fileidentity.SourceColumn),
+		)
+		schemaConfig := fi.schemaConfig
+		step.To.Schema = schemaConfig.FileSource
+		step.Edge.Schema = schemaConfig.FileIdentity
+		fromV = sqlgraph.Neighbors(fi.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *FileIdentityClient) Hooks() []Hook {
+	hooks := c.hooks.FileIdentity
+	return append(hooks[:len(hooks):len(hooks)], fileidentity.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *FileIdentityClient) Interceptors() []Interceptor {
+	return c.inters.FileIdentity
+}
+
+func (c *FileIdentityClient) mutate(ctx context.Context, m *FileIdentityMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&FileIdentityCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&FileIdentityUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&FileIdentityUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&FileIdentityDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown FileIdentity mutation op: %q", m.Op())
+	}
+}
+
+// FileSourceClient is a client for the FileSource schema.
+type FileSourceClient struct {
+	config
+}
+
+// NewFileSourceClient returns a client for the FileSource from the given config.
+func NewFileSourceClient(c config) *FileSourceClient {
+	return &FileSourceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `filesource.Hooks(f(g(h())))`.
+func (c *FileSourceClient) Use(hooks ...Hook) {
+	c.hooks.FileSource = append(c.hooks.FileSource, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `filesource.Intercept(f(g(h())))`.
+func (c *FileSourceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.FileSource = append(c.inters.FileSource, interceptors...)
+}
+
+// Create returns a builder for creating a FileSource entity.
+func (c *FileSourceClient) Create() *FileSourceCreate {
+	mutation := newFileSourceMutation(c.config, OpCreate)
+	return &FileSourceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of FileSource entities.
+func (c *FileSourceClient) CreateBulk(builders ...*FileSourceCreate) *FileSourceCreateBulk {
+	return &FileSourceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *FileSourceClient) MapCreateBulk(slice any, setFunc func(*FileSourceCreate, int)) *FileSourceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &FileSourceCreateBulk{err: fmt.Errorf("calling to FileSourceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*FileSourceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &FileSourceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for FileSource.
+func (c *FileSourceClient) Update() *FileSourceUpdate {
+	mutation := newFileSourceMutation(c.config, OpUpdate)
+	return &FileSourceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *FileSourceClient) UpdateOne(fs *FileSource) *FileSourceUpdateOne {
+	mutation := newFileSourceMutation(c.config, OpUpdateOne, withFileSource(fs))
+	return &FileSourceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *FileSourceClient) UpdateOneID(id int) *FileSourceUpdateOne {
+	mutation := newFileSourceMutation(c.config, OpUpdateOne, withFileSourceID(id))
+	return &FileSourceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for FileSource.
+func (c *FileSourceClient) Delete() *FileSourceDelete {
+	mutation := newFileSourceMutation(c.config, OpDelete)
+	return &FileSourceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *FileSourceClient) DeleteOne(fs *FileSource) *FileSourceDeleteOne {
+	return c.DeleteOneID(fs.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *FileSourceClient) DeleteOneID(id int) *FileSourceDeleteOne {
+	builder := c.Delete().Where(filesource.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &FileSourceDeleteOne{builder}
+}
+
+// Query returns a query builder for FileSource.
+func (c *FileSourceClient) Query() *FileSourceQuery {
+	return &FileSourceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeFileSource},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a FileSource entity by its id.
+func (c *FileSourceClient) Get(ctx context.Context, id int) (*FileSource, error) {
+	return c.Query().Where(filesource.ID(id)).Only(entcache.WithEntryKey(ctx, "FileSource", id))
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *FileSourceClient) GetX(ctx context.Context, id int) *FileSource {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryIdentities queries the identities edge of a FileSource.
+func (c *FileSourceClient) QueryIdentities(fs *FileSource) *FileIdentityQuery {
+	query := (&FileIdentityClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := fs.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(filesource.Table, filesource.FieldID, id),
+			sqlgraph.To(fileidentity.Table, fileidentity.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, filesource.IdentitiesTable, filesource.IdentitiesColumn),
+		)
+		schemaConfig := fs.schemaConfig
+		step.To.Schema = schemaConfig.FileIdentity
+		step.Edge.Schema = schemaConfig.FileIdentity
+		fromV = sqlgraph.Neighbors(fs.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *FileSourceClient) Hooks() []Hook {
+	hooks := c.hooks.FileSource
+	return append(hooks[:len(hooks):len(hooks)], filesource.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *FileSourceClient) Interceptors() []Interceptor {
+	return c.inters.FileSource
+}
+
+func (c *FileSourceClient) mutate(ctx context.Context, m *FileSourceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&FileSourceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&FileSourceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&FileSourceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&FileSourceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown FileSource mutation op: %q", m.Op())
 	}
 }
 
@@ -2398,13 +2725,14 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSubscriber,
-		MsgTemplate, MsgType, Nlog, NlogAlert, OrgRoleUser, Silence, User []ent.Hook
+		FileIdentity, FileSource, MsgAlert, MsgChannel, MsgEvent, MsgInternal,
+		MsgInternalTo, MsgSubscriber, MsgTemplate, MsgType, Nlog, NlogAlert,
+		OrgRoleUser, Silence, User []ent.Hook
 	}
 	inters struct {
-		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSubscriber,
-		MsgTemplate, MsgType, Nlog, NlogAlert, OrgRoleUser, Silence,
-		User []ent.Interceptor
+		FileIdentity, FileSource, MsgAlert, MsgChannel, MsgEvent, MsgInternal,
+		MsgInternalTo, MsgSubscriber, MsgTemplate, MsgType, Nlog, NlogAlert,
+		OrgRoleUser, Silence, User []ent.Interceptor
 	}
 )
 

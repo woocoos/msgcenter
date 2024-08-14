@@ -9,10 +9,55 @@ import (
 )
 
 var (
+	// FileIdentityColumns holds the columns for the "file_identity" table.
+	FileIdentityColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "tenant_id", Type: field.TypeInt},
+		{Name: "access_key_id", Type: field.TypeString, Size: 255},
+		{Name: "access_key_secret", Type: field.TypeString, Size: 255},
+		{Name: "role_arn", Type: field.TypeString, Size: 255},
+		{Name: "policy", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "duration_seconds", Type: field.TypeInt, Nullable: true, Default: 3600},
+		{Name: "is_default", Type: field.TypeBool, Default: false},
+		{Name: "comments", Type: field.TypeString, Nullable: true},
+		{Name: "file_source_id", Type: field.TypeInt},
+	}
+	// FileIdentityTable holds the schema information for the "file_identity" table.
+	FileIdentityTable = &schema.Table{
+		Name:       "file_identity",
+		Columns:    FileIdentityColumns,
+		PrimaryKey: []*schema.Column{FileIdentityColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "file_identity_file_source_identities",
+				Columns:    []*schema.Column{FileIdentityColumns[9]},
+				RefColumns: []*schema.Column{FileSourceColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// FileSourceColumns holds the columns for the "file_source" table.
+	FileSourceColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "kind", Type: field.TypeEnum, Enums: []string{"local", "minio", "aliOSS", "awsS3"}},
+		{Name: "comments", Type: field.TypeString, Nullable: true},
+		{Name: "endpoint", Type: field.TypeString, Size: 255},
+		{Name: "endpoint_immutable", Type: field.TypeBool, Default: false},
+		{Name: "sts_endpoint", Type: field.TypeString, Size: 255},
+		{Name: "region", Type: field.TypeString, Size: 100},
+		{Name: "bucket", Type: field.TypeString, Size: 255},
+		{Name: "bucket_url", Type: field.TypeString, Size: 255},
+	}
+	// FileSourceTable holds the schema information for the "file_source" table.
+	FileSourceTable = &schema.Table{
+		Name:       "file_source",
+		Columns:    FileSourceColumns,
+		PrimaryKey: []*schema.Column{FileSourceColumns[0]},
+	}
 	// MsgAlertColumns holds the columns for the "msg_alert" table.
 	MsgAlertColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
-		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
 		{Name: "labels", Type: field.TypeJSON, Nullable: true},
 		{Name: "annotations", Type: field.TypeJSON, Nullable: true},
 		{Name: "starts_at", Type: field.TypeTime},
@@ -89,7 +134,7 @@ var (
 	// MsgInternalColumns holds the columns for the "msg_internal" table.
 	MsgInternalColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
-		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
 		{Name: "created_by", Type: field.TypeInt},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
@@ -109,7 +154,7 @@ var (
 	// MsgInternalToColumns holds the columns for the "msg_internal_to" table.
 	MsgInternalToColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
-		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
 		{Name: "read_at", Type: field.TypeTime, Nullable: true},
 		{Name: "delete_at", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
@@ -188,10 +233,8 @@ var (
 		{Name: "cc", Type: field.TypeString, Nullable: true},
 		{Name: "bcc", Type: field.TypeString, Nullable: true},
 		{Name: "body", Type: field.TypeString, Nullable: true, Size: 2147483647},
-		{Name: "tpl", Type: field.TypeString, Nullable: true, Size: 2147483647},
-		{Name: "tpl_file_id", Type: field.TypeInt, Nullable: true},
+		{Name: "tpl", Type: field.TypeString, Nullable: true},
 		{Name: "attachments", Type: field.TypeJSON, Nullable: true},
-		{Name: "attachments_file_ids", Type: field.TypeJSON, Nullable: true},
 		{Name: "comments", Type: field.TypeString, Nullable: true},
 		{Name: "msg_event_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
 	}
@@ -203,7 +246,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "msg_template_msg_event_customer_template",
-				Columns:    []*schema.Column{MsgTemplateColumns[22]},
+				Columns:    []*schema.Column{MsgTemplateColumns[20]},
 				RefColumns: []*schema.Column{MsgEventColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -233,7 +276,7 @@ var (
 	// MsgNlogColumns holds the columns for the "msg_nlog" table.
 	MsgNlogColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
-		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
 		{Name: "group_key", Type: field.TypeString},
 		{Name: "receiver", Type: field.TypeString},
 		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "message", "webhook"}},
@@ -303,7 +346,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
 		{Name: "matchers", Type: field.TypeJSON, Nullable: true},
 		{Name: "starts_at", Type: field.TypeTime},
 		{Name: "ends_at", Type: field.TypeTime},
@@ -341,6 +384,8 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		FileIdentityTable,
+		FileSourceTable,
 		MsgAlertTable,
 		MsgChannelTable,
 		MsgEventTable,
@@ -358,6 +403,13 @@ var (
 )
 
 func init() {
+	FileIdentityTable.ForeignKeys[0].RefTable = FileSourceTable
+	FileIdentityTable.Annotation = &entsql.Annotation{
+		Table: "file_identity",
+	}
+	FileSourceTable.Annotation = &entsql.Annotation{
+		Table: "file_source",
+	}
 	MsgAlertTable.Annotation = &entsql.Annotation{
 		Table: "msg_alert",
 	}

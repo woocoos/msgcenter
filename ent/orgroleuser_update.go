@@ -36,6 +36,14 @@ func (oruu *OrgRoleUserUpdate) SetOrgRoleID(i int) *OrgRoleUserUpdate {
 	return oruu
 }
 
+// SetNillableOrgRoleID sets the "org_role_id" field if the given value is not nil.
+func (oruu *OrgRoleUserUpdate) SetNillableOrgRoleID(i *int) *OrgRoleUserUpdate {
+	if i != nil {
+		oruu.SetOrgRoleID(*i)
+	}
+	return oruu
+}
+
 // AddOrgRoleID adds i to the "org_role_id" field.
 func (oruu *OrgRoleUserUpdate) AddOrgRoleID(i int) *OrgRoleUserUpdate {
 	oruu.mutation.AddOrgRoleID(i)
@@ -46,6 +54,14 @@ func (oruu *OrgRoleUserUpdate) AddOrgRoleID(i int) *OrgRoleUserUpdate {
 func (oruu *OrgRoleUserUpdate) SetOrgUserID(i int) *OrgRoleUserUpdate {
 	oruu.mutation.ResetOrgUserID()
 	oruu.mutation.SetOrgUserID(i)
+	return oruu
+}
+
+// SetNillableOrgUserID sets the "org_user_id" field if the given value is not nil.
+func (oruu *OrgRoleUserUpdate) SetNillableOrgUserID(i *int) *OrgRoleUserUpdate {
+	if i != nil {
+		oruu.SetOrgUserID(*i)
+	}
 	return oruu
 }
 
@@ -62,6 +78,14 @@ func (oruu *OrgRoleUserUpdate) SetOrgID(i int) *OrgRoleUserUpdate {
 	return oruu
 }
 
+// SetNillableOrgID sets the "org_id" field if the given value is not nil.
+func (oruu *OrgRoleUserUpdate) SetNillableOrgID(i *int) *OrgRoleUserUpdate {
+	if i != nil {
+		oruu.SetOrgID(*i)
+	}
+	return oruu
+}
+
 // AddOrgID adds i to the "org_id" field.
 func (oruu *OrgRoleUserUpdate) AddOrgID(i int) *OrgRoleUserUpdate {
 	oruu.mutation.AddOrgID(i)
@@ -72,6 +96,14 @@ func (oruu *OrgRoleUserUpdate) AddOrgID(i int) *OrgRoleUserUpdate {
 func (oruu *OrgRoleUserUpdate) SetUserID(i int) *OrgRoleUserUpdate {
 	oruu.mutation.ResetUserID()
 	oruu.mutation.SetUserID(i)
+	return oruu
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (oruu *OrgRoleUserUpdate) SetNillableUserID(i *int) *OrgRoleUserUpdate {
+	if i != nil {
+		oruu.SetUserID(*i)
+	}
 	return oruu
 }
 
@@ -175,6 +207,14 @@ func (oruuo *OrgRoleUserUpdateOne) SetOrgRoleID(i int) *OrgRoleUserUpdateOne {
 	return oruuo
 }
 
+// SetNillableOrgRoleID sets the "org_role_id" field if the given value is not nil.
+func (oruuo *OrgRoleUserUpdateOne) SetNillableOrgRoleID(i *int) *OrgRoleUserUpdateOne {
+	if i != nil {
+		oruuo.SetOrgRoleID(*i)
+	}
+	return oruuo
+}
+
 // AddOrgRoleID adds i to the "org_role_id" field.
 func (oruuo *OrgRoleUserUpdateOne) AddOrgRoleID(i int) *OrgRoleUserUpdateOne {
 	oruuo.mutation.AddOrgRoleID(i)
@@ -185,6 +225,14 @@ func (oruuo *OrgRoleUserUpdateOne) AddOrgRoleID(i int) *OrgRoleUserUpdateOne {
 func (oruuo *OrgRoleUserUpdateOne) SetOrgUserID(i int) *OrgRoleUserUpdateOne {
 	oruuo.mutation.ResetOrgUserID()
 	oruuo.mutation.SetOrgUserID(i)
+	return oruuo
+}
+
+// SetNillableOrgUserID sets the "org_user_id" field if the given value is not nil.
+func (oruuo *OrgRoleUserUpdateOne) SetNillableOrgUserID(i *int) *OrgRoleUserUpdateOne {
+	if i != nil {
+		oruuo.SetOrgUserID(*i)
+	}
 	return oruuo
 }
 
@@ -201,6 +249,14 @@ func (oruuo *OrgRoleUserUpdateOne) SetOrgID(i int) *OrgRoleUserUpdateOne {
 	return oruuo
 }
 
+// SetNillableOrgID sets the "org_id" field if the given value is not nil.
+func (oruuo *OrgRoleUserUpdateOne) SetNillableOrgID(i *int) *OrgRoleUserUpdateOne {
+	if i != nil {
+		oruuo.SetOrgID(*i)
+	}
+	return oruuo
+}
+
 // AddOrgID adds i to the "org_id" field.
 func (oruuo *OrgRoleUserUpdateOne) AddOrgID(i int) *OrgRoleUserUpdateOne {
 	oruuo.mutation.AddOrgID(i)
@@ -211,6 +267,14 @@ func (oruuo *OrgRoleUserUpdateOne) AddOrgID(i int) *OrgRoleUserUpdateOne {
 func (oruuo *OrgRoleUserUpdateOne) SetUserID(i int) *OrgRoleUserUpdateOne {
 	oruuo.mutation.ResetUserID()
 	oruuo.mutation.SetUserID(i)
+	return oruuo
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (oruuo *OrgRoleUserUpdateOne) SetNillableUserID(i *int) *OrgRoleUserUpdateOne {
+	if i != nil {
+		oruuo.SetUserID(*i)
+	}
 	return oruuo
 }
 

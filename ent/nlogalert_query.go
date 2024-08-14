@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -118,7 +119,7 @@ func (naq *NlogAlertQuery) QueryAlert() *MsgAlertQuery {
 // First returns the first NlogAlert entity from the query.
 // Returns a *NotFoundError when no NlogAlert was found.
 func (naq *NlogAlertQuery) First(ctx context.Context) (*NlogAlert, error) {
-	nodes, err := naq.Limit(1).All(setContextOp(ctx, naq.ctx, "First"))
+	nodes, err := naq.Limit(1).All(setContextOp(ctx, naq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +142,7 @@ func (naq *NlogAlertQuery) FirstX(ctx context.Context) *NlogAlert {
 // Returns a *NotFoundError when no NlogAlert ID was found.
 func (naq *NlogAlertQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = naq.Limit(1).IDs(setContextOp(ctx, naq.ctx, "FirstID")); err != nil {
+	if ids, err = naq.Limit(1).IDs(setContextOp(ctx, naq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -164,7 +165,7 @@ func (naq *NlogAlertQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one NlogAlert entity is found.
 // Returns a *NotFoundError when no NlogAlert entities are found.
 func (naq *NlogAlertQuery) Only(ctx context.Context) (*NlogAlert, error) {
-	nodes, err := naq.Limit(2).All(setContextOp(ctx, naq.ctx, "Only"))
+	nodes, err := naq.Limit(2).All(setContextOp(ctx, naq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +193,7 @@ func (naq *NlogAlertQuery) OnlyX(ctx context.Context) *NlogAlert {
 // Returns a *NotFoundError when no entities are found.
 func (naq *NlogAlertQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = naq.Limit(2).IDs(setContextOp(ctx, naq.ctx, "OnlyID")); err != nil {
+	if ids, err = naq.Limit(2).IDs(setContextOp(ctx, naq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -217,7 +218,7 @@ func (naq *NlogAlertQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of NlogAlerts.
 func (naq *NlogAlertQuery) All(ctx context.Context) ([]*NlogAlert, error) {
-	ctx = setContextOp(ctx, naq.ctx, "All")
+	ctx = setContextOp(ctx, naq.ctx, ent.OpQueryAll)
 	if err := naq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -239,7 +240,7 @@ func (naq *NlogAlertQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if naq.ctx.Unique == nil && naq.path != nil {
 		naq.Unique(true)
 	}
-	ctx = setContextOp(ctx, naq.ctx, "IDs")
+	ctx = setContextOp(ctx, naq.ctx, ent.OpQueryIDs)
 	if err = naq.Select(nlogalert.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -257,7 +258,7 @@ func (naq *NlogAlertQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (naq *NlogAlertQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, naq.ctx, "Count")
+	ctx = setContextOp(ctx, naq.ctx, ent.OpQueryCount)
 	if err := naq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -275,7 +276,7 @@ func (naq *NlogAlertQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (naq *NlogAlertQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, naq.ctx, "Exist")
+	ctx = setContextOp(ctx, naq.ctx, ent.OpQueryExist)
 	switch _, err := naq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -631,7 +632,7 @@ func (nagb *NlogAlertGroupBy) Aggregate(fns ...AggregateFunc) *NlogAlertGroupBy 
 
 // Scan applies the selector query and scans the result into the given value.
 func (nagb *NlogAlertGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, nagb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, nagb.build.ctx, ent.OpQueryGroupBy)
 	if err := nagb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -679,7 +680,7 @@ func (nas *NlogAlertSelect) Aggregate(fns ...AggregateFunc) *NlogAlertSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (nas *NlogAlertSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, nas.ctx, "Select")
+	ctx = setContextOp(ctx, nas.ctx, ent.OpQuerySelect)
 	if err := nas.prepareQuery(ctx); err != nil {
 		return err
 	}

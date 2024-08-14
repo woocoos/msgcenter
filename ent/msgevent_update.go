@@ -87,9 +87,25 @@ func (meu *MsgEventUpdate) SetMsgTypeID(i int) *MsgEventUpdate {
 	return meu
 }
 
+// SetNillableMsgTypeID sets the "msg_type_id" field if the given value is not nil.
+func (meu *MsgEventUpdate) SetNillableMsgTypeID(i *int) *MsgEventUpdate {
+	if i != nil {
+		meu.SetMsgTypeID(*i)
+	}
+	return meu
+}
+
 // SetName sets the "name" field.
 func (meu *MsgEventUpdate) SetName(s string) *MsgEventUpdate {
 	meu.mutation.SetName(s)
+	return meu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (meu *MsgEventUpdate) SetNillableName(s *string) *MsgEventUpdate {
+	if s != nil {
+		meu.SetName(*s)
+	}
 	return meu
 }
 
@@ -148,6 +164,14 @@ func (meu *MsgEventUpdate) ClearRoute() *MsgEventUpdate {
 // SetModes sets the "modes" field.
 func (meu *MsgEventUpdate) SetModes(s string) *MsgEventUpdate {
 	meu.mutation.SetModes(s)
+	return meu
+}
+
+// SetNillableModes sets the "modes" field if the given value is not nil.
+func (meu *MsgEventUpdate) SetNillableModes(s *string) *MsgEventUpdate {
+	if s != nil {
+		meu.SetModes(*s)
+	}
 	return meu
 }
 
@@ -247,7 +271,7 @@ func (meu *MsgEventUpdate) check() error {
 			return &ValidationError{Name: "route", err: fmt.Errorf(`ent: validator failed for field "MsgEvent.route": %w`, err)}
 		}
 	}
-	if _, ok := meu.mutation.MsgTypeID(); meu.mutation.MsgTypeCleared() && !ok {
+	if meu.mutation.MsgTypeCleared() && len(meu.mutation.MsgTypeIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgEvent.msg_type"`)
 	}
 	return nil
@@ -458,9 +482,25 @@ func (meuo *MsgEventUpdateOne) SetMsgTypeID(i int) *MsgEventUpdateOne {
 	return meuo
 }
 
+// SetNillableMsgTypeID sets the "msg_type_id" field if the given value is not nil.
+func (meuo *MsgEventUpdateOne) SetNillableMsgTypeID(i *int) *MsgEventUpdateOne {
+	if i != nil {
+		meuo.SetMsgTypeID(*i)
+	}
+	return meuo
+}
+
 // SetName sets the "name" field.
 func (meuo *MsgEventUpdateOne) SetName(s string) *MsgEventUpdateOne {
 	meuo.mutation.SetName(s)
+	return meuo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (meuo *MsgEventUpdateOne) SetNillableName(s *string) *MsgEventUpdateOne {
+	if s != nil {
+		meuo.SetName(*s)
+	}
 	return meuo
 }
 
@@ -519,6 +559,14 @@ func (meuo *MsgEventUpdateOne) ClearRoute() *MsgEventUpdateOne {
 // SetModes sets the "modes" field.
 func (meuo *MsgEventUpdateOne) SetModes(s string) *MsgEventUpdateOne {
 	meuo.mutation.SetModes(s)
+	return meuo
+}
+
+// SetNillableModes sets the "modes" field if the given value is not nil.
+func (meuo *MsgEventUpdateOne) SetNillableModes(s *string) *MsgEventUpdateOne {
+	if s != nil {
+		meuo.SetModes(*s)
+	}
 	return meuo
 }
 
@@ -631,7 +679,7 @@ func (meuo *MsgEventUpdateOne) check() error {
 			return &ValidationError{Name: "route", err: fmt.Errorf(`ent: validator failed for field "MsgEvent.route": %w`, err)}
 		}
 	}
-	if _, ok := meuo.mutation.MsgTypeID(); meuo.mutation.MsgTypeCleared() && !ok {
+	if meuo.mutation.MsgTypeCleared() && len(meuo.mutation.MsgTypeIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgEvent.msg_type"`)
 	}
 	return nil
