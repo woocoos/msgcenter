@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"embed"
 	"fmt"
+	"github.com/woocoos/knockout-go/api"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
-	"github.com/woocoos/msgcenter/service/fsclient"
 	tmplhtml "html/template"
 	"io/fs"
 	"net/url"
@@ -41,7 +41,7 @@ type Template struct {
 
 	ExternalURL *url.URL
 
-	FSClient *fsclient.Client
+	KOSdk *api.SDK
 }
 
 // Option is generic modifier of the text and html templates used by a Template.

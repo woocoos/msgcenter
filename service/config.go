@@ -13,7 +13,7 @@ import (
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
-	"github.com/woocoos/msgcenter/service/fsclient"
+	"github.com/woocoos/msgcenter/service/kosdk"
 	"net/mail"
 	"strconv"
 	"strings"
@@ -80,7 +80,7 @@ func findTemplate(ctx context.Context, basedir, attdir string, client *ent.Clien
 	if event.Attachments != nil && len(event.Attachments) > 0 {
 		as := make([]string, len(event.Attachments))
 		for i, attacher := range event.Attachments {
-			path, err := fsclient.DefaultFilePath(event.TenantID, attacher, basedir, attdir)
+			path, err := kosdk.DefaultFilePath(event.TenantID, attacher, basedir, attdir)
 			if err != nil {
 				return nil, err
 			}

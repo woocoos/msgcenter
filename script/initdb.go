@@ -32,7 +32,7 @@ func main() {
 		migrate.WithDropIndex(true),
 		migrate.WithDropColumn(true),
 		migrate.WithForeignKeys(false),
-		entx.SkipTablesDiffHook("user", "org_role_user", "file_source", "file_identity"),
+		entx.SkipTablesDiffHook("user", "org_role_user"),
 	)
 	if err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)

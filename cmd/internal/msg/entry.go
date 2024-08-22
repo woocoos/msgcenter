@@ -49,10 +49,8 @@ func (s *Server) buildEntClient() {
 	drv := ents["msgcenter"]
 
 	scfg := ent.AlternateSchema(ent.SchemaConfig{
-		User:         "portal",
-		OrgRoleUser:  "portal",
-		FileIdentity: "portal",
-		FileSource:   "portal",
+		User:        "portal",
+		OrgRoleUser: "portal",
 	})
 	if s.appCnf.Development {
 		s.dbClient = ent.NewClient(ent.Driver(drv), ent.Debug(), scfg)

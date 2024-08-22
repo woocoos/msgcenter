@@ -8,7 +8,6 @@ require (
 	github.com/99designs/gqlgen v0.17.48
 	github.com/alicebob/miniredis/v2 v2.30.5
 	github.com/aws/aws-sdk-go-v2 v1.30.3
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.58.2
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.10.0
@@ -32,7 +31,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.12
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	github.com/woocoos/entcache v0.0.0-20231206055445-856f0148efa5
-	github.com/woocoos/knockout-go v0.0.0-20240812100252-b523ce9149a6
+	github.com/woocoos/knockout-go v0.0.0-20240822063016-87042cc38ffd
 	go.uber.org/zap v1.26.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/sync v0.7.0
@@ -62,6 +61,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.3.17 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.11.17 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.17.15 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.58.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.22.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.26.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.30.3 // indirect

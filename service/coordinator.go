@@ -9,6 +9,7 @@ import (
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/woocoos/knockout-go/api"
+	"github.com/woocoos/knockout-go/api/fs"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
@@ -20,9 +21,10 @@ import (
 	"github.com/woocoos/msgcenter/notify/webhook"
 	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/pkg/profile"
-	"github.com/woocoos/msgcenter/service/fsclient"
+	"github.com/woocoos/msgcenter/service/kosdk"
 	"github.com/woocoos/msgcenter/template"
 	"go.uber.org/zap"
+	"os"
 	"path/filepath"
 	"strconv"
 	"sync"
@@ -45,8 +47,6 @@ type Coordinator struct {
 	db *ent.Client
 	// knockout sdk
 	KOSdk *api.SDK
-	// file client
-	FSClient *fsclient.Client
 }
 
 // NewCoordinator returns a new coordinator with the given configuration for alert manager.
@@ -162,9 +162,9 @@ func (c *Coordinator) loadTemplates() error {
 	if err != nil {
 		return fmt.Errorf("failed to parse templates %w", err)
 	}
-	tmpl.FSClient = c.FSClient
+	tmpl.KOSdk = c.KOSdk
 	c.Template = tmpl
-	if err := c.cnf.Sub("template").Unmarshal(&c.Template); err != nil {
+	if err = c.cnf.Sub("template").Unmarshal(&c.Template); err != nil {
 		return err
 	}
 	c.Template.BaseDir, err = filepath.Abs(c.Template.BaseDir)
@@ -172,17 +172,17 @@ func (c *Coordinator) loadTemplates() error {
 		return err
 	}
 	// 远程下载文件
-	if err := c.downloadTempFromRemote(); err != nil {
+	if err = c.downloadTempFromRemote(); err != nil {
 		logger.Error("Error loading remote template file", zap.Error(err))
 		metrics.Coordinator.ConfigSuccess.Set(0)
 		return err
 	}
 	for _, ptn := range c.profile.Templates {
 		// 如果根目录未创建则跳过
-		if !fsclient.FileExists(c.Template.BaseDir) {
+		if _, err = os.Stat(c.Template.BaseDir); os.IsNotExist(err) {
 			continue
 		}
-		if _, err := c.Template.ParseGlob(c.cnf.Abs(ptn)); err != nil {
+		if _, err = c.Template.ParseGlob(c.cnf.Abs(ptn)); err != nil {
 			return err
 		}
 	}
@@ -199,8 +199,11 @@ func (c *Coordinator) downloadTempFromRemote() error {
 	for _, tpl := range tpls {
 		// 下载模板文件
 		if tpl.Tpl != "" {
-			provider := c.FSClient.GetProvider(tpl.TenantID)
-			_, err = provider.DefaultDownloadObject(tpl.Tpl, c.Template.BaseDir, c.Template.DataDir)
+			localFile, err := kosdk.DefaultFilePath(tpl.TenantID, tpl.Tpl, c.Template.BaseDir, c.Template.DataDir)
+			if err != nil {
+				return err
+			}
+			err = c.KOSdk.Fs().DownloadObjectByKey(strconv.Itoa(tpl.TenantID), tpl.Tpl, localFile, fs.WithOverwrittenFile(false))
 			if err != nil {
 				return err
 			}
@@ -208,8 +211,11 @@ func (c *Coordinator) downloadTempFromRemote() error {
 		// 下载附件
 		if len(tpl.Attachments) != 0 {
 			for _, att := range tpl.Attachments {
-				provider := c.FSClient.GetProvider(tpl.TenantID)
-				_, err = provider.DefaultDownloadObject(att, c.Template.BaseDir, c.Template.AttachmentDir)
+				localFile, err := kosdk.DefaultFilePath(tpl.TenantID, att, c.Template.BaseDir, c.Template.AttachmentDir)
+				if err != nil {
+					return err
+				}
+				err = c.KOSdk.Fs().DownloadObjectByKey(strconv.Itoa(tpl.TenantID), att, localFile, fs.WithOverwrittenFile(false))
 				if err != nil {
 					return err
 				}

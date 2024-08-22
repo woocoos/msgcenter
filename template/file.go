@@ -1,8 +1,10 @@
 package template
 
 import (
-	"github.com/woocoos/msgcenter/service/fsclient"
+	"github.com/woocoos/knockout-go/api/fs"
+	"github.com/woocoos/msgcenter/service/kosdk"
 	"os"
+	"strconv"
 )
 
 // EnableTplFile 启用模板文件
@@ -11,13 +13,16 @@ func (t *Template) EnableTplFile(tpl string, tenantID int) error {
 	if tpl == "" {
 		return nil
 	}
-	provider := t.FSClient.GetProvider(tenantID)
-	tplPath, err := provider.DefaultDownloadObject(tpl, t.BaseDir, t.DataDir)
+	localFile, err := kosdk.DefaultFilePath(tenantID, tpl, t.BaseDir, t.DataDir)
+	if err != nil {
+		return err
+	}
+	err = t.KOSdk.Fs().DownloadObjectByKey(strconv.Itoa(tenantID), tpl, localFile, fs.WithOverwrittenFile(false))
 	if err != nil {
 		return err
 	}
 	// 加载模板
-	_, err = t.ParseFiles(tplPath)
+	_, err = t.ParseFiles(localFile)
 	if err != nil {
 		return err
 	}
@@ -30,7 +35,7 @@ func (t *Template) RemoveTplFile(tpl string, tenantID int) error {
 	if tpl == "" {
 		return nil
 	}
-	tplPath, err := fsclient.DefaultFilePath(tenantID, tpl, t.BaseDir, t.DataDir)
+	tplPath, err := kosdk.DefaultFilePath(tenantID, tpl, t.BaseDir, t.DataDir)
 	if err != nil {
 		return err
 	}
@@ -56,12 +61,15 @@ func (t *Template) EnableAttachFile(attachments []string, tenantID int) error {
 	if len(attachments) == 0 {
 		return nil
 	}
-	provider := t.FSClient.GetProvider(tenantID)
 	for _, att := range attachments {
 		if att == "" {
 			continue
 		}
-		_, err := provider.DefaultDownloadObject(att, t.BaseDir, t.AttachmentDir)
+		localFile, err := kosdk.DefaultFilePath(tenantID, att, t.BaseDir, t.AttachmentDir)
+		if err != nil {
+			return err
+		}
+		err = t.KOSdk.Fs().DownloadObjectByKey(strconv.Itoa(tenantID), att, localFile, fs.WithOverwrittenFile(false))
 		if err != nil {
 			return err
 		}
@@ -80,7 +88,7 @@ func (t *Template) RemoveAttachFile(attachments []string, tenantID int) error {
 		if att == "" {
 			continue
 		}
-		dataPath, err := fsclient.DefaultFilePath(tenantID, att, t.BaseDir, t.AttachmentDir)
+		dataPath, err := kosdk.DefaultFilePath(tenantID, att, t.BaseDir, t.AttachmentDir)
 		if err != nil {
 			return err
 		}
