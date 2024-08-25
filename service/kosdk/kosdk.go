@@ -4,11 +4,12 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/woocoos/knockout-go/api"
 	"github.com/woocoos/knockout-go/api/fs"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	urlx "net/url"
 	"path/filepath"
 	"strconv"
@@ -19,7 +20,12 @@ func NewSDK(cfg *conf.Configuration, db *ent.Client) (*api.SDK, error) {
 	if err != nil {
 		return nil, err
 	}
-	ret, _, err := kosdk.Fs().FileIdentityAPI.GetFileIdentities(context.Background(), fs.GetFileIdentitiesRequest{IsDefault: aws.Bool(true)})
+	// 获取所有tenantID
+	tenantIDs, err := db.MsgTemplate.Query().Where(msgtemplate.StatusEQ(typex.SimpleStatusActive)).GroupBy(msgtemplate.FieldTenantID).Ints(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	ret, _, err := kosdk.Fs().FileIdentityAPI.GetFileIdentities(context.Background(), &fs.GetFileIdentitiesRequest{TenantIDs: tenantIDs, IsDefault: true})
 	if err != nil {
 		return nil, err
 	}

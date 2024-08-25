@@ -7,7 +7,6 @@ require (
 	entgo.io/ent v0.14.0
 	github.com/99designs/gqlgen v0.17.48
 	github.com/alicebob/miniredis/v2 v2.30.5
-	github.com/aws/aws-sdk-go-v2 v1.30.3
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/gin-contrib/static v0.0.1
 	github.com/gin-gonic/gin v1.10.0
@@ -31,7 +30,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.12
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	github.com/woocoos/entcache v0.0.0-20231206055445-856f0148efa5
-	github.com/woocoos/knockout-go v0.0.0-20240822063016-87042cc38ffd
+	github.com/woocoos/knockout-go v0.0.0-20240825122907-868ab7c7367a
 	go.uber.org/zap v1.26.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/sync v0.7.0
@@ -49,6 +48,7 @@ require (
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da // indirect
+	github.com/aws/aws-sdk-go-v2 v1.30.3 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.3 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.27.27 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.27 // indirect
