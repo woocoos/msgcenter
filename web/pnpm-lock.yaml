@@ -12,14 +12,14 @@ dependencies:
     specifier: ^2.6.28
     version: 2.6.28(antd@5.9.4)(rc-field-form@1.38.2)(react-dom@18.2.0)(react@18.2.0)
   '@knockout-js/api':
-    specifier: 0.1.6
-    version: 0.1.6(react@18.2.0)
+    specifier: 0.1.7
+    version: 0.1.7(react@18.2.0)
   '@knockout-js/ice-urql':
     specifier: 0.1.4
     version: 0.1.4(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
   '@knockout-js/layout':
-    specifier: 0.1.5
-    version: 0.1.5(graphql@16.8.1)(prop-types@15.8.1)(rc-field-form@1.38.2)(react-dom@18.2.0)(react@18.2.0)
+    specifier: 0.1.6
+    version: 0.1.6(graphql@16.8.1)(prop-types@15.8.1)(rc-field-form@1.38.2)(react-dom@18.2.0)(react@18.2.0)
   '@knockout-js/org':
     specifier: 0.1.4
     version: 0.1.4(graphql@16.8.1)(prop-types@15.8.1)(rc-field-form@1.38.2)(react-dom@18.2.0)(react@18.2.0)
@@ -3101,8 +3101,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@knockout-js/api@0.1.6(react@18.2.0):
-    resolution: {integrity: sha512-MWB2Phq5wCydyO5/HLJKw+cb7tIflEmtQ6DMPoEEF3L1hJ2278ckx32OkGUKBXIRMuQC4nIKJC1xSVtlGrwDVA==}
+  /@knockout-js/api@0.1.7(react@18.2.0):
+    resolution: {integrity: sha512-XNkBDpwrFAreuJ6ZveJRNWMpnw1+vcCVDSBVt6UA/fNfJxK0/mQk19ijxmZDA9A77trsEN96vD2MUtXv+yUiDA==}
     peerDependencies:
       react: ^17 || ^18
     dependencies:
@@ -3140,8 +3140,8 @@ packages:
       - supports-color
     dev: false
 
-  /@knockout-js/layout@0.1.5(graphql@16.8.1)(prop-types@15.8.1)(rc-field-form@1.38.2)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-nNf8uPi7eg6wfroVMJsQ+EbnccFXK4Ow2IDBu5QE3VwWiOOXVFVpA8tvDx4EcmMzQ4G6CpSf6tw882hN1gxV1g==}
+  /@knockout-js/layout@0.1.6(graphql@16.8.1)(prop-types@15.8.1)(rc-field-form@1.38.2)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-kkMXApc8SSAosGmYKwWz45b8qkwuMyWmoRtB4DjK66idYexG4tRIXOihYbE/+hqyD5sDtKracs/dKI9uqL/l3g==}
     peerDependencies:
       react: ^17 || ^18
     dependencies:
@@ -3152,7 +3152,7 @@ packages:
       '@dnd-kit/utilities': 3.2.1(react@18.2.0)
       '@ice/jsx-runtime': 0.2.2(react@18.2.0)
       '@ice/runtime': 1.2.9(react-dom@18.2.0)(react@18.2.0)
-      '@knockout-js/api': 0.1.6(react@18.2.0)
+      '@knockout-js/api': 0.1.7(react@18.2.0)
       '@knockout-js/ice-urql': 0.1.4(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
       '@swc/helpers': 0.5.3
       antd: 5.9.4(react-dom@18.2.0)(react@18.2.0)
@@ -3182,9 +3182,9 @@ packages:
       '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-components': 2.6.28(antd@5.9.4)(rc-field-form@1.38.2)(react-dom@18.2.0)(react@18.2.0)
       '@ice/jsx-runtime': 0.2.2(react@18.2.0)
-      '@knockout-js/api': 0.1.6(react@18.2.0)
+      '@knockout-js/api': 0.1.7(react@18.2.0)
       '@knockout-js/ice-urql': 0.1.4(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
-      '@knockout-js/layout': 0.1.5(graphql@16.8.1)(prop-types@15.8.1)(rc-field-form@1.38.2)(react-dom@18.2.0)(react@18.2.0)
+      '@knockout-js/layout': 0.1.6(graphql@16.8.1)(prop-types@15.8.1)(rc-field-form@1.38.2)(react-dom@18.2.0)(react@18.2.0)
       '@swc/helpers': 0.5.3
       antd: 5.9.4(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
