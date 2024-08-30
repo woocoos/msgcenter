@@ -12,8 +12,8 @@ dependencies:
     specifier: ^2.6.28
     version: 2.6.28(antd@5.9.4)(rc-field-form@1.38.2)(react-dom@18.2.0)(react@18.2.0)
   '@knockout-js/api':
-    specifier: 0.1.7
-    version: 0.1.7(react@18.2.0)
+    specifier: 0.1.8
+    version: 0.1.8(react@18.2.0)
   '@knockout-js/ice-urql':
     specifier: 0.1.4
     version: 0.1.4(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
@@ -3101,8 +3101,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@knockout-js/api@0.1.7(react@18.2.0):
-    resolution: {integrity: sha512-XNkBDpwrFAreuJ6ZveJRNWMpnw1+vcCVDSBVt6UA/fNfJxK0/mQk19ijxmZDA9A77trsEN96vD2MUtXv+yUiDA==}
+  /@knockout-js/api@0.1.8(react@18.2.0):
+    resolution: {integrity: sha512-+vmgsdGAA1BTCEni1+CixcmSWCKcNBQc5OLoQfQbolaVo192I8b0H0MnAT3fX2mFzdmulQB2FSMrKHF4HzhXyQ==}
     peerDependencies:
       react: ^17 || ^18
     dependencies:
@@ -3152,7 +3152,7 @@ packages:
       '@dnd-kit/utilities': 3.2.1(react@18.2.0)
       '@ice/jsx-runtime': 0.2.2(react@18.2.0)
       '@ice/runtime': 1.2.9(react-dom@18.2.0)(react@18.2.0)
-      '@knockout-js/api': 0.1.7(react@18.2.0)
+      '@knockout-js/api': 0.1.8(react@18.2.0)
       '@knockout-js/ice-urql': 0.1.4(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
       '@swc/helpers': 0.5.3
       antd: 5.9.4(react-dom@18.2.0)(react@18.2.0)
@@ -3182,7 +3182,7 @@ packages:
       '@ant-design/icons': 5.2.6(react-dom@18.2.0)(react@18.2.0)
       '@ant-design/pro-components': 2.6.28(antd@5.9.4)(rc-field-form@1.38.2)(react-dom@18.2.0)(react@18.2.0)
       '@ice/jsx-runtime': 0.2.2(react@18.2.0)
-      '@knockout-js/api': 0.1.7(react@18.2.0)
+      '@knockout-js/api': 0.1.8(react@18.2.0)
       '@knockout-js/ice-urql': 0.1.4(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
       '@knockout-js/layout': 0.1.6(graphql@16.8.1)(prop-types@15.8.1)(rc-field-form@1.38.2)(react-dom@18.2.0)(react@18.2.0)
       '@swc/helpers': 0.5.3
@@ -3289,6 +3289,7 @@ packages:
     engines: {node: '>= 10.0.0'}
     cpu: [arm]
     os: [linux]
+    libc: [glibc]
     requiresBuild: true
     dev: true
     optional: true
@@ -3298,6 +3299,7 @@ packages:
     engines: {node: '>= 10.0.0'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
     requiresBuild: true
     dev: true
     optional: true
@@ -3307,6 +3309,7 @@ packages:
     engines: {node: '>= 10.0.0'}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
     requiresBuild: true
     dev: true
     optional: true
@@ -3316,6 +3319,7 @@ packages:
     engines: {node: '>= 10.0.0'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
     requiresBuild: true
     dev: true
     optional: true
@@ -3325,6 +3329,7 @@ packages:
     engines: {node: '>= 10.0.0'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
     requiresBuild: true
     dev: true
     optional: true
@@ -4023,6 +4028,7 @@ packages:
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
     requiresBuild: true
     optional: true
 
@@ -4031,6 +4037,7 @@ packages:
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
     requiresBuild: true
     optional: true
 
@@ -4039,6 +4046,7 @@ packages:
     engines: {node: '>=10'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
     requiresBuild: true
     optional: true
 
@@ -4047,6 +4055,7 @@ packages:
     engines: {node: '>=10'}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
     requiresBuild: true
     optional: true
 
