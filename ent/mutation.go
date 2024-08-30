@@ -6409,43 +6409,39 @@ func (m *MsgSubscriberMutation) ResetEdge(name string) error {
 // MsgTemplateMutation represents an operation that mutates the MsgTemplate nodes in the graph.
 type MsgTemplateMutation struct {
 	config
-	op                         Op
-	typ                        string
-	id                         *int
-	created_by                 *int
-	addcreated_by              *int
-	created_at                 *time.Time
-	updated_by                 *int
-	addupdated_by              *int
-	updated_at                 *time.Time
-	msg_type_id                *int
-	addmsg_type_id             *int
-	tenant_id                  *int
-	addtenant_id               *int
-	name                       *string
-	status                     *typex.SimpleStatus
-	receiver_type              *profile.ReceiverType
-	format                     *msgtemplate.Format
-	subject                    *string
-	from                       *string
-	to                         *string
-	cc                         *string
-	bcc                        *string
-	body                       *string
-	tpl                        *string
-	tpl_file_id                *int
-	addtpl_file_id             *int
-	attachments                *[]string
-	appendattachments          []string
-	attachments_file_ids       *[]int
-	appendattachments_file_ids []int
-	comments                   *string
-	clearedFields              map[string]struct{}
-	event                      *int
-	clearedevent               bool
-	done                       bool
-	oldValue                   func(context.Context) (*MsgTemplate, error)
-	predicates                 []predicate.MsgTemplate
+	op                Op
+	typ               string
+	id                *int
+	created_by        *int
+	addcreated_by     *int
+	created_at        *time.Time
+	updated_by        *int
+	addupdated_by     *int
+	updated_at        *time.Time
+	msg_type_id       *int
+	addmsg_type_id    *int
+	tenant_id         *int
+	addtenant_id      *int
+	name              *string
+	status            *typex.SimpleStatus
+	receiver_type     *profile.ReceiverType
+	format            *msgtemplate.Format
+	subject           *string
+	from              *string
+	to                *string
+	cc                *string
+	bcc               *string
+	body              *string
+	tpl               *string
+	attachments       *[]string
+	appendattachments []string
+	comments          *string
+	clearedFields     map[string]struct{}
+	event             *int
+	clearedevent      bool
+	done              bool
+	oldValue          func(context.Context) (*MsgTemplate, error)
+	predicates        []predicate.MsgTemplate
 }
 
 var _ ent.Mutation = (*MsgTemplateMutation)(nil)
@@ -7411,76 +7407,6 @@ func (m *MsgTemplateMutation) ResetTpl() {
 	delete(m.clearedFields, msgtemplate.FieldTpl)
 }
 
-// SetTplFileID sets the "tpl_file_id" field.
-func (m *MsgTemplateMutation) SetTplFileID(i int) {
-	m.tpl_file_id = &i
-	m.addtpl_file_id = nil
-}
-
-// TplFileID returns the value of the "tpl_file_id" field in the mutation.
-func (m *MsgTemplateMutation) TplFileID() (r int, exists bool) {
-	v := m.tpl_file_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTplFileID returns the old "tpl_file_id" field's value of the MsgTemplate entity.
-// If the MsgTemplate object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MsgTemplateMutation) OldTplFileID(ctx context.Context) (v *int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTplFileID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTplFileID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTplFileID: %w", err)
-	}
-	return oldValue.TplFileID, nil
-}
-
-// AddTplFileID adds i to the "tpl_file_id" field.
-func (m *MsgTemplateMutation) AddTplFileID(i int) {
-	if m.addtpl_file_id != nil {
-		*m.addtpl_file_id += i
-	} else {
-		m.addtpl_file_id = &i
-	}
-}
-
-// AddedTplFileID returns the value that was added to the "tpl_file_id" field in this mutation.
-func (m *MsgTemplateMutation) AddedTplFileID() (r int, exists bool) {
-	v := m.addtpl_file_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearTplFileID clears the value of the "tpl_file_id" field.
-func (m *MsgTemplateMutation) ClearTplFileID() {
-	m.tpl_file_id = nil
-	m.addtpl_file_id = nil
-	m.clearedFields[msgtemplate.FieldTplFileID] = struct{}{}
-}
-
-// TplFileIDCleared returns if the "tpl_file_id" field was cleared in this mutation.
-func (m *MsgTemplateMutation) TplFileIDCleared() bool {
-	_, ok := m.clearedFields[msgtemplate.FieldTplFileID]
-	return ok
-}
-
-// ResetTplFileID resets all changes to the "tpl_file_id" field.
-func (m *MsgTemplateMutation) ResetTplFileID() {
-	m.tpl_file_id = nil
-	m.addtpl_file_id = nil
-	delete(m.clearedFields, msgtemplate.FieldTplFileID)
-}
-
 // SetAttachments sets the "attachments" field.
 func (m *MsgTemplateMutation) SetAttachments(s []string) {
 	m.attachments = &s
@@ -7544,71 +7470,6 @@ func (m *MsgTemplateMutation) ResetAttachments() {
 	m.attachments = nil
 	m.appendattachments = nil
 	delete(m.clearedFields, msgtemplate.FieldAttachments)
-}
-
-// SetAttachmentsFileIds sets the "attachments_file_ids" field.
-func (m *MsgTemplateMutation) SetAttachmentsFileIds(i []int) {
-	m.attachments_file_ids = &i
-	m.appendattachments_file_ids = nil
-}
-
-// AttachmentsFileIds returns the value of the "attachments_file_ids" field in the mutation.
-func (m *MsgTemplateMutation) AttachmentsFileIds() (r []int, exists bool) {
-	v := m.attachments_file_ids
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAttachmentsFileIds returns the old "attachments_file_ids" field's value of the MsgTemplate entity.
-// If the MsgTemplate object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MsgTemplateMutation) OldAttachmentsFileIds(ctx context.Context) (v []int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAttachmentsFileIds is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAttachmentsFileIds requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAttachmentsFileIds: %w", err)
-	}
-	return oldValue.AttachmentsFileIds, nil
-}
-
-// AppendAttachmentsFileIds adds i to the "attachments_file_ids" field.
-func (m *MsgTemplateMutation) AppendAttachmentsFileIds(i []int) {
-	m.appendattachments_file_ids = append(m.appendattachments_file_ids, i...)
-}
-
-// AppendedAttachmentsFileIds returns the list of values that were appended to the "attachments_file_ids" field in this mutation.
-func (m *MsgTemplateMutation) AppendedAttachmentsFileIds() ([]int, bool) {
-	if len(m.appendattachments_file_ids) == 0 {
-		return nil, false
-	}
-	return m.appendattachments_file_ids, true
-}
-
-// ClearAttachmentsFileIds clears the value of the "attachments_file_ids" field.
-func (m *MsgTemplateMutation) ClearAttachmentsFileIds() {
-	m.attachments_file_ids = nil
-	m.appendattachments_file_ids = nil
-	m.clearedFields[msgtemplate.FieldAttachmentsFileIds] = struct{}{}
-}
-
-// AttachmentsFileIdsCleared returns if the "attachments_file_ids" field was cleared in this mutation.
-func (m *MsgTemplateMutation) AttachmentsFileIdsCleared() bool {
-	_, ok := m.clearedFields[msgtemplate.FieldAttachmentsFileIds]
-	return ok
-}
-
-// ResetAttachmentsFileIds resets all changes to the "attachments_file_ids" field.
-func (m *MsgTemplateMutation) ResetAttachmentsFileIds() {
-	m.attachments_file_ids = nil
-	m.appendattachments_file_ids = nil
-	delete(m.clearedFields, msgtemplate.FieldAttachmentsFileIds)
 }
 
 // SetComments sets the "comments" field.
@@ -7734,7 +7595,7 @@ func (m *MsgTemplateMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MsgTemplateMutation) Fields() []string {
-	fields := make([]string, 0, 22)
+	fields := make([]string, 0, 20)
 	if m.created_by != nil {
 		fields = append(fields, msgtemplate.FieldCreatedBy)
 	}
@@ -7789,14 +7650,8 @@ func (m *MsgTemplateMutation) Fields() []string {
 	if m.tpl != nil {
 		fields = append(fields, msgtemplate.FieldTpl)
 	}
-	if m.tpl_file_id != nil {
-		fields = append(fields, msgtemplate.FieldTplFileID)
-	}
 	if m.attachments != nil {
 		fields = append(fields, msgtemplate.FieldAttachments)
-	}
-	if m.attachments_file_ids != nil {
-		fields = append(fields, msgtemplate.FieldAttachmentsFileIds)
 	}
 	if m.comments != nil {
 		fields = append(fields, msgtemplate.FieldComments)
@@ -7845,12 +7700,8 @@ func (m *MsgTemplateMutation) Field(name string) (ent.Value, bool) {
 		return m.Body()
 	case msgtemplate.FieldTpl:
 		return m.Tpl()
-	case msgtemplate.FieldTplFileID:
-		return m.TplFileID()
 	case msgtemplate.FieldAttachments:
 		return m.Attachments()
-	case msgtemplate.FieldAttachmentsFileIds:
-		return m.AttachmentsFileIds()
 	case msgtemplate.FieldComments:
 		return m.Comments()
 	}
@@ -7898,12 +7749,8 @@ func (m *MsgTemplateMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldBody(ctx)
 	case msgtemplate.FieldTpl:
 		return m.OldTpl(ctx)
-	case msgtemplate.FieldTplFileID:
-		return m.OldTplFileID(ctx)
 	case msgtemplate.FieldAttachments:
 		return m.OldAttachments(ctx)
-	case msgtemplate.FieldAttachmentsFileIds:
-		return m.OldAttachmentsFileIds(ctx)
 	case msgtemplate.FieldComments:
 		return m.OldComments(ctx)
 	}
@@ -8041,26 +7888,12 @@ func (m *MsgTemplateMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTpl(v)
 		return nil
-	case msgtemplate.FieldTplFileID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTplFileID(v)
-		return nil
 	case msgtemplate.FieldAttachments:
 		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAttachments(v)
-		return nil
-	case msgtemplate.FieldAttachmentsFileIds:
-		v, ok := value.([]int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAttachmentsFileIds(v)
 		return nil
 	case msgtemplate.FieldComments:
 		v, ok := value.(string)
@@ -8089,9 +7922,6 @@ func (m *MsgTemplateMutation) AddedFields() []string {
 	if m.addtenant_id != nil {
 		fields = append(fields, msgtemplate.FieldTenantID)
 	}
-	if m.addtpl_file_id != nil {
-		fields = append(fields, msgtemplate.FieldTplFileID)
-	}
 	return fields
 }
 
@@ -8108,8 +7938,6 @@ func (m *MsgTemplateMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedMsgTypeID()
 	case msgtemplate.FieldTenantID:
 		return m.AddedTenantID()
-	case msgtemplate.FieldTplFileID:
-		return m.AddedTplFileID()
 	}
 	return nil, false
 }
@@ -8146,13 +7974,6 @@ func (m *MsgTemplateMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddTenantID(v)
-		return nil
-	case msgtemplate.FieldTplFileID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddTplFileID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown MsgTemplate numeric field %s", name)
@@ -8192,14 +8013,8 @@ func (m *MsgTemplateMutation) ClearedFields() []string {
 	if m.FieldCleared(msgtemplate.FieldTpl) {
 		fields = append(fields, msgtemplate.FieldTpl)
 	}
-	if m.FieldCleared(msgtemplate.FieldTplFileID) {
-		fields = append(fields, msgtemplate.FieldTplFileID)
-	}
 	if m.FieldCleared(msgtemplate.FieldAttachments) {
 		fields = append(fields, msgtemplate.FieldAttachments)
-	}
-	if m.FieldCleared(msgtemplate.FieldAttachmentsFileIds) {
-		fields = append(fields, msgtemplate.FieldAttachmentsFileIds)
 	}
 	if m.FieldCleared(msgtemplate.FieldComments) {
 		fields = append(fields, msgtemplate.FieldComments)
@@ -8248,14 +8063,8 @@ func (m *MsgTemplateMutation) ClearField(name string) error {
 	case msgtemplate.FieldTpl:
 		m.ClearTpl()
 		return nil
-	case msgtemplate.FieldTplFileID:
-		m.ClearTplFileID()
-		return nil
 	case msgtemplate.FieldAttachments:
 		m.ClearAttachments()
-		return nil
-	case msgtemplate.FieldAttachmentsFileIds:
-		m.ClearAttachmentsFileIds()
 		return nil
 	case msgtemplate.FieldComments:
 		m.ClearComments()
@@ -8322,14 +8131,8 @@ func (m *MsgTemplateMutation) ResetField(name string) error {
 	case msgtemplate.FieldTpl:
 		m.ResetTpl()
 		return nil
-	case msgtemplate.FieldTplFileID:
-		m.ResetTplFileID()
-		return nil
 	case msgtemplate.FieldAttachments:
 		m.ResetAttachments()
-		return nil
-	case msgtemplate.FieldAttachmentsFileIds:
-		m.ResetAttachmentsFileIds()
 		return nil
 	case msgtemplate.FieldComments:
 		m.ResetComments()

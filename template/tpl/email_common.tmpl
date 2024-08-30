@@ -1,0 +1,6 @@
+{{/* gotype: github.com/woocoos/msgcenter/template.Data */}}
+
+{{ define "email.to"}}{{ with .CommonAnnotations }}{{.to}}{{end}}{{end}}
+{{ define "email.cc"}}{{ with .CommonAnnotations }}{{.cc}}{{end}}{{end}}
+{{ define "email.bcc"}}{{ with .CommonAnnotations }}{{.bcc}}{{end}}{{end}}
+{{ define "email.from"}}{{ with .CommonAnnotations }}{{.from}}{{end}}{{end}}

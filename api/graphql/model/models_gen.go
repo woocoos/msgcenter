@@ -28,6 +28,9 @@ type MessageFilter struct {
 	DeviceID string `json:"deviceId"`
 }
 
+type Subscription struct {
+}
+
 type RouteStrType string
 
 const (

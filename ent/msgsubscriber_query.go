@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -118,7 +119,7 @@ func (msq *MsgSubscriberQuery) QueryUser() *UserQuery {
 // First returns the first MsgSubscriber entity from the query.
 // Returns a *NotFoundError when no MsgSubscriber was found.
 func (msq *MsgSubscriberQuery) First(ctx context.Context) (*MsgSubscriber, error) {
-	nodes, err := msq.Limit(1).All(setContextOp(ctx, msq.ctx, "First"))
+	nodes, err := msq.Limit(1).All(setContextOp(ctx, msq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +142,7 @@ func (msq *MsgSubscriberQuery) FirstX(ctx context.Context) *MsgSubscriber {
 // Returns a *NotFoundError when no MsgSubscriber ID was found.
 func (msq *MsgSubscriberQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = msq.Limit(1).IDs(setContextOp(ctx, msq.ctx, "FirstID")); err != nil {
+	if ids, err = msq.Limit(1).IDs(setContextOp(ctx, msq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -164,7 +165,7 @@ func (msq *MsgSubscriberQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one MsgSubscriber entity is found.
 // Returns a *NotFoundError when no MsgSubscriber entities are found.
 func (msq *MsgSubscriberQuery) Only(ctx context.Context) (*MsgSubscriber, error) {
-	nodes, err := msq.Limit(2).All(setContextOp(ctx, msq.ctx, "Only"))
+	nodes, err := msq.Limit(2).All(setContextOp(ctx, msq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +193,7 @@ func (msq *MsgSubscriberQuery) OnlyX(ctx context.Context) *MsgSubscriber {
 // Returns a *NotFoundError when no entities are found.
 func (msq *MsgSubscriberQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = msq.Limit(2).IDs(setContextOp(ctx, msq.ctx, "OnlyID")); err != nil {
+	if ids, err = msq.Limit(2).IDs(setContextOp(ctx, msq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -217,7 +218,7 @@ func (msq *MsgSubscriberQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of MsgSubscribers.
 func (msq *MsgSubscriberQuery) All(ctx context.Context) ([]*MsgSubscriber, error) {
-	ctx = setContextOp(ctx, msq.ctx, "All")
+	ctx = setContextOp(ctx, msq.ctx, ent.OpQueryAll)
 	if err := msq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -239,7 +240,7 @@ func (msq *MsgSubscriberQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if msq.ctx.Unique == nil && msq.path != nil {
 		msq.Unique(true)
 	}
-	ctx = setContextOp(ctx, msq.ctx, "IDs")
+	ctx = setContextOp(ctx, msq.ctx, ent.OpQueryIDs)
 	if err = msq.Select(msgsubscriber.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -257,7 +258,7 @@ func (msq *MsgSubscriberQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (msq *MsgSubscriberQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, msq.ctx, "Count")
+	ctx = setContextOp(ctx, msq.ctx, ent.OpQueryCount)
 	if err := msq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -275,7 +276,7 @@ func (msq *MsgSubscriberQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (msq *MsgSubscriberQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, msq.ctx, "Exist")
+	ctx = setContextOp(ctx, msq.ctx, ent.OpQueryExist)
 	switch _, err := msq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -631,7 +632,7 @@ func (msgb *MsgSubscriberGroupBy) Aggregate(fns ...AggregateFunc) *MsgSubscriber
 
 // Scan applies the selector query and scans the result into the given value.
 func (msgb *MsgSubscriberGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, msgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, msgb.build.ctx, ent.OpQueryGroupBy)
 	if err := msgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -679,7 +680,7 @@ func (mss *MsgSubscriberSelect) Aggregate(fns ...AggregateFunc) *MsgSubscriberSe
 
 // Scan applies the selector query and scans the result into the given value.
 func (mss *MsgSubscriberSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mss.ctx, "Select")
+	ctx = setContextOp(ctx, mss.ctx, ent.OpQuerySelect)
 	if err := mss.prepareQuery(ctx); err != nil {
 		return err
 	}

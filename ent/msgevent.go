@@ -65,12 +65,10 @@ type MsgEventEdges struct {
 // MsgTypeOrErr returns the MsgType value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e MsgEventEdges) MsgTypeOrErr() (*MsgType, error) {
-	if e.loadedTypes[0] {
-		if e.MsgType == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: msgtype.Label}
-		}
+	if e.MsgType != nil {
 		return e.MsgType, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: msgtype.Label}
 	}
 	return nil, &NotLoadedError{edge: "msg_type"}
 }

@@ -8,6 +8,7 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/knockout-go/ent/schemax"
+	"github.com/woocoos/knockout-go/ent/schemax/fieldx"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
@@ -53,14 +54,10 @@ func (MsgTemplate) Fields() []ent.Field {
 		field.String("bcc").Optional().Comment("密送"),
 		field.Text("body").Optional().Comment("消息体").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
-		field.Text("tpl").Optional().Comment("模板地址。key：/msg/tpl/temp/1/xxx").Annotations(
+		fieldx.File("tpl").Optional().Comment("模板地址").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
-		field.Int("tpl_file_id").Optional().Nillable().Comment("模板地址").Annotations(
-			entgql.Skip(entgql.SkipWhereInput), entgql.Type("ID")),
-		field.Strings("attachments").Optional().Comment("附件地址。key：/msg/att/1/xxx").Annotations(
+		field.Strings("attachments").Optional().Comment("附件地址").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
-		field.Ints("attachments_file_ids").Optional().Comment("附件ids").Annotations(
-			entgql.Skip(entgql.SkipWhereInput), entgql.Type("[ID!]")),
 		field.String("comments").Optional().Comment("备注").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
 	}

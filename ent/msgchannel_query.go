@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -64,7 +65,7 @@ func (mcq *MsgChannelQuery) Order(o ...msgchannel.OrderOption) *MsgChannelQuery 
 // First returns the first MsgChannel entity from the query.
 // Returns a *NotFoundError when no MsgChannel was found.
 func (mcq *MsgChannelQuery) First(ctx context.Context) (*MsgChannel, error) {
-	nodes, err := mcq.Limit(1).All(setContextOp(ctx, mcq.ctx, "First"))
+	nodes, err := mcq.Limit(1).All(setContextOp(ctx, mcq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +88,7 @@ func (mcq *MsgChannelQuery) FirstX(ctx context.Context) *MsgChannel {
 // Returns a *NotFoundError when no MsgChannel ID was found.
 func (mcq *MsgChannelQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = mcq.Limit(1).IDs(setContextOp(ctx, mcq.ctx, "FirstID")); err != nil {
+	if ids, err = mcq.Limit(1).IDs(setContextOp(ctx, mcq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -110,7 +111,7 @@ func (mcq *MsgChannelQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one MsgChannel entity is found.
 // Returns a *NotFoundError when no MsgChannel entities are found.
 func (mcq *MsgChannelQuery) Only(ctx context.Context) (*MsgChannel, error) {
-	nodes, err := mcq.Limit(2).All(setContextOp(ctx, mcq.ctx, "Only"))
+	nodes, err := mcq.Limit(2).All(setContextOp(ctx, mcq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +139,7 @@ func (mcq *MsgChannelQuery) OnlyX(ctx context.Context) *MsgChannel {
 // Returns a *NotFoundError when no entities are found.
 func (mcq *MsgChannelQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = mcq.Limit(2).IDs(setContextOp(ctx, mcq.ctx, "OnlyID")); err != nil {
+	if ids, err = mcq.Limit(2).IDs(setContextOp(ctx, mcq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -163,7 +164,7 @@ func (mcq *MsgChannelQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of MsgChannels.
 func (mcq *MsgChannelQuery) All(ctx context.Context) ([]*MsgChannel, error) {
-	ctx = setContextOp(ctx, mcq.ctx, "All")
+	ctx = setContextOp(ctx, mcq.ctx, ent.OpQueryAll)
 	if err := mcq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -185,7 +186,7 @@ func (mcq *MsgChannelQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if mcq.ctx.Unique == nil && mcq.path != nil {
 		mcq.Unique(true)
 	}
-	ctx = setContextOp(ctx, mcq.ctx, "IDs")
+	ctx = setContextOp(ctx, mcq.ctx, ent.OpQueryIDs)
 	if err = mcq.Select(msgchannel.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -203,7 +204,7 @@ func (mcq *MsgChannelQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (mcq *MsgChannelQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, mcq.ctx, "Count")
+	ctx = setContextOp(ctx, mcq.ctx, ent.OpQueryCount)
 	if err := mcq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -221,7 +222,7 @@ func (mcq *MsgChannelQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (mcq *MsgChannelQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, mcq.ctx, "Exist")
+	ctx = setContextOp(ctx, mcq.ctx, ent.OpQueryExist)
 	switch _, err := mcq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -471,7 +472,7 @@ func (mcgb *MsgChannelGroupBy) Aggregate(fns ...AggregateFunc) *MsgChannelGroupB
 
 // Scan applies the selector query and scans the result into the given value.
 func (mcgb *MsgChannelGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mcgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, mcgb.build.ctx, ent.OpQueryGroupBy)
 	if err := mcgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -519,7 +520,7 @@ func (mcs *MsgChannelSelect) Aggregate(fns ...AggregateFunc) *MsgChannelSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (mcs *MsgChannelSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mcs.ctx, "Select")
+	ctx = setContextOp(ctx, mcs.ctx, ent.OpQuerySelect)
 	if err := mcs.prepareQuery(ctx); err != nil {
 		return err
 	}

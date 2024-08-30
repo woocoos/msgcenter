@@ -268,4 +268,13 @@ export const initStoreData = (store: IMockStore) => {
     id: 4, code: "test", name: '测试消息', dictID: "1", refCode: "resource:MsgCategory", dict: store.get('AppDict', 1)
   })
 
+  // OrgFileIdentity
+  store.set('OrgFileIdentity', 1, {
+    id: 1, isDefault: true, source: store.get('FileSource', 1)
+  })
+
+  // FileSource
+  store.set('FileSource', 1, {
+    id: 1, bucket: 'test1', bucketURL: 'http://127.0.0.1:9000/test1', endpoint: 'http://127.0.0.1:9000', region: 'local', stsEndpoint: 'http://127.0.0.1:9000'
+  })
 }

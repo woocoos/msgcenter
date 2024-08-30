@@ -84,9 +84,25 @@ func (miu *MsgInternalUpdate) SetCategory(s string) *MsgInternalUpdate {
 	return miu
 }
 
+// SetNillableCategory sets the "category" field if the given value is not nil.
+func (miu *MsgInternalUpdate) SetNillableCategory(s *string) *MsgInternalUpdate {
+	if s != nil {
+		miu.SetCategory(*s)
+	}
+	return miu
+}
+
 // SetSubject sets the "subject" field.
 func (miu *MsgInternalUpdate) SetSubject(s string) *MsgInternalUpdate {
 	miu.mutation.SetSubject(s)
+	return miu
+}
+
+// SetNillableSubject sets the "subject" field if the given value is not nil.
+func (miu *MsgInternalUpdate) SetNillableSubject(s *string) *MsgInternalUpdate {
+	if s != nil {
+		miu.SetSubject(*s)
+	}
 	return miu
 }
 
@@ -113,6 +129,14 @@ func (miu *MsgInternalUpdate) ClearBody() *MsgInternalUpdate {
 // SetFormat sets the "format" field.
 func (miu *MsgInternalUpdate) SetFormat(s string) *MsgInternalUpdate {
 	miu.mutation.SetFormat(s)
+	return miu
+}
+
+// SetNillableFormat sets the "format" field if the given value is not nil.
+func (miu *MsgInternalUpdate) SetNillableFormat(s *string) *MsgInternalUpdate {
+	if s != nil {
+		miu.SetFormat(*s)
+	}
 	return miu
 }
 
@@ -385,9 +409,25 @@ func (miuo *MsgInternalUpdateOne) SetCategory(s string) *MsgInternalUpdateOne {
 	return miuo
 }
 
+// SetNillableCategory sets the "category" field if the given value is not nil.
+func (miuo *MsgInternalUpdateOne) SetNillableCategory(s *string) *MsgInternalUpdateOne {
+	if s != nil {
+		miuo.SetCategory(*s)
+	}
+	return miuo
+}
+
 // SetSubject sets the "subject" field.
 func (miuo *MsgInternalUpdateOne) SetSubject(s string) *MsgInternalUpdateOne {
 	miuo.mutation.SetSubject(s)
+	return miuo
+}
+
+// SetNillableSubject sets the "subject" field if the given value is not nil.
+func (miuo *MsgInternalUpdateOne) SetNillableSubject(s *string) *MsgInternalUpdateOne {
+	if s != nil {
+		miuo.SetSubject(*s)
+	}
 	return miuo
 }
 
@@ -414,6 +454,14 @@ func (miuo *MsgInternalUpdateOne) ClearBody() *MsgInternalUpdateOne {
 // SetFormat sets the "format" field.
 func (miuo *MsgInternalUpdateOne) SetFormat(s string) *MsgInternalUpdateOne {
 	miuo.mutation.SetFormat(s)
+	return miuo
+}
+
+// SetNillableFormat sets the "format" field if the given value is not nil.
+func (miuo *MsgInternalUpdateOne) SetNillableFormat(s *string) *MsgInternalUpdateOne {
+	if s != nil {
+		miuo.SetFormat(*s)
+	}
 	return miuo
 }
 

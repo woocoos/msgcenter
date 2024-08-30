@@ -10,7 +10,7 @@ import { Layout, useLeavePrompt } from '@knockout-js/layout';
 import { getAppDeployConfig, logout, urlSpm } from '@/services/auth';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import { createFromIconfontCN } from '@ant-design/icons';
-import { getFilesRaw } from '@knockout-js/api';
+import { getStorageUrl } from '@knockout-js/api';
 import FloatMsg, { WsMsgViewActions } from '../floatMsg';
 import { MsgDropdownRef } from '@knockout-js/layout/esm/components/msg-dropdown';
 
@@ -38,11 +38,9 @@ export default () => {
 
 
   useEffect(() => {
-    if (userState.user?.avatarFileId) {
-      getFilesRaw(userState.user?.avatarFileId, 'url').then(result => {
-        if (typeof result === 'string') {
-          setAvatar(result);
-        }
+    if (userState.user?.avatar) {
+      getStorageUrl(userState.user?.avatar).then(result => {
+        setAvatar(result);
       })
     }
 

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"embed"
 	"fmt"
+	"github.com/woocoos/knockout-go/api"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	tmplhtml "html/template"
@@ -26,8 +27,6 @@ var (
 type Config struct {
 	// path for custom template
 	BaseDir string
-	// path for temporary template
-	TmpDir string
 	// path for active template dir
 	DataDir string
 	// path for attachment
@@ -41,6 +40,8 @@ type Template struct {
 	html *tmplhtml.Template
 
 	ExternalURL *url.URL
+
+	KOSdk *api.SDK
 }
 
 // Option is generic modifier of the text and html templates used by a Template.
@@ -135,6 +136,61 @@ func (t *Template) AddParseTree(name string, tree *parse.Tree) (*Template, error
 		return nil, err
 	}
 	return t, nil
+}
+
+// RemoveTemplates removes the given templates from the template.
+func (t *Template) RemoveTemplates(tplPath string) error {
+	// 获取要移除的模板
+	rmTmpl, err := tmpltext.New("").Option("missingkey=zero").ParseFiles(tplPath)
+	if err != nil {
+		return err
+	}
+	rmNames := make([]string, len(rmTmpl.Templates()))
+	for i, tmpl := range rmTmpl.Templates() {
+		rmNames[i] = tmpl.Name()
+	}
+	// 处理text模板
+	textTmpl := tmpltext.New("").Option("missingkey=zero")
+	textNames := make([]string, len(t.text.Templates()))
+	for i, tmpl := range t.text.Templates() {
+		textNames[i] = tmpl.Name()
+	}
+	for _, n := range textNames {
+		if !existInArray(rmNames, n) {
+			tmpl := t.text.Lookup(n)
+			_, err := textTmpl.AddParseTree(tmpl.Name(), tmpl.Tree)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	t.text = textTmpl
+	// 处理html模板
+	htmlTmpl := tmplhtml.New("").Option("missingkey=zero")
+	htmlNames := make([]string, len(t.html.Templates()))
+	for i, tmpl := range t.html.Templates() {
+		htmlNames[i] = tmpl.Name()
+	}
+	for _, n := range htmlNames {
+		if !existInArray(rmNames, n) {
+			tmpl := t.html.Lookup(n)
+			_, err := htmlTmpl.AddParseTree(tmpl.Name(), tmpl.Tree)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	t.html = htmlTmpl
+	return nil
+}
+
+func existInArray(array []string, target string) bool {
+	for _, str := range array {
+		if str == target {
+			return true
+		}
+	}
+	return false
 }
 
 // MustParse is a helper that wraps a call to a function returning (*Template, error)

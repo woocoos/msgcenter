@@ -85,10 +85,26 @@ func (msu *MsgSubscriberUpdate) SetMsgTypeID(i int) *MsgSubscriberUpdate {
 	return msu
 }
 
+// SetNillableMsgTypeID sets the "msg_type_id" field if the given value is not nil.
+func (msu *MsgSubscriberUpdate) SetNillableMsgTypeID(i *int) *MsgSubscriberUpdate {
+	if i != nil {
+		msu.SetMsgTypeID(*i)
+	}
+	return msu
+}
+
 // SetTenantID sets the "tenant_id" field.
 func (msu *MsgSubscriberUpdate) SetTenantID(i int) *MsgSubscriberUpdate {
 	msu.mutation.ResetTenantID()
 	msu.mutation.SetTenantID(i)
+	return msu
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (msu *MsgSubscriberUpdate) SetNillableTenantID(i *int) *MsgSubscriberUpdate {
+	if i != nil {
+		msu.SetTenantID(*i)
+	}
 	return msu
 }
 
@@ -221,7 +237,7 @@ func (msu *MsgSubscriberUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (msu *MsgSubscriberUpdate) check() error {
-	if _, ok := msu.mutation.MsgTypeID(); msu.mutation.MsgTypeCleared() && !ok {
+	if msu.mutation.MsgTypeCleared() && len(msu.mutation.MsgTypeIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgSubscriber.msg_type"`)
 	}
 	return nil
@@ -412,10 +428,26 @@ func (msuo *MsgSubscriberUpdateOne) SetMsgTypeID(i int) *MsgSubscriberUpdateOne 
 	return msuo
 }
 
+// SetNillableMsgTypeID sets the "msg_type_id" field if the given value is not nil.
+func (msuo *MsgSubscriberUpdateOne) SetNillableMsgTypeID(i *int) *MsgSubscriberUpdateOne {
+	if i != nil {
+		msuo.SetMsgTypeID(*i)
+	}
+	return msuo
+}
+
 // SetTenantID sets the "tenant_id" field.
 func (msuo *MsgSubscriberUpdateOne) SetTenantID(i int) *MsgSubscriberUpdateOne {
 	msuo.mutation.ResetTenantID()
 	msuo.mutation.SetTenantID(i)
+	return msuo
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (msuo *MsgSubscriberUpdateOne) SetNillableTenantID(i *int) *MsgSubscriberUpdateOne {
+	if i != nil {
+		msuo.SetTenantID(*i)
+	}
 	return msuo
 }
 
@@ -561,7 +593,7 @@ func (msuo *MsgSubscriberUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (msuo *MsgSubscriberUpdateOne) check() error {
-	if _, ok := msuo.mutation.MsgTypeID(); msuo.mutation.MsgTypeCleared() && !ok {
+	if msuo.mutation.MsgTypeCleared() && len(msuo.mutation.MsgTypeIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgSubscriber.msg_type"`)
 	}
 	return nil

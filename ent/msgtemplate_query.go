@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -91,7 +92,7 @@ func (mtq *MsgTemplateQuery) QueryEvent() *MsgEventQuery {
 // First returns the first MsgTemplate entity from the query.
 // Returns a *NotFoundError when no MsgTemplate was found.
 func (mtq *MsgTemplateQuery) First(ctx context.Context) (*MsgTemplate, error) {
-	nodes, err := mtq.Limit(1).All(setContextOp(ctx, mtq.ctx, "First"))
+	nodes, err := mtq.Limit(1).All(setContextOp(ctx, mtq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +115,7 @@ func (mtq *MsgTemplateQuery) FirstX(ctx context.Context) *MsgTemplate {
 // Returns a *NotFoundError when no MsgTemplate ID was found.
 func (mtq *MsgTemplateQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = mtq.Limit(1).IDs(setContextOp(ctx, mtq.ctx, "FirstID")); err != nil {
+	if ids, err = mtq.Limit(1).IDs(setContextOp(ctx, mtq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -137,7 +138,7 @@ func (mtq *MsgTemplateQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one MsgTemplate entity is found.
 // Returns a *NotFoundError when no MsgTemplate entities are found.
 func (mtq *MsgTemplateQuery) Only(ctx context.Context) (*MsgTemplate, error) {
-	nodes, err := mtq.Limit(2).All(setContextOp(ctx, mtq.ctx, "Only"))
+	nodes, err := mtq.Limit(2).All(setContextOp(ctx, mtq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +166,7 @@ func (mtq *MsgTemplateQuery) OnlyX(ctx context.Context) *MsgTemplate {
 // Returns a *NotFoundError when no entities are found.
 func (mtq *MsgTemplateQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = mtq.Limit(2).IDs(setContextOp(ctx, mtq.ctx, "OnlyID")); err != nil {
+	if ids, err = mtq.Limit(2).IDs(setContextOp(ctx, mtq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -190,7 +191,7 @@ func (mtq *MsgTemplateQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of MsgTemplates.
 func (mtq *MsgTemplateQuery) All(ctx context.Context) ([]*MsgTemplate, error) {
-	ctx = setContextOp(ctx, mtq.ctx, "All")
+	ctx = setContextOp(ctx, mtq.ctx, ent.OpQueryAll)
 	if err := mtq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -212,7 +213,7 @@ func (mtq *MsgTemplateQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if mtq.ctx.Unique == nil && mtq.path != nil {
 		mtq.Unique(true)
 	}
-	ctx = setContextOp(ctx, mtq.ctx, "IDs")
+	ctx = setContextOp(ctx, mtq.ctx, ent.OpQueryIDs)
 	if err = mtq.Select(msgtemplate.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -230,7 +231,7 @@ func (mtq *MsgTemplateQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (mtq *MsgTemplateQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, mtq.ctx, "Count")
+	ctx = setContextOp(ctx, mtq.ctx, ent.OpQueryCount)
 	if err := mtq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -248,7 +249,7 @@ func (mtq *MsgTemplateQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (mtq *MsgTemplateQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, mtq.ctx, "Exist")
+	ctx = setContextOp(ctx, mtq.ctx, ent.OpQueryExist)
 	switch _, err := mtq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -553,7 +554,7 @@ func (mtgb *MsgTemplateGroupBy) Aggregate(fns ...AggregateFunc) *MsgTemplateGrou
 
 // Scan applies the selector query and scans the result into the given value.
 func (mtgb *MsgTemplateGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mtgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, mtgb.build.ctx, ent.OpQueryGroupBy)
 	if err := mtgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -601,7 +602,7 @@ func (mts *MsgTemplateSelect) Aggregate(fns ...AggregateFunc) *MsgTemplateSelect
 
 // Scan applies the selector query and scans the result into the given value.
 func (mts *MsgTemplateSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mts.ctx, "Select")
+	ctx = setContextOp(ctx, mts.ctx, ent.OpQuerySelect)
 	if err := mts.prepareQuery(ctx); err != nil {
 		return err
 	}

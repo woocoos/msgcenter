@@ -39,9 +39,25 @@ func (nu *NlogUpdate) SetGroupKey(s string) *NlogUpdate {
 	return nu
 }
 
+// SetNillableGroupKey sets the "group_key" field if the given value is not nil.
+func (nu *NlogUpdate) SetNillableGroupKey(s *string) *NlogUpdate {
+	if s != nil {
+		nu.SetGroupKey(*s)
+	}
+	return nu
+}
+
 // SetReceiver sets the "receiver" field.
 func (nu *NlogUpdate) SetReceiver(s string) *NlogUpdate {
 	nu.mutation.SetReceiver(s)
+	return nu
+}
+
+// SetNillableReceiver sets the "receiver" field if the given value is not nil.
+func (nu *NlogUpdate) SetNillableReceiver(s *string) *NlogUpdate {
+	if s != nil {
+		nu.SetReceiver(*s)
+	}
 	return nu
 }
 
@@ -51,10 +67,26 @@ func (nu *NlogUpdate) SetReceiverType(pt profile.ReceiverType) *NlogUpdate {
 	return nu
 }
 
+// SetNillableReceiverType sets the "receiver_type" field if the given value is not nil.
+func (nu *NlogUpdate) SetNillableReceiverType(pt *profile.ReceiverType) *NlogUpdate {
+	if pt != nil {
+		nu.SetReceiverType(*pt)
+	}
+	return nu
+}
+
 // SetIdx sets the "idx" field.
 func (nu *NlogUpdate) SetIdx(i int) *NlogUpdate {
 	nu.mutation.ResetIdx()
 	nu.mutation.SetIdx(i)
+	return nu
+}
+
+// SetNillableIdx sets the "idx" field if the given value is not nil.
+func (nu *NlogUpdate) SetNillableIdx(i *int) *NlogUpdate {
+	if i != nil {
+		nu.SetIdx(*i)
+	}
 	return nu
 }
 
@@ -67,6 +99,14 @@ func (nu *NlogUpdate) AddIdx(i int) *NlogUpdate {
 // SetSendAt sets the "send_at" field.
 func (nu *NlogUpdate) SetSendAt(t time.Time) *NlogUpdate {
 	nu.mutation.SetSendAt(t)
+	return nu
+}
+
+// SetNillableSendAt sets the "send_at" field if the given value is not nil.
+func (nu *NlogUpdate) SetNillableSendAt(t *time.Time) *NlogUpdate {
+	if t != nil {
+		nu.SetSendAt(*t)
+	}
 	return nu
 }
 
@@ -93,6 +133,14 @@ func (nu *NlogUpdate) ClearUpdatedAt() *NlogUpdate {
 // SetExpiresAt sets the "expires_at" field.
 func (nu *NlogUpdate) SetExpiresAt(t time.Time) *NlogUpdate {
 	nu.mutation.SetExpiresAt(t)
+	return nu
+}
+
+// SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
+func (nu *NlogUpdate) SetNillableExpiresAt(t *time.Time) *NlogUpdate {
+	if t != nil {
+		nu.SetExpiresAt(*t)
+	}
 	return nu
 }
 
@@ -385,9 +433,25 @@ func (nuo *NlogUpdateOne) SetGroupKey(s string) *NlogUpdateOne {
 	return nuo
 }
 
+// SetNillableGroupKey sets the "group_key" field if the given value is not nil.
+func (nuo *NlogUpdateOne) SetNillableGroupKey(s *string) *NlogUpdateOne {
+	if s != nil {
+		nuo.SetGroupKey(*s)
+	}
+	return nuo
+}
+
 // SetReceiver sets the "receiver" field.
 func (nuo *NlogUpdateOne) SetReceiver(s string) *NlogUpdateOne {
 	nuo.mutation.SetReceiver(s)
+	return nuo
+}
+
+// SetNillableReceiver sets the "receiver" field if the given value is not nil.
+func (nuo *NlogUpdateOne) SetNillableReceiver(s *string) *NlogUpdateOne {
+	if s != nil {
+		nuo.SetReceiver(*s)
+	}
 	return nuo
 }
 
@@ -397,10 +461,26 @@ func (nuo *NlogUpdateOne) SetReceiverType(pt profile.ReceiverType) *NlogUpdateOn
 	return nuo
 }
 
+// SetNillableReceiverType sets the "receiver_type" field if the given value is not nil.
+func (nuo *NlogUpdateOne) SetNillableReceiverType(pt *profile.ReceiverType) *NlogUpdateOne {
+	if pt != nil {
+		nuo.SetReceiverType(*pt)
+	}
+	return nuo
+}
+
 // SetIdx sets the "idx" field.
 func (nuo *NlogUpdateOne) SetIdx(i int) *NlogUpdateOne {
 	nuo.mutation.ResetIdx()
 	nuo.mutation.SetIdx(i)
+	return nuo
+}
+
+// SetNillableIdx sets the "idx" field if the given value is not nil.
+func (nuo *NlogUpdateOne) SetNillableIdx(i *int) *NlogUpdateOne {
+	if i != nil {
+		nuo.SetIdx(*i)
+	}
 	return nuo
 }
 
@@ -413,6 +493,14 @@ func (nuo *NlogUpdateOne) AddIdx(i int) *NlogUpdateOne {
 // SetSendAt sets the "send_at" field.
 func (nuo *NlogUpdateOne) SetSendAt(t time.Time) *NlogUpdateOne {
 	nuo.mutation.SetSendAt(t)
+	return nuo
+}
+
+// SetNillableSendAt sets the "send_at" field if the given value is not nil.
+func (nuo *NlogUpdateOne) SetNillableSendAt(t *time.Time) *NlogUpdateOne {
+	if t != nil {
+		nuo.SetSendAt(*t)
+	}
 	return nuo
 }
 
@@ -439,6 +527,14 @@ func (nuo *NlogUpdateOne) ClearUpdatedAt() *NlogUpdateOne {
 // SetExpiresAt sets the "expires_at" field.
 func (nuo *NlogUpdateOne) SetExpiresAt(t time.Time) *NlogUpdateOne {
 	nuo.mutation.SetExpiresAt(t)
+	return nuo
+}
+
+// SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
+func (nuo *NlogUpdateOne) SetNillableExpiresAt(t *time.Time) *NlogUpdateOne {
+	if t != nil {
+		nuo.SetExpiresAt(*t)
+	}
 	return nuo
 }
 

@@ -36,9 +36,25 @@ func (uu *UserUpdate) SetPrincipalName(s string) *UserUpdate {
 	return uu
 }
 
+// SetNillablePrincipalName sets the "principal_name" field if the given value is not nil.
+func (uu *UserUpdate) SetNillablePrincipalName(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetPrincipalName(*s)
+	}
+	return uu
+}
+
 // SetDisplayName sets the "display_name" field.
 func (uu *UserUpdate) SetDisplayName(s string) *UserUpdate {
 	uu.mutation.SetDisplayName(s)
+	return uu
+}
+
+// SetNillableDisplayName sets the "display_name" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableDisplayName(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetDisplayName(*s)
+	}
 	return uu
 }
 
@@ -271,9 +287,25 @@ func (uuo *UserUpdateOne) SetPrincipalName(s string) *UserUpdateOne {
 	return uuo
 }
 
+// SetNillablePrincipalName sets the "principal_name" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillablePrincipalName(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetPrincipalName(*s)
+	}
+	return uuo
+}
+
 // SetDisplayName sets the "display_name" field.
 func (uuo *UserUpdateOne) SetDisplayName(s string) *UserUpdateOne {
 	uuo.mutation.SetDisplayName(s)
+	return uuo
+}
+
+// SetNillableDisplayName sets the "display_name" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableDisplayName(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetDisplayName(*s)
+	}
 	return uuo
 }
 

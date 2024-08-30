@@ -113,9 +113,25 @@ func (mtu *MsgTypeUpdate) SetCategory(s string) *MsgTypeUpdate {
 	return mtu
 }
 
+// SetNillableCategory sets the "category" field if the given value is not nil.
+func (mtu *MsgTypeUpdate) SetNillableCategory(s *string) *MsgTypeUpdate {
+	if s != nil {
+		mtu.SetCategory(*s)
+	}
+	return mtu
+}
+
 // SetName sets the "name" field.
 func (mtu *MsgTypeUpdate) SetName(s string) *MsgTypeUpdate {
 	mtu.mutation.SetName(s)
+	return mtu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (mtu *MsgTypeUpdate) SetNillableName(s *string) *MsgTypeUpdate {
+	if s != nil {
+		mtu.SetName(*s)
+	}
 	return mtu
 }
 
@@ -587,9 +603,25 @@ func (mtuo *MsgTypeUpdateOne) SetCategory(s string) *MsgTypeUpdateOne {
 	return mtuo
 }
 
+// SetNillableCategory sets the "category" field if the given value is not nil.
+func (mtuo *MsgTypeUpdateOne) SetNillableCategory(s *string) *MsgTypeUpdateOne {
+	if s != nil {
+		mtuo.SetCategory(*s)
+	}
+	return mtuo
+}
+
 // SetName sets the "name" field.
 func (mtuo *MsgTypeUpdateOne) SetName(s string) *MsgTypeUpdateOne {
 	mtuo.mutation.SetName(s)
+	return mtuo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (mtuo *MsgTypeUpdateOne) SetNillableName(s *string) *MsgTypeUpdateOne {
+	if s != nil {
+		mtuo.SetName(*s)
+	}
 	return mtuo
 }
 

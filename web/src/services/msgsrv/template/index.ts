@@ -37,7 +37,7 @@ const queryMsgTemplateInfo = gql(/* GraphQL */`query MsgTemplateInfo($gid:GID!){
     id
     ... on MsgTemplate{
       id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,
-      receiverType,format,subject,from,to,cc,bcc,body,tplFileID,attachmentsFileIds,tpl,attachments
+      receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments
     }
   }
 }`);

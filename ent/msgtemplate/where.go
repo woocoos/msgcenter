@@ -134,11 +134,6 @@ func Tpl(v string) predicate.MsgTemplate {
 	return predicate.MsgTemplate(sql.FieldEQ(FieldTpl, v))
 }
 
-// TplFileID applies equality check predicate on the "tpl_file_id" field. It's identical to TplFileIDEQ.
-func TplFileID(v int) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldEQ(FieldTplFileID, v))
-}
-
 // Comments applies equality check predicate on the "comments" field. It's identical to CommentsEQ.
 func Comments(v string) predicate.MsgTemplate {
 	return predicate.MsgTemplate(sql.FieldEQ(FieldComments, v))
@@ -1104,56 +1099,6 @@ func TplContainsFold(v string) predicate.MsgTemplate {
 	return predicate.MsgTemplate(sql.FieldContainsFold(FieldTpl, v))
 }
 
-// TplFileIDEQ applies the EQ predicate on the "tpl_file_id" field.
-func TplFileIDEQ(v int) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldEQ(FieldTplFileID, v))
-}
-
-// TplFileIDNEQ applies the NEQ predicate on the "tpl_file_id" field.
-func TplFileIDNEQ(v int) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldNEQ(FieldTplFileID, v))
-}
-
-// TplFileIDIn applies the In predicate on the "tpl_file_id" field.
-func TplFileIDIn(vs ...int) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldIn(FieldTplFileID, vs...))
-}
-
-// TplFileIDNotIn applies the NotIn predicate on the "tpl_file_id" field.
-func TplFileIDNotIn(vs ...int) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldNotIn(FieldTplFileID, vs...))
-}
-
-// TplFileIDGT applies the GT predicate on the "tpl_file_id" field.
-func TplFileIDGT(v int) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldGT(FieldTplFileID, v))
-}
-
-// TplFileIDGTE applies the GTE predicate on the "tpl_file_id" field.
-func TplFileIDGTE(v int) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldGTE(FieldTplFileID, v))
-}
-
-// TplFileIDLT applies the LT predicate on the "tpl_file_id" field.
-func TplFileIDLT(v int) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldLT(FieldTplFileID, v))
-}
-
-// TplFileIDLTE applies the LTE predicate on the "tpl_file_id" field.
-func TplFileIDLTE(v int) predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldLTE(FieldTplFileID, v))
-}
-
-// TplFileIDIsNil applies the IsNil predicate on the "tpl_file_id" field.
-func TplFileIDIsNil() predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldIsNull(FieldTplFileID))
-}
-
-// TplFileIDNotNil applies the NotNil predicate on the "tpl_file_id" field.
-func TplFileIDNotNil() predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldNotNull(FieldTplFileID))
-}
-
 // AttachmentsIsNil applies the IsNil predicate on the "attachments" field.
 func AttachmentsIsNil() predicate.MsgTemplate {
 	return predicate.MsgTemplate(sql.FieldIsNull(FieldAttachments))
@@ -1162,16 +1107,6 @@ func AttachmentsIsNil() predicate.MsgTemplate {
 // AttachmentsNotNil applies the NotNil predicate on the "attachments" field.
 func AttachmentsNotNil() predicate.MsgTemplate {
 	return predicate.MsgTemplate(sql.FieldNotNull(FieldAttachments))
-}
-
-// AttachmentsFileIdsIsNil applies the IsNil predicate on the "attachments_file_ids" field.
-func AttachmentsFileIdsIsNil() predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldIsNull(FieldAttachmentsFileIds))
-}
-
-// AttachmentsFileIdsNotNil applies the NotNil predicate on the "attachments_file_ids" field.
-func AttachmentsFileIdsNotNil() predicate.MsgTemplate {
-	return predicate.MsgTemplate(sql.FieldNotNull(FieldAttachmentsFileIds))
 }
 
 // CommentsEQ applies the EQ predicate on the "comments" field.

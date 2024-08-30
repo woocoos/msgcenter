@@ -20,6 +20,7 @@ import (
 // NewExecutableSchema creates an ExecutableSchema from the ResolverRoot interface.
 func NewExecutableSchema(cfg Config) graphql.ExecutableSchema {
 	return &executableSchema{
+		schema:     cfg.Schema,
 		resolvers:  cfg.Resolvers,
 		directives: cfg.Directives,
 		complexity: cfg.Complexity,
@@ -27,6 +28,7 @@ func NewExecutableSchema(cfg Config) graphql.ExecutableSchema {
 }
 
 type Config struct {
+	Schema     *ast.Schema
 	Resolvers  ResolverRoot
 	Directives DirectiveRoot
 	Complexity ComplexityRoot
@@ -238,30 +240,28 @@ type ComplexityRoot struct {
 	}
 
 	MsgTemplate struct {
-		Attachments        func(childComplexity int) int
-		AttachmentsFileIds func(childComplexity int) int
-		Bcc                func(childComplexity int) int
-		Body               func(childComplexity int) int
-		Cc                 func(childComplexity int) int
-		Comments           func(childComplexity int) int
-		CreatedAt          func(childComplexity int) int
-		CreatedBy          func(childComplexity int) int
-		Event              func(childComplexity int) int
-		Format             func(childComplexity int) int
-		From               func(childComplexity int) int
-		ID                 func(childComplexity int) int
-		MsgEventID         func(childComplexity int) int
-		MsgTypeID          func(childComplexity int) int
-		Name               func(childComplexity int) int
-		ReceiverType       func(childComplexity int) int
-		Status             func(childComplexity int) int
-		Subject            func(childComplexity int) int
-		TenantID           func(childComplexity int) int
-		To                 func(childComplexity int) int
-		Tpl                func(childComplexity int) int
-		TplFileID          func(childComplexity int) int
-		UpdatedAt          func(childComplexity int) int
-		UpdatedBy          func(childComplexity int) int
+		Attachments  func(childComplexity int) int
+		Bcc          func(childComplexity int) int
+		Body         func(childComplexity int) int
+		Cc           func(childComplexity int) int
+		Comments     func(childComplexity int) int
+		CreatedAt    func(childComplexity int) int
+		CreatedBy    func(childComplexity int) int
+		Event        func(childComplexity int) int
+		Format       func(childComplexity int) int
+		From         func(childComplexity int) int
+		ID           func(childComplexity int) int
+		MsgEventID   func(childComplexity int) int
+		MsgTypeID    func(childComplexity int) int
+		Name         func(childComplexity int) int
+		ReceiverType func(childComplexity int) int
+		Status       func(childComplexity int) int
+		Subject      func(childComplexity int) int
+		TenantID     func(childComplexity int) int
+		To           func(childComplexity int) int
+		Tpl          func(childComplexity int) int
+		UpdatedAt    func(childComplexity int) int
+		UpdatedBy    func(childComplexity int) int
 	}
 
 	MsgTemplateConnection struct {
@@ -456,12 +456,16 @@ type ComplexityRoot struct {
 }
 
 type executableSchema struct {
+	schema     *ast.Schema
 	resolvers  ResolverRoot
 	directives DirectiveRoot
 	complexity ComplexityRoot
 }
 
 func (e *executableSchema) Schema() *ast.Schema {
+	if e.schema != nil {
+		return e.schema
+	}
 	return parsedSchema
 }
 
@@ -1369,13 +1373,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgTemplate.Attachments(childComplexity), true
 
-	case "MsgTemplate.attachmentsFileIds":
-		if e.complexity.MsgTemplate.AttachmentsFileIds == nil {
-			break
-		}
-
-		return e.complexity.MsgTemplate.AttachmentsFileIds(childComplexity), true
-
 	case "MsgTemplate.bcc":
 		if e.complexity.MsgTemplate.Bcc == nil {
 			break
@@ -1508,13 +1505,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgTemplate.Tpl(childComplexity), true
-
-	case "MsgTemplate.tplFileID":
-		if e.complexity.MsgTemplate.TplFileID == nil {
-			break
-		}
-
-		return e.complexity.MsgTemplate.TplFileID(childComplexity), true
 
 	case "MsgTemplate.updatedAt":
 		if e.complexity.MsgTemplate.UpdatedAt == nil {
@@ -2811,33 +2801,43 @@ func (ec *executionContext) introspectSchema() (*introspection.Schema, error) {
 	if ec.DisableIntrospection {
 		return nil, errors.New("introspection disabled")
 	}
-	return introspection.WrapSchema(parsedSchema), nil
+	return introspection.WrapSchema(ec.Schema()), nil
 }
 
 func (ec *executionContext) introspectType(name string) (*introspection.Type, error) {
 	if ec.DisableIntrospection {
 		return nil, errors.New("introspection disabled")
 	}
-	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
+	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
 var sources = []*ast.Source{
-	{Name: "../ent.graphql", Input: `directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
-directive @goModel(model: String, models: [String!]) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
+	{Name: "../ent.graphql", Input: `directive @goField(forceResolver: Boolean, name: String, omittable: Boolean) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+directive @goModel(model: String, models: [String!], forceGenerate: Boolean) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
 """
 CreateMsgChannelInput is used for create MsgChannel object.
 Input was generated by ent.
 """
 input CreateMsgChannelInput {
-  """消息通道名称"""
+  """
+  消息通道名称
+  """
   name: String!
-  """组织ID"""
+  """
+  组织ID
+  """
   tenantID: ID!
-  """支持的消息模式:站内信,app推送,邮件,短信,微信等"""
+  """
+  支持的消息模式:站内信,app推送,邮件,短信,微信等
+  """
   receiverType: MsgChannelReceiverType!
-  """通道配置Json格式"""
+  """
+  通道配置Json格式
+  """
   receiver: ReceiverInput
-  """备注"""
+  """
+  备注
+  """
   comments: String
 }
 """
@@ -2845,13 +2845,21 @@ CreateMsgEventInput is used for create MsgEvent object.
 Input was generated by ent.
 """
 input CreateMsgEventInput {
-  """消息事件名称,应用内唯一"""
+  """
+  消息事件名称,应用内唯一
+  """
   name: String!
-  """备注"""
+  """
+  备注
+  """
   comments: String
-  """消息路由配置"""
+  """
+  消息路由配置
+  """
   route: RouteInput
-  """根据route配置对应的以,分隔的mode列表"""
+  """
+  根据route配置对应的以,分隔的mode列表
+  """
   modes: String!
   msgTypeID: ID!
 }
@@ -2860,11 +2868,17 @@ CreateMsgSubscriberInput is used for create MsgSubscriber object.
 Input was generated by ent.
 """
 input CreateMsgSubscriberInput {
-  """组织ID"""
+  """
+  组织ID
+  """
   tenantID: ID!
-  """用户组ID"""
+  """
+  用户组ID
+  """
   orgRoleID: ID
-  """是否排除"""
+  """
+  是否排除
+  """
   exclude: Boolean
   msgTypeID: ID!
   userID: ID
@@ -2874,37 +2888,61 @@ CreateMsgTemplateInput is used for create MsgTemplate object.
 Input was generated by ent.
 """
 input CreateMsgTemplateInput {
-  """应用消息类型ID"""
+  """
+  应用消息类型ID
+  """
   msgTypeID: Int!
-  """组织ID"""
+  """
+  组织ID
+  """
   tenantID: ID!
-  """消息模板名称"""
+  """
+  消息模板名称
+  """
   name: String!
-  """消息模式:站内信,app推送,邮件,短信,微信等"""
+  """
+  消息模式:站内信,app推送,邮件,短信,微信等
+  """
   receiverType: MsgTemplateReceiverType!
-  """消息类型:文本,网页,需要结合mod确定支持的格式"""
+  """
+  消息类型:文本,网页,需要结合mod确定支持的格式
+  """
   format: MsgTemplateFormat!
-  """标题"""
+  """
+  标题
+  """
   subject: String
-  """发件人"""
+  """
+  发件人
+  """
   from: String
-  """收件人"""
+  """
+  收件人
+  """
   to: String
-  """抄送"""
+  """
+  抄送
+  """
   cc: String
-  """密送"""
+  """
+  密送
+  """
   bcc: String
-  """消息体"""
+  """
+  消息体
+  """
   body: String
-  """模板地址。key：/msg/tpl/temp/1/xxx"""
+  """
+  模板地址
+  """
   tpl: String
-  """模板地址"""
-  tplFileID: ID
-  """附件地址。key：/msg/att/1/xxx"""
+  """
+  附件地址
+  """
   attachments: [String!]
-  """附件ids"""
-  attachmentsFileIds: [ID!]
-  """备注"""
+  """
+  备注
+  """
   comments: String
   eventID: ID!
 }
@@ -2913,19 +2951,33 @@ CreateMsgTypeInput is used for create MsgType object.
 Input was generated by ent.
 """
 input CreateMsgTypeInput {
-  """应用ID"""
+  """
+  应用ID
+  """
   appID: ID
-  """消息类型分类"""
+  """
+  消息类型分类
+  """
   category: String!
-  """消息类型名称,应用内唯一"""
+  """
+  消息类型名称,应用内唯一
+  """
   name: String!
-  """状态"""
+  """
+  状态
+  """
   status: MsgTypeSimpleStatus
-  """备注"""
+  """
+  备注
+  """
   comments: String
-  """是否可订阅"""
+  """
+  是否可订阅
+  """
   canSubs: Boolean
-  """是否可定制"""
+  """
+  是否可定制
+  """
   canCustom: Boolean
 }
 """
@@ -2934,15 +2986,25 @@ Input was generated by ent.
 """
 input CreateSilenceInput {
   tenantID: Int!
-  """应用ID"""
+  """
+  应用ID
+  """
   matchers: [MatcherInput]
-  """开始时间"""
+  """
+  开始时间
+  """
   startsAt: Time!
-  """结束时间"""
+  """
+  结束时间
+  """
   endsAt: Time!
-  """备注"""
+  """
+  备注
+  """
   comments: String
-  """状态"""
+  """
+  状态
+  """
   state: SilenceSilenceState
 }
 """
@@ -2950,82 +3012,138 @@ Define a Relay Cursor type:
 https://relay.dev/graphql/connections.htm#sec-Cursor
 """
 scalar Cursor
-"""An object with a Global ID,for using in Noder interface."""
+"""
+An object with a Global ID,for using in Noder interface.
+"""
 scalar GID
 type MsgAlert implements Node {
   id: ID!
   tenantID: Int!
-  """标签"""
+  """
+  标签
+  """
   labels: MapString
-  """注解"""
+  """
+  注解
+  """
   annotations: MapString
-  """开始时间"""
+  """
+  开始时间
+  """
   startsAt: Time!
-  """结束时间"""
+  """
+  结束时间
+  """
   endsAt: Time
-  """generatorURL"""
+  """
+  generatorURL
+  """
   url: String
-  """状态"""
+  """
+  状态
+  """
   timeout: Boolean!
-  """指纹hash值"""
+  """
+  指纹hash值
+  """
   fingerprint: String!
-  """通知状态,firing: 触发通知,resolved: 已处理过"""
+  """
+  通知状态,firing: 触发通知,resolved: 已处理过
+  """
   state: MsgAlertAlertStatus!
   createdAt: Time!
   updatedAt: Time
-  """是否移除"""
+  """
+  是否移除
+  """
   deleted: Boolean!
   nlog(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for Nlogs returned from the connection."""
+    """
+    Ordering options for Nlogs returned from the connection.
+    """
     orderBy: NlogOrder
 
-    """Filtering options for Nlogs returned from the connection."""
+    """
+    Filtering options for Nlogs returned from the connection.
+    """
     where: NlogWhereInput
   ): NlogConnection!
   nlogAlerts: [NlogAlert!]
 }
-"""MsgAlertAlertStatus is enum for the field state"""
+"""
+MsgAlertAlertStatus is enum for the field state
+"""
 enum MsgAlertAlertStatus @goModel(model: "github.com/woocoos/msgcenter/pkg/alert.AlertStatus") {
   none
   firing
   resolved
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type MsgAlertConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [MsgAlertEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type MsgAlertEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: MsgAlert
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for MsgAlert connections"""
+"""
+Ordering options for MsgAlert connections
+"""
 input MsgAlertOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order MsgAlerts."""
+  """
+  The field by which to order MsgAlerts.
+  """
   field: MsgAlertOrderField!
 }
-"""Properties by which MsgAlert connections can be ordered."""
+"""
+Properties by which MsgAlert connections can be ordered.
+"""
 enum MsgAlertOrderField {
   createdAt
 }
@@ -3037,7 +3155,9 @@ input MsgAlertWhereInput {
   not: MsgAlertWhereInput
   and: [MsgAlertWhereInput!]
   or: [MsgAlertWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3046,7 +3166,9 @@ input MsgAlertWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """tenant_id field predicates"""
+  """
+  tenant_id field predicates
+  """
   tenantID: Int
   tenantIDNEQ: Int
   tenantIDIn: [Int!]
@@ -3055,7 +3177,9 @@ input MsgAlertWhereInput {
   tenantIDGTE: Int
   tenantIDLT: Int
   tenantIDLTE: Int
-  """starts_at field predicates"""
+  """
+  starts_at field predicates
+  """
   startsAt: Time
   startsAtNEQ: Time
   startsAtIn: [Time!]
@@ -3064,7 +3188,9 @@ input MsgAlertWhereInput {
   startsAtGTE: Time
   startsAtLT: Time
   startsAtLTE: Time
-  """ends_at field predicates"""
+  """
+  ends_at field predicates
+  """
   endsAt: Time
   endsAtNEQ: Time
   endsAtIn: [Time!]
@@ -3075,7 +3201,9 @@ input MsgAlertWhereInput {
   endsAtLTE: Time
   endsAtIsNil: Boolean
   endsAtNotNil: Boolean
-  """url field predicates"""
+  """
+  url field predicates
+  """
   url: String
   urlNEQ: String
   urlIn: [String!]
@@ -3091,10 +3219,14 @@ input MsgAlertWhereInput {
   urlNotNil: Boolean
   urlEqualFold: String
   urlContainsFold: String
-  """timeout field predicates"""
+  """
+  timeout field predicates
+  """
   timeout: Boolean
   timeoutNEQ: Boolean
-  """fingerprint field predicates"""
+  """
+  fingerprint field predicates
+  """
   fingerprint: String
   fingerprintNEQ: String
   fingerprintIn: [String!]
@@ -3108,12 +3240,16 @@ input MsgAlertWhereInput {
   fingerprintHasSuffix: String
   fingerprintEqualFold: String
   fingerprintContainsFold: String
-  """state field predicates"""
+  """
+  state field predicates
+  """
   state: MsgAlertAlertStatus
   stateNEQ: MsgAlertAlertStatus
   stateIn: [MsgAlertAlertStatus!]
   stateNotIn: [MsgAlertAlertStatus!]
-  """created_at field predicates"""
+  """
+  created_at field predicates
+  """
   createdAt: Time
   createdAtNEQ: Time
   createdAtIn: [Time!]
@@ -3122,7 +3258,9 @@ input MsgAlertWhereInput {
   createdAtGTE: Time
   createdAtLT: Time
   createdAtLTE: Time
-  """updated_at field predicates"""
+  """
+  updated_at field predicates
+  """
   updatedAt: Time
   updatedAtNEQ: Time
   updatedAtIn: [Time!]
@@ -3133,13 +3271,19 @@ input MsgAlertWhereInput {
   updatedAtLTE: Time
   updatedAtIsNil: Boolean
   updatedAtNotNil: Boolean
-  """deleted field predicates"""
+  """
+  deleted field predicates
+  """
   deleted: Boolean
   deletedNEQ: Boolean
-  """nlog edge predicates"""
+  """
+  nlog edge predicates
+  """
   hasNlog: Boolean
   hasNlogWith: [NlogWhereInput!]
-  """nlog_alerts edge predicates"""
+  """
+  nlog_alerts edge predicates
+  """
   hasNlogAlerts: Boolean
   hasNlogAlertsWith: [NlogAlertWhereInput!]
 }
@@ -3149,53 +3293,91 @@ type MsgChannel implements Node {
   createdAt: Time!
   updatedBy: Int
   updatedAt: Time
-  """消息通道名称"""
+  """
+  消息通道名称
+  """
   name: String!
-  """组织ID"""
+  """
+  组织ID
+  """
   tenantID: ID!
-  """支持的消息模式:站内信,app推送,邮件,短信,微信等"""
+  """
+  支持的消息模式:站内信,app推送,邮件,短信,微信等
+  """
   receiverType: MsgChannelReceiverType!
-  """状态"""
+  """
+  状态
+  """
   status: MsgChannelSimpleStatus
-  """通道配置Json格式"""
+  """
+  通道配置Json格式
+  """
   receiver: Receiver
-  """备注"""
+  """
+  备注
+  """
   comments: String
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type MsgChannelConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [MsgChannelEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type MsgChannelEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: MsgChannel
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for MsgChannel connections"""
+"""
+Ordering options for MsgChannel connections
+"""
 input MsgChannelOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order MsgChannels."""
+  """
+  The field by which to order MsgChannels.
+  """
   field: MsgChannelOrderField!
 }
-"""Properties by which MsgChannel connections can be ordered."""
+"""
+Properties by which MsgChannel connections can be ordered.
+"""
 enum MsgChannelOrderField {
   createdAt
 }
-"""MsgChannelReceiverType is enum for the field receiver_type"""
+"""
+MsgChannelReceiverType is enum for the field receiver_type
+"""
 enum MsgChannelReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
   email
   message
   webhook
 }
-"""MsgChannelSimpleStatus is enum for the field status"""
+"""
+MsgChannelSimpleStatus is enum for the field status
+"""
 enum MsgChannelSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   inactive
@@ -3210,7 +3392,9 @@ input MsgChannelWhereInput {
   not: MsgChannelWhereInput
   and: [MsgChannelWhereInput!]
   or: [MsgChannelWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3219,7 +3403,9 @@ input MsgChannelWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """created_by field predicates"""
+  """
+  created_by field predicates
+  """
   createdBy: Int
   createdByNEQ: Int
   createdByIn: [Int!]
@@ -3228,7 +3414,9 @@ input MsgChannelWhereInput {
   createdByGTE: Int
   createdByLT: Int
   createdByLTE: Int
-  """created_at field predicates"""
+  """
+  created_at field predicates
+  """
   createdAt: Time
   createdAtNEQ: Time
   createdAtIn: [Time!]
@@ -3237,7 +3425,9 @@ input MsgChannelWhereInput {
   createdAtGTE: Time
   createdAtLT: Time
   createdAtLTE: Time
-  """updated_by field predicates"""
+  """
+  updated_by field predicates
+  """
   updatedBy: Int
   updatedByNEQ: Int
   updatedByIn: [Int!]
@@ -3248,7 +3438,9 @@ input MsgChannelWhereInput {
   updatedByLTE: Int
   updatedByIsNil: Boolean
   updatedByNotNil: Boolean
-  """updated_at field predicates"""
+  """
+  updated_at field predicates
+  """
   updatedAt: Time
   updatedAtNEQ: Time
   updatedAtIn: [Time!]
@@ -3259,7 +3451,9 @@ input MsgChannelWhereInput {
   updatedAtLTE: Time
   updatedAtIsNil: Boolean
   updatedAtNotNil: Boolean
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -3273,7 +3467,9 @@ input MsgChannelWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """tenant_id field predicates"""
+  """
+  tenant_id field predicates
+  """
   tenantID: ID
   tenantIDNEQ: ID
   tenantIDIn: [ID!]
@@ -3282,19 +3478,25 @@ input MsgChannelWhereInput {
   tenantIDGTE: ID
   tenantIDLT: ID
   tenantIDLTE: ID
-  """receiver_type field predicates"""
+  """
+  receiver_type field predicates
+  """
   receiverType: MsgChannelReceiverType
   receiverTypeNEQ: MsgChannelReceiverType
   receiverTypeIn: [MsgChannelReceiverType!]
   receiverTypeNotIn: [MsgChannelReceiverType!]
-  """status field predicates"""
+  """
+  status field predicates
+  """
   status: MsgChannelSimpleStatus
   statusNEQ: MsgChannelSimpleStatus
   statusIn: [MsgChannelSimpleStatus!]
   statusNotIn: [MsgChannelSimpleStatus!]
   statusIsNil: Boolean
   statusNotNil: Boolean
-  """comments field predicates"""
+  """
+  comments field predicates
+  """
   comments: String
   commentsNEQ: String
   commentsIn: [String!]
@@ -3317,51 +3519,91 @@ type MsgEvent implements Node {
   createdAt: Time!
   updatedBy: Int
   updatedAt: Time
-  """消息类型ID"""
+  """
+  消息类型ID
+  """
   msgTypeID: ID!
-  """消息事件名称,应用内唯一"""
+  """
+  消息事件名称,应用内唯一
+  """
   name: String!
-  """状态"""
+  """
+  状态
+  """
   status: MsgEventSimpleStatus
-  """备注"""
+  """
+  备注
+  """
   comments: String
-  """消息路由配置"""
+  """
+  消息路由配置
+  """
   route: Route
-  """根据route配置对应的以,分隔的mode列表"""
+  """
+  根据route配置对应的以,分隔的mode列表
+  """
   modes: String!
-  """消息类型"""
+  """
+  消息类型
+  """
   msgType: MsgType!
-  """自定义的消息模板"""
+  """
+  自定义的消息模板
+  """
   customerTemplate: [MsgTemplate!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type MsgEventConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [MsgEventEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type MsgEventEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: MsgEvent
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for MsgEvent connections"""
+"""
+Ordering options for MsgEvent connections
+"""
 input MsgEventOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order MsgEvents."""
+  """
+  The field by which to order MsgEvents.
+  """
   field: MsgEventOrderField!
 }
-"""Properties by which MsgEvent connections can be ordered."""
+"""
+Properties by which MsgEvent connections can be ordered.
+"""
 enum MsgEventOrderField {
   createdAt
 }
-"""MsgEventSimpleStatus is enum for the field status"""
+"""
+MsgEventSimpleStatus is enum for the field status
+"""
 enum MsgEventSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   inactive
@@ -3376,7 +3618,9 @@ input MsgEventWhereInput {
   not: MsgEventWhereInput
   and: [MsgEventWhereInput!]
   or: [MsgEventWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3385,7 +3629,9 @@ input MsgEventWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """created_by field predicates"""
+  """
+  created_by field predicates
+  """
   createdBy: Int
   createdByNEQ: Int
   createdByIn: [Int!]
@@ -3394,7 +3640,9 @@ input MsgEventWhereInput {
   createdByGTE: Int
   createdByLT: Int
   createdByLTE: Int
-  """created_at field predicates"""
+  """
+  created_at field predicates
+  """
   createdAt: Time
   createdAtNEQ: Time
   createdAtIn: [Time!]
@@ -3403,7 +3651,9 @@ input MsgEventWhereInput {
   createdAtGTE: Time
   createdAtLT: Time
   createdAtLTE: Time
-  """updated_by field predicates"""
+  """
+  updated_by field predicates
+  """
   updatedBy: Int
   updatedByNEQ: Int
   updatedByIn: [Int!]
@@ -3414,7 +3664,9 @@ input MsgEventWhereInput {
   updatedByLTE: Int
   updatedByIsNil: Boolean
   updatedByNotNil: Boolean
-  """updated_at field predicates"""
+  """
+  updated_at field predicates
+  """
   updatedAt: Time
   updatedAtNEQ: Time
   updatedAtIn: [Time!]
@@ -3425,12 +3677,16 @@ input MsgEventWhereInput {
   updatedAtLTE: Time
   updatedAtIsNil: Boolean
   updatedAtNotNil: Boolean
-  """msg_type_id field predicates"""
+  """
+  msg_type_id field predicates
+  """
   msgTypeID: ID
   msgTypeIDNEQ: ID
   msgTypeIDIn: [ID!]
   msgTypeIDNotIn: [ID!]
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -3444,14 +3700,18 @@ input MsgEventWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """status field predicates"""
+  """
+  status field predicates
+  """
   status: MsgEventSimpleStatus
   statusNEQ: MsgEventSimpleStatus
   statusIn: [MsgEventSimpleStatus!]
   statusNotIn: [MsgEventSimpleStatus!]
   statusIsNil: Boolean
   statusNotNil: Boolean
-  """modes field predicates"""
+  """
+  modes field predicates
+  """
   modes: String
   modesNEQ: String
   modesIn: [String!]
@@ -3465,10 +3725,14 @@ input MsgEventWhereInput {
   modesHasSuffix: String
   modesEqualFold: String
   modesContainsFold: String
-  """msg_type edge predicates"""
+  """
+  msg_type edge predicates
+  """
   hasMsgType: Boolean
   hasMsgTypeWith: [MsgTypeWhereInput!]
-  """customer_template edge predicates"""
+  """
+  customer_template edge predicates
+  """
   hasCustomerTemplate: Boolean
   hasCustomerTemplateWith: [MsgTemplateWhereInput!]
 }
@@ -3479,84 +3743,146 @@ type MsgInternal implements Node {
   createdAt: Time!
   updatedBy: Int
   updatedAt: Time
-  """消息类型分类"""
+  """
+  消息类型分类
+  """
   category: String!
-  """标题"""
+  """
+  标题
+  """
   subject: String!
-  """消息体"""
+  """
+  消息体
+  """
   body: String
-  """内容类型: html,txt"""
+  """
+  内容类型: html,txt
+  """
   format: String!
-  """消息跳转"""
+  """
+  消息跳转
+  """
   redirect: String
   msgInternalTo: [MsgInternalTo!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type MsgInternalConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [MsgInternalEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type MsgInternalEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: MsgInternal
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for MsgInternal connections"""
+"""
+Ordering options for MsgInternal connections
+"""
 input MsgInternalOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order MsgInternals."""
+  """
+  The field by which to order MsgInternals.
+  """
   field: MsgInternalOrderField!
 }
-"""Properties by which MsgInternal connections can be ordered."""
+"""
+Properties by which MsgInternal connections can be ordered.
+"""
 enum MsgInternalOrderField {
   createdAt
 }
 type MsgInternalTo implements Node {
   id: ID!
   tenantID: Int!
-  """站内信ID"""
+  """
+  站内信ID
+  """
   msgInternalID: ID!
-  """用户ID"""
+  """
+  用户ID
+  """
   userID: ID!
-  """阅读时间"""
+  """
+  阅读时间
+  """
   readAt: Time
-  """删除时间"""
+  """
+  删除时间
+  """
   deleteAt: Time
   createdAt: Time!
   msgInternal: MsgInternal!
   user: User!
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type MsgInternalToConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [MsgInternalToEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type MsgInternalToEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: MsgInternalTo
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for MsgInternalTo connections"""
+"""
+Ordering options for MsgInternalTo connections
+"""
 input MsgInternalToOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order MsgInternalTos."""
+  """
+  The field by which to order MsgInternalTos.
+  """
   field: MsgInternalToOrderField!
 }
-"""Properties by which MsgInternalTo connections can be ordered."""
+"""
+Properties by which MsgInternalTo connections can be ordered.
+"""
 enum MsgInternalToOrderField {
   createdAt
 }
@@ -3568,7 +3894,9 @@ input MsgInternalToWhereInput {
   not: MsgInternalToWhereInput
   and: [MsgInternalToWhereInput!]
   or: [MsgInternalToWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3577,7 +3905,9 @@ input MsgInternalToWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """tenant_id field predicates"""
+  """
+  tenant_id field predicates
+  """
   tenantID: Int
   tenantIDNEQ: Int
   tenantIDIn: [Int!]
@@ -3586,17 +3916,23 @@ input MsgInternalToWhereInput {
   tenantIDGTE: Int
   tenantIDLT: Int
   tenantIDLTE: Int
-  """msg_internal_id field predicates"""
+  """
+  msg_internal_id field predicates
+  """
   msgInternalID: ID
   msgInternalIDNEQ: ID
   msgInternalIDIn: [ID!]
   msgInternalIDNotIn: [ID!]
-  """user_id field predicates"""
+  """
+  user_id field predicates
+  """
   userID: ID
   userIDNEQ: ID
   userIDIn: [ID!]
   userIDNotIn: [ID!]
-  """read_at field predicates"""
+  """
+  read_at field predicates
+  """
   readAt: Time
   readAtNEQ: Time
   readAtIn: [Time!]
@@ -3607,7 +3943,9 @@ input MsgInternalToWhereInput {
   readAtLTE: Time
   readAtIsNil: Boolean
   readAtNotNil: Boolean
-  """delete_at field predicates"""
+  """
+  delete_at field predicates
+  """
   deleteAt: Time
   deleteAtNEQ: Time
   deleteAtIn: [Time!]
@@ -3618,7 +3956,9 @@ input MsgInternalToWhereInput {
   deleteAtLTE: Time
   deleteAtIsNil: Boolean
   deleteAtNotNil: Boolean
-  """created_at field predicates"""
+  """
+  created_at field predicates
+  """
   createdAt: Time
   createdAtNEQ: Time
   createdAtIn: [Time!]
@@ -3627,7 +3967,9 @@ input MsgInternalToWhereInput {
   createdAtGTE: Time
   createdAtLT: Time
   createdAtLTE: Time
-  """msg_internal edge predicates"""
+  """
+  msg_internal edge predicates
+  """
   hasMsgInternal: Boolean
   hasMsgInternalWith: [MsgInternalWhereInput!]
 }
@@ -3639,7 +3981,9 @@ input MsgInternalWhereInput {
   not: MsgInternalWhereInput
   and: [MsgInternalWhereInput!]
   or: [MsgInternalWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3648,7 +3992,9 @@ input MsgInternalWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """tenant_id field predicates"""
+  """
+  tenant_id field predicates
+  """
   tenantID: Int
   tenantIDNEQ: Int
   tenantIDIn: [Int!]
@@ -3657,7 +4003,9 @@ input MsgInternalWhereInput {
   tenantIDGTE: Int
   tenantIDLT: Int
   tenantIDLTE: Int
-  """created_by field predicates"""
+  """
+  created_by field predicates
+  """
   createdBy: Int
   createdByNEQ: Int
   createdByIn: [Int!]
@@ -3666,7 +4014,9 @@ input MsgInternalWhereInput {
   createdByGTE: Int
   createdByLT: Int
   createdByLTE: Int
-  """created_at field predicates"""
+  """
+  created_at field predicates
+  """
   createdAt: Time
   createdAtNEQ: Time
   createdAtIn: [Time!]
@@ -3675,7 +4025,9 @@ input MsgInternalWhereInput {
   createdAtGTE: Time
   createdAtLT: Time
   createdAtLTE: Time
-  """updated_by field predicates"""
+  """
+  updated_by field predicates
+  """
   updatedBy: Int
   updatedByNEQ: Int
   updatedByIn: [Int!]
@@ -3686,7 +4038,9 @@ input MsgInternalWhereInput {
   updatedByLTE: Int
   updatedByIsNil: Boolean
   updatedByNotNil: Boolean
-  """updated_at field predicates"""
+  """
+  updated_at field predicates
+  """
   updatedAt: Time
   updatedAtNEQ: Time
   updatedAtIn: [Time!]
@@ -3697,7 +4051,9 @@ input MsgInternalWhereInput {
   updatedAtLTE: Time
   updatedAtIsNil: Boolean
   updatedAtNotNil: Boolean
-  """category field predicates"""
+  """
+  category field predicates
+  """
   category: String
   categoryNEQ: String
   categoryIn: [String!]
@@ -3711,7 +4067,9 @@ input MsgInternalWhereInput {
   categoryHasSuffix: String
   categoryEqualFold: String
   categoryContainsFold: String
-  """subject field predicates"""
+  """
+  subject field predicates
+  """
   subject: String
   subjectNEQ: String
   subjectIn: [String!]
@@ -3725,7 +4083,9 @@ input MsgInternalWhereInput {
   subjectHasSuffix: String
   subjectEqualFold: String
   subjectContainsFold: String
-  """format field predicates"""
+  """
+  format field predicates
+  """
   format: String
   formatNEQ: String
   formatIn: [String!]
@@ -3739,7 +4099,9 @@ input MsgInternalWhereInput {
   formatHasSuffix: String
   formatEqualFold: String
   formatContainsFold: String
-  """redirect field predicates"""
+  """
+  redirect field predicates
+  """
   redirect: String
   redirectNEQ: String
   redirectIn: [String!]
@@ -3755,7 +4117,9 @@ input MsgInternalWhereInput {
   redirectNotNil: Boolean
   redirectEqualFold: String
   redirectContainsFold: String
-  """msg_internal_to edge predicates"""
+  """
+  msg_internal_to edge predicates
+  """
   hasMsgInternalTo: Boolean
   hasMsgInternalToWith: [MsgInternalToWhereInput!]
 }
@@ -3765,27 +4129,45 @@ type MsgSubscriber implements Node {
   createdAt: Time!
   updatedBy: Int
   updatedAt: Time
-  """应用消息类型ID"""
+  """
+  应用消息类型ID
+  """
   msgTypeID: ID!
-  """组织ID"""
+  """
+  组织ID
+  """
   tenantID: ID!
-  """用户ID"""
+  """
+  用户ID
+  """
   userID: ID
-  """用户组ID"""
+  """
+  用户组ID
+  """
   orgRoleID: ID
-  """是否排除"""
+  """
+  是否排除
+  """
   exclude: Boolean
   msgType: MsgType!
   user: User
 }
-"""Ordering options for MsgSubscriber connections"""
+"""
+Ordering options for MsgSubscriber connections
+"""
 input MsgSubscriberOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order MsgSubscribers."""
+  """
+  The field by which to order MsgSubscribers.
+  """
   field: MsgSubscriberOrderField!
 }
-"""Properties by which MsgSubscriber connections can be ordered."""
+"""
+Properties by which MsgSubscriber connections can be ordered.
+"""
 enum MsgSubscriberOrderField {
   createdAt
 }
@@ -3797,7 +4179,9 @@ input MsgSubscriberWhereInput {
   not: MsgSubscriberWhereInput
   and: [MsgSubscriberWhereInput!]
   or: [MsgSubscriberWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3806,7 +4190,9 @@ input MsgSubscriberWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """created_by field predicates"""
+  """
+  created_by field predicates
+  """
   createdBy: Int
   createdByNEQ: Int
   createdByIn: [Int!]
@@ -3815,7 +4201,9 @@ input MsgSubscriberWhereInput {
   createdByGTE: Int
   createdByLT: Int
   createdByLTE: Int
-  """created_at field predicates"""
+  """
+  created_at field predicates
+  """
   createdAt: Time
   createdAtNEQ: Time
   createdAtIn: [Time!]
@@ -3824,7 +4212,9 @@ input MsgSubscriberWhereInput {
   createdAtGTE: Time
   createdAtLT: Time
   createdAtLTE: Time
-  """updated_by field predicates"""
+  """
+  updated_by field predicates
+  """
   updatedBy: Int
   updatedByNEQ: Int
   updatedByIn: [Int!]
@@ -3835,7 +4225,9 @@ input MsgSubscriberWhereInput {
   updatedByLTE: Int
   updatedByIsNil: Boolean
   updatedByNotNil: Boolean
-  """updated_at field predicates"""
+  """
+  updated_at field predicates
+  """
   updatedAt: Time
   updatedAtNEQ: Time
   updatedAtIn: [Time!]
@@ -3846,12 +4238,16 @@ input MsgSubscriberWhereInput {
   updatedAtLTE: Time
   updatedAtIsNil: Boolean
   updatedAtNotNil: Boolean
-  """msg_type_id field predicates"""
+  """
+  msg_type_id field predicates
+  """
   msgTypeID: ID
   msgTypeIDNEQ: ID
   msgTypeIDIn: [ID!]
   msgTypeIDNotIn: [ID!]
-  """tenant_id field predicates"""
+  """
+  tenant_id field predicates
+  """
   tenantID: ID
   tenantIDNEQ: ID
   tenantIDIn: [ID!]
@@ -3860,14 +4256,18 @@ input MsgSubscriberWhereInput {
   tenantIDGTE: ID
   tenantIDLT: ID
   tenantIDLTE: ID
-  """user_id field predicates"""
+  """
+  user_id field predicates
+  """
   userID: ID
   userIDNEQ: ID
   userIDIn: [ID!]
   userIDNotIn: [ID!]
   userIDIsNil: Boolean
   userIDNotNil: Boolean
-  """org_role_id field predicates"""
+  """
+  org_role_id field predicates
+  """
   orgRoleID: ID
   orgRoleIDNEQ: ID
   orgRoleIDIn: [ID!]
@@ -3878,12 +4278,16 @@ input MsgSubscriberWhereInput {
   orgRoleIDLTE: ID
   orgRoleIDIsNil: Boolean
   orgRoleIDNotNil: Boolean
-  """exclude field predicates"""
+  """
+  exclude field predicates
+  """
   exclude: Boolean
   excludeNEQ: Boolean
   excludeIsNil: Boolean
   excludeNotNil: Boolean
-  """msg_type edge predicates"""
+  """
+  msg_type edge predicates
+  """
   hasMsgType: Boolean
   hasMsgTypeWith: [MsgTypeWhereInput!]
 }
@@ -3893,83 +4297,139 @@ type MsgTemplate implements Node {
   createdAt: Time!
   updatedBy: Int
   updatedAt: Time
-  """应用消息类型ID"""
+  """
+  应用消息类型ID
+  """
   msgTypeID: Int!
-  """消息事件ID"""
+  """
+  消息事件ID
+  """
   msgEventID: ID!
-  """组织ID"""
+  """
+  组织ID
+  """
   tenantID: ID!
-  """消息模板名称"""
+  """
+  消息模板名称
+  """
   name: String!
-  """状态"""
+  """
+  状态
+  """
   status: MsgTemplateSimpleStatus
-  """消息模式:站内信,app推送,邮件,短信,微信等"""
+  """
+  消息模式:站内信,app推送,邮件,短信,微信等
+  """
   receiverType: MsgTemplateReceiverType!
-  """消息类型:文本,网页,需要结合mod确定支持的格式"""
+  """
+  消息类型:文本,网页,需要结合mod确定支持的格式
+  """
   format: MsgTemplateFormat!
-  """标题"""
+  """
+  标题
+  """
   subject: String
-  """发件人"""
+  """
+  发件人
+  """
   from: String
-  """收件人"""
+  """
+  收件人
+  """
   to: String
-  """抄送"""
+  """
+  抄送
+  """
   cc: String
-  """密送"""
+  """
+  密送
+  """
   bcc: String
-  """消息体"""
+  """
+  消息体
+  """
   body: String
-  """模板地址。key：/msg/tpl/temp/1/xxx"""
+  """
+  模板地址
+  """
   tpl: String
-  """模板地址"""
-  tplFileID: ID
-  """附件地址。key：/msg/att/1/xxx"""
+  """
+  附件地址
+  """
   attachments: [String!]
-  """附件ids"""
-  attachmentsFileIds: [ID!]
-  """备注"""
+  """
+  备注
+  """
   comments: String
   event: MsgEvent!
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type MsgTemplateConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [MsgTemplateEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type MsgTemplateEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: MsgTemplate
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""MsgTemplateFormat is enum for the field format"""
+"""
+MsgTemplateFormat is enum for the field format
+"""
 enum MsgTemplateFormat @goModel(model: "github.com/woocoos/msgcenter/ent/msgtemplate.Format") {
   txt
   html
 }
-"""Ordering options for MsgTemplate connections"""
+"""
+Ordering options for MsgTemplate connections
+"""
 input MsgTemplateOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order MsgTemplates."""
+  """
+  The field by which to order MsgTemplates.
+  """
   field: MsgTemplateOrderField!
 }
-"""Properties by which MsgTemplate connections can be ordered."""
+"""
+Properties by which MsgTemplate connections can be ordered.
+"""
 enum MsgTemplateOrderField {
   createdAt
 }
-"""MsgTemplateReceiverType is enum for the field receiver_type"""
+"""
+MsgTemplateReceiverType is enum for the field receiver_type
+"""
 enum MsgTemplateReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
   email
   message
   webhook
 }
-"""MsgTemplateSimpleStatus is enum for the field status"""
+"""
+MsgTemplateSimpleStatus is enum for the field status
+"""
 enum MsgTemplateSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   inactive
@@ -3984,7 +4444,9 @@ input MsgTemplateWhereInput {
   not: MsgTemplateWhereInput
   and: [MsgTemplateWhereInput!]
   or: [MsgTemplateWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3993,7 +4455,9 @@ input MsgTemplateWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """created_by field predicates"""
+  """
+  created_by field predicates
+  """
   createdBy: Int
   createdByNEQ: Int
   createdByIn: [Int!]
@@ -4002,7 +4466,9 @@ input MsgTemplateWhereInput {
   createdByGTE: Int
   createdByLT: Int
   createdByLTE: Int
-  """created_at field predicates"""
+  """
+  created_at field predicates
+  """
   createdAt: Time
   createdAtNEQ: Time
   createdAtIn: [Time!]
@@ -4011,7 +4477,9 @@ input MsgTemplateWhereInput {
   createdAtGTE: Time
   createdAtLT: Time
   createdAtLTE: Time
-  """updated_by field predicates"""
+  """
+  updated_by field predicates
+  """
   updatedBy: Int
   updatedByNEQ: Int
   updatedByIn: [Int!]
@@ -4022,7 +4490,9 @@ input MsgTemplateWhereInput {
   updatedByLTE: Int
   updatedByIsNil: Boolean
   updatedByNotNil: Boolean
-  """updated_at field predicates"""
+  """
+  updated_at field predicates
+  """
   updatedAt: Time
   updatedAtNEQ: Time
   updatedAtIn: [Time!]
@@ -4033,7 +4503,9 @@ input MsgTemplateWhereInput {
   updatedAtLTE: Time
   updatedAtIsNil: Boolean
   updatedAtNotNil: Boolean
-  """msg_type_id field predicates"""
+  """
+  msg_type_id field predicates
+  """
   msgTypeID: Int
   msgTypeIDNEQ: Int
   msgTypeIDIn: [Int!]
@@ -4042,12 +4514,16 @@ input MsgTemplateWhereInput {
   msgTypeIDGTE: Int
   msgTypeIDLT: Int
   msgTypeIDLTE: Int
-  """msg_event_id field predicates"""
+  """
+  msg_event_id field predicates
+  """
   msgEventID: ID
   msgEventIDNEQ: ID
   msgEventIDIn: [ID!]
   msgEventIDNotIn: [ID!]
-  """tenant_id field predicates"""
+  """
+  tenant_id field predicates
+  """
   tenantID: ID
   tenantIDNEQ: ID
   tenantIDIn: [ID!]
@@ -4056,7 +4532,9 @@ input MsgTemplateWhereInput {
   tenantIDGTE: ID
   tenantIDLT: ID
   tenantIDLTE: ID
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -4070,24 +4548,32 @@ input MsgTemplateWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """status field predicates"""
+  """
+  status field predicates
+  """
   status: MsgTemplateSimpleStatus
   statusNEQ: MsgTemplateSimpleStatus
   statusIn: [MsgTemplateSimpleStatus!]
   statusNotIn: [MsgTemplateSimpleStatus!]
   statusIsNil: Boolean
   statusNotNil: Boolean
-  """receiver_type field predicates"""
+  """
+  receiver_type field predicates
+  """
   receiverType: MsgTemplateReceiverType
   receiverTypeNEQ: MsgTemplateReceiverType
   receiverTypeIn: [MsgTemplateReceiverType!]
   receiverTypeNotIn: [MsgTemplateReceiverType!]
-  """format field predicates"""
+  """
+  format field predicates
+  """
   format: MsgTemplateFormat
   formatNEQ: MsgTemplateFormat
   formatIn: [MsgTemplateFormat!]
   formatNotIn: [MsgTemplateFormat!]
-  """subject field predicates"""
+  """
+  subject field predicates
+  """
   subject: String
   subjectNEQ: String
   subjectIn: [String!]
@@ -4103,7 +4589,9 @@ input MsgTemplateWhereInput {
   subjectNotNil: Boolean
   subjectEqualFold: String
   subjectContainsFold: String
-  """from field predicates"""
+  """
+  from field predicates
+  """
   from: String
   fromNEQ: String
   fromIn: [String!]
@@ -4119,7 +4607,9 @@ input MsgTemplateWhereInput {
   fromNotNil: Boolean
   fromEqualFold: String
   fromContainsFold: String
-  """to field predicates"""
+  """
+  to field predicates
+  """
   to: String
   toNEQ: String
   toIn: [String!]
@@ -4135,7 +4625,9 @@ input MsgTemplateWhereInput {
   toNotNil: Boolean
   toEqualFold: String
   toContainsFold: String
-  """cc field predicates"""
+  """
+  cc field predicates
+  """
   cc: String
   ccNEQ: String
   ccIn: [String!]
@@ -4151,7 +4643,9 @@ input MsgTemplateWhereInput {
   ccNotNil: Boolean
   ccEqualFold: String
   ccContainsFold: String
-  """bcc field predicates"""
+  """
+  bcc field predicates
+  """
   bcc: String
   bccNEQ: String
   bccIn: [String!]
@@ -4167,7 +4661,9 @@ input MsgTemplateWhereInput {
   bccNotNil: Boolean
   bccEqualFold: String
   bccContainsFold: String
-  """event edge predicates"""
+  """
+  event edge predicates
+  """
   hasEvent: Boolean
   hasEventWith: [MsgEventWhereInput!]
 }
@@ -4177,53 +4673,95 @@ type MsgType implements Node {
   createdAt: Time!
   updatedBy: Int
   updatedAt: Time
-  """应用ID"""
+  """
+  应用ID
+  """
   appID: ID
-  """消息类型分类"""
+  """
+  消息类型分类
+  """
   category: String!
-  """消息类型名称,应用内唯一"""
+  """
+  消息类型名称,应用内唯一
+  """
   name: String!
-  """状态"""
+  """
+  状态
+  """
   status: MsgTypeSimpleStatus
-  """备注"""
+  """
+  备注
+  """
   comments: String
-  """是否可订阅"""
+  """
+  是否可订阅
+  """
   canSubs: Boolean
-  """是否可定制"""
+  """
+  是否可定制
+  """
   canCustom: Boolean
-  """消息事件"""
+  """
+  消息事件
+  """
   events: [MsgEvent!]
-  """订阅者"""
+  """
+  订阅者
+  """
   subscribers: [MsgSubscriber!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type MsgTypeConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [MsgTypeEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type MsgTypeEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: MsgType
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for MsgType connections"""
+"""
+Ordering options for MsgType connections
+"""
 input MsgTypeOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order MsgTypes."""
+  """
+  The field by which to order MsgTypes.
+  """
   field: MsgTypeOrderField!
 }
-"""Properties by which MsgType connections can be ordered."""
+"""
+Properties by which MsgType connections can be ordered.
+"""
 enum MsgTypeOrderField {
   createdAt
 }
-"""MsgTypeSimpleStatus is enum for the field status"""
+"""
+MsgTypeSimpleStatus is enum for the field status
+"""
 enum MsgTypeSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   inactive
@@ -4238,7 +4776,9 @@ input MsgTypeWhereInput {
   not: MsgTypeWhereInput
   and: [MsgTypeWhereInput!]
   or: [MsgTypeWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -4247,7 +4787,9 @@ input MsgTypeWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """created_by field predicates"""
+  """
+  created_by field predicates
+  """
   createdBy: Int
   createdByNEQ: Int
   createdByIn: [Int!]
@@ -4256,7 +4798,9 @@ input MsgTypeWhereInput {
   createdByGTE: Int
   createdByLT: Int
   createdByLTE: Int
-  """created_at field predicates"""
+  """
+  created_at field predicates
+  """
   createdAt: Time
   createdAtNEQ: Time
   createdAtIn: [Time!]
@@ -4265,7 +4809,9 @@ input MsgTypeWhereInput {
   createdAtGTE: Time
   createdAtLT: Time
   createdAtLTE: Time
-  """updated_by field predicates"""
+  """
+  updated_by field predicates
+  """
   updatedBy: Int
   updatedByNEQ: Int
   updatedByIn: [Int!]
@@ -4276,7 +4822,9 @@ input MsgTypeWhereInput {
   updatedByLTE: Int
   updatedByIsNil: Boolean
   updatedByNotNil: Boolean
-  """updated_at field predicates"""
+  """
+  updated_at field predicates
+  """
   updatedAt: Time
   updatedAtNEQ: Time
   updatedAtIn: [Time!]
@@ -4287,7 +4835,9 @@ input MsgTypeWhereInput {
   updatedAtLTE: Time
   updatedAtIsNil: Boolean
   updatedAtNotNil: Boolean
-  """app_id field predicates"""
+  """
+  app_id field predicates
+  """
   appID: ID
   appIDNEQ: ID
   appIDIn: [ID!]
@@ -4298,7 +4848,9 @@ input MsgTypeWhereInput {
   appIDLTE: ID
   appIDIsNil: Boolean
   appIDNotNil: Boolean
-  """category field predicates"""
+  """
+  category field predicates
+  """
   category: String
   categoryNEQ: String
   categoryIn: [String!]
@@ -4312,7 +4864,9 @@ input MsgTypeWhereInput {
   categoryHasSuffix: String
   categoryEqualFold: String
   categoryContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -4326,68 +4880,102 @@ input MsgTypeWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """status field predicates"""
+  """
+  status field predicates
+  """
   status: MsgTypeSimpleStatus
   statusNEQ: MsgTypeSimpleStatus
   statusIn: [MsgTypeSimpleStatus!]
   statusNotIn: [MsgTypeSimpleStatus!]
   statusIsNil: Boolean
   statusNotNil: Boolean
-  """can_subs field predicates"""
+  """
+  can_subs field predicates
+  """
   canSubs: Boolean
   canSubsNEQ: Boolean
   canSubsIsNil: Boolean
   canSubsNotNil: Boolean
-  """can_custom field predicates"""
+  """
+  can_custom field predicates
+  """
   canCustom: Boolean
   canCustomNEQ: Boolean
   canCustomIsNil: Boolean
   canCustomNotNil: Boolean
-  """events edge predicates"""
+  """
+  events edge predicates
+  """
   hasEvents: Boolean
   hasEventsWith: [MsgEventWhereInput!]
-  """subscribers edge predicates"""
+  """
+  subscribers edge predicates
+  """
   hasSubscribers: Boolean
   hasSubscribersWith: [MsgSubscriberWhereInput!]
 }
 type Nlog implements Node {
   id: ID!
   tenantID: Int!
-  """分组键"""
+  """
+  分组键
+  """
   groupKey: String!
-  """接收组名称"""
+  """
+  接收组名称
+  """
   receiver: String!
-  """支持的消息模式:站内信,app推送,邮件,短信,微信等"""
+  """
+  支持的消息模式:站内信,app推送,邮件,短信,微信等
+  """
   receiverType: NlogReceiverType!
-  """通道的索引位置"""
+  """
+  通道的索引位置
+  """
   idx: Int!
-  """发送时间"""
+  """
+  发送时间
+  """
   sendAt: Time!
   createdAt: Time!
   updatedAt: Time
-  """过期时间"""
+  """
+  过期时间
+  """
   expiresAt: Time!
   alerts: [MsgAlert!]
   nlogAlert: [NlogAlert!]
 }
 type NlogAlert implements Node {
   id: ID!
-  """nlog id"""
+  """
+  nlog id
+  """
   nlogID: ID!
-  """alert id"""
+  """
+  alert id
+  """
   alertID: ID!
   createdAt: Time!
   nlog: Nlog!
   alert: MsgAlert!
 }
-"""Ordering options for NlogAlert connections"""
+"""
+Ordering options for NlogAlert connections
+"""
 input NlogAlertOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order NlogAlerts."""
+  """
+  The field by which to order NlogAlerts.
+  """
   field: NlogAlertOrderField!
 }
-"""Properties by which NlogAlert connections can be ordered."""
+"""
+Properties by which NlogAlert connections can be ordered.
+"""
 enum NlogAlertOrderField {
   createdAt
 }
@@ -4399,7 +4987,9 @@ input NlogAlertWhereInput {
   not: NlogAlertWhereInput
   and: [NlogAlertWhereInput!]
   or: [NlogAlertWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -4408,7 +4998,9 @@ input NlogAlertWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """created_at field predicates"""
+  """
+  created_at field predicates
+  """
   createdAt: Time
   createdAtNEQ: Time
   createdAtIn: [Time!]
@@ -4418,34 +5010,58 @@ input NlogAlertWhereInput {
   createdAtLT: Time
   createdAtLTE: Time
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type NlogConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [NlogEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type NlogEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Nlog
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for Nlog connections"""
+"""
+Ordering options for Nlog connections
+"""
 input NlogOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order Nlogs."""
+  """
+  The field by which to order Nlogs.
+  """
   field: NlogOrderField!
 }
-"""Properties by which Nlog connections can be ordered."""
+"""
+Properties by which Nlog connections can be ordered.
+"""
 enum NlogOrderField {
   createdAt
 }
-"""NlogReceiverType is enum for the field receiver_type"""
+"""
+NlogReceiverType is enum for the field receiver_type
+"""
 enum NlogReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
   email
   message
@@ -4459,7 +5075,9 @@ input NlogWhereInput {
   not: NlogWhereInput
   and: [NlogWhereInput!]
   or: [NlogWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -4468,7 +5086,9 @@ input NlogWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """tenant_id field predicates"""
+  """
+  tenant_id field predicates
+  """
   tenantID: Int
   tenantIDNEQ: Int
   tenantIDIn: [Int!]
@@ -4477,7 +5097,9 @@ input NlogWhereInput {
   tenantIDGTE: Int
   tenantIDLT: Int
   tenantIDLTE: Int
-  """group_key field predicates"""
+  """
+  group_key field predicates
+  """
   groupKey: String
   groupKeyNEQ: String
   groupKeyIn: [String!]
@@ -4491,7 +5113,9 @@ input NlogWhereInput {
   groupKeyHasSuffix: String
   groupKeyEqualFold: String
   groupKeyContainsFold: String
-  """receiver field predicates"""
+  """
+  receiver field predicates
+  """
   receiver: String
   receiverNEQ: String
   receiverIn: [String!]
@@ -4505,12 +5129,16 @@ input NlogWhereInput {
   receiverHasSuffix: String
   receiverEqualFold: String
   receiverContainsFold: String
-  """receiver_type field predicates"""
+  """
+  receiver_type field predicates
+  """
   receiverType: NlogReceiverType
   receiverTypeNEQ: NlogReceiverType
   receiverTypeIn: [NlogReceiverType!]
   receiverTypeNotIn: [NlogReceiverType!]
-  """idx field predicates"""
+  """
+  idx field predicates
+  """
   idx: Int
   idxNEQ: Int
   idxIn: [Int!]
@@ -4519,7 +5147,9 @@ input NlogWhereInput {
   idxGTE: Int
   idxLT: Int
   idxLTE: Int
-  """send_at field predicates"""
+  """
+  send_at field predicates
+  """
   sendAt: Time
   sendAtNEQ: Time
   sendAtIn: [Time!]
@@ -4528,7 +5158,9 @@ input NlogWhereInput {
   sendAtGTE: Time
   sendAtLT: Time
   sendAtLTE: Time
-  """created_at field predicates"""
+  """
+  created_at field predicates
+  """
   createdAt: Time
   createdAtNEQ: Time
   createdAtIn: [Time!]
@@ -4537,7 +5169,9 @@ input NlogWhereInput {
   createdAtGTE: Time
   createdAtLT: Time
   createdAtLTE: Time
-  """updated_at field predicates"""
+  """
+  updated_at field predicates
+  """
   updatedAt: Time
   updatedAtNEQ: Time
   updatedAtIn: [Time!]
@@ -4548,7 +5182,9 @@ input NlogWhereInput {
   updatedAtLTE: Time
   updatedAtIsNil: Boolean
   updatedAtNotNil: Boolean
-  """expires_at field predicates"""
+  """
+  expires_at field predicates
+  """
   expiresAt: Time
   expiresAtNEQ: Time
   expiresAtIn: [Time!]
@@ -4557,10 +5193,14 @@ input NlogWhereInput {
   expiresAtGTE: Time
   expiresAtLT: Time
   expiresAtLTE: Time
-  """alerts edge predicates"""
+  """
+  alerts edge predicates
+  """
   hasAlerts: Boolean
   hasAlertsWith: [MsgAlertWhereInput!]
-  """nlog_alert edge predicates"""
+  """
+  nlog_alert edge predicates
+  """
   hasNlogAlert: Boolean
   hasNlogAlertWith: [NlogAlertWhereInput!]
 }
@@ -4569,14 +5209,22 @@ An object with an ID.
 Follows the [Relay Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm)
 """
 interface Node @goModel(model: "github.com/woocoos/msgcenter/ent.Noder") {
-  """The id of the object."""
+  """
+  The id of the object.
+  """
   id: ID!
 }
-"""Possible directions in which to order a list of items when provided an ` + "`" + `orderBy` + "`" + ` argument."""
+"""
+Possible directions in which to order a list of items when provided an ` + "`" + `orderBy` + "`" + ` argument.
+"""
 enum OrderDirection {
-  """Specifies an ascending order for a given ` + "`" + `orderBy` + "`" + ` argument."""
+  """
+  Specifies an ascending order for a given ` + "`" + `orderBy` + "`" + ` argument.
+  """
   ASC
-  """Specifies a descending order for a given ` + "`" + `orderBy` + "`" + ` argument."""
+  """
+  Specifies a descending order for a given ` + "`" + `orderBy` + "`" + ` argument.
+  """
   DESC
 }
 """
@@ -4584,64 +5232,108 @@ Information about pagination in a connection.
 https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
 """
 type PageInfo {
-  """When paginating forwards, are there more items?"""
+  """
+  When paginating forwards, are there more items?
+  """
   hasNextPage: Boolean!
-  """When paginating backwards, are there more items?"""
+  """
+  When paginating backwards, are there more items?
+  """
   hasPreviousPage: Boolean!
-  """When paginating backwards, the cursor to continue."""
+  """
+  When paginating backwards, the cursor to continue.
+  """
   startCursor: Cursor
-  """When paginating forwards, the cursor to continue."""
+  """
+  When paginating forwards, the cursor to continue.
+  """
   endCursor: Cursor
 }
 type Query {
-  """Fetches an object given its ID."""
+  """
+  Fetches an object given its ID.
+  """
   node(
-    """ID of the object."""
+    """
+    ID of the object.
+    """
     id: GID!
   ): Node
-  """Lookup nodes by a list of IDs."""
+  """
+  Lookup nodes by a list of IDs.
+  """
   nodes(
-    """The list of node IDs."""
+    """
+    The list of node IDs.
+    """
     ids: [GID!]!
   ): [Node]!
-  """站内信查询"""
+  """
+  站内信查询
+  """
   msgInternals(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for MsgInternals returned from the connection."""
+    """
+    Ordering options for MsgInternals returned from the connection.
+    """
     orderBy: MsgInternalOrder
 
-    """Filtering options for MsgInternals returned from the connection."""
+    """
+    Filtering options for MsgInternals returned from the connection.
+    """
     where: MsgInternalWhereInput
   ): MsgInternalConnection!
-  """站内信明细查询"""
+  """
+  站内信明细查询
+  """
   msgInternalTos(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for MsgInternalTos returned from the connection."""
+    """
+    Ordering options for MsgInternalTos returned from the connection.
+    """
     orderBy: MsgInternalToOrder
 
-    """Filtering options for MsgInternalTos returned from the connection."""
+    """
+    Filtering options for MsgInternalTos returned from the connection.
+    """
     where: MsgInternalToWhereInput
   ): MsgInternalToConnection!
 }
@@ -4652,47 +5344,83 @@ type Silence implements Node {
   updatedBy: Int
   updatedAt: Time
   tenantID: Int!
-  """应用ID"""
+  """
+  应用ID
+  """
   matchers: [Matcher]
-  """开始时间"""
+  """
+  开始时间
+  """
   startsAt: Time!
-  """结束时间"""
+  """
+  结束时间
+  """
   endsAt: Time!
-  """备注"""
+  """
+  备注
+  """
   comments: String
-  """状态"""
+  """
+  状态
+  """
   state: SilenceSilenceState!
-  """创建人"""
+  """
+  创建人
+  """
   user: User!
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type SilenceConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [SilenceEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type SilenceEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Silence
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for Silence connections"""
+"""
+Ordering options for Silence connections
+"""
 input SilenceOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order Silences."""
+  """
+  The field by which to order Silences.
+  """
   field: SilenceOrderField!
 }
-"""Properties by which Silence connections can be ordered."""
+"""
+Properties by which Silence connections can be ordered.
+"""
 enum SilenceOrderField {
   createdAt
 }
-"""SilenceSilenceState is enum for the field state"""
+"""
+SilenceSilenceState is enum for the field state
+"""
 enum SilenceSilenceState @goModel(model: "github.com/woocoos/msgcenter/pkg/alert.SilenceState") {
   expired
   active
@@ -4706,7 +5434,9 @@ input SilenceWhereInput {
   not: SilenceWhereInput
   and: [SilenceWhereInput!]
   or: [SilenceWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -4715,12 +5445,16 @@ input SilenceWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """created_by field predicates"""
+  """
+  created_by field predicates
+  """
   createdBy: ID
   createdByNEQ: ID
   createdByIn: [ID!]
   createdByNotIn: [ID!]
-  """created_at field predicates"""
+  """
+  created_at field predicates
+  """
   createdAt: Time
   createdAtNEQ: Time
   createdAtIn: [Time!]
@@ -4729,7 +5463,9 @@ input SilenceWhereInput {
   createdAtGTE: Time
   createdAtLT: Time
   createdAtLTE: Time
-  """updated_by field predicates"""
+  """
+  updated_by field predicates
+  """
   updatedBy: Int
   updatedByNEQ: Int
   updatedByIn: [Int!]
@@ -4740,7 +5476,9 @@ input SilenceWhereInput {
   updatedByLTE: Int
   updatedByIsNil: Boolean
   updatedByNotNil: Boolean
-  """updated_at field predicates"""
+  """
+  updated_at field predicates
+  """
   updatedAt: Time
   updatedAtNEQ: Time
   updatedAtIn: [Time!]
@@ -4751,7 +5489,9 @@ input SilenceWhereInput {
   updatedAtLTE: Time
   updatedAtIsNil: Boolean
   updatedAtNotNil: Boolean
-  """tenant_id field predicates"""
+  """
+  tenant_id field predicates
+  """
   tenantID: Int
   tenantIDNEQ: Int
   tenantIDIn: [Int!]
@@ -4760,7 +5500,9 @@ input SilenceWhereInput {
   tenantIDGTE: Int
   tenantIDLT: Int
   tenantIDLTE: Int
-  """starts_at field predicates"""
+  """
+  starts_at field predicates
+  """
   startsAt: Time
   startsAtNEQ: Time
   startsAtIn: [Time!]
@@ -4769,7 +5511,9 @@ input SilenceWhereInput {
   startsAtGTE: Time
   startsAtLT: Time
   startsAtLTE: Time
-  """ends_at field predicates"""
+  """
+  ends_at field predicates
+  """
   endsAt: Time
   endsAtNEQ: Time
   endsAtIn: [Time!]
@@ -4778,29 +5522,43 @@ input SilenceWhereInput {
   endsAtGTE: Time
   endsAtLT: Time
   endsAtLTE: Time
-  """state field predicates"""
+  """
+  state field predicates
+  """
   state: SilenceSilenceState
   stateNEQ: SilenceSilenceState
   stateIn: [SilenceSilenceState!]
   stateNotIn: [SilenceSilenceState!]
 }
-"""The builtin Time type"""
+"""
+The builtin Time type
+"""
 scalar Time
 """
 UpdateMsgChannelInput is used for update MsgChannel object.
 Input was generated by ent.
 """
 input UpdateMsgChannelInput {
-  """消息通道名称"""
+  """
+  消息通道名称
+  """
   name: String
-  """组织ID"""
+  """
+  组织ID
+  """
   tenantID: ID
-  """支持的消息模式:站内信,app推送,邮件,短信,微信等"""
+  """
+  支持的消息模式:站内信,app推送,邮件,短信,微信等
+  """
   receiverType: MsgChannelReceiverType
-  """通道配置Json格式"""
+  """
+  通道配置Json格式
+  """
   receiver: ReceiverInput
   clearReceiver: Boolean
-  """备注"""
+  """
+  备注
+  """
   comments: String
   clearComments: Boolean
 }
@@ -4809,15 +5567,23 @@ UpdateMsgEventInput is used for update MsgEvent object.
 Input was generated by ent.
 """
 input UpdateMsgEventInput {
-  """消息事件名称,应用内唯一"""
+  """
+  消息事件名称,应用内唯一
+  """
   name: String
-  """备注"""
+  """
+  备注
+  """
   comments: String
   clearComments: Boolean
-  """消息路由配置"""
+  """
+  消息路由配置
+  """
   route: RouteInput
   clearRoute: Boolean
-  """根据route配置对应的以,分隔的mode列表"""
+  """
+  根据route配置对应的以,分隔的mode列表
+  """
   modes: String
   msgTypeID: ID
 }
@@ -4826,12 +5592,18 @@ UpdateMsgSubscriberInput is used for update MsgSubscriber object.
 Input was generated by ent.
 """
 input UpdateMsgSubscriberInput {
-  """组织ID"""
+  """
+  组织ID
+  """
   tenantID: ID
-  """用户组ID"""
+  """
+  用户组ID
+  """
   orgRoleID: ID
   clearOrgRoleID: Boolean
-  """是否排除"""
+  """
+  是否排除
+  """
   exclude: Boolean
   clearExclude: Boolean
   msgTypeID: ID
@@ -4843,49 +5615,70 @@ UpdateMsgTemplateInput is used for update MsgTemplate object.
 Input was generated by ent.
 """
 input UpdateMsgTemplateInput {
-  """应用消息类型ID"""
+  """
+  应用消息类型ID
+  """
   msgTypeID: Int
-  """组织ID"""
+  """
+  组织ID
+  """
   tenantID: ID
-  """消息模板名称"""
+  """
+  消息模板名称
+  """
   name: String
-  """消息模式:站内信,app推送,邮件,短信,微信等"""
+  """
+  消息模式:站内信,app推送,邮件,短信,微信等
+  """
   receiverType: MsgTemplateReceiverType
-  """消息类型:文本,网页,需要结合mod确定支持的格式"""
+  """
+  消息类型:文本,网页,需要结合mod确定支持的格式
+  """
   format: MsgTemplateFormat
-  """标题"""
+  """
+  标题
+  """
   subject: String
   clearSubject: Boolean
-  """发件人"""
+  """
+  发件人
+  """
   from: String
   clearFrom: Boolean
-  """收件人"""
+  """
+  收件人
+  """
   to: String
   clearTo: Boolean
-  """抄送"""
+  """
+  抄送
+  """
   cc: String
   clearCc: Boolean
-  """密送"""
+  """
+  密送
+  """
   bcc: String
   clearBcc: Boolean
-  """消息体"""
+  """
+  消息体
+  """
   body: String
   clearBody: Boolean
-  """模板地址。key：/msg/tpl/temp/1/xxx"""
+  """
+  模板地址
+  """
   tpl: String
   clearTpl: Boolean
-  """模板地址"""
-  tplFileID: ID
-  clearTplFileID: Boolean
-  """附件地址。key：/msg/att/1/xxx"""
+  """
+  附件地址
+  """
   attachments: [String!]
   appendAttachments: [String!]
   clearAttachments: Boolean
-  """附件ids"""
-  attachmentsFileIds: [ID!]
-  appendAttachmentsFileIds: [ID!]
-  clearAttachmentsFileIds: Boolean
-  """备注"""
+  """
+  备注
+  """
   comments: String
   clearComments: Boolean
   eventID: ID
@@ -4895,23 +5688,37 @@ UpdateMsgTypeInput is used for update MsgType object.
 Input was generated by ent.
 """
 input UpdateMsgTypeInput {
-  """应用ID"""
+  """
+  应用ID
+  """
   appID: ID
   clearAppID: Boolean
-  """消息类型分类"""
+  """
+  消息类型分类
+  """
   category: String
-  """消息类型名称,应用内唯一"""
+  """
+  消息类型名称,应用内唯一
+  """
   name: String
-  """状态"""
+  """
+  状态
+  """
   status: MsgTypeSimpleStatus
   clearStatus: Boolean
-  """备注"""
+  """
+  备注
+  """
   comments: String
   clearComments: Boolean
-  """是否可订阅"""
+  """
+  是否可订阅
+  """
   canSubs: Boolean
   clearCanSubs: Boolean
-  """是否可定制"""
+  """
+  是否可定制
+  """
   canCustom: Boolean
   clearCanCustom: Boolean
 }
@@ -4920,32 +5727,54 @@ UpdateSilenceInput is used for update Silence object.
 Input was generated by ent.
 """
 input UpdateSilenceInput {
-  """应用ID"""
+  """
+  应用ID
+  """
   matchers: [MatcherInput]
   appendMatchers: [MatcherInput]
   clearMatchers: Boolean
-  """开始时间"""
+  """
+  开始时间
+  """
   startsAt: Time
-  """结束时间"""
+  """
+  结束时间
+  """
   endsAt: Time
-  """备注"""
+  """
+  备注
+  """
   comments: String
   clearComments: Boolean
-  """状态"""
+  """
+  状态
+  """
   state: SilenceSilenceState
 }
 type User implements Node {
-  """ID"""
+  """
+  ID
+  """
   id: ID!
-  """登陆名称"""
+  """
+  登陆名称
+  """
   principalName: String!
-  """显示名"""
+  """
+  显示名
+  """
   displayName: String!
-  """邮箱"""
+  """
+  邮箱
+  """
   email: String
-  """手机"""
+  """
+  手机
+  """
   mobile: String
-  """静默"""
+  """
+  静默
+  """
   silences: [Silence!]
 }
 `, BuiltIn: false},

@@ -85,10 +85,26 @@ func (mcu *MsgChannelUpdate) SetName(s string) *MsgChannelUpdate {
 	return mcu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (mcu *MsgChannelUpdate) SetNillableName(s *string) *MsgChannelUpdate {
+	if s != nil {
+		mcu.SetName(*s)
+	}
+	return mcu
+}
+
 // SetTenantID sets the "tenant_id" field.
 func (mcu *MsgChannelUpdate) SetTenantID(i int) *MsgChannelUpdate {
 	mcu.mutation.ResetTenantID()
 	mcu.mutation.SetTenantID(i)
+	return mcu
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (mcu *MsgChannelUpdate) SetNillableTenantID(i *int) *MsgChannelUpdate {
+	if i != nil {
+		mcu.SetTenantID(*i)
+	}
 	return mcu
 }
 
@@ -101,6 +117,14 @@ func (mcu *MsgChannelUpdate) AddTenantID(i int) *MsgChannelUpdate {
 // SetReceiverType sets the "receiver_type" field.
 func (mcu *MsgChannelUpdate) SetReceiverType(pt profile.ReceiverType) *MsgChannelUpdate {
 	mcu.mutation.SetReceiverType(pt)
+	return mcu
+}
+
+// SetNillableReceiverType sets the "receiver_type" field if the given value is not nil.
+func (mcu *MsgChannelUpdate) SetNillableReceiverType(pt *profile.ReceiverType) *MsgChannelUpdate {
+	if pt != nil {
+		mcu.SetReceiverType(*pt)
+	}
 	return mcu
 }
 
@@ -340,10 +364,26 @@ func (mcuo *MsgChannelUpdateOne) SetName(s string) *MsgChannelUpdateOne {
 	return mcuo
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (mcuo *MsgChannelUpdateOne) SetNillableName(s *string) *MsgChannelUpdateOne {
+	if s != nil {
+		mcuo.SetName(*s)
+	}
+	return mcuo
+}
+
 // SetTenantID sets the "tenant_id" field.
 func (mcuo *MsgChannelUpdateOne) SetTenantID(i int) *MsgChannelUpdateOne {
 	mcuo.mutation.ResetTenantID()
 	mcuo.mutation.SetTenantID(i)
+	return mcuo
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (mcuo *MsgChannelUpdateOne) SetNillableTenantID(i *int) *MsgChannelUpdateOne {
+	if i != nil {
+		mcuo.SetTenantID(*i)
+	}
 	return mcuo
 }
 
@@ -356,6 +396,14 @@ func (mcuo *MsgChannelUpdateOne) AddTenantID(i int) *MsgChannelUpdateOne {
 // SetReceiverType sets the "receiver_type" field.
 func (mcuo *MsgChannelUpdateOne) SetReceiverType(pt profile.ReceiverType) *MsgChannelUpdateOne {
 	mcuo.mutation.SetReceiverType(pt)
+	return mcuo
+}
+
+// SetNillableReceiverType sets the "receiver_type" field if the given value is not nil.
+func (mcuo *MsgChannelUpdateOne) SetNillableReceiverType(pt *profile.ReceiverType) *MsgChannelUpdateOne {
+	if pt != nil {
+		mcuo.SetReceiverType(*pt)
+	}
 	return mcuo
 }
 

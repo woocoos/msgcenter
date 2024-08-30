@@ -68,7 +68,7 @@ func (ec *executionContext) _EmailConfig_to(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_EmailConfig_to(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_EmailConfig_to(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "EmailConfig",
 		Field:      field,
@@ -109,7 +109,7 @@ func (ec *executionContext) _EmailConfig_from(ctx context.Context, field graphql
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_EmailConfig_from(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_EmailConfig_from(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "EmailConfig",
 		Field:      field,
@@ -153,7 +153,7 @@ func (ec *executionContext) _EmailConfig_smartHost(ctx context.Context, field gr
 	return ec.marshalNHostPort2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐHostPort(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_EmailConfig_smartHost(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_EmailConfig_smartHost(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "EmailConfig",
 		Field:      field,
@@ -197,7 +197,7 @@ func (ec *executionContext) _EmailConfig_authType(ctx context.Context, field gra
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_EmailConfig_authType(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_EmailConfig_authType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "EmailConfig",
 		Field:      field,
@@ -241,7 +241,7 @@ func (ec *executionContext) _EmailConfig_authUsername(ctx context.Context, field
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_EmailConfig_authUsername(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_EmailConfig_authUsername(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "EmailConfig",
 		Field:      field,
@@ -285,7 +285,7 @@ func (ec *executionContext) _EmailConfig_authPassword(ctx context.Context, field
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_EmailConfig_authPassword(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_EmailConfig_authPassword(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "EmailConfig",
 		Field:      field,
@@ -329,7 +329,7 @@ func (ec *executionContext) _EmailConfig_authSecret(ctx context.Context, field g
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_EmailConfig_authSecret(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_EmailConfig_authSecret(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "EmailConfig",
 		Field:      field,
@@ -373,7 +373,7 @@ func (ec *executionContext) _EmailConfig_authIdentity(ctx context.Context, field
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_EmailConfig_authIdentity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_EmailConfig_authIdentity(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "EmailConfig",
 		Field:      field,
@@ -414,7 +414,7 @@ func (ec *executionContext) _EmailConfig_headers(ctx context.Context, field grap
 	return ec.marshalOMapString2map(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_EmailConfig_headers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_EmailConfig_headers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "EmailConfig",
 		Field:      field,
@@ -458,7 +458,7 @@ func (ec *executionContext) _Matcher_type(ctx context.Context, field graphql.Col
 	return ec.marshalNMatchType2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐMatchType(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Matcher_type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Matcher_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Matcher",
 		Field:      field,
@@ -502,7 +502,7 @@ func (ec *executionContext) _Matcher_name(ctx context.Context, field graphql.Col
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Matcher_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Matcher_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Matcher",
 		Field:      field,
@@ -546,7 +546,7 @@ func (ec *executionContext) _Matcher_value(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Matcher_value(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Matcher_value(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Matcher",
 		Field:      field,
@@ -587,7 +587,7 @@ func (ec *executionContext) _MessageConfig_to(ctx context.Context, field graphql
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_MessageConfig_to(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_MessageConfig_to(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "MessageConfig",
 		Field:      field,
@@ -628,7 +628,7 @@ func (ec *executionContext) _MessageConfig_subject(ctx context.Context, field gr
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_MessageConfig_subject(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_MessageConfig_subject(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "MessageConfig",
 		Field:      field,
@@ -669,7 +669,7 @@ func (ec *executionContext) _MessageConfig_redirect(ctx context.Context, field g
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_MessageConfig_redirect(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_MessageConfig_redirect(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "MessageConfig",
 		Field:      field,
@@ -713,7 +713,7 @@ func (ec *executionContext) _Receiver_name(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Receiver_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Receiver_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Receiver",
 		Field:      field,
@@ -754,7 +754,7 @@ func (ec *executionContext) _Receiver_emailConfigs(ctx context.Context, field gr
 	return ec.marshalOEmailConfig2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐEmailConfig(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Receiver_emailConfigs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Receiver_emailConfigs(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Receiver",
 		Field:      field,
@@ -815,7 +815,7 @@ func (ec *executionContext) _Receiver_messageConfig(ctx context.Context, field g
 	return ec.marshalOMessageConfig2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐMessageConfig(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Receiver_messageConfig(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Receiver_messageConfig(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Receiver",
 		Field:      field,
@@ -864,7 +864,7 @@ func (ec *executionContext) _Route_receiver(ctx context.Context, field graphql.C
 	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Route_receiver(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Route_receiver(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Route",
 		Field:      field,
@@ -905,7 +905,7 @@ func (ec *executionContext) _Route_groupBy(ctx context.Context, field graphql.Co
 	return ec.marshalOLabelName2ᚕgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐLabelName(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Route_groupBy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Route_groupBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Route",
 		Field:      field,
@@ -946,7 +946,7 @@ func (ec *executionContext) _Route_matchers(ctx context.Context, field graphql.C
 	return ec.marshalOMatcher2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐMatcher(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Route_matchers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Route_matchers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Route",
 		Field:      field,
@@ -995,7 +995,7 @@ func (ec *executionContext) _Route_muteTimeIntervals(ctx context.Context, field 
 	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Route_muteTimeIntervals(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Route_muteTimeIntervals(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Route",
 		Field:      field,
@@ -1036,7 +1036,7 @@ func (ec *executionContext) _Route_activeTimeIntervals(ctx context.Context, fiel
 	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Route_activeTimeIntervals(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Route_activeTimeIntervals(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Route",
 		Field:      field,
@@ -1077,7 +1077,7 @@ func (ec *executionContext) _Route_continue(ctx context.Context, field graphql.C
 	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Route_continue(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Route_continue(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Route",
 		Field:      field,
@@ -1118,7 +1118,7 @@ func (ec *executionContext) _Route_routes(ctx context.Context, field graphql.Col
 	return ec.marshalORoute2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐRoute(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Route_routes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Route_routes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Route",
 		Field:      field,
@@ -1181,7 +1181,7 @@ func (ec *executionContext) _Route_groupWait(ctx context.Context, field graphql.
 	return ec.marshalODuration2ᚖtimeᚐDuration(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Route_groupWait(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Route_groupWait(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Route",
 		Field:      field,
@@ -1222,7 +1222,7 @@ func (ec *executionContext) _Route_GroupInterval(ctx context.Context, field grap
 	return ec.marshalODuration2ᚖtimeᚐDuration(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Route_GroupInterval(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Route_GroupInterval(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Route",
 		Field:      field,
@@ -1263,7 +1263,7 @@ func (ec *executionContext) _Route_repeatInterval(ctx context.Context, field gra
 	return ec.marshalODuration2ᚖtimeᚐDuration(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Route_repeatInterval(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Route_repeatInterval(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Route",
 		Field:      field,
@@ -1511,7 +1511,7 @@ func (ec *executionContext) _Route(ctx context.Context, sel ast.SelectionSet, ob
 		case "matchers":
 			field := field
 
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))

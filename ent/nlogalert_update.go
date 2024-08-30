@@ -37,9 +37,25 @@ func (nau *NlogAlertUpdate) SetNlogID(i int) *NlogAlertUpdate {
 	return nau
 }
 
+// SetNillableNlogID sets the "nlog_id" field if the given value is not nil.
+func (nau *NlogAlertUpdate) SetNillableNlogID(i *int) *NlogAlertUpdate {
+	if i != nil {
+		nau.SetNlogID(*i)
+	}
+	return nau
+}
+
 // SetAlertID sets the "alert_id" field.
 func (nau *NlogAlertUpdate) SetAlertID(i int) *NlogAlertUpdate {
 	nau.mutation.SetAlertID(i)
+	return nau
+}
+
+// SetNillableAlertID sets the "alert_id" field if the given value is not nil.
+func (nau *NlogAlertUpdate) SetNillableAlertID(i *int) *NlogAlertUpdate {
+	if i != nil {
+		nau.SetAlertID(*i)
+	}
 	return nau
 }
 
@@ -99,10 +115,10 @@ func (nau *NlogAlertUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (nau *NlogAlertUpdate) check() error {
-	if _, ok := nau.mutation.NlogID(); nau.mutation.NlogCleared() && !ok {
+	if nau.mutation.NlogCleared() && len(nau.mutation.NlogIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "NlogAlert.nlog"`)
 	}
-	if _, ok := nau.mutation.AlertID(); nau.mutation.AlertCleared() && !ok {
+	if nau.mutation.AlertCleared() && len(nau.mutation.AlertIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "NlogAlert.alert"`)
 	}
 	return nil
@@ -210,9 +226,25 @@ func (nauo *NlogAlertUpdateOne) SetNlogID(i int) *NlogAlertUpdateOne {
 	return nauo
 }
 
+// SetNillableNlogID sets the "nlog_id" field if the given value is not nil.
+func (nauo *NlogAlertUpdateOne) SetNillableNlogID(i *int) *NlogAlertUpdateOne {
+	if i != nil {
+		nauo.SetNlogID(*i)
+	}
+	return nauo
+}
+
 // SetAlertID sets the "alert_id" field.
 func (nauo *NlogAlertUpdateOne) SetAlertID(i int) *NlogAlertUpdateOne {
 	nauo.mutation.SetAlertID(i)
+	return nauo
+}
+
+// SetNillableAlertID sets the "alert_id" field if the given value is not nil.
+func (nauo *NlogAlertUpdateOne) SetNillableAlertID(i *int) *NlogAlertUpdateOne {
+	if i != nil {
+		nauo.SetAlertID(*i)
+	}
 	return nauo
 }
 
@@ -285,10 +317,10 @@ func (nauo *NlogAlertUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (nauo *NlogAlertUpdateOne) check() error {
-	if _, ok := nauo.mutation.NlogID(); nauo.mutation.NlogCleared() && !ok {
+	if nauo.mutation.NlogCleared() && len(nauo.mutation.NlogIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "NlogAlert.nlog"`)
 	}
-	if _, ok := nauo.mutation.AlertID(); nauo.mutation.AlertCleared() && !ok {
+	if nauo.mutation.AlertCleared() && len(nauo.mutation.AlertIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "NlogAlert.alert"`)
 	}
 	return nil

@@ -1657,12 +1657,8 @@ func (ec *executionContext) fieldContext_Mutation_createMsgTemplate(ctx context.
 				return ec.fieldContext_MsgTemplate_body(ctx, field)
 			case "tpl":
 				return ec.fieldContext_MsgTemplate_tpl(ctx, field)
-			case "tplFileID":
-				return ec.fieldContext_MsgTemplate_tplFileID(ctx, field)
 			case "attachments":
 				return ec.fieldContext_MsgTemplate_attachments(ctx, field)
-			case "attachmentsFileIds":
-				return ec.fieldContext_MsgTemplate_attachmentsFileIds(ctx, field)
 			case "comments":
 				return ec.fieldContext_MsgTemplate_comments(ctx, field)
 			case "event":
@@ -1762,12 +1758,8 @@ func (ec *executionContext) fieldContext_Mutation_updateMsgTemplate(ctx context.
 				return ec.fieldContext_MsgTemplate_body(ctx, field)
 			case "tpl":
 				return ec.fieldContext_MsgTemplate_tpl(ctx, field)
-			case "tplFileID":
-				return ec.fieldContext_MsgTemplate_tplFileID(ctx, field)
 			case "attachments":
 				return ec.fieldContext_MsgTemplate_attachments(ctx, field)
-			case "attachmentsFileIds":
-				return ec.fieldContext_MsgTemplate_attachmentsFileIds(ctx, field)
 			case "comments":
 				return ec.fieldContext_MsgTemplate_comments(ctx, field)
 			case "event":
@@ -1922,12 +1914,8 @@ func (ec *executionContext) fieldContext_Mutation_enableMsgTemplate(ctx context.
 				return ec.fieldContext_MsgTemplate_body(ctx, field)
 			case "tpl":
 				return ec.fieldContext_MsgTemplate_tpl(ctx, field)
-			case "tplFileID":
-				return ec.fieldContext_MsgTemplate_tplFileID(ctx, field)
 			case "attachments":
 				return ec.fieldContext_MsgTemplate_attachments(ctx, field)
-			case "attachmentsFileIds":
-				return ec.fieldContext_MsgTemplate_attachmentsFileIds(ctx, field)
 			case "comments":
 				return ec.fieldContext_MsgTemplate_comments(ctx, field)
 			case "event":
@@ -2027,12 +2015,8 @@ func (ec *executionContext) fieldContext_Mutation_disableMsgTemplate(ctx context
 				return ec.fieldContext_MsgTemplate_body(ctx, field)
 			case "tpl":
 				return ec.fieldContext_MsgTemplate_tpl(ctx, field)
-			case "tplFileID":
-				return ec.fieldContext_MsgTemplate_tplFileID(ctx, field)
 			case "attachments":
 				return ec.fieldContext_MsgTemplate_attachments(ctx, field)
-			case "attachmentsFileIds":
-				return ec.fieldContext_MsgTemplate_attachmentsFileIds(ctx, field)
 			case "comments":
 				return ec.fieldContext_MsgTemplate_comments(ctx, field)
 			case "event":
@@ -2647,8 +2631,6 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 		}
 		switch k {
 		case "to":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("to"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -2656,8 +2638,6 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 			}
 			it.To = data
 		case "from":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("from"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -2665,8 +2645,6 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 			}
 			it.From = data
 		case "smartHost":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("smartHost"))
 			data, err := ec.unmarshalNHostPort2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐHostPort(ctx, v)
 			if err != nil {
@@ -2674,8 +2652,6 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 			}
 			it.SmartHost = data
 		case "authType":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authType"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -2683,8 +2659,6 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 			}
 			it.AuthType = data
 		case "authUsername":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authUsername"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -2692,8 +2666,6 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 			}
 			it.AuthUsername = data
 		case "authPassword":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authPassword"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -2701,8 +2673,6 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 			}
 			it.AuthPassword = data
 		case "authSecret":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authSecret"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -2710,8 +2680,6 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 			}
 			it.AuthSecret = data
 		case "authIdentity":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authIdentity"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -2719,8 +2687,6 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 			}
 			it.AuthIdentity = data
 		case "headers":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("headers"))
 			data, err := ec.unmarshalOMapString2map(ctx, v)
 			if err != nil {
@@ -2748,8 +2714,6 @@ func (ec *executionContext) unmarshalInputMatcherInput(ctx context.Context, obj 
 		}
 		switch k {
 		case "type":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
 			data, err := ec.unmarshalNMatchType2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐMatchType(ctx, v)
 			if err != nil {
@@ -2757,8 +2721,6 @@ func (ec *executionContext) unmarshalInputMatcherInput(ctx context.Context, obj 
 			}
 			it.Type = data
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -2766,8 +2728,6 @@ func (ec *executionContext) unmarshalInputMatcherInput(ctx context.Context, obj 
 			}
 			it.Name = data
 		case "value":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -2795,8 +2755,6 @@ func (ec *executionContext) unmarshalInputMessageConfigInput(ctx context.Context
 		}
 		switch k {
 		case "to":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("to"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -2804,8 +2762,6 @@ func (ec *executionContext) unmarshalInputMessageConfigInput(ctx context.Context
 			}
 			it.To = data
 		case "subject":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subject"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -2813,8 +2769,6 @@ func (ec *executionContext) unmarshalInputMessageConfigInput(ctx context.Context
 			}
 			it.Subject = data
 		case "redirect":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("redirect"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -2842,8 +2796,6 @@ func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj
 		}
 		switch k {
 		case "name":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
@@ -2851,8 +2803,6 @@ func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj
 			}
 			it.Name = data
 		case "emailConfigs":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("emailConfigs"))
 			data, err := ec.unmarshalOEmailConfigInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐEmailConfig(ctx, v)
 			if err != nil {
@@ -2860,8 +2810,6 @@ func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj
 			}
 			it.EmailConfigs = data
 		case "messageConfig":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageConfig"))
 			data, err := ec.unmarshalOMessageConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐMessageConfig(ctx, v)
 			if err != nil {
@@ -2889,8 +2837,6 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj in
 		}
 		switch k {
 		case "receiver":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiver"))
 			data, err := ec.unmarshalOString2string(ctx, v)
 			if err != nil {
@@ -2898,8 +2844,6 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj in
 			}
 			it.Receiver = data
 		case "groupBy":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("groupBy"))
 			data, err := ec.unmarshalOLabelName2ᚕgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐLabelName(ctx, v)
 			if err != nil {
@@ -2907,8 +2851,6 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj in
 			}
 			it.GroupBy = data
 		case "matchers":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("matchers"))
 			data, err := ec.unmarshalOMatcherInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐMatcher(ctx, v)
 			if err != nil {
@@ -2918,8 +2860,6 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj in
 				return it, err
 			}
 		case "muteTimeIntervals":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("muteTimeIntervals"))
 			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
@@ -2927,8 +2867,6 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj in
 			}
 			it.MuteTimeIntervals = data
 		case "activeTimeIntervals":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("activeTimeIntervals"))
 			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
@@ -2936,8 +2874,6 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj in
 			}
 			it.ActiveTimeIntervals = data
 		case "continue":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("continue"))
 			data, err := ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
@@ -2945,8 +2881,6 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj in
 			}
 			it.Continue = data
 		case "routes":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("routes"))
 			data, err := ec.unmarshalORouteInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐRoute(ctx, v)
 			if err != nil {
@@ -2954,8 +2888,6 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj in
 			}
 			it.Routes = data
 		case "groupWait":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("groupWait"))
 			data, err := ec.unmarshalODuration2ᚖtimeᚐDuration(ctx, v)
 			if err != nil {
@@ -2963,8 +2895,6 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj in
 			}
 			it.GroupWait = data
 		case "groupInterval":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("groupInterval"))
 			data, err := ec.unmarshalODuration2ᚖtimeᚐDuration(ctx, v)
 			if err != nil {
@@ -2972,8 +2902,6 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj in
 			}
 			it.GroupInterval = data
 		case "repeatInterval":
-			var err error
-
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("repeatInterval"))
 			data, err := ec.unmarshalODuration2ᚖtimeᚐDuration(ctx, v)
 			if err != nil {

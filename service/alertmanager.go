@@ -14,6 +14,7 @@ import (
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service/inhibit"
+	"github.com/woocoos/msgcenter/service/kosdk"
 	"github.com/woocoos/msgcenter/service/provider"
 	"github.com/woocoos/msgcenter/service/provider/mem"
 	"github.com/woocoos/msgcenter/service/silence"
@@ -76,9 +77,15 @@ func NewAlertManager(app *woocoo.App, opts ...AmOption) (*AlertManager, error) {
 		return nil, err
 	}
 
+	koSdk, err := kosdk.NewSDK(app.AppConfiguration().Sub("kosdk"), am.DB)
+	if err != nil {
+		return nil, err
+	}
+
 	am.Coordinator = NewCoordinator(am.cnf)
 	am.Coordinator.db = am.DB
 	am.Subscribe.DB = am.DB
+	am.Coordinator.KOSdk = koSdk
 
 	app.RegisterServer(am.Alerts, am.NotificationLog, am.Silences)
 
