@@ -30,7 +30,7 @@ require (
 	github.com/vektah/gqlparser/v2 v2.5.12
 	github.com/vmihailenco/msgpack/v5 v5.3.5
 	github.com/woocoos/entcache v0.0.0-20231206055445-856f0148efa5
-	github.com/woocoos/knockout-go v0.0.0-20240829122518-cea89e619058
+	github.com/woocoos/knockout-go v0.0.0-20240831084203-f75e619750a2
 	go.uber.org/zap v1.26.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/sync v0.7.0

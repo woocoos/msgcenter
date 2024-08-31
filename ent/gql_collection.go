@@ -31,13 +31,13 @@ func (ma *MsgAlertQuery) CollectFields(ctx context.Context, satisfies ...string)
 	if fc == nil {
 		return ma, nil
 	}
-	if err := ma.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := ma.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
 	return ma, nil
 }
 
-func (ma *MsgAlertQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (ma *MsgAlertQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -121,13 +121,17 @@ func (ma *MsgAlertQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 			}
 			path = append(path, edgesField, nodeField)
 			if field := collectedField(ctx, path...); field != nil {
-				if err := query.collectField(ctx, opCtx, *field, path, mayAddCondition(satisfies, nlogImplementors)...); err != nil {
+				if err := query.collectField(ctx, false, opCtx, *field, path, mayAddCondition(satisfies, nlogImplementors)...); err != nil {
 					return err
 				}
 			}
 			if limit := paginateLimit(args.first, args.last); limit > 0 {
-				modify := limitRows(ctx, msgalert.NlogPrimaryKey[1], limit, args.first, args.last, pager.orderExpr(query))
-				query.modifiers = append(query.modifiers, modify)
+				if oneNode {
+					pager.applyOrder(query.Limit(limit))
+				} else {
+					modify := pagination.LimitPerRow(ctx, msgalert.NlogPrimaryKey[1], limit, args.first, args.last, pager.orderExpr(query))
+					query.modifiers = append(query.modifiers, modify)
+				}
 			} else {
 				query = pager.applyOrder(query)
 			}
@@ -205,13 +209,17 @@ func (ma *MsgAlertQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 			}
 			path = append(path, edgesField, nodeField)
 			if field := collectedField(ctx, path...); field != nil {
-				if err := query.collectField(ctx, opCtx, *field, path, mayAddCondition(satisfies, nlogalertImplementors)...); err != nil {
+				if err := query.collectField(ctx, false, opCtx, *field, path, mayAddCondition(satisfies, nlogalertImplementors)...); err != nil {
 					return err
 				}
 			}
 			if limit := paginateLimit(args.first, args.last); limit > 0 {
-				modify := limitRows(ctx, msgalert.NlogAlertsColumn, limit, args.first, args.last, pager.orderExpr(query))
-				query.modifiers = append(query.modifiers, modify)
+				if oneNode {
+					pager.applyOrder(query.Limit(limit))
+				} else {
+					modify := pagination.LimitPerRow(ctx, msgalert.NlogAlertsColumn, limit, args.first, args.last, pager.orderExpr(query))
+					query.modifiers = append(query.modifiers, modify)
+				}
 			} else {
 				query = pager.applyOrder(query)
 			}
@@ -347,13 +355,13 @@ func (mc *MsgChannelQuery) CollectFields(ctx context.Context, satisfies ...strin
 	if fc == nil {
 		return mc, nil
 	}
-	if err := mc.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := mc.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
 	return mc, nil
 }
 
-func (mc *MsgChannelQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (mc *MsgChannelQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -481,13 +489,13 @@ func (me *MsgEventQuery) CollectFields(ctx context.Context, satisfies ...string)
 	if fc == nil {
 		return me, nil
 	}
-	if err := me.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := me.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
 	return me, nil
 }
 
-func (me *MsgEventQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (me *MsgEventQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -502,7 +510,7 @@ func (me *MsgEventQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				path  = append(path, alias)
 				query = (&MsgTypeClient{config: me.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgtypeImplementors)...); err != nil {
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, msgtypeImplementors)...); err != nil {
 				return err
 			}
 			me.withMsgType = query
@@ -516,7 +524,7 @@ func (me *MsgEventQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				path  = append(path, alias)
 				query = (&MsgTemplateClient{config: me.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgtemplateImplementors)...); err != nil {
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, msgtemplateImplementors)...); err != nil {
 				return err
 			}
 			me.WithNamedCustomerTemplate(alias, func(wq *MsgTemplateQuery) {
@@ -641,13 +649,13 @@ func (mi *MsgInternalQuery) CollectFields(ctx context.Context, satisfies ...stri
 	if fc == nil {
 		return mi, nil
 	}
-	if err := mi.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := mi.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
 	return mi, nil
 }
 
-func (mi *MsgInternalQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (mi *MsgInternalQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -662,7 +670,7 @@ func (mi *MsgInternalQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 				path  = append(path, alias)
 				query = (&MsgInternalToClient{config: mi.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msginternaltoImplementors)...); err != nil {
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, msginternaltoImplementors)...); err != nil {
 				return err
 			}
 			mi.WithNamedMsgInternalTo(alias, func(wq *MsgInternalToQuery) {
@@ -787,13 +795,13 @@ func (mit *MsgInternalToQuery) CollectFields(ctx context.Context, satisfies ...s
 	if fc == nil {
 		return mit, nil
 	}
-	if err := mit.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := mit.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
 	return mit, nil
 }
 
-func (mit *MsgInternalToQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (mit *MsgInternalToQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -808,7 +816,7 @@ func (mit *MsgInternalToQuery) collectField(ctx context.Context, opCtx *graphql.
 				path  = append(path, alias)
 				query = (&MsgInternalClient{config: mit.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msginternalImplementors)...); err != nil {
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, msginternalImplementors)...); err != nil {
 				return err
 			}
 			mit.withMsgInternal = query
@@ -822,7 +830,7 @@ func (mit *MsgInternalToQuery) collectField(ctx context.Context, opCtx *graphql.
 				path  = append(path, alias)
 				query = (&UserClient{config: mit.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
 				return err
 			}
 			mit.withUser = query
@@ -929,13 +937,13 @@ func (ms *MsgSubscriberQuery) CollectFields(ctx context.Context, satisfies ...st
 	if fc == nil {
 		return ms, nil
 	}
-	if err := ms.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := ms.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
 	return ms, nil
 }
 
-func (ms *MsgSubscriberQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (ms *MsgSubscriberQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -950,7 +958,7 @@ func (ms *MsgSubscriberQuery) collectField(ctx context.Context, opCtx *graphql.O
 				path  = append(path, alias)
 				query = (&MsgTypeClient{config: ms.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgtypeImplementors)...); err != nil {
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, msgtypeImplementors)...); err != nil {
 				return err
 			}
 			ms.withMsgType = query
@@ -964,7 +972,7 @@ func (ms *MsgSubscriberQuery) collectField(ctx context.Context, opCtx *graphql.O
 				path  = append(path, alias)
 				query = (&UserClient{config: ms.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
 				return err
 			}
 			ms.withUser = query
@@ -1086,13 +1094,13 @@ func (mt *MsgTemplateQuery) CollectFields(ctx context.Context, satisfies ...stri
 	if fc == nil {
 		return mt, nil
 	}
-	if err := mt.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := mt.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
 	return mt, nil
 }
 
-func (mt *MsgTemplateQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (mt *MsgTemplateQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -1107,7 +1115,7 @@ func (mt *MsgTemplateQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 				path  = append(path, alias)
 				query = (&MsgEventClient{config: mt.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgeventImplementors)...); err != nil {
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, msgeventImplementors)...); err != nil {
 				return err
 			}
 			mt.withEvent = query
@@ -1284,13 +1292,13 @@ func (mt *MsgTypeQuery) CollectFields(ctx context.Context, satisfies ...string) 
 	if fc == nil {
 		return mt, nil
 	}
-	if err := mt.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := mt.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
 	return mt, nil
 }
 
-func (mt *MsgTypeQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (mt *MsgTypeQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -1305,7 +1313,7 @@ func (mt *MsgTypeQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 				path  = append(path, alias)
 				query = (&MsgEventClient{config: mt.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgeventImplementors)...); err != nil {
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, msgeventImplementors)...); err != nil {
 				return err
 			}
 			mt.WithNamedEvents(alias, func(wq *MsgEventQuery) {
@@ -1317,7 +1325,7 @@ func (mt *MsgTypeQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 				path  = append(path, alias)
 				query = (&MsgSubscriberClient{config: mt.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgsubscriberImplementors)...); err != nil {
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, msgsubscriberImplementors)...); err != nil {
 				return err
 			}
 			mt.WithNamedSubscribers(alias, func(wq *MsgSubscriberQuery) {
@@ -1447,13 +1455,13 @@ func (n *NlogQuery) CollectFields(ctx context.Context, satisfies ...string) (*Nl
 	if fc == nil {
 		return n, nil
 	}
-	if err := n.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := n.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
 	return n, nil
 }
 
-func (n *NlogQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (n *NlogQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -1468,7 +1476,7 @@ func (n *NlogQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 				path  = append(path, alias)
 				query = (&MsgAlertClient{config: n.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgalertImplementors)...); err != nil {
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, msgalertImplementors)...); err != nil {
 				return err
 			}
 			n.WithNamedAlerts(alias, func(wq *MsgAlertQuery) {
@@ -1480,7 +1488,7 @@ func (n *NlogQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 				path  = append(path, alias)
 				query = (&NlogAlertClient{config: n.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, nlogalertImplementors)...); err != nil {
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, nlogalertImplementors)...); err != nil {
 				return err
 			}
 			n.WithNamedNlogAlert(alias, func(wq *NlogAlertQuery) {
@@ -1600,13 +1608,13 @@ func (na *NlogAlertQuery) CollectFields(ctx context.Context, satisfies ...string
 	if fc == nil {
 		return na, nil
 	}
-	if err := na.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := na.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
 	return na, nil
 }
 
-func (na *NlogAlertQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (na *NlogAlertQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -1621,7 +1629,7 @@ func (na *NlogAlertQuery) collectField(ctx context.Context, opCtx *graphql.Opera
 				path  = append(path, alias)
 				query = (&NlogClient{config: na.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, nlogImplementors)...); err != nil {
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, nlogImplementors)...); err != nil {
 				return err
 			}
 			na.withNlog = query
@@ -1635,7 +1643,7 @@ func (na *NlogAlertQuery) collectField(ctx context.Context, opCtx *graphql.Opera
 				path  = append(path, alias)
 				query = (&MsgAlertClient{config: na.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, msgalertImplementors)...); err != nil {
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, msgalertImplementors)...); err != nil {
 				return err
 			}
 			na.withAlert = query
@@ -1727,13 +1735,13 @@ func (s *SilenceQuery) CollectFields(ctx context.Context, satisfies ...string) (
 	if fc == nil {
 		return s, nil
 	}
-	if err := s.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := s.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
 	return s, nil
 }
 
-func (s *SilenceQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (s *SilenceQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -1748,7 +1756,7 @@ func (s *SilenceQuery) collectField(ctx context.Context, opCtx *graphql.Operatio
 				path  = append(path, alias)
 				query = (&UserClient{config: s.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
 				return err
 			}
 			s.withUser = query
@@ -1875,13 +1883,13 @@ func (u *UserQuery) CollectFields(ctx context.Context, satisfies ...string) (*Us
 	if fc == nil {
 		return u, nil
 	}
-	if err := u.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := u.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
 	return u, nil
 }
 
-func (u *UserQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
@@ -1896,7 +1904,7 @@ func (u *UserQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 				path  = append(path, alias)
 				query = (&SilenceClient{config: u.config}).Query()
 			)
-			if err := query.collectField(ctx, opCtx, field, path, mayAddCondition(satisfies, silenceImplementors)...); err != nil {
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, silenceImplementors)...); err != nil {
 				return err
 			}
 			u.WithNamedSilences(alias, func(wq *SilenceQuery) {
@@ -2010,45 +2018,6 @@ func unmarshalArgs(ctx context.Context, whereInput any, args map[string]any) map
 	}
 
 	return args
-}
-
-func limitRows(ctx context.Context, partitionBy string, limit int, first, last *int, orderBy ...sql.Querier) func(s *sql.Selector) {
-	offset := 0
-	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
-		if first != nil {
-			offset = (sp.PageIndex - sp.CurrentIndex - 1) * *first
-		}
-		if last != nil {
-			offset = (sp.CurrentIndex - sp.PageIndex - 1) * *last
-		}
-	}
-	return func(s *sql.Selector) {
-		d := sql.Dialect(s.Dialect())
-		s.SetDistinct(false)
-		with := d.With("src_query").
-			As(s.Clone()).
-			With("limited_query").
-			As(
-				d.Select("*").
-					AppendSelectExprAs(
-						sql.RowNumber().PartitionBy(partitionBy).OrderExpr(orderBy...),
-						"row_number",
-					).
-					From(d.Table("src_query")),
-			)
-		t := d.Table("limited_query").As(s.TableName())
-		if offset != 0 {
-			*s = *d.Select(s.UnqualifiedColumns()...).
-				From(t).
-				Where(sql.GT(t.C("row_number"), offset)).Limit(limit).
-				Prefix(with)
-		} else {
-			*s = *d.Select(s.UnqualifiedColumns()...).
-				From(t).
-				Where(sql.LTE(t.C("row_number"), limit)).
-				Prefix(with)
-		}
-	}
 }
 
 // mayAddCondition appends another type condition to the satisfies list

@@ -300,7 +300,8 @@ func (ma *MsgAlertQuery) Paginate(
 	if ma, err = pager.applyCursors(ma, after, before); err != nil {
 		return nil, err
 	}
-	if limit := paginateLimit(first, last); limit != 0 {
+	limit := paginateLimit(first, last)
+	if limit != 0 {
 		ma.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
@@ -312,7 +313,7 @@ func (ma *MsgAlertQuery) Paginate(
 		}
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
-		if err := ma.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+		if err := ma.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
 			return nil, err
 		}
 	}
@@ -603,7 +604,8 @@ func (mc *MsgChannelQuery) Paginate(
 	if mc, err = pager.applyCursors(mc, after, before); err != nil {
 		return nil, err
 	}
-	if limit := paginateLimit(first, last); limit != 0 {
+	limit := paginateLimit(first, last)
+	if limit != 0 {
 		mc.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
@@ -615,7 +617,7 @@ func (mc *MsgChannelQuery) Paginate(
 		}
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
-		if err := mc.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+		if err := mc.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
 			return nil, err
 		}
 	}
@@ -906,7 +908,8 @@ func (me *MsgEventQuery) Paginate(
 	if me, err = pager.applyCursors(me, after, before); err != nil {
 		return nil, err
 	}
-	if limit := paginateLimit(first, last); limit != 0 {
+	limit := paginateLimit(first, last)
+	if limit != 0 {
 		me.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
@@ -918,7 +921,7 @@ func (me *MsgEventQuery) Paginate(
 		}
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
-		if err := me.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+		if err := me.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
 			return nil, err
 		}
 	}
@@ -1209,7 +1212,8 @@ func (mi *MsgInternalQuery) Paginate(
 	if mi, err = pager.applyCursors(mi, after, before); err != nil {
 		return nil, err
 	}
-	if limit := paginateLimit(first, last); limit != 0 {
+	limit := paginateLimit(first, last)
+	if limit != 0 {
 		mi.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
@@ -1221,7 +1225,7 @@ func (mi *MsgInternalQuery) Paginate(
 		}
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
-		if err := mi.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+		if err := mi.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
 			return nil, err
 		}
 	}
@@ -1512,7 +1516,8 @@ func (mit *MsgInternalToQuery) Paginate(
 	if mit, err = pager.applyCursors(mit, after, before); err != nil {
 		return nil, err
 	}
-	if limit := paginateLimit(first, last); limit != 0 {
+	limit := paginateLimit(first, last)
+	if limit != 0 {
 		mit.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
@@ -1524,7 +1529,7 @@ func (mit *MsgInternalToQuery) Paginate(
 		}
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
-		if err := mit.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+		if err := mit.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
 			return nil, err
 		}
 	}
@@ -1815,7 +1820,8 @@ func (ms *MsgSubscriberQuery) Paginate(
 	if ms, err = pager.applyCursors(ms, after, before); err != nil {
 		return nil, err
 	}
-	if limit := paginateLimit(first, last); limit != 0 {
+	limit := paginateLimit(first, last)
+	if limit != 0 {
 		ms.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
@@ -1827,7 +1833,7 @@ func (ms *MsgSubscriberQuery) Paginate(
 		}
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
-		if err := ms.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+		if err := ms.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
 			return nil, err
 		}
 	}
@@ -2118,7 +2124,8 @@ func (mt *MsgTemplateQuery) Paginate(
 	if mt, err = pager.applyCursors(mt, after, before); err != nil {
 		return nil, err
 	}
-	if limit := paginateLimit(first, last); limit != 0 {
+	limit := paginateLimit(first, last)
+	if limit != 0 {
 		mt.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
@@ -2130,7 +2137,7 @@ func (mt *MsgTemplateQuery) Paginate(
 		}
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
-		if err := mt.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+		if err := mt.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
 			return nil, err
 		}
 	}
@@ -2421,7 +2428,8 @@ func (mt *MsgTypeQuery) Paginate(
 	if mt, err = pager.applyCursors(mt, after, before); err != nil {
 		return nil, err
 	}
-	if limit := paginateLimit(first, last); limit != 0 {
+	limit := paginateLimit(first, last)
+	if limit != 0 {
 		mt.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
@@ -2433,7 +2441,7 @@ func (mt *MsgTypeQuery) Paginate(
 		}
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
-		if err := mt.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+		if err := mt.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
 			return nil, err
 		}
 	}
@@ -2724,7 +2732,8 @@ func (n *NlogQuery) Paginate(
 	if n, err = pager.applyCursors(n, after, before); err != nil {
 		return nil, err
 	}
-	if limit := paginateLimit(first, last); limit != 0 {
+	limit := paginateLimit(first, last)
+	if limit != 0 {
 		n.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
@@ -2736,7 +2745,7 @@ func (n *NlogQuery) Paginate(
 		}
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
-		if err := n.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+		if err := n.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
 			return nil, err
 		}
 	}
@@ -3027,7 +3036,8 @@ func (na *NlogAlertQuery) Paginate(
 	if na, err = pager.applyCursors(na, after, before); err != nil {
 		return nil, err
 	}
-	if limit := paginateLimit(first, last); limit != 0 {
+	limit := paginateLimit(first, last)
+	if limit != 0 {
 		na.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
@@ -3039,7 +3049,7 @@ func (na *NlogAlertQuery) Paginate(
 		}
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
-		if err := na.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+		if err := na.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
 			return nil, err
 		}
 	}
@@ -3330,7 +3340,8 @@ func (s *SilenceQuery) Paginate(
 	if s, err = pager.applyCursors(s, after, before); err != nil {
 		return nil, err
 	}
-	if limit := paginateLimit(first, last); limit != 0 {
+	limit := paginateLimit(first, last)
+	if limit != 0 {
 		s.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
@@ -3342,7 +3353,7 @@ func (s *SilenceQuery) Paginate(
 		}
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
-		if err := s.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+		if err := s.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
 			return nil, err
 		}
 	}
@@ -3633,7 +3644,8 @@ func (u *UserQuery) Paginate(
 	if u, err = pager.applyCursors(u, after, before); err != nil {
 		return nil, err
 	}
-	if limit := paginateLimit(first, last); limit != 0 {
+	limit := paginateLimit(first, last)
+	if limit != 0 {
 		u.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
@@ -3645,7 +3657,7 @@ func (u *UserQuery) Paginate(
 		}
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
-		if err := u.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+		if err := u.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
 			return nil, err
 		}
 	}
