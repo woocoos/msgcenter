@@ -10,6 +10,7 @@ import (
 	"github.com/tsingsun/woocoo/pkg/security"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/knockout-go/pkg/identity"
+	"github.com/woocoos/knockout-go/pkg/koapp"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/pkg/label"
@@ -42,6 +43,8 @@ func (o *BaseSuite) Setup() error {
 	o.App = initTestApp()
 	o.Cnf = o.App.AppConfiguration()
 	o.redis = initMiniRedis(o.Cnf)
+
+	koapp.BuildCacheComponents(o.Cnf)
 
 	if o.DSN == "" && o.DriverName == "" {
 		o.DriverName = "sqlite3"
@@ -89,10 +92,8 @@ func initTestApp() *woocoo.App {
 func open(ctx context.Context, driverName, dsn string) (*ent.Client, error) {
 	client, err := ent.Open(driverName, dsn,
 		ent.Debug(), ent.AlternateSchema(ent.SchemaConfig{
-			User:         "portal",
-			OrgRoleUser:  "portal",
-			FileIdentity: "portal",
-			FileSource:   "portal",
+			User:        "portal",
+			OrgRoleUser: "portal",
 		}),
 	)
 	if err != nil {
@@ -147,8 +148,7 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
 		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
-		SetBody(`{{ template "1.alterpwd.txt" . }}`).SetAttachments([]string{"1/alterpwd.tmpl"}).
-		SetTpl("1/alterpwd.tmpl").SaveX(ctx)
+		SetBody(`{{ template "1.alterpwd.txt" . }}`).SaveX(ctx)
 
 	client.MsgChannel.Create().SetName("email").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
 		SetTenantID(1).SetReceiverType(profile.ReceiverEmail).
@@ -162,12 +162,6 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 				},
 			},
 		}).SaveX(ctx)
-	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(1).SetTenantID(1).SetName(alterPassWordEventName).SetCreatedBy(1).
-		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
-		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
-		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
-		SetBody(`{{ template "1.alterpwd.txt" . }}`).SetAttachments([]string{"1/alterpwd.tmpl"}).
-		SetTpl("1/alterpwd.tmpl").SaveX(ctx)
 
 	client.MsgType.Create().SetName("alert1").SetID(2).SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
 		SetAppID(1).SetCategory("订阅类型").SetCanSubs(true).SetCanCustom(true).SaveX(ctx)
@@ -201,8 +195,7 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
 		SetSubject(`订阅事件提醒`).SetCc(`{{ template "email.cc" . }}`).
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
-		SetBody(`{{ template "1.subevent.txt" . }}`).
-		SetTpl("1/subevent.tmpl").SaveX(ctx)
+		SetBody(`{{ template "1.subevent.txt" . }}`).SaveX(ctx)
 
 	client.MsgChannel.Create().SetName("webhook").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
 		SetTenantID(1).SetReceiverType(profile.ReceiverWebhook).
