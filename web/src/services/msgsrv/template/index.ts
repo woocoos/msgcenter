@@ -43,11 +43,17 @@ const queryMsgTemplateInfo = gql(/* GraphQL */`query MsgTemplateInfo($gid:GID!){
 }`);
 
 const mutationCreateMsgTemplate = gql(/* GraphQL */`mutation createMsgTemplate($input: CreateMsgTemplateInput!){
-  createMsgTemplate(input: $input){id}
+  createMsgTemplate(input: $input){
+    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,
+    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments
+  }
 }`);
 
 const mutationUpdateMsgTemplate = gql(/* GraphQL */`mutation updateMsgTemplate($id:ID!,$input: UpdateMsgTemplateInput!){
-  updateMsgTemplate(id:$id,input: $input){id}
+  updateMsgTemplate(id:$id,input: $input){
+    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,
+    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments
+  }
 }`);
 
 const mutationDelMsgTemplate = gql(/* GraphQL */`mutation delMsgTemplate($id:ID!){
@@ -55,11 +61,17 @@ const mutationDelMsgTemplate = gql(/* GraphQL */`mutation delMsgTemplate($id:ID!
 }`);
 
 const mutationEnableMsgTemplate = gql(/* GraphQL */`mutation enableMsgTemplate($id:ID!){
-  enableMsgTemplate(id:$id){id}
+  enableMsgTemplate(id:$id){
+    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,
+    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments
+  }
 }`);
 
 const mutationDisableMsgTemplate = gql(/* GraphQL */`mutation disableMsgTemplate($id:ID!){
-  disableMsgTemplate(id:$id){id}
+  disableMsgTemplate(id:$id){
+    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,
+    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments
+  }
 }`);
 
 

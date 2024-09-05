@@ -2,7 +2,7 @@ import { DrawerForm, ProFormText } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getMsgEventInfoRoute, updateMsgEvent } from '@/services/msgsrv/event';
-import { MatchType, RouteStrType } from '@/generated/msgsrv/graphql';
+import { MatchType, MsgEvent, RouteStrType } from '@/generated/msgsrv/graphql';
 import * as yaml from 'js-yaml'
 import { Alert, Typography } from 'antd';
 import { useLeavePrompt } from '@knockout-js/layout';
@@ -16,7 +16,7 @@ export default (props: {
   open: boolean;
   title?: string;
   id: string;
-  onClose: (isSuccess?: boolean) => void;
+  onClose: (isSuccess?: boolean, newInfo?: MsgEvent) => void;
 }) => {
   const { t } = useTranslation(),
     [errStr, setErrStr] = useState<string>(),
@@ -73,7 +73,7 @@ export default (props: {
         });
         if (result?.id) {
           setSaveDisabled(true);
-          props.onClose(true);
+          props.onClose(true, result as MsgEvent);
         }
       } catch (error) {
         setErrStr(error.message)

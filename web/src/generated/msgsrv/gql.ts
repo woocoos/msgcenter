@@ -15,23 +15,23 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 const documents = {
     "query msgChannelList($first: Int,$orderBy:MsgChannelOrder,$where:MsgChannelWhereInput){\n  msgChannels(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,receiverType,tenantID,comments,status,status,createdAt\n      }\n    }\n  }\n}": types.MsgChannelListDocument,
     "query msgChannelInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgChannel{\n      id,name,receiverType,tenantID,comments,status,status,createdAt\n    }\n  }\n}": types.MsgChannelInfoDocument,
-    "query msgChannelReceiverInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgChannel{\n      id,receiver{\n        name,\n        emailConfigs{\n          authIdentity,authPassword,authSecret,authType,authUsername,from,headers,smartHost,to\n        },\n        messageConfig{\n          redirect,subject,to\n        }\n      }\n    }\n  }\n}": types.MsgChannelReceiverInfoDocument,
-    "mutation createMsgChannel($input: CreateMsgChannelInput!){\n createMsgChannel(input:$input){id}\n}": types.CreateMsgChannelDocument,
-    "mutation updateMsgChannel($id:ID!,$input: UpdateMsgChannelInput!){\n updateMsgChannel(id:$id,input:$input){id}\n}": types.UpdateMsgChannelDocument,
+    "query msgChannelReceiverInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgChannel{\n      id,name,receiverType,tenantID,comments,status,status,createdAt,\n      receiver{\n        name,\n        emailConfigs{\n          authIdentity,authPassword,authSecret,authType,authUsername,from,headers,smartHost,to\n        },\n        messageConfig{\n          redirect,subject,to\n        }\n      }\n    }\n  }\n}": types.MsgChannelReceiverInfoDocument,
+    "mutation createMsgChannel($input: CreateMsgChannelInput!){\n createMsgChannel(input:$input){id,name,receiverType,tenantID,comments,status,status,createdAt}\n}": types.CreateMsgChannelDocument,
+    "mutation updateMsgChannel($id:ID!,$input: UpdateMsgChannelInput!){\n updateMsgChannel(id:$id,input:$input){id,name,receiverType,tenantID,comments,status,status,createdAt}\n}": types.UpdateMsgChannelDocument,
     "mutation delMsgChannel($id:ID!){\n deleteMsgChannel(id:$id)\n}": types.DelMsgChannelDocument,
-    "mutation enableMsgChannel($id:ID!){\n enableMsgChannel(id:$id){id}\n}": types.EnableMsgChannelDocument,
-    "mutation disableMsgChannel($id:ID!){\n disableMsgChannel(id:$id){id}\n}": types.DisableMsgChannelDocument,
+    "mutation enableMsgChannel($id:ID!){\n enableMsgChannel(id:$id){id,name,receiverType,tenantID,comments,status,status,createdAt}\n}": types.EnableMsgChannelDocument,
+    "mutation disableMsgChannel($id:ID!){\n disableMsgChannel(id:$id){id,name,receiverType,tenantID,comments,status,status,createdAt}\n}": types.DisableMsgChannelDocument,
     "query msgEventList($first: Int,$orderBy:MsgEventOrder,$where:MsgEventWhereInput){\n  msgEvents(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,status,createdAt,msgTypeID,modes\n        msgType{\n          id,category,appID,name\n        }\n      }\n    }\n  }\n}": types.MsgEventListDocument,
     "query MsgEventInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes\n      msgType{\n        id,category,appID,name\n      }\n    }\n  }\n}": types.MsgEventInfoDocument,
-    "query MsgEventInfoRoute($gid:GID!,$type:RouteStrType!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes,routeStr(type:$type)\n    }\n  }\n}\n": types.MsgEventInfoRouteDocument,
-    "mutation createMsgEvent($input: CreateMsgEventInput!){\n  createMsgEvent(input: $input){id}\n}": types.CreateMsgEventDocument,
-    "mutation updateMsgEvent($id:ID!,$input: UpdateMsgEventInput!){\n  updateMsgEvent(id:$id,input: $input){id}\n}": types.UpdateMsgEventDocument,
+    "query MsgEventInfoRoute($gid:GID!,$type:RouteStrType!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes,routeStr(type:$type)\n      msgType{\n        id,category,appID,name\n      }\n    }\n  }\n}\n": types.MsgEventInfoRouteDocument,
+    "mutation createMsgEvent($input: CreateMsgEventInput!){\n  createMsgEvent(input: $input){\n    id,name,comments,status,createdAt,msgTypeID,modes\n    msgType{\n      id,category,appID,name\n    }\n  }\n}": types.CreateMsgEventDocument,
+    "mutation updateMsgEvent($id:ID!,$input: UpdateMsgEventInput!){\n  updateMsgEvent(id:$id,input: $input){\n    id,name,comments,status,createdAt,msgTypeID,modes\n    msgType{\n      id,category,appID,name\n    }\n  }\n}": types.UpdateMsgEventDocument,
     "mutation delMsgEvent($id:ID!){\n  deleteMsgEvent(id:$id)\n}": types.DelMsgEventDocument,
-    "mutation enableMsgEvent($id:ID!){\n  enableMsgEvent(id:$id){id}\n}": types.EnableMsgEventDocument,
-    "mutation disableMsgEvent($id:ID!){\n  disableMsgEvent(id:$id){id}\n}": types.DisableMsgEventDocument,
+    "mutation enableMsgEvent($id:ID!){\n  enableMsgEvent(id:$id){\n    id,name,comments,status,createdAt,msgTypeID,modes\n    msgType{\n      id,category,appID,name\n    }\n  }\n}": types.EnableMsgEventDocument,
+    "mutation disableMsgEvent($id:ID!){\n  disableMsgEvent(id:$id){\n    id,name,comments,status,createdAt,msgTypeID,modes\n    msgType{\n      id,category,appID,name\n    }\n  }\n}": types.DisableMsgEventDocument,
     "query msgInternalList($first: Int,$orderBy: MsgInternalOrder,$where:MsgInternalWhereInput){\n  msgInternals(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,tenantID,createdBy,createdAt,subject,body,format,redirect\n      }\n    }\n  }\n}": types.MsgInternalListDocument,
     "query userMsgInternalList($first: Int,$orderBy: MsgInternalToOrder,$where:MsgInternalToWhereInput){\n  userMsgInternalTos(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,msgInternalID,createdAt,deleteAt,readAt,userID\n        msgInternal{\n          id,tenantID,createdBy,createdAt,subject,body,format,redirect,category\n        }\n      }\n    }\n  }\n}": types.UserMsgInternalListDocument,
-    "query msgInternalInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgInternal{\n      id,tenantID,createdBy,createdAt,subject,body,format,redirect\n    }\n  }\n}": types.MsgInternalInfoDocument,
+    "query msgInternalInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgInternal{\n      id,tenantID,createdBy,createdAt,subject,body,format,redirect,category\n    }\n  }\n}": types.MsgInternalInfoDocument,
     "query userMsgCategory{\n  userSubMsgCategory\n}": types.UserMsgCategoryDocument,
     "query userMsgCategoryNum($categories:[String!]!){\n  userUnreadMsgInternalsFromMsgCategory(categories:$categories)\n}": types.UserMsgCategoryNumDocument,
     "query msgInternalToInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgInternalTo{\n      id,msgInternalID,createdAt,deleteAt,readAt,userID\n      msgInternal{\n        id,tenantID,createdBy,createdAt,subject,body,format,redirect,category\n      }\n    }\n  }\n}": types.MsgInternalToInfoDocument,
@@ -42,27 +42,27 @@ const documents = {
     "query msgAlertLogList($gid:GID!,$first: Int,$orderBy:NlogOrder,$where:NlogWhereInput){\n   node(id: $gid){\n    id\n    ... on MsgAlert{\n      id,\n      nlog(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,sendAt,expiresAt,groupKey,receiver,receiverType\n          }\n        }\n      }\n    }\n  }\n}": types.MsgAlertLogListDocument,
     "query silenceList($first: Int,$orderBy:SilenceOrder,$where:SilenceWhereInput){\n  silences(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,tenantID,comments,createdAt,startsAt,endsAt,state,\n        matchers{\n          type,name,value\n        }\n\n      }\n    }\n  }\n}": types.SilenceListDocument,
     "query SilenceInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on Silence{\n      id,tenantID,startsAt,endsAt,comments,state\n      matchers{\n        type,name,value\n      }\n    }\n  }\n}": types.SilenceInfoDocument,
-    "mutation createSilence($input: CreateSilenceInput!){\n  createSilence(input: $input){id}\n}": types.CreateSilenceDocument,
-    "mutation updateSilence($id:ID!,$input: UpdateSilenceInput!){\n  updateSilence(id:$id,input: $input){id}\n}": types.UpdateSilenceDocument,
+    "mutation createSilence($input: CreateSilenceInput!){\n  createSilence(input: $input){\n    id,tenantID,comments,createdAt,startsAt,endsAt,state,\n    matchers{\n      type,name,value\n    }\n  }\n}": types.CreateSilenceDocument,
+    "mutation updateSilence($id:ID!,$input: UpdateSilenceInput!){\n  updateSilence(id:$id,input: $input){\n    id,tenantID,comments,createdAt,startsAt,endsAt,state,\n    matchers{\n      type,name,value\n    }\n  }\n}": types.UpdateSilenceDocument,
     "mutation delSilence($id:ID!){\n  deleteSilence(id:$id)\n}": types.DelSilenceDocument,
     "query msgTemplateList($first: Int,$orderBy:MsgTemplateOrder,$where:MsgTemplateWhereInput){\n  msgTemplates(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n        receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n      }\n    }\n  }\n}": types.MsgTemplateListDocument,
     "query MsgTemplateInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgTemplate{\n      id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n      receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n    }\n  }\n}": types.MsgTemplateInfoDocument,
-    "mutation createMsgTemplate($input: CreateMsgTemplateInput!){\n  createMsgTemplate(input: $input){id}\n}": types.CreateMsgTemplateDocument,
-    "mutation updateMsgTemplate($id:ID!,$input: UpdateMsgTemplateInput!){\n  updateMsgTemplate(id:$id,input: $input){id}\n}": types.UpdateMsgTemplateDocument,
+    "mutation createMsgTemplate($input: CreateMsgTemplateInput!){\n  createMsgTemplate(input: $input){\n    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n  }\n}": types.CreateMsgTemplateDocument,
+    "mutation updateMsgTemplate($id:ID!,$input: UpdateMsgTemplateInput!){\n  updateMsgTemplate(id:$id,input: $input){\n    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n  }\n}": types.UpdateMsgTemplateDocument,
     "mutation delMsgTemplate($id:ID!){\n  deleteMsgTemplate(id:$id)\n}": types.DelMsgTemplateDocument,
-    "mutation enableMsgTemplate($id:ID!){\n  enableMsgTemplate(id:$id){id}\n}": types.EnableMsgTemplateDocument,
-    "mutation disableMsgTemplate($id:ID!){\n  disableMsgTemplate(id:$id){id}\n}": types.DisableMsgTemplateDocument,
+    "mutation enableMsgTemplate($id:ID!){\n  enableMsgTemplate(id:$id){\n    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n  }\n}": types.EnableMsgTemplateDocument,
+    "mutation disableMsgTemplate($id:ID!){\n  disableMsgTemplate(id:$id){\n    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n  }\n}": types.DisableMsgTemplateDocument,
     "mutation testSendEmailTpl($annotations: MapString, $email: String!, $labels: MapString, $tplID: ID!){\n  testSendEmailTpl(annotations: $annotations, email: $email, labels:$labels, tplID: $tplID)\n}": types.TestSendEmailTplDocument,
     "mutation testSendMessageTpl($annotations: MapString, $userID: ID!, $labels: MapString, $tplID: ID!){\n  testSendMessageTpl(annotations: $annotations, userID: $userID, labels:$labels, tplID: $tplID)\n}": types.TestSendMessageTplDocument,
     "query msgTypeList($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n      }\n    }\n  }\n}": types.MsgTypeListDocument,
     "query msgTypeInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgType{\n      id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n    }\n  }\n}": types.MsgTypeInfoDocument,
-    "mutation createMsgType($input: CreateMsgTypeInput!){\n  createMsgType(input: $input){id}\n}": types.CreateMsgTypeDocument,
-    "mutation updateMsgType($id:ID!,$input: UpdateMsgTypeInput!){\n  updateMsgType(id:$id,input: $input){id}\n}": types.UpdateMsgTypeDocument,
+    "mutation createMsgType($input: CreateMsgTypeInput!){\n  createMsgType(input: $input){\n    id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n  }\n}": types.CreateMsgTypeDocument,
+    "mutation updateMsgType($id:ID!,$input: UpdateMsgTypeInput!){\n  updateMsgType(id:$id,input: $input){\n    id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n  }\n}": types.UpdateMsgTypeDocument,
     "mutation delMsgType($id:ID!){\n  deleteMsgType(id:$id)\n}": types.DelMsgTypeDocument,
     "query msgTypeCategory($keyword:String,$appID:ID){\n  msgTypeCategories(keyword: $keyword,appID:$appID)\n}": types.MsgTypeCategoryDocument,
-    "query msgTypeListAndSub($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,category,\n        subscriberUsers{\n          id,tenantID,msgTypeID,userID\n        },\n        subscriberRoles{\n          id,tenantID,msgTypeID,orgRoleID\n        },\n        excludeSubscriberUsers{\n          id,tenantID,msgTypeID,userID\n        }\n      }\n    }\n  }\n}": types.MsgTypeListAndSubDocument,
-    "query msgTypeAndSubInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgType{\n      id,name,appID,category,\n      subscriberUsers{\n        id,tenantID,msgTypeID,userID\n      },\n      subscriberRoles{\n        id,tenantID,msgTypeID,orgRoleID\n      },\n      excludeSubscriberUsers{\n        id,tenantID,msgTypeID,userID\n      }\n    }\n  }\n}": types.MsgTypeAndSubInfoDocument,
-    "mutation createMsgSubscriber($inputs: [CreateMsgSubscriberInput!]!){\n  createMsgSubscriber(inputs: $inputs){id}\n}": types.CreateMsgSubscriberDocument,
+    "query msgTypeListAndSub($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n        subscriberUsers{\n          id,tenantID,msgTypeID,userID\n        },\n        subscriberRoles{\n          id,tenantID,msgTypeID,orgRoleID\n        },\n        excludeSubscriberUsers{\n          id,tenantID,msgTypeID,userID\n        }\n      }\n    }\n  }\n}": types.MsgTypeListAndSubDocument,
+    "query msgTypeAndSubInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgType{\n      id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n      subscriberUsers{\n        id,tenantID,msgTypeID,userID\n      },\n      subscriberRoles{\n        id,tenantID,msgTypeID,orgRoleID\n      },\n      excludeSubscriberUsers{\n        id,tenantID,msgTypeID,userID\n      }\n    }\n  }\n}": types.MsgTypeAndSubInfoDocument,
+    "mutation createMsgSubscriber($inputs: [CreateMsgSubscriberInput!]!){\n  createMsgSubscriber(inputs: $inputs){\n    id,tenantID,msgTypeID,userID\n  }\n}": types.CreateMsgSubscriberDocument,
     "mutation deleteMsgSubscriber($ids: [ID!]!){\n  deleteMsgSubscriber(ids: $ids)\n}": types.DeleteMsgSubscriberDocument,
 };
 
@@ -91,15 +91,15 @@ export function gql(source: "query msgChannelInfo($gid:GID!){\n  node(id: $gid){
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query msgChannelReceiverInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgChannel{\n      id,receiver{\n        name,\n        emailConfigs{\n          authIdentity,authPassword,authSecret,authType,authUsername,from,headers,smartHost,to\n        },\n        messageConfig{\n          redirect,subject,to\n        }\n      }\n    }\n  }\n}"): (typeof documents)["query msgChannelReceiverInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgChannel{\n      id,receiver{\n        name,\n        emailConfigs{\n          authIdentity,authPassword,authSecret,authType,authUsername,from,headers,smartHost,to\n        },\n        messageConfig{\n          redirect,subject,to\n        }\n      }\n    }\n  }\n}"];
+export function gql(source: "query msgChannelReceiverInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgChannel{\n      id,name,receiverType,tenantID,comments,status,status,createdAt,\n      receiver{\n        name,\n        emailConfigs{\n          authIdentity,authPassword,authSecret,authType,authUsername,from,headers,smartHost,to\n        },\n        messageConfig{\n          redirect,subject,to\n        }\n      }\n    }\n  }\n}"): (typeof documents)["query msgChannelReceiverInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgChannel{\n      id,name,receiverType,tenantID,comments,status,status,createdAt,\n      receiver{\n        name,\n        emailConfigs{\n          authIdentity,authPassword,authSecret,authType,authUsername,from,headers,smartHost,to\n        },\n        messageConfig{\n          redirect,subject,to\n        }\n      }\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createMsgChannel($input: CreateMsgChannelInput!){\n createMsgChannel(input:$input){id}\n}"): (typeof documents)["mutation createMsgChannel($input: CreateMsgChannelInput!){\n createMsgChannel(input:$input){id}\n}"];
+export function gql(source: "mutation createMsgChannel($input: CreateMsgChannelInput!){\n createMsgChannel(input:$input){id,name,receiverType,tenantID,comments,status,status,createdAt}\n}"): (typeof documents)["mutation createMsgChannel($input: CreateMsgChannelInput!){\n createMsgChannel(input:$input){id,name,receiverType,tenantID,comments,status,status,createdAt}\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateMsgChannel($id:ID!,$input: UpdateMsgChannelInput!){\n updateMsgChannel(id:$id,input:$input){id}\n}"): (typeof documents)["mutation updateMsgChannel($id:ID!,$input: UpdateMsgChannelInput!){\n updateMsgChannel(id:$id,input:$input){id}\n}"];
+export function gql(source: "mutation updateMsgChannel($id:ID!,$input: UpdateMsgChannelInput!){\n updateMsgChannel(id:$id,input:$input){id,name,receiverType,tenantID,comments,status,status,createdAt}\n}"): (typeof documents)["mutation updateMsgChannel($id:ID!,$input: UpdateMsgChannelInput!){\n updateMsgChannel(id:$id,input:$input){id,name,receiverType,tenantID,comments,status,status,createdAt}\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -107,11 +107,11 @@ export function gql(source: "mutation delMsgChannel($id:ID!){\n deleteMsgChannel
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation enableMsgChannel($id:ID!){\n enableMsgChannel(id:$id){id}\n}"): (typeof documents)["mutation enableMsgChannel($id:ID!){\n enableMsgChannel(id:$id){id}\n}"];
+export function gql(source: "mutation enableMsgChannel($id:ID!){\n enableMsgChannel(id:$id){id,name,receiverType,tenantID,comments,status,status,createdAt}\n}"): (typeof documents)["mutation enableMsgChannel($id:ID!){\n enableMsgChannel(id:$id){id,name,receiverType,tenantID,comments,status,status,createdAt}\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation disableMsgChannel($id:ID!){\n disableMsgChannel(id:$id){id}\n}"): (typeof documents)["mutation disableMsgChannel($id:ID!){\n disableMsgChannel(id:$id){id}\n}"];
+export function gql(source: "mutation disableMsgChannel($id:ID!){\n disableMsgChannel(id:$id){id,name,receiverType,tenantID,comments,status,status,createdAt}\n}"): (typeof documents)["mutation disableMsgChannel($id:ID!){\n disableMsgChannel(id:$id){id,name,receiverType,tenantID,comments,status,status,createdAt}\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -123,15 +123,15 @@ export function gql(source: "query MsgEventInfo($gid:GID!){\n  node(id: $gid){\n
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query MsgEventInfoRoute($gid:GID!,$type:RouteStrType!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes,routeStr(type:$type)\n    }\n  }\n}\n"): (typeof documents)["query MsgEventInfoRoute($gid:GID!,$type:RouteStrType!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes,routeStr(type:$type)\n    }\n  }\n}\n"];
+export function gql(source: "query MsgEventInfoRoute($gid:GID!,$type:RouteStrType!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes,routeStr(type:$type)\n      msgType{\n        id,category,appID,name\n      }\n    }\n  }\n}\n"): (typeof documents)["query MsgEventInfoRoute($gid:GID!,$type:RouteStrType!){\n  node(id: $gid){\n    id\n    ... on MsgEvent{\n      id,name,comments,status,createdAt,msgTypeID,modes,routeStr(type:$type)\n      msgType{\n        id,category,appID,name\n      }\n    }\n  }\n}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createMsgEvent($input: CreateMsgEventInput!){\n  createMsgEvent(input: $input){id}\n}"): (typeof documents)["mutation createMsgEvent($input: CreateMsgEventInput!){\n  createMsgEvent(input: $input){id}\n}"];
+export function gql(source: "mutation createMsgEvent($input: CreateMsgEventInput!){\n  createMsgEvent(input: $input){\n    id,name,comments,status,createdAt,msgTypeID,modes\n    msgType{\n      id,category,appID,name\n    }\n  }\n}"): (typeof documents)["mutation createMsgEvent($input: CreateMsgEventInput!){\n  createMsgEvent(input: $input){\n    id,name,comments,status,createdAt,msgTypeID,modes\n    msgType{\n      id,category,appID,name\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateMsgEvent($id:ID!,$input: UpdateMsgEventInput!){\n  updateMsgEvent(id:$id,input: $input){id}\n}"): (typeof documents)["mutation updateMsgEvent($id:ID!,$input: UpdateMsgEventInput!){\n  updateMsgEvent(id:$id,input: $input){id}\n}"];
+export function gql(source: "mutation updateMsgEvent($id:ID!,$input: UpdateMsgEventInput!){\n  updateMsgEvent(id:$id,input: $input){\n    id,name,comments,status,createdAt,msgTypeID,modes\n    msgType{\n      id,category,appID,name\n    }\n  }\n}"): (typeof documents)["mutation updateMsgEvent($id:ID!,$input: UpdateMsgEventInput!){\n  updateMsgEvent(id:$id,input: $input){\n    id,name,comments,status,createdAt,msgTypeID,modes\n    msgType{\n      id,category,appID,name\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -139,11 +139,11 @@ export function gql(source: "mutation delMsgEvent($id:ID!){\n  deleteMsgEvent(id
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation enableMsgEvent($id:ID!){\n  enableMsgEvent(id:$id){id}\n}"): (typeof documents)["mutation enableMsgEvent($id:ID!){\n  enableMsgEvent(id:$id){id}\n}"];
+export function gql(source: "mutation enableMsgEvent($id:ID!){\n  enableMsgEvent(id:$id){\n    id,name,comments,status,createdAt,msgTypeID,modes\n    msgType{\n      id,category,appID,name\n    }\n  }\n}"): (typeof documents)["mutation enableMsgEvent($id:ID!){\n  enableMsgEvent(id:$id){\n    id,name,comments,status,createdAt,msgTypeID,modes\n    msgType{\n      id,category,appID,name\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation disableMsgEvent($id:ID!){\n  disableMsgEvent(id:$id){id}\n}"): (typeof documents)["mutation disableMsgEvent($id:ID!){\n  disableMsgEvent(id:$id){id}\n}"];
+export function gql(source: "mutation disableMsgEvent($id:ID!){\n  disableMsgEvent(id:$id){\n    id,name,comments,status,createdAt,msgTypeID,modes\n    msgType{\n      id,category,appID,name\n    }\n  }\n}"): (typeof documents)["mutation disableMsgEvent($id:ID!){\n  disableMsgEvent(id:$id){\n    id,name,comments,status,createdAt,msgTypeID,modes\n    msgType{\n      id,category,appID,name\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -155,7 +155,7 @@ export function gql(source: "query userMsgInternalList($first: Int,$orderBy: Msg
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query msgInternalInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgInternal{\n      id,tenantID,createdBy,createdAt,subject,body,format,redirect\n    }\n  }\n}"): (typeof documents)["query msgInternalInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgInternal{\n      id,tenantID,createdBy,createdAt,subject,body,format,redirect\n    }\n  }\n}"];
+export function gql(source: "query msgInternalInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgInternal{\n      id,tenantID,createdBy,createdAt,subject,body,format,redirect,category\n    }\n  }\n}"): (typeof documents)["query msgInternalInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgInternal{\n      id,tenantID,createdBy,createdAt,subject,body,format,redirect,category\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -199,11 +199,11 @@ export function gql(source: "query SilenceInfo($gid:GID!){\n  node(id: $gid){\n 
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createSilence($input: CreateSilenceInput!){\n  createSilence(input: $input){id}\n}"): (typeof documents)["mutation createSilence($input: CreateSilenceInput!){\n  createSilence(input: $input){id}\n}"];
+export function gql(source: "mutation createSilence($input: CreateSilenceInput!){\n  createSilence(input: $input){\n    id,tenantID,comments,createdAt,startsAt,endsAt,state,\n    matchers{\n      type,name,value\n    }\n  }\n}"): (typeof documents)["mutation createSilence($input: CreateSilenceInput!){\n  createSilence(input: $input){\n    id,tenantID,comments,createdAt,startsAt,endsAt,state,\n    matchers{\n      type,name,value\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateSilence($id:ID!,$input: UpdateSilenceInput!){\n  updateSilence(id:$id,input: $input){id}\n}"): (typeof documents)["mutation updateSilence($id:ID!,$input: UpdateSilenceInput!){\n  updateSilence(id:$id,input: $input){id}\n}"];
+export function gql(source: "mutation updateSilence($id:ID!,$input: UpdateSilenceInput!){\n  updateSilence(id:$id,input: $input){\n    id,tenantID,comments,createdAt,startsAt,endsAt,state,\n    matchers{\n      type,name,value\n    }\n  }\n}"): (typeof documents)["mutation updateSilence($id:ID!,$input: UpdateSilenceInput!){\n  updateSilence(id:$id,input: $input){\n    id,tenantID,comments,createdAt,startsAt,endsAt,state,\n    matchers{\n      type,name,value\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -219,11 +219,11 @@ export function gql(source: "query MsgTemplateInfo($gid:GID!){\n  node(id: $gid)
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createMsgTemplate($input: CreateMsgTemplateInput!){\n  createMsgTemplate(input: $input){id}\n}"): (typeof documents)["mutation createMsgTemplate($input: CreateMsgTemplateInput!){\n  createMsgTemplate(input: $input){id}\n}"];
+export function gql(source: "mutation createMsgTemplate($input: CreateMsgTemplateInput!){\n  createMsgTemplate(input: $input){\n    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n  }\n}"): (typeof documents)["mutation createMsgTemplate($input: CreateMsgTemplateInput!){\n  createMsgTemplate(input: $input){\n    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateMsgTemplate($id:ID!,$input: UpdateMsgTemplateInput!){\n  updateMsgTemplate(id:$id,input: $input){id}\n}"): (typeof documents)["mutation updateMsgTemplate($id:ID!,$input: UpdateMsgTemplateInput!){\n  updateMsgTemplate(id:$id,input: $input){id}\n}"];
+export function gql(source: "mutation updateMsgTemplate($id:ID!,$input: UpdateMsgTemplateInput!){\n  updateMsgTemplate(id:$id,input: $input){\n    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n  }\n}"): (typeof documents)["mutation updateMsgTemplate($id:ID!,$input: UpdateMsgTemplateInput!){\n  updateMsgTemplate(id:$id,input: $input){\n    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -231,11 +231,11 @@ export function gql(source: "mutation delMsgTemplate($id:ID!){\n  deleteMsgTempl
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation enableMsgTemplate($id:ID!){\n  enableMsgTemplate(id:$id){id}\n}"): (typeof documents)["mutation enableMsgTemplate($id:ID!){\n  enableMsgTemplate(id:$id){id}\n}"];
+export function gql(source: "mutation enableMsgTemplate($id:ID!){\n  enableMsgTemplate(id:$id){\n    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n  }\n}"): (typeof documents)["mutation enableMsgTemplate($id:ID!){\n  enableMsgTemplate(id:$id){\n    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation disableMsgTemplate($id:ID!){\n  disableMsgTemplate(id:$id){id}\n}"): (typeof documents)["mutation disableMsgTemplate($id:ID!){\n  disableMsgTemplate(id:$id){id}\n}"];
+export function gql(source: "mutation disableMsgTemplate($id:ID!){\n  disableMsgTemplate(id:$id){\n    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n  }\n}"): (typeof documents)["mutation disableMsgTemplate($id:ID!){\n  disableMsgTemplate(id:$id){\n    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -255,11 +255,11 @@ export function gql(source: "query msgTypeInfo($gid:GID!){\n  node(id: $gid){\n 
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createMsgType($input: CreateMsgTypeInput!){\n  createMsgType(input: $input){id}\n}"): (typeof documents)["mutation createMsgType($input: CreateMsgTypeInput!){\n  createMsgType(input: $input){id}\n}"];
+export function gql(source: "mutation createMsgType($input: CreateMsgTypeInput!){\n  createMsgType(input: $input){\n    id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n  }\n}"): (typeof documents)["mutation createMsgType($input: CreateMsgTypeInput!){\n  createMsgType(input: $input){\n    id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateMsgType($id:ID!,$input: UpdateMsgTypeInput!){\n  updateMsgType(id:$id,input: $input){id}\n}"): (typeof documents)["mutation updateMsgType($id:ID!,$input: UpdateMsgTypeInput!){\n  updateMsgType(id:$id,input: $input){id}\n}"];
+export function gql(source: "mutation updateMsgType($id:ID!,$input: UpdateMsgTypeInput!){\n  updateMsgType(id:$id,input: $input){\n    id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n  }\n}"): (typeof documents)["mutation updateMsgType($id:ID!,$input: UpdateMsgTypeInput!){\n  updateMsgType(id:$id,input: $input){\n    id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -271,15 +271,15 @@ export function gql(source: "query msgTypeCategory($keyword:String,$appID:ID){\n
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query msgTypeListAndSub($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,category,\n        subscriberUsers{\n          id,tenantID,msgTypeID,userID\n        },\n        subscriberRoles{\n          id,tenantID,msgTypeID,orgRoleID\n        },\n        excludeSubscriberUsers{\n          id,tenantID,msgTypeID,userID\n        }\n      }\n    }\n  }\n}"): (typeof documents)["query msgTypeListAndSub($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,category,\n        subscriberUsers{\n          id,tenantID,msgTypeID,userID\n        },\n        subscriberRoles{\n          id,tenantID,msgTypeID,orgRoleID\n        },\n        excludeSubscriberUsers{\n          id,tenantID,msgTypeID,userID\n        }\n      }\n    }\n  }\n}"];
+export function gql(source: "query msgTypeListAndSub($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n        subscriberUsers{\n          id,tenantID,msgTypeID,userID\n        },\n        subscriberRoles{\n          id,tenantID,msgTypeID,orgRoleID\n        },\n        excludeSubscriberUsers{\n          id,tenantID,msgTypeID,userID\n        }\n      }\n    }\n  }\n}"): (typeof documents)["query msgTypeListAndSub($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n        subscriberUsers{\n          id,tenantID,msgTypeID,userID\n        },\n        subscriberRoles{\n          id,tenantID,msgTypeID,orgRoleID\n        },\n        excludeSubscriberUsers{\n          id,tenantID,msgTypeID,userID\n        }\n      }\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query msgTypeAndSubInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgType{\n      id,name,appID,category,\n      subscriberUsers{\n        id,tenantID,msgTypeID,userID\n      },\n      subscriberRoles{\n        id,tenantID,msgTypeID,orgRoleID\n      },\n      excludeSubscriberUsers{\n        id,tenantID,msgTypeID,userID\n      }\n    }\n  }\n}"): (typeof documents)["query msgTypeAndSubInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgType{\n      id,name,appID,category,\n      subscriberUsers{\n        id,tenantID,msgTypeID,userID\n      },\n      subscriberRoles{\n        id,tenantID,msgTypeID,orgRoleID\n      },\n      excludeSubscriberUsers{\n        id,tenantID,msgTypeID,userID\n      }\n    }\n  }\n}"];
+export function gql(source: "query msgTypeAndSubInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgType{\n      id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n      subscriberUsers{\n        id,tenantID,msgTypeID,userID\n      },\n      subscriberRoles{\n        id,tenantID,msgTypeID,orgRoleID\n      },\n      excludeSubscriberUsers{\n        id,tenantID,msgTypeID,userID\n      }\n    }\n  }\n}"): (typeof documents)["query msgTypeAndSubInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgType{\n      id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n      subscriberUsers{\n        id,tenantID,msgTypeID,userID\n      },\n      subscriberRoles{\n        id,tenantID,msgTypeID,orgRoleID\n      },\n      excludeSubscriberUsers{\n        id,tenantID,msgTypeID,userID\n      }\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createMsgSubscriber($inputs: [CreateMsgSubscriberInput!]!){\n  createMsgSubscriber(inputs: $inputs){id}\n}"): (typeof documents)["mutation createMsgSubscriber($inputs: [CreateMsgSubscriberInput!]!){\n  createMsgSubscriber(inputs: $inputs){id}\n}"];
+export function gql(source: "mutation createMsgSubscriber($inputs: [CreateMsgSubscriberInput!]!){\n  createMsgSubscriber(inputs: $inputs){\n    id,tenantID,msgTypeID,userID\n  }\n}"): (typeof documents)["mutation createMsgSubscriber($inputs: [CreateMsgSubscriberInput!]!){\n  createMsgSubscriber(inputs: $inputs){\n    id,tenantID,msgTypeID,userID\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

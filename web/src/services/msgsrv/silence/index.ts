@@ -45,11 +45,21 @@ const querySilenceInfo = gql(/* GraphQL */`query SilenceInfo($gid:GID!){
 
 
 const mutationCreateSilence = gql(/* GraphQL */`mutation createSilence($input: CreateSilenceInput!){
-  createSilence(input: $input){id}
+  createSilence(input: $input){
+    id,tenantID,comments,createdAt,startsAt,endsAt,state,
+    matchers{
+      type,name,value
+    }
+  }
 }`);
 
 const mutationUpdateSilence = gql(/* GraphQL */`mutation updateSilence($id:ID!,$input: UpdateSilenceInput!){
-  updateSilence(id:$id,input: $input){id}
+  updateSilence(id:$id,input: $input){
+    id,tenantID,comments,createdAt,startsAt,endsAt,state,
+    matchers{
+      type,name,value
+    }
+  }
 }`);
 
 const mutationDelSilence = gql(/* GraphQL */`mutation delSilence($id:ID!){

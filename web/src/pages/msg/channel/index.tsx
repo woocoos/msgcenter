@@ -13,6 +13,8 @@ import { OrgKind, Org } from '@knockout-js/api/ucenter';
 import { KeepAlive } from '@knockout-js/layout';
 import ConfigExample from './components/configExample';
 import { definePageConfig } from 'ice';
+import { delDataSource, saveDataSource } from '@/util';
+import { it } from 'node:test';
 
 
 export default () => {
@@ -125,12 +127,13 @@ export default () => {
         onOk: async (close) => {
           const result = await delMsgChannel(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
+            setDataSource(delDataSource(dataSource, record.id))
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
             close();
           }
         },
@@ -143,7 +146,7 @@ export default () => {
         onOk: async (close) => {
           const result = record.status === MsgChannelSimpleStatus.Active ? await disableMsgChannel(record.id) : await enableMsgChannel(record.id);
           if (result?.id) {
-            proTableRef.current?.reload();
+            setDataSource(saveDataSource(dataSource, result as MsgChannel))
             close();
           }
         },
@@ -198,6 +201,7 @@ export default () => {
           }}
           scroll={{ x: 'max-content' }}
           columns={columns}
+          dataSource={dataSource}
           request={async (params, sort, filter) => {
             const table = { data: [] as MsgChannel[], success: true, total: 0 },
               where: MsgChannelWhereInput = {};
@@ -230,9 +234,12 @@ export default () => {
           open={modal.open}
           title={modal.title}
           id={modal.id}
-          onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
+          onClose={async (isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              if (!orgs.find(item => item.id === newInfo.tenantID)) {
+                setOrgs([...orgs, ...(await getOrgs([newInfo.tenantID]))])
+              }
+              setDataSource(saveDataSource(dataSource, newInfo))
             }
             setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
           }}
@@ -242,9 +249,9 @@ export default () => {
           open={modal.open}
           title={modal.title}
           id={modal.id}
-          onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              setDataSource(saveDataSource(dataSource, newInfo))
             }
             setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
           }}

@@ -33,7 +33,7 @@ export default (props: {
   id?: string | null;
   msgEvent: MsgEvent;
   receiverType: MsgTemplateReceiverType
-  onClose: (isSuccess?: boolean) => void;
+  onClose: (isSuccess?: boolean, newInfo?: MsgTemplate) => void;
 }) => {
   const { t } = useTranslation(),
     formRef = useRef<ProFormInstance>(),
@@ -122,7 +122,7 @@ export default (props: {
         : await createMsgTemplate(input as CreateMsgTemplateInput);
       if (result?.id) {
         setSaveDisabled(true);
-        props.onClose(true);
+        props.onClose(true, result as MsgTemplate);
       }
       setSaveLoading(false);
       return false;

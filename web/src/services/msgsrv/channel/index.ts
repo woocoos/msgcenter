@@ -41,7 +41,8 @@ const queryMsgChannelReceiverInfo = gql(/* GraphQL */`query msgChannelReceiverIn
   node(id: $gid){
     id
     ... on MsgChannel{
-      id,receiver{
+      id,name,receiverType,tenantID,comments,status,status,createdAt,
+      receiver{
         name,
         emailConfigs{
           authIdentity,authPassword,authSecret,authType,authUsername,from,headers,smartHost,to
@@ -55,11 +56,11 @@ const queryMsgChannelReceiverInfo = gql(/* GraphQL */`query msgChannelReceiverIn
 }`);
 
 const mutationCreateMsgChannel = gql(/* GraphQL */`mutation createMsgChannel($input: CreateMsgChannelInput!){
- createMsgChannel(input:$input){id}
+ createMsgChannel(input:$input){id,name,receiverType,tenantID,comments,status,status,createdAt}
 }`);
 
 const mutationUpdateMsgChannel = gql(/* GraphQL */`mutation updateMsgChannel($id:ID!,$input: UpdateMsgChannelInput!){
- updateMsgChannel(id:$id,input:$input){id}
+ updateMsgChannel(id:$id,input:$input){id,name,receiverType,tenantID,comments,status,status,createdAt}
 }`);
 
 const mutationDelMsgChannel = gql(/* GraphQL */`mutation delMsgChannel($id:ID!){
@@ -67,11 +68,11 @@ const mutationDelMsgChannel = gql(/* GraphQL */`mutation delMsgChannel($id:ID!){
 }`);
 
 const mutationEnableMsgChannel = gql(/* GraphQL */`mutation enableMsgChannel($id:ID!){
- enableMsgChannel(id:$id){id}
+ enableMsgChannel(id:$id){id,name,receiverType,tenantID,comments,status,status,createdAt}
 }`);
 
 const mutationDisableMsgChannel = gql(/* GraphQL */`mutation disableMsgChannel($id:ID!){
- disableMsgChannel(id:$id){id}
+ disableMsgChannel(id:$id){id,name,receiverType,tenantID,comments,status,status,createdAt}
 }`);
 
 

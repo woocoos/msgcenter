@@ -32,7 +32,7 @@ const queryMsgInternalInfo = gql(/* GraphQL */`query msgInternalInfo($gid:GID!){
   node(id: $gid){
     id
     ... on MsgInternal{
-      id,tenantID,createdBy,createdAt,subject,body,format,redirect
+      id,tenantID,createdBy,createdAt,subject,body,format,redirect,category
     }
   }
 }`);

@@ -11,6 +11,7 @@ import { OrgSelect } from '@knockout-js/org';
 import { Org, OrgKind } from '@knockout-js/api/ucenter';
 import { KeepAlive } from '@knockout-js/layout';
 import { definePageConfig } from 'ice';
+import { delDataSource, saveDataSource } from '@/util';
 
 
 export default () => {
@@ -117,12 +118,13 @@ export default () => {
         onOk: async (close) => {
           const result = await delSilence(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
+            setDataSource(delDataSource(dataSource, record.id))
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
             close();
           }
         },
@@ -170,6 +172,7 @@ export default () => {
           }}
           scroll={{ x: 'max-content' }}
           columns={columns}
+          dataSource={dataSource}
           request={async (params, sort, filter) => {
             const table = { data: [] as Silence[], success: true, total: 0 },
               where: SilenceWhereInput = {};
@@ -202,9 +205,12 @@ export default () => {
           title={modal.title}
           id={modal.id}
           isCopy={modal.scene === 'copy'}
-          onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
+          onClose={async (isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              if (!orgs.find(item => item.id == `${newInfo.tenantID}`)) {
+                setOrgs([...orgs, ...(await getOrgs([newInfo.tenantID]))])
+              }
+              setDataSource(saveDataSource(dataSource, newInfo))
             }
             setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
           }}

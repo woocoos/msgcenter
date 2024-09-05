@@ -12,6 +12,7 @@ import Create from './components/create';
 import { getOrgs } from '@knockout-js/api';
 import { Org } from '@knockout-js/api/ucenter';
 import Test from './components/test';
+import { delDataSource, saveDataSource } from '@/util';
 
 
 export default () => {
@@ -142,12 +143,13 @@ export default () => {
         onOk: async (close) => {
           const result = await delMsgTemplate(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
+            setDataSource(delDataSource(dataSource, record.id))
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
             close();
           }
         },
@@ -160,7 +162,7 @@ export default () => {
         onOk: async (close) => {
           const result = record.status === MsgTemplateSimpleStatus.Active ? await disableMsgTemplate(record.id) : await enableMsgTemplate(record.id);
           if (result?.id) {
-            proTableRef.current?.reload();
+            setDataSource(saveDataSource(dataSource, result as MsgTemplate))
             close();
           }
         },
@@ -215,6 +217,7 @@ export default () => {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
+        dataSource={dataSource}
         request={async (params, sort, filter) => {
           const table = { data: [] as MsgTemplate[], success: true, total: 0 },
             where: MsgTemplateWhereInput = {};
@@ -252,9 +255,9 @@ export default () => {
           open={modal.open}
           title={modal.title}
           id={modal.id}
-          onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              setDataSource(saveDataSource(dataSource, newInfo))
             }
             setModal({ open: false, title: modal.title, id: '', receiverType: modal.receiverType });
           }}
@@ -267,7 +270,7 @@ export default () => {
           open={modal.open}
           title={modal.title}
           id={modal.id}
-          onClose={(s) => {
+          onClose={() => {
             setModal({ open: false, title: modal.title, id: '' });
           }}
         /> : <></>

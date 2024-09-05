@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useLeavePrompt } from '@knockout-js/layout';
 import * as yaml from 'js-yaml'
 import Editor from '@/components/editor';
+import { MsgChannel } from '@/generated/msgsrv/graphql';
 
 type ProFormData = {
   receiver: string;
@@ -15,7 +16,7 @@ export default (props: {
   open: boolean;
   title?: string;
   id: string;
-  onClose: (isSuccess?: boolean) => void;
+  onClose: (isSuccess?: boolean, newInfo?: MsgChannel) => void;
 }) => {
   const { t } = useTranslation(),
     [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
@@ -82,7 +83,7 @@ export default (props: {
       });
       if (result?.id) {
         setSaveDisabled(true);
-        props.onClose(true);
+        props.onClose(true, result as MsgChannel);
       }
       setSaveLoading(false);
       return false;

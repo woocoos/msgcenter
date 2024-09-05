@@ -24,7 +24,7 @@ export default (props: {
   open: boolean;
   title?: string;
   id?: string | null;
-  onClose: (isSuccess?: boolean) => void;
+  onClose: (isSuccess?: boolean, newInfo?: MsgType) => void;
 }) => {
   const { t } = useTranslation(),
     [info, setInfo] = useState<MsgType>(),
@@ -98,7 +98,7 @@ export default (props: {
         });
       if (result?.id) {
         setSaveDisabled(true);
-        props.onClose(true);
+        props.onClose(true, result as MsgType);
       }
       setSaveLoading(false);
       return false;

@@ -12,6 +12,7 @@ import ConfigExample from './components/configExample';
 import { KeepAlive } from '@knockout-js/layout';
 import { DictSelect, DictText } from '@knockout-js/org';
 import { definePageConfig } from 'ice';
+import { delDataSource, saveDataSource } from '@/util';
 
 
 export default () => {
@@ -135,12 +136,13 @@ export default () => {
         onOk: async (close) => {
           const result = await delMsgEvent(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
+            setDataSource(delDataSource(dataSource, record.id))
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
             close();
           }
         },
@@ -153,7 +155,7 @@ export default () => {
         onOk: async (close) => {
           const result = record.status === MsgEventSimpleStatus.Active ? await disableMsgEvent(record.id) : await enableMsgEvent(record.id);
           if (result?.id) {
-            proTableRef.current?.reload();
+            setDataSource(saveDataSource(dataSource, result as MsgEvent))
             close();
           }
         },
@@ -243,9 +245,9 @@ export default () => {
           open={modal.open}
           title={modal.title}
           id={modal.id}
-          onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              setDataSource(saveDataSource(dataSource, newInfo))
             }
             setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
           }}
@@ -255,9 +257,9 @@ export default () => {
           open={modal.open}
           title={modal.title}
           id={modal.id}
-          onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              setDataSource(saveDataSource(dataSource, newInfo))
             }
             setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
           }}

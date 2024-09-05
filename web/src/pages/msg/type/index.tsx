@@ -12,6 +12,7 @@ import { App } from '@knockout-js/api/ucenter';
 import { KeepAlive } from '@knockout-js/layout';
 import { DictSelect, DictText } from '@knockout-js/org';
 import { definePageConfig } from 'ice';
+import { delDataSource, saveDataSource } from '@/util';
 
 export default () => {
   const { token } = useToken(),
@@ -118,12 +119,13 @@ export default () => {
         onOk: async (close) => {
           const result = await delMsgType(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
+            setDataSource(delDataSource(dataSource, record.id))
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
             close();
           }
         },
@@ -171,6 +173,7 @@ export default () => {
           }}
           scroll={{ x: 'max-content' }}
           columns={columns}
+          dataSource={dataSource}
           request={async (params, sort, filter) => {
             const table = { data: [] as MsgType[], success: true, total: 0 },
               where: MsgTypeWhereInput = {};
@@ -202,9 +205,12 @@ export default () => {
           open={modal.open}
           title={modal.title}
           id={modal.id}
-          onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
+          onClose={async (isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              if (newInfo.appID && !apps.find(item => item.id === newInfo.appID)) {
+                setApps([...apps, ...(await getApps([newInfo.appID]))])
+              }
+              setDataSource(saveDataSource(dataSource, newInfo))
             }
             setModal({ open: false, title: modal.title, id: '' });
           }} />
