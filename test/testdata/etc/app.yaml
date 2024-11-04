@@ -39,30 +39,3 @@ cache:
     driverName: memory
     size: 1000
     ttl: 100s
-
-kosdk:
-  client:
-    timeout: 2s
-    oauth2:
-      clientID: 206734260394752
-      clientSecret: T2UlqISVFq4DR9InXamj3l74iWdu3Tyr
-      endpoint:
-        tokenURL: http://127.0.0.1:10070/token
-      scopes:
-      storeKey: memory
-  signer:
-    authScheme: "KO-HMAC-SHA1"
-    authHeaders: [ "timestamp", "nonce" ]
-    signedLookups:
-      accessToken: "header:authorization>bearer"
-      timestamp:
-      nonce:
-      url: CanonicalUri
-    nonceLen: 12
-  plugin:
-    msg:
-      basePath: "http://127.0.0.1:10072/api/v2"
-    fs:
-      basePath: "http://127.0.0.1:8080"
-      headers:
-        "X-Tenant-ID": 1
