@@ -1,6 +1,6 @@
 module github.com/woocoos/msgcenter
 
-go 1.22.5
+go 1.23.0
 
 require (
 	entgo.io/contrib v0.6.0
