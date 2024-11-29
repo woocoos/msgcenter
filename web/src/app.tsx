@@ -193,7 +193,7 @@ export const authConfig = defineAuthConfig(async (appData) => {
     token = appData?.user?.token ? appData.user.token : getItem<string>('token'),
     tenantId = appData?.user?.tenantId ? appData.user.tenantId : getItem<string>('tenantId');
   // 判断路由权限
-  if (appData?.user?.token) {
+  if (token) {
     const result = await userPermissions(ICE_APP_CODE, {
       Authorization: getRequestHeaderAuthorization(token, ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined),
       'X-Tenant-ID': tenantId,
