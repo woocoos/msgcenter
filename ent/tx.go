@@ -38,6 +38,8 @@ type Tx struct {
 	Silence *SilenceClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserAddr is the client for interacting with the UserAddr builders.
+	UserAddr *UserAddrClient
 
 	// lazily loaded.
 	client     *Client
@@ -182,6 +184,7 @@ func (tx *Tx) init() {
 	tx.OrgRoleUser = NewOrgRoleUserClient(tx.config)
 	tx.Silence = NewSilenceClient(tx.config)
 	tx.User = NewUserClient(tx.config)
+	tx.UserAddr = NewUserAddrClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

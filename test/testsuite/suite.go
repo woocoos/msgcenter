@@ -13,6 +13,7 @@ import (
 	"github.com/woocoos/knockout-go/pkg/koapp"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
+	"github.com/woocoos/msgcenter/ent/useraddr"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -94,6 +95,7 @@ func open(ctx context.Context, driverName, dsn string) (*ent.Client, error) {
 		ent.Debug(), ent.AlternateSchema(ent.SchemaConfig{
 			User:        "portal",
 			OrgRoleUser: "portal",
+			UserAddr:    "portal",
 		}),
 	)
 	if err != nil {
@@ -215,12 +217,15 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetBody(`{{ template "dingtalk.content" . }}`).
 		SaveX(ctx)
 
-	client.User.Create().SetID(1).SetDisplayName("admin").SetEmail("admin@localhost").
-		SetPrincipalName("admin").SetMobile("13800138000").SaveX(ctx)
-	client.User.Create().SetID(2).SetDisplayName("user").SetEmail("user@localhost").
-		SetPrincipalName("user").SetMobile("13800138001").SaveX(ctx)
-	client.User.Create().SetID(3).SetDisplayName("nobody").SetEmail("nobody@localhost").
-		SetPrincipalName("nobody").SetMobile("13800138002").SaveX(ctx)
+	client.User.Create().SetID(1).SetDisplayName("admin").SetPrincipalName("admin").SaveX(ctx)
+	client.UserAddr.Create().SetID(1).SetUserID(1).SetEmail("admin@localhost").
+		SetMobile("13800138000").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)
+	client.User.Create().SetID(2).SetDisplayName("user").SetPrincipalName("user").SaveX(ctx)
+	client.UserAddr.Create().SetID(2).SetUserID(2).SetEmail("user@localhost").
+		SetMobile("13800138001").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)
+	client.User.Create().SetID(3).SetDisplayName("nobody").SetPrincipalName("nobody").SaveX(ctx)
+	client.UserAddr.Create().SetID(3).SetUserID(3).SetEmail("nobody@localhost").
+		SetMobile("13800138002").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)
 	client.OrgRoleUser.Create().SetID(1).SetOrgID(1).SetUserID(1).SetOrgRoleID(12).SetOrgUserID(3).
 		SaveX(ctx)
 	client.OrgRoleUser.Create().SetID(2).SetOrgID(1).SetUserID(2).SetOrgRoleID(13).SetOrgUserID(4).

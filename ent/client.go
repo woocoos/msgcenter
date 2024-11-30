@@ -29,6 +29,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
+	"github.com/woocoos/msgcenter/ent/useraddr"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
@@ -64,6 +65,8 @@ type Client struct {
 	Silence *SilenceClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserAddr is the client for interacting with the UserAddr builders.
+	UserAddr *UserAddrClient
 	// additional fields for node api
 	tables tables
 }
@@ -90,6 +93,7 @@ func (c *Client) init() {
 	c.OrgRoleUser = NewOrgRoleUserClient(c.config)
 	c.Silence = NewSilenceClient(c.config)
 	c.User = NewUserClient(c.config)
+	c.UserAddr = NewUserAddrClient(c.config)
 }
 
 type (
@@ -197,6 +201,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		OrgRoleUser:   NewOrgRoleUserClient(cfg),
 		Silence:       NewSilenceClient(cfg),
 		User:          NewUserClient(cfg),
+		UserAddr:      NewUserAddrClient(cfg),
 	}, nil
 }
 
@@ -229,6 +234,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		OrgRoleUser:   NewOrgRoleUserClient(cfg),
 		Silence:       NewSilenceClient(cfg),
 		User:          NewUserClient(cfg),
+		UserAddr:      NewUserAddrClient(cfg),
 	}, nil
 }
 
@@ -260,7 +266,7 @@ func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal, c.MsgInternalTo,
 		c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert, c.OrgRoleUser,
-		c.Silence, c.User,
+		c.Silence, c.User, c.UserAddr,
 	} {
 		n.Use(hooks...)
 	}
@@ -272,7 +278,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal, c.MsgInternalTo,
 		c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert, c.OrgRoleUser,
-		c.Silence, c.User,
+		c.Silence, c.User, c.UserAddr,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -307,6 +313,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Silence.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
+	case *UserAddrMutation:
+		return c.UserAddr.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -2374,6 +2382,25 @@ func (c *UserClient) QuerySilences(u *User) *SilenceQuery {
 	return query
 }
 
+// QueryAddresses queries the addresses edge of a User.
+func (c *UserClient) QueryAddresses(u *User) *UserAddrQuery {
+	query := (&UserAddrClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(useraddr.Table, useraddr.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.AddressesTable, user.AddressesColumn),
+		)
+		schemaConfig := u.schemaConfig
+		step.To.Schema = schemaConfig.UserAddr
+		step.Edge.Schema = schemaConfig.UserAddr
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	hooks := c.hooks.User
@@ -2400,16 +2427,170 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 	}
 }
 
+// UserAddrClient is a client for the UserAddr schema.
+type UserAddrClient struct {
+	config
+}
+
+// NewUserAddrClient returns a client for the UserAddr from the given config.
+func NewUserAddrClient(c config) *UserAddrClient {
+	return &UserAddrClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `useraddr.Hooks(f(g(h())))`.
+func (c *UserAddrClient) Use(hooks ...Hook) {
+	c.hooks.UserAddr = append(c.hooks.UserAddr, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `useraddr.Intercept(f(g(h())))`.
+func (c *UserAddrClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserAddr = append(c.inters.UserAddr, interceptors...)
+}
+
+// Create returns a builder for creating a UserAddr entity.
+func (c *UserAddrClient) Create() *UserAddrCreate {
+	mutation := newUserAddrMutation(c.config, OpCreate)
+	return &UserAddrCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserAddr entities.
+func (c *UserAddrClient) CreateBulk(builders ...*UserAddrCreate) *UserAddrCreateBulk {
+	return &UserAddrCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserAddrClient) MapCreateBulk(slice any, setFunc func(*UserAddrCreate, int)) *UserAddrCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserAddrCreateBulk{err: fmt.Errorf("calling to UserAddrClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserAddrCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserAddrCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserAddr.
+func (c *UserAddrClient) Update() *UserAddrUpdate {
+	mutation := newUserAddrMutation(c.config, OpUpdate)
+	return &UserAddrUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserAddrClient) UpdateOne(ua *UserAddr) *UserAddrUpdateOne {
+	mutation := newUserAddrMutation(c.config, OpUpdateOne, withUserAddr(ua))
+	return &UserAddrUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserAddrClient) UpdateOneID(id int) *UserAddrUpdateOne {
+	mutation := newUserAddrMutation(c.config, OpUpdateOne, withUserAddrID(id))
+	return &UserAddrUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserAddr.
+func (c *UserAddrClient) Delete() *UserAddrDelete {
+	mutation := newUserAddrMutation(c.config, OpDelete)
+	return &UserAddrDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UserAddrClient) DeleteOne(ua *UserAddr) *UserAddrDeleteOne {
+	return c.DeleteOneID(ua.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UserAddrClient) DeleteOneID(id int) *UserAddrDeleteOne {
+	builder := c.Delete().Where(useraddr.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserAddrDeleteOne{builder}
+}
+
+// Query returns a query builder for UserAddr.
+func (c *UserAddrClient) Query() *UserAddrQuery {
+	return &UserAddrQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserAddr},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UserAddr entity by its id.
+func (c *UserAddrClient) Get(ctx context.Context, id int) (*UserAddr, error) {
+	return c.Query().Where(useraddr.ID(id)).Only(entcache.WithEntryKey(ctx, "UserAddr", id))
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserAddrClient) GetX(ctx context.Context, id int) *UserAddr {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a UserAddr.
+func (c *UserAddrClient) QueryUser(ua *UserAddr) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ua.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(useraddr.Table, useraddr.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, useraddr.UserTable, useraddr.UserColumn),
+		)
+		schemaConfig := ua.schemaConfig
+		step.To.Schema = schemaConfig.User
+		step.Edge.Schema = schemaConfig.UserAddr
+		fromV = sqlgraph.Neighbors(ua.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *UserAddrClient) Hooks() []Hook {
+	hooks := c.hooks.UserAddr
+	return append(hooks[:len(hooks):len(hooks)], useraddr.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserAddrClient) Interceptors() []Interceptor {
+	return c.inters.UserAddr
+}
+
+func (c *UserAddrClient) mutate(ctx context.Context, m *UserAddrMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserAddrCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserAddrUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserAddrUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserAddrDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserAddr mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
 		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSubscriber,
-		MsgTemplate, MsgType, Nlog, NlogAlert, OrgRoleUser, Silence, User []ent.Hook
+		MsgTemplate, MsgType, Nlog, NlogAlert, OrgRoleUser, Silence, User,
+		UserAddr []ent.Hook
 	}
 	inters struct {
 		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSubscriber,
-		MsgTemplate, MsgType, Nlog, NlogAlert, OrgRoleUser, Silence,
-		User []ent.Interceptor
+		MsgTemplate, MsgType, Nlog, NlogAlert, OrgRoleUser, Silence, User,
+		UserAddr []ent.Interceptor
 	}
 )
 

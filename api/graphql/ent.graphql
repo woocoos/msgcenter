@@ -2951,14 +2951,6 @@ type User implements Node {
   """
   displayName: String!
   """
-  邮箱
-  """
-  email: String
-  """
-  手机
-  """
-  mobile: String
-  """
   静默
   """
   silences: [Silence!]

@@ -10,6 +10,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/user"
+	"github.com/woocoos/msgcenter/ent/useraddr"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -128,10 +129,14 @@ func overrideEmailConfig(basedir, attdir string, client *ent.Client) notify.Cust
 		if len(eus) > 0 {
 			tos := make([]string, 0, len(eus))
 			for _, u := range eus {
-				if u.Email != "" {
+				addr, err := u.QueryAddresses().Where(useraddr.AddrTypeEQ(useraddr.AddrTypeContact)).Only(ctx)
+				if err != nil {
+					return err
+				}
+				if addr.Email != "" {
 					ma := mail.Address{
 						Name:    u.DisplayName,
-						Address: u.Email,
+						Address: addr.Email,
 					}
 					tos = append(tos, ma.String())
 				}

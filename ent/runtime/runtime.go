@@ -19,6 +19,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
+	"github.com/woocoos/msgcenter/ent/useraddr"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -246,19 +247,41 @@ func init() {
 	silence.DefaultID = silenceDescID.Default.(func() int)
 	userHooks := schema.User{}.Hooks()
 	user.Hooks[0] = userHooks[0]
-	userFields := schema.User{}.Fields()
-	_ = userFields
-	// userDescEmail is the schema descriptor for email field.
-	userDescEmail := userFields[3].Descriptor()
-	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.
-	user.EmailValidator = userDescEmail.Validators[0].(func(string) error)
-	// userDescMobile is the schema descriptor for mobile field.
-	userDescMobile := userFields[4].Descriptor()
-	// user.MobileValidator is a validator for the "mobile" field. It is called by the builders before save.
-	user.MobileValidator = userDescMobile.Validators[0].(func(string) error)
+	useraddrHooks := schema.UserAddr{}.Hooks()
+	useraddr.Hooks[0] = useraddrHooks[0]
+	useraddrFields := schema.UserAddr{}.Fields()
+	_ = useraddrFields
+	// useraddrDescEmail is the schema descriptor for email field.
+	useraddrDescEmail := useraddrFields[5].Descriptor()
+	// useraddr.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	useraddr.EmailValidator = useraddrDescEmail.Validators[0].(func(string) error)
+	// useraddrDescFax is the schema descriptor for fax field.
+	useraddrDescFax := useraddrFields[6].Descriptor()
+	// useraddr.FaxValidator is a validator for the "fax" field. It is called by the builders before save.
+	useraddr.FaxValidator = useraddrDescFax.Validators[0].(func(string) error)
+	// useraddrDescZipCode is the schema descriptor for zip_code field.
+	useraddrDescZipCode := useraddrFields[7].Descriptor()
+	// useraddr.ZipCodeValidator is a validator for the "zip_code" field. It is called by the builders before save.
+	useraddr.ZipCodeValidator = useraddrDescZipCode.Validators[0].(func(string) error)
+	// useraddrDescTel is the schema descriptor for tel field.
+	useraddrDescTel := useraddrFields[8].Descriptor()
+	// useraddr.TelValidator is a validator for the "tel" field. It is called by the builders before save.
+	useraddr.TelValidator = useraddrDescTel.Validators[0].(func(string) error)
+	// useraddrDescMobile is the schema descriptor for mobile field.
+	useraddrDescMobile := useraddrFields[9].Descriptor()
+	// useraddr.MobileValidator is a validator for the "mobile" field. It is called by the builders before save.
+	useraddr.MobileValidator = useraddrDescMobile.Validators[0].(func(string) error)
+	// useraddrDescName is the schema descriptor for name field.
+	useraddrDescName := useraddrFields[10].Descriptor()
+	// useraddr.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	useraddr.NameValidator = useraddrDescName.Validators[0].(func(string) error)
+	// useraddrDescIsDefault is the schema descriptor for is_default field.
+	useraddrDescIsDefault := useraddrFields[11].Descriptor()
+	// useraddr.DefaultIsDefault holds the default value on creation for the is_default field.
+	useraddr.DefaultIsDefault = useraddrDescIsDefault.Default.(bool)
 }
 
 const (
-	Version = "v0.14.0"                                         // Version of ent codegen.
-	Sum     = "h1:EO3Z9aZ5bXJatJeGqu/EVdnNr6K4mRq3rWe5owt0MC4=" // Sum of ent codegen.
+	Version = "v0.14.1"                                         // Version of ent codegen.
+	Sum     = "h1:fUERL506Pqr92EPHJqr8EYxbPioflJo6PudkrEA8a/s=" // Sum of ent codegen.
 )

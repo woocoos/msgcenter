@@ -15,6 +15,7 @@ import (
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/tsingsun/woocoo/web"
+	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/knockout-go/pkg/koapp"
 	"github.com/woocoos/knockout-go/pkg/middleware"
@@ -51,6 +52,7 @@ func (s *Server) buildEntClient() {
 	scfg := ent.AlternateSchema(ent.SchemaConfig{
 		User:        "portal",
 		OrgRoleUser: "portal",
+		UserAddr:    "portal",
 	})
 	if s.appCnf.Development {
 		s.dbClient = ent.NewClient(ent.Driver(drv), ent.Debug(), scfg)
@@ -100,11 +102,11 @@ func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
 	gqlsrv.AddTransport(transport.POST{})
 	gqlsrv.AddTransport(transport.MultipartForm{})
 
-	gqlsrv.SetQueryCache(lru.New(1000))
+	gqlsrv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
 
 	gqlsrv.Use(extension.Introspection{})
 	gqlsrv.Use(extension.AutomaticPersistedQuery{
-		Cache: lru.New(100),
+		Cache: lru.New[string](100),
 	})
 
 	gqlsrv.AroundResponses(middleware.SimplePagination())

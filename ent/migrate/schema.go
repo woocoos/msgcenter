@@ -11,7 +11,7 @@ import (
 var (
 	// MsgAlertColumns holds the columns for the "msg_alert" table.
 	MsgAlertColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
 		{Name: "labels", Type: field.TypeJSON, Nullable: true},
 		{Name: "annotations", Type: field.TypeJSON, Nullable: true},
@@ -40,7 +40,7 @@ var (
 	}
 	// MsgChannelColumns holds the columns for the "msg_channel" table.
 	MsgChannelColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_by", Type: field.TypeInt},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
@@ -60,7 +60,7 @@ var (
 	}
 	// MsgEventColumns holds the columns for the "msg_event" table.
 	MsgEventColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_by", Type: field.TypeInt},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
@@ -70,7 +70,7 @@ var (
 		{Name: "comments", Type: field.TypeString, Nullable: true},
 		{Name: "route", Type: field.TypeJSON, Nullable: true},
 		{Name: "modes", Type: field.TypeString},
-		{Name: "msg_type_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "msg_type_id", Type: field.TypeInt},
 	}
 	// MsgEventTable holds the schema information for the "msg_event" table.
 	MsgEventTable = &schema.Table{
@@ -88,7 +88,7 @@ var (
 	}
 	// MsgInternalColumns holds the columns for the "msg_internal" table.
 	MsgInternalColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
 		{Name: "created_by", Type: field.TypeInt},
 		{Name: "created_at", Type: field.TypeTime},
@@ -108,12 +108,12 @@ var (
 	}
 	// MsgInternalToColumns holds the columns for the "msg_internal_to" table.
 	MsgInternalToColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
 		{Name: "read_at", Type: field.TypeTime, Nullable: true},
 		{Name: "delete_at", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "msg_internal_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "msg_internal_id", Type: field.TypeInt},
 		{Name: "user_id", Type: field.TypeInt},
 	}
 	// MsgInternalToTable holds the schema information for the "msg_internal_to" table.
@@ -138,7 +138,7 @@ var (
 	}
 	// MsgSubscriberColumns holds the columns for the "msg_subscriber" table.
 	MsgSubscriberColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_by", Type: field.TypeInt},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
@@ -147,7 +147,7 @@ var (
 		{Name: "org_role_id", Type: field.TypeInt, Nullable: true},
 		{Name: "exclude", Type: field.TypeBool, Nullable: true, Default: false},
 		{Name: "user_id", Type: field.TypeInt, Nullable: true},
-		{Name: "msg_type_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "msg_type_id", Type: field.TypeInt},
 	}
 	// MsgSubscriberTable holds the schema information for the "msg_subscriber" table.
 	MsgSubscriberTable = &schema.Table{
@@ -171,12 +171,12 @@ var (
 	}
 	// MsgTemplateColumns holds the columns for the "msg_template" table.
 	MsgTemplateColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_by", Type: field.TypeInt},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "msg_type_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "msg_type_id", Type: field.TypeInt},
 		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "name", Type: field.TypeString, Size: 45},
 		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"active", "inactive", "processing", "disabled"}, Default: "inactive"},
@@ -191,7 +191,7 @@ var (
 		{Name: "tpl", Type: field.TypeString, Nullable: true},
 		{Name: "attachments", Type: field.TypeJSON, Nullable: true},
 		{Name: "comments", Type: field.TypeString, Nullable: true},
-		{Name: "msg_event_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "msg_event_id", Type: field.TypeInt},
 	}
 	// MsgTemplateTable holds the schema information for the "msg_template" table.
 	MsgTemplateTable = &schema.Table{
@@ -209,7 +209,7 @@ var (
 	}
 	// MsgTypeColumns holds the columns for the "msg_type" table.
 	MsgTypeColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_by", Type: field.TypeInt},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
@@ -230,7 +230,7 @@ var (
 	}
 	// MsgNlogColumns holds the columns for the "msg_nlog" table.
 	MsgNlogColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
 		{Name: "group_key", Type: field.TypeString},
 		{Name: "receiver", Type: field.TypeString},
@@ -251,8 +251,8 @@ var (
 	MsgNlogAlertColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "nlog_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
-		{Name: "alert_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "int"}},
+		{Name: "nlog_id", Type: field.TypeInt},
+		{Name: "alert_id", Type: field.TypeInt},
 	}
 	// MsgNlogAlertTable holds the schema information for the "msg_nlog_alert" table.
 	MsgNlogAlertTable = &schema.Table{
@@ -328,14 +328,41 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "principal_name", Type: field.TypeString, Unique: true},
 		{Name: "display_name", Type: field.TypeString},
-		{Name: "email", Type: field.TypeString, Nullable: true, Size: 45},
-		{Name: "mobile", Type: field.TypeString, Nullable: true, Size: 45},
 	}
 	// UserTable holds the schema information for the "user" table.
 	UserTable = &schema.Table{
 		Name:       "user",
 		Columns:    UserColumns,
 		PrimaryKey: []*schema.Column{UserColumns[0]},
+	}
+	// UserAddrColumns holds the columns for the "user_addr" table.
+	UserAddrColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "addr_type", Type: field.TypeEnum, Enums: []string{"contact", "delivery"}},
+		{Name: "region_id", Type: field.TypeInt, Nullable: true},
+		{Name: "addr", Type: field.TypeString, Nullable: true},
+		{Name: "email", Type: field.TypeString, Nullable: true, Size: 45},
+		{Name: "fax", Type: field.TypeString, Nullable: true, Size: 45},
+		{Name: "zip_code", Type: field.TypeString, Nullable: true, Size: 45},
+		{Name: "tel", Type: field.TypeString, Nullable: true, Size: 45},
+		{Name: "mobile", Type: field.TypeString, Nullable: true, Size: 45},
+		{Name: "name", Type: field.TypeString, Nullable: true, Size: 45},
+		{Name: "is_default", Type: field.TypeBool, Default: false},
+		{Name: "user_id", Type: field.TypeInt, Nullable: true},
+	}
+	// UserAddrTable holds the schema information for the "user_addr" table.
+	UserAddrTable = &schema.Table{
+		Name:       "user_addr",
+		Columns:    UserAddrColumns,
+		PrimaryKey: []*schema.Column{UserAddrColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_addr_user_addresses",
+				Columns:    []*schema.Column{UserAddrColumns[11]},
+				RefColumns: []*schema.Column{UserColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
@@ -352,6 +379,7 @@ var (
 		OrgRoleUserTable,
 		MsgSilenceTable,
 		UserTable,
+		UserAddrTable,
 	}
 )
 
@@ -403,5 +431,9 @@ func init() {
 	}
 	UserTable.Annotation = &entsql.Annotation{
 		Table: "user",
+	}
+	UserAddrTable.ForeignKeys[0].RefTable = UserTable
+	UserAddrTable.Annotation = &entsql.Annotation{
+		Table: "user_addr",
 	}
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/tsingsun/woocoo/contrib/gql"
 	"github.com/tsingsun/woocoo/contrib/telemetry/otelweb"
 	"github.com/tsingsun/woocoo/web"
+	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/woocoos/knockout-go/pkg/middleware"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/service"
@@ -60,11 +61,11 @@ func (s *Server) buildWebEngine(app *woocoo.App, am *service.AlertManager) {
 	gqlsrv.AddTransport(transport.POST{})
 	gqlsrv.AddTransport(transport.MultipartForm{})
 
-	gqlsrv.SetQueryCache(lru.New(1000))
+	gqlsrv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
 
 	gqlsrv.Use(extension.Introspection{})
 	gqlsrv.Use(extension.AutomaticPersistedQuery{
-		Cache: lru.New(100),
+		Cache: lru.New[string](100),
 	})
 
 	gqlsrv.AroundResponses(middleware.SimplePagination())

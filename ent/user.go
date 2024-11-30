@@ -21,10 +21,6 @@ type User struct {
 	PrincipalName string `json:"principal_name,omitempty"`
 	// 显示名
 	DisplayName string `json:"display_name,omitempty"`
-	// 邮箱
-	Email string `json:"email,omitempty"`
-	// 手机
-	Mobile string `json:"mobile,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges        UserEdges `json:"edges"`
@@ -35,13 +31,16 @@ type User struct {
 type UserEdges struct {
 	// 静默
 	Silences []*Silence `json:"silences,omitempty"`
+	// 用户联系信息
+	Addresses []*UserAddr `json:"addresses,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
 	totalCount [1]map[string]int
 
-	namedSilences map[string][]*Silence
+	namedSilences  map[string][]*Silence
+	namedAddresses map[string][]*UserAddr
 }
 
 // SilencesOrErr returns the Silences value or an error if the edge
@@ -53,6 +52,15 @@ func (e UserEdges) SilencesOrErr() ([]*Silence, error) {
 	return nil, &NotLoadedError{edge: "silences"}
 }
 
+// AddressesOrErr returns the Addresses value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) AddressesOrErr() ([]*UserAddr, error) {
+	if e.loadedTypes[1] {
+		return e.Addresses, nil
+	}
+	return nil, &NotLoadedError{edge: "addresses"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -60,7 +68,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldPrincipalName, user.FieldDisplayName, user.FieldEmail, user.FieldMobile:
+		case user.FieldPrincipalName, user.FieldDisplayName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -95,18 +103,6 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.DisplayName = value.String
 			}
-		case user.FieldEmail:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field email", values[i])
-			} else if value.Valid {
-				u.Email = value.String
-			}
-		case user.FieldMobile:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field mobile", values[i])
-			} else if value.Valid {
-				u.Mobile = value.String
-			}
 		default:
 			u.selectValues.Set(columns[i], values[i])
 		}
@@ -123,6 +119,11 @@ func (u *User) Value(name string) (ent.Value, error) {
 // QuerySilences queries the "silences" edge of the User entity.
 func (u *User) QuerySilences() *SilenceQuery {
 	return NewUserClient(u.config).QuerySilences(u)
+}
+
+// QueryAddresses queries the "addresses" edge of the User entity.
+func (u *User) QueryAddresses() *UserAddrQuery {
+	return NewUserClient(u.config).QueryAddresses(u)
 }
 
 // Update returns a builder for updating this User.
@@ -153,12 +154,6 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("display_name=")
 	builder.WriteString(u.DisplayName)
-	builder.WriteString(", ")
-	builder.WriteString("email=")
-	builder.WriteString(u.Email)
-	builder.WriteString(", ")
-	builder.WriteString("mobile=")
-	builder.WriteString(u.Mobile)
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -184,6 +179,30 @@ func (u *User) appendNamedSilences(name string, edges ...*Silence) {
 		u.Edges.namedSilences[name] = []*Silence{}
 	} else {
 		u.Edges.namedSilences[name] = append(u.Edges.namedSilences[name], edges...)
+	}
+}
+
+// NamedAddresses returns the Addresses named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (u *User) NamedAddresses(name string) ([]*UserAddr, error) {
+	if u.Edges.namedAddresses == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := u.Edges.namedAddresses[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (u *User) appendNamedAddresses(name string, edges ...*UserAddr) {
+	if u.Edges.namedAddresses == nil {
+		u.Edges.namedAddresses = make(map[string][]*UserAddr)
+	}
+	if len(edges) == 0 {
+		u.Edges.namedAddresses[name] = []*UserAddr{}
+	} else {
+		u.Edges.namedAddresses[name] = append(u.Edges.namedAddresses[name], edges...)
 	}
 }
 

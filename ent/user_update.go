@@ -13,6 +13,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
+	"github.com/woocoos/msgcenter/ent/useraddr"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
@@ -58,46 +59,6 @@ func (uu *UserUpdate) SetNillableDisplayName(s *string) *UserUpdate {
 	return uu
 }
 
-// SetEmail sets the "email" field.
-func (uu *UserUpdate) SetEmail(s string) *UserUpdate {
-	uu.mutation.SetEmail(s)
-	return uu
-}
-
-// SetNillableEmail sets the "email" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableEmail(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetEmail(*s)
-	}
-	return uu
-}
-
-// ClearEmail clears the value of the "email" field.
-func (uu *UserUpdate) ClearEmail() *UserUpdate {
-	uu.mutation.ClearEmail()
-	return uu
-}
-
-// SetMobile sets the "mobile" field.
-func (uu *UserUpdate) SetMobile(s string) *UserUpdate {
-	uu.mutation.SetMobile(s)
-	return uu
-}
-
-// SetNillableMobile sets the "mobile" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableMobile(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetMobile(*s)
-	}
-	return uu
-}
-
-// ClearMobile clears the value of the "mobile" field.
-func (uu *UserUpdate) ClearMobile() *UserUpdate {
-	uu.mutation.ClearMobile()
-	return uu
-}
-
 // AddSilenceIDs adds the "silences" edge to the Silence entity by IDs.
 func (uu *UserUpdate) AddSilenceIDs(ids ...int) *UserUpdate {
 	uu.mutation.AddSilenceIDs(ids...)
@@ -111,6 +72,21 @@ func (uu *UserUpdate) AddSilences(s ...*Silence) *UserUpdate {
 		ids[i] = s[i].ID
 	}
 	return uu.AddSilenceIDs(ids...)
+}
+
+// AddAddressIDs adds the "addresses" edge to the UserAddr entity by IDs.
+func (uu *UserUpdate) AddAddressIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddAddressIDs(ids...)
+	return uu
+}
+
+// AddAddresses adds the "addresses" edges to the UserAddr entity.
+func (uu *UserUpdate) AddAddresses(u ...*UserAddr) *UserUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.AddAddressIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -137,6 +113,27 @@ func (uu *UserUpdate) RemoveSilences(s ...*Silence) *UserUpdate {
 		ids[i] = s[i].ID
 	}
 	return uu.RemoveSilenceIDs(ids...)
+}
+
+// ClearAddresses clears all "addresses" edges to the UserAddr entity.
+func (uu *UserUpdate) ClearAddresses() *UserUpdate {
+	uu.mutation.ClearAddresses()
+	return uu
+}
+
+// RemoveAddressIDs removes the "addresses" edge to UserAddr entities by IDs.
+func (uu *UserUpdate) RemoveAddressIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveAddressIDs(ids...)
+	return uu
+}
+
+// RemoveAddresses removes "addresses" edges to UserAddr entities.
+func (uu *UserUpdate) RemoveAddresses(u ...*UserAddr) *UserUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.RemoveAddressIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -166,25 +163,7 @@ func (uu *UserUpdate) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (uu *UserUpdate) check() error {
-	if v, ok := uu.mutation.Email(); ok {
-		if err := user.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
-		}
-	}
-	if v, ok := uu.mutation.Mobile(); ok {
-		if err := user.MobileValidator(v); err != nil {
-			return &ValidationError{Name: "mobile", err: fmt.Errorf(`ent: validator failed for field "User.mobile": %w`, err)}
-		}
-	}
-	return nil
-}
-
 func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := uu.check(); err != nil {
-		return n, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt))
 	if ps := uu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -198,18 +177,6 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.DisplayName(); ok {
 		_spec.SetField(user.FieldDisplayName, field.TypeString, value)
-	}
-	if value, ok := uu.mutation.Email(); ok {
-		_spec.SetField(user.FieldEmail, field.TypeString, value)
-	}
-	if uu.mutation.EmailCleared() {
-		_spec.ClearField(user.FieldEmail, field.TypeString)
-	}
-	if value, ok := uu.mutation.Mobile(); ok {
-		_spec.SetField(user.FieldMobile, field.TypeString, value)
-	}
-	if uu.mutation.MobileCleared() {
-		_spec.ClearField(user.FieldMobile, field.TypeString)
 	}
 	if uu.mutation.SilencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -254,6 +221,54 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			},
 		}
 		edge.Schema = uu.schemaConfig.Silence
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.AddressesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.AddressesTable,
+			Columns: []string{user.AddressesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(useraddr.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = uu.schemaConfig.UserAddr
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedAddressesIDs(); len(nodes) > 0 && !uu.mutation.AddressesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.AddressesTable,
+			Columns: []string{user.AddressesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(useraddr.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = uu.schemaConfig.UserAddr
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.AddressesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.AddressesTable,
+			Columns: []string{user.AddressesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(useraddr.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = uu.schemaConfig.UserAddr
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -309,46 +324,6 @@ func (uuo *UserUpdateOne) SetNillableDisplayName(s *string) *UserUpdateOne {
 	return uuo
 }
 
-// SetEmail sets the "email" field.
-func (uuo *UserUpdateOne) SetEmail(s string) *UserUpdateOne {
-	uuo.mutation.SetEmail(s)
-	return uuo
-}
-
-// SetNillableEmail sets the "email" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableEmail(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetEmail(*s)
-	}
-	return uuo
-}
-
-// ClearEmail clears the value of the "email" field.
-func (uuo *UserUpdateOne) ClearEmail() *UserUpdateOne {
-	uuo.mutation.ClearEmail()
-	return uuo
-}
-
-// SetMobile sets the "mobile" field.
-func (uuo *UserUpdateOne) SetMobile(s string) *UserUpdateOne {
-	uuo.mutation.SetMobile(s)
-	return uuo
-}
-
-// SetNillableMobile sets the "mobile" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableMobile(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetMobile(*s)
-	}
-	return uuo
-}
-
-// ClearMobile clears the value of the "mobile" field.
-func (uuo *UserUpdateOne) ClearMobile() *UserUpdateOne {
-	uuo.mutation.ClearMobile()
-	return uuo
-}
-
 // AddSilenceIDs adds the "silences" edge to the Silence entity by IDs.
 func (uuo *UserUpdateOne) AddSilenceIDs(ids ...int) *UserUpdateOne {
 	uuo.mutation.AddSilenceIDs(ids...)
@@ -362,6 +337,21 @@ func (uuo *UserUpdateOne) AddSilences(s ...*Silence) *UserUpdateOne {
 		ids[i] = s[i].ID
 	}
 	return uuo.AddSilenceIDs(ids...)
+}
+
+// AddAddressIDs adds the "addresses" edge to the UserAddr entity by IDs.
+func (uuo *UserUpdateOne) AddAddressIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddAddressIDs(ids...)
+	return uuo
+}
+
+// AddAddresses adds the "addresses" edges to the UserAddr entity.
+func (uuo *UserUpdateOne) AddAddresses(u ...*UserAddr) *UserUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.AddAddressIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -388,6 +378,27 @@ func (uuo *UserUpdateOne) RemoveSilences(s ...*Silence) *UserUpdateOne {
 		ids[i] = s[i].ID
 	}
 	return uuo.RemoveSilenceIDs(ids...)
+}
+
+// ClearAddresses clears all "addresses" edges to the UserAddr entity.
+func (uuo *UserUpdateOne) ClearAddresses() *UserUpdateOne {
+	uuo.mutation.ClearAddresses()
+	return uuo
+}
+
+// RemoveAddressIDs removes the "addresses" edge to UserAddr entities by IDs.
+func (uuo *UserUpdateOne) RemoveAddressIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveAddressIDs(ids...)
+	return uuo
+}
+
+// RemoveAddresses removes "addresses" edges to UserAddr entities.
+func (uuo *UserUpdateOne) RemoveAddresses(u ...*UserAddr) *UserUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.RemoveAddressIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -430,25 +441,7 @@ func (uuo *UserUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (uuo *UserUpdateOne) check() error {
-	if v, ok := uuo.mutation.Email(); ok {
-		if err := user.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
-		}
-	}
-	if v, ok := uuo.mutation.Mobile(); ok {
-		if err := user.MobileValidator(v); err != nil {
-			return &ValidationError{Name: "mobile", err: fmt.Errorf(`ent: validator failed for field "User.mobile": %w`, err)}
-		}
-	}
-	return nil
-}
-
 func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
-	if err := uuo.check(); err != nil {
-		return _node, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt))
 	id, ok := uuo.mutation.ID()
 	if !ok {
@@ -479,18 +472,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.DisplayName(); ok {
 		_spec.SetField(user.FieldDisplayName, field.TypeString, value)
-	}
-	if value, ok := uuo.mutation.Email(); ok {
-		_spec.SetField(user.FieldEmail, field.TypeString, value)
-	}
-	if uuo.mutation.EmailCleared() {
-		_spec.ClearField(user.FieldEmail, field.TypeString)
-	}
-	if value, ok := uuo.mutation.Mobile(); ok {
-		_spec.SetField(user.FieldMobile, field.TypeString, value)
-	}
-	if uuo.mutation.MobileCleared() {
-		_spec.ClearField(user.FieldMobile, field.TypeString)
 	}
 	if uuo.mutation.SilencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -535,6 +516,54 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			},
 		}
 		edge.Schema = uuo.schemaConfig.Silence
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.AddressesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.AddressesTable,
+			Columns: []string{user.AddressesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(useraddr.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = uuo.schemaConfig.UserAddr
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedAddressesIDs(); len(nodes) > 0 && !uuo.mutation.AddressesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.AddressesTable,
+			Columns: []string{user.AddressesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(useraddr.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = uuo.schemaConfig.UserAddr
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.AddressesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.AddressesTable,
+			Columns: []string{user.AddressesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(useraddr.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = uuo.schemaConfig.UserAddr
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}

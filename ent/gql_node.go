@@ -161,7 +161,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, "MsgAlert", id))
+		return query.Only(entcache.WithRefEntryKey(ctx, msgalert.Table, id))
 	case msgchannel.Table:
 		query := c.MsgChannel.Query().
 			Where(msgchannel.ID(id))
@@ -170,7 +170,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, "MsgChannel", id))
+		return query.Only(entcache.WithRefEntryKey(ctx, msgchannel.Table, id))
 	case msgevent.Table:
 		query := c.MsgEvent.Query().
 			Where(msgevent.ID(id))
@@ -179,7 +179,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, "MsgEvent", id))
+		return query.Only(entcache.WithRefEntryKey(ctx, msgevent.Table, id))
 	case msginternal.Table:
 		query := c.MsgInternal.Query().
 			Where(msginternal.ID(id))
@@ -188,7 +188,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, "MsgInternal", id))
+		return query.Only(entcache.WithRefEntryKey(ctx, msginternal.Table, id))
 	case msginternalto.Table:
 		query := c.MsgInternalTo.Query().
 			Where(msginternalto.ID(id))
@@ -197,7 +197,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, "MsgInternalTo", id))
+		return query.Only(entcache.WithRefEntryKey(ctx, msginternalto.Table, id))
 	case msgsubscriber.Table:
 		query := c.MsgSubscriber.Query().
 			Where(msgsubscriber.ID(id))
@@ -206,7 +206,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, "MsgSubscriber", id))
+		return query.Only(entcache.WithRefEntryKey(ctx, msgsubscriber.Table, id))
 	case msgtemplate.Table:
 		query := c.MsgTemplate.Query().
 			Where(msgtemplate.ID(id))
@@ -215,7 +215,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, "MsgTemplate", id))
+		return query.Only(entcache.WithRefEntryKey(ctx, msgtemplate.Table, id))
 	case msgtype.Table:
 		query := c.MsgType.Query().
 			Where(msgtype.ID(id))
@@ -224,7 +224,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, "MsgType", id))
+		return query.Only(entcache.WithRefEntryKey(ctx, msgtype.Table, id))
 	case nlog.Table:
 		query := c.Nlog.Query().
 			Where(nlog.ID(id))
@@ -233,7 +233,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, "Nlog", id))
+		return query.Only(entcache.WithRefEntryKey(ctx, nlog.Table, id))
 	case nlogalert.Table:
 		query := c.NlogAlert.Query().
 			Where(nlogalert.ID(id))
@@ -242,7 +242,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, "NlogAlert", id))
+		return query.Only(entcache.WithRefEntryKey(ctx, nlogalert.Table, id))
 	case silence.Table:
 		query := c.Silence.Query().
 			Where(silence.ID(id))
@@ -251,7 +251,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, "Silence", id))
+		return query.Only(entcache.WithRefEntryKey(ctx, silence.Table, id))
 	case user.Table:
 		query := c.User.Query().
 			Where(user.ID(id))
@@ -260,7 +260,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, "User", id))
+		return query.Only(entcache.WithRefEntryKey(ctx, user.Table, id))
 	default:
 		return nil, fmt.Errorf("cannot resolve noder from table %q: %w", table, errNodeInvalidID)
 	}

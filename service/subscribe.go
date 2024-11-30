@@ -8,6 +8,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/user"
+	"github.com/woocoos/msgcenter/ent/useraddr"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
@@ -64,17 +65,21 @@ func (u *UserSubscribe) SubUsers(ctx context.Context, al *alert.Alert) ([]notify
 		return nil, err
 	}
 	ul, err := u.DB.User.Query().Where(user.IDIn(ids...)).
-		Select(user.FieldID, user.FieldDisplayName, user.FieldEmail, user.FieldMobile).All(ctx)
+		Select(user.FieldID, user.FieldDisplayName).All(ctx)
 	if err != nil {
 		return nil, err
 	}
 	var uis []notify.UserInfo
 	for _, eu := range ul {
+		addr, err := eu.QueryAddresses().Where(useraddr.AddrTypeEQ(useraddr.AddrTypeContact)).Only(ctx)
+		if err != nil {
+			return nil, err
+		}
 		uis = append(uis, notify.UserInfo{
 			UserID: strconv.Itoa(eu.ID),
 			Name:   eu.DisplayName,
-			Email:  eu.Email,
-			Mobile: eu.Mobile,
+			Email:  addr.Email,
+			Mobile: addr.Mobile,
 		})
 	}
 	return uis, nil

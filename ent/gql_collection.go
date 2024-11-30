@@ -126,7 +126,7 @@ func (ma *MsgAlertQuery) collectField(ctx context.Context, oneNode bool, opCtx *
 				}
 			}
 			if limit := paginateLimit(args.first, args.last); limit > 0 {
-				if oneNode {
+				if args.after == nil && args.last == nil {
 					pager.applyOrder(query.Limit(limit))
 				} else {
 					modify := pagination.LimitPerRow(ctx, msgalert.NlogPrimaryKey[1], limit, args.first, args.last, pager.orderExpr(query))
@@ -214,7 +214,7 @@ func (ma *MsgAlertQuery) collectField(ctx context.Context, oneNode bool, opCtx *
 				}
 			}
 			if limit := paginateLimit(args.first, args.last); limit > 0 {
-				if oneNode {
+				if args.after == nil && args.last == nil {
 					pager.applyOrder(query.Limit(limit))
 				} else {
 					modify := pagination.LimitPerRow(ctx, msgalert.NlogAlertsColumn, limit, args.first, args.last, pager.orderExpr(query))
@@ -1920,16 +1920,6 @@ func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 				selectedFields = append(selectedFields, user.FieldDisplayName)
 				fieldSeen[user.FieldDisplayName] = struct{}{}
 			}
-		case "email":
-			if _, ok := fieldSeen[user.FieldEmail]; !ok {
-				selectedFields = append(selectedFields, user.FieldEmail)
-				fieldSeen[user.FieldEmail] = struct{}{}
-			}
-		case "mobile":
-			if _, ok := fieldSeen[user.FieldMobile]; !ok {
-				selectedFields = append(selectedFields, user.FieldMobile)
-				fieldSeen[user.FieldMobile] = struct{}{}
-			}
 		case "id":
 		case "__typename":
 		default:
@@ -1993,7 +1983,7 @@ func fieldArgs(ctx context.Context, whereInput any, path ...string) map[string]a
 func unmarshalArgs(ctx context.Context, whereInput any, args map[string]any) map[string]any {
 	for _, k := range []string{firstField, lastField} {
 		v, ok := args[k]
-		if !ok {
+		if !ok || v == nil {
 			continue
 		}
 		i, err := graphql.UnmarshalInt(v)
