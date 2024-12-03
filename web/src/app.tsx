@@ -17,6 +17,7 @@ import { Message } from './generated/msgsrv/graphql';
 import { logout } from './services/auth';
 import { parseSpm } from './services/auth/noStore';
 import { browserLanguage, getMenuAppActions } from './util';
+import { setLibraryName } from '@ice/stark-app';
 
 const NODE_ENV = process.env.NODE_ENV ?? '',
   ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
@@ -28,6 +29,8 @@ const NODE_ENV = process.env.NODE_ENV ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
   ICE_WS_MSGSRV = process.env.ICE_WS_MSGSRV ?? '',
   ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '';
+
+setLibraryName('msgsrv-ui')
 
 export const icestark = defineChildConfig(() => ({
   mount: (data) => {
