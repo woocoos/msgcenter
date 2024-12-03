@@ -14,6 +14,9 @@ importers:
       '@ant-design/pro-components':
         specifier: ^2.6.28
         version: 2.8.2(antd@5.22.1(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(rc-field-form@2.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ice/stark-data':
+        specifier: ^0.1.3
+        version: 0.1.3
       '@knockout-js/api':
         specifier: 0.1.8
         version: 0.1.8(react@18.3.1)
@@ -1264,28 +1267,24 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@ice/css-modules-hash-linux-arm64-musl@0.0.10':
     resolution: {integrity: sha512-t8Vtb19CvoQWGx8K7svS7j77ck0klDN7IVReRnDK1YR7J8j5B+eWoN3pfy5jf7g3veuAWD/S/6FlAuSyuzWW5w==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@ice/css-modules-hash-linux-x64-gnu@0.0.10':
     resolution: {integrity: sha512-Ds1HqTF9I7MotP6AsFfwySKH8KcO6FJ9yI11LMB2WW5H/Sy/d1Xdh6Gu+W9VfAd3JAN7eV5X4KsPnpQpF44gjw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@ice/css-modules-hash-linux-x64-musl@0.0.10':
     resolution: {integrity: sha512-iiOcPliswsgHTpuim2EVi0zHx141dOIObSFKu3JkX8gs+s83b6r1BhnobPgbsyZ8EUPpk/k7BIn2zld//J+bVA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@ice/css-modules-hash-win32-arm64-msvc@0.0.10':
     resolution: {integrity: sha512-Zwbs6s3ZR38TWGInH9LtrLyjRw++KNG21f46OSQN4of4isNKLuTknQSeuiv9cMCn5NWfndLUiGc7exBSUqvaQw==}
@@ -1341,28 +1340,24 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@ice/pack-binding-linux-arm64-musl@0.0.13':
     resolution: {integrity: sha512-3EcQR0NjV+axIcOZu4AzRzR4K899ext1vOCf+MzU908fEZWGdZUWzq0U5SNbXmVhC37OO0F1lsNaOdf4Nkfxsw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@ice/pack-binding-linux-x64-gnu@0.0.13':
     resolution: {integrity: sha512-hCzYIE3/mnXaVhe1Y+RrZx8xOfys7bxk3fgvZYFr1wwjz30WiX1TjxSn4WAg3QDI9GH98X8fifGcKc22Z+keig==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@ice/pack-binding-linux-x64-musl@0.0.13':
     resolution: {integrity: sha512-oWwBaS9VUTpp7sxh0wE/af8pYkzk3q8PR2Poud7URs3JH8vlUgpmmJfsp5TV0qYOZoG4GvyAI2fPtvX+LEEGBQ==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@ice/pack-binding-win32-arm64-msvc@0.0.13':
     resolution: {integrity: sha512-ajWyxuDb8Riw7kP0e1o0ELX/73FVuhW/pDZ0dQ9d4FjFnGV2F5yrUAjDOAUVcas38oxDNBJDHSwzWrLyI0RjDQ==}
@@ -1436,6 +1431,9 @@ packages:
 
   '@ice/stark-app@1.5.0':
     resolution: {integrity: sha512-9fuCri48eZj6TnfPkCju4vVLhGurz+mt6lFx4JQFHhnRBQ5MuiBqRZg5F/3vdnJ7dAYQJlCXmHlQtBHok82z+g==}
+
+  '@ice/stark-data@0.1.3':
+    resolution: {integrity: sha512-qm8f9EF1UFZZcgMxTqxMCqace8FU9ssDnR/zIQPIj5T3G4QzztvzNBHAtysO+g1E6ZFlaB+bKuCTjueosfFi8Q==}
 
   '@ice/stark@2.7.5':
     resolution: {integrity: sha512-HyV3/6PtTfNiKBkncztunpjsWMBw/SyQ24TvrYLnpkuSmrlZ9t0/jkJWuaM6nGpAufyZ62YfQ2Tn032So9OeIg==}
@@ -1560,42 +1558,36 @@ packages:
     engines: {node: '>= 10.0.0'}
     cpu: [arm]
     os: [linux]
-    libc: [glibc]
 
   '@parcel/watcher-linux-arm-musl@2.5.0':
     resolution: {integrity: sha512-6uHywSIzz8+vi2lAzFeltnYbdHsDm3iIB57d4g5oaB9vKwjb6N6dRIgZMujw4nm5r6v9/BQH0noq6DzHrqr2pA==}
     engines: {node: '>= 10.0.0'}
     cpu: [arm]
     os: [linux]
-    libc: [musl]
 
   '@parcel/watcher-linux-arm64-glibc@2.5.0':
     resolution: {integrity: sha512-BfNjXwZKxBy4WibDb/LDCriWSKLz+jJRL3cM/DllnHH5QUyoiUNEp3GmL80ZqxeumoADfCCP19+qiYiC8gUBjA==}
     engines: {node: '>= 10.0.0'}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@parcel/watcher-linux-arm64-musl@2.5.0':
     resolution: {integrity: sha512-S1qARKOphxfiBEkwLUbHjCY9BWPdWnW9j7f7Hb2jPplu8UZ3nes7zpPOW9bkLbHRvWM0WDTsjdOTUgW0xLBN1Q==}
     engines: {node: '>= 10.0.0'}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@parcel/watcher-linux-x64-glibc@2.5.0':
     resolution: {integrity: sha512-d9AOkusyXARkFD66S6zlGXyzx5RvY+chTP9Jp0ypSTC9d4lzyRs9ovGf/80VCxjKddcUvnsGwCHWuF2EoPgWjw==}
     engines: {node: '>= 10.0.0'}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@parcel/watcher-linux-x64-musl@2.5.0':
     resolution: {integrity: sha512-iqOC+GoTDoFyk/VYSFHwjHhYrk8bljW6zOhPuhi5t9ulqiYq1togGJB5e3PwYVFFfeVgc6pbz3JdQyDoBszVaA==}
     engines: {node: '>= 10.0.0'}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@parcel/watcher-win32-arm64@2.5.0':
     resolution: {integrity: sha512-twtft1d+JRNkM5YbmexfcH/N4znDtjgysFaV9zvZmmJezQsKpkfLYJ+JFV3uygugK6AtIM2oADPkB2AdhBrNig==}
@@ -1925,28 +1917,24 @@ packages:
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@swc/core-linux-arm64-musl@1.3.80':
     resolution: {integrity: sha512-AhdCQ7QKx5mWrtpaOA1mFRiWWvuiiUtspvo0QSpspDetRKTND1rlf/3UB5+gp0kCeCNUTsVmJWU7fIA9ICZtXA==}
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@swc/core-linux-x64-gnu@1.3.80':
     resolution: {integrity: sha512-+2e5oni1vOrLIjM5Q2/GIzK/uS2YEtuJqnjPvCK8SciRJsSl8OgVsRvyCDbmKeZNtJ2Q+o/O2AQ2w1qpAJG6jg==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@swc/core-linux-x64-musl@1.3.80':
     resolution: {integrity: sha512-8OK9IlI1zpWOm7vIp1iXmZSEzLAwFpqhsGSEhxPavpOx2m54kLFdPcw/Uv3n461f6TCtszIxkGq1kSqBUdfUBA==}
     engines: {node: '>=10'}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@swc/core-win32-arm64-msvc@1.3.80':
     resolution: {integrity: sha512-RKhatwiAGlffnF6z2Mm3Ddid0v3KB+uf5m/Gc7N9zO/EUAV0PnHRuYuZSGyqodHmGFC+mK8YrCooFCEmHL9n+w==}
@@ -7488,6 +7476,8 @@ snapshots:
   '@ice/shared@1.0.2': {}
 
   '@ice/stark-app@1.5.0': {}
+
+  '@ice/stark-data@0.1.3': {}
 
   '@ice/stark@2.7.5(react@18.3.1)':
     dependencies:

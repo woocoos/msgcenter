@@ -35,13 +35,14 @@ export default defineConfig(() => ({
     ],
   },
   externals: {
-    'react': 'React',
-    'react-dom': 'ReactDOM',
-    'react-i18next': 'ReactI18next',
-    'i18next': 'i18next',
-    'js-yaml': 'jsyaml',
-    'antd': 'antd',
-    '@ant-design/pro-components': 'ProComponents',
+    // 先禁用cdn处理 由于子应用加载会找不到react问题
+    // 'react': 'React',
+    // 'react-dom': 'ReactDOM',
+    // 'react-i18next': 'ReactI18next',
+    // 'i18next': 'i18next',
+    // 'js-yaml': 'jsyaml',
+    // 'antd': 'antd',
+    // '@ant-design/pro-components': 'ProComponents',
   },
   plugins: [
     icestark({ type: 'child' }),

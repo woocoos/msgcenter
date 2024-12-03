@@ -18,6 +18,8 @@ import { logout } from './services/auth';
 import { parseSpm } from './services/auth/noStore';
 import { browserLanguage, getMenuAppActions } from './util';
 import { setLibraryName } from '@ice/stark-app';
+import { isInIcestark } from '@ice/stark-app';
+import { store as starkStore, event as starkEvent } from '@ice/stark-data';
 
 const NODE_ENV = process.env.NODE_ENV ?? '',
   ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
@@ -66,16 +68,9 @@ export default defineAppConfig(() => ({
 
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
-  if (NODE_ENV === 'development') {
-    // 开发时使用
-    setItem('token', process.env.ICE_DEV_TOKEN)
-    setItem('tenantId', process.env.ICE_DEV_TID)
-    setItem('user', {
-      id: 1,
-      displayName: 'admin',
-    })
+  if (isInIcestark()) {
+    return starkStore.get('iceStore')
   }
-
   const sign = `sign_cid=y`
   if (document.cookie.indexOf(sign) === -1) {
     removeItem('token');
@@ -153,6 +148,7 @@ export const urqlConfig = defineUrqlConfig([
           },
           setStateToken: (newToken) => {
             store.dispatch.user.updateToken(newToken);
+            starkEvent.emit('set-token', newToken);
           }
         },
         error: (err, errstr) => {
