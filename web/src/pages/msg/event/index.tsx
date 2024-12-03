@@ -41,7 +41,7 @@ export default () => {
       {
         title: t('way_receiving'), dataIndex: 'modes', width: 120, search: false,
         render(text, record) {
-          return record.modes.split(',').join('、')
+          return record.modes?.split(',')?.join('、')
         },
       },
       {
