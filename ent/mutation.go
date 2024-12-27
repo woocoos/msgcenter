@@ -3443,14 +3443,14 @@ type MsgInternalMutation struct {
 	op                     Op
 	typ                    string
 	id                     *int
-	tenant_id              *int
-	addtenant_id           *int
 	created_by             *int
 	addcreated_by          *int
 	created_at             *time.Time
 	updated_by             *int
 	addupdated_by          *int
 	updated_at             *time.Time
+	tenant_id              *int
+	addtenant_id           *int
 	category               *string
 	subject                *string
 	body                   *string
@@ -3567,62 +3567,6 @@ func (m *MsgInternalMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
-}
-
-// SetTenantID sets the "tenant_id" field.
-func (m *MsgInternalMutation) SetTenantID(i int) {
-	m.tenant_id = &i
-	m.addtenant_id = nil
-}
-
-// TenantID returns the value of the "tenant_id" field in the mutation.
-func (m *MsgInternalMutation) TenantID() (r int, exists bool) {
-	v := m.tenant_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTenantID returns the old "tenant_id" field's value of the MsgInternal entity.
-// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MsgInternalMutation) OldTenantID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTenantID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
-	}
-	return oldValue.TenantID, nil
-}
-
-// AddTenantID adds i to the "tenant_id" field.
-func (m *MsgInternalMutation) AddTenantID(i int) {
-	if m.addtenant_id != nil {
-		*m.addtenant_id += i
-	} else {
-		m.addtenant_id = &i
-	}
-}
-
-// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
-func (m *MsgInternalMutation) AddedTenantID() (r int, exists bool) {
-	v := m.addtenant_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetTenantID resets all changes to the "tenant_id" field.
-func (m *MsgInternalMutation) ResetTenantID() {
-	m.tenant_id = nil
-	m.addtenant_id = nil
 }
 
 // SetCreatedBy sets the "created_by" field.
@@ -3834,6 +3778,62 @@ func (m *MsgInternalMutation) UpdatedAtCleared() bool {
 func (m *MsgInternalMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 	delete(m.clearedFields, msginternal.FieldUpdatedAt)
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *MsgInternalMutation) SetTenantID(i int) {
+	m.tenant_id = &i
+	m.addtenant_id = nil
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *MsgInternalMutation) TenantID() (r int, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the MsgInternal entity.
+// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalMutation) OldTenantID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// AddTenantID adds i to the "tenant_id" field.
+func (m *MsgInternalMutation) AddTenantID(i int) {
+	if m.addtenant_id != nil {
+		*m.addtenant_id += i
+	} else {
+		m.addtenant_id = &i
+	}
+}
+
+// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
+func (m *MsgInternalMutation) AddedTenantID() (r int, exists bool) {
+	v := m.addtenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *MsgInternalMutation) ResetTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
 }
 
 // SetCategory sets the "category" field.
@@ -4131,9 +4131,6 @@ func (m *MsgInternalMutation) Type() string {
 // AddedFields().
 func (m *MsgInternalMutation) Fields() []string {
 	fields := make([]string, 0, 10)
-	if m.tenant_id != nil {
-		fields = append(fields, msginternal.FieldTenantID)
-	}
 	if m.created_by != nil {
 		fields = append(fields, msginternal.FieldCreatedBy)
 	}
@@ -4145,6 +4142,9 @@ func (m *MsgInternalMutation) Fields() []string {
 	}
 	if m.updated_at != nil {
 		fields = append(fields, msginternal.FieldUpdatedAt)
+	}
+	if m.tenant_id != nil {
+		fields = append(fields, msginternal.FieldTenantID)
 	}
 	if m.category != nil {
 		fields = append(fields, msginternal.FieldCategory)
@@ -4169,8 +4169,6 @@ func (m *MsgInternalMutation) Fields() []string {
 // schema.
 func (m *MsgInternalMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case msginternal.FieldTenantID:
-		return m.TenantID()
 	case msginternal.FieldCreatedBy:
 		return m.CreatedBy()
 	case msginternal.FieldCreatedAt:
@@ -4179,6 +4177,8 @@ func (m *MsgInternalMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedBy()
 	case msginternal.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case msginternal.FieldTenantID:
+		return m.TenantID()
 	case msginternal.FieldCategory:
 		return m.Category()
 	case msginternal.FieldSubject:
@@ -4198,8 +4198,6 @@ func (m *MsgInternalMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *MsgInternalMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case msginternal.FieldTenantID:
-		return m.OldTenantID(ctx)
 	case msginternal.FieldCreatedBy:
 		return m.OldCreatedBy(ctx)
 	case msginternal.FieldCreatedAt:
@@ -4208,6 +4206,8 @@ func (m *MsgInternalMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldUpdatedBy(ctx)
 	case msginternal.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case msginternal.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case msginternal.FieldCategory:
 		return m.OldCategory(ctx)
 	case msginternal.FieldSubject:
@@ -4227,13 +4227,6 @@ func (m *MsgInternalMutation) OldField(ctx context.Context, name string) (ent.Va
 // type.
 func (m *MsgInternalMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case msginternal.FieldTenantID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTenantID(v)
-		return nil
 	case msginternal.FieldCreatedBy:
 		v, ok := value.(int)
 		if !ok {
@@ -4261,6 +4254,13 @@ func (m *MsgInternalMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case msginternal.FieldTenantID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
 		return nil
 	case msginternal.FieldCategory:
 		v, ok := value.(string)
@@ -4305,14 +4305,14 @@ func (m *MsgInternalMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *MsgInternalMutation) AddedFields() []string {
 	var fields []string
-	if m.addtenant_id != nil {
-		fields = append(fields, msginternal.FieldTenantID)
-	}
 	if m.addcreated_by != nil {
 		fields = append(fields, msginternal.FieldCreatedBy)
 	}
 	if m.addupdated_by != nil {
 		fields = append(fields, msginternal.FieldUpdatedBy)
+	}
+	if m.addtenant_id != nil {
+		fields = append(fields, msginternal.FieldTenantID)
 	}
 	return fields
 }
@@ -4322,12 +4322,12 @@ func (m *MsgInternalMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *MsgInternalMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case msginternal.FieldTenantID:
-		return m.AddedTenantID()
 	case msginternal.FieldCreatedBy:
 		return m.AddedCreatedBy()
 	case msginternal.FieldUpdatedBy:
 		return m.AddedUpdatedBy()
+	case msginternal.FieldTenantID:
+		return m.AddedTenantID()
 	}
 	return nil, false
 }
@@ -4337,13 +4337,6 @@ func (m *MsgInternalMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *MsgInternalMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case msginternal.FieldTenantID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddTenantID(v)
-		return nil
 	case msginternal.FieldCreatedBy:
 		v, ok := value.(int)
 		if !ok {
@@ -4357,6 +4350,13 @@ func (m *MsgInternalMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddUpdatedBy(v)
+		return nil
+	case msginternal.FieldTenantID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTenantID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown MsgInternal numeric field %s", name)
@@ -4412,9 +4412,6 @@ func (m *MsgInternalMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *MsgInternalMutation) ResetField(name string) error {
 	switch name {
-	case msginternal.FieldTenantID:
-		m.ResetTenantID()
-		return nil
 	case msginternal.FieldCreatedBy:
 		m.ResetCreatedBy()
 		return nil
@@ -4426,6 +4423,9 @@ func (m *MsgInternalMutation) ResetField(name string) error {
 		return nil
 	case msginternal.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case msginternal.FieldTenantID:
+		m.ResetTenantID()
 		return nil
 	case msginternal.FieldCategory:
 		m.ResetCategory()

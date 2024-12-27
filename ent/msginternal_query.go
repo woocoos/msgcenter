@@ -307,12 +307,12 @@ func (miq *MsgInternalQuery) WithMsgInternalTo(opts ...func(*MsgInternalToQuery)
 // Example:
 //
 //	var v []struct {
-//		TenantID int `json:"tenant_id,omitempty"`
+//		CreatedBy int `json:"created_by,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.MsgInternal.Query().
-//		GroupBy(msginternal.FieldTenantID).
+//		GroupBy(msginternal.FieldCreatedBy).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (miq *MsgInternalQuery) GroupBy(field string, fields ...string) *MsgInternalGroupBy {
@@ -330,11 +330,11 @@ func (miq *MsgInternalQuery) GroupBy(field string, fields ...string) *MsgInterna
 // Example:
 //
 //	var v []struct {
-//		TenantID int `json:"tenant_id,omitempty"`
+//		CreatedBy int `json:"created_by,omitempty"`
 //	}
 //
 //	client.MsgInternal.Query().
-//		Select(msginternal.FieldTenantID).
+//		Select(msginternal.FieldCreatedBy).
 //		Scan(ctx, &v)
 func (miq *MsgInternalQuery) Select(fields ...string) *MsgInternalSelect {
 	miq.ctx.Fields = append(miq.ctx.Fields, fields...)

@@ -29,7 +29,7 @@ type Silence struct {
 	UpdatedBy int `json:"updated_by,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// TenantID holds the value of the "tenant_id" field.
+	// 租户ID
 	TenantID int `json:"tenant_id,omitempty"`
 	// 应用ID
 	Matchers []*label.Matcher `json:"matchers,omitempty"`

@@ -20,7 +20,7 @@ type MsgAlert struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// TenantID holds the value of the "tenant_id" field.
+	// 租户ID
 	TenantID int `json:"tenant_id,omitempty"`
 	// 标签
 	Labels *label.LabelSet `json:"labels,omitempty"`

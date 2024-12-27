@@ -39,6 +39,7 @@ func (MsgInternalTo) Mixin() []ent.Mixin {
 // Fields of the MsgInternalTo.
 func (MsgInternalTo) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int(schemax.FieldTenantID).Immutable().Comment("租户ID"),
 		field.Int("msg_internal_id").Comment("站内信ID").Immutable(),
 		field.Int("user_id").Comment("用户ID").Immutable(),
 		field.Time("read_at").Optional().Comment("阅读时间"),

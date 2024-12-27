@@ -57,11 +57,6 @@ func IDLTE(id int) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldLTE(FieldID, id))
 }
 
-// TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
-func TenantID(v int) predicate.MsgInternal {
-	return predicate.MsgInternal(sql.FieldEQ(FieldTenantID, v))
-}
-
 // CreatedBy applies equality check predicate on the "created_by" field. It's identical to CreatedByEQ.
 func CreatedBy(v int) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldEQ(FieldCreatedBy, v))
@@ -80,6 +75,11 @@ func UpdatedBy(v int) predicate.MsgInternal {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
+func TenantID(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldEQ(FieldTenantID, v))
 }
 
 // Category applies equality check predicate on the "category" field. It's identical to CategoryEQ.
@@ -105,46 +105,6 @@ func Format(v string) predicate.MsgInternal {
 // Redirect applies equality check predicate on the "redirect" field. It's identical to RedirectEQ.
 func Redirect(v string) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldEQ(FieldRedirect, v))
-}
-
-// TenantIDEQ applies the EQ predicate on the "tenant_id" field.
-func TenantIDEQ(v int) predicate.MsgInternal {
-	return predicate.MsgInternal(sql.FieldEQ(FieldTenantID, v))
-}
-
-// TenantIDNEQ applies the NEQ predicate on the "tenant_id" field.
-func TenantIDNEQ(v int) predicate.MsgInternal {
-	return predicate.MsgInternal(sql.FieldNEQ(FieldTenantID, v))
-}
-
-// TenantIDIn applies the In predicate on the "tenant_id" field.
-func TenantIDIn(vs ...int) predicate.MsgInternal {
-	return predicate.MsgInternal(sql.FieldIn(FieldTenantID, vs...))
-}
-
-// TenantIDNotIn applies the NotIn predicate on the "tenant_id" field.
-func TenantIDNotIn(vs ...int) predicate.MsgInternal {
-	return predicate.MsgInternal(sql.FieldNotIn(FieldTenantID, vs...))
-}
-
-// TenantIDGT applies the GT predicate on the "tenant_id" field.
-func TenantIDGT(v int) predicate.MsgInternal {
-	return predicate.MsgInternal(sql.FieldGT(FieldTenantID, v))
-}
-
-// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
-func TenantIDGTE(v int) predicate.MsgInternal {
-	return predicate.MsgInternal(sql.FieldGTE(FieldTenantID, v))
-}
-
-// TenantIDLT applies the LT predicate on the "tenant_id" field.
-func TenantIDLT(v int) predicate.MsgInternal {
-	return predicate.MsgInternal(sql.FieldLT(FieldTenantID, v))
-}
-
-// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
-func TenantIDLTE(v int) predicate.MsgInternal {
-	return predicate.MsgInternal(sql.FieldLTE(FieldTenantID, v))
 }
 
 // CreatedByEQ applies the EQ predicate on the "created_by" field.
@@ -325,6 +285,46 @@ func UpdatedAtIsNil() predicate.MsgInternal {
 // UpdatedAtNotNil applies the NotNil predicate on the "updated_at" field.
 func UpdatedAtNotNil() predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldNotNull(FieldUpdatedAt))
+}
+
+// TenantIDEQ applies the EQ predicate on the "tenant_id" field.
+func TenantIDEQ(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldEQ(FieldTenantID, v))
+}
+
+// TenantIDNEQ applies the NEQ predicate on the "tenant_id" field.
+func TenantIDNEQ(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNEQ(FieldTenantID, v))
+}
+
+// TenantIDIn applies the In predicate on the "tenant_id" field.
+func TenantIDIn(vs ...int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldIn(FieldTenantID, vs...))
+}
+
+// TenantIDNotIn applies the NotIn predicate on the "tenant_id" field.
+func TenantIDNotIn(vs ...int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNotIn(FieldTenantID, vs...))
+}
+
+// TenantIDGT applies the GT predicate on the "tenant_id" field.
+func TenantIDGT(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldGT(FieldTenantID, v))
+}
+
+// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
+func TenantIDGTE(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldGTE(FieldTenantID, v))
+}
+
+// TenantIDLT applies the LT predicate on the "tenant_id" field.
+func TenantIDLT(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldLT(FieldTenantID, v))
+}
+
+// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
+func TenantIDLTE(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldLTE(FieldTenantID, v))
 }
 
 // CategoryEQ applies the EQ predicate on the "category" field.

@@ -41,6 +41,7 @@ func (Silence) Mixin() []ent.Mixin {
 // Fields of the Silence.
 func (Silence) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int(schemax.FieldTenantID).Immutable().Comment("租户ID"),
 		field.JSON("matchers", []*label.Matcher{}).Optional().Comment("应用ID").
 			Annotations(entgql.Skip(entgql.SkipWhereInput)),
 		field.Time("starts_at").Comment("开始时间"),

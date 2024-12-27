@@ -18,7 +18,7 @@ type Nlog struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// TenantID holds the value of the "tenant_id" field.
+	// 租户ID
 	TenantID int `json:"tenant_id,omitempty"`
 	// 分组键
 	GroupKey string `json:"group_key,omitempty"`

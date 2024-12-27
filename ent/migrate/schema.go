@@ -12,7 +12,7 @@ var (
 	// MsgAlertColumns holds the columns for the "msg_alert" table.
 	MsgAlertColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
+		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "labels", Type: field.TypeJSON, Nullable: true},
 		{Name: "annotations", Type: field.TypeJSON, Nullable: true},
 		{Name: "starts_at", Type: field.TypeTime},
@@ -89,11 +89,11 @@ var (
 	// MsgInternalColumns holds the columns for the "msg_internal" table.
 	MsgInternalColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
 		{Name: "created_by", Type: field.TypeInt},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "category", Type: field.TypeString, Size: 20},
 		{Name: "subject", Type: field.TypeString},
 		{Name: "body", Type: field.TypeString, Nullable: true},
@@ -109,7 +109,7 @@ var (
 	// MsgInternalToColumns holds the columns for the "msg_internal_to" table.
 	MsgInternalToColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
+		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "read_at", Type: field.TypeTime, Nullable: true},
 		{Name: "delete_at", Type: field.TypeTime, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
@@ -231,7 +231,7 @@ var (
 	// MsgNlogColumns holds the columns for the "msg_nlog" table.
 	MsgNlogColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
+		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "group_key", Type: field.TypeString},
 		{Name: "receiver", Type: field.TypeString},
 		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "message", "webhook"}},
@@ -301,7 +301,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "tenant_id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
+		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "matchers", Type: field.TypeJSON, Nullable: true},
 		{Name: "starts_at", Type: field.TypeTime},
 		{Name: "ends_at", Type: field.TypeTime},

@@ -676,11 +676,6 @@ func (mi *MsgInternalQuery) collectField(ctx context.Context, oneNode bool, opCt
 			mi.WithNamedMsgInternalTo(alias, func(wq *MsgInternalToQuery) {
 				*wq = *query
 			})
-		case "tenantID":
-			if _, ok := fieldSeen[msginternal.FieldTenantID]; !ok {
-				selectedFields = append(selectedFields, msginternal.FieldTenantID)
-				fieldSeen[msginternal.FieldTenantID] = struct{}{}
-			}
 		case "createdBy":
 			if _, ok := fieldSeen[msginternal.FieldCreatedBy]; !ok {
 				selectedFields = append(selectedFields, msginternal.FieldCreatedBy)
@@ -700,6 +695,11 @@ func (mi *MsgInternalQuery) collectField(ctx context.Context, oneNode bool, opCt
 			if _, ok := fieldSeen[msginternal.FieldUpdatedAt]; !ok {
 				selectedFields = append(selectedFields, msginternal.FieldUpdatedAt)
 				fieldSeen[msginternal.FieldUpdatedAt] = struct{}{}
+			}
+		case "tenantID":
+			if _, ok := fieldSeen[msginternal.FieldTenantID]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldTenantID)
+				fieldSeen[msginternal.FieldTenantID] = struct{}{}
 			}
 		case "category":
 			if _, ok := fieldSeen[msginternal.FieldCategory]; !ok {

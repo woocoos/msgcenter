@@ -153,7 +153,7 @@ func (c *Client) Noder(ctx context.Context, id int, opts ...NodeOption) (_ Noder
 
 func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error) {
 	switch table {
-	case msgalert.Table:
+	case "MsgAlert":
 		query := c.MsgAlert.Query().
 			Where(msgalert.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
@@ -161,8 +161,8 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, msgalert.Table, id))
-	case msgchannel.Table:
+		return query.Only(entcache.WithRefEntryKey(ctx, "MsgAlert", id))
+	case "MsgChannel":
 		query := c.MsgChannel.Query().
 			Where(msgchannel.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
@@ -170,8 +170,8 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, msgchannel.Table, id))
-	case msgevent.Table:
+		return query.Only(entcache.WithRefEntryKey(ctx, "MsgChannel", id))
+	case "MsgEvent":
 		query := c.MsgEvent.Query().
 			Where(msgevent.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
@@ -179,8 +179,8 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, msgevent.Table, id))
-	case msginternal.Table:
+		return query.Only(entcache.WithRefEntryKey(ctx, "MsgEvent", id))
+	case "MsgInternal":
 		query := c.MsgInternal.Query().
 			Where(msginternal.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
@@ -188,8 +188,8 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, msginternal.Table, id))
-	case msginternalto.Table:
+		return query.Only(entcache.WithRefEntryKey(ctx, "MsgInternal", id))
+	case "MsgInternalTo":
 		query := c.MsgInternalTo.Query().
 			Where(msginternalto.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
@@ -197,8 +197,8 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, msginternalto.Table, id))
-	case msgsubscriber.Table:
+		return query.Only(entcache.WithRefEntryKey(ctx, "MsgInternalTo", id))
+	case "MsgSubscriber":
 		query := c.MsgSubscriber.Query().
 			Where(msgsubscriber.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
@@ -206,8 +206,8 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, msgsubscriber.Table, id))
-	case msgtemplate.Table:
+		return query.Only(entcache.WithRefEntryKey(ctx, "MsgSubscriber", id))
+	case "MsgTemplate":
 		query := c.MsgTemplate.Query().
 			Where(msgtemplate.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
@@ -215,8 +215,8 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, msgtemplate.Table, id))
-	case msgtype.Table:
+		return query.Only(entcache.WithRefEntryKey(ctx, "MsgTemplate", id))
+	case "MsgType":
 		query := c.MsgType.Query().
 			Where(msgtype.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
@@ -224,8 +224,8 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, msgtype.Table, id))
-	case nlog.Table:
+		return query.Only(entcache.WithRefEntryKey(ctx, "MsgType", id))
+	case "Nlog":
 		query := c.Nlog.Query().
 			Where(nlog.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
@@ -233,8 +233,8 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, nlog.Table, id))
-	case nlogalert.Table:
+		return query.Only(entcache.WithRefEntryKey(ctx, "Nlog", id))
+	case "NlogAlert":
 		query := c.NlogAlert.Query().
 			Where(nlogalert.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
@@ -242,8 +242,8 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, nlogalert.Table, id))
-	case silence.Table:
+		return query.Only(entcache.WithRefEntryKey(ctx, "NlogAlert", id))
+	case "Silence":
 		query := c.Silence.Query().
 			Where(silence.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
@@ -251,8 +251,8 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, silence.Table, id))
-	case user.Table:
+		return query.Only(entcache.WithRefEntryKey(ctx, "Silence", id))
+	case "User":
 		query := c.User.Query().
 			Where(user.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
@@ -260,7 +260,7 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 				return nil, err
 			}
 		}
-		return query.Only(entcache.WithRefEntryKey(ctx, user.Table, id))
+		return query.Only(entcache.WithRefEntryKey(ctx, "User", id))
 	default:
 		return nil, fmt.Errorf("cannot resolve noder from table %q: %w", table, errNodeInvalidID)
 	}
@@ -334,7 +334,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		idmap[id] = append(idmap[id], &noders[i])
 	}
 	switch table {
-	case msgalert.Table:
+	case "MsgAlert":
 		query := c.MsgAlert.Query().
 			Where(msgalert.IDIn(ids...))
 		query, err := query.CollectFields(ctx, msgalertImplementors...)
@@ -350,7 +350,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case msgchannel.Table:
+	case "MsgChannel":
 		query := c.MsgChannel.Query().
 			Where(msgchannel.IDIn(ids...))
 		query, err := query.CollectFields(ctx, msgchannelImplementors...)
@@ -366,7 +366,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case msgevent.Table:
+	case "MsgEvent":
 		query := c.MsgEvent.Query().
 			Where(msgevent.IDIn(ids...))
 		query, err := query.CollectFields(ctx, msgeventImplementors...)
@@ -382,7 +382,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case msginternal.Table:
+	case "MsgInternal":
 		query := c.MsgInternal.Query().
 			Where(msginternal.IDIn(ids...))
 		query, err := query.CollectFields(ctx, msginternalImplementors...)
@@ -398,7 +398,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case msginternalto.Table:
+	case "MsgInternalTo":
 		query := c.MsgInternalTo.Query().
 			Where(msginternalto.IDIn(ids...))
 		query, err := query.CollectFields(ctx, msginternaltoImplementors...)
@@ -414,7 +414,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case msgsubscriber.Table:
+	case "MsgSubscriber":
 		query := c.MsgSubscriber.Query().
 			Where(msgsubscriber.IDIn(ids...))
 		query, err := query.CollectFields(ctx, msgsubscriberImplementors...)
@@ -430,7 +430,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case msgtemplate.Table:
+	case "MsgTemplate":
 		query := c.MsgTemplate.Query().
 			Where(msgtemplate.IDIn(ids...))
 		query, err := query.CollectFields(ctx, msgtemplateImplementors...)
@@ -446,7 +446,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case msgtype.Table:
+	case "MsgType":
 		query := c.MsgType.Query().
 			Where(msgtype.IDIn(ids...))
 		query, err := query.CollectFields(ctx, msgtypeImplementors...)
@@ -462,7 +462,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case nlog.Table:
+	case "Nlog":
 		query := c.Nlog.Query().
 			Where(nlog.IDIn(ids...))
 		query, err := query.CollectFields(ctx, nlogImplementors...)
@@ -478,7 +478,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case nlogalert.Table:
+	case "NlogAlert":
 		query := c.NlogAlert.Query().
 			Where(nlogalert.IDIn(ids...))
 		query, err := query.CollectFields(ctx, nlogalertImplementors...)
@@ -494,7 +494,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case silence.Table:
+	case "Silence":
 		query := c.Silence.Query().
 			Where(silence.IDIn(ids...))
 		query, err := query.CollectFields(ctx, silenceImplementors...)
@@ -510,7 +510,7 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case user.Table:
+	case "User":
 		query := c.User.Query().
 			Where(user.IDIn(ids...))
 		query, err := query.CollectFields(ctx, userImplementors...)

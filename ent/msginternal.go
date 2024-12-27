@@ -17,8 +17,6 @@ type MsgInternal struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// TenantID holds the value of the "tenant_id" field.
-	TenantID int `json:"tenant_id,omitempty"`
 	// CreatedBy holds the value of the "created_by" field.
 	CreatedBy int `json:"created_by,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -27,6 +25,8 @@ type MsgInternal struct {
 	UpdatedBy int `json:"updated_by,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// 租户ID
+	TenantID int `json:"tenant_id,omitempty"`
 	// 消息类型分类
 	Category string `json:"category,omitempty"`
 	// 标题
@@ -70,7 +70,7 @@ func (*MsgInternal) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case msginternal.FieldID, msginternal.FieldTenantID, msginternal.FieldCreatedBy, msginternal.FieldUpdatedBy:
+		case msginternal.FieldID, msginternal.FieldCreatedBy, msginternal.FieldUpdatedBy, msginternal.FieldTenantID:
 			values[i] = new(sql.NullInt64)
 		case msginternal.FieldCategory, msginternal.FieldSubject, msginternal.FieldBody, msginternal.FieldFormat, msginternal.FieldRedirect:
 			values[i] = new(sql.NullString)
@@ -97,12 +97,6 @@ func (mi *MsgInternal) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			mi.ID = int(value.Int64)
-		case msginternal.FieldTenantID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
-			} else if value.Valid {
-				mi.TenantID = int(value.Int64)
-			}
 		case msginternal.FieldCreatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_by", values[i])
@@ -126,6 +120,12 @@ func (mi *MsgInternal) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				mi.UpdatedAt = value.Time
+			}
+		case msginternal.FieldTenantID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
+			} else if value.Valid {
+				mi.TenantID = int(value.Int64)
 			}
 		case msginternal.FieldCategory:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -198,9 +198,6 @@ func (mi *MsgInternal) String() string {
 	var builder strings.Builder
 	builder.WriteString("MsgInternal(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", mi.ID))
-	builder.WriteString("tenant_id=")
-	builder.WriteString(fmt.Sprintf("%v", mi.TenantID))
-	builder.WriteString(", ")
 	builder.WriteString("created_by=")
 	builder.WriteString(fmt.Sprintf("%v", mi.CreatedBy))
 	builder.WriteString(", ")
@@ -212,6 +209,9 @@ func (mi *MsgInternal) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(mi.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", mi.TenantID))
 	builder.WriteString(", ")
 	builder.WriteString("category=")
 	builder.WriteString(mi.Category)

@@ -12,18 +12,6 @@ import (
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/hashicorp/go-multierror"
-	"github.com/woocoos/msgcenter/ent/msgalert"
-	"github.com/woocoos/msgcenter/ent/msgchannel"
-	"github.com/woocoos/msgcenter/ent/msgevent"
-	"github.com/woocoos/msgcenter/ent/msginternal"
-	"github.com/woocoos/msgcenter/ent/msginternalto"
-	"github.com/woocoos/msgcenter/ent/msgsubscriber"
-	"github.com/woocoos/msgcenter/ent/msgtemplate"
-	"github.com/woocoos/msgcenter/ent/msgtype"
-	"github.com/woocoos/msgcenter/ent/nlog"
-	"github.com/woocoos/msgcenter/ent/nlogalert"
-	"github.com/woocoos/msgcenter/ent/silence"
-	"github.com/woocoos/msgcenter/ent/user"
 )
 
 // GlobalID returns the global identifier for the given MsgAlert node.
@@ -115,29 +103,29 @@ func FromGlobalID(s string) (*ResolvedGlobal, error) {
 // GlobalID returns the global identifier for the given type and id.
 func GlobalID(tp, id string) (string, error) {
 	switch tp {
-	case msgalert.Table:
+	case "MsgAlert":
 		break
-	case msgchannel.Table:
+	case "MsgChannel":
 		break
-	case msgevent.Table:
+	case "MsgEvent":
 		break
-	case msginternal.Table:
+	case "MsgInternal":
 		break
-	case msginternalto.Table:
+	case "MsgInternalTo":
 		break
-	case msgsubscriber.Table:
+	case "MsgSubscriber":
 		break
-	case msgtemplate.Table:
+	case "MsgTemplate":
 		break
-	case msgtype.Table:
+	case "MsgType":
 		break
-	case nlog.Table:
+	case "Nlog":
 		break
-	case nlogalert.Table:
+	case "NlogAlert":
 		break
-	case silence.Table:
+	case "Silence":
 		break
-	case user.Table:
+	case "User":
 		break
 	default:
 		return "", fmt.Errorf("invalid type %q", tp)

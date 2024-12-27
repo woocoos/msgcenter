@@ -34,15 +34,15 @@ func init() {
 	msgalertFields := schema.MsgAlert{}.Fields()
 	_ = msgalertFields
 	// msgalertDescTimeout is the schema descriptor for timeout field.
-	msgalertDescTimeout := msgalertFields[5].Descriptor()
+	msgalertDescTimeout := msgalertFields[6].Descriptor()
 	// msgalert.DefaultTimeout holds the default value on creation for the timeout field.
 	msgalert.DefaultTimeout = msgalertDescTimeout.Default.(bool)
 	// msgalertDescCreatedAt is the schema descriptor for created_at field.
-	msgalertDescCreatedAt := msgalertFields[8].Descriptor()
+	msgalertDescCreatedAt := msgalertFields[9].Descriptor()
 	// msgalert.DefaultCreatedAt holds the default value on creation for the created_at field.
 	msgalert.DefaultCreatedAt = msgalertDescCreatedAt.Default.(func() time.Time)
 	// msgalertDescDeleted is the schema descriptor for deleted field.
-	msgalertDescDeleted := msgalertFields[10].Descriptor()
+	msgalertDescDeleted := msgalertFields[11].Descriptor()
 	// msgalert.DefaultDeleted holds the default value on creation for the deleted field.
 	msgalert.DefaultDeleted = msgalertDescDeleted.Default.(bool)
 	msgchannelMixin := schema.MsgChannel{}.Mixin()
@@ -118,7 +118,7 @@ func init() {
 	// msginternal.DefaultCreatedAt holds the default value on creation for the created_at field.
 	msginternal.DefaultCreatedAt = msginternalDescCreatedAt.Default.(func() time.Time)
 	// msginternalDescCategory is the schema descriptor for category field.
-	msginternalDescCategory := msginternalFields[0].Descriptor()
+	msginternalDescCategory := msginternalFields[1].Descriptor()
 	// msginternal.CategoryValidator is a validator for the "category" field. It is called by the builders before save.
 	msginternal.CategoryValidator = msginternalDescCategory.Validators[0].(func(string) error)
 	msginternaltoMixin := schema.MsgInternalTo{}.Mixin()
@@ -131,7 +131,7 @@ func init() {
 	msginternaltoFields := schema.MsgInternalTo{}.Fields()
 	_ = msginternaltoFields
 	// msginternaltoDescCreatedAt is the schema descriptor for created_at field.
-	msginternaltoDescCreatedAt := msginternaltoFields[4].Descriptor()
+	msginternaltoDescCreatedAt := msginternaltoFields[5].Descriptor()
 	// msginternalto.DefaultCreatedAt holds the default value on creation for the created_at field.
 	msginternalto.DefaultCreatedAt = msginternaltoDescCreatedAt.Default.(func() time.Time)
 	msgsubscriberMixin := schema.MsgSubscriber{}.Mixin()
@@ -211,7 +211,7 @@ func init() {
 	nlogFields := schema.Nlog{}.Fields()
 	_ = nlogFields
 	// nlogDescCreatedAt is the schema descriptor for created_at field.
-	nlogDescCreatedAt := nlogFields[5].Descriptor()
+	nlogDescCreatedAt := nlogFields[6].Descriptor()
 	// nlog.DefaultCreatedAt holds the default value on creation for the created_at field.
 	nlog.DefaultCreatedAt = nlogDescCreatedAt.Default.(func() time.Time)
 	nlogalertFields := schema.NlogAlert{}.Fields()

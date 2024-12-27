@@ -4648,50 +4648,6 @@ func (ec *executionContext) fieldContext_MsgInternal_id(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _MsgInternal_tenantID(ctx context.Context, field graphql.CollectedField, obj *ent.MsgInternal) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_MsgInternal_tenantID(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TenantID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_MsgInternal_tenantID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "MsgInternal",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _MsgInternal_createdBy(ctx context.Context, field graphql.CollectedField, obj *ent.MsgInternal) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MsgInternal_createdBy(ctx, field)
 	if err != nil {
@@ -4857,6 +4813,50 @@ func (ec *executionContext) fieldContext_MsgInternal_updatedAt(_ context.Context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgInternal_tenantID(ctx context.Context, field graphql.CollectedField, obj *ent.MsgInternal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgInternal_tenantID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TenantID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgInternal_tenantID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgInternal",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5408,8 +5408,6 @@ func (ec *executionContext) fieldContext_MsgInternalEdge_node(_ context.Context,
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_MsgInternal_id(ctx, field)
-			case "tenantID":
-				return ec.fieldContext_MsgInternal_tenantID(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_MsgInternal_createdBy(ctx, field)
 			case "createdAt":
@@ -5418,6 +5416,8 @@ func (ec *executionContext) fieldContext_MsgInternalEdge_node(_ context.Context,
 				return ec.fieldContext_MsgInternal_updatedBy(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_MsgInternal_updatedAt(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgInternal_tenantID(ctx, field)
 			case "category":
 				return ec.fieldContext_MsgInternal_category(ctx, field)
 			case "subject":
@@ -5828,8 +5828,6 @@ func (ec *executionContext) fieldContext_MsgInternalTo_msgInternal(_ context.Con
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_MsgInternal_id(ctx, field)
-			case "tenantID":
-				return ec.fieldContext_MsgInternal_tenantID(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_MsgInternal_createdBy(ctx, field)
 			case "createdAt":
@@ -5838,6 +5836,8 @@ func (ec *executionContext) fieldContext_MsgInternalTo_msgInternal(_ context.Con
 				return ec.fieldContext_MsgInternal_updatedBy(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_MsgInternal_updatedAt(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgInternal_tenantID(ctx, field)
 			case "category":
 				return ec.fieldContext_MsgInternal_category(ctx, field)
 			case "subject":
@@ -15409,7 +15409,7 @@ func (ec *executionContext) unmarshalInputMsgInternalWhereInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "category", "categoryNEQ", "categoryIn", "categoryNotIn", "categoryGT", "categoryGTE", "categoryLT", "categoryLTE", "categoryContains", "categoryHasPrefix", "categoryHasSuffix", "categoryEqualFold", "categoryContainsFold", "subject", "subjectNEQ", "subjectIn", "subjectNotIn", "subjectGT", "subjectGTE", "subjectLT", "subjectLTE", "subjectContains", "subjectHasPrefix", "subjectHasSuffix", "subjectEqualFold", "subjectContainsFold", "format", "formatNEQ", "formatIn", "formatNotIn", "formatGT", "formatGTE", "formatLT", "formatLTE", "formatContains", "formatHasPrefix", "formatHasSuffix", "formatEqualFold", "formatContainsFold", "redirect", "redirectNEQ", "redirectIn", "redirectNotIn", "redirectGT", "redirectGTE", "redirectLT", "redirectLTE", "redirectContains", "redirectHasPrefix", "redirectHasSuffix", "redirectIsNil", "redirectNotNil", "redirectEqualFold", "redirectContainsFold", "hasMsgInternalTo", "hasMsgInternalToWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "category", "categoryNEQ", "categoryIn", "categoryNotIn", "categoryGT", "categoryGTE", "categoryLT", "categoryLTE", "categoryContains", "categoryHasPrefix", "categoryHasSuffix", "categoryEqualFold", "categoryContainsFold", "subject", "subjectNEQ", "subjectIn", "subjectNotIn", "subjectGT", "subjectGTE", "subjectLT", "subjectLTE", "subjectContains", "subjectHasPrefix", "subjectHasSuffix", "subjectEqualFold", "subjectContainsFold", "format", "formatNEQ", "formatIn", "formatNotIn", "formatGT", "formatGTE", "formatLT", "formatLTE", "formatContains", "formatHasPrefix", "formatHasSuffix", "formatEqualFold", "formatContainsFold", "redirect", "redirectNEQ", "redirectIn", "redirectNotIn", "redirectGT", "redirectGTE", "redirectLT", "redirectLTE", "redirectContains", "redirectHasPrefix", "redirectHasSuffix", "redirectIsNil", "redirectNotNil", "redirectEqualFold", "redirectContainsFold", "hasMsgInternalTo", "hasMsgInternalToWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -15493,62 +15493,6 @@ func (ec *executionContext) unmarshalInputMsgInternalWhereInput(ctx context.Cont
 				return it, err
 			}
 			it.IDLTE = data
-		case "tenantID":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantID"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantID = data
-		case "tenantIDNEQ":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDNEQ"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantIDNEQ = data
-		case "tenantIDIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantIDIn = data
-		case "tenantIDNotIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDNotIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantIDNotIn = data
-		case "tenantIDGT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDGT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantIDGT = data
-		case "tenantIDGTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDGTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantIDGTE = data
-		case "tenantIDLT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDLT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantIDLT = data
-		case "tenantIDLTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDLTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantIDLTE = data
 		case "createdBy":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
@@ -15801,6 +15745,62 @@ func (ec *executionContext) unmarshalInputMsgInternalWhereInput(ctx context.Cont
 				return it, err
 			}
 			it.UpdatedAtNotNil = data
+		case "tenantID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantID"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantID = data
+		case "tenantIDNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDNEQ"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDNEQ = data
+		case "tenantIDIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDIn"))
+			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDIn = data
+		case "tenantIDNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDNotIn"))
+			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDNotIn = data
+		case "tenantIDGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDGT"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDGT = data
+		case "tenantIDGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDGTE"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDGTE = data
+		case "tenantIDLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDLT"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDLT = data
+		case "tenantIDLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDLTE"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDLTE = data
 		case "category":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -21724,11 +21724,6 @@ func (ec *executionContext) _MsgInternal(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "tenantID":
-			out.Values[i] = ec._MsgInternal_tenantID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		case "createdBy":
 			out.Values[i] = ec._MsgInternal_createdBy(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -21743,6 +21738,11 @@ func (ec *executionContext) _MsgInternal(ctx context.Context, sel ast.SelectionS
 			out.Values[i] = ec._MsgInternal_updatedBy(ctx, field, obj)
 		case "updatedAt":
 			out.Values[i] = ec._MsgInternal_updatedAt(ctx, field, obj)
+		case "tenantID":
+			out.Values[i] = ec._MsgInternal_tenantID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "category":
 			out.Values[i] = ec._MsgInternal_category(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

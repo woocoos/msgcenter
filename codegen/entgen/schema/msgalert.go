@@ -41,6 +41,7 @@ func (MsgAlert) Mixin() []ent.Mixin {
 // Fields of the MsgAlert.
 func (MsgAlert) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int(schemax.FieldTenantID).Immutable().Comment("租户ID"),
 		field.JSON("labels", &label.LabelSet{}).Optional().Comment("标签").
 			Annotations(entgql.Skip(entgql.SkipWhereInput), entgql.Type("MapString")),
 		field.JSON("annotations", &label.LabelSet{}).Optional().Comment("注解").
