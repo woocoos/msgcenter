@@ -104,7 +104,7 @@ export async function getSilenceList(
  */
 export async function getSilenceInfo(silenceId: string) {
   const result = await query(querySilenceInfo, {
-    gid: gid('msg_silence', silenceId)
+    gid: gid('Silence', silenceId)
   })
   if (result.data?.node?.__typename === "Silence") {
     return result.data.node

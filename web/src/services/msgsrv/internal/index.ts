@@ -101,7 +101,7 @@ export async function getMsgInternalList(
  */
 export async function getMsgInternalInfo(msgInternalId: string) {
   const result = await query(queryMsgInternalInfo, {
-    gid: gid('msg_internal', msgInternalId)
+    gid: gid('MsgInternal', msgInternalId)
   })
   if (result.data?.node?.__typename === "MsgInternal") {
     return result.data.node
@@ -175,7 +175,7 @@ export async function getUserMsgInternalList(
  */
 export async function getMsgInternalToInfo(msgInternalToId: string) {
   const result = await query(queryMsgInternalToInfo, {
-    gid: gid('msg_internal_to', msgInternalToId)
+    gid: gid('MsgInternalTo', msgInternalToId)
   })
   if (result.data?.node?.__typename === "MsgInternalTo") {
     return result.data.node

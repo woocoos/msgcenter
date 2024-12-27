@@ -135,7 +135,7 @@ export async function getMsgTypeList(
  */
 export async function getMsgTypeInfo(msgTypeId: string) {
   const result = await query(queryMsgTypeInfo, {
-    gid: gid('msg_type', msgTypeId)
+    gid: gid('MsgType', msgTypeId)
   })
   if (result.data?.node?.__typename === 'MsgType') {
     return result.data.node
@@ -246,7 +246,7 @@ export async function getMsgTypeListAndSub(
  */
 export async function getMsgTypeAndSubInfo(msgTypeId: string) {
   const result = await query(queryMsgTypeAndSubInfo, {
-    gid: gid('msg_type', msgTypeId)
+    gid: gid('MsgType', msgTypeId)
   })
   if (result.data?.node?.__typename === 'MsgType') {
     return result.data.node

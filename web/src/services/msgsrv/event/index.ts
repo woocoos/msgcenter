@@ -125,7 +125,7 @@ export async function getMsgEventList(
  */
 export async function getMsgEventInfo(msgEventId: string) {
   const result = await query(queryMsgEventInfo, {
-    gid: gid('msg_event', msgEventId)
+    gid: gid('MsgEvent', msgEventId)
   })
   if (result.data?.node?.__typename === 'MsgEvent') {
     return result.data.node
@@ -140,7 +140,7 @@ export async function getMsgEventInfo(msgEventId: string) {
  */
 export async function getMsgEventInfoRoute(msgEventId: string, type: RouteStrType) {
   const result = await query(queryMsgEventInfoRoute, {
-    gid: gid('msg_event', msgEventId),
+    gid: gid('MsgEvent', msgEventId),
     type,
   })
   if (result.data?.node?.__typename === 'MsgEvent') {

@@ -120,7 +120,7 @@ export async function getMsgTemplateList(
  */
 export async function getMsgTemplateInfo(msgTemplateId: string) {
   const result = await query(queryMsgTemplateInfo, {
-    gid: gid('msg_template', msgTemplateId)
+    gid: gid('MsgTemplate', msgTemplateId)
   })
   if (result.data?.node?.__typename === 'MsgTemplate') {
     return result.data.node

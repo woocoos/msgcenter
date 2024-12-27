@@ -112,7 +112,7 @@ export async function getMsgChannelList(
  */
 export async function getMsgChannelInfo(msgChannelId: string) {
   const result = await query(queryMsgChannelInfo, {
-    gid: gid('msg_channel', msgChannelId)
+    gid: gid('MsgChannel', msgChannelId)
   })
   if (result.data?.node?.__typename === 'MsgChannel') {
     return result.data.node
@@ -127,7 +127,7 @@ export async function getMsgChannelInfo(msgChannelId: string) {
  */
 export async function getMsgChannelReceiverInfo(msgChannelId: string) {
   const result = await query(queryMsgChannelReceiverInfo, {
-    gid: gid('msg_channel', msgChannelId)
+    gid: gid('MsgChannel', msgChannelId)
   })
   if (result.data?.node?.__typename === 'MsgChannel') {
     return result.data.node

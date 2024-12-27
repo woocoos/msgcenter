@@ -89,7 +89,7 @@ export async function getMsgAlertLogList(
   }) {
   const result = await paging(
     queryMsgAlertLogList, {
-    gid: gid('msg_alert', msgAlertId),
+    gid: gid('MsgAlert', msgAlertId),
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy ?? {
