@@ -37,21 +37,9 @@ setLibraryName('msgsrv-ui')
 export const icestark = defineChildConfig(() => ({
   mount: (data) => {
     // 在微应用挂载前执行
-    if (data?.customProps) {
-      setItem('locale', data.customProps.app.locale);
-      setItem('darkMode', data.customProps.app.darkMode);
-      setItem('compactMode', data.customProps.app.compactMode);
-      setItem('token', data.customProps.user.token);
-      setItem('refreshToken', data.customProps.user.refreshToken);
-      setItem('tenantId', data.customProps.user.tenantId);
-      setItem('user', data.customProps.user.user);
-    }
   },
   unmount: () => {
     // 在微应用卸载后执行
-    removeItem('token');
-    removeItem('refreshToken');
-    removeItem('tenantId');
   },
 }));
 
