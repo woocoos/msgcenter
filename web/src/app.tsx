@@ -1,5 +1,5 @@
 import '@/assets/styles/index.css';
-import { getItem, removeItem } from '@/pkg/localStore';
+import { getItem, removeItem, setItem } from '@/pkg/localStore';
 import store from '@/store';
 import { defineAuthConfig } from '@ice/plugin-auth/esm/types';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
@@ -22,6 +22,8 @@ import { isInIcestark } from '@ice/stark-app';
 import { store as starkStore, event as starkEvent } from '@ice/stark-data';
 
 const NODE_ENV = process.env.NODE_ENV ?? '',
+  ICE_DEV_TOKEN = process.env.ICE_DEV_TOKEN ?? '',
+  ICE_DEV_TID = process.env.ICE_DEV_TID ?? '',
   ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
   ICE_ROUTER_BASENAME = process.env.ICE_ROUTER_BASENAME ?? '/',
   ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
@@ -65,8 +67,11 @@ export const dataLoader = defineDataLoader(async () => {
     removeItem('refreshToken');
   }
   document.cookie = `${sign}; path=/`;
+  if (NODE_ENV === 'development' && ICE_DEV_TOKEN && ICE_DEV_TID) {
+    setItem('token', ICE_DEV_TOKEN)
+    setItem('tenantId', ICE_DEV_TID)
+  }
   await parseSpm();
-
   let locale = getItem<string>('locale'),
     darkMode = getItem<string>('darkMode'),
     compactMode = getItem<string>('compactMode'),
@@ -123,11 +128,16 @@ export const urqlConfig = defineUrqlConfig([
       authOpts: {
         store: {
           getState: () => {
-            const userState = store.getModelState('user'),
-              token = userState.token ? userState.token : getItem<string>('token') as string,
+            const userState = store.getModelState('user')
+            let token = userState.token ? userState.token : getItem<string>('token') as string,
               tenantId = userState.tenantId ? userState.tenantId : getItem<string>('tenantId') as string,
               refreshToken = userState.refreshToken ? userState.refreshToken : getItem<string>('refreshToken') as string;
-
+            if (isInIcestark()) {
+              const iceStore = starkStore.get('iceStore')
+              token = iceStore?.user?.token
+              tenantId = iceStore?.user?.tenantId
+              refreshToken = iceStore?.user?.refreshToken
+            }
             return {
               token: token,
               tenantId: tenantId,
@@ -135,8 +145,11 @@ export const urqlConfig = defineUrqlConfig([
             }
           },
           setStateToken: (newToken) => {
-            store.dispatch.user.updateToken(newToken);
-            starkEvent.emit('set-token', newToken);
+            if (isInIcestark()) {
+              starkEvent.emit('set-token', newToken);
+            } else {
+              store.dispatch.user.updateToken(newToken);
+            }
           }
         },
         error: (err, errstr) => {
@@ -176,11 +189,16 @@ export const urqlConfig = defineUrqlConfig([
 
 // 权限
 export const authConfig = defineAuthConfig(async (appData) => {
-  const initialAuth = getMenuAppActions(),
-    token = appData?.user?.token ? appData.user.token : getItem<string>('token'),
+  const initialAuth = getMenuAppActions()
+  let token = appData?.user?.token ? appData.user.token : getItem<string>('token'),
     tenantId = appData?.user?.tenantId ? appData.user.tenantId : getItem<string>('tenantId');
+  if (isInIcestark()) {
+    const iceStore = starkStore.get('iceStore')
+    token = iceStore?.user?.token
+    tenantId = iceStore?.user?.tenantId
+  }
   // 判断路由权限
-  if (token) {
+  if (token && tenantId) {
     const result = await userPermissions(ICE_APP_CODE, {
       Authorization: getRequestHeaderAuthorization(token, ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined),
       'X-Tenant-ID': tenantId,
