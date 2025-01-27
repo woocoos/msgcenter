@@ -24,8 +24,8 @@ importers:
         specifier: 0.1.6
         version: 0.1.6(@urql/core@4.1.3(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@knockout-js/layout':
-        specifier: 0.1.14
-        version: 0.1.14(@urql/core@4.1.3(graphql@16.9.0))(graphql@16.9.0)(moment@2.30.1)(prop-types@15.8.1)(rc-field-form@2.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 0.1.15
+        version: 0.1.15(@urql/core@4.1.3(graphql@16.9.0))(graphql@16.9.0)(moment@2.30.1)(prop-types@15.8.1)(rc-field-form@2.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@knockout-js/org':
         specifier: 0.1.8
         version: 0.1.8(@urql/core@4.1.3(graphql@16.9.0))(graphql@16.9.0)(moment@2.30.1)(prop-types@15.8.1)(rc-field-form@2.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1500,8 +1500,8 @@ packages:
       react: ^18.0.0
       react-dom: ^18.0.0
 
-  '@knockout-js/layout@0.1.14':
-    resolution: {integrity: sha512-t+374WCJms/3tJWfwKJUPGbSQwM8A5laFc+hcqL4LINPzH/UcbixUmUr0drhtg/7cCHUHbZzp9NTy8IxY5mUtQ==}
+  '@knockout-js/layout@0.1.15':
+    resolution: {integrity: sha512-oXuokwZ+vc8lcu2FiIgHzxZ48lIXWzW9opMs2I2BD6ULER5Ui39HDSonTMSt3YUqmxxklUnUfRAjLmWElIpEjA==}
     peerDependencies:
       react: ^17 || ^18
 
@@ -7589,7 +7589,7 @@ snapshots:
       - graphql
       - supports-color
 
-  '@knockout-js/layout@0.1.14(@urql/core@4.1.3(graphql@16.9.0))(graphql@16.9.0)(moment@2.30.1)(prop-types@15.8.1)(rc-field-form@2.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@knockout-js/layout@0.1.15(@urql/core@4.1.3(graphql@16.9.0))(graphql@16.9.0)(moment@2.30.1)(prop-types@15.8.1)(rc-field-form@2.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@ant-design/icons': 5.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@ant-design/pro-components': 2.8.2(antd@5.22.1(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(rc-field-form@2.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -7626,7 +7626,7 @@ snapshots:
       '@ice/jsx-runtime': 0.2.2(react@18.3.1)
       '@knockout-js/api': 0.1.13(react@18.3.1)
       '@knockout-js/ice-urql': 0.1.6(@urql/core@4.1.3(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@knockout-js/layout': 0.1.14(@urql/core@4.1.3(graphql@16.9.0))(graphql@16.9.0)(moment@2.30.1)(prop-types@15.8.1)(rc-field-form@2.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@knockout-js/layout': 0.1.15(@urql/core@4.1.3(graphql@16.9.0))(graphql@16.9.0)(moment@2.30.1)(prop-types@15.8.1)(rc-field-form@2.5.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@swc/helpers': 0.5.15
       antd: 5.22.1(moment@2.30.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1

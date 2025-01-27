@@ -28,7 +28,7 @@ export default () => {
           return <DictSelect dictCode="MsgCategory" placeholder={t('please_enter_category')} />
         },
         render(text, record) {
-          return <DictText dictCode="MsgCategory" value={record.msgType.category} />
+          return <DictText dictCode="MsgCategory" value={record.msgType?.category} />
         },
       },
       {
