@@ -34,7 +34,7 @@ export default () => {
       {
         title: t('msg_type_name'), dataIndex: 'msgTypeName', width: 120,
         render(text, record) {
-          return record.msgType.name
+          return record.msgType?.name ?? ''
         },
       },
       { title: t('msg_event_name'), dataIndex: 'name', width: 120 },

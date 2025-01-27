@@ -24,7 +24,7 @@ export default defineConfig(() => ({
   ssg: false,
   ssr: false,
   minify,
-  codeSplitting: 'page-vendors',
+  codeSplitting: false,//'page-vendors',
   devPublicPath: ICE_DEV_PUBLIC_PATH,
   publicPath: ICE_BUILD_PUBLIC_PATH,
   compileDependencies: NODE_ENV === 'development' ? [] : true,
