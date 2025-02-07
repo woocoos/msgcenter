@@ -7,7 +7,6 @@ import (
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/woocoos/knockout-go/api"
 	"github.com/woocoos/knockout-go/api/fs"
-	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	urlx "net/url"
@@ -21,7 +20,7 @@ func NewSDK(cfg *conf.Configuration, db *ent.Client) (*api.SDK, error) {
 		return nil, err
 	}
 	// 获取所有tenantID
-	tenantIDs, err := db.MsgTemplate.Query().Where(msgtemplate.StatusEQ(typex.SimpleStatusActive)).GroupBy(msgtemplate.FieldTenantID).Ints(context.Background())
+	tenantIDs, err := db.MsgTemplate.Query().GroupBy(msgtemplate.FieldTenantID).Ints(context.Background())
 	if err != nil {
 		return nil, err
 	}
