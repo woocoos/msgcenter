@@ -7,6 +7,7 @@ import (
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/woocoos/knockout-go/api"
 	"github.com/woocoos/knockout-go/api/fs"
+	"github.com/woocoos/knockout-go/api/fs/alioss"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	urlx "net/url"
@@ -28,6 +29,7 @@ func NewSDK(cfg *conf.Configuration, db *ent.Client) (*api.SDK, error) {
 	if err != nil {
 		return nil, err
 	}
+	fs.RegisterS3Provider(fs.KindAliOSS, alioss.BuildProvider)
 	for _, fi := range ret {
 		err = kosdk.Fs().RegistryProvider(fs.ToProviderConfig(fi), fi.TenantID.String())
 		if err != nil {
