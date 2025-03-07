@@ -16,7 +16,6 @@ const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '',
   ICE_PROXY_MSGSRV = process.env.ICE_PROXY_MSGSRV ?? '',
   ICE_API_ADMINX_PREFIX = process.env.ICE_API_ADMINX_PREFIX ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
-  ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '',
   ICE_API_MSGSRV_PREFIX = process.env.ICE_API_MSGSRV_PREFIX ?? '',
   minify = process.env.NODE_ENV === 'production' ? 'swc' : false;
 
@@ -56,25 +55,20 @@ export default defineConfig(() => ({
     auth(),
   ],
   proxy: {
-    [ICE_API_MSGSRV_PREFIX]: {
+    [`${ICE_API_MSGSRV_PREFIX}/`]: {
       target: ICE_PROXY_MSGSRV,
       changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_MSGSRV_PREFIX}`]: '' },
+      pathRewrite: { [`^${ICE_API_MSGSRV_PREFIX}/`]: '/' },
     },
-    [ICE_API_ADMINX_PREFIX]: {
+    [`${ICE_API_ADMINX_PREFIX}/`]: {
       target: ICE_PROXY_ADMINX,
       changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_ADMINX_PREFIX}`]: '' },
+      pathRewrite: { [`^${ICE_API_ADMINX_PREFIX}/`]: '/' },
     },
-    [ICE_API_AUTH_PREFIX]: {
+    [`${ICE_API_AUTH_PREFIX}/`]: {
       target: ICE_PROXY_AUTH,
       changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_AUTH_PREFIX}`]: '' },
-    },
-    [ICE_API_FILES_PREFIX]: {
-      target: ICE_PROXY_AUTH,
-      changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_FILES_PREFIX}`]: '' },
+      pathRewrite: { [`^${ICE_API_AUTH_PREFIX}/`]: '/' },
     },
   },
 }));

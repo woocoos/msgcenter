@@ -5,7 +5,7 @@ import { defineAuthConfig } from '@ice/plugin-auth/esm/types';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { defineRequestConfig } from '@ice/plugin-request/esm/types';
 import { defineStoreConfig } from '@ice/plugin-store/esm/types';
-import { instanceName, userPermissions } from '@knockout-js/api';
+import { instanceName, setStsApi, userPermissions } from '@knockout-js/api';
 import { User } from '@knockout-js/api/ucenter';
 import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/requestInterceptor';
 import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/types";
@@ -31,8 +31,7 @@ const NODE_ENV = process.env.NODE_ENV ?? '',
   ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '',
   ICE_HTTP_SIGN = process.env.ICE_HTTP_SIGN ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
-  ICE_WS_MSGSRV = process.env.ICE_WS_MSGSRV ?? '',
-  ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '';
+  ICE_WS_MSGSRV = process.env.ICE_WS_MSGSRV ?? '';
 
 setLibraryName('msgsrv-ui')
 
@@ -213,6 +212,7 @@ export const authConfig = defineAuthConfig(async (appData) => {
   } else {
     await logout();
   }
+  setStsApi(`${ICE_API_AUTH_PREFIX}/oss/sts`)
   return {
     initialAuth,
     NoAuthFallback: () => {
