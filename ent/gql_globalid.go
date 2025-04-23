@@ -14,6 +14,12 @@ import (
 	"github.com/hashicorp/go-multierror"
 )
 
+// GlobalID returns the global identifier for the given AppDictItem node.
+func (adi *AppDictItem) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("AppDictItem:%d", adi.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
 // GlobalID returns the global identifier for the given MsgAlert node.
 func (ma *MsgAlert) GlobalID(context.Context) (string, error) {
 	id := fmt.Sprintf("MsgAlert:%d", ma.ID)
@@ -103,6 +109,8 @@ func FromGlobalID(s string) (*ResolvedGlobal, error) {
 // GlobalID returns the global identifier for the given type and id.
 func GlobalID(tp, id string) (string, error) {
 	switch tp {
+	case "AppDictItem":
+		break
 	case "MsgAlert":
 		break
 	case "MsgChannel":

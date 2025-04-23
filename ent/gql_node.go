@@ -15,6 +15,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/hashicorp/go-multierror"
 	"github.com/woocoos/entcache"
+	"github.com/woocoos/msgcenter/ent/appdictitem"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -34,6 +35,11 @@ import (
 type Noder interface {
 	IsNode()
 }
+
+var appdictitemImplementors = []string{"AppDictItem", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*AppDictItem) IsNode() {}
 
 var msgalertImplementors = []string{"MsgAlert", "Node"}
 
@@ -153,6 +159,15 @@ func (c *Client) Noder(ctx context.Context, id int, opts ...NodeOption) (_ Noder
 
 func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error) {
 	switch table {
+	case "AppDictItem":
+		query := c.AppDictItem.Query().
+			Where(appdictitem.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, appdictitemImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(entcache.WithRefEntryKey(ctx, "AppDictItem", id))
 	case "MsgAlert":
 		query := c.MsgAlert.Query().
 			Where(msgalert.ID(id))
@@ -334,6 +349,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		idmap[id] = append(idmap[id], &noders[i])
 	}
 	switch table {
+	case "AppDictItem":
+		query := c.AppDictItem.Query().
+			Where(appdictitem.IDIn(ids...))
+		query, err := query.CollectFields(ctx, appdictitemImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	case "MsgAlert":
 		query := c.MsgAlert.Query().
 			Where(msgalert.IDIn(ids...))

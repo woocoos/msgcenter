@@ -9,6 +9,18 @@ import (
 	"github.com/woocoos/msgcenter/ent"
 )
 
+// The AppDictItemFunc type is an adapter to allow the use of ordinary
+// function as AppDictItem mutator.
+type AppDictItemFunc func(context.Context, *ent.AppDictItemMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AppDictItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AppDictItemMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AppDictItemMutation", m)
+}
+
 // The MsgAlertFunc type is an adapter to allow the use of ordinary
 // function as MsgAlert mutator.
 type MsgAlertFunc func(context.Context, *ent.MsgAlertMutation) (ent.Value, error)

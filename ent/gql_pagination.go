@@ -16,6 +16,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/errcode"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"github.com/woocoos/knockout-go/pkg/pagination"
+	"github.com/woocoos/msgcenter/ent/appdictitem"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -108,6 +109,258 @@ func paginateLimit(first, last *int) int {
 		limit = *last + 1
 	}
 	return limit
+}
+
+// AppDictItemEdge is the edge representation of AppDictItem.
+type AppDictItemEdge struct {
+	Node   *AppDictItem `json:"node"`
+	Cursor Cursor       `json:"cursor"`
+}
+
+// AppDictItemConnection is the connection containing edges to AppDictItem.
+type AppDictItemConnection struct {
+	Edges      []*AppDictItemEdge `json:"edges"`
+	PageInfo   PageInfo           `json:"pageInfo"`
+	TotalCount int                `json:"totalCount"`
+}
+
+func (c *AppDictItemConnection) build(nodes []*AppDictItem, pager *appdictitemPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *AppDictItem
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *AppDictItem {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *AppDictItem {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*AppDictItemEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &AppDictItemEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// AppDictItemPaginateOption enables pagination customization.
+type AppDictItemPaginateOption func(*appdictitemPager) error
+
+// WithAppDictItemOrder configures pagination ordering.
+func WithAppDictItemOrder(order *AppDictItemOrder) AppDictItemPaginateOption {
+	if order == nil {
+		order = DefaultAppDictItemOrder
+	}
+	o := *order
+	return func(pager *appdictitemPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultAppDictItemOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithAppDictItemFilter configures pagination filter.
+func WithAppDictItemFilter(filter func(*AppDictItemQuery) (*AppDictItemQuery, error)) AppDictItemPaginateOption {
+	return func(pager *appdictitemPager) error {
+		if filter == nil {
+			return errors.New("AppDictItemQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type appdictitemPager struct {
+	reverse bool
+	order   *AppDictItemOrder
+	filter  func(*AppDictItemQuery) (*AppDictItemQuery, error)
+}
+
+func newAppDictItemPager(opts []AppDictItemPaginateOption, reverse bool) (*appdictitemPager, error) {
+	pager := &appdictitemPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultAppDictItemOrder
+	}
+	return pager, nil
+}
+
+func (p *appdictitemPager) applyFilter(query *AppDictItemQuery) (*AppDictItemQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *appdictitemPager) toCursor(adi *AppDictItem) Cursor {
+	return p.order.Field.toCursor(adi)
+}
+
+func (p *appdictitemPager) applyCursors(query *AppDictItemQuery, after, before *Cursor) (*AppDictItemQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultAppDictItemOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *appdictitemPager) applyOrder(query *AppDictItemQuery) *AppDictItemQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultAppDictItemOrder.Field {
+		query = query.Order(DefaultAppDictItemOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *appdictitemPager) orderExpr(query *AppDictItemQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultAppDictItemOrder.Field {
+			b.Comma().Ident(DefaultAppDictItemOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to AppDictItem.
+func (adi *AppDictItemQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...AppDictItemPaginateOption,
+) (*AppDictItemConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newAppDictItemPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if adi, err = pager.applyFilter(adi); err != nil {
+		return nil, err
+	}
+	conn := &AppDictItemConnection{Edges: []*AppDictItemEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := adi.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if adi, err = pager.applyCursors(adi, after, before); err != nil {
+		return nil, err
+	}
+	limit := paginateLimit(first, last)
+	if limit != 0 {
+		adi.Limit(limit)
+	}
+	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
+		adi.Offset(sp.Offset(first, last))
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := adi.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	adi = pager.applyOrder(adi)
+	nodes, err := adi.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// AppDictItemOrderField defines the ordering field of AppDictItem.
+type AppDictItemOrderField struct {
+	// Value extracts the ordering value from the given AppDictItem.
+	Value    func(*AppDictItem) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) appdictitem.OrderOption
+	toCursor func(*AppDictItem) Cursor
+}
+
+// AppDictItemOrder defines the ordering of AppDictItem.
+type AppDictItemOrder struct {
+	Direction OrderDirection         `json:"direction"`
+	Field     *AppDictItemOrderField `json:"field"`
+}
+
+// DefaultAppDictItemOrder is the default ordering of AppDictItem.
+var DefaultAppDictItemOrder = &AppDictItemOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &AppDictItemOrderField{
+		Value: func(adi *AppDictItem) (ent.Value, error) {
+			return adi.ID, nil
+		},
+		column: appdictitem.FieldID,
+		toTerm: appdictitem.ByID,
+		toCursor: func(adi *AppDictItem) Cursor {
+			return Cursor{ID: adi.ID}
+		},
+	},
+}
+
+// ToEdge converts AppDictItem into AppDictItemEdge.
+func (adi *AppDictItem) ToEdge(order *AppDictItemOrder) *AppDictItemEdge {
+	if order == nil {
+		order = DefaultAppDictItemOrder
+	}
+	return &AppDictItemEdge{
+		Node:   adi,
+		Cursor: order.Field.toCursor(adi),
+	}
 }
 
 // MsgAlertEdge is the edge representation of MsgAlert.
@@ -305,12 +558,7 @@ func (ma *MsgAlertQuery) Paginate(
 		ma.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
-		if first != nil {
-			ma.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
-		}
-		if last != nil {
-			ma.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
-		}
+		ma.Offset(sp.Offset(first, last))
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
 		if err := ma.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
@@ -609,12 +857,7 @@ func (mc *MsgChannelQuery) Paginate(
 		mc.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
-		if first != nil {
-			mc.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
-		}
-		if last != nil {
-			mc.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
-		}
+		mc.Offset(sp.Offset(first, last))
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
 		if err := mc.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
@@ -913,12 +1156,7 @@ func (me *MsgEventQuery) Paginate(
 		me.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
-		if first != nil {
-			me.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
-		}
-		if last != nil {
-			me.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
-		}
+		me.Offset(sp.Offset(first, last))
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
 		if err := me.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
@@ -1217,12 +1455,7 @@ func (mi *MsgInternalQuery) Paginate(
 		mi.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
-		if first != nil {
-			mi.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
-		}
-		if last != nil {
-			mi.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
-		}
+		mi.Offset(sp.Offset(first, last))
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
 		if err := mi.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
@@ -1521,12 +1754,7 @@ func (mit *MsgInternalToQuery) Paginate(
 		mit.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
-		if first != nil {
-			mit.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
-		}
-		if last != nil {
-			mit.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
-		}
+		mit.Offset(sp.Offset(first, last))
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
 		if err := mit.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
@@ -1825,12 +2053,7 @@ func (ms *MsgSubscriberQuery) Paginate(
 		ms.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
-		if first != nil {
-			ms.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
-		}
-		if last != nil {
-			ms.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
-		}
+		ms.Offset(sp.Offset(first, last))
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
 		if err := ms.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
@@ -2129,12 +2352,7 @@ func (mt *MsgTemplateQuery) Paginate(
 		mt.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
-		if first != nil {
-			mt.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
-		}
-		if last != nil {
-			mt.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
-		}
+		mt.Offset(sp.Offset(first, last))
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
 		if err := mt.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
@@ -2433,12 +2651,7 @@ func (mt *MsgTypeQuery) Paginate(
 		mt.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
-		if first != nil {
-			mt.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
-		}
-		if last != nil {
-			mt.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
-		}
+		mt.Offset(sp.Offset(first, last))
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
 		if err := mt.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
@@ -2737,12 +2950,7 @@ func (n *NlogQuery) Paginate(
 		n.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
-		if first != nil {
-			n.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
-		}
-		if last != nil {
-			n.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
-		}
+		n.Offset(sp.Offset(first, last))
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
 		if err := n.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
@@ -3041,12 +3249,7 @@ func (na *NlogAlertQuery) Paginate(
 		na.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
-		if first != nil {
-			na.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
-		}
-		if last != nil {
-			na.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
-		}
+		na.Offset(sp.Offset(first, last))
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
 		if err := na.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
@@ -3345,12 +3548,7 @@ func (s *SilenceQuery) Paginate(
 		s.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
-		if first != nil {
-			s.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
-		}
-		if last != nil {
-			s.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
-		}
+		s.Offset(sp.Offset(first, last))
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
 		if err := s.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
@@ -3649,12 +3847,7 @@ func (u *UserQuery) Paginate(
 		u.Limit(limit)
 	}
 	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
-		if first != nil {
-			u.Offset((sp.PageIndex - sp.CurrentIndex - 1) * *first)
-		}
-		if last != nil {
-			u.Offset((sp.CurrentIndex - sp.PageIndex - 1) * *last)
-		}
+		u.Offset(sp.Offset(first, last))
 	}
 	if field := collectedField(ctx, edgesField, nodeField); field != nil {
 		if err := u.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {

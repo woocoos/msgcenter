@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
+	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/mail"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/template"
@@ -21,18 +22,20 @@ type Notifier struct {
 	tmpl          *template.Template
 	hostname      string
 	customTplFunc notify.CustomerConfigFunc[profile.EmailConfig]
+	tempParams    map[int]map[string]string
 }
 
 func (n *Notifier) SendResolved() bool {
 	return n.config.SendResolved
 }
 
-func New(cfg *profile.EmailConfig, tmpl *template.Template, fn notify.CustomerConfigFunc[profile.EmailConfig],
+func New(cfg *profile.EmailConfig, tmpl *template.Template, fn notify.CustomerConfigFunc[profile.EmailConfig], tempParams map[int]map[string]string,
 ) (*Notifier, error) {
 	return &Notifier{
 		config:        cfg,
 		tmpl:          tmpl,
 		customTplFunc: fn,
+		tempParams:    tempParams,
 	}, nil
 }
 
@@ -64,6 +67,8 @@ func (n *Notifier) CustomConfig(ctx context.Context) (*profile.EmailConfig, erro
 func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bool, err error) {
 	email := mail.NewEmailMsg()
 	data := notify.GetTemplateData(ctx, n.tmpl, alerts)
+	// 追加模板参数
+	n.appendTempParams(ctx, data)
 	tmpl := notify.TmplText(n.tmpl, data, &err)
 	// use custom template setting to render the email
 	config, err := n.CustomConfig(ctx)
@@ -167,4 +172,28 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 		return false, err
 	}
 	return true, nil
+}
+
+// appendTempParams appends template params to the alerts.
+func (n *Notifier) appendTempParams(ctx context.Context, data *template.Data) {
+	// 判断是否忽略模板参数
+	if data.CommonLabels[label.SkipTempParamsLabel] == "Y" {
+		return
+	}
+	// 判断是否传递租户id
+	tenant := data.CommonLabels[label.TenantLabel]
+	if tenant == "" || n.tempParams == nil {
+		return
+	}
+	tenantID, err := strconv.Atoi(tenant)
+	if err != nil {
+		return
+	}
+	tp := n.tempParams[tenantID]
+	if tp == nil {
+		return
+	}
+	for k, v := range tp {
+		data.CommonAnnotations[k] = v
+	}
 }

@@ -15,7 +15,7 @@ import (
 
 // receive two arguments: the migration name and the database dsn.
 var (
-	dsn  = flag.String("dsn", "root:myql135@$^@tcp(192.168.0.14:3310)/msgcenter", "")
+	dsn  = flag.String("dsn", "root@tcp(localhost:3306)/msgcenter", "")
 	name = flag.String("name", "mysql", "driver name")
 )
 
@@ -32,7 +32,7 @@ func main() {
 		migrate.WithDropIndex(true),
 		migrate.WithDropColumn(true),
 		migrate.WithForeignKeys(false),
-		entx.SkipTablesDiffHook("user", "org_role_user", "user_addr"),
+		entx.SkipTablesDiffHook("user", "org_role_user", "user_addr", "app_dict_item"),
 	)
 	if err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)

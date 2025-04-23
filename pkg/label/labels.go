@@ -20,6 +20,8 @@ const (
 	ToUserIDLabel = "user"
 	// SkipSubscribeLabel indicates if the alert is from Event Subs or skip Event Subs.
 	SkipSubscribeLabel = "skipSub"
+	// SkipTempParamsLabel is the label name for the skip template params. Y/N
+	SkipTempParamsLabel = "skipTempParams"
 )
 
 type LabelName string

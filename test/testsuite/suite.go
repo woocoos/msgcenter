@@ -96,6 +96,7 @@ func open(ctx context.Context, driverName, dsn string) (*ent.Client, error) {
 			User:        "portal",
 			OrgRoleUser: "portal",
 			UserAddr:    "portal",
+			AppDictItem: "portal",
 		}),
 	)
 	if err != nil {
@@ -147,6 +148,11 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 			},
 		}).SaveX(ctx)
 	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(1).SetTenantID(1).SetName(alterPassWordEventName).SetCreatedBy(1).
+		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
+		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
+		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
+		SetBody(`{{ template "1.alterpwd.txt" . }}`).SaveX(ctx)
+	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(1).SetTenantID(2).SetName(alterPassWordEventName).SetCreatedBy(1).
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
 		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
@@ -245,4 +251,10 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetCategory("订阅类型").SetCreatedBy(1).SaveX(ctx)
 	client.MsgInternalTo.Create().SetID(2).SetTenantID(1).SetCreatedAt(time.Now()).SetMsgInternalID(2).
 		SetUserID(1).SaveX(ctx)
+
+	client.AppDictItem.Create().SetRefCode("msg:MsgTempParams").SetCode("tempCo").SetName("祺麟资本管理").SetOrgID(1).SetStatus(typex.SimpleStatusActive).SaveX(ctx)
+	client.AppDictItem.Create().SetRefCode("msg:MsgTempParams").SetCode("tempFax").SetName("+852 2593 1222").SetOrgID(1).SetStatus(typex.SimpleStatusActive).SaveX(ctx)
+	client.AppDictItem.Create().SetRefCode("msg:MsgTempParams").SetCode("tempLogo").SetName("https://files.qeelyn.com/cdn/images/logo-icon.svg").SetOrgID(1).SetStatus(typex.SimpleStatusActive).SaveX(ctx)
+	client.AppDictItem.Create().SetRefCode("msg:MsgTempParams").SetCode("tempCo").SetName("祺麟厦门").SetOrgID(2).SetStatus(typex.SimpleStatusActive).SaveX(ctx)
+	client.AppDictItem.Create().SetRefCode("msg:MsgTempParams").SetCode("tempFax").SetName("+852 2593 1222").SetOrgID(2).SetStatus(typex.SimpleStatusActive).SaveX(ctx)
 }

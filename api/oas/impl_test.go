@@ -140,6 +140,33 @@ func (s *serviceSuite) TestPostAlerts() {
 	s.Require().Equal("alerts@example.com", mail.To[0]["Address"])
 }
 
+// TestPostAlertsWithParams
+func (s *serviceSuite) TestPostAlertsWithParams() {
+	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	req := PostableAlerts{
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					"alertname":       "AlterPassword",
+					label.TenantLabel: "2",
+				},
+			},
+			Annotations: map[string]string{
+				"to":       "alerts@example.com",
+				"nickname": "test",
+			},
+			EndsAt:   time.Now().Add(time.Hour),
+			StartsAt: time.Now(),
+		},
+	}
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
+	time.Sleep(time.Second * 2)
+	mail, err := s.maildev.GetLastEmail()
+	s.Require().NoError(err)
+	s.Require().NotNil(mail)
+	s.Require().Equal("alerts@example.com", mail.To[0]["Address"])
+}
+
 // TestPostAlertsWithTenant tenant with custom template and attachment
 func (s *serviceSuite) TestPostAlertsWithTenant() {
 	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())

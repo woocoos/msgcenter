@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/woocoos/knockout-go/pkg/pagination"
+	"github.com/woocoos/msgcenter/ent/appdictitem"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -24,6 +25,90 @@ import (
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 )
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (adi *AppDictItemQuery) CollectFields(ctx context.Context, satisfies ...string) (*AppDictItemQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return adi, nil
+	}
+	if err := adi.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return adi, nil
+}
+
+func (adi *AppDictItemQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(appdictitem.Columns))
+		selectedFields = []string{appdictitem.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "orgID":
+			if _, ok := fieldSeen[appdictitem.FieldOrgID]; !ok {
+				selectedFields = append(selectedFields, appdictitem.FieldOrgID)
+				fieldSeen[appdictitem.FieldOrgID] = struct{}{}
+			}
+		case "refCode":
+			if _, ok := fieldSeen[appdictitem.FieldRefCode]; !ok {
+				selectedFields = append(selectedFields, appdictitem.FieldRefCode)
+				fieldSeen[appdictitem.FieldRefCode] = struct{}{}
+			}
+		case "code":
+			if _, ok := fieldSeen[appdictitem.FieldCode]; !ok {
+				selectedFields = append(selectedFields, appdictitem.FieldCode)
+				fieldSeen[appdictitem.FieldCode] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[appdictitem.FieldName]; !ok {
+				selectedFields = append(selectedFields, appdictitem.FieldName)
+				fieldSeen[appdictitem.FieldName] = struct{}{}
+			}
+		case "status":
+			if _, ok := fieldSeen[appdictitem.FieldStatus]; !ok {
+				selectedFields = append(selectedFields, appdictitem.FieldStatus)
+				fieldSeen[appdictitem.FieldStatus] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		adi.Select(selectedFields...)
+	}
+	return nil
+}
+
+type appdictitemPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []AppDictItemPaginateOption
+}
+
+func newAppDictItemPaginateArgs(rv map[string]any) *appdictitemPaginateArgs {
+	args := &appdictitemPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	return args
+}
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (ma *MsgAlertQuery) CollectFields(ctx context.Context, satisfies ...string) (*MsgAlertQuery, error) {
@@ -126,10 +211,15 @@ func (ma *MsgAlertQuery) collectField(ctx context.Context, oneNode bool, opCtx *
 				}
 			}
 			if limit := paginateLimit(args.first, args.last); limit > 0 {
-				if args.after == nil && args.last == nil {
+				var offset int
+				sp, ok := pagination.SimplePaginationFromContext(ctx)
+				if ok {
+					offset = sp.Offset(args.first, args.last)
+				}
+				if !ok && args.after == nil && args.before == nil {
 					pager.applyOrder(query.Limit(limit))
 				} else {
-					modify := pagination.LimitPerRow(ctx, msgalert.NlogPrimaryKey[1], limit, args.first, args.last, pager.orderExpr(query))
+					modify := pagination.LimitPerRow(msgalert.NlogPrimaryKey[1], limit, offset, pager.orderExpr(query))
 					query.modifiers = append(query.modifiers, modify)
 				}
 			} else {
@@ -214,10 +304,15 @@ func (ma *MsgAlertQuery) collectField(ctx context.Context, oneNode bool, opCtx *
 				}
 			}
 			if limit := paginateLimit(args.first, args.last); limit > 0 {
-				if args.after == nil && args.last == nil {
+				var offset int
+				sp, ok := pagination.SimplePaginationFromContext(ctx)
+				if ok {
+					offset = sp.Offset(args.first, args.last)
+				}
+				if !ok && args.after == nil && args.before == nil {
 					pager.applyOrder(query.Limit(limit))
 				} else {
-					modify := pagination.LimitPerRow(ctx, msgalert.NlogAlertsColumn, limit, args.first, args.last, pager.orderExpr(query))
+					modify := pagination.LimitPerRow(msgalert.NlogAlertsColumn, limit, offset, pager.orderExpr(query))
 					query.modifiers = append(query.modifiers, modify)
 				}
 			} else {

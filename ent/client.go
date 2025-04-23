@@ -16,6 +16,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/woocoos/entcache"
+	"github.com/woocoos/msgcenter/ent/appdictitem"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -39,6 +40,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// AppDictItem is the client for interacting with the AppDictItem builders.
+	AppDictItem *AppDictItemClient
 	// MsgAlert is the client for interacting with the MsgAlert builders.
 	MsgAlert *MsgAlertClient
 	// MsgChannel is the client for interacting with the MsgChannel builders.
@@ -80,6 +83,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.AppDictItem = NewAppDictItemClient(c.config)
 	c.MsgAlert = NewMsgAlertClient(c.config)
 	c.MsgChannel = NewMsgChannelClient(c.config)
 	c.MsgEvent = NewMsgEventClient(c.config)
@@ -188,6 +192,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:           ctx,
 		config:        cfg,
+		AppDictItem:   NewAppDictItemClient(cfg),
 		MsgAlert:      NewMsgAlertClient(cfg),
 		MsgChannel:    NewMsgChannelClient(cfg),
 		MsgEvent:      NewMsgEventClient(cfg),
@@ -221,6 +226,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:           ctx,
 		config:        cfg,
+		AppDictItem:   NewAppDictItemClient(cfg),
 		MsgAlert:      NewMsgAlertClient(cfg),
 		MsgChannel:    NewMsgChannelClient(cfg),
 		MsgEvent:      NewMsgEventClient(cfg),
@@ -241,7 +247,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		MsgAlert.
+//		AppDictItem.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -264,9 +270,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal, c.MsgInternalTo,
-		c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert, c.OrgRoleUser,
-		c.Silence, c.User, c.UserAddr,
+		c.AppDictItem, c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal,
+		c.MsgInternalTo, c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog,
+		c.NlogAlert, c.OrgRoleUser, c.Silence, c.User, c.UserAddr,
 	} {
 		n.Use(hooks...)
 	}
@@ -276,9 +282,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal, c.MsgInternalTo,
-		c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert, c.OrgRoleUser,
-		c.Silence, c.User, c.UserAddr,
+		c.AppDictItem, c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal,
+		c.MsgInternalTo, c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog,
+		c.NlogAlert, c.OrgRoleUser, c.Silence, c.User, c.UserAddr,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -287,6 +293,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *AppDictItemMutation:
+		return c.AppDictItem.mutate(ctx, m)
 	case *MsgAlertMutation:
 		return c.MsgAlert.mutate(ctx, m)
 	case *MsgChannelMutation:
@@ -317,6 +325,140 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.UserAddr.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// AppDictItemClient is a client for the AppDictItem schema.
+type AppDictItemClient struct {
+	config
+}
+
+// NewAppDictItemClient returns a client for the AppDictItem from the given config.
+func NewAppDictItemClient(c config) *AppDictItemClient {
+	return &AppDictItemClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `appdictitem.Hooks(f(g(h())))`.
+func (c *AppDictItemClient) Use(hooks ...Hook) {
+	c.hooks.AppDictItem = append(c.hooks.AppDictItem, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `appdictitem.Intercept(f(g(h())))`.
+func (c *AppDictItemClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AppDictItem = append(c.inters.AppDictItem, interceptors...)
+}
+
+// Create returns a builder for creating a AppDictItem entity.
+func (c *AppDictItemClient) Create() *AppDictItemCreate {
+	mutation := newAppDictItemMutation(c.config, OpCreate)
+	return &AppDictItemCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AppDictItem entities.
+func (c *AppDictItemClient) CreateBulk(builders ...*AppDictItemCreate) *AppDictItemCreateBulk {
+	return &AppDictItemCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AppDictItemClient) MapCreateBulk(slice any, setFunc func(*AppDictItemCreate, int)) *AppDictItemCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AppDictItemCreateBulk{err: fmt.Errorf("calling to AppDictItemClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AppDictItemCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AppDictItemCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AppDictItem.
+func (c *AppDictItemClient) Update() *AppDictItemUpdate {
+	mutation := newAppDictItemMutation(c.config, OpUpdate)
+	return &AppDictItemUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AppDictItemClient) UpdateOne(adi *AppDictItem) *AppDictItemUpdateOne {
+	mutation := newAppDictItemMutation(c.config, OpUpdateOne, withAppDictItem(adi))
+	return &AppDictItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AppDictItemClient) UpdateOneID(id int) *AppDictItemUpdateOne {
+	mutation := newAppDictItemMutation(c.config, OpUpdateOne, withAppDictItemID(id))
+	return &AppDictItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AppDictItem.
+func (c *AppDictItemClient) Delete() *AppDictItemDelete {
+	mutation := newAppDictItemMutation(c.config, OpDelete)
+	return &AppDictItemDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AppDictItemClient) DeleteOne(adi *AppDictItem) *AppDictItemDeleteOne {
+	return c.DeleteOneID(adi.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AppDictItemClient) DeleteOneID(id int) *AppDictItemDeleteOne {
+	builder := c.Delete().Where(appdictitem.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AppDictItemDeleteOne{builder}
+}
+
+// Query returns a query builder for AppDictItem.
+func (c *AppDictItemClient) Query() *AppDictItemQuery {
+	return &AppDictItemQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAppDictItem},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AppDictItem entity by its id.
+func (c *AppDictItemClient) Get(ctx context.Context, id int) (*AppDictItem, error) {
+	return c.Query().Where(appdictitem.ID(id)).Only(entcache.WithEntryKey(ctx, "AppDictItem", id))
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AppDictItemClient) GetX(ctx context.Context, id int) *AppDictItem {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AppDictItemClient) Hooks() []Hook {
+	hooks := c.hooks.AppDictItem
+	return append(hooks[:len(hooks):len(hooks)], appdictitem.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *AppDictItemClient) Interceptors() []Interceptor {
+	return c.inters.AppDictItem
+}
+
+func (c *AppDictItemClient) mutate(ctx context.Context, m *AppDictItemMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AppDictItemCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AppDictItemUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AppDictItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AppDictItemDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AppDictItem mutation op: %q", m.Op())
 	}
 }
 
@@ -2583,14 +2725,14 @@ func (c *UserAddrClient) mutate(ctx context.Context, m *UserAddrMutation) (Value
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSubscriber,
-		MsgTemplate, MsgType, Nlog, NlogAlert, OrgRoleUser, Silence, User,
-		UserAddr []ent.Hook
+		AppDictItem, MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo,
+		MsgSubscriber, MsgTemplate, MsgType, Nlog, NlogAlert, OrgRoleUser, Silence,
+		User, UserAddr []ent.Hook
 	}
 	inters struct {
-		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSubscriber,
-		MsgTemplate, MsgType, Nlog, NlogAlert, OrgRoleUser, Silence, User,
-		UserAddr []ent.Interceptor
+		AppDictItem, MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo,
+		MsgSubscriber, MsgTemplate, MsgType, Nlog, NlogAlert, OrgRoleUser, Silence,
+		User, UserAddr []ent.Interceptor
 	}
 )
 
