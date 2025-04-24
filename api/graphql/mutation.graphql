@@ -53,6 +53,8 @@ type Mutation {
     testSendEmailTpl(tplID: ID!, email: String!, labels: MapString, annotations: MapString): Boolean!
     """ 测试站内信模板 """
     testSendMessageTpl(tplID: ID!, userID: ID!, labels: MapString, annotations: MapString): Boolean!
+    """ 刷新消息模板参数 """
+    refreshTemplateParams: Boolean!
 }
 
 input RouteInput  {

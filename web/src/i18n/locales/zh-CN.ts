@@ -175,6 +175,7 @@ export default {
     msg_log: '消息日志',
     msg_log_list: '消息日志列表',
     msg_event_config_tip: '修改后请重新启用后生效',
+    template_params_refresh: '模板参数刷新',
     hidd_cc: '删除抄送',
     show_cc: '添加抄送',
     hidd_bcc: '删除密送',

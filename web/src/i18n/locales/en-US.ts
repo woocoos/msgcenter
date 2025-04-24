@@ -172,6 +172,7 @@ export default {
     msg_log: 'message log',
     msg_log_list: 'Message log list',
     msg_event_config_tip: 'The modification takes effect after being enabled again',
+    template_params_refresh: 'refresh params',
     hidd_cc: 'Delete cc',
     show_cc: 'Add cc',
     hidd_bcc: 'Delete BCC',

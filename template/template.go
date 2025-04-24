@@ -41,7 +41,8 @@ type Template struct {
 
 	ExternalURL *url.URL
 
-	KOSdk *api.SDK
+	KOSdk      *api.SDK
+	TempParams map[string]map[string]string
 }
 
 // Option is generic modifier of the text and html templates used by a Template.
@@ -52,8 +53,9 @@ type Option func(text *tmpltext.Template, html *tmplhtml.Template)
 // of the text and html templates in given order.
 func New(options ...Option) (*Template, error) {
 	t := &Template{
-		text: tmpltext.New("").Option("missingkey=zero"),
-		html: tmplhtml.New("").Option("missingkey=zero"),
+		text:       tmpltext.New("").Option("missingkey=zero"),
+		html:       tmplhtml.New("").Option("missingkey=zero"),
+		TempParams: make(map[string]map[string]string),
 	}
 
 	for _, o := range options {
@@ -298,10 +300,32 @@ func (t *Template) Data(recv string, groupLabels label.LabelSet, alerts ...*aler
 		for k, v := range commonLabels {
 			data.CommonLabels[string(k)] = v
 		}
+		// 追加模板参数
+		t.appendTempParams(data)
 		for k, v := range commonAnnotations {
 			data.CommonAnnotations[string(k)] = v
 		}
 	}
 
 	return data
+}
+
+// appendTempParams appends template params to the alerts.
+func (t *Template) appendTempParams(data *Data) {
+	// 判断是否忽略模板参数
+	if data.CommonLabels[label.SkipTempParamsLabel] == "Y" {
+		return
+	}
+	// 判断是否传递租户id
+	tenant := data.CommonLabels[label.TenantLabel]
+	if tenant == "" || t.TempParams == nil {
+		return
+	}
+	tp := t.TempParams[tenant]
+	if tp == nil {
+		return
+	}
+	for k, v := range tp {
+		data.CommonAnnotations[k] = v
+	}
 }

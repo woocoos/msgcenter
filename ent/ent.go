@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/woocoos/msgcenter/ent/appdictitem"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -87,7 +86,6 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			appdictitem.Table:   appdictitem.ValidColumn,
 			msgalert.Table:      msgalert.ValidColumn,
 			msgchannel.Table:    msgchannel.ValidColumn,
 			msgevent.Table:      msgevent.ValidColumn,

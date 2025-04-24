@@ -11,6 +11,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * 3. It does not support dead code elimination, so it will add unused operations.
  *
  * Therefore it is highly recommended to use the babel or swc plugin for production.
+ * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 const documents = {
     "query msgChannelList($first: Int,$orderBy:MsgChannelOrder,$where:MsgChannelWhereInput){\n  msgChannels(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,receiverType,tenantID,comments,status,status,createdAt\n      }\n    }\n  }\n}": types.MsgChannelListDocument,
@@ -54,6 +55,7 @@ const documents = {
     "mutation disableMsgTemplate($id:ID!){\n  disableMsgTemplate(id:$id){\n    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n  }\n}": types.DisableMsgTemplateDocument,
     "mutation testSendEmailTpl($annotations: MapString, $email: String!, $labels: MapString, $tplID: ID!){\n  testSendEmailTpl(annotations: $annotations, email: $email, labels:$labels, tplID: $tplID)\n}": types.TestSendEmailTplDocument,
     "mutation testSendMessageTpl($annotations: MapString, $userID: ID!, $labels: MapString, $tplID: ID!){\n  testSendMessageTpl(annotations: $annotations, userID: $userID, labels:$labels, tplID: $tplID)\n}": types.TestSendMessageTplDocument,
+    "mutation refreshTemplateParams{\n  refreshTemplateParams\n}": types.RefreshTemplateParamsDocument,
     "query msgTypeList($first: Int,$orderBy:MsgTypeOrder,$where:MsgTypeWhereInput){\n  msgTypes(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n      }\n    }\n  }\n}": types.MsgTypeListDocument,
     "query msgTypeInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgType{\n      id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n    }\n  }\n}": types.MsgTypeInfoDocument,
     "mutation createMsgType($input: CreateMsgTypeInput!){\n  createMsgType(input: $input){\n    id,name,comments,appID,status,category,canSubs,canCustom,createdAt\n  }\n}": types.CreateMsgTypeDocument,
@@ -244,6 +246,10 @@ export function gql(source: "mutation testSendEmailTpl($annotations: MapString, 
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation testSendMessageTpl($annotations: MapString, $userID: ID!, $labels: MapString, $tplID: ID!){\n  testSendMessageTpl(annotations: $annotations, userID: $userID, labels:$labels, tplID: $tplID)\n}"): (typeof documents)["mutation testSendMessageTpl($annotations: MapString, $userID: ID!, $labels: MapString, $tplID: ID!){\n  testSendMessageTpl(annotations: $annotations, userID: $userID, labels:$labels, tplID: $tplID)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation refreshTemplateParams{\n  refreshTemplateParams\n}"): (typeof documents)["mutation refreshTemplateParams{\n  refreshTemplateParams\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

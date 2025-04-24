@@ -9,21 +9,6 @@ import (
 )
 
 var (
-	// AppDictItemColumns holds the columns for the "app_dict_item" table.
-	AppDictItemColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "org_id", Type: field.TypeInt, Nullable: true},
-		{Name: "ref_code", Type: field.TypeString},
-		{Name: "code", Type: field.TypeString, Size: 45},
-		{Name: "name", Type: field.TypeString, Size: 255},
-		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"active", "inactive", "processing", "disabled"}},
-	}
-	// AppDictItemTable holds the schema information for the "app_dict_item" table.
-	AppDictItemTable = &schema.Table{
-		Name:       "app_dict_item",
-		Columns:    AppDictItemColumns,
-		PrimaryKey: []*schema.Column{AppDictItemColumns[0]},
-	}
 	// MsgAlertColumns holds the columns for the "msg_alert" table.
 	MsgAlertColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -381,7 +366,6 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		AppDictItemTable,
 		MsgAlertTable,
 		MsgChannelTable,
 		MsgEventTable,
@@ -400,9 +384,6 @@ var (
 )
 
 func init() {
-	AppDictItemTable.Annotation = &entsql.Annotation{
-		Table: "app_dict_item",
-	}
 	MsgAlertTable.Annotation = &entsql.Annotation{
 		Table: "msg_alert",
 	}

@@ -148,7 +148,7 @@ func (s *serviceSuite) TestPostAlertsWithParams() {
 			Alert: &Alert{
 				Labels: map[string]string{
 					"alertname":       "AlterPassword",
-					label.TenantLabel: "2",
+					label.TenantLabel: "1",
 				},
 			},
 			Annotations: map[string]string{

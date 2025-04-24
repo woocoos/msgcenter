@@ -12,8 +12,6 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// AppDictItem is the client for interacting with the AppDictItem builders.
-	AppDictItem *AppDictItemClient
 	// MsgAlert is the client for interacting with the MsgAlert builders.
 	MsgAlert *MsgAlertClient
 	// MsgChannel is the client for interacting with the MsgChannel builders.
@@ -173,7 +171,6 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.AppDictItem = NewAppDictItemClient(tx.config)
 	tx.MsgAlert = NewMsgAlertClient(tx.config)
 	tx.MsgChannel = NewMsgChannelClient(tx.config)
 	tx.MsgEvent = NewMsgEventClient(tx.config)
@@ -197,7 +194,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: AppDictItem.QueryXXX(), the query will be executed
+// applies a query, for example: MsgAlert.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

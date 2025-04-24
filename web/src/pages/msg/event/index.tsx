@@ -1,10 +1,11 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
-import { Button, Space, Modal } from 'antd';
+import {Button, Space, Modal, message} from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
 import { MsgEvent, MsgEventSimpleStatus, MsgEventWhereInput } from '@/generated/msgsrv/graphql';
 import { EnumMsgEventStatus, delMsgEvent, disableMsgEvent, enableMsgEvent, getMsgEventList } from '@/services/msgsrv/event';
+import { refreshTemplateParams } from '@/services/msgsrv/template';
 import Create from './components/create';
 import { Link } from '@ice/runtime';
 import Config from './components/config';
@@ -125,8 +126,8 @@ export default () => {
       title: '',
       id: '',
       scene: 'editor'
-    });
-
+    }),
+    [loadingTempParams,setLoadingTempParams] = useState(false);
 
   const
     onDel = (record: MsgEvent) => {
@@ -162,12 +163,21 @@ export default () => {
       });
     };
 
-
   return (
     <KeepAlive clearAlive>
       <PageContainer
         header={{
           title: t('msg_event'),
+          extra: <Auth authKey={'refreshTemplateParams'}>
+            <Button size="middle" loading={loadingTempParams} onClick={ async () => {
+              setLoadingTempParams(true )
+              let result = await refreshTemplateParams();
+              if (result){
+                message.success(t('submit_success'));
+              }
+              setLoadingTempParams(false)
+            }}>{t('template_params_refresh')}</Button>
+          </Auth>,
           style: { background: token.colorBgContainer },
           breadcrumb: {
             items: [

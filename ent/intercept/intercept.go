@@ -8,7 +8,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/woocoos/msgcenter/ent"
-	"github.com/woocoos/msgcenter/ent/appdictitem"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -80,33 +79,6 @@ func (f TraverseFunc) Traverse(ctx context.Context, q ent.Query) error {
 		return err
 	}
 	return f(ctx, query)
-}
-
-// The AppDictItemFunc type is an adapter to allow the use of ordinary function as a Querier.
-type AppDictItemFunc func(context.Context, *ent.AppDictItemQuery) (ent.Value, error)
-
-// Query calls f(ctx, q).
-func (f AppDictItemFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
-	if q, ok := q.(*ent.AppDictItemQuery); ok {
-		return f(ctx, q)
-	}
-	return nil, fmt.Errorf("unexpected query type %T. expect *ent.AppDictItemQuery", q)
-}
-
-// The TraverseAppDictItem type is an adapter to allow the use of ordinary function as Traverser.
-type TraverseAppDictItem func(context.Context, *ent.AppDictItemQuery) error
-
-// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
-func (f TraverseAppDictItem) Intercept(next ent.Querier) ent.Querier {
-	return next
-}
-
-// Traverse calls f(ctx, q).
-func (f TraverseAppDictItem) Traverse(ctx context.Context, q ent.Query) error {
-	if q, ok := q.(*ent.AppDictItemQuery); ok {
-		return f(ctx, q)
-	}
-	return fmt.Errorf("unexpected query type %T. expect *ent.AppDictItemQuery", q)
 }
 
 // The MsgAlertFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -490,8 +462,6 @@ func (f TraverseUserAddr) Traverse(ctx context.Context, q ent.Query) error {
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
-	case *ent.AppDictItemQuery:
-		return &query[*ent.AppDictItemQuery, predicate.AppDictItem, appdictitem.OrderOption]{typ: ent.TypeAppDictItem, tq: q}, nil
 	case *ent.MsgAlertQuery:
 		return &query[*ent.MsgAlertQuery, predicate.MsgAlert, msgalert.OrderOption]{typ: ent.TypeMsgAlert, tq: q}, nil
 	case *ent.MsgChannelQuery:

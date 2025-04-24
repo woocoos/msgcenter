@@ -12,7 +12,6 @@ import (
 	"github.com/woocoos/knockout-go/api/fs"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent"
-	"github.com/woocoos/msgcenter/ent/appdictitem"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
@@ -44,7 +43,6 @@ type Coordinator struct {
 
 	ActiveReceivers map[string]int // receiver name -> number of Notifiers
 	Template        *template.Template
-	TempParams      map[int]map[string]string
 
 	db *ent.Client
 	// knockout sdk
@@ -58,9 +56,7 @@ func NewCoordinator(cnf *conf.Configuration) *Coordinator {
 	c := &Coordinator{
 		cnf:             cnf,
 		ActiveReceivers: make(map[string]int),
-		TempParams:      make(map[int]map[string]string),
 	}
-
 	return c
 }
 
@@ -127,12 +123,6 @@ func (c *Coordinator) Reload() error {
 		return err
 	}
 
-	if err := c.loadTempParams(); err != nil {
-		logger.Error("Error loading template params", zap.Error(err))
-		metrics.Coordinator.ConfigSuccess.Set(0)
-		return err
-	}
-
 	if err := c.notifySubscribers(); err != nil {
 		logger.Error("one or more config change reloadHooks failed to apply new config", zap.Error(err))
 		metrics.Coordinator.ConfigSuccess.Set(0)
@@ -180,6 +170,12 @@ func (c *Coordinator) loadTemplates() error {
 	if err != nil {
 		return err
 	}
+	// 加载消息模板参数
+	if err = c.loadTempParams(c.Template.TempParams); err != nil {
+		logger.Error("Error loading template params", zap.Error(err))
+		metrics.Coordinator.ConfigSuccess.Set(0)
+		return err
+	}
 	// 远程下载文件
 	if err = c.downloadTempFromRemote(); err != nil {
 		logger.Error("Error loading remote template file", zap.Error(err))
@@ -198,19 +194,32 @@ func (c *Coordinator) loadTemplates() error {
 	return nil
 }
 
-func (c *Coordinator) loadTempParams() error {
-	items, err := c.db.AppDictItem.Query().Where(appdictitem.RefCode("msg:MsgTempParams"), appdictitem.StatusEQ(typex.SimpleStatusActive)).All(context.Background())
+func (c *Coordinator) ReloadTempParams() error {
+	return c.loadTempParams(c.Template.TempParams)
+}
+
+func (c *Coordinator) loadTempParams(tempParams map[string]map[string]string) error {
+	filename := c.cnf.String("template.tempParamsFile")
+	if filename == "" {
+		return fmt.Errorf("no config file specified")
+	}
+	// read config file by filename
+	bytes, err := os.ReadFile(c.cnf.Abs(filename))
 	if err != nil {
 		return err
 	}
-	for _, item := range items {
-		if c.TempParams[item.OrgID] == nil {
-			c.TempParams[item.OrgID] = map[string]string{
-				item.Code: item.Name,
-			}
-		} else {
-			c.TempParams[item.OrgID][item.Code] = item.Name
+	sub := conf.NewFromBytes(bytes)
+	tps, err := sub.Parser().Sub("tempParams")
+	if err != nil {
+		return err
+	}
+	m := tps.ToStringMap()
+	for oid, vm := range m {
+		out := make(map[string]string)
+		for k, v := range vm.(map[string]interface{}) {
+			out[k] = fmt.Sprintf("%v", v)
 		}
+		tempParams[oid] = out
 	}
 	return nil
 }
@@ -441,7 +450,7 @@ func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *templ
 	attdir := c.Template.AttachmentDir
 	for i, cfg := range nc.EmailConfigs {
 		add("email", i, func() (notify.Notifier, error) {
-			return email.New(cfg, tmpl, overrideEmailConfig(basedir, attdir, c.db), c.TempParams)
+			return email.New(cfg, tmpl, overrideEmailConfig(basedir, attdir, c.db))
 		})
 	}
 	for i, cfg := range nc.WebhookConfigs {

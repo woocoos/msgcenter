@@ -540,6 +540,12 @@ func (r *mutationResolver) TestSendMessageTpl(ctx context.Context, tplID int, us
 	return err == nil, err
 }
 
+// RefreshTemplateParams is the resolver for the refreshTemplateParams field.
+func (r *mutationResolver) RefreshTemplateParams(ctx context.Context) (bool, error) {
+	err := r.coordinator.ReloadTempParams()
+	return err == nil, err
+}
+
 // Matchers is the resolver for the matchers field.
 func (r *routeInputResolver) Matchers(ctx context.Context, obj *profile.Route, data []*label.Matcher) error {
 	obj.Matchers = data

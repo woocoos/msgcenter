@@ -6,9 +6,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// AppDictItem is the predicate function for appdictitem builders.
-type AppDictItem func(*sql.Selector)
-
 // MsgAlert is the predicate function for msgalert builders.
 type MsgAlert func(*sql.Selector)
 

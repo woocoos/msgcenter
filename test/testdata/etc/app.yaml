@@ -33,6 +33,7 @@ alertManager:
     baseDir: testdata/files # path for custom template
     dataDir: "msg/tpl/data" # 模板正式路径
     attachmentDir: "msg/att" # 附件存储路径
+    tempParamsFile: testdata/etc/tempparams.yaml # 全局模板参数文件
 
 cache:
   local:

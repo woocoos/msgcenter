@@ -84,6 +84,10 @@ const mutationTestSendMessageTpl = gql(/* GraphQL */`mutation testSendMessageTpl
   testSendMessageTpl(annotations: $annotations, userID: $userID, labels:$labels, tplID: $tplID)
 }`);
 
+const mutationRefreshTempParams = gql(/* GraphQL */`mutation refreshTemplateParams{
+  refreshTemplateParams
+}`);
+
 
 /**
  * 消息事件列表
@@ -245,4 +249,16 @@ export async function testSendMessage(tplID: string, userID: string, labels?: Re
     return result.data.testSendMessageTpl
   }
   return null
+}
+
+/**
+ * 刷新全局模板参数
+ * @returns
+ */
+export async function refreshTemplateParams() {
+  const result = await mutation(mutationRefreshTempParams,{})
+  if (result.data?.refreshTemplateParams) {
+    return result.data.refreshTemplateParams
+  }
+  return false
 }

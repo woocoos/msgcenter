@@ -7,7 +7,6 @@ import "context"
 // SchemaConfig represents alternative schema names for all tables
 // that can be passed at runtime.
 type SchemaConfig struct {
-	AppDictItem   string // AppDictItem table.
 	MsgAlert      string // MsgAlert table.
 	MsgChannel    string // MsgChannel table.
 	MsgEvent      string // MsgEvent table.

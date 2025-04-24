@@ -96,7 +96,6 @@ func open(ctx context.Context, driverName, dsn string) (*ent.Client, error) {
 			User:        "portal",
 			OrgRoleUser: "portal",
 			UserAddr:    "portal",
-			AppDictItem: "portal",
 		}),
 	)
 	if err != nil {
@@ -251,10 +250,4 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetCategory("订阅类型").SetCreatedBy(1).SaveX(ctx)
 	client.MsgInternalTo.Create().SetID(2).SetTenantID(1).SetCreatedAt(time.Now()).SetMsgInternalID(2).
 		SetUserID(1).SaveX(ctx)
-
-	client.AppDictItem.Create().SetRefCode("msg:MsgTempParams").SetCode("tempCo").SetName("祺麟资本管理").SetOrgID(1).SetStatus(typex.SimpleStatusActive).SaveX(ctx)
-	client.AppDictItem.Create().SetRefCode("msg:MsgTempParams").SetCode("tempFax").SetName("+852 2593 1222").SetOrgID(1).SetStatus(typex.SimpleStatusActive).SaveX(ctx)
-	client.AppDictItem.Create().SetRefCode("msg:MsgTempParams").SetCode("tempLogo").SetName("https://files.qeelyn.com/cdn/images/logo-icon.svg").SetOrgID(1).SetStatus(typex.SimpleStatusActive).SaveX(ctx)
-	client.AppDictItem.Create().SetRefCode("msg:MsgTempParams").SetCode("tempCo").SetName("祺麟厦门").SetOrgID(2).SetStatus(typex.SimpleStatusActive).SaveX(ctx)
-	client.AppDictItem.Create().SetRefCode("msg:MsgTempParams").SetCode("tempFax").SetName("+852 2593 1222").SetOrgID(2).SetStatus(typex.SimpleStatusActive).SaveX(ctx)
 }

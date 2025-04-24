@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/woocoos/msgcenter/codegen/entgen/schema"
-	"github.com/woocoos/msgcenter/ent/appdictitem"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -27,32 +26,6 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	appdictitemHooks := schema.AppDictItem{}.Hooks()
-	appdictitem.Hooks[0] = appdictitemHooks[0]
-	appdictitemFields := schema.AppDictItem{}.Fields()
-	_ = appdictitemFields
-	// appdictitemDescCode is the schema descriptor for code field.
-	appdictitemDescCode := appdictitemFields[2].Descriptor()
-	// appdictitem.CodeValidator is a validator for the "code" field. It is called by the builders before save.
-	appdictitem.CodeValidator = func() func(string) error {
-		validators := appdictitemDescCode.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(code string) error {
-			for _, fn := range fns {
-				if err := fn(code); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
-	// appdictitemDescName is the schema descriptor for name field.
-	appdictitemDescName := appdictitemFields[3].Descriptor()
-	// appdictitem.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	appdictitem.NameValidator = appdictitemDescName.Validators[0].(func(string) error)
 	msgalertMixin := schema.MsgAlert{}.Mixin()
 	msgalertMixinHooks1 := msgalertMixin[1].Hooks()
 	msgalert.Hooks[0] = msgalertMixinHooks1[0]
