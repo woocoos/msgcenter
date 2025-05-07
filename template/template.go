@@ -20,6 +20,7 @@ import (
 
 var (
 	//go:embed tpl/*.tmpl
+	//go:embed tpl/**/*.tmpl
 	templateDir embed.FS
 )
 
@@ -63,7 +64,7 @@ func New(options ...Option) (*Template, error) {
 	}
 	t.text.Funcs(DefaultFuncs)
 	t.html.Funcs(DefaultFuncs)
-	MustParse(t.ParseFS(templateDir, "tpl/*.tmpl"))
+	MustParse(t.ParseFS(templateDir, "tpl/*.tmpl", "tpl/**/*.tmpl"))
 	return t, nil
 }
 
@@ -301,7 +302,7 @@ func (t *Template) Data(recv string, groupLabels label.LabelSet, alerts ...*aler
 			data.CommonLabels[string(k)] = v
 		}
 		// 追加模板参数
-		t.appendTempParams(data)
+		t.AppendTempParams(data)
 		for k, v := range commonAnnotations {
 			data.CommonAnnotations[string(k)] = v
 		}
@@ -310,8 +311,8 @@ func (t *Template) Data(recv string, groupLabels label.LabelSet, alerts ...*aler
 	return data
 }
 
-// appendTempParams appends template params to the alerts.
-func (t *Template) appendTempParams(data *Data) {
+// AppendTempParams appends template params to the alerts.
+func (t *Template) AppendTempParams(data *Data) {
 	// 判断是否忽略模板参数
 	if data.CommonLabels[label.SkipTempParamsLabel] == "Y" {
 		return

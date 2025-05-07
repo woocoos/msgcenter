@@ -15,6 +15,10 @@ import { DictSelect, DictText } from '@knockout-js/org';
 import { definePageConfig } from 'ice';
 import { delDataSource, saveDataSource } from '@/util';
 
+export const TemplateType = {
+  customer: 'customer',
+  default: 'default',
+};
 
 export default () => {
   const { token } = useToken(),
@@ -74,9 +78,15 @@ export default () => {
             </Auth>
             <Link
               key="template"
-              to={`/msg/template?id=${record.id}`}
+              to={`/msg/template?id=${record.id}&type=${TemplateType.customer}`}
             >
-              {t('template')}
+              {t('temp_customer')}
+            </Link>
+            <Link
+              key="template"
+              to={`/msg/template?id=${record.id}&type=${TemplateType.default}`}
+            >
+              {t('temp_default')}
             </Link>
             <Auth authKey="updateMsgEvent">
               <a

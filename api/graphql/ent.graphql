@@ -81,7 +81,7 @@ input CreateMsgTemplateInput {
   """
   组织ID
   """
-  tenantID: ID!
+  tenantID: ID
   """
   消息模板名称
   """
@@ -1506,7 +1506,7 @@ type MsgTemplate implements Node {
   """
   组织ID
   """
-  tenantID: ID!
+  tenantID: ID
   """
   消息模板名称
   """
@@ -1730,6 +1730,8 @@ input MsgTemplateWhereInput {
   tenantIDGTE: ID
   tenantIDLT: ID
   tenantIDLTE: ID
+  tenantIDIsNil: Boolean
+  tenantIDNotNil: Boolean
   """
   name field predicates
   """
@@ -2827,6 +2829,7 @@ input UpdateMsgTemplateInput {
   组织ID
   """
   tenantID: ID
+  clearTenantID: Boolean
   """
   消息模板名称
   """

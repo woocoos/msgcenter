@@ -209,7 +209,23 @@ func (r *mutationResolver) DisableMsgChannel(ctx context.Context, id int) (*ent.
 
 // CreateMsgTemplate is the resolver for the createMsgTemplate field.
 func (r *mutationResolver) CreateMsgTemplate(ctx context.Context, input ent.CreateMsgTemplateInput) (*ent.MsgTemplate, error) {
-	return ent.FromContext(ctx).MsgTemplate.Create().SetInput(input).Save(ctx)
+	client := ent.FromContext(ctx)
+	// 判断同一类型只能有一个模板
+	query := client.MsgTemplate.Query().Where(
+		msgtemplate.ReceiverTypeEQ(input.ReceiverType),
+		msgtemplate.MsgEventID(input.EventID),
+	)
+	if input.TenantID == nil {
+		query.Where(msgtemplate.TenantIDIsNil())
+	} else {
+		query.Where(msgtemplate.TenantID(*input.TenantID))
+	}
+	if has, err := query.Exist(ctx); err != nil {
+		return nil, err
+	} else if has {
+		return nil, fmt.Errorf("the %s message template already exists", input.ReceiverType.String())
+	}
+	return client.MsgTemplate.Create().SetInput(input).Save(ctx)
 }
 
 // UpdateMsgTemplate is the resolver for the updateMsgTemplate field.

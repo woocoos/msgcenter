@@ -2878,14 +2878,16 @@ type MsgTemplateWhereInput struct {
 	MsgEventIDNotIn []int `json:"msgEventIDNotIn,omitempty"`
 
 	// "tenant_id" field predicates.
-	TenantID      *int  `json:"tenantID,omitempty"`
-	TenantIDNEQ   *int  `json:"tenantIDNEQ,omitempty"`
-	TenantIDIn    []int `json:"tenantIDIn,omitempty"`
-	TenantIDNotIn []int `json:"tenantIDNotIn,omitempty"`
-	TenantIDGT    *int  `json:"tenantIDGT,omitempty"`
-	TenantIDGTE   *int  `json:"tenantIDGTE,omitempty"`
-	TenantIDLT    *int  `json:"tenantIDLT,omitempty"`
-	TenantIDLTE   *int  `json:"tenantIDLTE,omitempty"`
+	TenantID       *int  `json:"tenantID,omitempty"`
+	TenantIDNEQ    *int  `json:"tenantIDNEQ,omitempty"`
+	TenantIDIn     []int `json:"tenantIDIn,omitempty"`
+	TenantIDNotIn  []int `json:"tenantIDNotIn,omitempty"`
+	TenantIDGT     *int  `json:"tenantIDGT,omitempty"`
+	TenantIDGTE    *int  `json:"tenantIDGTE,omitempty"`
+	TenantIDLT     *int  `json:"tenantIDLT,omitempty"`
+	TenantIDLTE    *int  `json:"tenantIDLTE,omitempty"`
+	TenantIDIsNil  bool  `json:"tenantIDIsNil,omitempty"`
+	TenantIDNotNil bool  `json:"tenantIDNotNil,omitempty"`
 
 	// "name" field predicates.
 	Name             *string  `json:"name,omitempty"`
@@ -3274,6 +3276,12 @@ func (i *MsgTemplateWhereInput) P() (predicate.MsgTemplate, error) {
 	}
 	if i.TenantIDLTE != nil {
 		predicates = append(predicates, msgtemplate.TenantIDLTE(*i.TenantIDLTE))
+	}
+	if i.TenantIDIsNil {
+		predicates = append(predicates, msgtemplate.TenantIDIsNil())
+	}
+	if i.TenantIDNotNil {
+		predicates = append(predicates, msgtemplate.TenantIDNotNil())
 	}
 	if i.Name != nil {
 		predicates = append(predicates, msgtemplate.NameEQ(*i.Name))

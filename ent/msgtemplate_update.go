@@ -137,6 +137,12 @@ func (mtu *MsgTemplateUpdate) AddTenantID(i int) *MsgTemplateUpdate {
 	return mtu
 }
 
+// ClearTenantID clears the value of the "tenant_id" field.
+func (mtu *MsgTemplateUpdate) ClearTenantID() *MsgTemplateUpdate {
+	mtu.mutation.ClearTenantID()
+	return mtu
+}
+
 // SetName sets the "name" field.
 func (mtu *MsgTemplateUpdate) SetName(s string) *MsgTemplateUpdate {
 	mtu.mutation.SetName(s)
@@ -493,6 +499,9 @@ func (mtu *MsgTemplateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := mtu.mutation.AddedTenantID(); ok {
 		_spec.AddField(msgtemplate.FieldTenantID, field.TypeInt, value)
 	}
+	if mtu.mutation.TenantIDCleared() {
+		_spec.ClearField(msgtemplate.FieldTenantID, field.TypeInt)
+	}
 	if value, ok := mtu.mutation.Name(); ok {
 		_spec.SetField(msgtemplate.FieldName, field.TypeString, value)
 	}
@@ -720,6 +729,12 @@ func (mtuo *MsgTemplateUpdateOne) SetNillableTenantID(i *int) *MsgTemplateUpdate
 // AddTenantID adds i to the "tenant_id" field.
 func (mtuo *MsgTemplateUpdateOne) AddTenantID(i int) *MsgTemplateUpdateOne {
 	mtuo.mutation.AddTenantID(i)
+	return mtuo
+}
+
+// ClearTenantID clears the value of the "tenant_id" field.
+func (mtuo *MsgTemplateUpdateOne) ClearTenantID() *MsgTemplateUpdateOne {
+	mtuo.mutation.ClearTenantID()
 	return mtuo
 }
 
@@ -1108,6 +1123,9 @@ func (mtuo *MsgTemplateUpdateOne) sqlSave(ctx context.Context) (_node *MsgTempla
 	}
 	if value, ok := mtuo.mutation.AddedTenantID(); ok {
 		_spec.AddField(msgtemplate.FieldTenantID, field.TypeInt, value)
+	}
+	if mtuo.mutation.TenantIDCleared() {
+		_spec.ClearField(msgtemplate.FieldTenantID, field.TypeInt)
 	}
 	if value, ok := mtuo.mutation.Name(); ok {
 		_spec.SetField(msgtemplate.FieldName, field.TypeString, value)

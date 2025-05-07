@@ -232,6 +232,10 @@ func (c *Coordinator) downloadTempFromRemote() error {
 		return err
 	}
 	for _, tpl := range tpls {
+		if tpl.TenantID == 0 {
+			// 无组织为默认模板，不需要处理
+			continue
+		}
 		// 下载模板文件
 		if tpl.Tpl != "" {
 			localFile, err := kosdk.DefaultFilePath(tpl.TenantID, tpl.Tpl, c.Template.BaseDir, c.Template.DataDir)

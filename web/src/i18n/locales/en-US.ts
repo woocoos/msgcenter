@@ -126,6 +126,8 @@ export default {
     'file_accept_err_{{accept}}': 'File extensions are not supported:{{accept}}',
     temp_viewer: 'Template preview',
     temp_down: 'Template download',
+    temp_default: 'default template',
+    temp_customer: 'customer template',
     starts_at: 'Start time',
     end_at: 'End time',
     effective_time: 'Effective time',

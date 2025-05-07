@@ -1,5 +1,13 @@
 import { gql } from "@/generated/msgsrv";
-import { CreateMsgTemplateInput, MsgTemplateOrder, MsgTemplateOrderField, MsgTemplateWhereInput, OrderDirection, UpdateMsgTemplateInput } from "@/generated/msgsrv/graphql";
+import {
+  CreateMsgTemplateInput,
+  MsgTemplateFormat,
+  MsgTemplateOrder,
+  MsgTemplateOrderField,
+  MsgTemplateWhereInput,
+  OrderDirection,
+  UpdateMsgTemplateInput
+} from "@/generated/msgsrv/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
@@ -40,6 +48,10 @@ const queryMsgTemplateInfo = gql(/* GraphQL */`query MsgTemplateInfo($gid:GID!){
       receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments
     }
   }
+}`);
+
+const queryMsgTemplateDefineByName = gql(/* GraphQL */`query msgTemplateDefineByName($format:MsgTemplateFormat!,$body:String!){
+  msgTemplateDefineByName(format: $format,body: $body)
 }`);
 
 const mutationCreateMsgTemplate = gql(/* GraphQL */`mutation createMsgTemplate($input: CreateMsgTemplateInput!){
@@ -128,6 +140,23 @@ export async function getMsgTemplateInfo(msgTemplateId: string) {
   })
   if (result.data?.node?.__typename === 'MsgTemplate') {
     return result.data.node
+  }
+  return null
+}
+
+/**
+ * 消息事件详情
+ * @param format
+ * @param body
+ * @returns
+ */
+export async function getMsgTemplateDefine(format: MsgTemplateFormat,body: string) {
+  const result = await query(queryMsgTemplateDefineByName, {
+    body: body,
+    format: format,
+  })
+  if (result.data?.msgTemplateDefineByName) {
+    return result.data.msgTemplateDefineByName
   }
   return null
 }

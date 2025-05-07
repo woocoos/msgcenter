@@ -222,6 +222,32 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetBody(`{{ template "dingtalk.content" . }}`).
 		SaveX(ctx)
 
+	userRemoteLogin := "UserRemoteLogin"
+	client.MsgEvent.Create().SetID(4).SetMsgTypeID(1).SetName(userRemoteLogin).SetStatus(typex.SimpleStatusActive).
+		SetCreatedBy(1).SetModes("email,internal").
+		SetRoute(&profile.Route{
+			Name:     userRemoteLogin,
+			Receiver: "email",
+			Matchers: label.Matchers{
+				{Type: label.MatchEqual, Name: "app", Value: "1"},
+				{Name: "alertname", Value: userRemoteLogin, Type: label.MatchEqual},
+			},
+			Routes: []*profile.Route{
+				{
+					Matchers: label.Matchers{
+						{Name: "receiver", Value: "email", Type: label.MatchRegexp},
+					},
+					Receiver: "email",
+					Continue: true,
+				},
+			},
+		}).SaveX(ctx)
+	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(4).SetName(userRemoteLogin).SetCreatedBy(1).
+		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatHTML).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
+		SetSubject(`异地登录提醒`).SetCc(`{{ template "email.cc" . }}`).
+		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
+		SetBody(`{{ template "0.UserRemoteLogin.txt" . }}`).SaveX(ctx)
+
 	client.User.Create().SetID(1).SetDisplayName("admin").SetPrincipalName("admin").SaveX(ctx)
 	client.UserAddr.Create().SetID(1).SetUserID(1).SetEmail("admin@localhost").
 		SetMobile("13800138000").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)

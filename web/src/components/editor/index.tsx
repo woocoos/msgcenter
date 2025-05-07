@@ -1,5 +1,5 @@
 import Editor, { loader } from '@monaco-editor/react';
 
-loader.config({ paths: { vs: 'https://jsd.onmicrosoft.cn/npm/monaco-editor@0.44.0/min/vs' } })
+loader.config({ paths: { vs: 'https://files.qeelyn.com/cdn/monaco-editor/0.52.2/min/vs' } })
 
 export default Editor;

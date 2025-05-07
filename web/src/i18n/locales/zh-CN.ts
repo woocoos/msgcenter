@@ -129,6 +129,8 @@ export default {
     'file_accept_err_{{accept}}': '不支持文件扩展名：{{accept}}',
     temp_viewer: '模板预览',
     temp_down: '模板下载',
+    temp_default: '默认模板',
+    temp_customer: '客制模板',
     starts_at: '开始时间',
     end_at: '结束时间',
     effective_time: '生效时间',

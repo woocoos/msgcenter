@@ -110,7 +110,7 @@ export type CreateMsgTemplateInput = {
   /** 标题 */
   subject?: InputMaybe<Scalars['String']['input']>;
   /** 组织ID */
-  tenantID: Scalars['ID']['input'];
+  tenantID?: InputMaybe<Scalars['ID']['input']>;
   /** 收件人 */
   to?: InputMaybe<Scalars['String']['input']>;
   /** 模板地址 */
@@ -1267,7 +1267,7 @@ export type MsgTemplate = Node & {
   /** 标题 */
   subject?: Maybe<Scalars['String']['output']>;
   /** 组织ID */
-  tenantID: Scalars['ID']['output'];
+  tenantID?: Maybe<Scalars['ID']['output']>;
   /** 收件人 */
   to?: Maybe<Scalars['String']['output']>;
   /** 模板地址 */
@@ -1482,10 +1482,12 @@ export type MsgTemplateWhereInput = {
   tenantIDGT?: InputMaybe<Scalars['ID']['input']>;
   tenantIDGTE?: InputMaybe<Scalars['ID']['input']>;
   tenantIDIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tenantIDIsNil?: InputMaybe<Scalars['Boolean']['input']>;
   tenantIDLT?: InputMaybe<Scalars['ID']['input']>;
   tenantIDLTE?: InputMaybe<Scalars['ID']['input']>;
   tenantIDNEQ?: InputMaybe<Scalars['ID']['input']>;
   tenantIDNotIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tenantIDNotNil?: InputMaybe<Scalars['Boolean']['input']>;
   /** to field predicates */
   to?: InputMaybe<Scalars['String']['input']>;
   toContains?: InputMaybe<Scalars['String']['input']>;
@@ -2203,6 +2205,8 @@ export type Query = {
   msgInternalTos: MsgInternalToConnection;
   /** 站内信查询 */
   msgInternals: MsgInternalConnection;
+  /** 根据模板名称获取模板数据 */
+  msgTemplateDefineByName: Scalars['String']['output'];
   /**  消息模板列表  */
   msgTemplates: MsgTemplateConnection;
   /**  消息类型分类  */
@@ -2273,6 +2277,12 @@ export type QueryMsgInternalsArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<MsgInternalOrder>;
   where?: InputMaybe<MsgInternalWhereInput>;
+};
+
+
+export type QueryMsgTemplateDefineByNameArgs = {
+  body: Scalars['String']['input'];
+  format: MsgTemplateFormat;
 };
 
 
@@ -2612,6 +2622,7 @@ export type UpdateMsgTemplateInput = {
   clearComments?: InputMaybe<Scalars['Boolean']['input']>;
   clearFrom?: InputMaybe<Scalars['Boolean']['input']>;
   clearSubject?: InputMaybe<Scalars['Boolean']['input']>;
+  clearTenantID?: InputMaybe<Scalars['Boolean']['input']>;
   clearTo?: InputMaybe<Scalars['Boolean']['input']>;
   clearTpl?: InputMaybe<Scalars['Boolean']['input']>;
   /** 备注 */
@@ -2942,21 +2953,29 @@ export type MsgTemplateListQueryVariables = Exact<{
 }>;
 
 
-export type MsgTemplateListQuery = { __typename?: 'Query', msgTemplates: { __typename?: 'MsgTemplateConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'MsgTemplateEdge', cursor: any, node?: { __typename?: 'MsgTemplate', id: string, name: string, comments?: string | null, status?: MsgTemplateSimpleStatus | null, createdAt: any, msgTypeID: number, msgEventID: string, tenantID: string, receiverType: MsgTemplateReceiverType, format: MsgTemplateFormat, subject?: string | null, from?: string | null, to?: string | null, cc?: string | null, bcc?: string | null, body?: string | null, tpl?: string | null, attachments?: Array<string> | null } | null } | null> | null } };
+export type MsgTemplateListQuery = { __typename?: 'Query', msgTemplates: { __typename?: 'MsgTemplateConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'MsgTemplateEdge', cursor: any, node?: { __typename?: 'MsgTemplate', id: string, name: string, comments?: string | null, status?: MsgTemplateSimpleStatus | null, createdAt: any, msgTypeID: number, msgEventID: string, tenantID?: string | null, receiverType: MsgTemplateReceiverType, format: MsgTemplateFormat, subject?: string | null, from?: string | null, to?: string | null, cc?: string | null, bcc?: string | null, body?: string | null, tpl?: string | null, attachments?: Array<string> | null } | null } | null> | null } };
 
 export type MsgTemplateInfoQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type MsgTemplateInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string, name: string, comments?: string | null, status?: MsgTemplateSimpleStatus | null, createdAt: any, msgTypeID: number, msgEventID: string, tenantID: string, receiverType: MsgTemplateReceiverType, format: MsgTemplateFormat, subject?: string | null, from?: string | null, to?: string | null, cc?: string | null, bcc?: string | null, body?: string | null, tpl?: string | null, attachments?: Array<string> | null } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Silence', id: string } | { __typename?: 'User', id: string } | null };
+export type MsgTemplateInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string, name: string, comments?: string | null, status?: MsgTemplateSimpleStatus | null, createdAt: any, msgTypeID: number, msgEventID: string, tenantID?: string | null, receiverType: MsgTemplateReceiverType, format: MsgTemplateFormat, subject?: string | null, from?: string | null, to?: string | null, cc?: string | null, bcc?: string | null, body?: string | null, tpl?: string | null, attachments?: Array<string> | null } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Silence', id: string } | { __typename?: 'User', id: string } | null };
+
+export type MsgTemplateDefineByNameQueryVariables = Exact<{
+  format: MsgTemplateFormat;
+  body: Scalars['String']['input'];
+}>;
+
+
+export type MsgTemplateDefineByNameQuery = { __typename?: 'Query', msgTemplateDefineByName: string };
 
 export type CreateMsgTemplateMutationVariables = Exact<{
   input: CreateMsgTemplateInput;
 }>;
 
 
-export type CreateMsgTemplateMutation = { __typename?: 'Mutation', createMsgTemplate: { __typename?: 'MsgTemplate', id: string, name: string, comments?: string | null, status?: MsgTemplateSimpleStatus | null, createdAt: any, msgTypeID: number, msgEventID: string, tenantID: string, receiverType: MsgTemplateReceiverType, format: MsgTemplateFormat, subject?: string | null, from?: string | null, to?: string | null, cc?: string | null, bcc?: string | null, body?: string | null, tpl?: string | null, attachments?: Array<string> | null } };
+export type CreateMsgTemplateMutation = { __typename?: 'Mutation', createMsgTemplate: { __typename?: 'MsgTemplate', id: string, name: string, comments?: string | null, status?: MsgTemplateSimpleStatus | null, createdAt: any, msgTypeID: number, msgEventID: string, tenantID?: string | null, receiverType: MsgTemplateReceiverType, format: MsgTemplateFormat, subject?: string | null, from?: string | null, to?: string | null, cc?: string | null, bcc?: string | null, body?: string | null, tpl?: string | null, attachments?: Array<string> | null } };
 
 export type UpdateMsgTemplateMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -2964,7 +2983,7 @@ export type UpdateMsgTemplateMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMsgTemplateMutation = { __typename?: 'Mutation', updateMsgTemplate: { __typename?: 'MsgTemplate', id: string, name: string, comments?: string | null, status?: MsgTemplateSimpleStatus | null, createdAt: any, msgTypeID: number, msgEventID: string, tenantID: string, receiverType: MsgTemplateReceiverType, format: MsgTemplateFormat, subject?: string | null, from?: string | null, to?: string | null, cc?: string | null, bcc?: string | null, body?: string | null, tpl?: string | null, attachments?: Array<string> | null } };
+export type UpdateMsgTemplateMutation = { __typename?: 'Mutation', updateMsgTemplate: { __typename?: 'MsgTemplate', id: string, name: string, comments?: string | null, status?: MsgTemplateSimpleStatus | null, createdAt: any, msgTypeID: number, msgEventID: string, tenantID?: string | null, receiverType: MsgTemplateReceiverType, format: MsgTemplateFormat, subject?: string | null, from?: string | null, to?: string | null, cc?: string | null, bcc?: string | null, body?: string | null, tpl?: string | null, attachments?: Array<string> | null } };
 
 export type DelMsgTemplateMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -2978,14 +2997,14 @@ export type EnableMsgTemplateMutationVariables = Exact<{
 }>;
 
 
-export type EnableMsgTemplateMutation = { __typename?: 'Mutation', enableMsgTemplate: { __typename?: 'MsgTemplate', id: string, name: string, comments?: string | null, status?: MsgTemplateSimpleStatus | null, createdAt: any, msgTypeID: number, msgEventID: string, tenantID: string, receiverType: MsgTemplateReceiverType, format: MsgTemplateFormat, subject?: string | null, from?: string | null, to?: string | null, cc?: string | null, bcc?: string | null, body?: string | null, tpl?: string | null, attachments?: Array<string> | null } };
+export type EnableMsgTemplateMutation = { __typename?: 'Mutation', enableMsgTemplate: { __typename?: 'MsgTemplate', id: string, name: string, comments?: string | null, status?: MsgTemplateSimpleStatus | null, createdAt: any, msgTypeID: number, msgEventID: string, tenantID?: string | null, receiverType: MsgTemplateReceiverType, format: MsgTemplateFormat, subject?: string | null, from?: string | null, to?: string | null, cc?: string | null, bcc?: string | null, body?: string | null, tpl?: string | null, attachments?: Array<string> | null } };
 
 export type DisableMsgTemplateMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type DisableMsgTemplateMutation = { __typename?: 'Mutation', disableMsgTemplate: { __typename?: 'MsgTemplate', id: string, name: string, comments?: string | null, status?: MsgTemplateSimpleStatus | null, createdAt: any, msgTypeID: number, msgEventID: string, tenantID: string, receiverType: MsgTemplateReceiverType, format: MsgTemplateFormat, subject?: string | null, from?: string | null, to?: string | null, cc?: string | null, bcc?: string | null, body?: string | null, tpl?: string | null, attachments?: Array<string> | null } };
+export type DisableMsgTemplateMutation = { __typename?: 'Mutation', disableMsgTemplate: { __typename?: 'MsgTemplate', id: string, name: string, comments?: string | null, status?: MsgTemplateSimpleStatus | null, createdAt: any, msgTypeID: number, msgEventID: string, tenantID?: string | null, receiverType: MsgTemplateReceiverType, format: MsgTemplateFormat, subject?: string | null, from?: string | null, to?: string | null, cc?: string | null, bcc?: string | null, body?: string | null, tpl?: string | null, attachments?: Array<string> | null } };
 
 export type TestSendEmailTplMutationVariables = Exact<{
   annotations?: InputMaybe<Scalars['MapString']['input']>;
@@ -3123,6 +3142,7 @@ export const UpdateSilenceDocument = {"kind":"Document","definitions":[{"kind":"
 export const DelSilenceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"delSilence"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteSilence"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DelSilenceMutation, DelSilenceMutationVariables>;
 export const MsgTemplateListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"msgTemplateList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MsgTemplateOrder"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MsgTemplateWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"msgTemplates"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"msgTypeID"}},{"kind":"Field","name":{"kind":"Name","value":"msgEventID"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"receiverType"}},{"kind":"Field","name":{"kind":"Name","value":"format"}},{"kind":"Field","name":{"kind":"Name","value":"subject"}},{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}},{"kind":"Field","name":{"kind":"Name","value":"cc"}},{"kind":"Field","name":{"kind":"Name","value":"bcc"}},{"kind":"Field","name":{"kind":"Name","value":"body"}},{"kind":"Field","name":{"kind":"Name","value":"tpl"}},{"kind":"Field","name":{"kind":"Name","value":"attachments"}}]}}]}}]}}]}}]} as unknown as DocumentNode<MsgTemplateListQuery, MsgTemplateListQueryVariables>;
 export const MsgTemplateInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MsgTemplateInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"MsgTemplate"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"msgTypeID"}},{"kind":"Field","name":{"kind":"Name","value":"msgEventID"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"receiverType"}},{"kind":"Field","name":{"kind":"Name","value":"format"}},{"kind":"Field","name":{"kind":"Name","value":"subject"}},{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}},{"kind":"Field","name":{"kind":"Name","value":"cc"}},{"kind":"Field","name":{"kind":"Name","value":"bcc"}},{"kind":"Field","name":{"kind":"Name","value":"body"}},{"kind":"Field","name":{"kind":"Name","value":"tpl"}},{"kind":"Field","name":{"kind":"Name","value":"attachments"}}]}}]}}]}}]} as unknown as DocumentNode<MsgTemplateInfoQuery, MsgTemplateInfoQueryVariables>;
+export const MsgTemplateDefineByNameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"msgTemplateDefineByName"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"format"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MsgTemplateFormat"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"body"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"msgTemplateDefineByName"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"format"},"value":{"kind":"Variable","name":{"kind":"Name","value":"format"}}},{"kind":"Argument","name":{"kind":"Name","value":"body"},"value":{"kind":"Variable","name":{"kind":"Name","value":"body"}}}]}]}}]} as unknown as DocumentNode<MsgTemplateDefineByNameQuery, MsgTemplateDefineByNameQueryVariables>;
 export const CreateMsgTemplateDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createMsgTemplate"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateMsgTemplateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createMsgTemplate"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"msgTypeID"}},{"kind":"Field","name":{"kind":"Name","value":"msgEventID"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"receiverType"}},{"kind":"Field","name":{"kind":"Name","value":"format"}},{"kind":"Field","name":{"kind":"Name","value":"subject"}},{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}},{"kind":"Field","name":{"kind":"Name","value":"cc"}},{"kind":"Field","name":{"kind":"Name","value":"bcc"}},{"kind":"Field","name":{"kind":"Name","value":"body"}},{"kind":"Field","name":{"kind":"Name","value":"tpl"}},{"kind":"Field","name":{"kind":"Name","value":"attachments"}}]}}]}}]} as unknown as DocumentNode<CreateMsgTemplateMutation, CreateMsgTemplateMutationVariables>;
 export const UpdateMsgTemplateDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateMsgTemplate"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateMsgTemplateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMsgTemplate"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"msgTypeID"}},{"kind":"Field","name":{"kind":"Name","value":"msgEventID"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"receiverType"}},{"kind":"Field","name":{"kind":"Name","value":"format"}},{"kind":"Field","name":{"kind":"Name","value":"subject"}},{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"to"}},{"kind":"Field","name":{"kind":"Name","value":"cc"}},{"kind":"Field","name":{"kind":"Name","value":"bcc"}},{"kind":"Field","name":{"kind":"Name","value":"body"}},{"kind":"Field","name":{"kind":"Name","value":"tpl"}},{"kind":"Field","name":{"kind":"Name","value":"attachments"}}]}}]}}]} as unknown as DocumentNode<UpdateMsgTemplateMutation, UpdateMsgTemplateMutationVariables>;
 export const DelMsgTemplateDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"delMsgTemplate"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMsgTemplate"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DelMsgTemplateMutation, DelMsgTemplateMutationVariables>;

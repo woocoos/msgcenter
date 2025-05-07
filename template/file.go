@@ -10,7 +10,7 @@ import (
 // EnableTplFile 启用模板文件
 // tpl 模板地址
 func (t *Template) EnableTplFile(tpl string, tenantID int) error {
-	if tpl == "" {
+	if tpl == "" || tenantID == 0 {
 		return nil
 	}
 	localFile, err := kosdk.DefaultFilePath(tenantID, tpl, t.BaseDir, t.DataDir)
@@ -58,7 +58,7 @@ func (t *Template) RemoveTplFile(tpl string, tenantID int) error {
 // EnableAttachFile 启用模板文件
 // tpl 模板地址
 func (t *Template) EnableAttachFile(attachments []string, tenantID int) error {
-	if len(attachments) == 0 {
+	if len(attachments) == 0 || tenantID == 0 {
 		return nil
 	}
 	for _, att := range attachments {

@@ -13,24 +13,26 @@ import { getOrgs } from '@knockout-js/api';
 import { Org } from '@knockout-js/api/ucenter';
 import Test from './components/test';
 import { delDataSource, saveDataSource } from '@/util';
-
+import {TemplateType} from '../event'
+import store from '@/store'
 
 export default () => {
   const { token } = useToken(),
     { t } = useTranslation(),
+    userState = store.getModelState('user'),
     [searchParams] = useSearchParams(),
     [msgEventInfo, setMsgEventInfo] = useState<MsgEvent>(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<MsgTemplate>[] = [
       // 有需要排序配置  sorter: true
-      {
-        title: t('org'), dataIndex: 'org', width: 120,
-        render: (text, record) => {
-          const org = orgs.find(item => item.id == record.tenantID)
-          return record.tenantID ? org?.name || record.tenantID : '';
-        },
-      },
+      // {
+      //   title: t('org'), dataIndex: 'org', width: 120,
+      //   render: (text, record) => {
+      //     const org = orgs.find(item => item.id == record.tenantID)
+      //     return record.tenantID ? org?.name || record.tenantID : '';
+      //   },
+      // },
       {
         title: t('name'), dataIndex: 'name', width: 120,
       },
@@ -173,13 +175,13 @@ export default () => {
   return (
     <PageContainer
       header={{
-        title: t('msg_template'),
+        title: searchParams.get('type')=== TemplateType.customer?t('temp_customer'):t('temp_default'),
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
             { title: t('msg_center') },
             { title: <Link to={'/msg/event'}>{t('msg_event')}</Link> },
-            { title: t('msg_template') },
+            { title: searchParams.get('type')=== TemplateType.customer?t('temp_customer'):t('temp_default') },
           ],
         },
       }}
@@ -224,7 +226,12 @@ export default () => {
           const msgEvent = msgEventInfo?.id ? msgEventInfo : await getMsgEvent();
           if (msgEvent?.id) {
             where.msgEventID = msgEvent.id
-            where.tenantID = params.org?.id
+            if (searchParams.get('type') == TemplateType.customer) {
+              where.tenantID = userState.tenantId
+            }else {
+              where.tenantIDIsNil = true
+            }
+
             where.nameContains = params.name;
             where.subjectContains = params.subject;
             where.receiverTypeIn = filter.modes as MsgTemplateReceiverType[]
@@ -236,7 +243,7 @@ export default () => {
             });
             if (result?.totalCount) {
               table.data = result.edges?.map(item => item?.node) as MsgTemplate[];
-              setOrgs(await getOrgs(table.data.map(item => item.tenantID)))
+              // setOrgs(await getOrgs(table.data.map(item => item.tenantID)))
               table.total = result.totalCount;
             }
           }
@@ -254,6 +261,7 @@ export default () => {
         <Create
           open={modal.open}
           title={modal.title}
+          type={searchParams.get('type')}
           id={modal.id}
           onClose={(isSuccess, newInfo) => {
             if (isSuccess && newInfo) {

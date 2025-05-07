@@ -1,0 +1,50 @@
+{{/* gotype: github.com/woocoos/msgcenter/template.Data */}}
+{{ define "0.SendMFAToUser.txt"}}
+{{- with .CommonAnnotations }}
+    <!DOCTYPE html>
+    <html lang="ch">
+    <head>
+        <meta charset="UTF-8"/>
+    </head>
+    <body>
+    <table width="660" border="0" cellspacing="0" cellpadding="0"
+           style="margin: 0 auto;font-family:'微软雅黑',Helvetica,Arial,sans-serif;font-size:14px ">
+        <tbody>
+        <tr>
+            <td align="center" style="padding: 30px 0;">
+                <img src="{{.tempLogo}}"
+                     style="vertical-align: top" border="0" width="40" height="40"/>
+                <span style="font-size: 22px;font-weight: bold;display: inline-block;height: 40px;line-height: 40px;margin-left: 4px">{{.tempVersion}}</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div style=" border-radius: 10px;box-shadow: 0 0 20px #c1c1c1;overflow: hidden;">
+                    <div style='height: 90px;overflow: hidden;background: {{.tempBarColor}};padding:0 20px;text-align: right;'>
+                        <div style="height:60px"></div>
+                        <span style="color: #fff;font-size: 14px;">专业投资交易工具</span>
+                    </div>
+                    <div style="border: 1px #f1f1f1 solid;border-radius: 0 0 10px 10px;padding: 30px 76px;font-size: 14px;color: #2c3038;background: #ffffff;line-height: 24px;">
+                        <div>尊敬的{{.displayName}}，您好！</div>
+                        <div style="height:20px"></div>
+                        <div>为加强账户的安全性，账户开启了双重验证。即：登录时须首先输入“登录密码”，然后输入“身份验证码”。</div>
+                        <div>“身份验证码”请使用以下密钥在身份验证器中获取：</div>
+                        <div style="height:20px"></div>
+                        <div>密钥：</div>
+                        <div>{{.mfaSecret}}</div>
+                        <div style="height:20px"></div>
+                        <div>请注意：此密钥是账号对应的唯一密钥，请勿将此密钥泄露给他人，以免账户蒙受风险。</div>
+                        <div style="height:20px"></div>
+                        <div>顺颂商祺！</div>
+                        <div style="height:20px"></div>
+                        <div style="color: #2c3038;">{{.tempSign}}</div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    </body>
+    </html>
+{{- end }}
+{{end}}

@@ -17,11 +17,13 @@ import (
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
+	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/template"
 	yaml "gopkg.in/yaml.v3"
 )
 
@@ -229,6 +231,30 @@ func (r *queryResolver) UserUnreadMsgInternals(ctx context.Context) (int, error)
 	return r.client.MsgInternalTo.Query().Where(
 		msginternalto.UserID(uid), msginternalto.TenantID(tid), msginternalto.ReadAtIsNil(),
 	).Count(ctx)
+}
+
+// MsgTemplateDefineByName is the resolver for the msgTemplateDefineByName field.
+func (r *queryResolver) MsgTemplateDefineByName(ctx context.Context, format msgtemplate.Format, body string) (string, error) {
+	data := template.Data{
+		CommonLabels: template.KV{
+			label.TenantLabel: "0",
+		},
+		CommonAnnotations: template.KV{},
+	}
+	r.coordinator.Template.AppendTempParams(&data)
+	tmpl := ""
+	var err error
+	if format == msgtemplate.FormatHTML {
+		tmpl, err = r.coordinator.Template.ExecuteHTMLString(body, data)
+	} else if format == msgtemplate.FormatTxt {
+		tmpl, err = r.coordinator.Template.ExecuteTextString(body, data)
+	} else {
+		return "", fmt.Errorf("unknown format: %s", format)
+	}
+	if err != nil {
+		return "", err
+	}
+	return tmpl, nil
 }
 
 // Matchers is the resolver for the matchers field.

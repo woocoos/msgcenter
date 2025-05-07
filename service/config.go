@@ -71,8 +71,17 @@ func findTemplate(ctx context.Context, basedir, attdir string, client *ent.Clien
 	event, err := client.MsgTemplate.Query().Where(msgtemplate.TenantID(tid), msgtemplate.StatusEQ(typex.SimpleStatusActive),
 		msgtemplate.HasEventWith(msgevent.Name(en), msgevent.StatusEQ(typex.SimpleStatusActive)), msgtemplate.ReceiverTypeEQ(rt),
 	).Only(ctx)
-	if err != nil {
+	if err != nil && !ent.IsNotFound(err) {
 		return nil, err
+	}
+	if ent.IsNotFound(err) {
+		// 通过租户找不到模板则取默认模板
+		event, err = client.MsgTemplate.Query().Where(msgtemplate.TenantIDIsNil(), msgtemplate.StatusEQ(typex.SimpleStatusActive),
+			msgtemplate.HasEventWith(msgevent.Name(en), msgevent.StatusEQ(typex.SimpleStatusActive)), msgtemplate.ReceiverTypeEQ(rt),
+		).Only(ctx)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if event == nil {
 		return nil, nil

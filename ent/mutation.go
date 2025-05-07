@@ -6903,10 +6903,24 @@ func (m *MsgTemplateMutation) AddedTenantID() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearTenantID clears the value of the "tenant_id" field.
+func (m *MsgTemplateMutation) ClearTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+	m.clearedFields[msgtemplate.FieldTenantID] = struct{}{}
+}
+
+// TenantIDCleared returns if the "tenant_id" field was cleared in this mutation.
+func (m *MsgTemplateMutation) TenantIDCleared() bool {
+	_, ok := m.clearedFields[msgtemplate.FieldTenantID]
+	return ok
+}
+
 // ResetTenantID resets all changes to the "tenant_id" field.
 func (m *MsgTemplateMutation) ResetTenantID() {
 	m.tenant_id = nil
 	m.addtenant_id = nil
+	delete(m.clearedFields, msgtemplate.FieldTenantID)
 }
 
 // SetName sets the "name" field.
@@ -7991,6 +8005,9 @@ func (m *MsgTemplateMutation) ClearedFields() []string {
 	if m.FieldCleared(msgtemplate.FieldUpdatedAt) {
 		fields = append(fields, msgtemplate.FieldUpdatedAt)
 	}
+	if m.FieldCleared(msgtemplate.FieldTenantID) {
+		fields = append(fields, msgtemplate.FieldTenantID)
+	}
 	if m.FieldCleared(msgtemplate.FieldStatus) {
 		fields = append(fields, msgtemplate.FieldStatus)
 	}
@@ -8040,6 +8057,9 @@ func (m *MsgTemplateMutation) ClearField(name string) error {
 		return nil
 	case msgtemplate.FieldUpdatedAt:
 		m.ClearUpdatedAt()
+		return nil
+	case msgtemplate.FieldTenantID:
+		m.ClearTenantID()
 		return nil
 	case msgtemplate.FieldStatus:
 		m.ClearStatus()

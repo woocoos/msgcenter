@@ -15,6 +15,7 @@ import (
 	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/msgtemplate"
 )
 
 // NewExecutableSchema creates an ExecutableSchema from the ResolverRoot interface.
@@ -385,6 +386,7 @@ type ComplexityRoot struct {
 		MsgEvents                             func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) int
 		MsgInternalTos                        func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) int
 		MsgInternals                          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalOrder, where *ent.MsgInternalWhereInput) int
+		MsgTemplateDefineByName               func(childComplexity int, format msgtemplate.Format, body string) int
 		MsgTemplates                          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) int
 		MsgTypeCategories                     func(childComplexity int, keyword *string, appID *int) int
 		MsgTypes                              func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTypeOrder, where *ent.MsgTypeWhereInput) int
@@ -2288,6 +2290,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.MsgInternals(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgInternalOrder), args["where"].(*ent.MsgInternalWhereInput)), true
 
+	case "Query.msgTemplateDefineByName":
+		if e.complexity.Query.MsgTemplateDefineByName == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgTemplateDefineByName_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgTemplateDefineByName(childComplexity, args["format"].(msgtemplate.Format), args["body"].(string)), true
+
 	case "Query.msgTemplates":
 		if e.complexity.Query.MsgTemplates == nil {
 			break
@@ -2887,7 +2901,7 @@ input CreateMsgTemplateInput {
   """
   组织ID
   """
-  tenantID: ID!
+  tenantID: ID
   """
   消息模板名称
   """
@@ -4312,7 +4326,7 @@ type MsgTemplate implements Node {
   """
   组织ID
   """
-  tenantID: ID!
+  tenantID: ID
   """
   消息模板名称
   """
@@ -4536,6 +4550,8 @@ input MsgTemplateWhereInput {
   tenantIDGTE: ID
   tenantIDLT: ID
   tenantIDLTE: ID
+  tenantIDIsNil: Boolean
+  tenantIDNotNil: Boolean
   """
   name field predicates
   """
@@ -5633,6 +5649,7 @@ input UpdateMsgTemplateInput {
   组织ID
   """
   tenantID: ID
+  clearTenantID: Boolean
   """
   消息模板名称
   """
@@ -5947,6 +5964,13 @@ extend type Query {
     userUnreadMsgInternalsFromMsgCategory(categories: [String!]!):[Int!]!
     """用户站内信总未读数"""
     userUnreadMsgInternals:Int!
+    """根据模板名称获取模板数据"""
+    msgTemplateDefineByName(
+        """消息类型:文本,网页,需要结合mod确定支持的格式"""
+        format: MsgTemplateFormat!
+        """消息模板的body数据"""
+        body:String!
+    ):String!
 }`, BuiltIn: false},
 	{Name: "../mutation.graphql", Input: `type Mutation {
     """ 创建消息类型 """

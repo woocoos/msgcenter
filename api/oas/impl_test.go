@@ -199,6 +199,41 @@ func (s *serviceSuite) TestPostAlertsWithTenant() {
 	s.Require().Equal(to, mail.To[0]["Address"])
 }
 
+// TestPostAlertsWithDefaultTpl tenant with custom template and attachment
+func (s *serviceSuite) TestPostAlertsWithDefaultTpl() {
+	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	// rand a string
+	to := fmt.Sprintf("%d@localhost", rand.Intn(10000000))
+	// route: default
+	req := PostableAlerts{
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					"receiver":           "email",
+					label.AlertNameLabel: "UserRemoteLogin",
+					label.TenantLabel:    "1",
+				},
+			},
+			Annotations: map[string]string{
+				"to":             to,
+				"displayName":    "test",
+				"principalName":  "woocoos",
+				"loginTime":      time.Now().Format("2006-01-02 15:04:05"),
+				"clientLocation": "内网地址",
+				"ipAddress":      "127.0.0.1",
+			},
+			EndsAt:   time.Now().Add(time.Hour),
+			StartsAt: time.Now(),
+		},
+	}
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
+	time.Sleep(time.Second * 10)
+	mail, err := s.maildev.GetLastEmail()
+	s.Require().NoError(err)
+	s.Require().NotNil(mail)
+	s.Require().Equal(to, mail.To[0]["Address"])
+}
+
 // TestPostAlertsWithTenant tenant with custom template and attachment
 func (s *serviceSuite) TestUserSubscribe() {
 	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())

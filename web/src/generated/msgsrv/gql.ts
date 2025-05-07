@@ -48,6 +48,7 @@ const documents = {
     "mutation delSilence($id:ID!){\n  deleteSilence(id:$id)\n}": types.DelSilenceDocument,
     "query msgTemplateList($first: Int,$orderBy:MsgTemplateOrder,$where:MsgTemplateWhereInput){\n  msgTemplates(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n        receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n      }\n    }\n  }\n}": types.MsgTemplateListDocument,
     "query MsgTemplateInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgTemplate{\n      id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n      receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n    }\n  }\n}": types.MsgTemplateInfoDocument,
+    "query msgTemplateDefineByName($format:MsgTemplateFormat!,$body:String!){\n  msgTemplateDefineByName(format: $format,body: $body)\n}": types.MsgTemplateDefineByNameDocument,
     "mutation createMsgTemplate($input: CreateMsgTemplateInput!){\n  createMsgTemplate(input: $input){\n    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n  }\n}": types.CreateMsgTemplateDocument,
     "mutation updateMsgTemplate($id:ID!,$input: UpdateMsgTemplateInput!){\n  updateMsgTemplate(id:$id,input: $input){\n    id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n    receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n  }\n}": types.UpdateMsgTemplateDocument,
     "mutation delMsgTemplate($id:ID!){\n  deleteMsgTemplate(id:$id)\n}": types.DelMsgTemplateDocument,
@@ -218,6 +219,10 @@ export function gql(source: "query msgTemplateList($first: Int,$orderBy:MsgTempl
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "query MsgTemplateInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgTemplate{\n      id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n      receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n    }\n  }\n}"): (typeof documents)["query MsgTemplateInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgTemplate{\n      id,name,comments,status,createdAt,msgTypeID,msgEventID,tenantID,\n      receiverType,format,subject,from,to,cc,bcc,body,tpl,attachments\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query msgTemplateDefineByName($format:MsgTemplateFormat!,$body:String!){\n  msgTemplateDefineByName(format: $format,body: $body)\n}"): (typeof documents)["query msgTemplateDefineByName($format:MsgTemplateFormat!,$body:String!){\n  msgTemplateDefineByName(format: $format,body: $body)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

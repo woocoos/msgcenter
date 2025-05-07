@@ -21,7 +21,7 @@ func NewSDK(cfg *conf.Configuration, db *ent.Client) (*api.SDK, error) {
 		return nil, err
 	}
 	// 获取所有tenantID
-	tenantIDs, err := db.MsgTemplate.Query().GroupBy(msgtemplate.FieldTenantID).Ints(context.Background())
+	tenantIDs, err := db.MsgTemplate.Query().Where(msgtemplate.TenantIDNotNil()).GroupBy(msgtemplate.FieldTenantID).Ints(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -46,9 +46,6 @@ func DefaultFilePath(tenantID int, url, baseDir, dataDir string) (string, error)
 		return "", err
 	}
 	ext := filepath.Ext(u.Path)
-	if err != nil {
-		return "", err
-	}
 	fileName := MD5String([]byte(url)) + ext
 	localPath := filepath.Join(baseDir, strconv.Itoa(tenantID), dataDir, fileName)
 	return localPath, nil

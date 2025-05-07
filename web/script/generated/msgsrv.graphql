@@ -85,7 +85,7 @@ input CreateMsgTemplateInput {
   """标题"""
   subject: String
   """组织ID"""
-  tenantID: ID!
+  tenantID: ID
   """收件人"""
   to: String
   """模板地址"""
@@ -1241,7 +1241,7 @@ type MsgTemplate implements Node {
   """标题"""
   subject: String
   """组织ID"""
-  tenantID: ID!
+  tenantID: ID
   """收件人"""
   to: String
   """模板地址"""
@@ -1454,10 +1454,12 @@ input MsgTemplateWhereInput {
   tenantIDGT: ID
   tenantIDGTE: ID
   tenantIDIn: [ID!]
+  tenantIDIsNil: Boolean
   tenantIDLT: ID
   tenantIDLTE: ID
   tenantIDNEQ: ID
   tenantIDNotIn: [ID!]
+  tenantIDNotNil: Boolean
   """to field predicates"""
   to: String
   toContains: String
@@ -2050,6 +2052,13 @@ type Query {
     """Filtering options for MsgInternals returned from the connection."""
     where: MsgInternalWhereInput
   ): MsgInternalConnection!
+  """根据模板名称获取模板数据"""
+  msgTemplateDefineByName(
+    """消息模板的body数据"""
+    body: String!
+    """消息类型:文本,网页,需要结合mod确定支持的格式"""
+    format: MsgTemplateFormat!
+  ): String!
   """ 消息模板列表 """
   msgTemplates(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: MsgTemplateOrder, where: MsgTemplateWhereInput): MsgTemplateConnection!
   """ 消息类型分类 """
@@ -2351,6 +2360,7 @@ input UpdateMsgTemplateInput {
   clearComments: Boolean
   clearFrom: Boolean
   clearSubject: Boolean
+  clearTenantID: Boolean
   clearTo: Boolean
   clearTpl: Boolean
   """备注"""
