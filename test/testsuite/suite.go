@@ -248,6 +248,31 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
 		SetBody(`{{ template "0.UserRemoteLogin.txt" . }}`).SaveX(ctx)
 
+	msgGroupBy := "MsgGroupBy"
+	groupWait := time.Second * 1
+	groupInterval := time.Second * 5
+	client.MsgEvent.Create().SetID(5).SetMsgTypeID(1).SetName(msgGroupBy).SetStatus(typex.SimpleStatusActive).
+		SetCreatedBy(1).SetModes("email,internal").
+		SetRoute(&profile.Route{
+			Name:     msgGroupBy,
+			Receiver: "email",
+			Matchers: label.Matchers{
+				{Name: "alertname", Value: msgGroupBy, Type: label.MatchEqual},
+			},
+			GroupBy: []label.LabelName{
+				"alertname",
+				"tenant",
+				"receiver",
+			},
+			GroupWait:     &groupWait,
+			GroupInterval: &groupInterval,
+		}).SaveX(ctx)
+	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(5).SetName(msgGroupBy).SetCreatedBy(1).
+		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatHTML).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
+		SetSubject(`消息分组发送`).SetCc(`{{ template "email.cc" . }}`).
+		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
+		SetBody(`{{ template "1.msggroupby.txt" . }}`).SaveX(ctx)
+
 	client.User.Create().SetID(1).SetDisplayName("admin").SetPrincipalName("admin").SaveX(ctx)
 	client.UserAddr.Create().SetID(1).SetUserID(1).SetEmail("admin@localhost").
 		SetMobile("13800138000").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)
