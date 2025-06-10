@@ -1,0 +1,10 @@
+{{/* gotype: github.com/woocoos/msgcenter/template.Data */}}
+
+{{ define "1.msggroupby.txt"}}
+    {{- with .CommonAnnotations }}
+        Dear {{.nickname}} !
+
+        这是一封中文测试GroupBy的邮件.
+    {{- end }}
+
+{{end}}
