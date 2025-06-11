@@ -15,6 +15,7 @@ import (
 	"github.com/woocoos/msgcenter/notify/webhook"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/service"
 	"github.com/woocoos/msgcenter/service/provider/mem"
 	"github.com/woocoos/msgcenter/test/maildev"
 	"github.com/woocoos/msgcenter/test/testsuite"
@@ -82,6 +83,9 @@ func TestServiceSuite(t *testing.T) {
 func (s *serviceSuite) SetupSuite() {
 	err := s.BaseSuite.Setup()
 	s.Require().NoError(err)
+	s.Require().NoError(s.initData())
+	s.AlertManager, err = service.NewAlertManager(s.App, service.WithClient(s.Client))
+	s.Require().NoError(err)
 
 	s.server, err = NewServer(s.App, s.AlertManager, nil)
 	s.Require().NoError(err)
@@ -107,6 +111,11 @@ func (s *serviceSuite) SetupSuite() {
 		s.AlertManager.Stop()
 		alerts.Stop(context.Background())
 	})
+}
+
+// 在此添加特殊的用例数据
+func (s *serviceSuite) initData() error {
+	return nil
 }
 
 // TearDownSuite tears down the test suite

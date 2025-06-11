@@ -2,7 +2,8 @@
 maildev:
 	# https://github.com/axllent/mailpit UI: http://0.0.0.0:8025
 	/usr/local/opt/mailpit/bin/mailpit
-
+	# windows put exe in $GOPATH/bin then run
+	# mailpit
 ent-new:
 	GOWORK=off go run -mod=mod entgo.io/ent/cmd/ent --target codegen/entgen/schema new $(NAME)
 

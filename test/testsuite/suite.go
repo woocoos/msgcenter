@@ -61,8 +61,6 @@ func (o *BaseSuite) Setup() error {
 	// alert
 	metrics.BuildGlobal()
 
-	o.AlertManager, err = service.NewAlertManager(o.App, service.WithClient(o.Client))
-	o.Require().NoError(err)
 	return nil
 }
 
@@ -249,8 +247,8 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetBody(`{{ template "0.UserRemoteLogin.txt" . }}`).SaveX(ctx)
 
 	msgGroupBy := "MsgGroupBy"
-	groupWait := time.Second * 1
-	groupInterval := time.Second * 5
+	groupWait := time.Second * 2
+	groupInterval := time.Minute * 5
 	client.MsgEvent.Create().SetID(5).SetMsgTypeID(1).SetName(msgGroupBy).SetStatus(typex.SimpleStatusActive).
 		SetCreatedBy(1).SetModes("email,internal").
 		SetRoute(&profile.Route{

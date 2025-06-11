@@ -111,7 +111,7 @@ func (n NlogCallback) LoadData() ([]*notify.LogEntry, error) {
 		}
 		logs = append(logs, &notify.LogEntry{
 			ID: d.ID,
-			Receiver: profile.ReceiverKey{
+			Receiver: &profile.ReceiverKey{
 				Name:        d.Receiver,
 				Integration: string(d.ReceiverType),
 				Index:       uint32(d.Idx),
@@ -184,6 +184,6 @@ func (n NlogCallback) CreateLog(ctx context.Context, r *profile.ReceiverKey, gke
 }
 
 // EvictLog evict log from nlog cache. the rule is expireAt > now.so need not do anything
-func (n NlogCallback) EvictLog(ctx context.Context, ids []int) {
+func (n NlogCallback) EvictLog(ctx context.Context, ids []string) {
 	return
 }
