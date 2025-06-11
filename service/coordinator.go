@@ -183,9 +183,11 @@ func (c *Coordinator) loadTemplates() error {
 		return err
 	}
 	for _, ptn := range c.profile.Templates {
-		// 如果根目录未创建则跳过
+		// 如果根目录未创建则创建
 		if _, err = os.Stat(c.Template.BaseDir); os.IsNotExist(err) {
-			continue
+			if err = os.MkdirAll(c.Template.BaseDir, os.ModePerm); err != nil {
+				return err
+			}
 		}
 		if _, err = c.Template.ParseGlob(c.cnf.Abs(ptn)); err != nil {
 			return err
