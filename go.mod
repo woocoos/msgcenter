@@ -25,7 +25,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/tsingsun/members v0.0.0-20231020035013-99de08e2d5dd
 	github.com/tsingsun/woocoo v0.5.8
-	github.com/tsingsun/woocoo/contrib/gql v0.1.0
+	github.com/tsingsun/woocoo/contrib/gql v0.1.1-0.20250607120014-cbe4428cb751
 	github.com/tsingsun/woocoo/contrib/telemetry v0.58.0
 	github.com/vektah/gqlparser/v2 v2.5.19
 	github.com/vmihailenco/msgpack/v5 v5.3.5

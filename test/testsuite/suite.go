@@ -220,15 +220,15 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetBody(`{{ template "dingtalk.content" . }}`).
 		SaveX(ctx)
 
-	userRemoteLogin := "UserRemoteLogin"
-	client.MsgEvent.Create().SetID(4).SetMsgTypeID(1).SetName(userRemoteLogin).SetStatus(typex.SimpleStatusActive).
+	defaultParams := "defaultparams"
+	client.MsgEvent.Create().SetID(4).SetMsgTypeID(1).SetName(defaultParams).SetStatus(typex.SimpleStatusActive).
 		SetCreatedBy(1).SetModes("email,internal").
 		SetRoute(&profile.Route{
-			Name:     userRemoteLogin,
+			Name:     defaultParams,
 			Receiver: "email",
 			Matchers: label.Matchers{
 				{Type: label.MatchEqual, Name: "app", Value: "1"},
-				{Name: "alertname", Value: userRemoteLogin, Type: label.MatchEqual},
+				{Name: "alertname", Value: defaultParams, Type: label.MatchEqual},
 			},
 			Routes: []*profile.Route{
 				{
@@ -240,11 +240,11 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 				},
 			},
 		}).SaveX(ctx)
-	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(4).SetName(userRemoteLogin).SetCreatedBy(1).
+	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(4).SetName(defaultParams).SetCreatedBy(1).
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatHTML).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
-		SetSubject(`异地登录提醒`).SetCc(`{{ template "email.cc" . }}`).
+		SetSubject(`模板参数测试`).SetCc(`{{ template "email.cc" . }}`).
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
-		SetBody(`{{ template "0.UserRemoteLogin.txt" . }}`).SaveX(ctx)
+		SetBody(`{{ template "1.defaultparams.txt" . }}`).SaveX(ctx)
 
 	msgGroupBy := "MsgGroupBy"
 	groupWait := time.Second * 2

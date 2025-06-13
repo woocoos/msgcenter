@@ -20,7 +20,6 @@ import (
 
 var (
 	//go:embed tpl/*.tmpl
-	//go:embed tpl/**/*.tmpl
 	templateDir embed.FS
 )
 
@@ -64,7 +63,7 @@ func New(options ...Option) (*Template, error) {
 	}
 	t.text.Funcs(DefaultFuncs)
 	t.html.Funcs(DefaultFuncs)
-	MustParse(t.ParseFS(templateDir, "tpl/*.tmpl", "tpl/**/*.tmpl"))
+	MustParse(t.ParseFS(templateDir, "tpl/*.tmpl"))
 	return t, nil
 }
 

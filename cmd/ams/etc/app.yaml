@@ -7,6 +7,9 @@ log:
     - level: info
   rotate:
 
+includeFiles:
+#  - "etc/local.yaml"
+
 jwt: &jwt
   signingMethod: "HS256"
   signingKey: "secret"

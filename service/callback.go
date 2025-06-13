@@ -134,8 +134,12 @@ func (n NlogCallback) updateAlerts(ctx context.Context, alerts []uint64, state a
 	for i, fp := range alerts {
 		fps[i] = label.Fingerprint(fp).String()
 	}
+	wState := alert.AlertNone
+	if state == alert.AlertResolved {
+		wState = alert.AlertFiring
+	}
 	ids, err = n.db.MsgAlert.Query().Where(msgalert.FingerprintIn(fps...),
-		msgalert.StateEQ(alert.AlertNone)).IDs(ctx)
+		msgalert.StateEQ(wState)).IDs(ctx)
 	if err != nil {
 		return
 
@@ -165,7 +169,7 @@ func (n NlogCallback) CreateLog(ctx context.Context, r *profile.ReceiverKey, gke
 		alertids = append(alertids, ids...)
 	}
 	if len(resolvedAlerts) > 0 {
-		ids, err := n.updateAlerts(tctx, firingAlerts, alert.AlertResolved)
+		ids, err := n.updateAlerts(tctx, resolvedAlerts, alert.AlertResolved)
 		if err != nil {
 			return 0, err
 		}

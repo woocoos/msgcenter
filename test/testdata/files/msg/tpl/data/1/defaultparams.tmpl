@@ -1,5 +1,6 @@
 {{/* gotype: github.com/woocoos/msgcenter/template.Data */}}
-{{ define "1.msggroupby.txt"}}
+{{ define "1.defaultparams.txt"}}
+    {{- with .CommonAnnotations }}
     <!DOCTYPE html>
     <html lang="ch">
     <head>
@@ -7,19 +8,15 @@
     </head>
     <body>
         <div style="border: 1px #f1f1f1 solid;border-radius: 0 0 10px 10px;padding: 30px 76px;font-size: 14px;color: #2c3038;background: #ffffff;line-height: 24px;">
-        {{- with .CommonAnnotations }}
             <div>尊敬的{{.nickname}}，您好！</div>
-        {{- end }}
             <div style="height:20px"></div>
-        {{- range .Alerts}}
-            {{- with .Annotations}}
-            <div>消息内容：{{.message}}</div>
-            {{- end}}
-        {{- end}}
+            <div>这是一封测试模板参数的邮件.</div>
             <div style="height:20px"></div>
-            <div>这是一封中文测试GroupBy的邮件.</div>
-            <div style="height:20px"></div>
+            <div>参数：{{.tempTitle}}</div>
+            <div>参数：{{.tempEmail}}</div>
+            <div>参数：{{.tempPhone}}</div>
         </div>
     </body>
     </html>
+    {{- end }}
 {{end}}

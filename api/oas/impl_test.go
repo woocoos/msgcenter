@@ -220,17 +220,14 @@ func (s *serviceSuite) TestPostAlertsWithDefaultTpl() {
 			Alert: &Alert{
 				Labels: map[string]string{
 					"receiver":           "email",
-					label.AlertNameLabel: "UserRemoteLogin",
+					label.AlertNameLabel: "defaultparams",
 					label.TenantLabel:    "1",
 				},
 			},
 			Annotations: map[string]string{
-				"to":             to,
-				"displayName":    "test",
-				"principalName":  "woocoos",
-				"loginTime":      time.Now().Format("2006-01-02 15:04:05"),
-				"clientLocation": "内网地址",
-				"ipAddress":      "127.0.0.1",
+				"to":        to,
+				"nickname":  "test",
+				"timestamp": strconv.Itoa(int(time.Now().Unix())),
 			},
 			EndsAt:   time.Now().Add(time.Hour),
 			StartsAt: time.Now(),
@@ -262,6 +259,7 @@ func (s *serviceSuite) TestPostAlertsWithGroupBy() {
 			Annotations: map[string]string{
 				"to":       to,
 				"nickname": "test1",
+				"message":  "msg1",
 			},
 		},
 	}
@@ -283,13 +281,51 @@ func (s *serviceSuite) TestPostAlertsWithGroupBy() {
 			},
 			Annotations: map[string]string{
 				"to":       to,
-				"nickname": "test2",
+				"nickname": "test1",
+				"message":  "msg2",
 			},
 		},
 	}
 	err = s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req2})
 	s.Require().NoError(err)
-	time.Sleep(time.Second * 20)
+	// sleep5秒，等待req1消息发送完成
+	time.Sleep(time.Second * 5)
+	fmt.Println("===start 3===")
+	req3 := PostableAlerts{
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					"receiver":           "email",
+					label.AlertNameLabel: "MsgGroupBy",
+					label.TenantLabel:    "1",
+					"timestamp":          strconv.Itoa(int(time.Now().Add(2 * time.Second).Unix())),
+				},
+			},
+			Annotations: map[string]string{
+				"to":       to,
+				"nickname": "test1",
+				"message":  "msg3",
+			},
+		},
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					"receiver":           "email",
+					label.AlertNameLabel: "MsgGroupBy",
+					label.TenantLabel:    "1",
+					"timestamp":          strconv.Itoa(int(time.Now().Add(3 * time.Second).Unix())),
+				},
+			},
+			Annotations: map[string]string{
+				"to":       to,
+				"nickname": "test1",
+				"message":  "msg4",
+			},
+		},
+	}
+	err = s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req3})
+	s.Require().NoError(err)
+	time.Sleep(time.Second * 30)
 	mail, err := s.maildev.GetLastEmail()
 	s.Require().NoError(err)
 	s.Require().NotNil(mail)
