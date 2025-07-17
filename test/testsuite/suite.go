@@ -10,8 +10,10 @@ import (
 	"github.com/tsingsun/woocoo/pkg/security"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/knockout-go/pkg/identity"
+	"github.com/woocoos/knockout-go/pkg/koapp"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
+	"github.com/woocoos/msgcenter/ent/useraddr"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -43,6 +45,8 @@ func (o *BaseSuite) Setup() error {
 	o.Cnf = o.App.AppConfiguration()
 	o.redis = initMiniRedis(o.Cnf)
 
+	koapp.BuildCacheComponents(o.Cnf)
+
 	if o.DSN == "" && o.DriverName == "" {
 		o.DriverName = "sqlite3"
 		o.DSN = "file:msgcenter?mode=memory&cache=shared&_fk=1"
@@ -57,8 +61,6 @@ func (o *BaseSuite) Setup() error {
 	// alert
 	metrics.BuildGlobal()
 
-	o.AlertManager, err = service.NewAlertManager(o.App, service.WithClient(o.Client))
-	o.Require().NoError(err)
 	return nil
 }
 
@@ -89,10 +91,9 @@ func initTestApp() *woocoo.App {
 func open(ctx context.Context, driverName, dsn string) (*ent.Client, error) {
 	client, err := ent.Open(driverName, dsn,
 		ent.Debug(), ent.AlternateSchema(ent.SchemaConfig{
-			User:         "portal",
-			OrgRoleUser:  "portal",
-			FileIdentity: "portal",
-			FileSource:   "portal",
+			User:        "portal",
+			OrgRoleUser: "portal",
+			UserAddr:    "portal",
 		}),
 	)
 	if err != nil {
@@ -147,8 +148,12 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
 		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
-		SetBody(`{{ template "1.alterpwd.txt" . }}`).SetAttachments([]string{"1/alterpwd.tmpl"}).
-		SetTpl("1/alterpwd.tmpl").SaveX(ctx)
+		SetBody(`{{ template "1.alterpwd.txt" . }}`).SaveX(ctx)
+	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(1).SetTenantID(2).SetName(alterPassWordEventName).SetCreatedBy(1).
+		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
+		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
+		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
+		SetBody(`{{ template "1.alterpwd.txt" . }}`).SaveX(ctx)
 
 	client.MsgChannel.Create().SetName("email").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
 		SetTenantID(1).SetReceiverType(profile.ReceiverEmail).
@@ -162,12 +167,6 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 				},
 			},
 		}).SaveX(ctx)
-	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(1).SetTenantID(1).SetName(alterPassWordEventName).SetCreatedBy(1).
-		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
-		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
-		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
-		SetBody(`{{ template "1.alterpwd.txt" . }}`).SetAttachments([]string{"1/alterpwd.tmpl"}).
-		SetTpl("1/alterpwd.tmpl").SaveX(ctx)
 
 	client.MsgType.Create().SetName("alert1").SetID(2).SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
 		SetAppID(1).SetCategory("订阅类型").SetCanSubs(true).SetCanCustom(true).SaveX(ctx)
@@ -201,8 +200,7 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
 		SetSubject(`订阅事件提醒`).SetCc(`{{ template "email.cc" . }}`).
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
-		SetBody(`{{ template "1.subevent.txt" . }}`).
-		SetTpl("1/subevent.tmpl").SaveX(ctx)
+		SetBody(`{{ template "1.subevent.txt" . }}`).SaveX(ctx)
 
 	client.MsgChannel.Create().SetName("webhook").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
 		SetTenantID(1).SetReceiverType(profile.ReceiverWebhook).
@@ -222,12 +220,66 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetBody(`{{ template "dingtalk.content" . }}`).
 		SaveX(ctx)
 
-	client.User.Create().SetID(1).SetDisplayName("admin").SetEmail("admin@localhost").
-		SetPrincipalName("admin").SetMobile("13800138000").SaveX(ctx)
-	client.User.Create().SetID(2).SetDisplayName("user").SetEmail("user@localhost").
-		SetPrincipalName("user").SetMobile("13800138001").SaveX(ctx)
-	client.User.Create().SetID(3).SetDisplayName("nobody").SetEmail("nobody@localhost").
-		SetPrincipalName("nobody").SetMobile("13800138002").SaveX(ctx)
+	defaultParams := "defaultparams"
+	client.MsgEvent.Create().SetID(4).SetMsgTypeID(1).SetName(defaultParams).SetStatus(typex.SimpleStatusActive).
+		SetCreatedBy(1).SetModes("email,internal").
+		SetRoute(&profile.Route{
+			Name:     defaultParams,
+			Receiver: "email",
+			Matchers: label.Matchers{
+				{Type: label.MatchEqual, Name: "app", Value: "1"},
+				{Name: "alertname", Value: defaultParams, Type: label.MatchEqual},
+			},
+			Routes: []*profile.Route{
+				{
+					Matchers: label.Matchers{
+						{Name: "receiver", Value: "email", Type: label.MatchRegexp},
+					},
+					Receiver: "email",
+					Continue: true,
+				},
+			},
+		}).SaveX(ctx)
+	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(4).SetName(defaultParams).SetCreatedBy(1).
+		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatHTML).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
+		SetSubject(`模板参数测试`).SetCc(`{{ template "email.cc" . }}`).
+		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
+		SetBody(`{{ template "1.defaultparams.txt" . }}`).SaveX(ctx)
+
+	msgGroupBy := "MsgGroupBy"
+	groupWait := time.Second * 2
+	groupInterval := time.Minute * 5
+	client.MsgEvent.Create().SetID(5).SetMsgTypeID(1).SetName(msgGroupBy).SetStatus(typex.SimpleStatusActive).
+		SetCreatedBy(1).SetModes("email,internal").
+		SetRoute(&profile.Route{
+			Name:     msgGroupBy,
+			Receiver: "email",
+			Matchers: label.Matchers{
+				{Name: "alertname", Value: msgGroupBy, Type: label.MatchEqual},
+			},
+			GroupBy: []label.LabelName{
+				"alertname",
+				"tenant",
+				"receiver",
+			},
+			GroupWait:     &groupWait,
+			GroupInterval: &groupInterval,
+		}).SaveX(ctx)
+	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(5).SetName(msgGroupBy).SetCreatedBy(1).
+		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatHTML).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
+		SetSubject(`消息分组发送`).SetCc(`{{ template "email.cc" . }}`).
+		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
+		SetBody(`{{ template "1.msggroupby.txt" . }}`).SaveX(ctx)
+
+	client.User.Create().SetID(1).SetDisplayName("admin").SetPrincipalName("admin").SaveX(ctx)
+	client.UserAddr.Create().SetID(1).SetUserID(1).SetEmail("admin@localhost").
+		SetMobile("13800138000").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)
+	client.User.Create().SetID(2).SetDisplayName("user").SetPrincipalName("user").SaveX(ctx)
+	client.UserAddr.Create().SetID(2).SetUserID(2).SetEmail("user@localhost").
+		SetMobile("13800138001").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)
+	client.User.Create().SetID(3).SetDisplayName("nobody").SetPrincipalName("nobody").SaveX(ctx)
+	client.UserAddr.Create().SetID(3).SetUserID(3).SetEmail("nobody@localhost").
+		SetMobile("13800138002").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)
 	client.OrgRoleUser.Create().SetID(1).SetOrgID(1).SetUserID(1).SetOrgRoleID(12).SetOrgUserID(3).
 		SaveX(ctx)
 	client.OrgRoleUser.Create().SetID(2).SetOrgID(1).SetUserID(2).SetOrgRoleID(13).SetOrgUserID(4).

@@ -91,6 +91,14 @@ func (mtc *MsgTemplateCreate) SetTenantID(i int) *MsgTemplateCreate {
 	return mtc
 }
 
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (mtc *MsgTemplateCreate) SetNillableTenantID(i *int) *MsgTemplateCreate {
+	if i != nil {
+		mtc.SetTenantID(*i)
+	}
+	return mtc
+}
+
 // SetName sets the "name" field.
 func (mtc *MsgTemplateCreate) SetName(s string) *MsgTemplateCreate {
 	mtc.mutation.SetName(s)
@@ -322,9 +330,6 @@ func (mtc *MsgTemplateCreate) check() error {
 	}
 	if _, ok := mtc.mutation.MsgEventID(); !ok {
 		return &ValidationError{Name: "msg_event_id", err: errors.New(`ent: missing required field "MsgTemplate.msg_event_id"`)}
-	}
-	if _, ok := mtc.mutation.TenantID(); !ok {
-		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "MsgTemplate.tenant_id"`)}
 	}
 	if _, ok := mtc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "MsgTemplate.name"`)}
@@ -625,6 +630,12 @@ func (u *MsgTemplateUpsert) UpdateTenantID() *MsgTemplateUpsert {
 // AddTenantID adds v to the "tenant_id" field.
 func (u *MsgTemplateUpsert) AddTenantID(v int) *MsgTemplateUpsert {
 	u.Add(msgtemplate.FieldTenantID, v)
+	return u
+}
+
+// ClearTenantID clears the value of the "tenant_id" field.
+func (u *MsgTemplateUpsert) ClearTenantID() *MsgTemplateUpsert {
+	u.SetNull(msgtemplate.FieldTenantID)
 	return u
 }
 
@@ -1000,6 +1011,13 @@ func (u *MsgTemplateUpsertOne) AddTenantID(v int) *MsgTemplateUpsertOne {
 func (u *MsgTemplateUpsertOne) UpdateTenantID() *MsgTemplateUpsertOne {
 	return u.Update(func(s *MsgTemplateUpsert) {
 		s.UpdateTenantID()
+	})
+}
+
+// ClearTenantID clears the value of the "tenant_id" field.
+func (u *MsgTemplateUpsertOne) ClearTenantID() *MsgTemplateUpsertOne {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.ClearTenantID()
 	})
 }
 
@@ -1577,6 +1595,13 @@ func (u *MsgTemplateUpsertBulk) AddTenantID(v int) *MsgTemplateUpsertBulk {
 func (u *MsgTemplateUpsertBulk) UpdateTenantID() *MsgTemplateUpsertBulk {
 	return u.Update(func(s *MsgTemplateUpsert) {
 		s.UpdateTenantID()
+	})
+}
+
+// ClearTenantID clears the value of the "tenant_id" field.
+func (u *MsgTemplateUpsertBulk) ClearTenantID() *MsgTemplateUpsertBulk {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.ClearTenantID()
 	})
 }
 

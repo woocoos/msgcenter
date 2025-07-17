@@ -7,6 +7,9 @@ log:
     - level: info
   rotate:
 
+includeFiles:
+#  - "etc/local.yaml"
+
 jwt: &jwt
   signingMethod: "HS256"
   signingKey: "secret"
@@ -43,7 +46,7 @@ web:
 
 ui:
   staticDir: "../../web/build"
-  enabled: true
+  enabled: false
   server:
     addr: :10073
   engine:
@@ -89,6 +92,7 @@ alertManager:
     baseDir: "files" # 相对于程序运行目录
     dataDir: "tpl" # 模板正式路径
     attachmentDir: "att" # 附件存储路径
+    tempParamsFile: etc/tempparams.yaml # 全局模板参数文件
 
 prometheus:
   server:

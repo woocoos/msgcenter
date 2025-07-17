@@ -15,6 +15,7 @@ import (
 	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/msgtemplate"
 )
 
 // NewExecutableSchema creates an ExecutableSchema from the ResolverRoot interface.
@@ -327,6 +328,7 @@ type ComplexityRoot struct {
 		EnableMsgTemplate             func(childComplexity int, id int) int
 		MarkMsgInternalToDeleted      func(childComplexity int, ids []int) int
 		MarkMsgInternalToReadOrUnRead func(childComplexity int, ids []int, read bool) int
+		RefreshTemplateParams         func(childComplexity int) int
 		TestSendEmailTpl              func(childComplexity int, tplID int, email string, labels map[string]string, annotations map[string]string) int
 		TestSendMessageTpl            func(childComplexity int, tplID int, userID int, labels map[string]string, annotations map[string]string) int
 		UpdateMsgChannel              func(childComplexity int, id int, input ent.UpdateMsgChannelInput) int
@@ -384,6 +386,7 @@ type ComplexityRoot struct {
 		MsgEvents                             func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) int
 		MsgInternalTos                        func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) int
 		MsgInternals                          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalOrder, where *ent.MsgInternalWhereInput) int
+		MsgTemplateDefineByName               func(childComplexity int, format msgtemplate.Format, body string) int
 		MsgTemplates                          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) int
 		MsgTypeCategories                     func(childComplexity int, keyword *string, appID *int) int
 		MsgTypes                              func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTypeOrder, where *ent.MsgTypeWhereInput) int
@@ -447,9 +450,7 @@ type ComplexityRoot struct {
 
 	User struct {
 		DisplayName   func(childComplexity int) int
-		Email         func(childComplexity int) int
 		ID            func(childComplexity int) int
-		Mobile        func(childComplexity int) int
 		PrincipalName func(childComplexity int) int
 		Silences      func(childComplexity int) int
 	}
@@ -1949,6 +1950,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.MarkMsgInternalToReadOrUnRead(childComplexity, args["ids"].([]int), args["read"].(bool)), true
 
+	case "Mutation.refreshTemplateParams":
+		if e.complexity.Mutation.RefreshTemplateParams == nil {
+			break
+		}
+
+		return e.complexity.Mutation.RefreshTemplateParams(childComplexity), true
+
 	case "Mutation.testSendEmailTpl":
 		if e.complexity.Mutation.TestSendEmailTpl == nil {
 			break
@@ -2281,6 +2289,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.MsgInternals(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgInternalOrder), args["where"].(*ent.MsgInternalWhereInput)), true
+
+	case "Query.msgTemplateDefineByName":
+		if e.complexity.Query.MsgTemplateDefineByName == nil {
+			break
+		}
+
+		args, err := ec.field_Query_msgTemplateDefineByName_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.MsgTemplateDefineByName(childComplexity, args["format"].(msgtemplate.Format), args["body"].(string)), true
 
 	case "Query.msgTemplates":
 		if e.complexity.Query.MsgTemplates == nil {
@@ -2616,26 +2636,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.DisplayName(childComplexity), true
 
-	case "User.email":
-		if e.complexity.User.Email == nil {
-			break
-		}
-
-		return e.complexity.User.Email(childComplexity), true
-
 	case "User.id":
 		if e.complexity.User.ID == nil {
 			break
 		}
 
 		return e.complexity.User.ID(childComplexity), true
-
-	case "User.mobile":
-		if e.complexity.User.Mobile == nil {
-			break
-		}
-
-		return e.complexity.User.Mobile(childComplexity), true
 
 	case "User.principalName":
 		if e.complexity.User.PrincipalName == nil {
@@ -2656,8 +2662,8 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 }
 
 func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
-	rc := graphql.GetOperationContext(ctx)
-	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
+	opCtx := graphql.GetOperationContext(ctx)
+	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateMsgChannelInput,
 		ec.unmarshalInputCreateMsgEventInput,
@@ -2701,7 +2707,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	)
 	first := true
 
-	switch rc.Operation.Operation {
+	switch opCtx.Operation.Operation {
 	case ast.Query:
 		return func(ctx context.Context) *graphql.Response {
 			var response graphql.Response
@@ -2709,7 +2715,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			if first {
 				first = false
 				ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-				data = ec._Query(ctx, rc.Operation.SelectionSet)
+				data = ec._Query(ctx, opCtx.Operation.SelectionSet)
 			} else {
 				if atomic.LoadInt32(&ec.pendingDeferred) > 0 {
 					result := <-ec.deferredResults
@@ -2739,7 +2745,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			}
 			first = false
 			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-			data := ec._Mutation(ctx, rc.Operation.SelectionSet)
+			data := ec._Mutation(ctx, opCtx.Operation.SelectionSet)
 			var buf bytes.Buffer
 			data.MarshalGQL(&buf)
 
@@ -2748,7 +2754,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			}
 		}
 	case ast.Subscription:
-		next := ec._Subscription(ctx, rc.Operation.SelectionSet)
+		next := ec._Subscription(ctx, opCtx.Operation.SelectionSet)
 
 		var buf bytes.Buffer
 		return func(ctx context.Context) *graphql.Response {
@@ -2895,7 +2901,7 @@ input CreateMsgTemplateInput {
   """
   组织ID
   """
-  tenantID: ID!
+  tenantID: ID
   """
   消息模板名称
   """
@@ -2985,6 +2991,9 @@ CreateSilenceInput is used for create Silence object.
 Input was generated by ent.
 """
 input CreateSilenceInput {
+  """
+  租户ID
+  """
   tenantID: Int!
   """
   应用ID
@@ -3015,9 +3024,12 @@ scalar Cursor
 """
 An object with a Global ID,for using in Noder interface.
 """
-scalar GID
+scalar GID @goModel(model: "github.com/99designs/gqlgen/graphql.ID")
 type MsgAlert implements Node {
   id: ID!
+  """
+  租户ID
+  """
   tenantID: Int!
   """
   标签
@@ -3738,11 +3750,14 @@ input MsgEventWhereInput {
 }
 type MsgInternal implements Node {
   id: ID!
-  tenantID: Int!
   createdBy: Int!
   createdAt: Time!
   updatedBy: Int
   updatedAt: Time
+  """
+  租户ID
+  """
+  tenantID: Int!
   """
   消息类型分类
   """
@@ -3816,6 +3831,9 @@ enum MsgInternalOrderField {
 }
 type MsgInternalTo implements Node {
   id: ID!
+  """
+  租户ID
+  """
   tenantID: Int!
   """
   站内信ID
@@ -3993,17 +4011,6 @@ input MsgInternalWhereInput {
   idLT: ID
   idLTE: ID
   """
-  tenant_id field predicates
-  """
-  tenantID: Int
-  tenantIDNEQ: Int
-  tenantIDIn: [Int!]
-  tenantIDNotIn: [Int!]
-  tenantIDGT: Int
-  tenantIDGTE: Int
-  tenantIDLT: Int
-  tenantIDLTE: Int
-  """
   created_by field predicates
   """
   createdBy: Int
@@ -4051,6 +4058,17 @@ input MsgInternalWhereInput {
   updatedAtLTE: Time
   updatedAtIsNil: Boolean
   updatedAtNotNil: Boolean
+  """
+  tenant_id field predicates
+  """
+  tenantID: Int
+  tenantIDNEQ: Int
+  tenantIDIn: [Int!]
+  tenantIDNotIn: [Int!]
+  tenantIDGT: Int
+  tenantIDGTE: Int
+  tenantIDLT: Int
+  tenantIDLTE: Int
   """
   category field predicates
   """
@@ -4308,7 +4326,7 @@ type MsgTemplate implements Node {
   """
   组织ID
   """
-  tenantID: ID!
+  tenantID: ID
   """
   消息模板名称
   """
@@ -4532,6 +4550,8 @@ input MsgTemplateWhereInput {
   tenantIDGTE: ID
   tenantIDLT: ID
   tenantIDLTE: ID
+  tenantIDIsNil: Boolean
+  tenantIDNotNil: Boolean
   """
   name field predicates
   """
@@ -4916,6 +4936,9 @@ input MsgTypeWhereInput {
 }
 type Nlog implements Node {
   id: ID!
+  """
+  租户ID
+  """
   tenantID: Int!
   """
   分组键
@@ -5343,6 +5366,9 @@ type Silence implements Node {
   createdAt: Time!
   updatedBy: Int
   updatedAt: Time
+  """
+  租户ID
+  """
   tenantID: Int!
   """
   应用ID
@@ -5623,6 +5649,7 @@ input UpdateMsgTemplateInput {
   组织ID
   """
   tenantID: ID
+  clearTenantID: Boolean
   """
   消息模板名称
   """
@@ -5764,14 +5791,6 @@ type User implements Node {
   显示名
   """
   displayName: String!
-  """
-  邮箱
-  """
-  email: String
-  """
-  手机
-  """
-  mobile: String
   """
   静默
   """
@@ -5945,6 +5964,13 @@ extend type Query {
     userUnreadMsgInternalsFromMsgCategory(categories: [String!]!):[Int!]!
     """用户站内信总未读数"""
     userUnreadMsgInternals:Int!
+    """根据模板名称获取模板数据"""
+    msgTemplateDefineByName(
+        """消息类型:文本,网页,需要结合mod确定支持的格式"""
+        format: MsgTemplateFormat!
+        """消息模板的body数据"""
+        body:String!
+    ):String!
 }`, BuiltIn: false},
 	{Name: "../mutation.graphql", Input: `type Mutation {
     """ 创建消息类型 """
@@ -6001,6 +6027,8 @@ extend type Query {
     testSendEmailTpl(tplID: ID!, email: String!, labels: MapString, annotations: MapString): Boolean!
     """ 测试站内信模板 """
     testSendMessageTpl(tplID: ID!, userID: ID!, labels: MapString, annotations: MapString): Boolean!
+    """ 刷新消息模板参数 """
+    refreshTemplateParams: Boolean!
 }
 
 input RouteInput  {

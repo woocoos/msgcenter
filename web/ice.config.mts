@@ -16,7 +16,6 @@ const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '',
   ICE_PROXY_MSGSRV = process.env.ICE_PROXY_MSGSRV ?? '',
   ICE_API_ADMINX_PREFIX = process.env.ICE_API_ADMINX_PREFIX ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
-  ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '',
   ICE_API_MSGSRV_PREFIX = process.env.ICE_API_MSGSRV_PREFIX ?? '',
   minify = process.env.NODE_ENV === 'production' ? 'swc' : false;
 
@@ -24,10 +23,10 @@ export default defineConfig(() => ({
   ssg: false,
   ssr: false,
   minify,
-  codeSplitting: 'page',
+  codeSplitting: false,//'page-vendors',
   devPublicPath: ICE_DEV_PUBLIC_PATH,
   publicPath: ICE_BUILD_PUBLIC_PATH,
-  compileDependencies: NODE_ENV === 'development' ? [/@urql\/core/, /@smithy\/*/] : true,
+  compileDependencies: NODE_ENV === 'development' ? [] : true,
   hash: NODE_ENV === 'development' ? false : true,
   routes: {
     ignoreFiles: [
@@ -35,13 +34,14 @@ export default defineConfig(() => ({
     ],
   },
   externals: {
-    'react': 'React',
-    'react-dom': 'ReactDOM',
-    'react-i18next': 'ReactI18next',
-    'i18next': 'i18next',
-    'js-yaml': 'jsyaml',
-    'antd': 'antd',
-    '@ant-design/pro-components': 'ProComponents',
+    // 先禁用cdn处理 由于子应用加载会找不到react问题
+    // 'react': 'React',
+    // 'react-dom': 'ReactDOM',
+    // 'react-i18next': 'ReactI18next',
+    // 'i18next': 'i18next',
+    // 'js-yaml': 'jsyaml',
+    // 'antd': 'antd',
+    // '@ant-design/pro-components': 'ProComponents',
   },
   plugins: [
     icestark({ type: 'child' }),
@@ -55,25 +55,20 @@ export default defineConfig(() => ({
     auth(),
   ],
   proxy: {
-    [ICE_API_MSGSRV_PREFIX]: {
+    [`${ICE_API_MSGSRV_PREFIX}/`]: {
       target: ICE_PROXY_MSGSRV,
       changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_MSGSRV_PREFIX}`]: '' },
+      pathRewrite: { [`^${ICE_API_MSGSRV_PREFIX}/`]: '/' },
     },
-    [ICE_API_ADMINX_PREFIX]: {
+    [`${ICE_API_ADMINX_PREFIX}/`]: {
       target: ICE_PROXY_ADMINX,
       changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_ADMINX_PREFIX}`]: '' },
+      pathRewrite: { [`^${ICE_API_ADMINX_PREFIX}/`]: '/' },
     },
-    [ICE_API_AUTH_PREFIX]: {
+    [`${ICE_API_AUTH_PREFIX}/`]: {
       target: ICE_PROXY_AUTH,
       changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_AUTH_PREFIX}`]: '' },
-    },
-    [ICE_API_FILES_PREFIX]: {
-      target: ICE_PROXY_AUTH,
-      changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_FILES_PREFIX}`]: '' },
+      pathRewrite: { [`^${ICE_API_AUTH_PREFIX}/`]: '/' },
     },
   },
 }));

@@ -60,6 +60,7 @@ type QueryResolver interface {
 	UserSubMsgCategory(ctx context.Context) ([]string, error)
 	UserUnreadMsgInternalsFromMsgCategory(ctx context.Context, categories []string) ([]int, error)
 	UserUnreadMsgInternals(ctx context.Context) (int, error)
+	MsgTemplateDefineByName(ctx context.Context, format msgtemplate.Format, body string) (string, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -69,700 +70,1949 @@ type QueryResolver interface {
 func (ec *executionContext) field_MsgAlert_nlog_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_MsgAlert_nlog_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_MsgAlert_nlog_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_MsgAlert_nlog_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg3, err := ec.field_MsgAlert_nlog_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["last"] = arg3
-	var arg4 *ent.NlogOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalONlogOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐNlogOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg4, err := ec.field_MsgAlert_nlog_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["orderBy"] = arg4
-	var arg5 *ent.NlogWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalONlogWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐNlogWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg5, err := ec.field_MsgAlert_nlog_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["where"] = arg5
 	return args, nil
+}
+func (ec *executionContext) field_MsgAlert_nlog_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["after"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_MsgAlert_nlog_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["first"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_MsgAlert_nlog_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["before"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_MsgAlert_nlog_argsLast(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["last"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_MsgAlert_nlog_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.NlogOrder, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["orderBy"]
+	if !ok {
+		var zeroVal *ent.NlogOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalONlogOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐNlogOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.NlogOrder
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_MsgAlert_nlog_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.NlogWhereInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["where"]
+	if !ok {
+		var zeroVal *ent.NlogWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalONlogWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐNlogWhereInput(ctx, tmp)
+	}
+
+	var zeroVal *ent.NlogWhereInput
+	return zeroVal, nil
 }
 
 func (ec *executionContext) field_MsgEvent_routeStr_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.RouteStrType
-	if tmp, ok := rawArgs["type"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-		arg0, err = ec.unmarshalNRouteStrType2githubᚗcomᚋwoocoosᚋmsgcenterᚋapiᚋgraphqlᚋmodelᚐRouteStrType(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_MsgEvent_routeStr_argsType(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["type"] = arg0
 	return args, nil
+}
+func (ec *executionContext) field_MsgEvent_routeStr_argsType(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (model.RouteStrType, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["type"]
+	if !ok {
+		var zeroVal model.RouteStrType
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+	if tmp, ok := rawArgs["type"]; ok {
+		return ec.unmarshalNRouteStrType2githubᚗcomᚋwoocoosᚋmsgcenterᚋapiᚋgraphqlᚋmodelᚐRouteStrType(ctx, tmp)
+	}
+
+	var zeroVal model.RouteStrType
+	return zeroVal, nil
 }
 
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["name"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_Query___type_argsName(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["name"] = arg0
 	return args, nil
+}
+func (ec *executionContext) field_Query___type_argsName(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (string, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["name"]
+	if !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+	if tmp, ok := rawArgs["name"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
 }
 
 func (ec *executionContext) field_Query_msgAlerts_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_Query_msgAlerts_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Query_msgAlerts_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_Query_msgAlerts_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg3, err := ec.field_Query_msgAlerts_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["last"] = arg3
-	var arg4 *ent.MsgAlertOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOMsgAlertOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgAlertOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg4, err := ec.field_Query_msgAlerts_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["orderBy"] = arg4
-	var arg5 *ent.MsgAlertWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOMsgAlertWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgAlertWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg5, err := ec.field_Query_msgAlerts_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["where"] = arg5
 	return args, nil
+}
+func (ec *executionContext) field_Query_msgAlerts_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["after"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgAlerts_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["first"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgAlerts_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["before"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgAlerts_argsLast(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["last"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgAlerts_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgAlertOrder, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["orderBy"]
+	if !ok {
+		var zeroVal *ent.MsgAlertOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOMsgAlertOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgAlertOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgAlertOrder
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgAlerts_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgAlertWhereInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["where"]
+	if !ok {
+		var zeroVal *ent.MsgAlertWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalOMsgAlertWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgAlertWhereInput(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgAlertWhereInput
+	return zeroVal, nil
 }
 
 func (ec *executionContext) field_Query_msgChannels_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_Query_msgChannels_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Query_msgChannels_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_Query_msgChannels_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg3, err := ec.field_Query_msgChannels_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["last"] = arg3
-	var arg4 *ent.MsgChannelOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOMsgChannelOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannelOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg4, err := ec.field_Query_msgChannels_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["orderBy"] = arg4
-	var arg5 *ent.MsgChannelWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOMsgChannelWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannelWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg5, err := ec.field_Query_msgChannels_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["where"] = arg5
 	return args, nil
+}
+func (ec *executionContext) field_Query_msgChannels_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["after"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgChannels_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["first"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgChannels_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["before"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgChannels_argsLast(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["last"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgChannels_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgChannelOrder, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["orderBy"]
+	if !ok {
+		var zeroVal *ent.MsgChannelOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOMsgChannelOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannelOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgChannelOrder
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgChannels_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgChannelWhereInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["where"]
+	if !ok {
+		var zeroVal *ent.MsgChannelWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalOMsgChannelWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgChannelWhereInput(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgChannelWhereInput
+	return zeroVal, nil
 }
 
 func (ec *executionContext) field_Query_msgEvents_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_Query_msgEvents_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Query_msgEvents_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_Query_msgEvents_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg3, err := ec.field_Query_msgEvents_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["last"] = arg3
-	var arg4 *ent.MsgEventOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOMsgEventOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg4, err := ec.field_Query_msgEvents_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["orderBy"] = arg4
-	var arg5 *ent.MsgEventWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOMsgEventWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg5, err := ec.field_Query_msgEvents_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["where"] = arg5
 	return args, nil
+}
+func (ec *executionContext) field_Query_msgEvents_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["after"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgEvents_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["first"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgEvents_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["before"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgEvents_argsLast(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["last"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgEvents_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgEventOrder, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["orderBy"]
+	if !ok {
+		var zeroVal *ent.MsgEventOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOMsgEventOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgEventOrder
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgEvents_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgEventWhereInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["where"]
+	if !ok {
+		var zeroVal *ent.MsgEventWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalOMsgEventWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventWhereInput(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgEventWhereInput
+	return zeroVal, nil
 }
 
 func (ec *executionContext) field_Query_msgInternalTos_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_Query_msgInternalTos_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Query_msgInternalTos_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_Query_msgInternalTos_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg3, err := ec.field_Query_msgInternalTos_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["last"] = arg3
-	var arg4 *ent.MsgInternalToOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOMsgInternalToOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalToOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg4, err := ec.field_Query_msgInternalTos_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["orderBy"] = arg4
-	var arg5 *ent.MsgInternalToWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOMsgInternalToWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalToWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg5, err := ec.field_Query_msgInternalTos_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["where"] = arg5
 	return args, nil
+}
+func (ec *executionContext) field_Query_msgInternalTos_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["after"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgInternalTos_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["first"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgInternalTos_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["before"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgInternalTos_argsLast(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["last"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgInternalTos_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgInternalToOrder, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["orderBy"]
+	if !ok {
+		var zeroVal *ent.MsgInternalToOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOMsgInternalToOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalToOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgInternalToOrder
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgInternalTos_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgInternalToWhereInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["where"]
+	if !ok {
+		var zeroVal *ent.MsgInternalToWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalOMsgInternalToWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalToWhereInput(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgInternalToWhereInput
+	return zeroVal, nil
 }
 
 func (ec *executionContext) field_Query_msgInternals_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_Query_msgInternals_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Query_msgInternals_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_Query_msgInternals_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg3, err := ec.field_Query_msgInternals_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["last"] = arg3
-	var arg4 *ent.MsgInternalOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOMsgInternalOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg4, err := ec.field_Query_msgInternals_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["orderBy"] = arg4
-	var arg5 *ent.MsgInternalWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOMsgInternalWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg5, err := ec.field_Query_msgInternals_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["where"] = arg5
 	return args, nil
+}
+func (ec *executionContext) field_Query_msgInternals_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["after"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgInternals_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["first"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgInternals_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["before"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgInternals_argsLast(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["last"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgInternals_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgInternalOrder, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["orderBy"]
+	if !ok {
+		var zeroVal *ent.MsgInternalOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOMsgInternalOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgInternalOrder
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgInternals_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgInternalWhereInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["where"]
+	if !ok {
+		var zeroVal *ent.MsgInternalWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalOMsgInternalWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalWhereInput(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgInternalWhereInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgTemplateDefineByName_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	arg0, err := ec.field_Query_msgTemplateDefineByName_argsFormat(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["format"] = arg0
+	arg1, err := ec.field_Query_msgTemplateDefineByName_argsBody(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["body"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Query_msgTemplateDefineByName_argsFormat(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (msgtemplate.Format, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["format"]
+	if !ok {
+		var zeroVal msgtemplate.Format
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("format"))
+	if tmp, ok := rawArgs["format"]; ok {
+		return ec.unmarshalNMsgTemplateFormat2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚋmsgtemplateᚐFormat(ctx, tmp)
+	}
+
+	var zeroVal msgtemplate.Format
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgTemplateDefineByName_argsBody(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (string, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["body"]
+	if !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("body"))
+	if tmp, ok := rawArgs["body"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
 }
 
 func (ec *executionContext) field_Query_msgTemplates_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_Query_msgTemplates_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Query_msgTemplates_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_Query_msgTemplates_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg3, err := ec.field_Query_msgTemplates_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["last"] = arg3
-	var arg4 *ent.MsgTemplateOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOMsgTemplateOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplateOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg4, err := ec.field_Query_msgTemplates_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["orderBy"] = arg4
-	var arg5 *ent.MsgTemplateWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOMsgTemplateWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplateWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg5, err := ec.field_Query_msgTemplates_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["where"] = arg5
 	return args, nil
+}
+func (ec *executionContext) field_Query_msgTemplates_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["after"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgTemplates_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["first"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgTemplates_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["before"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgTemplates_argsLast(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["last"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgTemplates_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgTemplateOrder, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["orderBy"]
+	if !ok {
+		var zeroVal *ent.MsgTemplateOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOMsgTemplateOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplateOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgTemplateOrder
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgTemplates_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgTemplateWhereInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["where"]
+	if !ok {
+		var zeroVal *ent.MsgTemplateWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalOMsgTemplateWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTemplateWhereInput(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgTemplateWhereInput
+	return zeroVal, nil
 }
 
 func (ec *executionContext) field_Query_msgTypeCategories_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["keyword"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("keyword"))
-		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_Query_msgTypeCategories_argsKeyword(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["keyword"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["appID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("appID"))
-		arg1, err = ec.unmarshalOID2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Query_msgTypeCategories_argsAppID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["appID"] = arg1
 	return args, nil
+}
+func (ec *executionContext) field_Query_msgTypeCategories_argsKeyword(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*string, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["keyword"]
+	if !ok {
+		var zeroVal *string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("keyword"))
+	if tmp, ok := rawArgs["keyword"]; ok {
+		return ec.unmarshalOString2ᚖstring(ctx, tmp)
+	}
+
+	var zeroVal *string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgTypeCategories_argsAppID(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["appID"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("appID"))
+	if tmp, ok := rawArgs["appID"]; ok {
+		return ec.unmarshalOID2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
 }
 
 func (ec *executionContext) field_Query_msgTypes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_Query_msgTypes_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Query_msgTypes_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_Query_msgTypes_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg3, err := ec.field_Query_msgTypes_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["last"] = arg3
-	var arg4 *ent.MsgTypeOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOMsgTypeOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTypeOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg4, err := ec.field_Query_msgTypes_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["orderBy"] = arg4
-	var arg5 *ent.MsgTypeWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOMsgTypeWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTypeWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg5, err := ec.field_Query_msgTypes_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["where"] = arg5
 	return args, nil
+}
+func (ec *executionContext) field_Query_msgTypes_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["after"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgTypes_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["first"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgTypes_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["before"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgTypes_argsLast(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["last"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgTypes_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgTypeOrder, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["orderBy"]
+	if !ok {
+		var zeroVal *ent.MsgTypeOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOMsgTypeOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTypeOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgTypeOrder
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgTypes_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgTypeWhereInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["where"]
+	if !ok {
+		var zeroVal *ent.MsgTypeWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalOMsgTypeWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgTypeWhereInput(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgTypeWhereInput
+	return zeroVal, nil
 }
 
 func (ec *executionContext) field_Query_node_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNGID2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_Query_node_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["id"] = arg0
 	return args, nil
+}
+func (ec *executionContext) field_Query_node_argsID(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (string, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["id"]
+	if !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNGID2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
 }
 
 func (ec *executionContext) field_Query_nodes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 []string
-	if tmp, ok := rawArgs["ids"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ids"))
-		arg0, err = ec.unmarshalNGID2ᚕstringᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_Query_nodes_argsIds(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["ids"] = arg0
 	return args, nil
+}
+func (ec *executionContext) field_Query_nodes_argsIds(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) ([]string, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["ids"]
+	if !ok {
+		var zeroVal []string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("ids"))
+	if tmp, ok := rawArgs["ids"]; ok {
+		return ec.unmarshalNGID2ᚕstringᚄ(ctx, tmp)
+	}
+
+	var zeroVal []string
+	return zeroVal, nil
 }
 
 func (ec *executionContext) field_Query_silences_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_Query_silences_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Query_silences_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_Query_silences_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg3, err := ec.field_Query_silences_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["last"] = arg3
-	var arg4 *ent.SilenceOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOSilenceOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilenceOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg4, err := ec.field_Query_silences_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["orderBy"] = arg4
-	var arg5 *ent.SilenceWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOSilenceWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilenceWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg5, err := ec.field_Query_silences_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["where"] = arg5
 	return args, nil
+}
+func (ec *executionContext) field_Query_silences_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["after"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_silences_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["first"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_silences_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["before"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_silences_argsLast(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["last"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_silences_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.SilenceOrder, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["orderBy"]
+	if !ok {
+		var zeroVal *ent.SilenceOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOSilenceOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilenceOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.SilenceOrder
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_silences_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.SilenceWhereInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["where"]
+	if !ok {
+		var zeroVal *ent.SilenceWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalOSilenceWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilenceWhereInput(ctx, tmp)
+	}
+
+	var zeroVal *ent.SilenceWhereInput
+	return zeroVal, nil
 }
 
 func (ec *executionContext) field_Query_userMsgInternalTos_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_Query_userMsgInternalTos_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Query_userMsgInternalTos_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_Query_userMsgInternalTos_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg3, err := ec.field_Query_userMsgInternalTos_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["last"] = arg3
-	var arg4 *ent.MsgInternalToOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOMsgInternalToOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalToOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg4, err := ec.field_Query_userMsgInternalTos_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["orderBy"] = arg4
-	var arg5 *ent.MsgInternalToWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOMsgInternalToWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalToWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg5, err := ec.field_Query_userMsgInternalTos_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["where"] = arg5
 	return args, nil
+}
+func (ec *executionContext) field_Query_userMsgInternalTos_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["after"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_userMsgInternalTos_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["first"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_userMsgInternalTos_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*entgql.Cursor[int], error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["before"]
+	if !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_userMsgInternalTos_argsLast(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*int, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["last"]
+	if !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_userMsgInternalTos_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgInternalToOrder, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["orderBy"]
+	if !ok {
+		var zeroVal *ent.MsgInternalToOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOMsgInternalToOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalToOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgInternalToOrder
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_userMsgInternalTos_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*ent.MsgInternalToWhereInput, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["where"]
+	if !ok {
+		var zeroVal *ent.MsgInternalToWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalOMsgInternalToWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalToWhereInput(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgInternalToWhereInput
+	return zeroVal, nil
 }
 
 func (ec *executionContext) field_Query_userUnreadMsgInternalsFromMsgCategory_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 []string
-	if tmp, ok := rawArgs["categories"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categories"))
-		arg0, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg0, err := ec.field_Query_userUnreadMsgInternalsFromMsgCategory_argsCategories(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["categories"] = arg0
 	return args, nil
+}
+func (ec *executionContext) field_Query_userUnreadMsgInternalsFromMsgCategory_argsCategories(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) ([]string, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["categories"]
+	if !ok {
+		var zeroVal []string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("categories"))
+	if tmp, ok := rawArgs["categories"]; ok {
+		return ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
+	}
+
+	var zeroVal []string
+	return zeroVal, nil
 }
 
 // endregion ***************************** args.gotpl *****************************
@@ -3458,50 +4708,6 @@ func (ec *executionContext) fieldContext_MsgInternal_id(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _MsgInternal_tenantID(ctx context.Context, field graphql.CollectedField, obj *ent.MsgInternal) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_MsgInternal_tenantID(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TenantID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_MsgInternal_tenantID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "MsgInternal",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _MsgInternal_createdBy(ctx context.Context, field graphql.CollectedField, obj *ent.MsgInternal) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MsgInternal_createdBy(ctx, field)
 	if err != nil {
@@ -3667,6 +4873,50 @@ func (ec *executionContext) fieldContext_MsgInternal_updatedAt(_ context.Context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgInternal_tenantID(ctx context.Context, field graphql.CollectedField, obj *ent.MsgInternal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgInternal_tenantID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TenantID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgInternal_tenantID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgInternal",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4218,8 +5468,6 @@ func (ec *executionContext) fieldContext_MsgInternalEdge_node(_ context.Context,
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_MsgInternal_id(ctx, field)
-			case "tenantID":
-				return ec.fieldContext_MsgInternal_tenantID(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_MsgInternal_createdBy(ctx, field)
 			case "createdAt":
@@ -4228,6 +5476,8 @@ func (ec *executionContext) fieldContext_MsgInternalEdge_node(_ context.Context,
 				return ec.fieldContext_MsgInternal_updatedBy(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_MsgInternal_updatedAt(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgInternal_tenantID(ctx, field)
 			case "category":
 				return ec.fieldContext_MsgInternal_category(ctx, field)
 			case "subject":
@@ -4638,8 +5888,6 @@ func (ec *executionContext) fieldContext_MsgInternalTo_msgInternal(_ context.Con
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_MsgInternal_id(ctx, field)
-			case "tenantID":
-				return ec.fieldContext_MsgInternal_tenantID(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_MsgInternal_createdBy(ctx, field)
 			case "createdAt":
@@ -4648,6 +5896,8 @@ func (ec *executionContext) fieldContext_MsgInternalTo_msgInternal(_ context.Con
 				return ec.fieldContext_MsgInternal_updatedBy(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_MsgInternal_updatedAt(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgInternal_tenantID(ctx, field)
 			case "category":
 				return ec.fieldContext_MsgInternal_category(ctx, field)
 			case "subject":
@@ -4716,10 +5966,6 @@ func (ec *executionContext) fieldContext_MsgInternalTo_user(_ context.Context, f
 				return ec.fieldContext_User_principalName(ctx, field)
 			case "displayName":
 				return ec.fieldContext_User_displayName(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "mobile":
-				return ec.fieldContext_User_mobile(ctx, field)
 			case "silences":
 				return ec.fieldContext_User_silences(ctx, field)
 			}
@@ -5526,10 +6772,6 @@ func (ec *executionContext) fieldContext_MsgSubscriber_user(_ context.Context, f
 				return ec.fieldContext_User_principalName(ctx, field)
 			case "displayName":
 				return ec.fieldContext_User_displayName(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "mobile":
-				return ec.fieldContext_User_mobile(ctx, field)
 			case "silences":
 				return ec.fieldContext_User_silences(ctx, field)
 			}
@@ -5862,14 +7104,11 @@ func (ec *executionContext) _MsgTemplate_tenantID(ctx context.Context, field gra
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNID2int(ctx, field.Selections, res)
+	return ec.marshalOID2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MsgTemplate_tenantID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10083,6 +11322,61 @@ func (ec *executionContext) fieldContext_Query_userUnreadMsgInternals(_ context.
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_msgTemplateDefineByName(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_msgTemplateDefineByName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().MsgTemplateDefineByName(rctx, fc.Args["format"].(msgtemplate.Format), fc.Args["body"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_msgTemplateDefineByName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_msgTemplateDefineByName_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -10737,10 +12031,6 @@ func (ec *executionContext) fieldContext_Silence_user(_ context.Context, field g
 				return ec.fieldContext_User_principalName(ctx, field)
 			case "displayName":
 				return ec.fieldContext_User_displayName(ctx, field)
-			case "email":
-				return ec.fieldContext_User_email(ctx, field)
-			case "mobile":
-				return ec.fieldContext_User_mobile(ctx, field)
 			case "silences":
 				return ec.fieldContext_User_silences(ctx, field)
 			}
@@ -11138,88 +12428,6 @@ func (ec *executionContext) fieldContext_User_displayName(_ context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _User_email(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_email(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Email, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_User_email(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _User_mobile(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_User_mobile(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Mobile, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_User_mobile(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _User_silences(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_silences(ctx, field)
 	if err != nil {
@@ -11479,7 +12687,7 @@ func (ec *executionContext) unmarshalInputCreateMsgTemplateInput(ctx context.Con
 			it.MsgTypeID = data
 		case "tenantID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantID"))
-			data, err := ec.unmarshalNID2int(ctx, v)
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14313,7 +15521,7 @@ func (ec *executionContext) unmarshalInputMsgInternalWhereInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "category", "categoryNEQ", "categoryIn", "categoryNotIn", "categoryGT", "categoryGTE", "categoryLT", "categoryLTE", "categoryContains", "categoryHasPrefix", "categoryHasSuffix", "categoryEqualFold", "categoryContainsFold", "subject", "subjectNEQ", "subjectIn", "subjectNotIn", "subjectGT", "subjectGTE", "subjectLT", "subjectLTE", "subjectContains", "subjectHasPrefix", "subjectHasSuffix", "subjectEqualFold", "subjectContainsFold", "format", "formatNEQ", "formatIn", "formatNotIn", "formatGT", "formatGTE", "formatLT", "formatLTE", "formatContains", "formatHasPrefix", "formatHasSuffix", "formatEqualFold", "formatContainsFold", "redirect", "redirectNEQ", "redirectIn", "redirectNotIn", "redirectGT", "redirectGTE", "redirectLT", "redirectLTE", "redirectContains", "redirectHasPrefix", "redirectHasSuffix", "redirectIsNil", "redirectNotNil", "redirectEqualFold", "redirectContainsFold", "hasMsgInternalTo", "hasMsgInternalToWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "category", "categoryNEQ", "categoryIn", "categoryNotIn", "categoryGT", "categoryGTE", "categoryLT", "categoryLTE", "categoryContains", "categoryHasPrefix", "categoryHasSuffix", "categoryEqualFold", "categoryContainsFold", "subject", "subjectNEQ", "subjectIn", "subjectNotIn", "subjectGT", "subjectGTE", "subjectLT", "subjectLTE", "subjectContains", "subjectHasPrefix", "subjectHasSuffix", "subjectEqualFold", "subjectContainsFold", "format", "formatNEQ", "formatIn", "formatNotIn", "formatGT", "formatGTE", "formatLT", "formatLTE", "formatContains", "formatHasPrefix", "formatHasSuffix", "formatEqualFold", "formatContainsFold", "redirect", "redirectNEQ", "redirectIn", "redirectNotIn", "redirectGT", "redirectGTE", "redirectLT", "redirectLTE", "redirectContains", "redirectHasPrefix", "redirectHasSuffix", "redirectIsNil", "redirectNotNil", "redirectEqualFold", "redirectContainsFold", "hasMsgInternalTo", "hasMsgInternalToWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14397,62 +15605,6 @@ func (ec *executionContext) unmarshalInputMsgInternalWhereInput(ctx context.Cont
 				return it, err
 			}
 			it.IDLTE = data
-		case "tenantID":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantID"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantID = data
-		case "tenantIDNEQ":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDNEQ"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantIDNEQ = data
-		case "tenantIDIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantIDIn = data
-		case "tenantIDNotIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDNotIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantIDNotIn = data
-		case "tenantIDGT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDGT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantIDGT = data
-		case "tenantIDGTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDGTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantIDGTE = data
-		case "tenantIDLT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDLT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantIDLT = data
-		case "tenantIDLTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDLTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.TenantIDLTE = data
 		case "createdBy":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
@@ -14705,6 +15857,62 @@ func (ec *executionContext) unmarshalInputMsgInternalWhereInput(ctx context.Cont
 				return it, err
 			}
 			it.UpdatedAtNotNil = data
+		case "tenantID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantID"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantID = data
+		case "tenantIDNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDNEQ"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDNEQ = data
+		case "tenantIDIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDIn"))
+			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDIn = data
+		case "tenantIDNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDNotIn"))
+			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDNotIn = data
+		case "tenantIDGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDGT"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDGT = data
+		case "tenantIDGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDGTE"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDGTE = data
+		case "tenantIDLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDLT"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDLT = data
+		case "tenantIDLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDLTE"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDLTE = data
 		case "category":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -15773,7 +16981,7 @@ func (ec *executionContext) unmarshalInputMsgTemplateWhereInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "msgTypeID", "msgTypeIDNEQ", "msgTypeIDIn", "msgTypeIDNotIn", "msgTypeIDGT", "msgTypeIDGTE", "msgTypeIDLT", "msgTypeIDLTE", "msgEventID", "msgEventIDNEQ", "msgEventIDIn", "msgEventIDNotIn", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "status", "statusNEQ", "statusIn", "statusNotIn", "statusIsNil", "statusNotNil", "receiverType", "receiverTypeNEQ", "receiverTypeIn", "receiverTypeNotIn", "format", "formatNEQ", "formatIn", "formatNotIn", "subject", "subjectNEQ", "subjectIn", "subjectNotIn", "subjectGT", "subjectGTE", "subjectLT", "subjectLTE", "subjectContains", "subjectHasPrefix", "subjectHasSuffix", "subjectIsNil", "subjectNotNil", "subjectEqualFold", "subjectContainsFold", "from", "fromNEQ", "fromIn", "fromNotIn", "fromGT", "fromGTE", "fromLT", "fromLTE", "fromContains", "fromHasPrefix", "fromHasSuffix", "fromIsNil", "fromNotNil", "fromEqualFold", "fromContainsFold", "to", "toNEQ", "toIn", "toNotIn", "toGT", "toGTE", "toLT", "toLTE", "toContains", "toHasPrefix", "toHasSuffix", "toIsNil", "toNotNil", "toEqualFold", "toContainsFold", "cc", "ccNEQ", "ccIn", "ccNotIn", "ccGT", "ccGTE", "ccLT", "ccLTE", "ccContains", "ccHasPrefix", "ccHasSuffix", "ccIsNil", "ccNotNil", "ccEqualFold", "ccContainsFold", "bcc", "bccNEQ", "bccIn", "bccNotIn", "bccGT", "bccGTE", "bccLT", "bccLTE", "bccContains", "bccHasPrefix", "bccHasSuffix", "bccIsNil", "bccNotNil", "bccEqualFold", "bccContainsFold", "hasEvent", "hasEventWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "msgTypeID", "msgTypeIDNEQ", "msgTypeIDIn", "msgTypeIDNotIn", "msgTypeIDGT", "msgTypeIDGTE", "msgTypeIDLT", "msgTypeIDLTE", "msgEventID", "msgEventIDNEQ", "msgEventIDIn", "msgEventIDNotIn", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "tenantIDIsNil", "tenantIDNotNil", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "status", "statusNEQ", "statusIn", "statusNotIn", "statusIsNil", "statusNotNil", "receiverType", "receiverTypeNEQ", "receiverTypeIn", "receiverTypeNotIn", "format", "formatNEQ", "formatIn", "formatNotIn", "subject", "subjectNEQ", "subjectIn", "subjectNotIn", "subjectGT", "subjectGTE", "subjectLT", "subjectLTE", "subjectContains", "subjectHasPrefix", "subjectHasSuffix", "subjectIsNil", "subjectNotNil", "subjectEqualFold", "subjectContainsFold", "from", "fromNEQ", "fromIn", "fromNotIn", "fromGT", "fromGTE", "fromLT", "fromLTE", "fromContains", "fromHasPrefix", "fromHasSuffix", "fromIsNil", "fromNotNil", "fromEqualFold", "fromContainsFold", "to", "toNEQ", "toIn", "toNotIn", "toGT", "toGTE", "toLT", "toLTE", "toContains", "toHasPrefix", "toHasSuffix", "toIsNil", "toNotNil", "toEqualFold", "toContainsFold", "cc", "ccNEQ", "ccIn", "ccNotIn", "ccGT", "ccGTE", "ccLT", "ccLTE", "ccContains", "ccHasPrefix", "ccHasSuffix", "ccIsNil", "ccNotNil", "ccEqualFold", "ccContainsFold", "bcc", "bccNEQ", "bccIn", "bccNotIn", "bccGT", "bccGTE", "bccLT", "bccLTE", "bccContains", "bccHasPrefix", "bccHasSuffix", "bccIsNil", "bccNotNil", "bccEqualFold", "bccContainsFold", "hasEvent", "hasEventWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -16249,6 +17457,20 @@ func (ec *executionContext) unmarshalInputMsgTemplateWhereInput(ctx context.Cont
 				return it, err
 			}
 			it.TenantIDLTE = data
+		case "tenantIDIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDIsNil = data
+		case "tenantIDNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDNotNil = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -19438,7 +20660,7 @@ func (ec *executionContext) unmarshalInputUpdateMsgTemplateInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"msgTypeID", "tenantID", "name", "receiverType", "format", "subject", "clearSubject", "from", "clearFrom", "to", "clearTo", "cc", "clearCc", "bcc", "clearBcc", "body", "clearBody", "tpl", "clearTpl", "attachments", "appendAttachments", "clearAttachments", "comments", "clearComments", "eventID"}
+	fieldsInOrder := [...]string{"msgTypeID", "tenantID", "clearTenantID", "name", "receiverType", "format", "subject", "clearSubject", "from", "clearFrom", "to", "clearTo", "cc", "clearCc", "bcc", "clearBcc", "body", "clearBody", "tpl", "clearTpl", "attachments", "appendAttachments", "clearAttachments", "comments", "clearComments", "eventID"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -19459,6 +20681,13 @@ func (ec *executionContext) unmarshalInputUpdateMsgTemplateInput(ctx context.Con
 				return it, err
 			}
 			it.TenantID = data
+		case "clearTenantID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearTenantID"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearTenantID = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -20628,11 +21857,6 @@ func (ec *executionContext) _MsgInternal(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "tenantID":
-			out.Values[i] = ec._MsgInternal_tenantID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		case "createdBy":
 			out.Values[i] = ec._MsgInternal_createdBy(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -20647,6 +21871,11 @@ func (ec *executionContext) _MsgInternal(ctx context.Context, sel ast.SelectionS
 			out.Values[i] = ec._MsgInternal_updatedBy(ctx, field, obj)
 		case "updatedAt":
 			out.Values[i] = ec._MsgInternal_updatedAt(ctx, field, obj)
+		case "tenantID":
+			out.Values[i] = ec._MsgInternal_tenantID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "category":
 			out.Values[i] = ec._MsgInternal_category(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -21283,9 +22512,6 @@ func (ec *executionContext) _MsgTemplate(ctx context.Context, sel ast.SelectionS
 			}
 		case "tenantID":
 			out.Values[i] = ec._MsgTemplate_tenantID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
 		case "name":
 			out.Values[i] = ec._MsgTemplate_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -22555,6 +23781,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "msgTemplateDefineByName":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_msgTemplateDefineByName(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -22812,10 +24060,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "email":
-			out.Values[i] = ec._User_email(ctx, field, obj)
-		case "mobile":
-			out.Values[i] = ec._User_mobile(ctx, field, obj)
 		case "silences":
 			field := field
 

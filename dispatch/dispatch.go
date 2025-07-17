@@ -2,6 +2,7 @@ package dispatch
 
 import (
 	"context"
+	"errors"
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
@@ -268,7 +269,7 @@ func (d *Dispatcher) processAlert(alt *alert.Alert, route *Route) {
 		if err != nil {
 			msg := "notify for alerts failed"
 			fs := []zap.Field{zap.Int("num_alerts", len(alerts)), zap.Error(err)}
-			if ctx.Err() == context.Canceled {
+			if errors.Is(ctx.Err(), context.Canceled) {
 				// It is expected for the context to be canceled on
 				// configuration reload or shutdown. In this case, the
 				// message should only be logged at the debug level.

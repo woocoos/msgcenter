@@ -41,17 +41,30 @@ const queryMsgEventInfoRoute = gql(/* GraphQL */`query MsgEventInfoRoute($gid:GI
     id
     ... on MsgEvent{
       id,name,comments,status,createdAt,msgTypeID,modes,routeStr(type:$type)
+      msgType{
+        id,category,appID,name
+      }
     }
   }
 }
 `);
 
 const mutationCreateMsgEvent = gql(/* GraphQL */`mutation createMsgEvent($input: CreateMsgEventInput!){
-  createMsgEvent(input: $input){id}
+  createMsgEvent(input: $input){
+    id,name,comments,status,createdAt,msgTypeID,modes
+    msgType{
+      id,category,appID,name
+    }
+  }
 }`);
 
 const mutationUpdateMsgEvent = gql(/* GraphQL */`mutation updateMsgEvent($id:ID!,$input: UpdateMsgEventInput!){
-  updateMsgEvent(id:$id,input: $input){id}
+  updateMsgEvent(id:$id,input: $input){
+    id,name,comments,status,createdAt,msgTypeID,modes
+    msgType{
+      id,category,appID,name
+    }
+  }
 }`);
 
 const mutationDelMsgEvent = gql(/* GraphQL */`mutation delMsgEvent($id:ID!){
@@ -59,11 +72,21 @@ const mutationDelMsgEvent = gql(/* GraphQL */`mutation delMsgEvent($id:ID!){
 }`);
 
 const mutationEnableMsgEvent = gql(/* GraphQL */`mutation enableMsgEvent($id:ID!){
-  enableMsgEvent(id:$id){id}
+  enableMsgEvent(id:$id){
+    id,name,comments,status,createdAt,msgTypeID,modes
+    msgType{
+      id,category,appID,name
+    }
+  }
 }`);
 
 const mutationDisableMsgEvent = gql(/* GraphQL */`mutation disableMsgEvent($id:ID!){
-  disableMsgEvent(id:$id){id}
+  disableMsgEvent(id:$id){
+    id,name,comments,status,createdAt,msgTypeID,modes
+    msgType{
+      id,category,appID,name
+    }
+  }
 }`);
 
 
@@ -102,7 +125,7 @@ export async function getMsgEventList(
  */
 export async function getMsgEventInfo(msgEventId: string) {
   const result = await query(queryMsgEventInfo, {
-    gid: gid('msg_event', msgEventId)
+    gid: gid('MsgEvent', msgEventId)
   })
   if (result.data?.node?.__typename === 'MsgEvent') {
     return result.data.node
@@ -117,7 +140,7 @@ export async function getMsgEventInfo(msgEventId: string) {
  */
 export async function getMsgEventInfoRoute(msgEventId: string, type: RouteStrType) {
   const result = await query(queryMsgEventInfoRoute, {
-    gid: gid('msg_event', msgEventId),
+    gid: gid('MsgEvent', msgEventId),
     type,
   })
   if (result.data?.node?.__typename === 'MsgEvent') {

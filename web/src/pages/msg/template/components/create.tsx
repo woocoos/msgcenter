@@ -3,17 +3,17 @@ import { DrawerForm, ProFormInstance, ProFormRadio, ProFormText, ProFormTextArea
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CreateMsgTemplateInput, MsgEvent, MsgTemplate, MsgTemplateFormat, MsgTemplateReceiverType, UpdateMsgTemplateInput } from '@/generated/msgsrv/graphql';
-import { EnumMsgTemplateFormat, createMsgTemplate, getMsgTemplateInfo, updateMsgTemplate } from '@/services/msgsrv/template';
+import { EnumMsgTemplateFormat, createMsgTemplate, getMsgTemplateInfo, updateMsgTemplate,getMsgTemplateDefine } from '@/services/msgsrv/template';
 import InputMultiple from '@/components/input/multiple';
 import { UploadMultiple, UploadTemp, useLeavePrompt } from '@knockout-js/layout';
 import { OrgSelect } from '@knockout-js/org';
 import { getOrg } from '@knockout-js/api';
 import { Org, OrgKind } from '@knockout-js/api/ucenter';
 import store from '@/store';
-import { Button, Col, Row, Space } from 'antd';
+import { Button, Col, Row, Space,Modal } from 'antd';
+import {TemplateType} from '../../event'
 
 type ProFormData = {
-  org?: Org;
   name: string;
   comments?: string;
   subject: string;
@@ -30,10 +30,11 @@ type ProFormData = {
 export default (props: {
   open: boolean;
   title?: string;
+  type: string | null;
   id?: string | null;
   msgEvent: MsgEvent;
   receiverType: MsgTemplateReceiverType
-  onClose: (isSuccess?: boolean) => void;
+  onClose: (isSuccess?: boolean, newInfo?: MsgTemplate) => void;
 }) => {
   const { t } = useTranslation(),
     formRef = useRef<ProFormInstance>(),
@@ -43,7 +44,13 @@ export default (props: {
     [showCc, setShowCc] = useState(false),
     [showBcc, setShowBcc] = useState(false),
     [saveLoading, setSaveLoading] = useState(false),
-    [saveDisabled, setSaveDisabled] = useState(true);
+    [saveDisabled, setSaveDisabled] = useState(true),
+    iframeRef = useRef<HTMLIFrameElement>(null),
+    [modal, setModal] = useState<{
+      show: boolean,
+    }>({
+      show: false,
+    });
 
   useEffect(() => {
     setLeavePromptWhen(saveDisabled);
@@ -72,7 +79,6 @@ export default (props: {
         const result = await getMsgTemplateInfo(props.id) as MsgTemplate | null;
         if (result?.id) {
           setInfo(result);
-          initData.org = await getOrg(result.tenantID) as Org;
           initData.name = result.name;
           initData.subject = result.subject || '';
           initData.format = result.format;
@@ -102,11 +108,13 @@ export default (props: {
         msgTypeID: Number(props.msgEvent.msgTypeID),
         name: values.name,
         receiverType: props.receiverType,
-        tenantID: values.org?.id ? values.org.id : "",
         subject: values.subject,
         body: values.body,
         tpl: values.tpl,
         comments: values.comments,
+      }
+      if (props.type === TemplateType.customer){
+        input.tenantID = userState.tenantId;
       }
 
       if (props.receiverType === MsgTemplateReceiverType.Email) {
@@ -122,7 +130,7 @@ export default (props: {
         : await createMsgTemplate(input as CreateMsgTemplateInput);
       if (result?.id) {
         setSaveDisabled(true);
-        props.onClose(true);
+        props.onClose(true, result as MsgTemplate);
       }
       setSaveLoading(false);
       return false;
@@ -154,27 +162,13 @@ export default (props: {
       onOpenChange={onOpenChange}
       formRef={formRef}
     >
-      <Row gutter={20}>
-        <Col span={8}>
-          <ProFormText
-            name="org"
-            label={t('org')}
-            rules={[
-              { required: true, message: `${t('please_enter_org')}` },
-            ]}>
-            <OrgSelect kind={OrgKind.Root} />
-          </ProFormText>
-        </Col>
-        <Col span={8}>
-          <ProFormText
-            name="name"
-            label={t('name')}
-            rules={[
-              { required: true, message: `${t('please_enter_name')}` },
-            ]}
-          />
-        </Col>
-      </Row>
+      <ProFormText
+        name="name"
+        label={t('name')}
+        rules={[
+          { required: true, message: `${t('please_enter_name')}` },
+        ]}
+      />
       <ProFormTextArea
         name="comments"
         label={t('description')}
@@ -243,14 +237,17 @@ export default (props: {
           rows: 6,
         }}
       />
-      <ProFormText name="tpl">
+      <ProFormText
+        x-if={props.type === TemplateType.customer}
+        name="tpl"
+      >
         <UploadTemp
           accept=".tmpl"
           directory={`${userState.tenantId}/msg/tpl`}
         />
       </ProFormText>
       <ProFormText
-        x-if={props.receiverType === MsgTemplateReceiverType.Email}
+        x-if={props.receiverType === MsgTemplateReceiverType.Email && props.type === TemplateType.customer}
         name="attachments"
         label={t('attachments')}
         tooltip={t('attachments_tip')}
@@ -260,6 +257,34 @@ export default (props: {
           directory={`${userState.tenantId}/msg/att`}
         />
       </ProFormText>
+      <a x-if={props.type === TemplateType.default} onClick={async () => {
+        let format = formRef.current?.getFieldValue('format') || '',body = formRef.current?.getFieldValue('body') || '';
+        if (format == '' || body == '') {
+          return
+        }
+        const result = await getMsgTemplateDefine(format, body)
+        setModal({ show: true })
+        setTimeout(()=>{
+          if (iframeRef.current?.contentWindow) {
+            iframeRef.current.contentWindow.document.write(`<pre>${result}</pre>`)
+          } else if (iframeRef.current?.contentDocument) {
+            iframeRef.current.contentDocument.write(`<pre>${result}</pre>`)
+          }
+        },200)
+      }}
+      >{t('temp_viewer')}</a>
+      <Modal
+        title={t('temp_viewer')}
+        open={modal.show}
+        destroyOnClose
+        footer={null}
+        width={800}
+        onCancel={() => {
+          setModal({ show: false })
+        }}
+      >
+        <iframe style={{width: '100%',height: '60vh',border: '0 none'}} ref={iframeRef}></iframe>
+      </Modal>
     </DrawerForm>
   );
 };

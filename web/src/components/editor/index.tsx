@@ -1,5 +1,9 @@
 import Editor, { loader } from '@monaco-editor/react';
 
-loader.config({ paths: { vs: 'https://jsd.onmicrosoft.cn/npm/monaco-editor@0.44.0/min/vs' } })
+const ICE_MONACO_CDN_HOST = process.env.ICE_MONACO_CDN_HOST
+
+if (ICE_MONACO_CDN_HOST) {
+  loader.config({ paths: { vs: ICE_MONACO_CDN_HOST } })
+}
 
 export default Editor;

@@ -5,6 +5,7 @@ global:
   smtpFrom: 'alertmanager@example.org'
   smtpAuthUsername: 'alertmanager'
   smtpAuthPassword: 'password'
+  resolveTimeout: 5m
 
 # 模板文件位置
 templates:

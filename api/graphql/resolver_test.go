@@ -137,3 +137,10 @@ func (s *resolverSuite) TestMessageHandler() {
 		s.Require().True(has)
 	})
 }
+
+func (s *resolverSuite) TestMsgTemplateDefineByName() {
+	ctx := s.NewTestCtx()
+	txt, err := s.qr.MsgTemplateDefineByName(ctx, "html", "{{ template \"0.ChangeUserPassword.txt\" . }}")
+	s.Require().NoError(err)
+	s.Require().NotEmpty(txt)
+}

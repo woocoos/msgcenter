@@ -57,7 +57,6 @@ func NewCoordinator(cnf *conf.Configuration) *Coordinator {
 		cnf:             cnf,
 		ActiveReceivers: make(map[string]int),
 	}
-
 	return c
 }
 
@@ -171,6 +170,12 @@ func (c *Coordinator) loadTemplates() error {
 	if err != nil {
 		return err
 	}
+	// 加载消息模板参数
+	if err = c.loadTempParams(c.Template.TempParams); err != nil {
+		logger.Error("Error loading template params", zap.Error(err))
+		metrics.Coordinator.ConfigSuccess.Set(0)
+		return err
+	}
 	// 远程下载文件
 	if err = c.downloadTempFromRemote(); err != nil {
 		logger.Error("Error loading remote template file", zap.Error(err))
@@ -178,13 +183,45 @@ func (c *Coordinator) loadTemplates() error {
 		return err
 	}
 	for _, ptn := range c.profile.Templates {
-		// 如果根目录未创建则跳过
+		// 如果根目录未创建则创建
 		if _, err = os.Stat(c.Template.BaseDir); os.IsNotExist(err) {
-			continue
+			if err = os.MkdirAll(c.Template.BaseDir, os.ModePerm); err != nil {
+				return err
+			}
 		}
 		if _, err = c.Template.ParseGlob(c.cnf.Abs(ptn)); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (c *Coordinator) ReloadTempParams() error {
+	return c.loadTempParams(c.Template.TempParams)
+}
+
+func (c *Coordinator) loadTempParams(tempParams map[string]map[string]string) error {
+	filename := c.cnf.String("template.tempParamsFile")
+	if filename == "" {
+		return fmt.Errorf("no config file specified")
+	}
+	// read config file by filename
+	bytes, err := os.ReadFile(c.cnf.Abs(filename))
+	if err != nil {
+		return err
+	}
+	sub := conf.NewFromBytes(bytes)
+	tps, err := sub.Parser().Sub("tempParams")
+	if err != nil {
+		return err
+	}
+	m := tps.ToStringMap()
+	for oid, vm := range m {
+		out := make(map[string]string)
+		for k, v := range vm.(map[string]interface{}) {
+			out[k] = fmt.Sprintf("%v", v)
+		}
+		tempParams[oid] = out
 	}
 	return nil
 }
@@ -197,6 +234,10 @@ func (c *Coordinator) downloadTempFromRemote() error {
 		return err
 	}
 	for _, tpl := range tpls {
+		if tpl.TenantID == 0 {
+			// 无组织为默认模板，不需要处理
+			continue
+		}
 		// 下载模板文件
 		if tpl.Tpl != "" {
 			localFile, err := kosdk.DefaultFilePath(tpl.TenantID, tpl.Tpl, c.Template.BaseDir, c.Template.DataDir)

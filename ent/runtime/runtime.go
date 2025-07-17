@@ -19,6 +19,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
+	"github.com/woocoos/msgcenter/ent/useraddr"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -33,15 +34,15 @@ func init() {
 	msgalertFields := schema.MsgAlert{}.Fields()
 	_ = msgalertFields
 	// msgalertDescTimeout is the schema descriptor for timeout field.
-	msgalertDescTimeout := msgalertFields[5].Descriptor()
+	msgalertDescTimeout := msgalertFields[6].Descriptor()
 	// msgalert.DefaultTimeout holds the default value on creation for the timeout field.
 	msgalert.DefaultTimeout = msgalertDescTimeout.Default.(bool)
 	// msgalertDescCreatedAt is the schema descriptor for created_at field.
-	msgalertDescCreatedAt := msgalertFields[8].Descriptor()
+	msgalertDescCreatedAt := msgalertFields[9].Descriptor()
 	// msgalert.DefaultCreatedAt holds the default value on creation for the created_at field.
 	msgalert.DefaultCreatedAt = msgalertDescCreatedAt.Default.(func() time.Time)
 	// msgalertDescDeleted is the schema descriptor for deleted field.
-	msgalertDescDeleted := msgalertFields[10].Descriptor()
+	msgalertDescDeleted := msgalertFields[11].Descriptor()
 	// msgalert.DefaultDeleted holds the default value on creation for the deleted field.
 	msgalert.DefaultDeleted = msgalertDescDeleted.Default.(bool)
 	msgchannelMixin := schema.MsgChannel{}.Mixin()
@@ -117,7 +118,7 @@ func init() {
 	// msginternal.DefaultCreatedAt holds the default value on creation for the created_at field.
 	msginternal.DefaultCreatedAt = msginternalDescCreatedAt.Default.(func() time.Time)
 	// msginternalDescCategory is the schema descriptor for category field.
-	msginternalDescCategory := msginternalFields[0].Descriptor()
+	msginternalDescCategory := msginternalFields[1].Descriptor()
 	// msginternal.CategoryValidator is a validator for the "category" field. It is called by the builders before save.
 	msginternal.CategoryValidator = msginternalDescCategory.Validators[0].(func(string) error)
 	msginternaltoMixin := schema.MsgInternalTo{}.Mixin()
@@ -130,7 +131,7 @@ func init() {
 	msginternaltoFields := schema.MsgInternalTo{}.Fields()
 	_ = msginternaltoFields
 	// msginternaltoDescCreatedAt is the schema descriptor for created_at field.
-	msginternaltoDescCreatedAt := msginternaltoFields[4].Descriptor()
+	msginternaltoDescCreatedAt := msginternaltoFields[5].Descriptor()
 	// msginternalto.DefaultCreatedAt holds the default value on creation for the created_at field.
 	msginternalto.DefaultCreatedAt = msginternaltoDescCreatedAt.Default.(func() time.Time)
 	msgsubscriberMixin := schema.MsgSubscriber{}.Mixin()
@@ -210,7 +211,7 @@ func init() {
 	nlogFields := schema.Nlog{}.Fields()
 	_ = nlogFields
 	// nlogDescCreatedAt is the schema descriptor for created_at field.
-	nlogDescCreatedAt := nlogFields[5].Descriptor()
+	nlogDescCreatedAt := nlogFields[6].Descriptor()
 	// nlog.DefaultCreatedAt holds the default value on creation for the created_at field.
 	nlog.DefaultCreatedAt = nlogDescCreatedAt.Default.(func() time.Time)
 	nlogalertFields := schema.NlogAlert{}.Fields()
@@ -246,19 +247,41 @@ func init() {
 	silence.DefaultID = silenceDescID.Default.(func() int)
 	userHooks := schema.User{}.Hooks()
 	user.Hooks[0] = userHooks[0]
-	userFields := schema.User{}.Fields()
-	_ = userFields
-	// userDescEmail is the schema descriptor for email field.
-	userDescEmail := userFields[3].Descriptor()
-	// user.EmailValidator is a validator for the "email" field. It is called by the builders before save.
-	user.EmailValidator = userDescEmail.Validators[0].(func(string) error)
-	// userDescMobile is the schema descriptor for mobile field.
-	userDescMobile := userFields[4].Descriptor()
-	// user.MobileValidator is a validator for the "mobile" field. It is called by the builders before save.
-	user.MobileValidator = userDescMobile.Validators[0].(func(string) error)
+	useraddrHooks := schema.UserAddr{}.Hooks()
+	useraddr.Hooks[0] = useraddrHooks[0]
+	useraddrFields := schema.UserAddr{}.Fields()
+	_ = useraddrFields
+	// useraddrDescEmail is the schema descriptor for email field.
+	useraddrDescEmail := useraddrFields[5].Descriptor()
+	// useraddr.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	useraddr.EmailValidator = useraddrDescEmail.Validators[0].(func(string) error)
+	// useraddrDescFax is the schema descriptor for fax field.
+	useraddrDescFax := useraddrFields[6].Descriptor()
+	// useraddr.FaxValidator is a validator for the "fax" field. It is called by the builders before save.
+	useraddr.FaxValidator = useraddrDescFax.Validators[0].(func(string) error)
+	// useraddrDescZipCode is the schema descriptor for zip_code field.
+	useraddrDescZipCode := useraddrFields[7].Descriptor()
+	// useraddr.ZipCodeValidator is a validator for the "zip_code" field. It is called by the builders before save.
+	useraddr.ZipCodeValidator = useraddrDescZipCode.Validators[0].(func(string) error)
+	// useraddrDescTel is the schema descriptor for tel field.
+	useraddrDescTel := useraddrFields[8].Descriptor()
+	// useraddr.TelValidator is a validator for the "tel" field. It is called by the builders before save.
+	useraddr.TelValidator = useraddrDescTel.Validators[0].(func(string) error)
+	// useraddrDescMobile is the schema descriptor for mobile field.
+	useraddrDescMobile := useraddrFields[9].Descriptor()
+	// useraddr.MobileValidator is a validator for the "mobile" field. It is called by the builders before save.
+	useraddr.MobileValidator = useraddrDescMobile.Validators[0].(func(string) error)
+	// useraddrDescName is the schema descriptor for name field.
+	useraddrDescName := useraddrFields[10].Descriptor()
+	// useraddr.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	useraddr.NameValidator = useraddrDescName.Validators[0].(func(string) error)
+	// useraddrDescIsDefault is the schema descriptor for is_default field.
+	useraddrDescIsDefault := useraddrFields[11].Descriptor()
+	// useraddr.DefaultIsDefault holds the default value on creation for the is_default field.
+	useraddr.DefaultIsDefault = useraddrDescIsDefault.Default.(bool)
 }
 
 const (
-	Version = "v0.14.0"                                         // Version of ent codegen.
-	Sum     = "h1:EO3Z9aZ5bXJatJeGqu/EVdnNr6K4mRq3rWe5owt0MC4=" // Sum of ent codegen.
+	Version = "v0.14.2"                                         // Version of ent codegen.
+	Sum     = "h1:ywld/j2Rx4EmnIKs8eZ29cbFA1zpB+DA9TLL5l3rlq0=" // Sum of ent codegen.
 )

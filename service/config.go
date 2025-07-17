@@ -10,6 +10,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/user"
+	"github.com/woocoos/msgcenter/ent/useraddr"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -70,8 +71,17 @@ func findTemplate(ctx context.Context, basedir, attdir string, client *ent.Clien
 	event, err := client.MsgTemplate.Query().Where(msgtemplate.TenantID(tid), msgtemplate.StatusEQ(typex.SimpleStatusActive),
 		msgtemplate.HasEventWith(msgevent.Name(en), msgevent.StatusEQ(typex.SimpleStatusActive)), msgtemplate.ReceiverTypeEQ(rt),
 	).Only(ctx)
-	if err != nil {
+	if err != nil && !ent.IsNotFound(err) {
 		return nil, err
+	}
+	if ent.IsNotFound(err) {
+		// 通过租户找不到模板则取默认模板
+		event, err = client.MsgTemplate.Query().Where(msgtemplate.TenantIDIsNil(), msgtemplate.StatusEQ(typex.SimpleStatusActive),
+			msgtemplate.HasEventWith(msgevent.Name(en), msgevent.StatusEQ(typex.SimpleStatusActive)), msgtemplate.ReceiverTypeEQ(rt),
+		).Only(ctx)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if event == nil {
 		return nil, nil
@@ -128,10 +138,14 @@ func overrideEmailConfig(basedir, attdir string, client *ent.Client) notify.Cust
 		if len(eus) > 0 {
 			tos := make([]string, 0, len(eus))
 			for _, u := range eus {
-				if u.Email != "" {
+				addr, err := u.QueryAddresses().Where(useraddr.AddrTypeEQ(useraddr.AddrTypeContact)).Only(ctx)
+				if err != nil {
+					return err
+				}
+				if addr.Email != "" {
 					ma := mail.Address{
 						Name:    u.DisplayName,
-						Address: u.Email,
+						Address: addr.Email,
 					}
 					tos = append(tos, ma.String())
 				}

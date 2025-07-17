@@ -13,6 +13,8 @@ export type TreeDataState<T> = {
   node?: T;
 };
 
+export type OrderSort = 'ASC' | 'DESC';
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -314,4 +316,143 @@ export const getMenuAppActions = (list?: MenuJsonData[]) => {
     });
   }
   return initialAuth;
+}
+
+/**
+ * 新增或更新tree结构数据
+ * @param treeList
+ * @param updateData
+ * @param defaultKeys
+ */
+export const saveTreeData = <T extends { children?: T[] }>(
+  treeList: Array<T>,
+  updateData: T,
+  defaultKeys?: {
+    id?: string,
+    parentId?: string,
+    sort?: OrderSort,
+  }) => {
+  const keys = {
+    id: 'id', parentId: 'parentId', sort: 'ASC',
+    ...defaultKeys
+  }
+  const idx = treeList.findIndex(item => item[keys.id] === updateData[keys.id])
+  if (idx === -1) {
+    const pIdx = treeList.findIndex(item => item[keys.id] === updateData[keys.parentId])
+    if (updateData[keys.parentId] === treeList[0][keys.parentId]) {
+      // 属于这一层
+      if (keys.sort === 'ASC') {
+        treeList.push(updateData)
+      } else {
+        treeList.unshift(updateData)
+      }
+    } else {
+      if (pIdx === -1) {
+        // 继续在children寻找位置
+        for (let i = 0; i < treeList.length; i++) {
+          const childList = treeList[i].children;
+          if (childList) {
+            saveTreeData(childList, updateData, defaultKeys)
+          }
+        }
+      } else {
+        // 父节点在这一层
+        if (treeList[pIdx].children) {
+          if (keys.sort === 'ASC') {
+            treeList[pIdx].children.push(updateData)
+          } else {
+            treeList[pIdx].children.unshift(updateData)
+          }
+        } else {
+          treeList[pIdx].children = [updateData]
+        }
+      }
+    }
+  } else {
+    // 更新
+    treeList[idx] = updateData
+  }
+}
+
+
+/**
+ * 移除tree数据
+ * @param treeList
+ * @param id
+ * @param defaultKeys
+ */
+export const delTreeData = <T extends { children?: T[] }>(
+  treeList: Array<T>,
+  id: string,
+  defaultKeys?: {
+    id?: string,
+  }) => {
+  const keys = {
+    id: 'id',
+    ...defaultKeys
+  }
+  const idx = treeList.findIndex(item => item[keys.id] === id)
+  if (idx === -1) {
+    for (let i = 0; i < treeList.length; i++) {
+      const childList = treeList[i].children;
+      if (childList) {
+        delTreeData(childList, id, defaultKeys)
+      }
+    }
+  } else {
+    treeList.splice(idx, 1)
+  }
+}
+
+/**
+ * 创建或修改数据
+ * @param dataSource
+ * @param data
+ * @param defaultKeys
+ */
+export const saveDataSource = <T extends { id: string }>(
+  dataSource: Array<T>,
+  data: T,
+  defaultKeys?: {
+    id?: string,
+    sort?: OrderSort,
+  }) => {
+  const keys = {
+    id: 'id',
+    sort: 'DESC',
+    ...defaultKeys
+  }
+  const idx = dataSource.findIndex(item => item[keys.id] == data[keys.id])
+  if (idx === -1) {
+    switch (keys.sort) {
+      case 'ASC':
+        dataSource.push(data)
+        break;
+      case 'DESC':
+        dataSource.unshift(data)
+        break;
+      default:
+        dataSource.unshift(data)
+        break;
+    }
+  } else {
+    dataSource[idx] = data
+  }
+  return [...dataSource];
+}
+
+/**
+ * 根据id一移除数据
+ * @param dataSource
+ * @param id
+ * @param defaultKeys
+ */
+export const delDataSource = <T extends { id: string }>(dataSource: Array<T>, id: string, defaultKeys?: {
+  id?: string,
+}) => {
+  const keys = {
+    id: 'id',
+    ...defaultKeys
+  }
+  return dataSource.filter(item => item[keys.id] != id)
 }

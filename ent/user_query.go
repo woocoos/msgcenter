@@ -15,6 +15,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
+	"github.com/woocoos/msgcenter/ent/useraddr"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
@@ -22,14 +23,16 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx               *QueryContext
-	order             []user.OrderOption
-	inters            []Interceptor
-	predicates        []predicate.User
-	withSilences      *SilenceQuery
-	modifiers         []func(*sql.Selector)
-	loadTotal         []func(context.Context, []*User) error
-	withNamedSilences map[string]*SilenceQuery
+	ctx                *QueryContext
+	order              []user.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.User
+	withSilences       *SilenceQuery
+	withAddresses      *UserAddrQuery
+	modifiers          []func(*sql.Selector)
+	loadTotal          []func(context.Context, []*User) error
+	withNamedSilences  map[string]*SilenceQuery
+	withNamedAddresses map[string]*UserAddrQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -85,6 +88,31 @@ func (uq *UserQuery) QuerySilences() *SilenceQuery {
 		schemaConfig := uq.schemaConfig
 		step.To.Schema = schemaConfig.Silence
 		step.Edge.Schema = schemaConfig.Silence
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAddresses chains the current query on the "addresses" edge.
+func (uq *UserQuery) QueryAddresses() *UserAddrQuery {
+	query := (&UserAddrClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(useraddr.Table, useraddr.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.AddressesTable, user.AddressesColumn),
+		)
+		schemaConfig := uq.schemaConfig
+		step.To.Schema = schemaConfig.UserAddr
+		step.Edge.Schema = schemaConfig.UserAddr
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
 	}
@@ -278,12 +306,13 @@ func (uq *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:       uq.config,
-		ctx:          uq.ctx.Clone(),
-		order:        append([]user.OrderOption{}, uq.order...),
-		inters:       append([]Interceptor{}, uq.inters...),
-		predicates:   append([]predicate.User{}, uq.predicates...),
-		withSilences: uq.withSilences.Clone(),
+		config:        uq.config,
+		ctx:           uq.ctx.Clone(),
+		order:         append([]user.OrderOption{}, uq.order...),
+		inters:        append([]Interceptor{}, uq.inters...),
+		predicates:    append([]predicate.User{}, uq.predicates...),
+		withSilences:  uq.withSilences.Clone(),
+		withAddresses: uq.withAddresses.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -298,6 +327,17 @@ func (uq *UserQuery) WithSilences(opts ...func(*SilenceQuery)) *UserQuery {
 		opt(query)
 	}
 	uq.withSilences = query
+	return uq
+}
+
+// WithAddresses tells the query-builder to eager-load the nodes that are connected to
+// the "addresses" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithAddresses(opts ...func(*UserAddrQuery)) *UserQuery {
+	query := (&UserAddrClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withAddresses = query
 	return uq
 }
 
@@ -379,8 +419,9 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			uq.withSilences != nil,
+			uq.withAddresses != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -413,10 +454,24 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
+	if query := uq.withAddresses; query != nil {
+		if err := uq.loadAddresses(ctx, query, nodes,
+			func(n *User) { n.Edges.Addresses = []*UserAddr{} },
+			func(n *User, e *UserAddr) { n.Edges.Addresses = append(n.Edges.Addresses, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range uq.withNamedSilences {
 		if err := uq.loadSilences(ctx, query, nodes,
 			func(n *User) { n.appendNamedSilences(name) },
 			func(n *User, e *Silence) { n.appendNamedSilences(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range uq.withNamedAddresses {
+		if err := uq.loadAddresses(ctx, query, nodes,
+			func(n *User) { n.appendNamedAddresses(name) },
+			func(n *User, e *UserAddr) { n.appendNamedAddresses(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -453,6 +508,36 @@ func (uq *UserQuery) loadSilences(ctx context.Context, query *SilenceQuery, node
 		node, ok := nodeids[fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "created_by" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (uq *UserQuery) loadAddresses(ctx context.Context, query *UserAddrQuery, nodes []*User, init func(*User), assign func(*User, *UserAddr)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(useraddr.FieldUserID)
+	}
+	query.Where(predicate.UserAddr(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.AddressesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UserID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -559,6 +644,20 @@ func (uq *UserQuery) WithNamedSilences(name string, opts ...func(*SilenceQuery))
 		uq.withNamedSilences = make(map[string]*SilenceQuery)
 	}
 	uq.withNamedSilences[name] = query
+	return uq
+}
+
+// WithNamedAddresses tells the query-builder to eager-load the nodes that are connected to the "addresses"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithNamedAddresses(name string, opts ...func(*UserAddrQuery)) *UserQuery {
+	query := (&UserAddrClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if uq.withNamedAddresses == nil {
+		uq.withNamedAddresses = make(map[string]*UserAddrQuery)
+	}
+	uq.withNamedAddresses[name] = query
 	return uq
 }
 

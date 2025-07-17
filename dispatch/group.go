@@ -179,21 +179,12 @@ func (ag *aggrGroup) flush(notify func(...*alert.Alert) bool) {
 	logger.Debug("flushing", ag.logField, zap.String("alerts", fmt.Sprintf("%v", alertsSlice)))
 
 	if notify(alertsSlice...) {
-		for _, a := range alertsSlice {
-			// Only delete if the fingerprint has not been inserted
-			// again since we notified about it.
-			fp := a.Fingerprint()
-			got, err := ag.alerts.Get(fp)
-			if err != nil {
-				// This should never happen.
-				logger.Error("failed to get alert", ag.logField, zap.Error(err), zap.String("alert", a.String()))
-				continue
-			}
-			if a.Resolved() && got.UpdatedAt == a.UpdatedAt {
-				if err := ag.alerts.Delete(fp); err != nil {
-					logger.Error("error on delete alert", ag.logField, zap.Error(err), zap.String("alert", a.String()))
-				}
-			}
+		// Delete all resolved alerts as we just sent a notification for them,
+		// and we don't want to send another one. However, we need to make sure
+		// that each resolved alert has not fired again during the flush as then
+		// we would delete an active alert thinking it was resolved.
+		if err := ag.alerts.DeleteIfNotModified(alertsSlice); err != nil {
+			logger.Error("error on delete alerts", zap.Error(err))
 		}
 	}
 }

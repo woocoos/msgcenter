@@ -5,9 +5,9 @@ import { defineAuthConfig } from '@ice/plugin-auth/esm/types';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { defineRequestConfig } from '@ice/plugin-request/esm/types';
 import { defineStoreConfig } from '@ice/plugin-store/esm/types';
-import { instanceName, userPermissions } from '@knockout-js/api';
+import { instanceName, setStsApi, userPermissions } from '@knockout-js/api';
 import { User } from '@knockout-js/api/ucenter';
-import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/request';
+import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/requestInterceptor';
 import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/types";
 import { Result, message } from 'antd';
 import { defineAppConfig, defineDataLoader } from 'ice';
@@ -17,8 +17,13 @@ import { Message } from './generated/msgsrv/graphql';
 import { logout } from './services/auth';
 import { parseSpm } from './services/auth/noStore';
 import { browserLanguage, getMenuAppActions } from './util';
+import { setLibraryName } from '@ice/stark-app';
+import { isInIcestark } from '@ice/stark-app';
+import { store as starkStore, event as starkEvent } from '@ice/stark-data';
 
 const NODE_ENV = process.env.NODE_ENV ?? '',
+  ICE_DEV_TOKEN = process.env.ICE_DEV_TOKEN ?? '',
+  ICE_DEV_TID = process.env.ICE_DEV_TID ?? '',
   ICE_API_MSGSRV = process.env.ICE_API_MSGSRV ?? '',
   ICE_ROUTER_BASENAME = process.env.ICE_ROUTER_BASENAME ?? '/',
   ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
@@ -26,27 +31,16 @@ const NODE_ENV = process.env.NODE_ENV ?? '',
   ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '',
   ICE_HTTP_SIGN = process.env.ICE_HTTP_SIGN ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
-  ICE_WS_MSGSRV = process.env.ICE_WS_MSGSRV ?? '',
-  ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '';
+  ICE_WS_MSGSRV = process.env.ICE_WS_MSGSRV ?? '';
+
+setLibraryName('msgsrv-ui')
 
 export const icestark = defineChildConfig(() => ({
   mount: (data) => {
     // 在微应用挂载前执行
-    if (data?.customProps) {
-      setItem('locale', data.customProps.app.locale);
-      setItem('darkMode', data.customProps.app.darkMode);
-      setItem('compactMode', data.customProps.app.compactMode);
-      setItem('token', data.customProps.user.token);
-      setItem('refreshToken', data.customProps.user.refreshToken);
-      setItem('tenantId', data.customProps.user.tenantId);
-      setItem('user', data.customProps.user.user);
-    }
   },
   unmount: () => {
     // 在微应用卸载后执行
-    removeItem('token');
-    removeItem('refreshToken');
-    removeItem('tenantId');
   },
 }));
 
@@ -63,24 +57,20 @@ export default defineAppConfig(() => ({
 
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
-  if (NODE_ENV === 'development') {
-    // 开发时使用
-    setItem('token', process.env.ICE_DEV_TOKEN)
-    setItem('tenantId', process.env.ICE_DEV_TID)
-    setItem('user', {
-      id: 1,
-      displayName: 'admin',
-    })
+  if (isInIcestark()) {
+    return starkStore.get('iceStore')
   }
-
   const sign = `sign_cid=y`
   if (document.cookie.indexOf(sign) === -1) {
     removeItem('token');
     removeItem('refreshToken');
   }
   document.cookie = `${sign}; path=/`;
+  if (NODE_ENV === 'development' && ICE_DEV_TOKEN && ICE_DEV_TID) {
+    setItem('token', ICE_DEV_TOKEN)
+    setItem('tenantId', ICE_DEV_TID)
+  }
   await parseSpm();
-
   let locale = getItem<string>('locale'),
     darkMode = getItem<string>('darkMode'),
     compactMode = getItem<string>('compactMode'),
@@ -137,11 +127,16 @@ export const urqlConfig = defineUrqlConfig([
       authOpts: {
         store: {
           getState: () => {
-            const userState = store.getModelState('user'),
-              token = userState.token ? userState.token : getItem<string>('token') as string,
+            const userState = store.getModelState('user')
+            let token = userState.token ? userState.token : getItem<string>('token') as string,
               tenantId = userState.tenantId ? userState.tenantId : getItem<string>('tenantId') as string,
               refreshToken = userState.refreshToken ? userState.refreshToken : getItem<string>('refreshToken') as string;
-
+            if (isInIcestark()) {
+              const iceStore = starkStore.get('iceStore')
+              token = starkStore.get('token') ?? iceStore?.user?.token
+              tenantId = iceStore?.user?.tenantId
+              refreshToken = iceStore?.user?.refreshToken
+            }
             return {
               token: token,
               tenantId: tenantId,
@@ -149,7 +144,11 @@ export const urqlConfig = defineUrqlConfig([
             }
           },
           setStateToken: (newToken) => {
-            store.dispatch.user.updateToken(newToken);
+            if (isInIcestark()) {
+              starkEvent.emit('set-token', newToken);
+            } else {
+              store.dispatch.user.updateToken(newToken);
+            }
           }
         },
         error: (err, errstr) => {
@@ -189,11 +188,16 @@ export const urqlConfig = defineUrqlConfig([
 
 // 权限
 export const authConfig = defineAuthConfig(async (appData) => {
-  const initialAuth = getMenuAppActions(),
-    token = appData?.user?.token ? appData.user.token : getItem<string>('token'),
+  const initialAuth = getMenuAppActions()
+  let token = appData?.user?.token ? appData.user.token : getItem<string>('token'),
     tenantId = appData?.user?.tenantId ? appData.user.tenantId : getItem<string>('tenantId');
+  if (isInIcestark()) {
+    const iceStore = starkStore.get('iceStore')
+    token = starkStore.get('token') ?? iceStore?.user?.token
+    tenantId = iceStore?.user?.tenantId
+  }
   // 判断路由权限
-  if (appData?.user?.token) {
+  if (token && tenantId) {
     const result = await userPermissions(ICE_APP_CODE, {
       Authorization: getRequestHeaderAuthorization(token, ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined),
       'X-Tenant-ID': tenantId,
@@ -208,6 +212,7 @@ export const authConfig = defineAuthConfig(async (appData) => {
   } else {
     await logout();
   }
+  setStsApi(`${ICE_API_AUTH_PREFIX}/oss/sts`)
   return {
     initialAuth,
     NoAuthFallback: () => {
@@ -238,8 +243,13 @@ export const requestConfig = defineRequestConfig({
   interceptors: requestInterceptor({
     store: {
       getState: () => {
-        const token = getItem<string>('token') as string,
+        let token = getItem<string>('token') as string,
           tenantId = getItem<string>('tenantId') as string;
+        if (isInIcestark()) {
+          const iceStore = starkStore.get('iceStore')
+          token = starkStore.get('token') ?? iceStore?.user?.token
+          tenantId = iceStore?.user?.tenantId
+        }
         return {
           token: token,
           tenantId: tenantId,
@@ -250,7 +260,7 @@ export const requestConfig = defineRequestConfig({
     login: ICE_LOGIN_URL,
     error: (err, str) => {
       if (str) {
-        window.antd.message.error(str)
+        message.error(str)
       }
     }
   })

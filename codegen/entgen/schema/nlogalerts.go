@@ -7,7 +7,6 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/knockout-go/ent/schemax"
 	"time"
 )
 
@@ -25,8 +24,8 @@ func (NlogAlert) Annotations() []schema.Annotation {
 // Fields of the NlogAlert.
 func (NlogAlert) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("nlog_id").Comment("nlog id").SchemaType(schemax.IntID{}.SchemaType()),
-		field.Int("alert_id").Comment("alert id").SchemaType(schemax.IntID{}.SchemaType()),
+		field.Int("nlog_id").Comment("nlog id"),
+		field.Int("alert_id").Comment("alert id"),
 		field.Time("created_at").Immutable().Default(time.Now).Immutable().
 			Annotations(entgql.OrderField("createdAt"), entgql.Skip(entgql.SkipMutationCreateInput)),
 	}

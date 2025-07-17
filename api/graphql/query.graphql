@@ -165,4 +165,11 @@ extend type Query {
     userUnreadMsgInternalsFromMsgCategory(categories: [String!]!):[Int!]!
     """用户站内信总未读数"""
     userUnreadMsgInternals:Int!
+    """根据模板名称获取模板数据"""
+    msgTemplateDefineByName(
+        """消息类型:文本,网页,需要结合mod确定支持的格式"""
+        format: MsgTemplateFormat!
+        """消息模板的body数据"""
+        body:String!
+    ):String!
 }

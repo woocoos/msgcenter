@@ -4,9 +4,6 @@ import (
 	"context"
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/handler/extension"
-	"github.com/99designs/gqlgen/graphql/handler/lru"
-	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/contrib/gql"
 	"github.com/tsingsun/woocoo/contrib/telemetry/otelweb"
@@ -48,27 +45,14 @@ func (s *Server) buildWebEngine(app *woocoo.App, am *service.AlertManager) {
 	)
 
 	//gql without websocket
-	gqlsrv := handler.New(NewSchema(
+	gqlsrv := handler.NewDefaultServer(NewSchema(
 		WithClient(s.DB),
 		WithCoordinator(am.Coordinator),
 		WithSilences(am.Silences),
 		WithKOClient(am.Coordinator.KOSdk),
 	))
-
-	gqlsrv.AddTransport(transport.Options{})
-	gqlsrv.AddTransport(transport.GET{})
-	gqlsrv.AddTransport(transport.POST{})
-	gqlsrv.AddTransport(transport.MultipartForm{})
-
-	gqlsrv.SetQueryCache(lru.New(1000))
-
-	gqlsrv.Use(extension.Introspection{})
-	gqlsrv.Use(extension.AutomaticPersistedQuery{
-		Cache: lru.New(100),
-	})
-
 	gqlsrv.AroundResponses(middleware.SimplePagination())
-	// mutation事务
+	// mutation transaction
 	gqlsrv.Use(entgql.Transactioner{TxOpener: s.DB})
 	if err := gql.RegisterGraphqlServer(s.WebServer, gqlsrv); err != nil {
 		panic(err)

@@ -41,6 +41,7 @@ func (Nlog) Mixin() []ent.Mixin {
 // Fields of the Nlog.
 func (Nlog) Fields() []ent.Field {
 	return []ent.Field{
+		field.Int(schemax.FieldTenantID).Immutable().Comment("租户ID"),
 		field.String("group_key").Comment("分组键"),
 		field.String("receiver").Comment("接收组名称"),
 		field.Enum("receiver_type").Comment("支持的消息模式:站内信,app推送,邮件,短信,微信等").

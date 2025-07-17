@@ -3,6 +3,7 @@ package notify
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/tsingsun/members"
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/woocoos/msgcenter/pkg/metrics"
@@ -26,7 +27,7 @@ type (
 		// CreateLog creates a new notification log entry. returns the id of the log entry.
 		CreateLog(ctx context.Context, r *profile.ReceiverKey, gkey string, firingAlerts, resolvedAlerts []uint64,
 			expiresAt time.Time) (int, error)
-		EvictLog(ctx context.Context, ids []int)
+		EvictLog(ctx context.Context, ids []string)
 	}
 	// Log holds the notification log state for alerts that have been notified.
 	Log struct {
@@ -105,7 +106,7 @@ func (l *Log) loadData() error {
 	}
 	st := make(state)
 	for _, e := range datas {
-		st[e.ID] = e
+		st[e.GroupKey] = e
 	}
 	l.mu.Lock()
 	l.st = st
@@ -148,15 +149,22 @@ func (l *Log) Stop(ctx context.Context) error {
 	return nil
 }
 
+// stateKey returns a string key for a log entry consisting of the group key
+// and receiver.
+func stateKey(k string, r *profile.ReceiverKey) string {
+	return fmt.Sprintf("%s:%s/%s/%d", k, r.Name, r.Integration, r.Index)
+}
+
 func (l *Log) Log(ctx context.Context, r *profile.ReceiverKey, gkey string, firingAlerts, resolvedAlerts []uint64, expiry time.Duration) error {
 	// Write all st with the same timestamp.
 	now := time.Now()
+	key := stateKey(gkey, r)
+
 	expiresAt := now.Add(l.Retention)
 	if expiry > 0 && l.Retention > expiry {
 		expiresAt = now.Add(expiry)
 	}
-	//key := stateKey(gkey, r)
-	key, err := l.NLogCallback.CreateLog(ctx, r, gkey, firingAlerts, resolvedAlerts, expiresAt)
+	rowId, err := l.NLogCallback.CreateLog(ctx, r, gkey, firingAlerts, resolvedAlerts, expiresAt)
 	if err != nil {
 		return err
 	}
@@ -170,9 +178,9 @@ func (l *Log) Log(ctx context.Context, r *profile.ReceiverKey, gkey string, firi
 		}
 	}
 	e := &LogEntry{
-		ID:       key,
+		ID:       rowId,
 		GroupKey: gkey,
-		Receiver: profile.ReceiverKey{
+		Receiver: &profile.ReceiverKey{
 			Name:        r.Name,
 			Integration: r.Integration,
 			Index:       r.Index,
@@ -204,7 +212,7 @@ func (l *Log) GC() (int, error) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	dl := make([]int, 0, len(l.st))
+	dl := make([]string, 0, len(l.st))
 	for k, le := range l.st {
 		if le.ExpiresAt.IsZero() {
 			return n, errors.New("unexpected zero expiration timestamp")

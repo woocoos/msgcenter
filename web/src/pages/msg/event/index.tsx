@@ -1,10 +1,11 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
-import { Button, Space, Modal } from 'antd';
+import {Button, Space, Modal, message} from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
 import { MsgEvent, MsgEventSimpleStatus, MsgEventWhereInput } from '@/generated/msgsrv/graphql';
 import { EnumMsgEventStatus, delMsgEvent, disableMsgEvent, enableMsgEvent, getMsgEventList } from '@/services/msgsrv/event';
+import { refreshTemplateParams } from '@/services/msgsrv/template';
 import Create from './components/create';
 import { Link } from '@ice/runtime';
 import Config from './components/config';
@@ -12,7 +13,12 @@ import ConfigExample from './components/configExample';
 import { KeepAlive } from '@knockout-js/layout';
 import { DictSelect, DictText } from '@knockout-js/org';
 import { definePageConfig } from 'ice';
+import { delDataSource, saveDataSource } from '@/util';
 
+export const TemplateType = {
+  customer: 'customer',
+  default: 'default',
+};
 
 export default () => {
   const { token } = useToken(),
@@ -27,20 +33,20 @@ export default () => {
           return <DictSelect dictCode="MsgCategory" placeholder={t('please_enter_category')} />
         },
         render(text, record) {
-          return <DictText dictCode="MsgCategory" value={record.msgType.category} />
+          return <DictText dictCode="MsgCategory" value={record.msgType?.category} />
         },
       },
       {
         title: t('msg_type_name'), dataIndex: 'msgTypeName', width: 120,
         render(text, record) {
-          return record.msgType.name
+          return record.msgType?.name ?? ''
         },
       },
       { title: t('msg_event_name'), dataIndex: 'name', width: 120 },
       {
         title: t('way_receiving'), dataIndex: 'modes', width: 120, search: false,
         render(text, record) {
-          return record.modes.split(',').join('、')
+          return record.modes?.split(',')?.join('、')
         },
       },
       {
@@ -72,9 +78,15 @@ export default () => {
             </Auth>
             <Link
               key="template"
-              to={`/msg/template?id=${record.id}`}
+              to={`/msg/template?id=${record.id}&type=${TemplateType.customer}`}
             >
-              {t('template')}
+              {t('temp_customer')}
+            </Link>
+            <Link
+              key="template"
+              to={`/msg/template?id=${record.id}&type=${TemplateType.default}`}
+            >
+              {t('temp_default')}
             </Link>
             <Auth authKey="updateMsgEvent">
               <a
@@ -124,8 +136,8 @@ export default () => {
       title: '',
       id: '',
       scene: 'editor'
-    });
-
+    }),
+    [loadingTempParams,setLoadingTempParams] = useState(false);
 
   const
     onDel = (record: MsgEvent) => {
@@ -135,12 +147,13 @@ export default () => {
         onOk: async (close) => {
           const result = await delMsgEvent(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
+            setDataSource(delDataSource(dataSource, record.id))
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
             close();
           }
         },
@@ -153,19 +166,28 @@ export default () => {
         onOk: async (close) => {
           const result = record.status === MsgEventSimpleStatus.Active ? await disableMsgEvent(record.id) : await enableMsgEvent(record.id);
           if (result?.id) {
-            proTableRef.current?.reload();
+            setDataSource(saveDataSource(dataSource, result as MsgEvent))
             close();
           }
         },
       });
     };
 
-
   return (
     <KeepAlive clearAlive>
       <PageContainer
         header={{
           title: t('msg_event'),
+          extra: <Auth authKey={'refreshTemplateParams'}>
+            <Button size="middle" loading={loadingTempParams} onClick={ async () => {
+              setLoadingTempParams(true )
+              let result = await refreshTemplateParams();
+              if (result){
+                message.success(t('submit_success'));
+              }
+              setLoadingTempParams(false)
+            }}>{t('template_params_refresh')}</Button>
+          </Auth>,
           style: { background: token.colorBgContainer },
           breadcrumb: {
             items: [
@@ -243,9 +265,9 @@ export default () => {
           open={modal.open}
           title={modal.title}
           id={modal.id}
-          onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              setDataSource(saveDataSource(dataSource, newInfo))
             }
             setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
           }}
@@ -255,9 +277,9 @@ export default () => {
           open={modal.open}
           title={modal.title}
           id={modal.id}
-          onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              setDataSource(saveDataSource(dataSource, newInfo))
             }
             setModal({ open: false, title: modal.title, id: '', scene: modal.scene });
           }}

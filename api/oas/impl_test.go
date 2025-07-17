@@ -15,6 +15,7 @@ import (
 	"github.com/woocoos/msgcenter/notify/webhook"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/service"
 	"github.com/woocoos/msgcenter/service/provider/mem"
 	"github.com/woocoos/msgcenter/test/maildev"
 	"github.com/woocoos/msgcenter/test/testsuite"
@@ -24,6 +25,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"testing"
 	"time"
 
@@ -81,6 +83,9 @@ func TestServiceSuite(t *testing.T) {
 func (s *serviceSuite) SetupSuite() {
 	err := s.BaseSuite.Setup()
 	s.Require().NoError(err)
+	s.Require().NoError(s.initData())
+	s.AlertManager, err = service.NewAlertManager(s.App, service.WithClient(s.Client))
+	s.Require().NoError(err)
 
 	s.server, err = NewServer(s.App, s.AlertManager, nil)
 	s.Require().NoError(err)
@@ -108,6 +113,11 @@ func (s *serviceSuite) SetupSuite() {
 	})
 }
 
+// 在此添加特殊的用例数据
+func (s *serviceSuite) initData() error {
+	return nil
+}
+
 // TearDownSuite tears down the test suite
 func (s *serviceSuite) TearDownSuite() {
 	for _, shutdown := range s.shutdowns {
@@ -127,6 +137,33 @@ func (s *serviceSuite) TestPostAlerts() {
 			},
 			Annotations: map[string]string{
 				"summary": "test",
+			},
+			EndsAt:   time.Now().Add(time.Hour),
+			StartsAt: time.Now(),
+		},
+	}
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
+	time.Sleep(time.Second * 2)
+	mail, err := s.maildev.GetLastEmail()
+	s.Require().NoError(err)
+	s.Require().NotNil(mail)
+	s.Require().Equal("alerts@example.com", mail.To[0]["Address"])
+}
+
+// TestPostAlertsWithParams
+func (s *serviceSuite) TestPostAlertsWithParams() {
+	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	req := PostableAlerts{
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					"alertname":       "AlterPassword",
+					label.TenantLabel: "1",
+				},
+			},
+			Annotations: map[string]string{
+				"to":       "alerts@example.com",
+				"nickname": "test",
 			},
 			EndsAt:   time.Now().Add(time.Hour),
 			StartsAt: time.Now(),
@@ -170,6 +207,131 @@ func (s *serviceSuite) TestPostAlertsWithTenant() {
 	s.Require().NoError(err)
 	s.Require().NotNil(mail)
 	s.Require().Equal(to, mail.To[0]["Address"])
+}
+
+// TestPostAlertsWithDefaultTpl tenant with custom template and attachment
+func (s *serviceSuite) TestPostAlertsWithDefaultTpl() {
+	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	// rand a string
+	to := fmt.Sprintf("%d@localhost", rand.Intn(10000000))
+	// route: default
+	req := PostableAlerts{
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					"receiver":           "email",
+					label.AlertNameLabel: "defaultparams",
+					label.TenantLabel:    "1",
+				},
+			},
+			Annotations: map[string]string{
+				"to":        to,
+				"nickname":  "test",
+				"timestamp": strconv.Itoa(int(time.Now().Unix())),
+			},
+			EndsAt:   time.Now().Add(time.Hour),
+			StartsAt: time.Now(),
+		},
+	}
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
+	time.Sleep(time.Second * 10)
+	mail, err := s.maildev.GetLastEmail()
+	s.Require().NoError(err)
+	s.Require().NotNil(mail)
+	s.Require().Equal(to, mail.To[0]["Address"])
+}
+
+func (s *serviceSuite) TestPostAlertsWithGroupBy() {
+	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	// rand a string
+	to := fmt.Sprintf("%d@localhost", rand.Intn(10000000))
+	// route: default
+	req1 := PostableAlerts{
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					"receiver":           "email",
+					label.AlertNameLabel: "MsgGroupBy",
+					label.TenantLabel:    "1",
+					"timestamp":          strconv.Itoa(int(time.Now().Unix())),
+				},
+			},
+			Annotations: map[string]string{
+				"to":       to,
+				"nickname": "test1",
+				"message":  "msg1",
+			},
+		},
+	}
+	fmt.Println("===start 1===")
+	err := s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req1})
+	s.Require().NoError(err)
+	// sleep5秒，等待req1消息发送完成
+	time.Sleep(time.Second * 5)
+	fmt.Println("===start 2===")
+	req2 := PostableAlerts{
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					"receiver":           "email",
+					label.AlertNameLabel: "MsgGroupBy",
+					label.TenantLabel:    "1",
+					"timestamp":          strconv.Itoa(int(time.Now().Add(1 * time.Second).Unix())),
+				},
+			},
+			Annotations: map[string]string{
+				"to":       to,
+				"nickname": "test1",
+				"message":  "msg2",
+			},
+		},
+	}
+	err = s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req2})
+	s.Require().NoError(err)
+	// sleep5秒，等待req1消息发送完成
+	time.Sleep(time.Second * 5)
+	fmt.Println("===start 3===")
+	req3 := PostableAlerts{
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					"receiver":           "email",
+					label.AlertNameLabel: "MsgGroupBy",
+					label.TenantLabel:    "1",
+					"timestamp":          strconv.Itoa(int(time.Now().Add(2 * time.Second).Unix())),
+				},
+			},
+			Annotations: map[string]string{
+				"to":       to,
+				"nickname": "test1",
+				"message":  "msg3",
+			},
+		},
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					"receiver":           "email",
+					label.AlertNameLabel: "MsgGroupBy",
+					label.TenantLabel:    "1",
+					"timestamp":          strconv.Itoa(int(time.Now().Add(3 * time.Second).Unix())),
+				},
+			},
+			Annotations: map[string]string{
+				"to":       to,
+				"nickname": "test1",
+				"message":  "msg4",
+			},
+		},
+	}
+	err = s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req3})
+	s.Require().NoError(err)
+	time.Sleep(time.Second * 30)
+	mail, err := s.maildev.GetLastEmail()
+	s.Require().NoError(err)
+	s.Require().NotNil(mail)
+	s.Require().Equal(to, mail.To[0]["Address"])
+
+	//二次测试
 }
 
 // TestPostAlertsWithTenant tenant with custom template and attachment

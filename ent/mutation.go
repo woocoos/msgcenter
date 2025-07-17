@@ -26,6 +26,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
+	"github.com/woocoos/msgcenter/ent/useraddr"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -53,6 +54,7 @@ const (
 	TypeOrgRoleUser   = "OrgRoleUser"
 	TypeSilence       = "Silence"
 	TypeUser          = "User"
+	TypeUserAddr      = "UserAddr"
 )
 
 // MsgAlertMutation represents an operation that mutates the MsgAlert nodes in the graph.
@@ -3441,14 +3443,14 @@ type MsgInternalMutation struct {
 	op                     Op
 	typ                    string
 	id                     *int
-	tenant_id              *int
-	addtenant_id           *int
 	created_by             *int
 	addcreated_by          *int
 	created_at             *time.Time
 	updated_by             *int
 	addupdated_by          *int
 	updated_at             *time.Time
+	tenant_id              *int
+	addtenant_id           *int
 	category               *string
 	subject                *string
 	body                   *string
@@ -3565,62 +3567,6 @@ func (m *MsgInternalMutation) IDs(ctx context.Context) ([]int, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
-}
-
-// SetTenantID sets the "tenant_id" field.
-func (m *MsgInternalMutation) SetTenantID(i int) {
-	m.tenant_id = &i
-	m.addtenant_id = nil
-}
-
-// TenantID returns the value of the "tenant_id" field in the mutation.
-func (m *MsgInternalMutation) TenantID() (r int, exists bool) {
-	v := m.tenant_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTenantID returns the old "tenant_id" field's value of the MsgInternal entity.
-// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MsgInternalMutation) OldTenantID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTenantID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
-	}
-	return oldValue.TenantID, nil
-}
-
-// AddTenantID adds i to the "tenant_id" field.
-func (m *MsgInternalMutation) AddTenantID(i int) {
-	if m.addtenant_id != nil {
-		*m.addtenant_id += i
-	} else {
-		m.addtenant_id = &i
-	}
-}
-
-// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
-func (m *MsgInternalMutation) AddedTenantID() (r int, exists bool) {
-	v := m.addtenant_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetTenantID resets all changes to the "tenant_id" field.
-func (m *MsgInternalMutation) ResetTenantID() {
-	m.tenant_id = nil
-	m.addtenant_id = nil
 }
 
 // SetCreatedBy sets the "created_by" field.
@@ -3832,6 +3778,62 @@ func (m *MsgInternalMutation) UpdatedAtCleared() bool {
 func (m *MsgInternalMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 	delete(m.clearedFields, msginternal.FieldUpdatedAt)
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *MsgInternalMutation) SetTenantID(i int) {
+	m.tenant_id = &i
+	m.addtenant_id = nil
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *MsgInternalMutation) TenantID() (r int, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the MsgInternal entity.
+// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalMutation) OldTenantID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// AddTenantID adds i to the "tenant_id" field.
+func (m *MsgInternalMutation) AddTenantID(i int) {
+	if m.addtenant_id != nil {
+		*m.addtenant_id += i
+	} else {
+		m.addtenant_id = &i
+	}
+}
+
+// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
+func (m *MsgInternalMutation) AddedTenantID() (r int, exists bool) {
+	v := m.addtenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *MsgInternalMutation) ResetTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
 }
 
 // SetCategory sets the "category" field.
@@ -4129,9 +4131,6 @@ func (m *MsgInternalMutation) Type() string {
 // AddedFields().
 func (m *MsgInternalMutation) Fields() []string {
 	fields := make([]string, 0, 10)
-	if m.tenant_id != nil {
-		fields = append(fields, msginternal.FieldTenantID)
-	}
 	if m.created_by != nil {
 		fields = append(fields, msginternal.FieldCreatedBy)
 	}
@@ -4143,6 +4142,9 @@ func (m *MsgInternalMutation) Fields() []string {
 	}
 	if m.updated_at != nil {
 		fields = append(fields, msginternal.FieldUpdatedAt)
+	}
+	if m.tenant_id != nil {
+		fields = append(fields, msginternal.FieldTenantID)
 	}
 	if m.category != nil {
 		fields = append(fields, msginternal.FieldCategory)
@@ -4167,8 +4169,6 @@ func (m *MsgInternalMutation) Fields() []string {
 // schema.
 func (m *MsgInternalMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case msginternal.FieldTenantID:
-		return m.TenantID()
 	case msginternal.FieldCreatedBy:
 		return m.CreatedBy()
 	case msginternal.FieldCreatedAt:
@@ -4177,6 +4177,8 @@ func (m *MsgInternalMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedBy()
 	case msginternal.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case msginternal.FieldTenantID:
+		return m.TenantID()
 	case msginternal.FieldCategory:
 		return m.Category()
 	case msginternal.FieldSubject:
@@ -4196,8 +4198,6 @@ func (m *MsgInternalMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *MsgInternalMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case msginternal.FieldTenantID:
-		return m.OldTenantID(ctx)
 	case msginternal.FieldCreatedBy:
 		return m.OldCreatedBy(ctx)
 	case msginternal.FieldCreatedAt:
@@ -4206,6 +4206,8 @@ func (m *MsgInternalMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldUpdatedBy(ctx)
 	case msginternal.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case msginternal.FieldTenantID:
+		return m.OldTenantID(ctx)
 	case msginternal.FieldCategory:
 		return m.OldCategory(ctx)
 	case msginternal.FieldSubject:
@@ -4225,13 +4227,6 @@ func (m *MsgInternalMutation) OldField(ctx context.Context, name string) (ent.Va
 // type.
 func (m *MsgInternalMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case msginternal.FieldTenantID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTenantID(v)
-		return nil
 	case msginternal.FieldCreatedBy:
 		v, ok := value.(int)
 		if !ok {
@@ -4259,6 +4254,13 @@ func (m *MsgInternalMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case msginternal.FieldTenantID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
 		return nil
 	case msginternal.FieldCategory:
 		v, ok := value.(string)
@@ -4303,14 +4305,14 @@ func (m *MsgInternalMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *MsgInternalMutation) AddedFields() []string {
 	var fields []string
-	if m.addtenant_id != nil {
-		fields = append(fields, msginternal.FieldTenantID)
-	}
 	if m.addcreated_by != nil {
 		fields = append(fields, msginternal.FieldCreatedBy)
 	}
 	if m.addupdated_by != nil {
 		fields = append(fields, msginternal.FieldUpdatedBy)
+	}
+	if m.addtenant_id != nil {
+		fields = append(fields, msginternal.FieldTenantID)
 	}
 	return fields
 }
@@ -4320,12 +4322,12 @@ func (m *MsgInternalMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *MsgInternalMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case msginternal.FieldTenantID:
-		return m.AddedTenantID()
 	case msginternal.FieldCreatedBy:
 		return m.AddedCreatedBy()
 	case msginternal.FieldUpdatedBy:
 		return m.AddedUpdatedBy()
+	case msginternal.FieldTenantID:
+		return m.AddedTenantID()
 	}
 	return nil, false
 }
@@ -4335,13 +4337,6 @@ func (m *MsgInternalMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *MsgInternalMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case msginternal.FieldTenantID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddTenantID(v)
-		return nil
 	case msginternal.FieldCreatedBy:
 		v, ok := value.(int)
 		if !ok {
@@ -4355,6 +4350,13 @@ func (m *MsgInternalMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddUpdatedBy(v)
+		return nil
+	case msginternal.FieldTenantID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTenantID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown MsgInternal numeric field %s", name)
@@ -4410,9 +4412,6 @@ func (m *MsgInternalMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *MsgInternalMutation) ResetField(name string) error {
 	switch name {
-	case msginternal.FieldTenantID:
-		m.ResetTenantID()
-		return nil
 	case msginternal.FieldCreatedBy:
 		m.ResetCreatedBy()
 		return nil
@@ -4424,6 +4423,9 @@ func (m *MsgInternalMutation) ResetField(name string) error {
 		return nil
 	case msginternal.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case msginternal.FieldTenantID:
+		m.ResetTenantID()
 		return nil
 	case msginternal.FieldCategory:
 		m.ResetCategory()
@@ -6901,10 +6903,24 @@ func (m *MsgTemplateMutation) AddedTenantID() (r int, exists bool) {
 	return *v, true
 }
 
+// ClearTenantID clears the value of the "tenant_id" field.
+func (m *MsgTemplateMutation) ClearTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+	m.clearedFields[msgtemplate.FieldTenantID] = struct{}{}
+}
+
+// TenantIDCleared returns if the "tenant_id" field was cleared in this mutation.
+func (m *MsgTemplateMutation) TenantIDCleared() bool {
+	_, ok := m.clearedFields[msgtemplate.FieldTenantID]
+	return ok
+}
+
 // ResetTenantID resets all changes to the "tenant_id" field.
 func (m *MsgTemplateMutation) ResetTenantID() {
 	m.tenant_id = nil
 	m.addtenant_id = nil
+	delete(m.clearedFields, msgtemplate.FieldTenantID)
 }
 
 // SetName sets the "name" field.
@@ -7989,6 +8005,9 @@ func (m *MsgTemplateMutation) ClearedFields() []string {
 	if m.FieldCleared(msgtemplate.FieldUpdatedAt) {
 		fields = append(fields, msgtemplate.FieldUpdatedAt)
 	}
+	if m.FieldCleared(msgtemplate.FieldTenantID) {
+		fields = append(fields, msgtemplate.FieldTenantID)
+	}
 	if m.FieldCleared(msgtemplate.FieldStatus) {
 		fields = append(fields, msgtemplate.FieldStatus)
 	}
@@ -8038,6 +8057,9 @@ func (m *MsgTemplateMutation) ClearField(name string) error {
 		return nil
 	case msgtemplate.FieldUpdatedAt:
 		m.ClearUpdatedAt()
+		return nil
+	case msgtemplate.FieldTenantID:
+		m.ClearTenantID()
 		return nil
 	case msgtemplate.FieldStatus:
 		m.ClearStatus()
@@ -12754,20 +12776,21 @@ func (m *SilenceMutation) ResetEdge(name string) error {
 // UserMutation represents an operation that mutates the User nodes in the graph.
 type UserMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *int
-	principal_name  *string
-	display_name    *string
-	email           *string
-	mobile          *string
-	clearedFields   map[string]struct{}
-	silences        map[int]struct{}
-	removedsilences map[int]struct{}
-	clearedsilences bool
-	done            bool
-	oldValue        func(context.Context) (*User, error)
-	predicates      []predicate.User
+	op               Op
+	typ              string
+	id               *int
+	principal_name   *string
+	display_name     *string
+	clearedFields    map[string]struct{}
+	silences         map[int]struct{}
+	removedsilences  map[int]struct{}
+	clearedsilences  bool
+	addresses        map[int]struct{}
+	removedaddresses map[int]struct{}
+	clearedaddresses bool
+	done             bool
+	oldValue         func(context.Context) (*User, error)
+	predicates       []predicate.User
 }
 
 var _ ent.Mutation = (*UserMutation)(nil)
@@ -12946,104 +12969,6 @@ func (m *UserMutation) ResetDisplayName() {
 	m.display_name = nil
 }
 
-// SetEmail sets the "email" field.
-func (m *UserMutation) SetEmail(s string) {
-	m.email = &s
-}
-
-// Email returns the value of the "email" field in the mutation.
-func (m *UserMutation) Email() (r string, exists bool) {
-	v := m.email
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldEmail returns the old "email" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldEmail(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEmail requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEmail: %w", err)
-	}
-	return oldValue.Email, nil
-}
-
-// ClearEmail clears the value of the "email" field.
-func (m *UserMutation) ClearEmail() {
-	m.email = nil
-	m.clearedFields[user.FieldEmail] = struct{}{}
-}
-
-// EmailCleared returns if the "email" field was cleared in this mutation.
-func (m *UserMutation) EmailCleared() bool {
-	_, ok := m.clearedFields[user.FieldEmail]
-	return ok
-}
-
-// ResetEmail resets all changes to the "email" field.
-func (m *UserMutation) ResetEmail() {
-	m.email = nil
-	delete(m.clearedFields, user.FieldEmail)
-}
-
-// SetMobile sets the "mobile" field.
-func (m *UserMutation) SetMobile(s string) {
-	m.mobile = &s
-}
-
-// Mobile returns the value of the "mobile" field in the mutation.
-func (m *UserMutation) Mobile() (r string, exists bool) {
-	v := m.mobile
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldMobile returns the old "mobile" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldMobile(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldMobile is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldMobile requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMobile: %w", err)
-	}
-	return oldValue.Mobile, nil
-}
-
-// ClearMobile clears the value of the "mobile" field.
-func (m *UserMutation) ClearMobile() {
-	m.mobile = nil
-	m.clearedFields[user.FieldMobile] = struct{}{}
-}
-
-// MobileCleared returns if the "mobile" field was cleared in this mutation.
-func (m *UserMutation) MobileCleared() bool {
-	_, ok := m.clearedFields[user.FieldMobile]
-	return ok
-}
-
-// ResetMobile resets all changes to the "mobile" field.
-func (m *UserMutation) ResetMobile() {
-	m.mobile = nil
-	delete(m.clearedFields, user.FieldMobile)
-}
-
 // AddSilenceIDs adds the "silences" edge to the Silence entity by ids.
 func (m *UserMutation) AddSilenceIDs(ids ...int) {
 	if m.silences == nil {
@@ -13098,6 +13023,60 @@ func (m *UserMutation) ResetSilences() {
 	m.removedsilences = nil
 }
 
+// AddAddressIDs adds the "addresses" edge to the UserAddr entity by ids.
+func (m *UserMutation) AddAddressIDs(ids ...int) {
+	if m.addresses == nil {
+		m.addresses = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.addresses[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAddresses clears the "addresses" edge to the UserAddr entity.
+func (m *UserMutation) ClearAddresses() {
+	m.clearedaddresses = true
+}
+
+// AddressesCleared reports if the "addresses" edge to the UserAddr entity was cleared.
+func (m *UserMutation) AddressesCleared() bool {
+	return m.clearedaddresses
+}
+
+// RemoveAddressIDs removes the "addresses" edge to the UserAddr entity by IDs.
+func (m *UserMutation) RemoveAddressIDs(ids ...int) {
+	if m.removedaddresses == nil {
+		m.removedaddresses = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.addresses, ids[i])
+		m.removedaddresses[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAddresses returns the removed IDs of the "addresses" edge to the UserAddr entity.
+func (m *UserMutation) RemovedAddressesIDs() (ids []int) {
+	for id := range m.removedaddresses {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AddressesIDs returns the "addresses" edge IDs in the mutation.
+func (m *UserMutation) AddressesIDs() (ids []int) {
+	for id := range m.addresses {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAddresses resets all changes to the "addresses" edge.
+func (m *UserMutation) ResetAddresses() {
+	m.addresses = nil
+	m.clearedaddresses = false
+	m.removedaddresses = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -13132,18 +13111,12 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 2)
 	if m.principal_name != nil {
 		fields = append(fields, user.FieldPrincipalName)
 	}
 	if m.display_name != nil {
 		fields = append(fields, user.FieldDisplayName)
-	}
-	if m.email != nil {
-		fields = append(fields, user.FieldEmail)
-	}
-	if m.mobile != nil {
-		fields = append(fields, user.FieldMobile)
 	}
 	return fields
 }
@@ -13157,10 +13130,6 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.PrincipalName()
 	case user.FieldDisplayName:
 		return m.DisplayName()
-	case user.FieldEmail:
-		return m.Email()
-	case user.FieldMobile:
-		return m.Mobile()
 	}
 	return nil, false
 }
@@ -13174,10 +13143,6 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldPrincipalName(ctx)
 	case user.FieldDisplayName:
 		return m.OldDisplayName(ctx)
-	case user.FieldEmail:
-		return m.OldEmail(ctx)
-	case user.FieldMobile:
-		return m.OldMobile(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -13200,20 +13165,6 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDisplayName(v)
-		return nil
-	case user.FieldEmail:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetEmail(v)
-		return nil
-	case user.FieldMobile:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetMobile(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -13244,14 +13195,7 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(user.FieldEmail) {
-		fields = append(fields, user.FieldEmail)
-	}
-	if m.FieldCleared(user.FieldMobile) {
-		fields = append(fields, user.FieldMobile)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -13264,14 +13208,6 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
-	switch name {
-	case user.FieldEmail:
-		m.ClearEmail()
-		return nil
-	case user.FieldMobile:
-		m.ClearMobile()
-		return nil
-	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
 
@@ -13285,21 +13221,18 @@ func (m *UserMutation) ResetField(name string) error {
 	case user.FieldDisplayName:
 		m.ResetDisplayName()
 		return nil
-	case user.FieldEmail:
-		m.ResetEmail()
-		return nil
-	case user.FieldMobile:
-		m.ResetMobile()
-		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.silences != nil {
 		edges = append(edges, user.EdgeSilences)
+	}
+	if m.addresses != nil {
+		edges = append(edges, user.EdgeAddresses)
 	}
 	return edges
 }
@@ -13314,15 +13247,24 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeAddresses:
+		ids := make([]ent.Value, 0, len(m.addresses))
+		for id := range m.addresses {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.removedsilences != nil {
 		edges = append(edges, user.EdgeSilences)
+	}
+	if m.removedaddresses != nil {
+		edges = append(edges, user.EdgeAddresses)
 	}
 	return edges
 }
@@ -13337,15 +13279,24 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeAddresses:
+		ids := make([]ent.Value, 0, len(m.removedaddresses))
+		for id := range m.removedaddresses {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedsilences {
 		edges = append(edges, user.EdgeSilences)
+	}
+	if m.clearedaddresses {
+		edges = append(edges, user.EdgeAddresses)
 	}
 	return edges
 }
@@ -13356,6 +13307,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 	switch name {
 	case user.EdgeSilences:
 		return m.clearedsilences
+	case user.EdgeAddresses:
+		return m.clearedaddresses
 	}
 	return false
 }
@@ -13375,6 +13328,1146 @@ func (m *UserMutation) ResetEdge(name string) error {
 	case user.EdgeSilences:
 		m.ResetSilences()
 		return nil
+	case user.EdgeAddresses:
+		m.ResetAddresses()
+		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)
+}
+
+// UserAddrMutation represents an operation that mutates the UserAddr nodes in the graph.
+type UserAddrMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	addr_type     *useraddr.AddrType
+	region_id     *int
+	addregion_id  *int
+	addr          *string
+	email         *string
+	fax           *string
+	zip_code      *string
+	tel           *string
+	mobile        *string
+	name          *string
+	is_default    *bool
+	clearedFields map[string]struct{}
+	user          *int
+	cleareduser   bool
+	done          bool
+	oldValue      func(context.Context) (*UserAddr, error)
+	predicates    []predicate.UserAddr
+}
+
+var _ ent.Mutation = (*UserAddrMutation)(nil)
+
+// useraddrOption allows management of the mutation configuration using functional options.
+type useraddrOption func(*UserAddrMutation)
+
+// newUserAddrMutation creates new mutation for the UserAddr entity.
+func newUserAddrMutation(c config, op Op, opts ...useraddrOption) *UserAddrMutation {
+	m := &UserAddrMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeUserAddr,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withUserAddrID sets the ID field of the mutation.
+func withUserAddrID(id int) useraddrOption {
+	return func(m *UserAddrMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *UserAddr
+		)
+		m.oldValue = func(ctx context.Context) (*UserAddr, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().UserAddr.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withUserAddr sets the old UserAddr of the mutation.
+func withUserAddr(node *UserAddr) useraddrOption {
+	return func(m *UserAddrMutation) {
+		m.oldValue = func(context.Context) (*UserAddr, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m UserAddrMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m UserAddrMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of UserAddr entities.
+func (m *UserAddrMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *UserAddrMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *UserAddrMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().UserAddr.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetUserID sets the "user_id" field.
+func (m *UserAddrMutation) SetUserID(i int) {
+	m.user = &i
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *UserAddrMutation) UserID() (r int, exists bool) {
+	v := m.user
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the UserAddr entity.
+// If the UserAddr object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserAddrMutation) OldUserID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (m *UserAddrMutation) ClearUserID() {
+	m.user = nil
+	m.clearedFields[useraddr.FieldUserID] = struct{}{}
+}
+
+// UserIDCleared returns if the "user_id" field was cleared in this mutation.
+func (m *UserAddrMutation) UserIDCleared() bool {
+	_, ok := m.clearedFields[useraddr.FieldUserID]
+	return ok
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *UserAddrMutation) ResetUserID() {
+	m.user = nil
+	delete(m.clearedFields, useraddr.FieldUserID)
+}
+
+// SetAddrType sets the "addr_type" field.
+func (m *UserAddrMutation) SetAddrType(ut useraddr.AddrType) {
+	m.addr_type = &ut
+}
+
+// AddrType returns the value of the "addr_type" field in the mutation.
+func (m *UserAddrMutation) AddrType() (r useraddr.AddrType, exists bool) {
+	v := m.addr_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAddrType returns the old "addr_type" field's value of the UserAddr entity.
+// If the UserAddr object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserAddrMutation) OldAddrType(ctx context.Context) (v useraddr.AddrType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAddrType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAddrType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAddrType: %w", err)
+	}
+	return oldValue.AddrType, nil
+}
+
+// ResetAddrType resets all changes to the "addr_type" field.
+func (m *UserAddrMutation) ResetAddrType() {
+	m.addr_type = nil
+}
+
+// SetRegionID sets the "region_id" field.
+func (m *UserAddrMutation) SetRegionID(i int) {
+	m.region_id = &i
+	m.addregion_id = nil
+}
+
+// RegionID returns the value of the "region_id" field in the mutation.
+func (m *UserAddrMutation) RegionID() (r int, exists bool) {
+	v := m.region_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRegionID returns the old "region_id" field's value of the UserAddr entity.
+// If the UserAddr object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserAddrMutation) OldRegionID(ctx context.Context) (v *int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRegionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRegionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRegionID: %w", err)
+	}
+	return oldValue.RegionID, nil
+}
+
+// AddRegionID adds i to the "region_id" field.
+func (m *UserAddrMutation) AddRegionID(i int) {
+	if m.addregion_id != nil {
+		*m.addregion_id += i
+	} else {
+		m.addregion_id = &i
+	}
+}
+
+// AddedRegionID returns the value that was added to the "region_id" field in this mutation.
+func (m *UserAddrMutation) AddedRegionID() (r int, exists bool) {
+	v := m.addregion_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearRegionID clears the value of the "region_id" field.
+func (m *UserAddrMutation) ClearRegionID() {
+	m.region_id = nil
+	m.addregion_id = nil
+	m.clearedFields[useraddr.FieldRegionID] = struct{}{}
+}
+
+// RegionIDCleared returns if the "region_id" field was cleared in this mutation.
+func (m *UserAddrMutation) RegionIDCleared() bool {
+	_, ok := m.clearedFields[useraddr.FieldRegionID]
+	return ok
+}
+
+// ResetRegionID resets all changes to the "region_id" field.
+func (m *UserAddrMutation) ResetRegionID() {
+	m.region_id = nil
+	m.addregion_id = nil
+	delete(m.clearedFields, useraddr.FieldRegionID)
+}
+
+// SetAddr sets the "addr" field.
+func (m *UserAddrMutation) SetAddr(s string) {
+	m.addr = &s
+}
+
+// Addr returns the value of the "addr" field in the mutation.
+func (m *UserAddrMutation) Addr() (r string, exists bool) {
+	v := m.addr
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAddr returns the old "addr" field's value of the UserAddr entity.
+// If the UserAddr object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserAddrMutation) OldAddr(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAddr is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAddr requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAddr: %w", err)
+	}
+	return oldValue.Addr, nil
+}
+
+// ClearAddr clears the value of the "addr" field.
+func (m *UserAddrMutation) ClearAddr() {
+	m.addr = nil
+	m.clearedFields[useraddr.FieldAddr] = struct{}{}
+}
+
+// AddrCleared returns if the "addr" field was cleared in this mutation.
+func (m *UserAddrMutation) AddrCleared() bool {
+	_, ok := m.clearedFields[useraddr.FieldAddr]
+	return ok
+}
+
+// ResetAddr resets all changes to the "addr" field.
+func (m *UserAddrMutation) ResetAddr() {
+	m.addr = nil
+	delete(m.clearedFields, useraddr.FieldAddr)
+}
+
+// SetEmail sets the "email" field.
+func (m *UserAddrMutation) SetEmail(s string) {
+	m.email = &s
+}
+
+// Email returns the value of the "email" field in the mutation.
+func (m *UserAddrMutation) Email() (r string, exists bool) {
+	v := m.email
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEmail returns the old "email" field's value of the UserAddr entity.
+// If the UserAddr object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserAddrMutation) OldEmail(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEmail requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEmail: %w", err)
+	}
+	return oldValue.Email, nil
+}
+
+// ClearEmail clears the value of the "email" field.
+func (m *UserAddrMutation) ClearEmail() {
+	m.email = nil
+	m.clearedFields[useraddr.FieldEmail] = struct{}{}
+}
+
+// EmailCleared returns if the "email" field was cleared in this mutation.
+func (m *UserAddrMutation) EmailCleared() bool {
+	_, ok := m.clearedFields[useraddr.FieldEmail]
+	return ok
+}
+
+// ResetEmail resets all changes to the "email" field.
+func (m *UserAddrMutation) ResetEmail() {
+	m.email = nil
+	delete(m.clearedFields, useraddr.FieldEmail)
+}
+
+// SetFax sets the "fax" field.
+func (m *UserAddrMutation) SetFax(s string) {
+	m.fax = &s
+}
+
+// Fax returns the value of the "fax" field in the mutation.
+func (m *UserAddrMutation) Fax() (r string, exists bool) {
+	v := m.fax
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFax returns the old "fax" field's value of the UserAddr entity.
+// If the UserAddr object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserAddrMutation) OldFax(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFax is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFax requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFax: %w", err)
+	}
+	return oldValue.Fax, nil
+}
+
+// ClearFax clears the value of the "fax" field.
+func (m *UserAddrMutation) ClearFax() {
+	m.fax = nil
+	m.clearedFields[useraddr.FieldFax] = struct{}{}
+}
+
+// FaxCleared returns if the "fax" field was cleared in this mutation.
+func (m *UserAddrMutation) FaxCleared() bool {
+	_, ok := m.clearedFields[useraddr.FieldFax]
+	return ok
+}
+
+// ResetFax resets all changes to the "fax" field.
+func (m *UserAddrMutation) ResetFax() {
+	m.fax = nil
+	delete(m.clearedFields, useraddr.FieldFax)
+}
+
+// SetZipCode sets the "zip_code" field.
+func (m *UserAddrMutation) SetZipCode(s string) {
+	m.zip_code = &s
+}
+
+// ZipCode returns the value of the "zip_code" field in the mutation.
+func (m *UserAddrMutation) ZipCode() (r string, exists bool) {
+	v := m.zip_code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldZipCode returns the old "zip_code" field's value of the UserAddr entity.
+// If the UserAddr object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserAddrMutation) OldZipCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldZipCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldZipCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldZipCode: %w", err)
+	}
+	return oldValue.ZipCode, nil
+}
+
+// ClearZipCode clears the value of the "zip_code" field.
+func (m *UserAddrMutation) ClearZipCode() {
+	m.zip_code = nil
+	m.clearedFields[useraddr.FieldZipCode] = struct{}{}
+}
+
+// ZipCodeCleared returns if the "zip_code" field was cleared in this mutation.
+func (m *UserAddrMutation) ZipCodeCleared() bool {
+	_, ok := m.clearedFields[useraddr.FieldZipCode]
+	return ok
+}
+
+// ResetZipCode resets all changes to the "zip_code" field.
+func (m *UserAddrMutation) ResetZipCode() {
+	m.zip_code = nil
+	delete(m.clearedFields, useraddr.FieldZipCode)
+}
+
+// SetTel sets the "tel" field.
+func (m *UserAddrMutation) SetTel(s string) {
+	m.tel = &s
+}
+
+// Tel returns the value of the "tel" field in the mutation.
+func (m *UserAddrMutation) Tel() (r string, exists bool) {
+	v := m.tel
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTel returns the old "tel" field's value of the UserAddr entity.
+// If the UserAddr object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserAddrMutation) OldTel(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTel: %w", err)
+	}
+	return oldValue.Tel, nil
+}
+
+// ClearTel clears the value of the "tel" field.
+func (m *UserAddrMutation) ClearTel() {
+	m.tel = nil
+	m.clearedFields[useraddr.FieldTel] = struct{}{}
+}
+
+// TelCleared returns if the "tel" field was cleared in this mutation.
+func (m *UserAddrMutation) TelCleared() bool {
+	_, ok := m.clearedFields[useraddr.FieldTel]
+	return ok
+}
+
+// ResetTel resets all changes to the "tel" field.
+func (m *UserAddrMutation) ResetTel() {
+	m.tel = nil
+	delete(m.clearedFields, useraddr.FieldTel)
+}
+
+// SetMobile sets the "mobile" field.
+func (m *UserAddrMutation) SetMobile(s string) {
+	m.mobile = &s
+}
+
+// Mobile returns the value of the "mobile" field in the mutation.
+func (m *UserAddrMutation) Mobile() (r string, exists bool) {
+	v := m.mobile
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMobile returns the old "mobile" field's value of the UserAddr entity.
+// If the UserAddr object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserAddrMutation) OldMobile(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMobile is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMobile requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMobile: %w", err)
+	}
+	return oldValue.Mobile, nil
+}
+
+// ClearMobile clears the value of the "mobile" field.
+func (m *UserAddrMutation) ClearMobile() {
+	m.mobile = nil
+	m.clearedFields[useraddr.FieldMobile] = struct{}{}
+}
+
+// MobileCleared returns if the "mobile" field was cleared in this mutation.
+func (m *UserAddrMutation) MobileCleared() bool {
+	_, ok := m.clearedFields[useraddr.FieldMobile]
+	return ok
+}
+
+// ResetMobile resets all changes to the "mobile" field.
+func (m *UserAddrMutation) ResetMobile() {
+	m.mobile = nil
+	delete(m.clearedFields, useraddr.FieldMobile)
+}
+
+// SetName sets the "name" field.
+func (m *UserAddrMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *UserAddrMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the UserAddr entity.
+// If the UserAddr object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserAddrMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ClearName clears the value of the "name" field.
+func (m *UserAddrMutation) ClearName() {
+	m.name = nil
+	m.clearedFields[useraddr.FieldName] = struct{}{}
+}
+
+// NameCleared returns if the "name" field was cleared in this mutation.
+func (m *UserAddrMutation) NameCleared() bool {
+	_, ok := m.clearedFields[useraddr.FieldName]
+	return ok
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *UserAddrMutation) ResetName() {
+	m.name = nil
+	delete(m.clearedFields, useraddr.FieldName)
+}
+
+// SetIsDefault sets the "is_default" field.
+func (m *UserAddrMutation) SetIsDefault(b bool) {
+	m.is_default = &b
+}
+
+// IsDefault returns the value of the "is_default" field in the mutation.
+func (m *UserAddrMutation) IsDefault() (r bool, exists bool) {
+	v := m.is_default
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsDefault returns the old "is_default" field's value of the UserAddr entity.
+// If the UserAddr object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserAddrMutation) OldIsDefault(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsDefault is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsDefault requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsDefault: %w", err)
+	}
+	return oldValue.IsDefault, nil
+}
+
+// ResetIsDefault resets all changes to the "is_default" field.
+func (m *UserAddrMutation) ResetIsDefault() {
+	m.is_default = nil
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *UserAddrMutation) ClearUser() {
+	m.cleareduser = true
+	m.clearedFields[useraddr.FieldUserID] = struct{}{}
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *UserAddrMutation) UserCleared() bool {
+	return m.UserIDCleared() || m.cleareduser
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *UserAddrMutation) UserIDs() (ids []int) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *UserAddrMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+}
+
+// Where appends a list predicates to the UserAddrMutation builder.
+func (m *UserAddrMutation) Where(ps ...predicate.UserAddr) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the UserAddrMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *UserAddrMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.UserAddr, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *UserAddrMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *UserAddrMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (UserAddr).
+func (m *UserAddrMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *UserAddrMutation) Fields() []string {
+	fields := make([]string, 0, 11)
+	if m.user != nil {
+		fields = append(fields, useraddr.FieldUserID)
+	}
+	if m.addr_type != nil {
+		fields = append(fields, useraddr.FieldAddrType)
+	}
+	if m.region_id != nil {
+		fields = append(fields, useraddr.FieldRegionID)
+	}
+	if m.addr != nil {
+		fields = append(fields, useraddr.FieldAddr)
+	}
+	if m.email != nil {
+		fields = append(fields, useraddr.FieldEmail)
+	}
+	if m.fax != nil {
+		fields = append(fields, useraddr.FieldFax)
+	}
+	if m.zip_code != nil {
+		fields = append(fields, useraddr.FieldZipCode)
+	}
+	if m.tel != nil {
+		fields = append(fields, useraddr.FieldTel)
+	}
+	if m.mobile != nil {
+		fields = append(fields, useraddr.FieldMobile)
+	}
+	if m.name != nil {
+		fields = append(fields, useraddr.FieldName)
+	}
+	if m.is_default != nil {
+		fields = append(fields, useraddr.FieldIsDefault)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *UserAddrMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case useraddr.FieldUserID:
+		return m.UserID()
+	case useraddr.FieldAddrType:
+		return m.AddrType()
+	case useraddr.FieldRegionID:
+		return m.RegionID()
+	case useraddr.FieldAddr:
+		return m.Addr()
+	case useraddr.FieldEmail:
+		return m.Email()
+	case useraddr.FieldFax:
+		return m.Fax()
+	case useraddr.FieldZipCode:
+		return m.ZipCode()
+	case useraddr.FieldTel:
+		return m.Tel()
+	case useraddr.FieldMobile:
+		return m.Mobile()
+	case useraddr.FieldName:
+		return m.Name()
+	case useraddr.FieldIsDefault:
+		return m.IsDefault()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *UserAddrMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case useraddr.FieldUserID:
+		return m.OldUserID(ctx)
+	case useraddr.FieldAddrType:
+		return m.OldAddrType(ctx)
+	case useraddr.FieldRegionID:
+		return m.OldRegionID(ctx)
+	case useraddr.FieldAddr:
+		return m.OldAddr(ctx)
+	case useraddr.FieldEmail:
+		return m.OldEmail(ctx)
+	case useraddr.FieldFax:
+		return m.OldFax(ctx)
+	case useraddr.FieldZipCode:
+		return m.OldZipCode(ctx)
+	case useraddr.FieldTel:
+		return m.OldTel(ctx)
+	case useraddr.FieldMobile:
+		return m.OldMobile(ctx)
+	case useraddr.FieldName:
+		return m.OldName(ctx)
+	case useraddr.FieldIsDefault:
+		return m.OldIsDefault(ctx)
+	}
+	return nil, fmt.Errorf("unknown UserAddr field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *UserAddrMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case useraddr.FieldUserID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case useraddr.FieldAddrType:
+		v, ok := value.(useraddr.AddrType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAddrType(v)
+		return nil
+	case useraddr.FieldRegionID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRegionID(v)
+		return nil
+	case useraddr.FieldAddr:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAddr(v)
+		return nil
+	case useraddr.FieldEmail:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEmail(v)
+		return nil
+	case useraddr.FieldFax:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFax(v)
+		return nil
+	case useraddr.FieldZipCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetZipCode(v)
+		return nil
+	case useraddr.FieldTel:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTel(v)
+		return nil
+	case useraddr.FieldMobile:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMobile(v)
+		return nil
+	case useraddr.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case useraddr.FieldIsDefault:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsDefault(v)
+		return nil
+	}
+	return fmt.Errorf("unknown UserAddr field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *UserAddrMutation) AddedFields() []string {
+	var fields []string
+	if m.addregion_id != nil {
+		fields = append(fields, useraddr.FieldRegionID)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *UserAddrMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case useraddr.FieldRegionID:
+		return m.AddedRegionID()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *UserAddrMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case useraddr.FieldRegionID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRegionID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown UserAddr numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *UserAddrMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(useraddr.FieldUserID) {
+		fields = append(fields, useraddr.FieldUserID)
+	}
+	if m.FieldCleared(useraddr.FieldRegionID) {
+		fields = append(fields, useraddr.FieldRegionID)
+	}
+	if m.FieldCleared(useraddr.FieldAddr) {
+		fields = append(fields, useraddr.FieldAddr)
+	}
+	if m.FieldCleared(useraddr.FieldEmail) {
+		fields = append(fields, useraddr.FieldEmail)
+	}
+	if m.FieldCleared(useraddr.FieldFax) {
+		fields = append(fields, useraddr.FieldFax)
+	}
+	if m.FieldCleared(useraddr.FieldZipCode) {
+		fields = append(fields, useraddr.FieldZipCode)
+	}
+	if m.FieldCleared(useraddr.FieldTel) {
+		fields = append(fields, useraddr.FieldTel)
+	}
+	if m.FieldCleared(useraddr.FieldMobile) {
+		fields = append(fields, useraddr.FieldMobile)
+	}
+	if m.FieldCleared(useraddr.FieldName) {
+		fields = append(fields, useraddr.FieldName)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *UserAddrMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *UserAddrMutation) ClearField(name string) error {
+	switch name {
+	case useraddr.FieldUserID:
+		m.ClearUserID()
+		return nil
+	case useraddr.FieldRegionID:
+		m.ClearRegionID()
+		return nil
+	case useraddr.FieldAddr:
+		m.ClearAddr()
+		return nil
+	case useraddr.FieldEmail:
+		m.ClearEmail()
+		return nil
+	case useraddr.FieldFax:
+		m.ClearFax()
+		return nil
+	case useraddr.FieldZipCode:
+		m.ClearZipCode()
+		return nil
+	case useraddr.FieldTel:
+		m.ClearTel()
+		return nil
+	case useraddr.FieldMobile:
+		m.ClearMobile()
+		return nil
+	case useraddr.FieldName:
+		m.ClearName()
+		return nil
+	}
+	return fmt.Errorf("unknown UserAddr nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *UserAddrMutation) ResetField(name string) error {
+	switch name {
+	case useraddr.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case useraddr.FieldAddrType:
+		m.ResetAddrType()
+		return nil
+	case useraddr.FieldRegionID:
+		m.ResetRegionID()
+		return nil
+	case useraddr.FieldAddr:
+		m.ResetAddr()
+		return nil
+	case useraddr.FieldEmail:
+		m.ResetEmail()
+		return nil
+	case useraddr.FieldFax:
+		m.ResetFax()
+		return nil
+	case useraddr.FieldZipCode:
+		m.ResetZipCode()
+		return nil
+	case useraddr.FieldTel:
+		m.ResetTel()
+		return nil
+	case useraddr.FieldMobile:
+		m.ResetMobile()
+		return nil
+	case useraddr.FieldName:
+		m.ResetName()
+		return nil
+	case useraddr.FieldIsDefault:
+		m.ResetIsDefault()
+		return nil
+	}
+	return fmt.Errorf("unknown UserAddr field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *UserAddrMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.user != nil {
+		edges = append(edges, useraddr.EdgeUser)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *UserAddrMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case useraddr.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *UserAddrMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *UserAddrMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *UserAddrMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.cleareduser {
+		edges = append(edges, useraddr.EdgeUser)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *UserAddrMutation) EdgeCleared(name string) bool {
+	switch name {
+	case useraddr.EdgeUser:
+		return m.cleareduser
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *UserAddrMutation) ClearEdge(name string) error {
+	switch name {
+	case useraddr.EdgeUser:
+		m.ClearUser()
+		return nil
+	}
+	return fmt.Errorf("unknown UserAddr unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *UserAddrMutation) ResetEdge(name string) error {
+	switch name {
+	case useraddr.EdgeUser:
+		m.ResetUser()
+		return nil
+	}
+	return fmt.Errorf("unknown UserAddr edge %s", name)
 }

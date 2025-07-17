@@ -65,16 +65,6 @@ func DisplayName(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldDisplayName, v))
 }
 
-// Email applies equality check predicate on the "email" field. It's identical to EmailEQ.
-func Email(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldEmail, v))
-}
-
-// Mobile applies equality check predicate on the "mobile" field. It's identical to MobileEQ.
-func Mobile(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldMobile, v))
-}
-
 // PrincipalNameEQ applies the EQ predicate on the "principal_name" field.
 func PrincipalNameEQ(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldPrincipalName, v))
@@ -205,156 +195,6 @@ func DisplayNameContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldDisplayName, v))
 }
 
-// EmailEQ applies the EQ predicate on the "email" field.
-func EmailEQ(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldEmail, v))
-}
-
-// EmailNEQ applies the NEQ predicate on the "email" field.
-func EmailNEQ(v string) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldEmail, v))
-}
-
-// EmailIn applies the In predicate on the "email" field.
-func EmailIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldIn(FieldEmail, vs...))
-}
-
-// EmailNotIn applies the NotIn predicate on the "email" field.
-func EmailNotIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldNotIn(FieldEmail, vs...))
-}
-
-// EmailGT applies the GT predicate on the "email" field.
-func EmailGT(v string) predicate.User {
-	return predicate.User(sql.FieldGT(FieldEmail, v))
-}
-
-// EmailGTE applies the GTE predicate on the "email" field.
-func EmailGTE(v string) predicate.User {
-	return predicate.User(sql.FieldGTE(FieldEmail, v))
-}
-
-// EmailLT applies the LT predicate on the "email" field.
-func EmailLT(v string) predicate.User {
-	return predicate.User(sql.FieldLT(FieldEmail, v))
-}
-
-// EmailLTE applies the LTE predicate on the "email" field.
-func EmailLTE(v string) predicate.User {
-	return predicate.User(sql.FieldLTE(FieldEmail, v))
-}
-
-// EmailContains applies the Contains predicate on the "email" field.
-func EmailContains(v string) predicate.User {
-	return predicate.User(sql.FieldContains(FieldEmail, v))
-}
-
-// EmailHasPrefix applies the HasPrefix predicate on the "email" field.
-func EmailHasPrefix(v string) predicate.User {
-	return predicate.User(sql.FieldHasPrefix(FieldEmail, v))
-}
-
-// EmailHasSuffix applies the HasSuffix predicate on the "email" field.
-func EmailHasSuffix(v string) predicate.User {
-	return predicate.User(sql.FieldHasSuffix(FieldEmail, v))
-}
-
-// EmailIsNil applies the IsNil predicate on the "email" field.
-func EmailIsNil() predicate.User {
-	return predicate.User(sql.FieldIsNull(FieldEmail))
-}
-
-// EmailNotNil applies the NotNil predicate on the "email" field.
-func EmailNotNil() predicate.User {
-	return predicate.User(sql.FieldNotNull(FieldEmail))
-}
-
-// EmailEqualFold applies the EqualFold predicate on the "email" field.
-func EmailEqualFold(v string) predicate.User {
-	return predicate.User(sql.FieldEqualFold(FieldEmail, v))
-}
-
-// EmailContainsFold applies the ContainsFold predicate on the "email" field.
-func EmailContainsFold(v string) predicate.User {
-	return predicate.User(sql.FieldContainsFold(FieldEmail, v))
-}
-
-// MobileEQ applies the EQ predicate on the "mobile" field.
-func MobileEQ(v string) predicate.User {
-	return predicate.User(sql.FieldEQ(FieldMobile, v))
-}
-
-// MobileNEQ applies the NEQ predicate on the "mobile" field.
-func MobileNEQ(v string) predicate.User {
-	return predicate.User(sql.FieldNEQ(FieldMobile, v))
-}
-
-// MobileIn applies the In predicate on the "mobile" field.
-func MobileIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldIn(FieldMobile, vs...))
-}
-
-// MobileNotIn applies the NotIn predicate on the "mobile" field.
-func MobileNotIn(vs ...string) predicate.User {
-	return predicate.User(sql.FieldNotIn(FieldMobile, vs...))
-}
-
-// MobileGT applies the GT predicate on the "mobile" field.
-func MobileGT(v string) predicate.User {
-	return predicate.User(sql.FieldGT(FieldMobile, v))
-}
-
-// MobileGTE applies the GTE predicate on the "mobile" field.
-func MobileGTE(v string) predicate.User {
-	return predicate.User(sql.FieldGTE(FieldMobile, v))
-}
-
-// MobileLT applies the LT predicate on the "mobile" field.
-func MobileLT(v string) predicate.User {
-	return predicate.User(sql.FieldLT(FieldMobile, v))
-}
-
-// MobileLTE applies the LTE predicate on the "mobile" field.
-func MobileLTE(v string) predicate.User {
-	return predicate.User(sql.FieldLTE(FieldMobile, v))
-}
-
-// MobileContains applies the Contains predicate on the "mobile" field.
-func MobileContains(v string) predicate.User {
-	return predicate.User(sql.FieldContains(FieldMobile, v))
-}
-
-// MobileHasPrefix applies the HasPrefix predicate on the "mobile" field.
-func MobileHasPrefix(v string) predicate.User {
-	return predicate.User(sql.FieldHasPrefix(FieldMobile, v))
-}
-
-// MobileHasSuffix applies the HasSuffix predicate on the "mobile" field.
-func MobileHasSuffix(v string) predicate.User {
-	return predicate.User(sql.FieldHasSuffix(FieldMobile, v))
-}
-
-// MobileIsNil applies the IsNil predicate on the "mobile" field.
-func MobileIsNil() predicate.User {
-	return predicate.User(sql.FieldIsNull(FieldMobile))
-}
-
-// MobileNotNil applies the NotNil predicate on the "mobile" field.
-func MobileNotNil() predicate.User {
-	return predicate.User(sql.FieldNotNull(FieldMobile))
-}
-
-// MobileEqualFold applies the EqualFold predicate on the "mobile" field.
-func MobileEqualFold(v string) predicate.User {
-	return predicate.User(sql.FieldEqualFold(FieldMobile, v))
-}
-
-// MobileContainsFold applies the ContainsFold predicate on the "mobile" field.
-func MobileContainsFold(v string) predicate.User {
-	return predicate.User(sql.FieldContainsFold(FieldMobile, v))
-}
-
 // HasSilences applies the HasEdge predicate on the "silences" edge.
 func HasSilences() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
@@ -376,6 +216,35 @@ func HasSilencesWith(preds ...predicate.Silence) predicate.User {
 		schemaConfig := internal.SchemaConfigFromContext(s.Context())
 		step.To.Schema = schemaConfig.Silence
 		step.Edge.Schema = schemaConfig.Silence
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAddresses applies the HasEdge predicate on the "addresses" edge.
+func HasAddresses() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, AddressesTable, AddressesColumn),
+		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.UserAddr
+		step.Edge.Schema = schemaConfig.UserAddr
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAddressesWith applies the HasEdge predicate on the "addresses" edge with a given conditions (other predicates).
+func HasAddressesWith(preds ...predicate.UserAddr) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newAddressesStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.UserAddr
+		step.Edge.Schema = schemaConfig.UserAddr
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

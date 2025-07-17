@@ -126,10 +126,15 @@ func (ma *MsgAlertQuery) collectField(ctx context.Context, oneNode bool, opCtx *
 				}
 			}
 			if limit := paginateLimit(args.first, args.last); limit > 0 {
-				if oneNode {
+				var offset int
+				sp, ok := pagination.SimplePaginationFromContext(ctx)
+				if ok {
+					offset = sp.Offset(args.first, args.last)
+				}
+				if !ok && args.after == nil && args.before == nil {
 					pager.applyOrder(query.Limit(limit))
 				} else {
-					modify := pagination.LimitPerRow(ctx, msgalert.NlogPrimaryKey[1], limit, args.first, args.last, pager.orderExpr(query))
+					modify := pagination.LimitPerRow(msgalert.NlogPrimaryKey[1], limit, offset, pager.orderExpr(query))
 					query.modifiers = append(query.modifiers, modify)
 				}
 			} else {
@@ -214,10 +219,15 @@ func (ma *MsgAlertQuery) collectField(ctx context.Context, oneNode bool, opCtx *
 				}
 			}
 			if limit := paginateLimit(args.first, args.last); limit > 0 {
-				if oneNode {
+				var offset int
+				sp, ok := pagination.SimplePaginationFromContext(ctx)
+				if ok {
+					offset = sp.Offset(args.first, args.last)
+				}
+				if !ok && args.after == nil && args.before == nil {
 					pager.applyOrder(query.Limit(limit))
 				} else {
-					modify := pagination.LimitPerRow(ctx, msgalert.NlogAlertsColumn, limit, args.first, args.last, pager.orderExpr(query))
+					modify := pagination.LimitPerRow(msgalert.NlogAlertsColumn, limit, offset, pager.orderExpr(query))
 					query.modifiers = append(query.modifiers, modify)
 				}
 			} else {
@@ -676,11 +686,6 @@ func (mi *MsgInternalQuery) collectField(ctx context.Context, oneNode bool, opCt
 			mi.WithNamedMsgInternalTo(alias, func(wq *MsgInternalToQuery) {
 				*wq = *query
 			})
-		case "tenantID":
-			if _, ok := fieldSeen[msginternal.FieldTenantID]; !ok {
-				selectedFields = append(selectedFields, msginternal.FieldTenantID)
-				fieldSeen[msginternal.FieldTenantID] = struct{}{}
-			}
 		case "createdBy":
 			if _, ok := fieldSeen[msginternal.FieldCreatedBy]; !ok {
 				selectedFields = append(selectedFields, msginternal.FieldCreatedBy)
@@ -700,6 +705,11 @@ func (mi *MsgInternalQuery) collectField(ctx context.Context, oneNode bool, opCt
 			if _, ok := fieldSeen[msginternal.FieldUpdatedAt]; !ok {
 				selectedFields = append(selectedFields, msginternal.FieldUpdatedAt)
 				fieldSeen[msginternal.FieldUpdatedAt] = struct{}{}
+			}
+		case "tenantID":
+			if _, ok := fieldSeen[msginternal.FieldTenantID]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldTenantID)
+				fieldSeen[msginternal.FieldTenantID] = struct{}{}
 			}
 		case "category":
 			if _, ok := fieldSeen[msginternal.FieldCategory]; !ok {
@@ -1920,16 +1930,6 @@ func (u *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graph
 				selectedFields = append(selectedFields, user.FieldDisplayName)
 				fieldSeen[user.FieldDisplayName] = struct{}{}
 			}
-		case "email":
-			if _, ok := fieldSeen[user.FieldEmail]; !ok {
-				selectedFields = append(selectedFields, user.FieldEmail)
-				fieldSeen[user.FieldEmail] = struct{}{}
-			}
-		case "mobile":
-			if _, ok := fieldSeen[user.FieldMobile]; !ok {
-				selectedFields = append(selectedFields, user.FieldMobile)
-				fieldSeen[user.FieldMobile] = struct{}{}
-			}
 		case "id":
 		case "__typename":
 		default:
@@ -1993,7 +1993,7 @@ func fieldArgs(ctx context.Context, whereInput any, path ...string) map[string]a
 func unmarshalArgs(ctx context.Context, whereInput any, args map[string]any) map[string]any {
 	for _, k := range []string{firstField, lastField} {
 		v, ok := args[k]
-		if !ok {
+		if !ok || v == nil {
 			continue
 		}
 		i, err := graphql.UnmarshalInt(v)

@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
+	"github.com/woocoos/msgcenter/ent/useraddr"
 )
 
 // UserCreate is the builder for creating a User entity.
@@ -34,34 +35,6 @@ func (uc *UserCreate) SetDisplayName(s string) *UserCreate {
 	return uc
 }
 
-// SetEmail sets the "email" field.
-func (uc *UserCreate) SetEmail(s string) *UserCreate {
-	uc.mutation.SetEmail(s)
-	return uc
-}
-
-// SetNillableEmail sets the "email" field if the given value is not nil.
-func (uc *UserCreate) SetNillableEmail(s *string) *UserCreate {
-	if s != nil {
-		uc.SetEmail(*s)
-	}
-	return uc
-}
-
-// SetMobile sets the "mobile" field.
-func (uc *UserCreate) SetMobile(s string) *UserCreate {
-	uc.mutation.SetMobile(s)
-	return uc
-}
-
-// SetNillableMobile sets the "mobile" field if the given value is not nil.
-func (uc *UserCreate) SetNillableMobile(s *string) *UserCreate {
-	if s != nil {
-		uc.SetMobile(*s)
-	}
-	return uc
-}
-
 // SetID sets the "id" field.
 func (uc *UserCreate) SetID(i int) *UserCreate {
 	uc.mutation.SetID(i)
@@ -81,6 +54,21 @@ func (uc *UserCreate) AddSilences(s ...*Silence) *UserCreate {
 		ids[i] = s[i].ID
 	}
 	return uc.AddSilenceIDs(ids...)
+}
+
+// AddAddressIDs adds the "addresses" edge to the UserAddr entity by IDs.
+func (uc *UserCreate) AddAddressIDs(ids ...int) *UserCreate {
+	uc.mutation.AddAddressIDs(ids...)
+	return uc
+}
+
+// AddAddresses adds the "addresses" edges to the UserAddr entity.
+func (uc *UserCreate) AddAddresses(u ...*UserAddr) *UserCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uc.AddAddressIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -122,16 +110,6 @@ func (uc *UserCreate) check() error {
 	}
 	if _, ok := uc.mutation.DisplayName(); !ok {
 		return &ValidationError{Name: "display_name", err: errors.New(`ent: missing required field "User.display_name"`)}
-	}
-	if v, ok := uc.mutation.Email(); ok {
-		if err := user.EmailValidator(v); err != nil {
-			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
-		}
-	}
-	if v, ok := uc.mutation.Mobile(); ok {
-		if err := user.MobileValidator(v); err != nil {
-			return &ValidationError{Name: "mobile", err: fmt.Errorf(`ent: validator failed for field "User.mobile": %w`, err)}
-		}
 	}
 	return nil
 }
@@ -175,14 +153,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldDisplayName, field.TypeString, value)
 		_node.DisplayName = value
 	}
-	if value, ok := uc.mutation.Email(); ok {
-		_spec.SetField(user.FieldEmail, field.TypeString, value)
-		_node.Email = value
-	}
-	if value, ok := uc.mutation.Mobile(); ok {
-		_spec.SetField(user.FieldMobile, field.TypeString, value)
-		_node.Mobile = value
-	}
 	if nodes := uc.mutation.SilencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -195,6 +165,23 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			},
 		}
 		edge.Schema = uc.schemaConfig.Silence
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.AddressesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.AddressesTable,
+			Columns: []string{user.AddressesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(useraddr.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = uc.schemaConfig.UserAddr
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -276,42 +263,6 @@ func (u *UserUpsert) UpdateDisplayName() *UserUpsert {
 	return u
 }
 
-// SetEmail sets the "email" field.
-func (u *UserUpsert) SetEmail(v string) *UserUpsert {
-	u.Set(user.FieldEmail, v)
-	return u
-}
-
-// UpdateEmail sets the "email" field to the value that was provided on create.
-func (u *UserUpsert) UpdateEmail() *UserUpsert {
-	u.SetExcluded(user.FieldEmail)
-	return u
-}
-
-// ClearEmail clears the value of the "email" field.
-func (u *UserUpsert) ClearEmail() *UserUpsert {
-	u.SetNull(user.FieldEmail)
-	return u
-}
-
-// SetMobile sets the "mobile" field.
-func (u *UserUpsert) SetMobile(v string) *UserUpsert {
-	u.Set(user.FieldMobile, v)
-	return u
-}
-
-// UpdateMobile sets the "mobile" field to the value that was provided on create.
-func (u *UserUpsert) UpdateMobile() *UserUpsert {
-	u.SetExcluded(user.FieldMobile)
-	return u
-}
-
-// ClearMobile clears the value of the "mobile" field.
-func (u *UserUpsert) ClearMobile() *UserUpsert {
-	u.SetNull(user.FieldMobile)
-	return u
-}
-
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -385,48 +336,6 @@ func (u *UserUpsertOne) SetDisplayName(v string) *UserUpsertOne {
 func (u *UserUpsertOne) UpdateDisplayName() *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
 		s.UpdateDisplayName()
-	})
-}
-
-// SetEmail sets the "email" field.
-func (u *UserUpsertOne) SetEmail(v string) *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.SetEmail(v)
-	})
-}
-
-// UpdateEmail sets the "email" field to the value that was provided on create.
-func (u *UserUpsertOne) UpdateEmail() *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.UpdateEmail()
-	})
-}
-
-// ClearEmail clears the value of the "email" field.
-func (u *UserUpsertOne) ClearEmail() *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.ClearEmail()
-	})
-}
-
-// SetMobile sets the "mobile" field.
-func (u *UserUpsertOne) SetMobile(v string) *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.SetMobile(v)
-	})
-}
-
-// UpdateMobile sets the "mobile" field to the value that was provided on create.
-func (u *UserUpsertOne) UpdateMobile() *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.UpdateMobile()
-	})
-}
-
-// ClearMobile clears the value of the "mobile" field.
-func (u *UserUpsertOne) ClearMobile() *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.ClearMobile()
 	})
 }
 
@@ -668,48 +577,6 @@ func (u *UserUpsertBulk) SetDisplayName(v string) *UserUpsertBulk {
 func (u *UserUpsertBulk) UpdateDisplayName() *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
 		s.UpdateDisplayName()
-	})
-}
-
-// SetEmail sets the "email" field.
-func (u *UserUpsertBulk) SetEmail(v string) *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.SetEmail(v)
-	})
-}
-
-// UpdateEmail sets the "email" field to the value that was provided on create.
-func (u *UserUpsertBulk) UpdateEmail() *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.UpdateEmail()
-	})
-}
-
-// ClearEmail clears the value of the "email" field.
-func (u *UserUpsertBulk) ClearEmail() *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.ClearEmail()
-	})
-}
-
-// SetMobile sets the "mobile" field.
-func (u *UserUpsertBulk) SetMobile(v string) *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.SetMobile(v)
-	})
-}
-
-// UpdateMobile sets the "mobile" field to the value that was provided on create.
-func (u *UserUpsertBulk) UpdateMobile() *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.UpdateMobile()
-	})
-}
-
-// ClearMobile clears the value of the "mobile" field.
-func (u *UserUpsertBulk) ClearMobile() *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.ClearMobile()
 	})
 }
 

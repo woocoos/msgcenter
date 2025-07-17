@@ -12,24 +12,27 @@ import Create from './components/create';
 import { getOrgs } from '@knockout-js/api';
 import { Org } from '@knockout-js/api/ucenter';
 import Test from './components/test';
-
+import { delDataSource, saveDataSource } from '@/util';
+import {TemplateType} from '../event'
+import store from '@/store'
 
 export default () => {
   const { token } = useToken(),
     { t } = useTranslation(),
+    userState = store.getModelState('user'),
     [searchParams] = useSearchParams(),
     [msgEventInfo, setMsgEventInfo] = useState<MsgEvent>(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<MsgTemplate>[] = [
       // 有需要排序配置  sorter: true
-      {
-        title: t('org'), dataIndex: 'org', width: 120,
-        render: (text, record) => {
-          const org = orgs.find(item => item.id == record.tenantID)
-          return record.tenantID ? org?.name || record.tenantID : '';
-        },
-      },
+      // {
+      //   title: t('org'), dataIndex: 'org', width: 120,
+      //   render: (text, record) => {
+      //     const org = orgs.find(item => item.id == record.tenantID)
+      //     return record.tenantID ? org?.name || record.tenantID : '';
+      //   },
+      // },
       {
         title: t('name'), dataIndex: 'name', width: 120,
       },
@@ -142,12 +145,13 @@ export default () => {
         onOk: async (close) => {
           const result = await delMsgTemplate(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
+            setDataSource(delDataSource(dataSource, record.id))
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
             close();
           }
         },
@@ -160,7 +164,7 @@ export default () => {
         onOk: async (close) => {
           const result = record.status === MsgTemplateSimpleStatus.Active ? await disableMsgTemplate(record.id) : await enableMsgTemplate(record.id);
           if (result?.id) {
-            proTableRef.current?.reload();
+            setDataSource(saveDataSource(dataSource, result as MsgTemplate))
             close();
           }
         },
@@ -171,13 +175,13 @@ export default () => {
   return (
     <PageContainer
       header={{
-        title: t('msg_template'),
+        title: searchParams.get('type')=== TemplateType.customer?t('temp_customer'):t('temp_default'),
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
             { title: t('msg_center') },
             { title: <Link to={'/msg/event'}>{t('msg_event')}</Link> },
-            { title: t('msg_template') },
+            { title: searchParams.get('type')=== TemplateType.customer?t('temp_customer'):t('temp_default') },
           ],
         },
       }}
@@ -215,13 +219,19 @@ export default () => {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
+        dataSource={dataSource}
         request={async (params, sort, filter) => {
           const table = { data: [] as MsgTemplate[], success: true, total: 0 },
             where: MsgTemplateWhereInput = {};
           const msgEvent = msgEventInfo?.id ? msgEventInfo : await getMsgEvent();
           if (msgEvent?.id) {
             where.msgEventID = msgEvent.id
-            where.tenantID = params.org?.id
+            if (searchParams.get('type') == TemplateType.customer) {
+              where.tenantID = userState.tenantId
+            }else {
+              where.tenantIDIsNil = true
+            }
+
             where.nameContains = params.name;
             where.subjectContains = params.subject;
             where.receiverTypeIn = filter.modes as MsgTemplateReceiverType[]
@@ -233,7 +243,7 @@ export default () => {
             });
             if (result?.totalCount) {
               table.data = result.edges?.map(item => item?.node) as MsgTemplate[];
-              setOrgs(await getOrgs(table.data.map(item => item.tenantID)))
+              // setOrgs(await getOrgs(table.data.map(item => item.tenantID)))
               table.total = result.totalCount;
             }
           }
@@ -251,10 +261,11 @@ export default () => {
         <Create
           open={modal.open}
           title={modal.title}
+          type={searchParams.get('type')}
           id={modal.id}
-          onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              setDataSource(saveDataSource(dataSource, newInfo))
             }
             setModal({ open: false, title: modal.title, id: '', receiverType: modal.receiverType });
           }}
@@ -267,7 +278,7 @@ export default () => {
           open={modal.open}
           title={modal.title}
           id={modal.id}
-          onClose={(s) => {
+          onClose={() => {
             setModal({ open: false, title: modal.title, id: '' });
           }}
         /> : <></>

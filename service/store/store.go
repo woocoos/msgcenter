@@ -138,3 +138,17 @@ func (a *Alerts) Empty() bool {
 
 	return len(a.c) == 0
 }
+
+// DeleteIfNotModified deletes the slice of Alerts from the store if not
+// modified.
+func (a *Alerts) DeleteIfNotModified(alerts alert.Alerts) error {
+	a.Lock()
+	defer a.Unlock()
+	for _, al := range alerts {
+		fp := al.Fingerprint()
+		if other, ok := a.c[fp]; ok && al.UpdatedAt == other.UpdatedAt {
+			delete(a.c, fp)
+		}
+	}
+	return nil
+}

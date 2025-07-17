@@ -23,12 +23,6 @@ type MsgInternalCreate struct {
 	conflict []sql.ConflictOption
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (mic *MsgInternalCreate) SetTenantID(i int) *MsgInternalCreate {
-	mic.mutation.SetTenantID(i)
-	return mic
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (mic *MsgInternalCreate) SetCreatedBy(i int) *MsgInternalCreate {
 	mic.mutation.SetCreatedBy(i)
@@ -74,6 +68,12 @@ func (mic *MsgInternalCreate) SetNillableUpdatedAt(t *time.Time) *MsgInternalCre
 	if t != nil {
 		mic.SetUpdatedAt(*t)
 	}
+	return mic
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (mic *MsgInternalCreate) SetTenantID(i int) *MsgInternalCreate {
+	mic.mutation.SetTenantID(i)
 	return mic
 }
 
@@ -193,14 +193,14 @@ func (mic *MsgInternalCreate) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (mic *MsgInternalCreate) check() error {
-	if _, ok := mic.mutation.TenantID(); !ok {
-		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "MsgInternal.tenant_id"`)}
-	}
 	if _, ok := mic.mutation.CreatedBy(); !ok {
 		return &ValidationError{Name: "created_by", err: errors.New(`ent: missing required field "MsgInternal.created_by"`)}
 	}
 	if _, ok := mic.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "MsgInternal.created_at"`)}
+	}
+	if _, ok := mic.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "MsgInternal.tenant_id"`)}
 	}
 	if _, ok := mic.mutation.Category(); !ok {
 		return &ValidationError{Name: "category", err: errors.New(`ent: missing required field "MsgInternal.category"`)}
@@ -250,10 +250,6 @@ func (mic *MsgInternalCreate) createSpec() (*MsgInternal, *sqlgraph.CreateSpec) 
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := mic.mutation.TenantID(); ok {
-		_spec.SetField(msginternal.FieldTenantID, field.TypeInt, value)
-		_node.TenantID = value
-	}
 	if value, ok := mic.mutation.CreatedBy(); ok {
 		_spec.SetField(msginternal.FieldCreatedBy, field.TypeInt, value)
 		_node.CreatedBy = value
@@ -269,6 +265,10 @@ func (mic *MsgInternalCreate) createSpec() (*MsgInternal, *sqlgraph.CreateSpec) 
 	if value, ok := mic.mutation.UpdatedAt(); ok {
 		_spec.SetField(msginternal.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := mic.mutation.TenantID(); ok {
+		_spec.SetField(msginternal.FieldTenantID, field.TypeInt, value)
+		_node.TenantID = value
 	}
 	if value, ok := mic.mutation.Category(); ok {
 		_spec.SetField(msginternal.FieldCategory, field.TypeString, value)
@@ -314,7 +314,7 @@ func (mic *MsgInternalCreate) createSpec() (*MsgInternal, *sqlgraph.CreateSpec) 
 // of the `INSERT` statement. For example:
 //
 //	client.MsgInternal.Create().
-//		SetTenantID(v).
+//		SetCreatedBy(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -323,7 +323,7 @@ func (mic *MsgInternalCreate) createSpec() (*MsgInternal, *sqlgraph.CreateSpec) 
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.MsgInternalUpsert) {
-//			SetTenantID(v+v).
+//			SetCreatedBy(v+v).
 //		}).
 //		Exec(ctx)
 func (mic *MsgInternalCreate) OnConflict(opts ...sql.ConflictOption) *MsgInternalUpsertOne {
@@ -490,14 +490,14 @@ func (u *MsgInternalUpsertOne) UpdateNewValues() *MsgInternalUpsertOne {
 		if _, exists := u.create.mutation.ID(); exists {
 			s.SetIgnore(msginternal.FieldID)
 		}
-		if _, exists := u.create.mutation.TenantID(); exists {
-			s.SetIgnore(msginternal.FieldTenantID)
-		}
 		if _, exists := u.create.mutation.CreatedBy(); exists {
 			s.SetIgnore(msginternal.FieldCreatedBy)
 		}
 		if _, exists := u.create.mutation.CreatedAt(); exists {
 			s.SetIgnore(msginternal.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.TenantID(); exists {
+			s.SetIgnore(msginternal.FieldTenantID)
 		}
 	}))
 	return u
@@ -798,7 +798,7 @@ func (micb *MsgInternalCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.MsgInternalUpsert) {
-//			SetTenantID(v+v).
+//			SetCreatedBy(v+v).
 //		}).
 //		Exec(ctx)
 func (micb *MsgInternalCreateBulk) OnConflict(opts ...sql.ConflictOption) *MsgInternalUpsertBulk {
@@ -845,14 +845,14 @@ func (u *MsgInternalUpsertBulk) UpdateNewValues() *MsgInternalUpsertBulk {
 			if _, exists := b.mutation.ID(); exists {
 				s.SetIgnore(msginternal.FieldID)
 			}
-			if _, exists := b.mutation.TenantID(); exists {
-				s.SetIgnore(msginternal.FieldTenantID)
-			}
 			if _, exists := b.mutation.CreatedBy(); exists {
 				s.SetIgnore(msginternal.FieldCreatedBy)
 			}
 			if _, exists := b.mutation.CreatedAt(); exists {
 				s.SetIgnore(msginternal.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.TenantID(); exists {
+				s.SetIgnore(msginternal.FieldTenantID)
 			}
 		}
 	}))

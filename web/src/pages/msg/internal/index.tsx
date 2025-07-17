@@ -11,6 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./index.module.css";
 import { definePageConfig } from "ice";
+import { delDataSource } from "@/util";
 
 type CategoryTag = {
   name: string,
@@ -62,7 +63,7 @@ export default () => {
                 onConfirm={async () => {
                   const result = await delMarkMsg([record.id]);
                   if (result) {
-                    proTableRef.current?.reload();
+                    setDataSource(delDataSource(dataSource, record.id))
                     message.success(t('submit_success'));
                   }
                 }}
@@ -76,6 +77,7 @@ export default () => {
         },
       },
     ],
+    [dataSource, setDataSource] = useState<MsgInternalTo[]>([]),
     // 选中处理
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
@@ -194,6 +196,7 @@ export default () => {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
+        dataSource={dataSource}
         request={async (params, sort, filter) => {
           const table = { data: [] as MsgInternalTo[], success: true, total: 0 },
             where: MsgInternalToWhereInput = {};

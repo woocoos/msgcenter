@@ -77,15 +77,17 @@ func NewAlertManager(app *woocoo.App, opts ...AmOption) (*AlertManager, error) {
 		return nil, err
 	}
 
-	koSdk, err := kosdk.NewSDK(app.AppConfiguration().Sub("kosdk"), am.DB)
-	if err != nil {
-		return nil, err
-	}
-
 	am.Coordinator = NewCoordinator(am.cnf)
 	am.Coordinator.db = am.DB
 	am.Subscribe.DB = am.DB
-	am.Coordinator.KOSdk = koSdk
+
+	if app.AppConfiguration().IsSet("kosdk") {
+		koSdk, err := kosdk.NewSDK(app.AppConfiguration().Sub("kosdk"), am.DB)
+		if err != nil {
+			return nil, err
+		}
+		am.Coordinator.KOSdk = koSdk
+	}
 
 	app.RegisterServer(am.Alerts, am.NotificationLog, am.Silences)
 
@@ -137,6 +139,7 @@ func (am *AlertManager) buildDBClient(cnf *conf.AppConfiguration) {
 	scfg := ent.AlternateSchema(ent.SchemaConfig{
 		User:        "portal",
 		OrgRoleUser: "portal",
+		UserAddr:    "portal",
 	})
 	if cnf.Development {
 		am.DB = ent.NewClient(ent.Driver(drv), ent.Debug(), scfg)

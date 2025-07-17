@@ -31,6 +31,12 @@ alertManager:
     gcInterval: 30m
   template:
     baseDir: testdata/files # path for custom template
-    tmpDir: "msg/tpl/tmp" # 模板临时路径
     dataDir: "msg/tpl/data" # 模板正式路径
     attachmentDir: "msg/att" # 附件存储路径
+    tempParamsFile: testdata/etc/tempparams.yaml # 全局模板参数文件
+
+cache:
+  local:
+    driverName: memory
+    size: 1000
+    ttl: 100s

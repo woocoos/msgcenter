@@ -15,21 +15,24 @@ type (
 		UpdatedAt time.Time `json:"updated_at,omitempty"`
 		// The key identifying the dispatching group.
 		GroupKey       string               `json:"group_key,omitempty"`
-		Receiver       profile.ReceiverKey  `json:"receiver,omitempty"`
+		Receiver       *profile.ReceiverKey `json:"receiver,omitempty"`
 		ReceiverType   profile.ReceiverType `json:"receiver_type,omitempty"`
 		Idx            int                  `json:"idx,omitempty"`
 		FiringAlerts   []uint64             `json:"firing_alerts,omitempty"`
 		ResolvedAlerts []uint64             `json:"resolved_alerts,omitempty"`
 	}
 
-	state map[int]*LogEntry
+	state map[string]*LogEntry
 
 	EntryQuery func(*LogEntry) bool
 )
 
 func QReceiver(r *profile.ReceiverKey) EntryQuery {
 	return func(e *LogEntry) bool {
-		return e.Receiver == *r
+		if e.Receiver == nil {
+			return false
+		}
+		return *e.Receiver == *r
 	}
 }
 
@@ -71,10 +74,11 @@ func (s state) merge(e *LogEntry, now time.Time) bool {
 	if e.ExpiresAt.Before(now) {
 		return false
 	}
+	k := stateKey(e.GroupKey, e.Receiver)
 
-	prev, ok := s[e.ID]
+	prev, ok := s[k]
 	if !ok || prev.UpdatedAt.Before(e.UpdatedAt) {
-		s[e.ID] = e
+		s[k] = e
 		return true
 	}
 	return false

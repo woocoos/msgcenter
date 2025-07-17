@@ -20,6 +20,7 @@ type SchemaConfig struct {
 	OrgRoleUser   string // OrgRoleUser table.
 	Silence       string // Silence table.
 	User          string // User table.
+	UserAddr      string // UserAddr table.
 }
 
 type schemaCtxKey struct{}

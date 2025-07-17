@@ -17,12 +17,10 @@ const (
 	FieldPrincipalName = "principal_name"
 	// FieldDisplayName holds the string denoting the display_name field in the database.
 	FieldDisplayName = "display_name"
-	// FieldEmail holds the string denoting the email field in the database.
-	FieldEmail = "email"
-	// FieldMobile holds the string denoting the mobile field in the database.
-	FieldMobile = "mobile"
 	// EdgeSilences holds the string denoting the silences edge name in mutations.
 	EdgeSilences = "silences"
+	// EdgeAddresses holds the string denoting the addresses edge name in mutations.
+	EdgeAddresses = "addresses"
 	// Table holds the table name of the user in the database.
 	Table = "user"
 	// SilencesTable is the table that holds the silences relation/edge.
@@ -32,6 +30,13 @@ const (
 	SilencesInverseTable = "msg_silence"
 	// SilencesColumn is the table column denoting the silences relation/edge.
 	SilencesColumn = "created_by"
+	// AddressesTable is the table that holds the addresses relation/edge.
+	AddressesTable = "user_addr"
+	// AddressesInverseTable is the table name for the UserAddr entity.
+	// It exists in this package in order to avoid circular dependency with the "useraddr" package.
+	AddressesInverseTable = "user_addr"
+	// AddressesColumn is the table column denoting the addresses relation/edge.
+	AddressesColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -39,8 +44,6 @@ var Columns = []string{
 	FieldID,
 	FieldPrincipalName,
 	FieldDisplayName,
-	FieldEmail,
-	FieldMobile,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -60,10 +63,6 @@ func ValidColumn(column string) bool {
 //	import _ "github.com/woocoos/msgcenter/ent/runtime"
 var (
 	Hooks [1]ent.Hook
-	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
-	EmailValidator func(string) error
-	// MobileValidator is a validator for the "mobile" field. It is called by the builders before save.
-	MobileValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the User queries.
@@ -84,16 +83,6 @@ func ByDisplayName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDisplayName, opts...).ToFunc()
 }
 
-// ByEmail orders the results by the email field.
-func ByEmail(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldEmail, opts...).ToFunc()
-}
-
-// ByMobile orders the results by the mobile field.
-func ByMobile(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldMobile, opts...).ToFunc()
-}
-
 // BySilencesCount orders the results by silences count.
 func BySilencesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -107,10 +96,31 @@ func BySilences(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSilencesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByAddressesCount orders the results by addresses count.
+func ByAddressesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAddressesStep(), opts...)
+	}
+}
+
+// ByAddresses orders the results by addresses terms.
+func ByAddresses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAddressesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newSilencesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SilencesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SilencesTable, SilencesColumn),
+	)
+}
+func newAddressesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AddressesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AddressesTable, AddressesColumn),
 	)
 }

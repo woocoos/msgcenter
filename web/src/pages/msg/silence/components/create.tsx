@@ -24,7 +24,7 @@ export default (props: {
   title?: string;
   id?: string | null;
   isCopy?: boolean;
-  onClose: (isSuccess?: boolean) => void;
+  onClose: (isSuccess?: boolean, newInfo?: Silence) => void;
 }) => {
   const { t } = useTranslation(),
     formRef = useRef<ProFormInstance<ProFormData>>(),
@@ -99,7 +99,7 @@ export default (props: {
         : await createSilence(input);
       if (result?.id) {
         setSaveDisabled(true);
-        props.onClose(true);
+        props.onClose(true, result as Silence);
       }
       setSaveLoading(false);
       return false;

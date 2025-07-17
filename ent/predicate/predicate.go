@@ -44,3 +44,6 @@ type Silence func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
+
+// UserAddr is the predicate function for useraddr builders.
+type UserAddr func(*sql.Selector)

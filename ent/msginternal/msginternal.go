@@ -15,8 +15,6 @@ const (
 	Label = "msg_internal"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldTenantID holds the string denoting the tenant_id field in the database.
-	FieldTenantID = "tenant_id"
 	// FieldCreatedBy holds the string denoting the created_by field in the database.
 	FieldCreatedBy = "created_by"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -25,6 +23,8 @@ const (
 	FieldUpdatedBy = "updated_by"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldTenantID holds the string denoting the tenant_id field in the database.
+	FieldTenantID = "tenant_id"
 	// FieldCategory holds the string denoting the category field in the database.
 	FieldCategory = "category"
 	// FieldSubject holds the string denoting the subject field in the database.
@@ -51,11 +51,11 @@ const (
 // Columns holds all SQL columns for msginternal fields.
 var Columns = []string{
 	FieldID,
-	FieldTenantID,
 	FieldCreatedBy,
 	FieldCreatedAt,
 	FieldUpdatedBy,
 	FieldUpdatedAt,
+	FieldTenantID,
 	FieldCategory,
 	FieldSubject,
 	FieldBody,
@@ -95,11 +95,6 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByTenantID orders the results by the tenant_id field.
-func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
-}
-
 // ByCreatedBy orders the results by the created_by field.
 func ByCreatedBy(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedBy, opts...).ToFunc()
@@ -118,6 +113,11 @@ func ByUpdatedBy(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByTenantID orders the results by the tenant_id field.
+func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
 // ByCategory orders the results by the category field.

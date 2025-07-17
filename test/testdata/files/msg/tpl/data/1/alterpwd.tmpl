@@ -3,7 +3,9 @@
 {{ define "1.alterpwd.txt"}}
     {{- with .CommonAnnotations }}
         Dear {{.nickname}} !
-
+        tempCo:{{.tempCo}}
+        tempFax: {{.tempFax}}
+        tempLogo: {{.tempLogo}}
         Your password has been changed successfully. If you did not change your password, please contact the administrator in time.
     {{- end }}
 

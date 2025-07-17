@@ -31,11 +31,15 @@ const queryMsgTypeInfo = gql(/* GraphQL */`query msgTypeInfo($gid:GID!){
 }`);
 
 const mutationCreateMsgType = gql(/* GraphQL */`mutation createMsgType($input: CreateMsgTypeInput!){
-  createMsgType(input: $input){id}
+  createMsgType(input: $input){
+    id,name,comments,appID,status,category,canSubs,canCustom,createdAt
+  }
 }`);
 
 const mutationUpdateMsgType = gql(/* GraphQL */`mutation updateMsgType($id:ID!,$input: UpdateMsgTypeInput!){
-  updateMsgType(id:$id,input: $input){id}
+  updateMsgType(id:$id,input: $input){
+    id,name,comments,appID,status,category,canSubs,canCustom,createdAt
+  }
 }`);
 
 const mutationDelMsgType = gql(/* GraphQL */`mutation delMsgType($id:ID!){
@@ -51,7 +55,7 @@ const queryMsgTypeListAndSub = gql(/* GraphQL */`query msgTypeListAndSub($first:
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
-        id,name,category,
+        id,name,comments,appID,status,category,canSubs,canCustom,createdAt
         subscriberUsers{
           id,tenantID,msgTypeID,userID
         },
@@ -70,7 +74,7 @@ const queryMsgTypeAndSubInfo = gql(/* GraphQL */`query msgTypeAndSubInfo($gid:GI
   node(id: $gid){
     id
     ... on MsgType{
-      id,name,appID,category,
+      id,name,comments,appID,status,category,canSubs,canCustom,createdAt
       subscriberUsers{
         id,tenantID,msgTypeID,userID
       },
@@ -85,7 +89,9 @@ const queryMsgTypeAndSubInfo = gql(/* GraphQL */`query msgTypeAndSubInfo($gid:GI
 }`);
 
 const mutationCreateSub = gql(/* GraphQL */`mutation createMsgSubscriber($inputs: [CreateMsgSubscriberInput!]!){
-  createMsgSubscriber(inputs: $inputs){id}
+  createMsgSubscriber(inputs: $inputs){
+    id,tenantID,msgTypeID,userID
+  }
 }`);
 
 const mutationDelSub = gql(/* GraphQL */`mutation deleteMsgSubscriber($ids: [ID!]!){
@@ -129,7 +135,7 @@ export async function getMsgTypeList(
  */
 export async function getMsgTypeInfo(msgTypeId: string) {
   const result = await query(queryMsgTypeInfo, {
-    gid: gid('msg_type', msgTypeId)
+    gid: gid('MsgType', msgTypeId)
   })
   if (result.data?.node?.__typename === 'MsgType') {
     return result.data.node
@@ -240,7 +246,7 @@ export async function getMsgTypeListAndSub(
  */
 export async function getMsgTypeAndSubInfo(msgTypeId: string) {
   const result = await query(queryMsgTypeAndSubInfo, {
-    gid: gid('msg_type', msgTypeId)
+    gid: gid('MsgType', msgTypeId)
   })
   if (result.data?.node?.__typename === 'MsgType') {
     return result.data.node

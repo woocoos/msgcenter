@@ -20,7 +20,7 @@ export default (props: {
   open: boolean;
   title?: string;
   id?: string | null;
-  onClose: (isSuccess?: boolean) => void;
+  onClose: (isSuccess?: boolean, newInfo?: MsgChannel) => void;
 }) => {
   const { t } = useTranslation(),
     [info, setInfo] = useState<MsgChannel>(),
@@ -81,7 +81,7 @@ export default (props: {
         });
       if (result?.id) {
         setSaveDisabled(true);
-        props.onClose(true);
+        props.onClose(true, result as MsgChannel);
       }
       setSaveLoading(false);
       return false;
