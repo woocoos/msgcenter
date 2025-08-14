@@ -28,6 +28,10 @@
         "path": "/msg/list"
       },
       {
+        "name": "消息查询",
+        "path": "/msg/query"
+      },
+      {
         "name": "站内消息",
         "path": "/msg/internal"
       }

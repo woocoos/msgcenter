@@ -8,11 +8,11 @@ log:
   rotate:
 
 includeFiles:
-#  - "etc/local.yaml"
+  - "etc/local.yaml"
 
 jwt: &jwt
-  signingMethod: "HS256"
-  signingKey: "secret"
+  signingMethod: "RS256"
+  signingKey: "file:///Volumes/QEELYN/GIT/woocoo/msgcenter/cmd/ams/etc/rsa_pub.pem"
 
 web:
   server:

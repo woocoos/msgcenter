@@ -10,6 +10,7 @@ import (
 	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/service"
+	"github.com/woocoos/msgcenter/service/ams"
 	"github.com/woocoos/msgcenter/service/silence"
 )
 
@@ -22,6 +23,12 @@ type Option func(*Resolver)
 func WithCoordinator(coordinator *service.Coordinator) Option {
 	return func(r *Resolver) {
 		r.coordinator = coordinator
+	}
+}
+
+func WithAmsService(ams *ams.Service) Option {
+	return func(r *Resolver) {
+		r.ams = ams
 	}
 }
 
@@ -62,6 +69,7 @@ type PubSub interface {
 // Resolver is the root resolver.
 type Resolver struct {
 	coordinator *service.Coordinator
+	ams         *ams.Service
 	client      *ent.Client
 	Silences    *silence.Silences
 	MsgClient   redis.UniversalClient

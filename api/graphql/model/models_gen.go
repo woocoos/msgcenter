@@ -7,7 +7,48 @@ import (
 	"io"
 	"strconv"
 	"time"
+
+	"entgo.io/contrib/entgql"
+	"github.com/woocoos/msgcenter/pkg/alert"
+	"github.com/woocoos/msgcenter/pkg/profile"
 )
+
+type FormatMsgAlert struct {
+	ID       int `json:"id"`
+	TenantID int `json:"tenantID"`
+	// 开始时间
+	StartsAt time.Time `json:"startsAt"`
+	// 结束时间
+	EndsAt *time.Time `json:"endsAt,omitempty"`
+	// 消息事件描述
+	MsgEventComments *string `json:"msgEventComments,omitempty"`
+	// 消息通道描述
+	MsgChannelComments *string `json:"msgChannelComments,omitempty"`
+	// 接收方式
+	ReceiverType profile.ReceiverType `json:"receiverType"`
+	// receiver名称
+	Receiver string `json:"receiver"`
+	// 消息模板标题
+	MsgTemplateTitle *string `json:"msgTemplateTitle,omitempty"`
+	// 接收用户
+	Users []*UserInfo `json:"users,omitempty"`
+	// 是否存在多条消息
+	HasMultiMsg bool `json:"hasMultiMsg"`
+	// 消息状态
+	State     alert.AlertStatus `json:"state"`
+	CreatedAt time.Time         `json:"createdAt"`
+}
+
+type FormatMsgAlertConnection struct {
+	Edges      []*FormatMsgAlertEdge `json:"edges,omitempty"`
+	PageInfo   *entgql.PageInfo[int] `json:"pageInfo"`
+	TotalCount int                   `json:"totalCount"`
+}
+
+type FormatMsgAlertEdge struct {
+	Node   *FormatMsgAlert    `json:"node,omitempty"`
+	Cursor entgql.Cursor[int] `json:"cursor"`
+}
 
 // SubscriptionAction is a generic type for all subscription actions
 type Message struct {
@@ -29,6 +70,13 @@ type MessageFilter struct {
 }
 
 type Subscription struct {
+}
+
+type UserInfo struct {
+	UserID *string `json:"userID,omitempty"`
+	Name   *string `json:"name,omitempty"`
+	Email  *string `json:"email,omitempty"`
+	Mobile *string `json:"mobile,omitempty"`
 }
 
 type RouteStrType string

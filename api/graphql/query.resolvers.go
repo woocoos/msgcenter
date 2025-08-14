@@ -153,6 +153,21 @@ func (r *queryResolver) MsgAlerts(ctx context.Context, after *entgql.Cursor[int]
 		ent.WithMsgAlertFilter(where.Filter))
 }
 
+// FormatMsgAlerts is the resolver for the formatMsgAlerts field.
+func (r *queryResolver) FormatMsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.MsgAlertWhereInput, orderBy *ent.MsgAlertOrder) (*model.FormatMsgAlertConnection, error) {
+	return r.ams.FormatMsgAlerts(ctx, after, first, before, last, orderBy, where)
+}
+
+// FormatMsgAlertMore is the resolver for the formatMsgAlertMore field.
+func (r *queryResolver) FormatMsgAlertMore(ctx context.Context, msgAlertID int) ([]*model.FormatMsgAlert, error) {
+	return r.ams.FormatMsgAlertMore(ctx, msgAlertID)
+}
+
+// RenderMsgAlert is the resolver for the renderMsgAlert field.
+func (r *queryResolver) RenderMsgAlert(ctx context.Context, msgAlertID int, receiver string) (*string, error) {
+	return r.ams.RenderMsgAlert(ctx, msgAlertID, receiver)
+}
+
 // UserMsgInternalTos is the resolver for the userMsgInternalTos field.
 func (r *queryResolver) UserMsgInternalTos(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) (*ent.MsgInternalToConnection, error) {
 	tid, err := identity.TenantIDFromContext(ctx)

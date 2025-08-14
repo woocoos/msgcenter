@@ -11,6 +11,7 @@ import (
 	"github.com/woocoos/knockout-go/pkg/middleware"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/service"
+	"github.com/woocoos/msgcenter/service/ams"
 )
 
 type Server struct {
@@ -44,10 +45,12 @@ func (s *Server) buildWebEngine(app *woocoo.App, am *service.AlertManager) {
 		otelweb.RegisterMiddleware(),
 	)
 
+	amsSvc := ams.NewService(ams.WithClient(s.DB), ams.WithAlertManager(am))
 	//gql without websocket
 	gqlsrv := handler.NewDefaultServer(NewSchema(
 		WithClient(s.DB),
 		WithCoordinator(am.Coordinator),
+		WithAmsService(amsSvc),
 		WithSilences(am.Silences),
 		WithKOClient(am.Coordinator.KOSdk),
 	))

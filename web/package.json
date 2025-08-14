@@ -22,6 +22,7 @@
     "@knockout-js/ice-urql": "0.1.7",
     "@knockout-js/layout": "0.1.20",
     "@knockout-js/org": "0.1.11",
+    "@qeelyn-pb/ims-js": "^1.0.19",
     "@monaco-editor/react": "^4.5.1",
     "antd": "^5.23.2",
     "dayjs": "^1.11.8",

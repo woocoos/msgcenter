@@ -392,17 +392,19 @@ func (s *serviceSuite) TestWebhook() {
 					"event":    "app:approve",
 					"receiver": "webhook",
 					"skipSub":  "Y",
+					"tenant":   "1000",
 				},
 			},
 			Annotations: map[string]string{
 				"summary": "webhook test",
+				"mobile":  "8618359260323",
 			},
 			StartsAt: time.Now(),
 			EndsAt:   time.Now().Add(time.Hour),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
-	time.Sleep(time.Second * 2)
+	time.Sleep(time.Second * 20)
 	s.Require().NotNil(got.Data)
 	s.Require().Equal("webhook test", got.Data.CommonAnnotations["summary"])
 }

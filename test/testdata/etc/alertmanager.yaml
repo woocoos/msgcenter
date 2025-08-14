@@ -103,10 +103,10 @@ receivers:
         to: alerts@example.com
   - name: 'webhook'
     webhookConfigs:
-      - url: "http://127.0.0.1:5001/webhook"
+      - url: "http://127.0.0.1:10080/webhook"
         httpConfig: &knockout
           timeout: 1s
-          oauth2:
+          oauth2: 
             clientID: 206734260394752
             clientSecret: T2UlqISVFq4DR9InXamj3l74iWdu3Tyr
             endpoint:
