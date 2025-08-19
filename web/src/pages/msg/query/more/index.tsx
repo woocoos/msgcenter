@@ -24,10 +24,10 @@ export default () => {
     }),
     columns: ProColumns<FormatMsgAlert>[] = [
       {
-        title: '消息事件', dataIndex: 'msgEventComments', width: 120, search: false,
+        title: t('msg_event'), dataIndex: 'msgEventComments', width: 120, search: false,
       },
       {
-        title: '接收方式',
+        title: t('receiving_type'),
         dataIndex: 'receiverType',
         width: 120,
         search: false,
@@ -36,7 +36,7 @@ export default () => {
         },
       },
       {
-        title: '标题', dataIndex: 'msgTemplateTitle', width: 120, search: false,
+        title: t('subject'), dataIndex: 'msgTemplateTitle', width: 120, search: false,
       },
       {
         title: t('starts_at'), dataIndex: 'startsAt', width: 120, valueType: 'dateTime', search: false,
@@ -45,7 +45,7 @@ export default () => {
         title: t('end_at'), dataIndex: 'endsAt', width: 120, valueType: 'dateTime', search: false,
       },
       {
-        title: '接收用户',
+        title: t('receiving_user'),
         width: 120,
         search: false,
         render: (text, record) => {
@@ -55,7 +55,7 @@ export default () => {
         },
       },
       {
-        title: '接收通道', dataIndex: 'msgChannelComments', width: 120, search: false,
+        title: t('receive_channel'), dataIndex: 'msgChannelComments', width: 120, search: false,
       },
       {
         title: t('status'),
@@ -85,7 +85,7 @@ export default () => {
               }
             }, 200);
           }}
-            >查看内容</a>
+            >{t('view_content')}</a>
             </Space>
           );
         },
@@ -95,13 +95,13 @@ export default () => {
   return (<KeepAlive clearAlive>
     <PageContainer
       header={{
-        title: '更多消息',
+        title: t('more_message'),
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
             { title: t('msg_center') },
-            { title: <Link to={'/msg/query'}>消息查询</Link> },
-            { title: '更多消息' },
+            { title: <Link to={'/msg/query'}>{t('query_message')}</Link> },
+            { title: t('more_message') },
           ],
         },
       }}
@@ -111,7 +111,7 @@ export default () => {
         search={false}
         rowKey={'id'}
         toolbar={{
-          title: `消息事件：${msgEventComments}`,
+          title: `${t('msg_event')}：${msgEventComments}`,
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
@@ -133,7 +133,7 @@ export default () => {
         }}
       />
       <Modal
-        title="查看内容"
+        title={t('view_content')}
         open={modal.show}
         destroyOnClose
         footer={null}
@@ -148,6 +148,6 @@ export default () => {
   </KeepAlive>);
 };
 
-export const pageConfig = definePageConfig(() => ({
-  auth: ['/msg/list'],
-}));
+// export const pageConfig = definePageConfig(() => ({
+//   auth: ['/msg/list'],
+// }));

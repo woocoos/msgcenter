@@ -50,8 +50,7 @@ func (MsgEvent) Fields() []ent.Field {
 			Match(regexp.MustCompile("[a-zA-Z0-9_]+$")),
 		field.Enum("status").GoType(typex.SimpleStatus("")).Default(typex.SimpleStatusInactive.String()).
 			Optional().Comment("状态").Annotations(entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput)),
-		field.String("comments").Optional().Comment("备注").Annotations(
-			entgql.Skip(entgql.SkipWhereInput)),
+		field.String("comments").Optional().Comment("备注"),
 		field.JSON("route", &profile.Route{}).Optional().Comment("消息路由配置"),
 		field.String("modes").Comment("根据route配置对应的以,分隔的mode列表"),
 	}

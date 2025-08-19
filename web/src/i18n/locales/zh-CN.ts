@@ -134,6 +134,8 @@ export default {
     starts_at: '开始时间',
     end_at: '结束时间',
     effective_time: '生效时间',
+    search_msg_event: '搜索消息事件',
+    click_search_msg_event: '点击搜索消息事件',
 
     msg_center: '消息中心',
     msg_type: '消息类型',
@@ -158,7 +160,9 @@ export default {
     attachments_tip: '附件为固定文档，暂时不支持附件中的变量',
     click_drag_upload: '点击或拖拽文件上传',
     receiving_user: '接收用户',
+    receiving_type: '接收方式',
     receiving_user_group: '接收用户组',
+    receive_channel: '接收通道',
     exclude_user: '排除用户',
     receiving_subject: '接受主体',
     match_type: '匹配类型',
@@ -188,6 +192,9 @@ export default {
     station_msg_detail: '站内消息详情',
     msg_event_config_example: '配置示例',
     page_403: "对不起，您没有权限访问此页面",
+    view_content: '查看内容',
+    more_message: '更多消息',
+    query_message: '消息查询',
 
     // 创建
     create_msg_type: '创建消息类型',

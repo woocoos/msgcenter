@@ -16,6 +16,7 @@ import (
 	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
+	"github.com/woocoos/msgcenter/pkg/profile"
 )
 
 // NewExecutableSchema creates an ExecutableSchema from the ResolverRoot interface.
@@ -409,7 +410,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		FormatMsgAlertMore                    func(childComplexity int, msgAlertID int) int
-		FormatMsgAlerts                       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.MsgAlertWhereInput, orderBy *ent.MsgAlertOrder) int
+		FormatMsgAlerts                       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, alertName *string, userID *string, receiverType *profile.ReceiverType, where *ent.MsgAlertWhereInput, orderBy *ent.MsgAlertOrder) int
 		MsgAlerts                             func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) int
 		MsgChannels                           func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgChannelOrder, where *ent.MsgChannelWhereInput) int
 		MsgEvents                             func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) int
@@ -2415,7 +2416,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.FormatMsgAlerts(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["where"].(*ent.MsgAlertWhereInput), args["orderBy"].(*ent.MsgAlertOrder)), true
+		return e.complexity.Query.FormatMsgAlerts(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["alertName"].(*string), args["userID"].(*string), args["receiverType"].(*profile.ReceiverType), args["where"].(*ent.MsgAlertWhereInput), args["orderBy"].(*ent.MsgAlertOrder)), true
 
 	case "Query.msgAlerts":
 		if e.complexity.Query.MsgAlerts == nil {
@@ -3948,6 +3949,24 @@ input MsgEventWhereInput {
   statusNotIn: [MsgEventSimpleStatus!]
   statusIsNil: Boolean
   statusNotNil: Boolean
+  """
+  comments field predicates
+  """
+  comments: String
+  commentsNEQ: String
+  commentsIn: [String!]
+  commentsNotIn: [String!]
+  commentsGT: String
+  commentsGTE: String
+  commentsLT: String
+  commentsLTE: String
+  commentsContains: String
+  commentsHasPrefix: String
+  commentsHasSuffix: String
+  commentsIsNil: Boolean
+  commentsNotNil: Boolean
+  commentsEqualFold: String
+  commentsContainsFold: String
   """
   modes field predicates
   """
@@ -6223,6 +6242,9 @@ extend type Query {
         first: Int
         before: Cursor
         last: Int
+        alertName: String
+        userID: String
+        receiverType: MsgTemplateReceiverType
         where: MsgAlertWhereInput
         orderBy: MsgAlertOrder
     ):FormatMsgAlertConnection!

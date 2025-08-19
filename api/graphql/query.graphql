@@ -197,6 +197,9 @@ extend type Query {
         first: Int
         before: Cursor
         last: Int
+        alertName: String
+        userID: String
+        receiverType: MsgTemplateReceiverType
         where: MsgAlertWhereInput
         orderBy: MsgAlertOrder
     ):FormatMsgAlertConnection!

@@ -3,6 +3,8 @@ package ams
 import (
 	"context"
 	"entgo.io/contrib/entgql"
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"fmt"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/model"
@@ -12,6 +14,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
+	"github.com/woocoos/msgcenter/ent/nlog"
+	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
 	"github.com/woocoos/msgcenter/notify"
@@ -50,8 +54,28 @@ func WithAlertManager(am *service.AlertManager) Option {
 	}
 }
 
-func (s *Service) FormatMsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) (*model.FormatMsgAlertConnection, error) {
-	msgAlerts, err := s.client.MsgAlert.Query().Paginate(ctx, after, first, before, last,
+func (s *Service) FormatMsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, alertName *string, userID *string, receiverType *profile.ReceiverType, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) (*model.FormatMsgAlertConnection, error) {
+	msgalert.LabelsIsNil()
+	w := make([]predicate.MsgAlert, 0)
+	if alertName != nil {
+		an := func(s *sql.Selector) {
+			s.Where(sqljson.ValueEQ(msgalert.FieldLabels, *alertName, sqljson.Path(label.AlertNameLabel)))
+		}
+		w = append(w, an)
+	}
+	if receiverType != nil {
+		ry := func(s *sql.Selector) {
+			s.Where(sqljson.ValueContains(msgalert.FieldLabels, receiverType.String(), sqljson.Path("receiver")))
+		}
+		w = append(w, msgalert.Or(ry, msgalert.HasNlogWith(nlog.ReceiverTypeEQ(*receiverType))))
+	}
+	if userID != nil {
+		usr := func(s *sql.Selector) {
+			s.Where(sqljson.ValueContains(msgalert.FieldLabels, userID, sqljson.Path(label.ToUserIDLabel)))
+		}
+		w = append(w, usr)
+	}
+	msgAlerts, err := s.client.MsgAlert.Query().Where(w...).Paginate(ctx, after, first, before, last,
 		ent.WithMsgAlertOrder(orderBy), ent.WithMsgAlertFilter(where.Filter))
 	if err != nil {
 		return nil, err
@@ -77,7 +101,9 @@ func (s *Service) FormatMsgAlerts(ctx context.Context, after *entgql.Cursor[int]
 		if err != nil {
 			return nil, err
 		}
-		formatMsgAlert.HasMultiMsg = hasMultiMsg
+		if formatMsgAlert != nil {
+			formatMsgAlert.HasMultiMsg = hasMultiMsg
+		}
 		formatMsgAlerts = append(formatMsgAlerts, &model.FormatMsgAlertEdge{
 			Cursor: msgAlert.Cursor,
 			Node:   formatMsgAlert,
@@ -115,6 +141,8 @@ func (s *Service) formatMsgAlert(ctx context.Context, msgAlert *ent.MsgAlert, ro
 		if err != nil {
 			return nil, err
 		}
+	} else {
+		return nil, nil
 	}
 	// 获取消息通道描述
 	msgChannel, err := s.client.MsgChannel.Query().Where(
@@ -140,44 +168,28 @@ func (s *Service) formatMsgAlert(ctx context.Context, msgAlert *ent.MsgAlert, ro
 	}
 	// 判断消息是否订阅
 	users := make([]*model.UserInfo, 0)
-	uis, err := s.am.Subscribe.SubUsers(ctx, &a)
+	// 取消息体的user
+	uids, err := service.UserIDsFromLabels(labels)
 	if err != nil {
 		return nil, err
 	}
-	if len(uis) > 0 {
-		// 有订阅则取订阅的用户信息
-		for _, u := range uis {
-			users = append(users, &model.UserInfo{
-				Name:   &u.Name,
-				Email:  &u.Email,
-				Mobile: &u.Mobile,
-				UserID: &u.UserID,
-			})
-		}
-	} else {
-		// 没有取消息体的user
-		uids, err := service.UserIDsFromLabels(labels)
+	if uids != nil {
+		us, err := s.client.User.Query().Where(user.IDIn(uids...)).All(ctx)
 		if err != nil {
 			return nil, err
 		}
-		if uids != nil {
-			us, err := s.client.User.Query().Where(user.IDIn(uids...)).All(ctx)
+		for _, u := range us {
+			addr, err := u.QueryAddresses().Where(useraddr.AddrTypeEQ(useraddr.AddrTypeContact)).Only(ctx)
 			if err != nil {
 				return nil, err
 			}
-			for _, u := range us {
-				addr, err := u.QueryAddresses().Where(useraddr.AddrTypeEQ(useraddr.AddrTypeContact)).Only(ctx)
-				if err != nil {
-					return nil, err
-				}
-				uid := strconv.Itoa(u.ID)
-				users = append(users, &model.UserInfo{
-					Name:   &u.DisplayName,
-					Email:  &addr.Email,
-					Mobile: &addr.Mobile,
-					UserID: &uid,
-				})
-			}
+			uid := strconv.Itoa(u.ID)
+			users = append(users, &model.UserInfo{
+				Name:   &u.DisplayName,
+				Email:  &addr.Email,
+				Mobile: &addr.Mobile,
+				UserID: &uid,
+			})
 		}
 	}
 	if len(users) == 0 {

@@ -56,7 +56,7 @@ type QueryResolver interface {
 	MsgTemplates(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) (*ent.MsgTemplateConnection, error)
 	Silences(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SilenceOrder, where *ent.SilenceWhereInput) (*ent.SilenceConnection, error)
 	MsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) (*ent.MsgAlertConnection, error)
-	FormatMsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.MsgAlertWhereInput, orderBy *ent.MsgAlertOrder) (*model.FormatMsgAlertConnection, error)
+	FormatMsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, alertName *string, userID *string, receiverType *profile.ReceiverType, where *ent.MsgAlertWhereInput, orderBy *ent.MsgAlertOrder) (*model.FormatMsgAlertConnection, error)
 	FormatMsgAlertMore(ctx context.Context, msgAlertID int) ([]*model.FormatMsgAlert, error)
 	RenderMsgAlert(ctx context.Context, msgAlertID int, receiver string) (*string, error)
 	UserMsgInternalTos(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) (*ent.MsgInternalToConnection, error)
@@ -356,16 +356,31 @@ func (ec *executionContext) field_Query_formatMsgAlerts_args(ctx context.Context
 		return nil, err
 	}
 	args["last"] = arg3
-	arg4, err := ec.field_Query_formatMsgAlerts_argsWhere(ctx, rawArgs)
+	arg4, err := ec.field_Query_formatMsgAlerts_argsAlertName(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["where"] = arg4
-	arg5, err := ec.field_Query_formatMsgAlerts_argsOrderBy(ctx, rawArgs)
+	args["alertName"] = arg4
+	arg5, err := ec.field_Query_formatMsgAlerts_argsUserID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["orderBy"] = arg5
+	args["userID"] = arg5
+	arg6, err := ec.field_Query_formatMsgAlerts_argsReceiverType(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["receiverType"] = arg6
+	arg7, err := ec.field_Query_formatMsgAlerts_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg7
+	arg8, err := ec.field_Query_formatMsgAlerts_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg8
 	return args, nil
 }
 func (ec *executionContext) field_Query_formatMsgAlerts_argsAfter(
@@ -453,6 +468,72 @@ func (ec *executionContext) field_Query_formatMsgAlerts_argsLast(
 	}
 
 	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_formatMsgAlerts_argsAlertName(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*string, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["alertName"]
+	if !ok {
+		var zeroVal *string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("alertName"))
+	if tmp, ok := rawArgs["alertName"]; ok {
+		return ec.unmarshalOString2ᚖstring(ctx, tmp)
+	}
+
+	var zeroVal *string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_formatMsgAlerts_argsUserID(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*string, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["userID"]
+	if !ok {
+		var zeroVal *string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+	if tmp, ok := rawArgs["userID"]; ok {
+		return ec.unmarshalOString2ᚖstring(ctx, tmp)
+	}
+
+	var zeroVal *string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_formatMsgAlerts_argsReceiverType(
+	ctx context.Context,
+	rawArgs map[string]interface{},
+) (*profile.ReceiverType, error) {
+	// We won't call the directive if the argument is null.
+	// Set call_argument_directives_with_null to true to call directives
+	// even if the argument is null.
+	_, ok := rawArgs["receiverType"]
+	if !ok {
+		var zeroVal *profile.ReceiverType
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverType"))
+	if tmp, ok := rawArgs["receiverType"]; ok {
+		return ec.unmarshalOMsgTemplateReceiverType2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverType(ctx, tmp)
+	}
+
+	var zeroVal *profile.ReceiverType
 	return zeroVal, nil
 }
 
@@ -11391,7 +11472,7 @@ func (ec *executionContext) _Query_formatMsgAlerts(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().FormatMsgAlerts(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["where"].(*ent.MsgAlertWhereInput), fc.Args["orderBy"].(*ent.MsgAlertOrder))
+		return ec.resolvers.Query().FormatMsgAlerts(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["alertName"].(*string), fc.Args["userID"].(*string), fc.Args["receiverType"].(*profile.ReceiverType), fc.Args["where"].(*ent.MsgAlertWhereInput), fc.Args["orderBy"].(*ent.MsgAlertOrder))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14853,7 +14934,7 @@ func (ec *executionContext) unmarshalInputMsgEventWhereInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "msgTypeID", "msgTypeIDNEQ", "msgTypeIDIn", "msgTypeIDNotIn", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "status", "statusNEQ", "statusIn", "statusNotIn", "statusIsNil", "statusNotNil", "modes", "modesNEQ", "modesIn", "modesNotIn", "modesGT", "modesGTE", "modesLT", "modesLTE", "modesContains", "modesHasPrefix", "modesHasSuffix", "modesEqualFold", "modesContainsFold", "hasMsgType", "hasMsgTypeWith", "hasCustomerTemplate", "hasCustomerTemplateWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "msgTypeID", "msgTypeIDNEQ", "msgTypeIDIn", "msgTypeIDNotIn", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "status", "statusNEQ", "statusIn", "statusNotIn", "statusIsNil", "statusNotNil", "comments", "commentsNEQ", "commentsIn", "commentsNotIn", "commentsGT", "commentsGTE", "commentsLT", "commentsLTE", "commentsContains", "commentsHasPrefix", "commentsHasSuffix", "commentsIsNil", "commentsNotNil", "commentsEqualFold", "commentsContainsFold", "modes", "modesNEQ", "modesIn", "modesNotIn", "modesGT", "modesGTE", "modesLT", "modesLTE", "modesContains", "modesHasPrefix", "modesHasSuffix", "modesEqualFold", "modesContainsFold", "hasMsgType", "hasMsgTypeWith", "hasCustomerTemplate", "hasCustomerTemplateWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -15350,6 +15431,111 @@ func (ec *executionContext) unmarshalInputMsgEventWhereInput(ctx context.Context
 				return it, err
 			}
 			it.StatusNotNil = data
+		case "comments":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("comments"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Comments = data
+		case "commentsNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentsNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CommentsNEQ = data
+		case "commentsIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentsIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CommentsIn = data
+		case "commentsNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentsNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CommentsNotIn = data
+		case "commentsGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentsGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CommentsGT = data
+		case "commentsGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentsGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CommentsGTE = data
+		case "commentsLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentsLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CommentsLT = data
+		case "commentsLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentsLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CommentsLTE = data
+		case "commentsContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentsContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CommentsContains = data
+		case "commentsHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentsHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CommentsHasPrefix = data
+		case "commentsHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentsHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CommentsHasSuffix = data
+		case "commentsIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentsIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CommentsIsNil = data
+		case "commentsNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentsNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CommentsNotNil = data
+		case "commentsEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentsEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CommentsEqualFold = data
+		case "commentsContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("commentsContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CommentsContainsFold = data
 		case "modes":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modes"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)

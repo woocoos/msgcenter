@@ -154,8 +154,8 @@ func (r *queryResolver) MsgAlerts(ctx context.Context, after *entgql.Cursor[int]
 }
 
 // FormatMsgAlerts is the resolver for the formatMsgAlerts field.
-func (r *queryResolver) FormatMsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.MsgAlertWhereInput, orderBy *ent.MsgAlertOrder) (*model.FormatMsgAlertConnection, error) {
-	return r.ams.FormatMsgAlerts(ctx, after, first, before, last, orderBy, where)
+func (r *queryResolver) FormatMsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, alertName *string, userID *string, receiverType *profile.ReceiverType, where *ent.MsgAlertWhereInput, orderBy *ent.MsgAlertOrder) (*model.FormatMsgAlertConnection, error) {
+	return r.ams.FormatMsgAlerts(ctx, after, first, before, last, alertName, userID, receiverType, orderBy, where)
 }
 
 // FormatMsgAlertMore is the resolver for the formatMsgAlertMore field.

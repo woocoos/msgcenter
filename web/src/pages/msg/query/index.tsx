@@ -1,15 +1,21 @@
 import { FormatMsgAlert, MsgAlertAlertStatus, MsgAlertWhereInput, UserInfo } from '@/generated/msgsrv/graphql';
-import { EnumMsgAlertStatus, getFormatMsgAlertList, getRenderMsgAlert } from '@/services/msgsrv/list';
+import {
+  EnumMsgAlertStatus,
+  EnumNlogReceiverType,
+  getFormatMsgAlertList,
+  getRenderMsgAlert,
+} from '@/services/msgsrv/list';
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { OrgKind } from '@knockout-js/api/ucenter';
 import { KeepAlive } from '@knockout-js/layout';
-import { OrgSelect } from '@knockout-js/org';
+import { UserSelect } from '@knockout-js/org';
 import { getDate } from '@qeelyn-pb/ims-js/esm/utils';
 import { Modal, Space, Typography } from 'antd';
 import { definePageConfig, useNavigate } from 'ice';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TemplateType } from '@/pages/msg/event';
+import InputMsgEvent from '@/pages/msg/query/components/inputMsgEvent';
 
 export default () => {
   const { token } = useToken(),
@@ -25,26 +31,37 @@ export default () => {
     }),
     columns: ProColumns<FormatMsgAlert>[] = [
       {
-        title: '消息事件', dataIndex: 'msgEventComments', width: 120, search: false,
+        title: t('msg_event'),
+        dataIndex: 'alertName',
+        width: 120,
+        order: 4,
+        renderFormItem: () => {
+          return <InputMsgEvent />;
+        },
+        render: (text, record) => {
+          return record.msgEventComments || '-';
+        },
       },
       {
-        title: '接收方式',
+        title: t('receiving_type'),
         dataIndex: 'receiverType',
         width: 120,
-        search: false,
+        valueType: 'select',
+        valueEnum: EnumNlogReceiverType,
+        order: 3,
         render: (text, record) => {
           return record.receiverType || '-';
         },
       },
       {
-        title: '标题', dataIndex: 'msgTemplateTitle', width: 120, search: false,
+        title: t('subject'), dataIndex: 'msgTemplateTitle', width: 120, search: false,
       },
       {
-        title: '开始时间',
+        title: t('send_at'),
         dataIndex: 'startsAt',
         width: 120,
         valueType: 'dateRange',
-        order: 3,
+        order: 1,
         fieldProps: {
           format: 'YYYY-MM-DD',
         },
@@ -58,9 +75,13 @@ export default () => {
         title: t('end_at'), dataIndex: 'endsAt', width: 120, valueType: 'dateTime', search: false,
       },
       {
-        title: '接收用户',
+        title: t('receiving_user'),
+        dataIndex: 'user',
         width: 120,
-        search: false,
+        order: 2,
+        renderFormItem: () => {
+          return <UserSelect />;
+        },
         render: (text, record) => {
           return record.users?.map((item: UserInfo) => {
             return item.name ? item.name : item.email;
@@ -68,7 +89,7 @@ export default () => {
         },
       },
       {
-        title: '接收通道', dataIndex: 'msgChannelComments', width: 120, search: false,
+        title: t('receive_channel'), dataIndex: 'msgChannelComments', width: 120, search: false,
       },
       {
         title: t('status'),
@@ -98,14 +119,14 @@ export default () => {
               }
             }, 200);
           }}
-            >查看内容</a>
+            >{t('view_content')}</a>
               <Typography.Link
                 disabled={!record.hasMultiMsg}
                 onClick={() => {
                   navigate(`/msg/query/more?id=${record.id}`);
                 }}
               >
-                更多消息
+                {t('more_message')}
               </Typography.Link>
             </Space>
           );
@@ -116,12 +137,12 @@ export default () => {
   return (<KeepAlive clearAlive>
     <PageContainer
       header={{
-        title: '消息查询',
+        title: t('query_message'),
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
             { title: t('msg_center') },
-            { title: '消息查询' },
+            { title: t('query_message') },
           ],
         },
       }}
@@ -135,7 +156,7 @@ export default () => {
         }}
         rowKey={'id'}
         toolbar={{
-          title: '消息查询',
+          title: t('query_message'),
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
@@ -146,9 +167,16 @@ export default () => {
             where.startsAtGTE = getDate(params.startsAt[0], 'YYYY-MM-DDT00:00:00Z');
             where.startsAtLTE = getDate(params.startsAt[1], 'YYYY-MM-DDT23:59:59Z');
           }
+          let alertName = '';
+          if (params?.alertName?.name) {
+            alertName = params?.alertName?.name;
+          }
           const result = await getFormatMsgAlertList({
             current: params.current,
             pageSize: params.pageSize,
+            receiverType: params.receiverType,
+            alertName: alertName,
+            userID: params?.user?.id,
             where: where,
           });
           if (result?.totalCount) {
@@ -160,7 +188,7 @@ export default () => {
 
       />
       <Modal
-        title="查看内容"
+        title={t('view_content')}
         open={modal.show}
         destroyOnClose
         footer={null}
@@ -176,5 +204,5 @@ export default () => {
 };
 
 export const pageConfig = definePageConfig(() => ({
-  auth: ['/msg/list'],
+  auth: ['/msg/query'],
 }));

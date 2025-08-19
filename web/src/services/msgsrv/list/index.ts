@@ -1,5 +1,14 @@
 import { gql } from '@/generated/msgsrv';
-import { MsgAlertOrder, MsgAlertOrderField, MsgAlertWhereInput, NlogOrder, NlogOrderField, NlogWhereInput, OrderDirection } from '@/generated/msgsrv/graphql';
+import {
+  MsgAlertOrder,
+  MsgAlertOrderField,
+  MsgAlertWhereInput,
+  MsgTemplateReceiverType,
+  NlogOrder,
+  NlogOrderField,
+  NlogWhereInput,
+  OrderDirection,
+} from '@/generated/msgsrv/graphql';
 import { gid } from '@knockout-js/api';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request';
 
@@ -26,8 +35,8 @@ const queryMsgAlertList = gql(/* GraphQL */`query msgAlertList($first: Int,$orde
   }
 }`);
 
-const queryFormatMsgAlertList = gql(/* GraphQL */`query formatMsgAlerts($first: Int,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){
-  formatMsgAlerts(first:$first,orderBy: $orderBy,where: $where){
+const queryFormatMsgAlertList = gql(/* GraphQL */`query formatMsgAlerts($first: Int,$alertName:String,$userID:String,$receiverType:MsgTemplateReceiverType,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){
+  formatMsgAlerts(first:$first,alertName: $alertName,userID: $userID,receiverType: $receiverType,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -102,18 +111,31 @@ export async function getFormatMsgAlertList(
   gather: {
     current?: number;
     pageSize?: number;
+    alertName?: string;
+    userID?: string;
+    receiverType?: MsgTemplateReceiverType;
     orderBy?: MsgAlertOrder;
     where?: MsgAlertWhereInput;
   }) {
+  let variables = {
+    first: gather.pageSize || 20,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: MsgAlertOrderField.CreatedAt,
+    },
+    where: gather.where,
+  };
+  if (gather?.alertName) {
+    variables['alertName'] = gather?.alertName;
+  }
+  if (gather?.userID) {
+    variables['userID'] = gather?.userID;
+  }
+  if (gather?.receiverType) {
+    variables['receiverType'] = gather?.receiverType;
+  }
   const result = await paging(
-    queryFormatMsgAlertList, {
-      first: gather.pageSize || 20,
-      orderBy: gather.orderBy ?? {
-        direction: OrderDirection.Desc,
-        field: MsgAlertOrderField.CreatedAt,
-      },
-      where: gather.where,
-    }, gather.current || 1);
+    queryFormatMsgAlertList, variables, gather.current || 1);
 
   if (result.data?.formatMsgAlerts) {
     return result.data.formatMsgAlerts;
