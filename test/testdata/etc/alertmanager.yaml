@@ -97,7 +97,7 @@ receivers:
     emailConfigs:
       - authPassword:
         authUsername:
-        from: alertmanager@example.com
+        from: default <serviceSuite@localhost>
         requireTLS: false
         smarthost: localhost:1025
         to: alerts@example.com
@@ -106,7 +106,7 @@ receivers:
       - url: "http://127.0.0.1:10080/webhook"
         httpConfig: &knockout
           timeout: 1s
-          oauth2: 
+          oauth2:
             clientID: 206734260394752
             clientSecret: T2UlqISVFq4DR9InXamj3l74iWdu3Tyr
             endpoint:

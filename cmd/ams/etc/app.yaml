@@ -130,3 +130,5 @@ kosdk:
       basePath: "http://127.0.0.1:8080"
       headers:
         "X-Tenant-ID": 1
+    auth:
+      basePath: "http://127.0.0.1:10070"

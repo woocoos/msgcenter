@@ -40,3 +40,23 @@ cache:
     driverName: memory
     size: 1000
     ttl: 100s
+
+kosdk:
+  client:
+    timeout: 2s
+    oauth2:
+      clientID: 206734260394752
+      clientSecret: T2UlqISVFq4DR9InXamj3l74iWdu3Tyr
+      endpoint:
+        tokenURL: http://127.0.0.1:5001/token
+      scopes:
+      storeKey: memory
+  plugin:
+    msg:
+      basePath: "http://127.0.0.1:5001/api/v2"
+    fs:
+      basePath: "http://127.0.0.1:5001"
+      headers:
+        "X-Tenant-ID": 1
+    auth:
+      basePath: "http://127.0.0.1:5001"
