@@ -2,9 +2,11 @@ package template
 
 import (
 	"bytes"
+	"context"
 	"embed"
 	"fmt"
 	"github.com/woocoos/knockout-go/api"
+	"github.com/woocoos/knockout-go/api/auth"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	tmplhtml "html/template"
@@ -13,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	tmpltext "text/template"
 	"text/template/parse"
@@ -323,7 +326,23 @@ func (t *Template) AppendTempParams(data *Data) {
 	}
 	tp := t.TempParams[tenant]
 	if tp == nil {
-		return
+		if t.KOSdk == nil {
+			return
+		}
+		tid, err := strconv.Atoi(tenant)
+		if err != nil {
+			return
+		}
+		ret, _, err := t.KOSdk.Auth().AuthAPI.GetDomain(context.Background(), &auth.GetDomainRequest{
+			OrgID: tid,
+		})
+		if err != nil {
+			return
+		}
+		tp = t.TempParams[strconv.Itoa(ret.ParentID)]
+		if tp == nil {
+			return
+		}
 	}
 	for k, v := range tp {
 		data.CommonAnnotations[k] = v

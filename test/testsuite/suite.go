@@ -147,12 +147,13 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(1).SetTenantID(1).SetName(alterPassWordEventName).SetCreatedBy(1).
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
 		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
-		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
+		SetBcc(`{{ template "email.bcc" . }}`).
 		SetBody(`{{ template "1.alterpwd.txt" . }}`).SaveX(ctx)
-	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(1).SetTenantID(2).SetName(alterPassWordEventName).SetCreatedBy(1).
+	// 默认模板
+	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(1).SetName(alterPassWordEventName).SetCreatedBy(1).
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
 		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
-		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
+		SetBcc(`{{ template "email.bcc" . }}`).
 		SetBody(`{{ template "1.alterpwd.txt" . }}`).SaveX(ctx)
 
 	client.MsgChannel.Create().SetName("email").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
@@ -161,9 +162,23 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 			Name: "email",
 			EmailConfigs: []*profile.EmailConfig{
 				{
+					SmartHost:    profile.HostPort{Host: "localhost", Port: "1025"},
+					To:           `{{ template "email.to" . }}`,
+					From:         "1 <serviceSuite@localhost>",
+					AuthUsername: "user1",
+					AuthPassword: "password1",
+				},
+			},
+		}).SaveX(ctx)
+	client.MsgChannel.Create().SetName("email").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
+		SetTenantID(2).SetReceiverType(profile.ReceiverEmail).
+		SetReceiver(&profile.Receiver{
+			Name: "email",
+			EmailConfigs: []*profile.EmailConfig{
+				{
 					SmartHost: profile.HostPort{Host: "localhost", Port: "1025"},
 					To:        `{{ template "email.to" . }}`,
-					From:      "serviceSuite@localhost",
+					From:      "2 <serviceSuite@localhost>",
 				},
 			},
 		}).SaveX(ctx)
