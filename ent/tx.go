@@ -32,6 +32,8 @@ type Tx struct {
 	Nlog *NlogClient
 	// NlogAlert is the client for interacting with the NlogAlert builders.
 	NlogAlert *NlogAlertClient
+	// Org is the client for interacting with the Org builders.
+	Org *OrgClient
 	// OrgRoleUser is the client for interacting with the OrgRoleUser builders.
 	OrgRoleUser *OrgRoleUserClient
 	// Silence is the client for interacting with the Silence builders.
@@ -181,6 +183,7 @@ func (tx *Tx) init() {
 	tx.MsgType = NewMsgTypeClient(tx.config)
 	tx.Nlog = NewNlogClient(tx.config)
 	tx.NlogAlert = NewNlogAlertClient(tx.config)
+	tx.Org = NewOrgClient(tx.config)
 	tx.OrgRoleUser = NewOrgRoleUserClient(tx.config)
 	tx.Silence = NewSilenceClient(tx.config)
 	tx.User = NewUserClient(tx.config)

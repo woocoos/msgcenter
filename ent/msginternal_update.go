@@ -26,189 +26,189 @@ type MsgInternalUpdate struct {
 }
 
 // Where appends a list predicates to the MsgInternalUpdate builder.
-func (miu *MsgInternalUpdate) Where(ps ...predicate.MsgInternal) *MsgInternalUpdate {
-	miu.mutation.Where(ps...)
-	return miu
+func (_u *MsgInternalUpdate) Where(ps ...predicate.MsgInternal) *MsgInternalUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (miu *MsgInternalUpdate) SetUpdatedBy(i int) *MsgInternalUpdate {
-	miu.mutation.ResetUpdatedBy()
-	miu.mutation.SetUpdatedBy(i)
-	return miu
+func (_u *MsgInternalUpdate) SetUpdatedBy(v int) *MsgInternalUpdate {
+	_u.mutation.ResetUpdatedBy()
+	_u.mutation.SetUpdatedBy(v)
+	return _u
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (miu *MsgInternalUpdate) SetNillableUpdatedBy(i *int) *MsgInternalUpdate {
-	if i != nil {
-		miu.SetUpdatedBy(*i)
+func (_u *MsgInternalUpdate) SetNillableUpdatedBy(v *int) *MsgInternalUpdate {
+	if v != nil {
+		_u.SetUpdatedBy(*v)
 	}
-	return miu
+	return _u
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (miu *MsgInternalUpdate) AddUpdatedBy(i int) *MsgInternalUpdate {
-	miu.mutation.AddUpdatedBy(i)
-	return miu
+// AddUpdatedBy adds value to the "updated_by" field.
+func (_u *MsgInternalUpdate) AddUpdatedBy(v int) *MsgInternalUpdate {
+	_u.mutation.AddUpdatedBy(v)
+	return _u
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (miu *MsgInternalUpdate) ClearUpdatedBy() *MsgInternalUpdate {
-	miu.mutation.ClearUpdatedBy()
-	return miu
+func (_u *MsgInternalUpdate) ClearUpdatedBy() *MsgInternalUpdate {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (miu *MsgInternalUpdate) SetUpdatedAt(t time.Time) *MsgInternalUpdate {
-	miu.mutation.SetUpdatedAt(t)
-	return miu
+func (_u *MsgInternalUpdate) SetUpdatedAt(v time.Time) *MsgInternalUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (miu *MsgInternalUpdate) SetNillableUpdatedAt(t *time.Time) *MsgInternalUpdate {
-	if t != nil {
-		miu.SetUpdatedAt(*t)
+func (_u *MsgInternalUpdate) SetNillableUpdatedAt(v *time.Time) *MsgInternalUpdate {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return miu
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (miu *MsgInternalUpdate) ClearUpdatedAt() *MsgInternalUpdate {
-	miu.mutation.ClearUpdatedAt()
-	return miu
+func (_u *MsgInternalUpdate) ClearUpdatedAt() *MsgInternalUpdate {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetCategory sets the "category" field.
-func (miu *MsgInternalUpdate) SetCategory(s string) *MsgInternalUpdate {
-	miu.mutation.SetCategory(s)
-	return miu
+func (_u *MsgInternalUpdate) SetCategory(v string) *MsgInternalUpdate {
+	_u.mutation.SetCategory(v)
+	return _u
 }
 
 // SetNillableCategory sets the "category" field if the given value is not nil.
-func (miu *MsgInternalUpdate) SetNillableCategory(s *string) *MsgInternalUpdate {
-	if s != nil {
-		miu.SetCategory(*s)
+func (_u *MsgInternalUpdate) SetNillableCategory(v *string) *MsgInternalUpdate {
+	if v != nil {
+		_u.SetCategory(*v)
 	}
-	return miu
+	return _u
 }
 
 // SetSubject sets the "subject" field.
-func (miu *MsgInternalUpdate) SetSubject(s string) *MsgInternalUpdate {
-	miu.mutation.SetSubject(s)
-	return miu
+func (_u *MsgInternalUpdate) SetSubject(v string) *MsgInternalUpdate {
+	_u.mutation.SetSubject(v)
+	return _u
 }
 
 // SetNillableSubject sets the "subject" field if the given value is not nil.
-func (miu *MsgInternalUpdate) SetNillableSubject(s *string) *MsgInternalUpdate {
-	if s != nil {
-		miu.SetSubject(*s)
+func (_u *MsgInternalUpdate) SetNillableSubject(v *string) *MsgInternalUpdate {
+	if v != nil {
+		_u.SetSubject(*v)
 	}
-	return miu
+	return _u
 }
 
 // SetBody sets the "body" field.
-func (miu *MsgInternalUpdate) SetBody(s string) *MsgInternalUpdate {
-	miu.mutation.SetBody(s)
-	return miu
+func (_u *MsgInternalUpdate) SetBody(v string) *MsgInternalUpdate {
+	_u.mutation.SetBody(v)
+	return _u
 }
 
 // SetNillableBody sets the "body" field if the given value is not nil.
-func (miu *MsgInternalUpdate) SetNillableBody(s *string) *MsgInternalUpdate {
-	if s != nil {
-		miu.SetBody(*s)
+func (_u *MsgInternalUpdate) SetNillableBody(v *string) *MsgInternalUpdate {
+	if v != nil {
+		_u.SetBody(*v)
 	}
-	return miu
+	return _u
 }
 
 // ClearBody clears the value of the "body" field.
-func (miu *MsgInternalUpdate) ClearBody() *MsgInternalUpdate {
-	miu.mutation.ClearBody()
-	return miu
+func (_u *MsgInternalUpdate) ClearBody() *MsgInternalUpdate {
+	_u.mutation.ClearBody()
+	return _u
 }
 
 // SetFormat sets the "format" field.
-func (miu *MsgInternalUpdate) SetFormat(s string) *MsgInternalUpdate {
-	miu.mutation.SetFormat(s)
-	return miu
+func (_u *MsgInternalUpdate) SetFormat(v string) *MsgInternalUpdate {
+	_u.mutation.SetFormat(v)
+	return _u
 }
 
 // SetNillableFormat sets the "format" field if the given value is not nil.
-func (miu *MsgInternalUpdate) SetNillableFormat(s *string) *MsgInternalUpdate {
-	if s != nil {
-		miu.SetFormat(*s)
+func (_u *MsgInternalUpdate) SetNillableFormat(v *string) *MsgInternalUpdate {
+	if v != nil {
+		_u.SetFormat(*v)
 	}
-	return miu
+	return _u
 }
 
 // SetRedirect sets the "redirect" field.
-func (miu *MsgInternalUpdate) SetRedirect(s string) *MsgInternalUpdate {
-	miu.mutation.SetRedirect(s)
-	return miu
+func (_u *MsgInternalUpdate) SetRedirect(v string) *MsgInternalUpdate {
+	_u.mutation.SetRedirect(v)
+	return _u
 }
 
 // SetNillableRedirect sets the "redirect" field if the given value is not nil.
-func (miu *MsgInternalUpdate) SetNillableRedirect(s *string) *MsgInternalUpdate {
-	if s != nil {
-		miu.SetRedirect(*s)
+func (_u *MsgInternalUpdate) SetNillableRedirect(v *string) *MsgInternalUpdate {
+	if v != nil {
+		_u.SetRedirect(*v)
 	}
-	return miu
+	return _u
 }
 
 // ClearRedirect clears the value of the "redirect" field.
-func (miu *MsgInternalUpdate) ClearRedirect() *MsgInternalUpdate {
-	miu.mutation.ClearRedirect()
-	return miu
+func (_u *MsgInternalUpdate) ClearRedirect() *MsgInternalUpdate {
+	_u.mutation.ClearRedirect()
+	return _u
 }
 
 // AddMsgInternalToIDs adds the "msg_internal_to" edge to the MsgInternalTo entity by IDs.
-func (miu *MsgInternalUpdate) AddMsgInternalToIDs(ids ...int) *MsgInternalUpdate {
-	miu.mutation.AddMsgInternalToIDs(ids...)
-	return miu
+func (_u *MsgInternalUpdate) AddMsgInternalToIDs(ids ...int) *MsgInternalUpdate {
+	_u.mutation.AddMsgInternalToIDs(ids...)
+	return _u
 }
 
 // AddMsgInternalTo adds the "msg_internal_to" edges to the MsgInternalTo entity.
-func (miu *MsgInternalUpdate) AddMsgInternalTo(m ...*MsgInternalTo) *MsgInternalUpdate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *MsgInternalUpdate) AddMsgInternalTo(v ...*MsgInternalTo) *MsgInternalUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return miu.AddMsgInternalToIDs(ids...)
+	return _u.AddMsgInternalToIDs(ids...)
 }
 
 // Mutation returns the MsgInternalMutation object of the builder.
-func (miu *MsgInternalUpdate) Mutation() *MsgInternalMutation {
-	return miu.mutation
+func (_u *MsgInternalUpdate) Mutation() *MsgInternalMutation {
+	return _u.mutation
 }
 
 // ClearMsgInternalTo clears all "msg_internal_to" edges to the MsgInternalTo entity.
-func (miu *MsgInternalUpdate) ClearMsgInternalTo() *MsgInternalUpdate {
-	miu.mutation.ClearMsgInternalTo()
-	return miu
+func (_u *MsgInternalUpdate) ClearMsgInternalTo() *MsgInternalUpdate {
+	_u.mutation.ClearMsgInternalTo()
+	return _u
 }
 
 // RemoveMsgInternalToIDs removes the "msg_internal_to" edge to MsgInternalTo entities by IDs.
-func (miu *MsgInternalUpdate) RemoveMsgInternalToIDs(ids ...int) *MsgInternalUpdate {
-	miu.mutation.RemoveMsgInternalToIDs(ids...)
-	return miu
+func (_u *MsgInternalUpdate) RemoveMsgInternalToIDs(ids ...int) *MsgInternalUpdate {
+	_u.mutation.RemoveMsgInternalToIDs(ids...)
+	return _u
 }
 
 // RemoveMsgInternalTo removes "msg_internal_to" edges to MsgInternalTo entities.
-func (miu *MsgInternalUpdate) RemoveMsgInternalTo(m ...*MsgInternalTo) *MsgInternalUpdate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *MsgInternalUpdate) RemoveMsgInternalTo(v ...*MsgInternalTo) *MsgInternalUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return miu.RemoveMsgInternalToIDs(ids...)
+	return _u.RemoveMsgInternalToIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (miu *MsgInternalUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, miu.sqlSave, miu.mutation, miu.hooks)
+func (_u *MsgInternalUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (miu *MsgInternalUpdate) SaveX(ctx context.Context) int {
-	affected, err := miu.Save(ctx)
+func (_u *MsgInternalUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -216,21 +216,21 @@ func (miu *MsgInternalUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (miu *MsgInternalUpdate) Exec(ctx context.Context) error {
-	_, err := miu.Save(ctx)
+func (_u *MsgInternalUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (miu *MsgInternalUpdate) ExecX(ctx context.Context) {
-	if err := miu.Exec(ctx); err != nil {
+func (_u *MsgInternalUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (miu *MsgInternalUpdate) check() error {
-	if v, ok := miu.mutation.Category(); ok {
+func (_u *MsgInternalUpdate) check() error {
+	if v, ok := _u.mutation.Category(); ok {
 		if err := msginternal.CategoryValidator(v); err != nil {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.category": %w`, err)}
 		}
@@ -238,55 +238,55 @@ func (miu *MsgInternalUpdate) check() error {
 	return nil
 }
 
-func (miu *MsgInternalUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := miu.check(); err != nil {
-		return n, err
+func (_u *MsgInternalUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(msginternal.Table, msginternal.Columns, sqlgraph.NewFieldSpec(msginternal.FieldID, field.TypeInt))
-	if ps := miu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := miu.mutation.UpdatedBy(); ok {
+	if value, ok := _u.mutation.UpdatedBy(); ok {
 		_spec.SetField(msginternal.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if value, ok := miu.mutation.AddedUpdatedBy(); ok {
+	if value, ok := _u.mutation.AddedUpdatedBy(); ok {
 		_spec.AddField(msginternal.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if miu.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		_spec.ClearField(msginternal.FieldUpdatedBy, field.TypeInt)
 	}
-	if value, ok := miu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(msginternal.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if miu.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(msginternal.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := miu.mutation.Category(); ok {
+	if value, ok := _u.mutation.Category(); ok {
 		_spec.SetField(msginternal.FieldCategory, field.TypeString, value)
 	}
-	if value, ok := miu.mutation.Subject(); ok {
+	if value, ok := _u.mutation.Subject(); ok {
 		_spec.SetField(msginternal.FieldSubject, field.TypeString, value)
 	}
-	if value, ok := miu.mutation.Body(); ok {
+	if value, ok := _u.mutation.Body(); ok {
 		_spec.SetField(msginternal.FieldBody, field.TypeString, value)
 	}
-	if miu.mutation.BodyCleared() {
+	if _u.mutation.BodyCleared() {
 		_spec.ClearField(msginternal.FieldBody, field.TypeString)
 	}
-	if value, ok := miu.mutation.Format(); ok {
+	if value, ok := _u.mutation.Format(); ok {
 		_spec.SetField(msginternal.FieldFormat, field.TypeString, value)
 	}
-	if value, ok := miu.mutation.Redirect(); ok {
+	if value, ok := _u.mutation.Redirect(); ok {
 		_spec.SetField(msginternal.FieldRedirect, field.TypeString, value)
 	}
-	if miu.mutation.RedirectCleared() {
+	if _u.mutation.RedirectCleared() {
 		_spec.ClearField(msginternal.FieldRedirect, field.TypeString)
 	}
-	if miu.mutation.MsgInternalToCleared() {
+	if _u.mutation.MsgInternalToCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -297,10 +297,10 @@ func (miu *MsgInternalUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msginternalto.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = miu.schemaConfig.MsgInternalTo
+		edge.Schema = _u.schemaConfig.MsgInternalTo
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := miu.mutation.RemovedMsgInternalToIDs(); len(nodes) > 0 && !miu.mutation.MsgInternalToCleared() {
+	if nodes := _u.mutation.RemovedMsgInternalToIDs(); len(nodes) > 0 && !_u.mutation.MsgInternalToCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -311,13 +311,13 @@ func (miu *MsgInternalUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msginternalto.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = miu.schemaConfig.MsgInternalTo
+		edge.Schema = _u.schemaConfig.MsgInternalTo
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := miu.mutation.MsgInternalToIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.MsgInternalToIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -328,15 +328,15 @@ func (miu *MsgInternalUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msginternalto.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = miu.schemaConfig.MsgInternalTo
+		edge.Schema = _u.schemaConfig.MsgInternalTo
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Node.Schema = miu.schemaConfig.MsgInternal
-	ctx = internal.NewSchemaConfigContext(ctx, miu.schemaConfig)
-	if n, err = sqlgraph.UpdateNodes(ctx, miu.driver, _spec); err != nil {
+	_spec.Node.Schema = _u.schemaConfig.MsgInternal
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msginternal.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -344,8 +344,8 @@ func (miu *MsgInternalUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	miu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // MsgInternalUpdateOne is the builder for updating a single MsgInternal entity.
@@ -357,196 +357,196 @@ type MsgInternalUpdateOne struct {
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (miuo *MsgInternalUpdateOne) SetUpdatedBy(i int) *MsgInternalUpdateOne {
-	miuo.mutation.ResetUpdatedBy()
-	miuo.mutation.SetUpdatedBy(i)
-	return miuo
+func (_u *MsgInternalUpdateOne) SetUpdatedBy(v int) *MsgInternalUpdateOne {
+	_u.mutation.ResetUpdatedBy()
+	_u.mutation.SetUpdatedBy(v)
+	return _u
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (miuo *MsgInternalUpdateOne) SetNillableUpdatedBy(i *int) *MsgInternalUpdateOne {
-	if i != nil {
-		miuo.SetUpdatedBy(*i)
+func (_u *MsgInternalUpdateOne) SetNillableUpdatedBy(v *int) *MsgInternalUpdateOne {
+	if v != nil {
+		_u.SetUpdatedBy(*v)
 	}
-	return miuo
+	return _u
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (miuo *MsgInternalUpdateOne) AddUpdatedBy(i int) *MsgInternalUpdateOne {
-	miuo.mutation.AddUpdatedBy(i)
-	return miuo
+// AddUpdatedBy adds value to the "updated_by" field.
+func (_u *MsgInternalUpdateOne) AddUpdatedBy(v int) *MsgInternalUpdateOne {
+	_u.mutation.AddUpdatedBy(v)
+	return _u
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (miuo *MsgInternalUpdateOne) ClearUpdatedBy() *MsgInternalUpdateOne {
-	miuo.mutation.ClearUpdatedBy()
-	return miuo
+func (_u *MsgInternalUpdateOne) ClearUpdatedBy() *MsgInternalUpdateOne {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (miuo *MsgInternalUpdateOne) SetUpdatedAt(t time.Time) *MsgInternalUpdateOne {
-	miuo.mutation.SetUpdatedAt(t)
-	return miuo
+func (_u *MsgInternalUpdateOne) SetUpdatedAt(v time.Time) *MsgInternalUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (miuo *MsgInternalUpdateOne) SetNillableUpdatedAt(t *time.Time) *MsgInternalUpdateOne {
-	if t != nil {
-		miuo.SetUpdatedAt(*t)
+func (_u *MsgInternalUpdateOne) SetNillableUpdatedAt(v *time.Time) *MsgInternalUpdateOne {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return miuo
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (miuo *MsgInternalUpdateOne) ClearUpdatedAt() *MsgInternalUpdateOne {
-	miuo.mutation.ClearUpdatedAt()
-	return miuo
+func (_u *MsgInternalUpdateOne) ClearUpdatedAt() *MsgInternalUpdateOne {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetCategory sets the "category" field.
-func (miuo *MsgInternalUpdateOne) SetCategory(s string) *MsgInternalUpdateOne {
-	miuo.mutation.SetCategory(s)
-	return miuo
+func (_u *MsgInternalUpdateOne) SetCategory(v string) *MsgInternalUpdateOne {
+	_u.mutation.SetCategory(v)
+	return _u
 }
 
 // SetNillableCategory sets the "category" field if the given value is not nil.
-func (miuo *MsgInternalUpdateOne) SetNillableCategory(s *string) *MsgInternalUpdateOne {
-	if s != nil {
-		miuo.SetCategory(*s)
+func (_u *MsgInternalUpdateOne) SetNillableCategory(v *string) *MsgInternalUpdateOne {
+	if v != nil {
+		_u.SetCategory(*v)
 	}
-	return miuo
+	return _u
 }
 
 // SetSubject sets the "subject" field.
-func (miuo *MsgInternalUpdateOne) SetSubject(s string) *MsgInternalUpdateOne {
-	miuo.mutation.SetSubject(s)
-	return miuo
+func (_u *MsgInternalUpdateOne) SetSubject(v string) *MsgInternalUpdateOne {
+	_u.mutation.SetSubject(v)
+	return _u
 }
 
 // SetNillableSubject sets the "subject" field if the given value is not nil.
-func (miuo *MsgInternalUpdateOne) SetNillableSubject(s *string) *MsgInternalUpdateOne {
-	if s != nil {
-		miuo.SetSubject(*s)
+func (_u *MsgInternalUpdateOne) SetNillableSubject(v *string) *MsgInternalUpdateOne {
+	if v != nil {
+		_u.SetSubject(*v)
 	}
-	return miuo
+	return _u
 }
 
 // SetBody sets the "body" field.
-func (miuo *MsgInternalUpdateOne) SetBody(s string) *MsgInternalUpdateOne {
-	miuo.mutation.SetBody(s)
-	return miuo
+func (_u *MsgInternalUpdateOne) SetBody(v string) *MsgInternalUpdateOne {
+	_u.mutation.SetBody(v)
+	return _u
 }
 
 // SetNillableBody sets the "body" field if the given value is not nil.
-func (miuo *MsgInternalUpdateOne) SetNillableBody(s *string) *MsgInternalUpdateOne {
-	if s != nil {
-		miuo.SetBody(*s)
+func (_u *MsgInternalUpdateOne) SetNillableBody(v *string) *MsgInternalUpdateOne {
+	if v != nil {
+		_u.SetBody(*v)
 	}
-	return miuo
+	return _u
 }
 
 // ClearBody clears the value of the "body" field.
-func (miuo *MsgInternalUpdateOne) ClearBody() *MsgInternalUpdateOne {
-	miuo.mutation.ClearBody()
-	return miuo
+func (_u *MsgInternalUpdateOne) ClearBody() *MsgInternalUpdateOne {
+	_u.mutation.ClearBody()
+	return _u
 }
 
 // SetFormat sets the "format" field.
-func (miuo *MsgInternalUpdateOne) SetFormat(s string) *MsgInternalUpdateOne {
-	miuo.mutation.SetFormat(s)
-	return miuo
+func (_u *MsgInternalUpdateOne) SetFormat(v string) *MsgInternalUpdateOne {
+	_u.mutation.SetFormat(v)
+	return _u
 }
 
 // SetNillableFormat sets the "format" field if the given value is not nil.
-func (miuo *MsgInternalUpdateOne) SetNillableFormat(s *string) *MsgInternalUpdateOne {
-	if s != nil {
-		miuo.SetFormat(*s)
+func (_u *MsgInternalUpdateOne) SetNillableFormat(v *string) *MsgInternalUpdateOne {
+	if v != nil {
+		_u.SetFormat(*v)
 	}
-	return miuo
+	return _u
 }
 
 // SetRedirect sets the "redirect" field.
-func (miuo *MsgInternalUpdateOne) SetRedirect(s string) *MsgInternalUpdateOne {
-	miuo.mutation.SetRedirect(s)
-	return miuo
+func (_u *MsgInternalUpdateOne) SetRedirect(v string) *MsgInternalUpdateOne {
+	_u.mutation.SetRedirect(v)
+	return _u
 }
 
 // SetNillableRedirect sets the "redirect" field if the given value is not nil.
-func (miuo *MsgInternalUpdateOne) SetNillableRedirect(s *string) *MsgInternalUpdateOne {
-	if s != nil {
-		miuo.SetRedirect(*s)
+func (_u *MsgInternalUpdateOne) SetNillableRedirect(v *string) *MsgInternalUpdateOne {
+	if v != nil {
+		_u.SetRedirect(*v)
 	}
-	return miuo
+	return _u
 }
 
 // ClearRedirect clears the value of the "redirect" field.
-func (miuo *MsgInternalUpdateOne) ClearRedirect() *MsgInternalUpdateOne {
-	miuo.mutation.ClearRedirect()
-	return miuo
+func (_u *MsgInternalUpdateOne) ClearRedirect() *MsgInternalUpdateOne {
+	_u.mutation.ClearRedirect()
+	return _u
 }
 
 // AddMsgInternalToIDs adds the "msg_internal_to" edge to the MsgInternalTo entity by IDs.
-func (miuo *MsgInternalUpdateOne) AddMsgInternalToIDs(ids ...int) *MsgInternalUpdateOne {
-	miuo.mutation.AddMsgInternalToIDs(ids...)
-	return miuo
+func (_u *MsgInternalUpdateOne) AddMsgInternalToIDs(ids ...int) *MsgInternalUpdateOne {
+	_u.mutation.AddMsgInternalToIDs(ids...)
+	return _u
 }
 
 // AddMsgInternalTo adds the "msg_internal_to" edges to the MsgInternalTo entity.
-func (miuo *MsgInternalUpdateOne) AddMsgInternalTo(m ...*MsgInternalTo) *MsgInternalUpdateOne {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *MsgInternalUpdateOne) AddMsgInternalTo(v ...*MsgInternalTo) *MsgInternalUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return miuo.AddMsgInternalToIDs(ids...)
+	return _u.AddMsgInternalToIDs(ids...)
 }
 
 // Mutation returns the MsgInternalMutation object of the builder.
-func (miuo *MsgInternalUpdateOne) Mutation() *MsgInternalMutation {
-	return miuo.mutation
+func (_u *MsgInternalUpdateOne) Mutation() *MsgInternalMutation {
+	return _u.mutation
 }
 
 // ClearMsgInternalTo clears all "msg_internal_to" edges to the MsgInternalTo entity.
-func (miuo *MsgInternalUpdateOne) ClearMsgInternalTo() *MsgInternalUpdateOne {
-	miuo.mutation.ClearMsgInternalTo()
-	return miuo
+func (_u *MsgInternalUpdateOne) ClearMsgInternalTo() *MsgInternalUpdateOne {
+	_u.mutation.ClearMsgInternalTo()
+	return _u
 }
 
 // RemoveMsgInternalToIDs removes the "msg_internal_to" edge to MsgInternalTo entities by IDs.
-func (miuo *MsgInternalUpdateOne) RemoveMsgInternalToIDs(ids ...int) *MsgInternalUpdateOne {
-	miuo.mutation.RemoveMsgInternalToIDs(ids...)
-	return miuo
+func (_u *MsgInternalUpdateOne) RemoveMsgInternalToIDs(ids ...int) *MsgInternalUpdateOne {
+	_u.mutation.RemoveMsgInternalToIDs(ids...)
+	return _u
 }
 
 // RemoveMsgInternalTo removes "msg_internal_to" edges to MsgInternalTo entities.
-func (miuo *MsgInternalUpdateOne) RemoveMsgInternalTo(m ...*MsgInternalTo) *MsgInternalUpdateOne {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *MsgInternalUpdateOne) RemoveMsgInternalTo(v ...*MsgInternalTo) *MsgInternalUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return miuo.RemoveMsgInternalToIDs(ids...)
+	return _u.RemoveMsgInternalToIDs(ids...)
 }
 
 // Where appends a list predicates to the MsgInternalUpdate builder.
-func (miuo *MsgInternalUpdateOne) Where(ps ...predicate.MsgInternal) *MsgInternalUpdateOne {
-	miuo.mutation.Where(ps...)
-	return miuo
+func (_u *MsgInternalUpdateOne) Where(ps ...predicate.MsgInternal) *MsgInternalUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (miuo *MsgInternalUpdateOne) Select(field string, fields ...string) *MsgInternalUpdateOne {
-	miuo.fields = append([]string{field}, fields...)
-	return miuo
+func (_u *MsgInternalUpdateOne) Select(field string, fields ...string) *MsgInternalUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated MsgInternal entity.
-func (miuo *MsgInternalUpdateOne) Save(ctx context.Context) (*MsgInternal, error) {
-	return withHooks(ctx, miuo.sqlSave, miuo.mutation, miuo.hooks)
+func (_u *MsgInternalUpdateOne) Save(ctx context.Context) (*MsgInternal, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (miuo *MsgInternalUpdateOne) SaveX(ctx context.Context) *MsgInternal {
-	node, err := miuo.Save(ctx)
+func (_u *MsgInternalUpdateOne) SaveX(ctx context.Context) *MsgInternal {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -554,21 +554,21 @@ func (miuo *MsgInternalUpdateOne) SaveX(ctx context.Context) *MsgInternal {
 }
 
 // Exec executes the query on the entity.
-func (miuo *MsgInternalUpdateOne) Exec(ctx context.Context) error {
-	_, err := miuo.Save(ctx)
+func (_u *MsgInternalUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (miuo *MsgInternalUpdateOne) ExecX(ctx context.Context) {
-	if err := miuo.Exec(ctx); err != nil {
+func (_u *MsgInternalUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (miuo *MsgInternalUpdateOne) check() error {
-	if v, ok := miuo.mutation.Category(); ok {
+func (_u *MsgInternalUpdateOne) check() error {
+	if v, ok := _u.mutation.Category(); ok {
 		if err := msginternal.CategoryValidator(v); err != nil {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.category": %w`, err)}
 		}
@@ -576,17 +576,17 @@ func (miuo *MsgInternalUpdateOne) check() error {
 	return nil
 }
 
-func (miuo *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgInternal, err error) {
-	if err := miuo.check(); err != nil {
+func (_u *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgInternal, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(msginternal.Table, msginternal.Columns, sqlgraph.NewFieldSpec(msginternal.FieldID, field.TypeInt))
-	id, ok := miuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "MsgInternal.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := miuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, msginternal.FieldID)
 		for _, f := range fields {
@@ -598,50 +598,50 @@ func (miuo *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgIntern
 			}
 		}
 	}
-	if ps := miuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := miuo.mutation.UpdatedBy(); ok {
+	if value, ok := _u.mutation.UpdatedBy(); ok {
 		_spec.SetField(msginternal.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if value, ok := miuo.mutation.AddedUpdatedBy(); ok {
+	if value, ok := _u.mutation.AddedUpdatedBy(); ok {
 		_spec.AddField(msginternal.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if miuo.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		_spec.ClearField(msginternal.FieldUpdatedBy, field.TypeInt)
 	}
-	if value, ok := miuo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(msginternal.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if miuo.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(msginternal.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := miuo.mutation.Category(); ok {
+	if value, ok := _u.mutation.Category(); ok {
 		_spec.SetField(msginternal.FieldCategory, field.TypeString, value)
 	}
-	if value, ok := miuo.mutation.Subject(); ok {
+	if value, ok := _u.mutation.Subject(); ok {
 		_spec.SetField(msginternal.FieldSubject, field.TypeString, value)
 	}
-	if value, ok := miuo.mutation.Body(); ok {
+	if value, ok := _u.mutation.Body(); ok {
 		_spec.SetField(msginternal.FieldBody, field.TypeString, value)
 	}
-	if miuo.mutation.BodyCleared() {
+	if _u.mutation.BodyCleared() {
 		_spec.ClearField(msginternal.FieldBody, field.TypeString)
 	}
-	if value, ok := miuo.mutation.Format(); ok {
+	if value, ok := _u.mutation.Format(); ok {
 		_spec.SetField(msginternal.FieldFormat, field.TypeString, value)
 	}
-	if value, ok := miuo.mutation.Redirect(); ok {
+	if value, ok := _u.mutation.Redirect(); ok {
 		_spec.SetField(msginternal.FieldRedirect, field.TypeString, value)
 	}
-	if miuo.mutation.RedirectCleared() {
+	if _u.mutation.RedirectCleared() {
 		_spec.ClearField(msginternal.FieldRedirect, field.TypeString)
 	}
-	if miuo.mutation.MsgInternalToCleared() {
+	if _u.mutation.MsgInternalToCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -652,10 +652,10 @@ func (miuo *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgIntern
 				IDSpec: sqlgraph.NewFieldSpec(msginternalto.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = miuo.schemaConfig.MsgInternalTo
+		edge.Schema = _u.schemaConfig.MsgInternalTo
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := miuo.mutation.RemovedMsgInternalToIDs(); len(nodes) > 0 && !miuo.mutation.MsgInternalToCleared() {
+	if nodes := _u.mutation.RemovedMsgInternalToIDs(); len(nodes) > 0 && !_u.mutation.MsgInternalToCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -666,13 +666,13 @@ func (miuo *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgIntern
 				IDSpec: sqlgraph.NewFieldSpec(msginternalto.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = miuo.schemaConfig.MsgInternalTo
+		edge.Schema = _u.schemaConfig.MsgInternalTo
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := miuo.mutation.MsgInternalToIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.MsgInternalToIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -683,18 +683,18 @@ func (miuo *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgIntern
 				IDSpec: sqlgraph.NewFieldSpec(msginternalto.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = miuo.schemaConfig.MsgInternalTo
+		edge.Schema = _u.schemaConfig.MsgInternalTo
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Node.Schema = miuo.schemaConfig.MsgInternal
-	ctx = internal.NewSchemaConfigContext(ctx, miuo.schemaConfig)
-	_node = &MsgInternal{config: miuo.config}
+	_spec.Node.Schema = _u.schemaConfig.MsgInternal
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	_node = &MsgInternal{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, miuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msginternal.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -702,6 +702,6 @@ func (miuo *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgIntern
 		}
 		return nil, err
 	}
-	miuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

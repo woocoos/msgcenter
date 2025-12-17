@@ -79,7 +79,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the User fields.
-func (u *User) assignValues(columns []string, values []any) error {
+func (_m *User) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -90,21 +90,21 @@ func (u *User) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			u.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case user.FieldPrincipalName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field principal_name", values[i])
 			} else if value.Valid {
-				u.PrincipalName = value.String
+				_m.PrincipalName = value.String
 			}
 		case user.FieldDisplayName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field display_name", values[i])
 			} else if value.Valid {
-				u.DisplayName = value.String
+				_m.DisplayName = value.String
 			}
 		default:
-			u.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -112,97 +112,97 @@ func (u *User) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the User.
 // This includes values selected through modifiers, order, etc.
-func (u *User) Value(name string) (ent.Value, error) {
-	return u.selectValues.Get(name)
+func (_m *User) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QuerySilences queries the "silences" edge of the User entity.
-func (u *User) QuerySilences() *SilenceQuery {
-	return NewUserClient(u.config).QuerySilences(u)
+func (_m *User) QuerySilences() *SilenceQuery {
+	return NewUserClient(_m.config).QuerySilences(_m)
 }
 
 // QueryAddresses queries the "addresses" edge of the User entity.
-func (u *User) QueryAddresses() *UserAddrQuery {
-	return NewUserClient(u.config).QueryAddresses(u)
+func (_m *User) QueryAddresses() *UserAddrQuery {
+	return NewUserClient(_m.config).QueryAddresses(_m)
 }
 
 // Update returns a builder for updating this User.
 // Note that you need to call User.Unwrap() before calling this method if this User
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (u *User) Update() *UserUpdateOne {
-	return NewUserClient(u.config).UpdateOne(u)
+func (_m *User) Update() *UserUpdateOne {
+	return NewUserClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the User entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (u *User) Unwrap() *User {
-	_tx, ok := u.config.driver.(*txDriver)
+func (_m *User) Unwrap() *User {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: User is not a transactional entity")
 	}
-	u.config.driver = _tx.drv
-	return u
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (u *User) String() string {
+func (_m *User) String() string {
 	var builder strings.Builder
 	builder.WriteString("User(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", u.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("principal_name=")
-	builder.WriteString(u.PrincipalName)
+	builder.WriteString(_m.PrincipalName)
 	builder.WriteString(", ")
 	builder.WriteString("display_name=")
-	builder.WriteString(u.DisplayName)
+	builder.WriteString(_m.DisplayName)
 	builder.WriteByte(')')
 	return builder.String()
 }
 
 // NamedSilences returns the Silences named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (u *User) NamedSilences(name string) ([]*Silence, error) {
-	if u.Edges.namedSilences == nil {
+func (_m *User) NamedSilences(name string) ([]*Silence, error) {
+	if _m.Edges.namedSilences == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := u.Edges.namedSilences[name]
+	nodes, ok := _m.Edges.namedSilences[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (u *User) appendNamedSilences(name string, edges ...*Silence) {
-	if u.Edges.namedSilences == nil {
-		u.Edges.namedSilences = make(map[string][]*Silence)
+func (_m *User) appendNamedSilences(name string, edges ...*Silence) {
+	if _m.Edges.namedSilences == nil {
+		_m.Edges.namedSilences = make(map[string][]*Silence)
 	}
 	if len(edges) == 0 {
-		u.Edges.namedSilences[name] = []*Silence{}
+		_m.Edges.namedSilences[name] = []*Silence{}
 	} else {
-		u.Edges.namedSilences[name] = append(u.Edges.namedSilences[name], edges...)
+		_m.Edges.namedSilences[name] = append(_m.Edges.namedSilences[name], edges...)
 	}
 }
 
 // NamedAddresses returns the Addresses named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (u *User) NamedAddresses(name string) ([]*UserAddr, error) {
-	if u.Edges.namedAddresses == nil {
+func (_m *User) NamedAddresses(name string) ([]*UserAddr, error) {
+	if _m.Edges.namedAddresses == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := u.Edges.namedAddresses[name]
+	nodes, ok := _m.Edges.namedAddresses[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (u *User) appendNamedAddresses(name string, edges ...*UserAddr) {
-	if u.Edges.namedAddresses == nil {
-		u.Edges.namedAddresses = make(map[string][]*UserAddr)
+func (_m *User) appendNamedAddresses(name string, edges ...*UserAddr) {
+	if _m.Edges.namedAddresses == nil {
+		_m.Edges.namedAddresses = make(map[string][]*UserAddr)
 	}
 	if len(edges) == 0 {
-		u.Edges.namedAddresses[name] = []*UserAddr{}
+		_m.Edges.namedAddresses[name] = []*UserAddr{}
 	} else {
-		u.Edges.namedAddresses[name] = append(u.Edges.namedAddresses[name], edges...)
+		_m.Edges.namedAddresses[name] = append(_m.Edges.namedAddresses[name], edges...)
 	}
 }
 

@@ -27,172 +27,172 @@ type MsgChannelUpdate struct {
 }
 
 // Where appends a list predicates to the MsgChannelUpdate builder.
-func (mcu *MsgChannelUpdate) Where(ps ...predicate.MsgChannel) *MsgChannelUpdate {
-	mcu.mutation.Where(ps...)
-	return mcu
+func (_u *MsgChannelUpdate) Where(ps ...predicate.MsgChannel) *MsgChannelUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (mcu *MsgChannelUpdate) SetUpdatedBy(i int) *MsgChannelUpdate {
-	mcu.mutation.ResetUpdatedBy()
-	mcu.mutation.SetUpdatedBy(i)
-	return mcu
+func (_u *MsgChannelUpdate) SetUpdatedBy(v int) *MsgChannelUpdate {
+	_u.mutation.ResetUpdatedBy()
+	_u.mutation.SetUpdatedBy(v)
+	return _u
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (mcu *MsgChannelUpdate) SetNillableUpdatedBy(i *int) *MsgChannelUpdate {
-	if i != nil {
-		mcu.SetUpdatedBy(*i)
+func (_u *MsgChannelUpdate) SetNillableUpdatedBy(v *int) *MsgChannelUpdate {
+	if v != nil {
+		_u.SetUpdatedBy(*v)
 	}
-	return mcu
+	return _u
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (mcu *MsgChannelUpdate) AddUpdatedBy(i int) *MsgChannelUpdate {
-	mcu.mutation.AddUpdatedBy(i)
-	return mcu
+// AddUpdatedBy adds value to the "updated_by" field.
+func (_u *MsgChannelUpdate) AddUpdatedBy(v int) *MsgChannelUpdate {
+	_u.mutation.AddUpdatedBy(v)
+	return _u
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (mcu *MsgChannelUpdate) ClearUpdatedBy() *MsgChannelUpdate {
-	mcu.mutation.ClearUpdatedBy()
-	return mcu
+func (_u *MsgChannelUpdate) ClearUpdatedBy() *MsgChannelUpdate {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (mcu *MsgChannelUpdate) SetUpdatedAt(t time.Time) *MsgChannelUpdate {
-	mcu.mutation.SetUpdatedAt(t)
-	return mcu
+func (_u *MsgChannelUpdate) SetUpdatedAt(v time.Time) *MsgChannelUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (mcu *MsgChannelUpdate) SetNillableUpdatedAt(t *time.Time) *MsgChannelUpdate {
-	if t != nil {
-		mcu.SetUpdatedAt(*t)
+func (_u *MsgChannelUpdate) SetNillableUpdatedAt(v *time.Time) *MsgChannelUpdate {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return mcu
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (mcu *MsgChannelUpdate) ClearUpdatedAt() *MsgChannelUpdate {
-	mcu.mutation.ClearUpdatedAt()
-	return mcu
+func (_u *MsgChannelUpdate) ClearUpdatedAt() *MsgChannelUpdate {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetName sets the "name" field.
-func (mcu *MsgChannelUpdate) SetName(s string) *MsgChannelUpdate {
-	mcu.mutation.SetName(s)
-	return mcu
+func (_u *MsgChannelUpdate) SetName(v string) *MsgChannelUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (mcu *MsgChannelUpdate) SetNillableName(s *string) *MsgChannelUpdate {
-	if s != nil {
-		mcu.SetName(*s)
+func (_u *MsgChannelUpdate) SetNillableName(v *string) *MsgChannelUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return mcu
+	return _u
 }
 
 // SetTenantID sets the "tenant_id" field.
-func (mcu *MsgChannelUpdate) SetTenantID(i int) *MsgChannelUpdate {
-	mcu.mutation.ResetTenantID()
-	mcu.mutation.SetTenantID(i)
-	return mcu
+func (_u *MsgChannelUpdate) SetTenantID(v int) *MsgChannelUpdate {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
 }
 
 // SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (mcu *MsgChannelUpdate) SetNillableTenantID(i *int) *MsgChannelUpdate {
-	if i != nil {
-		mcu.SetTenantID(*i)
+func (_u *MsgChannelUpdate) SetNillableTenantID(v *int) *MsgChannelUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
 	}
-	return mcu
+	return _u
 }
 
-// AddTenantID adds i to the "tenant_id" field.
-func (mcu *MsgChannelUpdate) AddTenantID(i int) *MsgChannelUpdate {
-	mcu.mutation.AddTenantID(i)
-	return mcu
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *MsgChannelUpdate) AddTenantID(v int) *MsgChannelUpdate {
+	_u.mutation.AddTenantID(v)
+	return _u
 }
 
 // SetReceiverType sets the "receiver_type" field.
-func (mcu *MsgChannelUpdate) SetReceiverType(pt profile.ReceiverType) *MsgChannelUpdate {
-	mcu.mutation.SetReceiverType(pt)
-	return mcu
+func (_u *MsgChannelUpdate) SetReceiverType(v profile.ReceiverType) *MsgChannelUpdate {
+	_u.mutation.SetReceiverType(v)
+	return _u
 }
 
 // SetNillableReceiverType sets the "receiver_type" field if the given value is not nil.
-func (mcu *MsgChannelUpdate) SetNillableReceiverType(pt *profile.ReceiverType) *MsgChannelUpdate {
-	if pt != nil {
-		mcu.SetReceiverType(*pt)
+func (_u *MsgChannelUpdate) SetNillableReceiverType(v *profile.ReceiverType) *MsgChannelUpdate {
+	if v != nil {
+		_u.SetReceiverType(*v)
 	}
-	return mcu
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (mcu *MsgChannelUpdate) SetStatus(ts typex.SimpleStatus) *MsgChannelUpdate {
-	mcu.mutation.SetStatus(ts)
-	return mcu
+func (_u *MsgChannelUpdate) SetStatus(v typex.SimpleStatus) *MsgChannelUpdate {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (mcu *MsgChannelUpdate) SetNillableStatus(ts *typex.SimpleStatus) *MsgChannelUpdate {
-	if ts != nil {
-		mcu.SetStatus(*ts)
+func (_u *MsgChannelUpdate) SetNillableStatus(v *typex.SimpleStatus) *MsgChannelUpdate {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return mcu
+	return _u
 }
 
 // ClearStatus clears the value of the "status" field.
-func (mcu *MsgChannelUpdate) ClearStatus() *MsgChannelUpdate {
-	mcu.mutation.ClearStatus()
-	return mcu
+func (_u *MsgChannelUpdate) ClearStatus() *MsgChannelUpdate {
+	_u.mutation.ClearStatus()
+	return _u
 }
 
 // SetReceiver sets the "receiver" field.
-func (mcu *MsgChannelUpdate) SetReceiver(pr *profile.Receiver) *MsgChannelUpdate {
-	mcu.mutation.SetReceiver(pr)
-	return mcu
+func (_u *MsgChannelUpdate) SetReceiver(v *profile.Receiver) *MsgChannelUpdate {
+	_u.mutation.SetReceiver(v)
+	return _u
 }
 
 // ClearReceiver clears the value of the "receiver" field.
-func (mcu *MsgChannelUpdate) ClearReceiver() *MsgChannelUpdate {
-	mcu.mutation.ClearReceiver()
-	return mcu
+func (_u *MsgChannelUpdate) ClearReceiver() *MsgChannelUpdate {
+	_u.mutation.ClearReceiver()
+	return _u
 }
 
 // SetComments sets the "comments" field.
-func (mcu *MsgChannelUpdate) SetComments(s string) *MsgChannelUpdate {
-	mcu.mutation.SetComments(s)
-	return mcu
+func (_u *MsgChannelUpdate) SetComments(v string) *MsgChannelUpdate {
+	_u.mutation.SetComments(v)
+	return _u
 }
 
 // SetNillableComments sets the "comments" field if the given value is not nil.
-func (mcu *MsgChannelUpdate) SetNillableComments(s *string) *MsgChannelUpdate {
-	if s != nil {
-		mcu.SetComments(*s)
+func (_u *MsgChannelUpdate) SetNillableComments(v *string) *MsgChannelUpdate {
+	if v != nil {
+		_u.SetComments(*v)
 	}
-	return mcu
+	return _u
 }
 
 // ClearComments clears the value of the "comments" field.
-func (mcu *MsgChannelUpdate) ClearComments() *MsgChannelUpdate {
-	mcu.mutation.ClearComments()
-	return mcu
+func (_u *MsgChannelUpdate) ClearComments() *MsgChannelUpdate {
+	_u.mutation.ClearComments()
+	return _u
 }
 
 // Mutation returns the MsgChannelMutation object of the builder.
-func (mcu *MsgChannelUpdate) Mutation() *MsgChannelMutation {
-	return mcu.mutation
+func (_u *MsgChannelUpdate) Mutation() *MsgChannelMutation {
+	return _u.mutation
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (mcu *MsgChannelUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, mcu.sqlSave, mcu.mutation, mcu.hooks)
+func (_u *MsgChannelUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mcu *MsgChannelUpdate) SaveX(ctx context.Context) int {
-	affected, err := mcu.Save(ctx)
+func (_u *MsgChannelUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -200,31 +200,31 @@ func (mcu *MsgChannelUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (mcu *MsgChannelUpdate) Exec(ctx context.Context) error {
-	_, err := mcu.Save(ctx)
+func (_u *MsgChannelUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mcu *MsgChannelUpdate) ExecX(ctx context.Context) {
-	if err := mcu.Exec(ctx); err != nil {
+func (_u *MsgChannelUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mcu *MsgChannelUpdate) check() error {
-	if v, ok := mcu.mutation.Name(); ok {
+func (_u *MsgChannelUpdate) check() error {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := msgchannel.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "MsgChannel.name": %w`, err)}
 		}
 	}
-	if v, ok := mcu.mutation.ReceiverType(); ok {
+	if v, ok := _u.mutation.ReceiverType(); ok {
 		if err := msgchannel.ReceiverTypeValidator(v); err != nil {
 			return &ValidationError{Name: "receiver_type", err: fmt.Errorf(`ent: validator failed for field "MsgChannel.receiver_type": %w`, err)}
 		}
 	}
-	if v, ok := mcu.mutation.Status(); ok {
+	if v, ok := _u.mutation.Status(); ok {
 		if err := msgchannel.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "MsgChannel.status": %w`, err)}
 		}
@@ -232,66 +232,66 @@ func (mcu *MsgChannelUpdate) check() error {
 	return nil
 }
 
-func (mcu *MsgChannelUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := mcu.check(); err != nil {
-		return n, err
+func (_u *MsgChannelUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(msgchannel.Table, msgchannel.Columns, sqlgraph.NewFieldSpec(msgchannel.FieldID, field.TypeInt))
-	if ps := mcu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := mcu.mutation.UpdatedBy(); ok {
+	if value, ok := _u.mutation.UpdatedBy(); ok {
 		_spec.SetField(msgchannel.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if value, ok := mcu.mutation.AddedUpdatedBy(); ok {
+	if value, ok := _u.mutation.AddedUpdatedBy(); ok {
 		_spec.AddField(msgchannel.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if mcu.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		_spec.ClearField(msgchannel.FieldUpdatedBy, field.TypeInt)
 	}
-	if value, ok := mcu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgchannel.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if mcu.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(msgchannel.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := mcu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(msgchannel.FieldName, field.TypeString, value)
 	}
-	if value, ok := mcu.mutation.TenantID(); ok {
+	if value, ok := _u.mutation.TenantID(); ok {
 		_spec.SetField(msgchannel.FieldTenantID, field.TypeInt, value)
 	}
-	if value, ok := mcu.mutation.AddedTenantID(); ok {
+	if value, ok := _u.mutation.AddedTenantID(); ok {
 		_spec.AddField(msgchannel.FieldTenantID, field.TypeInt, value)
 	}
-	if value, ok := mcu.mutation.ReceiverType(); ok {
+	if value, ok := _u.mutation.ReceiverType(); ok {
 		_spec.SetField(msgchannel.FieldReceiverType, field.TypeEnum, value)
 	}
-	if value, ok := mcu.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(msgchannel.FieldStatus, field.TypeEnum, value)
 	}
-	if mcu.mutation.StatusCleared() {
+	if _u.mutation.StatusCleared() {
 		_spec.ClearField(msgchannel.FieldStatus, field.TypeEnum)
 	}
-	if value, ok := mcu.mutation.Receiver(); ok {
+	if value, ok := _u.mutation.Receiver(); ok {
 		_spec.SetField(msgchannel.FieldReceiver, field.TypeJSON, value)
 	}
-	if mcu.mutation.ReceiverCleared() {
+	if _u.mutation.ReceiverCleared() {
 		_spec.ClearField(msgchannel.FieldReceiver, field.TypeJSON)
 	}
-	if value, ok := mcu.mutation.Comments(); ok {
+	if value, ok := _u.mutation.Comments(); ok {
 		_spec.SetField(msgchannel.FieldComments, field.TypeString, value)
 	}
-	if mcu.mutation.CommentsCleared() {
+	if _u.mutation.CommentsCleared() {
 		_spec.ClearField(msgchannel.FieldComments, field.TypeString)
 	}
-	_spec.Node.Schema = mcu.schemaConfig.MsgChannel
-	ctx = internal.NewSchemaConfigContext(ctx, mcu.schemaConfig)
-	if n, err = sqlgraph.UpdateNodes(ctx, mcu.driver, _spec); err != nil {
+	_spec.Node.Schema = _u.schemaConfig.MsgChannel
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgchannel.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -299,8 +299,8 @@ func (mcu *MsgChannelUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	mcu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // MsgChannelUpdateOne is the builder for updating a single MsgChannel entity.
@@ -312,179 +312,179 @@ type MsgChannelUpdateOne struct {
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (mcuo *MsgChannelUpdateOne) SetUpdatedBy(i int) *MsgChannelUpdateOne {
-	mcuo.mutation.ResetUpdatedBy()
-	mcuo.mutation.SetUpdatedBy(i)
-	return mcuo
+func (_u *MsgChannelUpdateOne) SetUpdatedBy(v int) *MsgChannelUpdateOne {
+	_u.mutation.ResetUpdatedBy()
+	_u.mutation.SetUpdatedBy(v)
+	return _u
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (mcuo *MsgChannelUpdateOne) SetNillableUpdatedBy(i *int) *MsgChannelUpdateOne {
-	if i != nil {
-		mcuo.SetUpdatedBy(*i)
+func (_u *MsgChannelUpdateOne) SetNillableUpdatedBy(v *int) *MsgChannelUpdateOne {
+	if v != nil {
+		_u.SetUpdatedBy(*v)
 	}
-	return mcuo
+	return _u
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (mcuo *MsgChannelUpdateOne) AddUpdatedBy(i int) *MsgChannelUpdateOne {
-	mcuo.mutation.AddUpdatedBy(i)
-	return mcuo
+// AddUpdatedBy adds value to the "updated_by" field.
+func (_u *MsgChannelUpdateOne) AddUpdatedBy(v int) *MsgChannelUpdateOne {
+	_u.mutation.AddUpdatedBy(v)
+	return _u
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (mcuo *MsgChannelUpdateOne) ClearUpdatedBy() *MsgChannelUpdateOne {
-	mcuo.mutation.ClearUpdatedBy()
-	return mcuo
+func (_u *MsgChannelUpdateOne) ClearUpdatedBy() *MsgChannelUpdateOne {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (mcuo *MsgChannelUpdateOne) SetUpdatedAt(t time.Time) *MsgChannelUpdateOne {
-	mcuo.mutation.SetUpdatedAt(t)
-	return mcuo
+func (_u *MsgChannelUpdateOne) SetUpdatedAt(v time.Time) *MsgChannelUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (mcuo *MsgChannelUpdateOne) SetNillableUpdatedAt(t *time.Time) *MsgChannelUpdateOne {
-	if t != nil {
-		mcuo.SetUpdatedAt(*t)
+func (_u *MsgChannelUpdateOne) SetNillableUpdatedAt(v *time.Time) *MsgChannelUpdateOne {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return mcuo
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (mcuo *MsgChannelUpdateOne) ClearUpdatedAt() *MsgChannelUpdateOne {
-	mcuo.mutation.ClearUpdatedAt()
-	return mcuo
+func (_u *MsgChannelUpdateOne) ClearUpdatedAt() *MsgChannelUpdateOne {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetName sets the "name" field.
-func (mcuo *MsgChannelUpdateOne) SetName(s string) *MsgChannelUpdateOne {
-	mcuo.mutation.SetName(s)
-	return mcuo
+func (_u *MsgChannelUpdateOne) SetName(v string) *MsgChannelUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (mcuo *MsgChannelUpdateOne) SetNillableName(s *string) *MsgChannelUpdateOne {
-	if s != nil {
-		mcuo.SetName(*s)
+func (_u *MsgChannelUpdateOne) SetNillableName(v *string) *MsgChannelUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return mcuo
+	return _u
 }
 
 // SetTenantID sets the "tenant_id" field.
-func (mcuo *MsgChannelUpdateOne) SetTenantID(i int) *MsgChannelUpdateOne {
-	mcuo.mutation.ResetTenantID()
-	mcuo.mutation.SetTenantID(i)
-	return mcuo
+func (_u *MsgChannelUpdateOne) SetTenantID(v int) *MsgChannelUpdateOne {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
 }
 
 // SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (mcuo *MsgChannelUpdateOne) SetNillableTenantID(i *int) *MsgChannelUpdateOne {
-	if i != nil {
-		mcuo.SetTenantID(*i)
+func (_u *MsgChannelUpdateOne) SetNillableTenantID(v *int) *MsgChannelUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
 	}
-	return mcuo
+	return _u
 }
 
-// AddTenantID adds i to the "tenant_id" field.
-func (mcuo *MsgChannelUpdateOne) AddTenantID(i int) *MsgChannelUpdateOne {
-	mcuo.mutation.AddTenantID(i)
-	return mcuo
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *MsgChannelUpdateOne) AddTenantID(v int) *MsgChannelUpdateOne {
+	_u.mutation.AddTenantID(v)
+	return _u
 }
 
 // SetReceiverType sets the "receiver_type" field.
-func (mcuo *MsgChannelUpdateOne) SetReceiverType(pt profile.ReceiverType) *MsgChannelUpdateOne {
-	mcuo.mutation.SetReceiverType(pt)
-	return mcuo
+func (_u *MsgChannelUpdateOne) SetReceiverType(v profile.ReceiverType) *MsgChannelUpdateOne {
+	_u.mutation.SetReceiverType(v)
+	return _u
 }
 
 // SetNillableReceiverType sets the "receiver_type" field if the given value is not nil.
-func (mcuo *MsgChannelUpdateOne) SetNillableReceiverType(pt *profile.ReceiverType) *MsgChannelUpdateOne {
-	if pt != nil {
-		mcuo.SetReceiverType(*pt)
+func (_u *MsgChannelUpdateOne) SetNillableReceiverType(v *profile.ReceiverType) *MsgChannelUpdateOne {
+	if v != nil {
+		_u.SetReceiverType(*v)
 	}
-	return mcuo
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (mcuo *MsgChannelUpdateOne) SetStatus(ts typex.SimpleStatus) *MsgChannelUpdateOne {
-	mcuo.mutation.SetStatus(ts)
-	return mcuo
+func (_u *MsgChannelUpdateOne) SetStatus(v typex.SimpleStatus) *MsgChannelUpdateOne {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (mcuo *MsgChannelUpdateOne) SetNillableStatus(ts *typex.SimpleStatus) *MsgChannelUpdateOne {
-	if ts != nil {
-		mcuo.SetStatus(*ts)
+func (_u *MsgChannelUpdateOne) SetNillableStatus(v *typex.SimpleStatus) *MsgChannelUpdateOne {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return mcuo
+	return _u
 }
 
 // ClearStatus clears the value of the "status" field.
-func (mcuo *MsgChannelUpdateOne) ClearStatus() *MsgChannelUpdateOne {
-	mcuo.mutation.ClearStatus()
-	return mcuo
+func (_u *MsgChannelUpdateOne) ClearStatus() *MsgChannelUpdateOne {
+	_u.mutation.ClearStatus()
+	return _u
 }
 
 // SetReceiver sets the "receiver" field.
-func (mcuo *MsgChannelUpdateOne) SetReceiver(pr *profile.Receiver) *MsgChannelUpdateOne {
-	mcuo.mutation.SetReceiver(pr)
-	return mcuo
+func (_u *MsgChannelUpdateOne) SetReceiver(v *profile.Receiver) *MsgChannelUpdateOne {
+	_u.mutation.SetReceiver(v)
+	return _u
 }
 
 // ClearReceiver clears the value of the "receiver" field.
-func (mcuo *MsgChannelUpdateOne) ClearReceiver() *MsgChannelUpdateOne {
-	mcuo.mutation.ClearReceiver()
-	return mcuo
+func (_u *MsgChannelUpdateOne) ClearReceiver() *MsgChannelUpdateOne {
+	_u.mutation.ClearReceiver()
+	return _u
 }
 
 // SetComments sets the "comments" field.
-func (mcuo *MsgChannelUpdateOne) SetComments(s string) *MsgChannelUpdateOne {
-	mcuo.mutation.SetComments(s)
-	return mcuo
+func (_u *MsgChannelUpdateOne) SetComments(v string) *MsgChannelUpdateOne {
+	_u.mutation.SetComments(v)
+	return _u
 }
 
 // SetNillableComments sets the "comments" field if the given value is not nil.
-func (mcuo *MsgChannelUpdateOne) SetNillableComments(s *string) *MsgChannelUpdateOne {
-	if s != nil {
-		mcuo.SetComments(*s)
+func (_u *MsgChannelUpdateOne) SetNillableComments(v *string) *MsgChannelUpdateOne {
+	if v != nil {
+		_u.SetComments(*v)
 	}
-	return mcuo
+	return _u
 }
 
 // ClearComments clears the value of the "comments" field.
-func (mcuo *MsgChannelUpdateOne) ClearComments() *MsgChannelUpdateOne {
-	mcuo.mutation.ClearComments()
-	return mcuo
+func (_u *MsgChannelUpdateOne) ClearComments() *MsgChannelUpdateOne {
+	_u.mutation.ClearComments()
+	return _u
 }
 
 // Mutation returns the MsgChannelMutation object of the builder.
-func (mcuo *MsgChannelUpdateOne) Mutation() *MsgChannelMutation {
-	return mcuo.mutation
+func (_u *MsgChannelUpdateOne) Mutation() *MsgChannelMutation {
+	return _u.mutation
 }
 
 // Where appends a list predicates to the MsgChannelUpdate builder.
-func (mcuo *MsgChannelUpdateOne) Where(ps ...predicate.MsgChannel) *MsgChannelUpdateOne {
-	mcuo.mutation.Where(ps...)
-	return mcuo
+func (_u *MsgChannelUpdateOne) Where(ps ...predicate.MsgChannel) *MsgChannelUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (mcuo *MsgChannelUpdateOne) Select(field string, fields ...string) *MsgChannelUpdateOne {
-	mcuo.fields = append([]string{field}, fields...)
-	return mcuo
+func (_u *MsgChannelUpdateOne) Select(field string, fields ...string) *MsgChannelUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated MsgChannel entity.
-func (mcuo *MsgChannelUpdateOne) Save(ctx context.Context) (*MsgChannel, error) {
-	return withHooks(ctx, mcuo.sqlSave, mcuo.mutation, mcuo.hooks)
+func (_u *MsgChannelUpdateOne) Save(ctx context.Context) (*MsgChannel, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mcuo *MsgChannelUpdateOne) SaveX(ctx context.Context) *MsgChannel {
-	node, err := mcuo.Save(ctx)
+func (_u *MsgChannelUpdateOne) SaveX(ctx context.Context) *MsgChannel {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -492,31 +492,31 @@ func (mcuo *MsgChannelUpdateOne) SaveX(ctx context.Context) *MsgChannel {
 }
 
 // Exec executes the query on the entity.
-func (mcuo *MsgChannelUpdateOne) Exec(ctx context.Context) error {
-	_, err := mcuo.Save(ctx)
+func (_u *MsgChannelUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mcuo *MsgChannelUpdateOne) ExecX(ctx context.Context) {
-	if err := mcuo.Exec(ctx); err != nil {
+func (_u *MsgChannelUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mcuo *MsgChannelUpdateOne) check() error {
-	if v, ok := mcuo.mutation.Name(); ok {
+func (_u *MsgChannelUpdateOne) check() error {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := msgchannel.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "MsgChannel.name": %w`, err)}
 		}
 	}
-	if v, ok := mcuo.mutation.ReceiverType(); ok {
+	if v, ok := _u.mutation.ReceiverType(); ok {
 		if err := msgchannel.ReceiverTypeValidator(v); err != nil {
 			return &ValidationError{Name: "receiver_type", err: fmt.Errorf(`ent: validator failed for field "MsgChannel.receiver_type": %w`, err)}
 		}
 	}
-	if v, ok := mcuo.mutation.Status(); ok {
+	if v, ok := _u.mutation.Status(); ok {
 		if err := msgchannel.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "MsgChannel.status": %w`, err)}
 		}
@@ -524,17 +524,17 @@ func (mcuo *MsgChannelUpdateOne) check() error {
 	return nil
 }
 
-func (mcuo *MsgChannelUpdateOne) sqlSave(ctx context.Context) (_node *MsgChannel, err error) {
-	if err := mcuo.check(); err != nil {
+func (_u *MsgChannelUpdateOne) sqlSave(ctx context.Context) (_node *MsgChannel, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(msgchannel.Table, msgchannel.Columns, sqlgraph.NewFieldSpec(msgchannel.FieldID, field.TypeInt))
-	id, ok := mcuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "MsgChannel.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := mcuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, msgchannel.FieldID)
 		for _, f := range fields {
@@ -546,64 +546,64 @@ func (mcuo *MsgChannelUpdateOne) sqlSave(ctx context.Context) (_node *MsgChannel
 			}
 		}
 	}
-	if ps := mcuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := mcuo.mutation.UpdatedBy(); ok {
+	if value, ok := _u.mutation.UpdatedBy(); ok {
 		_spec.SetField(msgchannel.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if value, ok := mcuo.mutation.AddedUpdatedBy(); ok {
+	if value, ok := _u.mutation.AddedUpdatedBy(); ok {
 		_spec.AddField(msgchannel.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if mcuo.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		_spec.ClearField(msgchannel.FieldUpdatedBy, field.TypeInt)
 	}
-	if value, ok := mcuo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgchannel.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if mcuo.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(msgchannel.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := mcuo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(msgchannel.FieldName, field.TypeString, value)
 	}
-	if value, ok := mcuo.mutation.TenantID(); ok {
+	if value, ok := _u.mutation.TenantID(); ok {
 		_spec.SetField(msgchannel.FieldTenantID, field.TypeInt, value)
 	}
-	if value, ok := mcuo.mutation.AddedTenantID(); ok {
+	if value, ok := _u.mutation.AddedTenantID(); ok {
 		_spec.AddField(msgchannel.FieldTenantID, field.TypeInt, value)
 	}
-	if value, ok := mcuo.mutation.ReceiverType(); ok {
+	if value, ok := _u.mutation.ReceiverType(); ok {
 		_spec.SetField(msgchannel.FieldReceiverType, field.TypeEnum, value)
 	}
-	if value, ok := mcuo.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(msgchannel.FieldStatus, field.TypeEnum, value)
 	}
-	if mcuo.mutation.StatusCleared() {
+	if _u.mutation.StatusCleared() {
 		_spec.ClearField(msgchannel.FieldStatus, field.TypeEnum)
 	}
-	if value, ok := mcuo.mutation.Receiver(); ok {
+	if value, ok := _u.mutation.Receiver(); ok {
 		_spec.SetField(msgchannel.FieldReceiver, field.TypeJSON, value)
 	}
-	if mcuo.mutation.ReceiverCleared() {
+	if _u.mutation.ReceiverCleared() {
 		_spec.ClearField(msgchannel.FieldReceiver, field.TypeJSON)
 	}
-	if value, ok := mcuo.mutation.Comments(); ok {
+	if value, ok := _u.mutation.Comments(); ok {
 		_spec.SetField(msgchannel.FieldComments, field.TypeString, value)
 	}
-	if mcuo.mutation.CommentsCleared() {
+	if _u.mutation.CommentsCleared() {
 		_spec.ClearField(msgchannel.FieldComments, field.TypeString)
 	}
-	_spec.Node.Schema = mcuo.schemaConfig.MsgChannel
-	ctx = internal.NewSchemaConfigContext(ctx, mcuo.schemaConfig)
-	_node = &MsgChannel{config: mcuo.config}
+	_spec.Node.Schema = _u.schemaConfig.MsgChannel
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	_node = &MsgChannel{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, mcuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgchannel.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -611,6 +611,6 @@ func (mcuo *MsgChannelUpdateOne) sqlSave(ctx context.Context) (_node *MsgChannel
 		}
 		return nil, err
 	}
-	mcuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

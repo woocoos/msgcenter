@@ -25,139 +25,139 @@ type MsgSubscriberCreate struct {
 }
 
 // SetCreatedBy sets the "created_by" field.
-func (msc *MsgSubscriberCreate) SetCreatedBy(i int) *MsgSubscriberCreate {
-	msc.mutation.SetCreatedBy(i)
-	return msc
+func (_c *MsgSubscriberCreate) SetCreatedBy(v int) *MsgSubscriberCreate {
+	_c.mutation.SetCreatedBy(v)
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (msc *MsgSubscriberCreate) SetCreatedAt(t time.Time) *MsgSubscriberCreate {
-	msc.mutation.SetCreatedAt(t)
-	return msc
+func (_c *MsgSubscriberCreate) SetCreatedAt(v time.Time) *MsgSubscriberCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (msc *MsgSubscriberCreate) SetNillableCreatedAt(t *time.Time) *MsgSubscriberCreate {
-	if t != nil {
-		msc.SetCreatedAt(*t)
+func (_c *MsgSubscriberCreate) SetNillableCreatedAt(v *time.Time) *MsgSubscriberCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return msc
+	return _c
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (msc *MsgSubscriberCreate) SetUpdatedBy(i int) *MsgSubscriberCreate {
-	msc.mutation.SetUpdatedBy(i)
-	return msc
+func (_c *MsgSubscriberCreate) SetUpdatedBy(v int) *MsgSubscriberCreate {
+	_c.mutation.SetUpdatedBy(v)
+	return _c
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (msc *MsgSubscriberCreate) SetNillableUpdatedBy(i *int) *MsgSubscriberCreate {
-	if i != nil {
-		msc.SetUpdatedBy(*i)
+func (_c *MsgSubscriberCreate) SetNillableUpdatedBy(v *int) *MsgSubscriberCreate {
+	if v != nil {
+		_c.SetUpdatedBy(*v)
 	}
-	return msc
+	return _c
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (msc *MsgSubscriberCreate) SetUpdatedAt(t time.Time) *MsgSubscriberCreate {
-	msc.mutation.SetUpdatedAt(t)
-	return msc
+func (_c *MsgSubscriberCreate) SetUpdatedAt(v time.Time) *MsgSubscriberCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (msc *MsgSubscriberCreate) SetNillableUpdatedAt(t *time.Time) *MsgSubscriberCreate {
-	if t != nil {
-		msc.SetUpdatedAt(*t)
+func (_c *MsgSubscriberCreate) SetNillableUpdatedAt(v *time.Time) *MsgSubscriberCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
 	}
-	return msc
+	return _c
 }
 
 // SetMsgTypeID sets the "msg_type_id" field.
-func (msc *MsgSubscriberCreate) SetMsgTypeID(i int) *MsgSubscriberCreate {
-	msc.mutation.SetMsgTypeID(i)
-	return msc
+func (_c *MsgSubscriberCreate) SetMsgTypeID(v int) *MsgSubscriberCreate {
+	_c.mutation.SetMsgTypeID(v)
+	return _c
 }
 
 // SetTenantID sets the "tenant_id" field.
-func (msc *MsgSubscriberCreate) SetTenantID(i int) *MsgSubscriberCreate {
-	msc.mutation.SetTenantID(i)
-	return msc
+func (_c *MsgSubscriberCreate) SetTenantID(v int) *MsgSubscriberCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
 }
 
 // SetUserID sets the "user_id" field.
-func (msc *MsgSubscriberCreate) SetUserID(i int) *MsgSubscriberCreate {
-	msc.mutation.SetUserID(i)
-	return msc
+func (_c *MsgSubscriberCreate) SetUserID(v int) *MsgSubscriberCreate {
+	_c.mutation.SetUserID(v)
+	return _c
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (msc *MsgSubscriberCreate) SetNillableUserID(i *int) *MsgSubscriberCreate {
-	if i != nil {
-		msc.SetUserID(*i)
+func (_c *MsgSubscriberCreate) SetNillableUserID(v *int) *MsgSubscriberCreate {
+	if v != nil {
+		_c.SetUserID(*v)
 	}
-	return msc
+	return _c
 }
 
 // SetOrgRoleID sets the "org_role_id" field.
-func (msc *MsgSubscriberCreate) SetOrgRoleID(i int) *MsgSubscriberCreate {
-	msc.mutation.SetOrgRoleID(i)
-	return msc
+func (_c *MsgSubscriberCreate) SetOrgRoleID(v int) *MsgSubscriberCreate {
+	_c.mutation.SetOrgRoleID(v)
+	return _c
 }
 
 // SetNillableOrgRoleID sets the "org_role_id" field if the given value is not nil.
-func (msc *MsgSubscriberCreate) SetNillableOrgRoleID(i *int) *MsgSubscriberCreate {
-	if i != nil {
-		msc.SetOrgRoleID(*i)
+func (_c *MsgSubscriberCreate) SetNillableOrgRoleID(v *int) *MsgSubscriberCreate {
+	if v != nil {
+		_c.SetOrgRoleID(*v)
 	}
-	return msc
+	return _c
 }
 
 // SetExclude sets the "exclude" field.
-func (msc *MsgSubscriberCreate) SetExclude(b bool) *MsgSubscriberCreate {
-	msc.mutation.SetExclude(b)
-	return msc
+func (_c *MsgSubscriberCreate) SetExclude(v bool) *MsgSubscriberCreate {
+	_c.mutation.SetExclude(v)
+	return _c
 }
 
 // SetNillableExclude sets the "exclude" field if the given value is not nil.
-func (msc *MsgSubscriberCreate) SetNillableExclude(b *bool) *MsgSubscriberCreate {
-	if b != nil {
-		msc.SetExclude(*b)
+func (_c *MsgSubscriberCreate) SetNillableExclude(v *bool) *MsgSubscriberCreate {
+	if v != nil {
+		_c.SetExclude(*v)
 	}
-	return msc
+	return _c
 }
 
 // SetID sets the "id" field.
-func (msc *MsgSubscriberCreate) SetID(i int) *MsgSubscriberCreate {
-	msc.mutation.SetID(i)
-	return msc
+func (_c *MsgSubscriberCreate) SetID(v int) *MsgSubscriberCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetMsgType sets the "msg_type" edge to the MsgType entity.
-func (msc *MsgSubscriberCreate) SetMsgType(m *MsgType) *MsgSubscriberCreate {
-	return msc.SetMsgTypeID(m.ID)
+func (_c *MsgSubscriberCreate) SetMsgType(v *MsgType) *MsgSubscriberCreate {
+	return _c.SetMsgTypeID(v.ID)
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (msc *MsgSubscriberCreate) SetUser(u *User) *MsgSubscriberCreate {
-	return msc.SetUserID(u.ID)
+func (_c *MsgSubscriberCreate) SetUser(v *User) *MsgSubscriberCreate {
+	return _c.SetUserID(v.ID)
 }
 
 // Mutation returns the MsgSubscriberMutation object of the builder.
-func (msc *MsgSubscriberCreate) Mutation() *MsgSubscriberMutation {
-	return msc.mutation
+func (_c *MsgSubscriberCreate) Mutation() *MsgSubscriberMutation {
+	return _c.mutation
 }
 
 // Save creates the MsgSubscriber in the database.
-func (msc *MsgSubscriberCreate) Save(ctx context.Context) (*MsgSubscriber, error) {
-	if err := msc.defaults(); err != nil {
+func (_c *MsgSubscriberCreate) Save(ctx context.Context) (*MsgSubscriber, error) {
+	if err := _c.defaults(); err != nil {
 		return nil, err
 	}
-	return withHooks(ctx, msc.sqlSave, msc.mutation, msc.hooks)
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (msc *MsgSubscriberCreate) SaveX(ctx context.Context) *MsgSubscriber {
-	v, err := msc.Save(ctx)
+func (_c *MsgSubscriberCreate) SaveX(ctx context.Context) *MsgSubscriber {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -165,60 +165,60 @@ func (msc *MsgSubscriberCreate) SaveX(ctx context.Context) *MsgSubscriber {
 }
 
 // Exec executes the query.
-func (msc *MsgSubscriberCreate) Exec(ctx context.Context) error {
-	_, err := msc.Save(ctx)
+func (_c *MsgSubscriberCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (msc *MsgSubscriberCreate) ExecX(ctx context.Context) {
-	if err := msc.Exec(ctx); err != nil {
+func (_c *MsgSubscriberCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (msc *MsgSubscriberCreate) defaults() error {
-	if _, ok := msc.mutation.CreatedAt(); !ok {
+func (_c *MsgSubscriberCreate) defaults() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		if msgsubscriber.DefaultCreatedAt == nil {
 			return fmt.Errorf("ent: uninitialized msgsubscriber.DefaultCreatedAt (forgotten import ent/runtime?)")
 		}
 		v := msgsubscriber.DefaultCreatedAt()
-		msc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := msc.mutation.Exclude(); !ok {
+	if _, ok := _c.mutation.Exclude(); !ok {
 		v := msgsubscriber.DefaultExclude
-		msc.mutation.SetExclude(v)
+		_c.mutation.SetExclude(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (msc *MsgSubscriberCreate) check() error {
-	if _, ok := msc.mutation.CreatedBy(); !ok {
+func (_c *MsgSubscriberCreate) check() error {
+	if _, ok := _c.mutation.CreatedBy(); !ok {
 		return &ValidationError{Name: "created_by", err: errors.New(`ent: missing required field "MsgSubscriber.created_by"`)}
 	}
-	if _, ok := msc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "MsgSubscriber.created_at"`)}
 	}
-	if _, ok := msc.mutation.MsgTypeID(); !ok {
+	if _, ok := _c.mutation.MsgTypeID(); !ok {
 		return &ValidationError{Name: "msg_type_id", err: errors.New(`ent: missing required field "MsgSubscriber.msg_type_id"`)}
 	}
-	if _, ok := msc.mutation.TenantID(); !ok {
+	if _, ok := _c.mutation.TenantID(); !ok {
 		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "MsgSubscriber.tenant_id"`)}
 	}
-	if len(msc.mutation.MsgTypeIDs()) == 0 {
+	if len(_c.mutation.MsgTypeIDs()) == 0 {
 		return &ValidationError{Name: "msg_type", err: errors.New(`ent: missing required edge "MsgSubscriber.msg_type"`)}
 	}
 	return nil
 }
 
-func (msc *MsgSubscriberCreate) sqlSave(ctx context.Context) (*MsgSubscriber, error) {
-	if err := msc.check(); err != nil {
+func (_c *MsgSubscriberCreate) sqlSave(ctx context.Context) (*MsgSubscriber, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := msc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, msc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -228,51 +228,51 @@ func (msc *MsgSubscriberCreate) sqlSave(ctx context.Context) (*MsgSubscriber, er
 		id := _spec.ID.Value.(int64)
 		_node.ID = int(id)
 	}
-	msc.mutation.id = &_node.ID
-	msc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (msc *MsgSubscriberCreate) createSpec() (*MsgSubscriber, *sqlgraph.CreateSpec) {
+func (_c *MsgSubscriberCreate) createSpec() (*MsgSubscriber, *sqlgraph.CreateSpec) {
 	var (
-		_node = &MsgSubscriber{config: msc.config}
+		_node = &MsgSubscriber{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(msgsubscriber.Table, sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt))
 	)
-	_spec.Schema = msc.schemaConfig.MsgSubscriber
-	_spec.OnConflict = msc.conflict
-	if id, ok := msc.mutation.ID(); ok {
+	_spec.Schema = _c.schemaConfig.MsgSubscriber
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := msc.mutation.CreatedBy(); ok {
+	if value, ok := _c.mutation.CreatedBy(); ok {
 		_spec.SetField(msgsubscriber.FieldCreatedBy, field.TypeInt, value)
 		_node.CreatedBy = value
 	}
-	if value, ok := msc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(msgsubscriber.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := msc.mutation.UpdatedBy(); ok {
+	if value, ok := _c.mutation.UpdatedBy(); ok {
 		_spec.SetField(msgsubscriber.FieldUpdatedBy, field.TypeInt, value)
 		_node.UpdatedBy = value
 	}
-	if value, ok := msc.mutation.UpdatedAt(); ok {
+	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgsubscriber.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := msc.mutation.TenantID(); ok {
+	if value, ok := _c.mutation.TenantID(); ok {
 		_spec.SetField(msgsubscriber.FieldTenantID, field.TypeInt, value)
 		_node.TenantID = value
 	}
-	if value, ok := msc.mutation.OrgRoleID(); ok {
+	if value, ok := _c.mutation.OrgRoleID(); ok {
 		_spec.SetField(msgsubscriber.FieldOrgRoleID, field.TypeInt, value)
 		_node.OrgRoleID = value
 	}
-	if value, ok := msc.mutation.Exclude(); ok {
+	if value, ok := _c.mutation.Exclude(); ok {
 		_spec.SetField(msgsubscriber.FieldExclude, field.TypeBool, value)
 		_node.Exclude = value
 	}
-	if nodes := msc.mutation.MsgTypeIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.MsgTypeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -283,14 +283,14 @@ func (msc *MsgSubscriberCreate) createSpec() (*MsgSubscriber, *sqlgraph.CreateSp
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = msc.schemaConfig.MsgSubscriber
+		edge.Schema = _c.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.MsgTypeID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := msc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -301,7 +301,7 @@ func (msc *MsgSubscriberCreate) createSpec() (*MsgSubscriber, *sqlgraph.CreateSp
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = msc.schemaConfig.MsgSubscriber
+		edge.Schema = _c.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -327,10 +327,10 @@ func (msc *MsgSubscriberCreate) createSpec() (*MsgSubscriber, *sqlgraph.CreateSp
 //			SetCreatedBy(v+v).
 //		}).
 //		Exec(ctx)
-func (msc *MsgSubscriberCreate) OnConflict(opts ...sql.ConflictOption) *MsgSubscriberUpsertOne {
-	msc.conflict = opts
+func (_c *MsgSubscriberCreate) OnConflict(opts ...sql.ConflictOption) *MsgSubscriberUpsertOne {
+	_c.conflict = opts
 	return &MsgSubscriberUpsertOne{
-		create: msc,
+		create: _c,
 	}
 }
 
@@ -340,10 +340,10 @@ func (msc *MsgSubscriberCreate) OnConflict(opts ...sql.ConflictOption) *MsgSubsc
 //	client.MsgSubscriber.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (msc *MsgSubscriberCreate) OnConflictColumns(columns ...string) *MsgSubscriberUpsertOne {
-	msc.conflict = append(msc.conflict, sql.ConflictColumns(columns...))
+func (_c *MsgSubscriberCreate) OnConflictColumns(columns ...string) *MsgSubscriberUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &MsgSubscriberUpsertOne{
-		create: msc,
+		create: _c,
 	}
 }
 
@@ -742,16 +742,16 @@ type MsgSubscriberCreateBulk struct {
 }
 
 // Save creates the MsgSubscriber entities in the database.
-func (mscb *MsgSubscriberCreateBulk) Save(ctx context.Context) ([]*MsgSubscriber, error) {
-	if mscb.err != nil {
-		return nil, mscb.err
+func (_c *MsgSubscriberCreateBulk) Save(ctx context.Context) ([]*MsgSubscriber, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(mscb.builders))
-	nodes := make([]*MsgSubscriber, len(mscb.builders))
-	mutators := make([]Mutator, len(mscb.builders))
-	for i := range mscb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*MsgSubscriber, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := mscb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MsgSubscriberMutation)
@@ -765,12 +765,12 @@ func (mscb *MsgSubscriberCreateBulk) Save(ctx context.Context) ([]*MsgSubscriber
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, mscb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = mscb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, mscb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -794,7 +794,7 @@ func (mscb *MsgSubscriberCreateBulk) Save(ctx context.Context) ([]*MsgSubscriber
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, mscb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -802,8 +802,8 @@ func (mscb *MsgSubscriberCreateBulk) Save(ctx context.Context) ([]*MsgSubscriber
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mscb *MsgSubscriberCreateBulk) SaveX(ctx context.Context) []*MsgSubscriber {
-	v, err := mscb.Save(ctx)
+func (_c *MsgSubscriberCreateBulk) SaveX(ctx context.Context) []*MsgSubscriber {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -811,14 +811,14 @@ func (mscb *MsgSubscriberCreateBulk) SaveX(ctx context.Context) []*MsgSubscriber
 }
 
 // Exec executes the query.
-func (mscb *MsgSubscriberCreateBulk) Exec(ctx context.Context) error {
-	_, err := mscb.Save(ctx)
+func (_c *MsgSubscriberCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mscb *MsgSubscriberCreateBulk) ExecX(ctx context.Context) {
-	if err := mscb.Exec(ctx); err != nil {
+func (_c *MsgSubscriberCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -838,10 +838,10 @@ func (mscb *MsgSubscriberCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedBy(v+v).
 //		}).
 //		Exec(ctx)
-func (mscb *MsgSubscriberCreateBulk) OnConflict(opts ...sql.ConflictOption) *MsgSubscriberUpsertBulk {
-	mscb.conflict = opts
+func (_c *MsgSubscriberCreateBulk) OnConflict(opts ...sql.ConflictOption) *MsgSubscriberUpsertBulk {
+	_c.conflict = opts
 	return &MsgSubscriberUpsertBulk{
-		create: mscb,
+		create: _c,
 	}
 }
 
@@ -851,10 +851,10 @@ func (mscb *MsgSubscriberCreateBulk) OnConflict(opts ...sql.ConflictOption) *Msg
 //	client.MsgSubscriber.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (mscb *MsgSubscriberCreateBulk) OnConflictColumns(columns ...string) *MsgSubscriberUpsertBulk {
-	mscb.conflict = append(mscb.conflict, sql.ConflictColumns(columns...))
+func (_c *MsgSubscriberCreateBulk) OnConflictColumns(columns ...string) *MsgSubscriberUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &MsgSubscriberUpsertBulk{
-		create: mscb,
+		create: _c,
 	}
 }
 

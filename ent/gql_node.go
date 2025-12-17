@@ -25,6 +25,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
+	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 	"golang.org/x/sync/semaphore"
@@ -84,6 +85,11 @@ var nlogalertImplementors = []string{"NlogAlert", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
 func (*NlogAlert) IsNode() {}
+
+var orgImplementors = []string{"Org", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*Org) IsNode() {}
 
 var silenceImplementors = []string{"Silence", "Node"}
 
@@ -243,6 +249,15 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			}
 		}
 		return query.Only(entcache.WithRefEntryKey(ctx, "NlogAlert", id))
+	case "Org":
+		query := c.Org.Query().
+			Where(org.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, orgImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(entcache.WithRefEntryKey(ctx, "Org", id))
 	case "Silence":
 		query := c.Silence.Query().
 			Where(silence.ID(id))
@@ -482,6 +497,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.NlogAlert.Query().
 			Where(nlogalert.IDIn(ids...))
 		query, err := query.CollectFields(ctx, nlogalertImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case "Org":
+		query := c.Org.Query().
+			Where(org.IDIn(ids...))
+		query, err := query.CollectFields(ctx, orgImplementors...)
 		if err != nil {
 			return nil, err
 		}

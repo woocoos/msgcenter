@@ -26,187 +26,187 @@ type MsgTypeCreate struct {
 }
 
 // SetCreatedBy sets the "created_by" field.
-func (mtc *MsgTypeCreate) SetCreatedBy(i int) *MsgTypeCreate {
-	mtc.mutation.SetCreatedBy(i)
-	return mtc
+func (_c *MsgTypeCreate) SetCreatedBy(v int) *MsgTypeCreate {
+	_c.mutation.SetCreatedBy(v)
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (mtc *MsgTypeCreate) SetCreatedAt(t time.Time) *MsgTypeCreate {
-	mtc.mutation.SetCreatedAt(t)
-	return mtc
+func (_c *MsgTypeCreate) SetCreatedAt(v time.Time) *MsgTypeCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (mtc *MsgTypeCreate) SetNillableCreatedAt(t *time.Time) *MsgTypeCreate {
-	if t != nil {
-		mtc.SetCreatedAt(*t)
+func (_c *MsgTypeCreate) SetNillableCreatedAt(v *time.Time) *MsgTypeCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return mtc
+	return _c
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (mtc *MsgTypeCreate) SetUpdatedBy(i int) *MsgTypeCreate {
-	mtc.mutation.SetUpdatedBy(i)
-	return mtc
+func (_c *MsgTypeCreate) SetUpdatedBy(v int) *MsgTypeCreate {
+	_c.mutation.SetUpdatedBy(v)
+	return _c
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (mtc *MsgTypeCreate) SetNillableUpdatedBy(i *int) *MsgTypeCreate {
-	if i != nil {
-		mtc.SetUpdatedBy(*i)
+func (_c *MsgTypeCreate) SetNillableUpdatedBy(v *int) *MsgTypeCreate {
+	if v != nil {
+		_c.SetUpdatedBy(*v)
 	}
-	return mtc
+	return _c
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (mtc *MsgTypeCreate) SetUpdatedAt(t time.Time) *MsgTypeCreate {
-	mtc.mutation.SetUpdatedAt(t)
-	return mtc
+func (_c *MsgTypeCreate) SetUpdatedAt(v time.Time) *MsgTypeCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (mtc *MsgTypeCreate) SetNillableUpdatedAt(t *time.Time) *MsgTypeCreate {
-	if t != nil {
-		mtc.SetUpdatedAt(*t)
+func (_c *MsgTypeCreate) SetNillableUpdatedAt(v *time.Time) *MsgTypeCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
 	}
-	return mtc
+	return _c
 }
 
 // SetAppID sets the "app_id" field.
-func (mtc *MsgTypeCreate) SetAppID(i int) *MsgTypeCreate {
-	mtc.mutation.SetAppID(i)
-	return mtc
+func (_c *MsgTypeCreate) SetAppID(v int) *MsgTypeCreate {
+	_c.mutation.SetAppID(v)
+	return _c
 }
 
 // SetNillableAppID sets the "app_id" field if the given value is not nil.
-func (mtc *MsgTypeCreate) SetNillableAppID(i *int) *MsgTypeCreate {
-	if i != nil {
-		mtc.SetAppID(*i)
+func (_c *MsgTypeCreate) SetNillableAppID(v *int) *MsgTypeCreate {
+	if v != nil {
+		_c.SetAppID(*v)
 	}
-	return mtc
+	return _c
 }
 
 // SetCategory sets the "category" field.
-func (mtc *MsgTypeCreate) SetCategory(s string) *MsgTypeCreate {
-	mtc.mutation.SetCategory(s)
-	return mtc
+func (_c *MsgTypeCreate) SetCategory(v string) *MsgTypeCreate {
+	_c.mutation.SetCategory(v)
+	return _c
 }
 
 // SetName sets the "name" field.
-func (mtc *MsgTypeCreate) SetName(s string) *MsgTypeCreate {
-	mtc.mutation.SetName(s)
-	return mtc
+func (_c *MsgTypeCreate) SetName(v string) *MsgTypeCreate {
+	_c.mutation.SetName(v)
+	return _c
 }
 
 // SetStatus sets the "status" field.
-func (mtc *MsgTypeCreate) SetStatus(ts typex.SimpleStatus) *MsgTypeCreate {
-	mtc.mutation.SetStatus(ts)
-	return mtc
+func (_c *MsgTypeCreate) SetStatus(v typex.SimpleStatus) *MsgTypeCreate {
+	_c.mutation.SetStatus(v)
+	return _c
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (mtc *MsgTypeCreate) SetNillableStatus(ts *typex.SimpleStatus) *MsgTypeCreate {
-	if ts != nil {
-		mtc.SetStatus(*ts)
+func (_c *MsgTypeCreate) SetNillableStatus(v *typex.SimpleStatus) *MsgTypeCreate {
+	if v != nil {
+		_c.SetStatus(*v)
 	}
-	return mtc
+	return _c
 }
 
 // SetComments sets the "comments" field.
-func (mtc *MsgTypeCreate) SetComments(s string) *MsgTypeCreate {
-	mtc.mutation.SetComments(s)
-	return mtc
+func (_c *MsgTypeCreate) SetComments(v string) *MsgTypeCreate {
+	_c.mutation.SetComments(v)
+	return _c
 }
 
 // SetNillableComments sets the "comments" field if the given value is not nil.
-func (mtc *MsgTypeCreate) SetNillableComments(s *string) *MsgTypeCreate {
-	if s != nil {
-		mtc.SetComments(*s)
+func (_c *MsgTypeCreate) SetNillableComments(v *string) *MsgTypeCreate {
+	if v != nil {
+		_c.SetComments(*v)
 	}
-	return mtc
+	return _c
 }
 
 // SetCanSubs sets the "can_subs" field.
-func (mtc *MsgTypeCreate) SetCanSubs(b bool) *MsgTypeCreate {
-	mtc.mutation.SetCanSubs(b)
-	return mtc
+func (_c *MsgTypeCreate) SetCanSubs(v bool) *MsgTypeCreate {
+	_c.mutation.SetCanSubs(v)
+	return _c
 }
 
 // SetNillableCanSubs sets the "can_subs" field if the given value is not nil.
-func (mtc *MsgTypeCreate) SetNillableCanSubs(b *bool) *MsgTypeCreate {
-	if b != nil {
-		mtc.SetCanSubs(*b)
+func (_c *MsgTypeCreate) SetNillableCanSubs(v *bool) *MsgTypeCreate {
+	if v != nil {
+		_c.SetCanSubs(*v)
 	}
-	return mtc
+	return _c
 }
 
 // SetCanCustom sets the "can_custom" field.
-func (mtc *MsgTypeCreate) SetCanCustom(b bool) *MsgTypeCreate {
-	mtc.mutation.SetCanCustom(b)
-	return mtc
+func (_c *MsgTypeCreate) SetCanCustom(v bool) *MsgTypeCreate {
+	_c.mutation.SetCanCustom(v)
+	return _c
 }
 
 // SetNillableCanCustom sets the "can_custom" field if the given value is not nil.
-func (mtc *MsgTypeCreate) SetNillableCanCustom(b *bool) *MsgTypeCreate {
-	if b != nil {
-		mtc.SetCanCustom(*b)
+func (_c *MsgTypeCreate) SetNillableCanCustom(v *bool) *MsgTypeCreate {
+	if v != nil {
+		_c.SetCanCustom(*v)
 	}
-	return mtc
+	return _c
 }
 
 // SetID sets the "id" field.
-func (mtc *MsgTypeCreate) SetID(i int) *MsgTypeCreate {
-	mtc.mutation.SetID(i)
-	return mtc
+func (_c *MsgTypeCreate) SetID(v int) *MsgTypeCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // AddEventIDs adds the "events" edge to the MsgEvent entity by IDs.
-func (mtc *MsgTypeCreate) AddEventIDs(ids ...int) *MsgTypeCreate {
-	mtc.mutation.AddEventIDs(ids...)
-	return mtc
+func (_c *MsgTypeCreate) AddEventIDs(ids ...int) *MsgTypeCreate {
+	_c.mutation.AddEventIDs(ids...)
+	return _c
 }
 
 // AddEvents adds the "events" edges to the MsgEvent entity.
-func (mtc *MsgTypeCreate) AddEvents(m ...*MsgEvent) *MsgTypeCreate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_c *MsgTypeCreate) AddEvents(v ...*MsgEvent) *MsgTypeCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return mtc.AddEventIDs(ids...)
+	return _c.AddEventIDs(ids...)
 }
 
 // AddSubscriberIDs adds the "subscribers" edge to the MsgSubscriber entity by IDs.
-func (mtc *MsgTypeCreate) AddSubscriberIDs(ids ...int) *MsgTypeCreate {
-	mtc.mutation.AddSubscriberIDs(ids...)
-	return mtc
+func (_c *MsgTypeCreate) AddSubscriberIDs(ids ...int) *MsgTypeCreate {
+	_c.mutation.AddSubscriberIDs(ids...)
+	return _c
 }
 
 // AddSubscribers adds the "subscribers" edges to the MsgSubscriber entity.
-func (mtc *MsgTypeCreate) AddSubscribers(m ...*MsgSubscriber) *MsgTypeCreate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_c *MsgTypeCreate) AddSubscribers(v ...*MsgSubscriber) *MsgTypeCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return mtc.AddSubscriberIDs(ids...)
+	return _c.AddSubscriberIDs(ids...)
 }
 
 // Mutation returns the MsgTypeMutation object of the builder.
-func (mtc *MsgTypeCreate) Mutation() *MsgTypeMutation {
-	return mtc.mutation
+func (_c *MsgTypeCreate) Mutation() *MsgTypeMutation {
+	return _c.mutation
 }
 
 // Save creates the MsgType in the database.
-func (mtc *MsgTypeCreate) Save(ctx context.Context) (*MsgType, error) {
-	if err := mtc.defaults(); err != nil {
+func (_c *MsgTypeCreate) Save(ctx context.Context) (*MsgType, error) {
+	if err := _c.defaults(); err != nil {
 		return nil, err
 	}
-	return withHooks(ctx, mtc.sqlSave, mtc.mutation, mtc.hooks)
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (mtc *MsgTypeCreate) SaveX(ctx context.Context) *MsgType {
-	v, err := mtc.Save(ctx)
+func (_c *MsgTypeCreate) SaveX(ctx context.Context) *MsgType {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -214,67 +214,67 @@ func (mtc *MsgTypeCreate) SaveX(ctx context.Context) *MsgType {
 }
 
 // Exec executes the query.
-func (mtc *MsgTypeCreate) Exec(ctx context.Context) error {
-	_, err := mtc.Save(ctx)
+func (_c *MsgTypeCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mtc *MsgTypeCreate) ExecX(ctx context.Context) {
-	if err := mtc.Exec(ctx); err != nil {
+func (_c *MsgTypeCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (mtc *MsgTypeCreate) defaults() error {
-	if _, ok := mtc.mutation.CreatedAt(); !ok {
+func (_c *MsgTypeCreate) defaults() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		if msgtype.DefaultCreatedAt == nil {
 			return fmt.Errorf("ent: uninitialized msgtype.DefaultCreatedAt (forgotten import ent/runtime?)")
 		}
 		v := msgtype.DefaultCreatedAt()
-		mtc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := mtc.mutation.Status(); !ok {
+	if _, ok := _c.mutation.Status(); !ok {
 		v := msgtype.DefaultStatus
-		mtc.mutation.SetStatus(v)
+		_c.mutation.SetStatus(v)
 	}
-	if _, ok := mtc.mutation.CanSubs(); !ok {
+	if _, ok := _c.mutation.CanSubs(); !ok {
 		v := msgtype.DefaultCanSubs
-		mtc.mutation.SetCanSubs(v)
+		_c.mutation.SetCanSubs(v)
 	}
-	if _, ok := mtc.mutation.CanCustom(); !ok {
+	if _, ok := _c.mutation.CanCustom(); !ok {
 		v := msgtype.DefaultCanCustom
-		mtc.mutation.SetCanCustom(v)
+		_c.mutation.SetCanCustom(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mtc *MsgTypeCreate) check() error {
-	if _, ok := mtc.mutation.CreatedBy(); !ok {
+func (_c *MsgTypeCreate) check() error {
+	if _, ok := _c.mutation.CreatedBy(); !ok {
 		return &ValidationError{Name: "created_by", err: errors.New(`ent: missing required field "MsgType.created_by"`)}
 	}
-	if _, ok := mtc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "MsgType.created_at"`)}
 	}
-	if _, ok := mtc.mutation.Category(); !ok {
+	if _, ok := _c.mutation.Category(); !ok {
 		return &ValidationError{Name: "category", err: errors.New(`ent: missing required field "MsgType.category"`)}
 	}
-	if v, ok := mtc.mutation.Category(); ok {
+	if v, ok := _c.mutation.Category(); ok {
 		if err := msgtype.CategoryValidator(v); err != nil {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "MsgType.category": %w`, err)}
 		}
 	}
-	if _, ok := mtc.mutation.Name(); !ok {
+	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "MsgType.name"`)}
 	}
-	if v, ok := mtc.mutation.Name(); ok {
+	if v, ok := _c.mutation.Name(); ok {
 		if err := msgtype.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "MsgType.name": %w`, err)}
 		}
 	}
-	if v, ok := mtc.mutation.Status(); ok {
+	if v, ok := _c.mutation.Status(); ok {
 		if err := msgtype.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "MsgType.status": %w`, err)}
 		}
@@ -282,12 +282,12 @@ func (mtc *MsgTypeCreate) check() error {
 	return nil
 }
 
-func (mtc *MsgTypeCreate) sqlSave(ctx context.Context) (*MsgType, error) {
-	if err := mtc.check(); err != nil {
+func (_c *MsgTypeCreate) sqlSave(ctx context.Context) (*MsgType, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := mtc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, mtc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -297,67 +297,67 @@ func (mtc *MsgTypeCreate) sqlSave(ctx context.Context) (*MsgType, error) {
 		id := _spec.ID.Value.(int64)
 		_node.ID = int(id)
 	}
-	mtc.mutation.id = &_node.ID
-	mtc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (mtc *MsgTypeCreate) createSpec() (*MsgType, *sqlgraph.CreateSpec) {
+func (_c *MsgTypeCreate) createSpec() (*MsgType, *sqlgraph.CreateSpec) {
 	var (
-		_node = &MsgType{config: mtc.config}
+		_node = &MsgType{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(msgtype.Table, sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt))
 	)
-	_spec.Schema = mtc.schemaConfig.MsgType
-	_spec.OnConflict = mtc.conflict
-	if id, ok := mtc.mutation.ID(); ok {
+	_spec.Schema = _c.schemaConfig.MsgType
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := mtc.mutation.CreatedBy(); ok {
+	if value, ok := _c.mutation.CreatedBy(); ok {
 		_spec.SetField(msgtype.FieldCreatedBy, field.TypeInt, value)
 		_node.CreatedBy = value
 	}
-	if value, ok := mtc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(msgtype.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := mtc.mutation.UpdatedBy(); ok {
+	if value, ok := _c.mutation.UpdatedBy(); ok {
 		_spec.SetField(msgtype.FieldUpdatedBy, field.TypeInt, value)
 		_node.UpdatedBy = value
 	}
-	if value, ok := mtc.mutation.UpdatedAt(); ok {
+	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgtype.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := mtc.mutation.AppID(); ok {
+	if value, ok := _c.mutation.AppID(); ok {
 		_spec.SetField(msgtype.FieldAppID, field.TypeInt, value)
 		_node.AppID = value
 	}
-	if value, ok := mtc.mutation.Category(); ok {
+	if value, ok := _c.mutation.Category(); ok {
 		_spec.SetField(msgtype.FieldCategory, field.TypeString, value)
 		_node.Category = value
 	}
-	if value, ok := mtc.mutation.Name(); ok {
+	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(msgtype.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := mtc.mutation.Status(); ok {
+	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(msgtype.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
 	}
-	if value, ok := mtc.mutation.Comments(); ok {
+	if value, ok := _c.mutation.Comments(); ok {
 		_spec.SetField(msgtype.FieldComments, field.TypeString, value)
 		_node.Comments = value
 	}
-	if value, ok := mtc.mutation.CanSubs(); ok {
+	if value, ok := _c.mutation.CanSubs(); ok {
 		_spec.SetField(msgtype.FieldCanSubs, field.TypeBool, value)
 		_node.CanSubs = value
 	}
-	if value, ok := mtc.mutation.CanCustom(); ok {
+	if value, ok := _c.mutation.CanCustom(); ok {
 		_spec.SetField(msgtype.FieldCanCustom, field.TypeBool, value)
 		_node.CanCustom = value
 	}
-	if nodes := mtc.mutation.EventsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.EventsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -368,13 +368,13 @@ func (mtc *MsgTypeCreate) createSpec() (*MsgType, *sqlgraph.CreateSpec) {
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mtc.schemaConfig.MsgEvent
+		edge.Schema = _c.schemaConfig.MsgEvent
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := mtc.mutation.SubscribersIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.SubscribersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -385,7 +385,7 @@ func (mtc *MsgTypeCreate) createSpec() (*MsgType, *sqlgraph.CreateSpec) {
 				IDSpec: sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mtc.schemaConfig.MsgSubscriber
+		edge.Schema = _c.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -410,10 +410,10 @@ func (mtc *MsgTypeCreate) createSpec() (*MsgType, *sqlgraph.CreateSpec) {
 //			SetCreatedBy(v+v).
 //		}).
 //		Exec(ctx)
-func (mtc *MsgTypeCreate) OnConflict(opts ...sql.ConflictOption) *MsgTypeUpsertOne {
-	mtc.conflict = opts
+func (_c *MsgTypeCreate) OnConflict(opts ...sql.ConflictOption) *MsgTypeUpsertOne {
+	_c.conflict = opts
 	return &MsgTypeUpsertOne{
-		create: mtc,
+		create: _c,
 	}
 }
 
@@ -423,10 +423,10 @@ func (mtc *MsgTypeCreate) OnConflict(opts ...sql.ConflictOption) *MsgTypeUpsertO
 //	client.MsgType.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (mtc *MsgTypeCreate) OnConflictColumns(columns ...string) *MsgTypeUpsertOne {
-	mtc.conflict = append(mtc.conflict, sql.ConflictColumns(columns...))
+func (_c *MsgTypeCreate) OnConflictColumns(columns ...string) *MsgTypeUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &MsgTypeUpsertOne{
-		create: mtc,
+		create: _c,
 	}
 }
 
@@ -890,16 +890,16 @@ type MsgTypeCreateBulk struct {
 }
 
 // Save creates the MsgType entities in the database.
-func (mtcb *MsgTypeCreateBulk) Save(ctx context.Context) ([]*MsgType, error) {
-	if mtcb.err != nil {
-		return nil, mtcb.err
+func (_c *MsgTypeCreateBulk) Save(ctx context.Context) ([]*MsgType, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(mtcb.builders))
-	nodes := make([]*MsgType, len(mtcb.builders))
-	mutators := make([]Mutator, len(mtcb.builders))
-	for i := range mtcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*MsgType, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := mtcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MsgTypeMutation)
@@ -913,12 +913,12 @@ func (mtcb *MsgTypeCreateBulk) Save(ctx context.Context) ([]*MsgType, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, mtcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = mtcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, mtcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -942,7 +942,7 @@ func (mtcb *MsgTypeCreateBulk) Save(ctx context.Context) ([]*MsgType, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, mtcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -950,8 +950,8 @@ func (mtcb *MsgTypeCreateBulk) Save(ctx context.Context) ([]*MsgType, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mtcb *MsgTypeCreateBulk) SaveX(ctx context.Context) []*MsgType {
-	v, err := mtcb.Save(ctx)
+func (_c *MsgTypeCreateBulk) SaveX(ctx context.Context) []*MsgType {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -959,14 +959,14 @@ func (mtcb *MsgTypeCreateBulk) SaveX(ctx context.Context) []*MsgType {
 }
 
 // Exec executes the query.
-func (mtcb *MsgTypeCreateBulk) Exec(ctx context.Context) error {
-	_, err := mtcb.Save(ctx)
+func (_c *MsgTypeCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mtcb *MsgTypeCreateBulk) ExecX(ctx context.Context) {
-	if err := mtcb.Exec(ctx); err != nil {
+func (_c *MsgTypeCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -986,10 +986,10 @@ func (mtcb *MsgTypeCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedBy(v+v).
 //		}).
 //		Exec(ctx)
-func (mtcb *MsgTypeCreateBulk) OnConflict(opts ...sql.ConflictOption) *MsgTypeUpsertBulk {
-	mtcb.conflict = opts
+func (_c *MsgTypeCreateBulk) OnConflict(opts ...sql.ConflictOption) *MsgTypeUpsertBulk {
+	_c.conflict = opts
 	return &MsgTypeUpsertBulk{
-		create: mtcb,
+		create: _c,
 	}
 }
 
@@ -999,10 +999,10 @@ func (mtcb *MsgTypeCreateBulk) OnConflict(opts ...sql.ConflictOption) *MsgTypeUp
 //	client.MsgType.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (mtcb *MsgTypeCreateBulk) OnConflictColumns(columns ...string) *MsgTypeUpsertBulk {
-	mtcb.conflict = append(mtcb.conflict, sql.ConflictColumns(columns...))
+func (_c *MsgTypeCreateBulk) OnConflictColumns(columns ...string) *MsgTypeUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &MsgTypeUpsertBulk{
-		create: mtcb,
+		create: _c,
 	}
 }
 

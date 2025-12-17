@@ -11,29 +11,29 @@ import (
 	"github.com/woocoos/msgcenter/ent/predicate"
 
 	"github.com/woocoos/msgcenter/ent/internal"
-	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/org"
 )
 
-// MsgEventDelete is the builder for deleting a MsgEvent entity.
-type MsgEventDelete struct {
+// OrgDelete is the builder for deleting a Org entity.
+type OrgDelete struct {
 	config
 	hooks    []Hook
-	mutation *MsgEventMutation
+	mutation *OrgMutation
 }
 
-// Where appends a list predicates to the MsgEventDelete builder.
-func (_d *MsgEventDelete) Where(ps ...predicate.MsgEvent) *MsgEventDelete {
+// Where appends a list predicates to the OrgDelete builder.
+func (_d *OrgDelete) Where(ps ...predicate.Org) *OrgDelete {
 	_d.mutation.Where(ps...)
 	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (_d *MsgEventDelete) Exec(ctx context.Context) (int, error) {
+func (_d *OrgDelete) Exec(ctx context.Context) (int, error) {
 	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_d *MsgEventDelete) ExecX(ctx context.Context) int {
+func (_d *OrgDelete) ExecX(ctx context.Context) int {
 	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
@@ -41,9 +41,9 @@ func (_d *MsgEventDelete) ExecX(ctx context.Context) int {
 	return n
 }
 
-func (_d *MsgEventDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(msgevent.Table, sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt))
-	_spec.Node.Schema = _d.schemaConfig.MsgEvent
+func (_d *OrgDelete) sqlExec(ctx context.Context) (int, error) {
+	_spec := sqlgraph.NewDeleteSpec(org.Table, sqlgraph.NewFieldSpec(org.FieldID, field.TypeInt))
+	_spec.Node.Schema = _d.schemaConfig.Org
 	ctx = internal.NewSchemaConfigContext(ctx, _d.schemaConfig)
 	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -60,32 +60,32 @@ func (_d *MsgEventDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// MsgEventDeleteOne is the builder for deleting a single MsgEvent entity.
-type MsgEventDeleteOne struct {
-	_d *MsgEventDelete
+// OrgDeleteOne is the builder for deleting a single Org entity.
+type OrgDeleteOne struct {
+	_d *OrgDelete
 }
 
-// Where appends a list predicates to the MsgEventDelete builder.
-func (_d *MsgEventDeleteOne) Where(ps ...predicate.MsgEvent) *MsgEventDeleteOne {
+// Where appends a list predicates to the OrgDelete builder.
+func (_d *OrgDeleteOne) Where(ps ...predicate.Org) *OrgDeleteOne {
 	_d._d.mutation.Where(ps...)
 	return _d
 }
 
 // Exec executes the deletion query.
-func (_d *MsgEventDeleteOne) Exec(ctx context.Context) error {
+func (_d *OrgDeleteOne) Exec(ctx context.Context) error {
 	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
 	case n == 0:
-		return &NotFoundError{msgevent.Label}
+		return &NotFoundError{org.Label}
 	default:
 		return nil
 	}
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_d *MsgEventDeleteOne) ExecX(ctx context.Context) {
+func (_d *OrgDeleteOne) ExecX(ctx context.Context) {
 	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}

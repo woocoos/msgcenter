@@ -29,212 +29,212 @@ type MsgEventUpdate struct {
 }
 
 // Where appends a list predicates to the MsgEventUpdate builder.
-func (meu *MsgEventUpdate) Where(ps ...predicate.MsgEvent) *MsgEventUpdate {
-	meu.mutation.Where(ps...)
-	return meu
+func (_u *MsgEventUpdate) Where(ps ...predicate.MsgEvent) *MsgEventUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (meu *MsgEventUpdate) SetUpdatedBy(i int) *MsgEventUpdate {
-	meu.mutation.ResetUpdatedBy()
-	meu.mutation.SetUpdatedBy(i)
-	return meu
+func (_u *MsgEventUpdate) SetUpdatedBy(v int) *MsgEventUpdate {
+	_u.mutation.ResetUpdatedBy()
+	_u.mutation.SetUpdatedBy(v)
+	return _u
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (meu *MsgEventUpdate) SetNillableUpdatedBy(i *int) *MsgEventUpdate {
-	if i != nil {
-		meu.SetUpdatedBy(*i)
+func (_u *MsgEventUpdate) SetNillableUpdatedBy(v *int) *MsgEventUpdate {
+	if v != nil {
+		_u.SetUpdatedBy(*v)
 	}
-	return meu
+	return _u
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (meu *MsgEventUpdate) AddUpdatedBy(i int) *MsgEventUpdate {
-	meu.mutation.AddUpdatedBy(i)
-	return meu
+// AddUpdatedBy adds value to the "updated_by" field.
+func (_u *MsgEventUpdate) AddUpdatedBy(v int) *MsgEventUpdate {
+	_u.mutation.AddUpdatedBy(v)
+	return _u
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (meu *MsgEventUpdate) ClearUpdatedBy() *MsgEventUpdate {
-	meu.mutation.ClearUpdatedBy()
-	return meu
+func (_u *MsgEventUpdate) ClearUpdatedBy() *MsgEventUpdate {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (meu *MsgEventUpdate) SetUpdatedAt(t time.Time) *MsgEventUpdate {
-	meu.mutation.SetUpdatedAt(t)
-	return meu
+func (_u *MsgEventUpdate) SetUpdatedAt(v time.Time) *MsgEventUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (meu *MsgEventUpdate) SetNillableUpdatedAt(t *time.Time) *MsgEventUpdate {
-	if t != nil {
-		meu.SetUpdatedAt(*t)
+func (_u *MsgEventUpdate) SetNillableUpdatedAt(v *time.Time) *MsgEventUpdate {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return meu
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (meu *MsgEventUpdate) ClearUpdatedAt() *MsgEventUpdate {
-	meu.mutation.ClearUpdatedAt()
-	return meu
+func (_u *MsgEventUpdate) ClearUpdatedAt() *MsgEventUpdate {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetMsgTypeID sets the "msg_type_id" field.
-func (meu *MsgEventUpdate) SetMsgTypeID(i int) *MsgEventUpdate {
-	meu.mutation.SetMsgTypeID(i)
-	return meu
+func (_u *MsgEventUpdate) SetMsgTypeID(v int) *MsgEventUpdate {
+	_u.mutation.SetMsgTypeID(v)
+	return _u
 }
 
 // SetNillableMsgTypeID sets the "msg_type_id" field if the given value is not nil.
-func (meu *MsgEventUpdate) SetNillableMsgTypeID(i *int) *MsgEventUpdate {
-	if i != nil {
-		meu.SetMsgTypeID(*i)
+func (_u *MsgEventUpdate) SetNillableMsgTypeID(v *int) *MsgEventUpdate {
+	if v != nil {
+		_u.SetMsgTypeID(*v)
 	}
-	return meu
+	return _u
 }
 
 // SetName sets the "name" field.
-func (meu *MsgEventUpdate) SetName(s string) *MsgEventUpdate {
-	meu.mutation.SetName(s)
-	return meu
+func (_u *MsgEventUpdate) SetName(v string) *MsgEventUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (meu *MsgEventUpdate) SetNillableName(s *string) *MsgEventUpdate {
-	if s != nil {
-		meu.SetName(*s)
+func (_u *MsgEventUpdate) SetNillableName(v *string) *MsgEventUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return meu
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (meu *MsgEventUpdate) SetStatus(ts typex.SimpleStatus) *MsgEventUpdate {
-	meu.mutation.SetStatus(ts)
-	return meu
+func (_u *MsgEventUpdate) SetStatus(v typex.SimpleStatus) *MsgEventUpdate {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (meu *MsgEventUpdate) SetNillableStatus(ts *typex.SimpleStatus) *MsgEventUpdate {
-	if ts != nil {
-		meu.SetStatus(*ts)
+func (_u *MsgEventUpdate) SetNillableStatus(v *typex.SimpleStatus) *MsgEventUpdate {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return meu
+	return _u
 }
 
 // ClearStatus clears the value of the "status" field.
-func (meu *MsgEventUpdate) ClearStatus() *MsgEventUpdate {
-	meu.mutation.ClearStatus()
-	return meu
+func (_u *MsgEventUpdate) ClearStatus() *MsgEventUpdate {
+	_u.mutation.ClearStatus()
+	return _u
 }
 
 // SetComments sets the "comments" field.
-func (meu *MsgEventUpdate) SetComments(s string) *MsgEventUpdate {
-	meu.mutation.SetComments(s)
-	return meu
+func (_u *MsgEventUpdate) SetComments(v string) *MsgEventUpdate {
+	_u.mutation.SetComments(v)
+	return _u
 }
 
 // SetNillableComments sets the "comments" field if the given value is not nil.
-func (meu *MsgEventUpdate) SetNillableComments(s *string) *MsgEventUpdate {
-	if s != nil {
-		meu.SetComments(*s)
+func (_u *MsgEventUpdate) SetNillableComments(v *string) *MsgEventUpdate {
+	if v != nil {
+		_u.SetComments(*v)
 	}
-	return meu
+	return _u
 }
 
 // ClearComments clears the value of the "comments" field.
-func (meu *MsgEventUpdate) ClearComments() *MsgEventUpdate {
-	meu.mutation.ClearComments()
-	return meu
+func (_u *MsgEventUpdate) ClearComments() *MsgEventUpdate {
+	_u.mutation.ClearComments()
+	return _u
 }
 
 // SetRoute sets the "route" field.
-func (meu *MsgEventUpdate) SetRoute(pr *profile.Route) *MsgEventUpdate {
-	meu.mutation.SetRoute(pr)
-	return meu
+func (_u *MsgEventUpdate) SetRoute(v *profile.Route) *MsgEventUpdate {
+	_u.mutation.SetRoute(v)
+	return _u
 }
 
 // ClearRoute clears the value of the "route" field.
-func (meu *MsgEventUpdate) ClearRoute() *MsgEventUpdate {
-	meu.mutation.ClearRoute()
-	return meu
+func (_u *MsgEventUpdate) ClearRoute() *MsgEventUpdate {
+	_u.mutation.ClearRoute()
+	return _u
 }
 
 // SetModes sets the "modes" field.
-func (meu *MsgEventUpdate) SetModes(s string) *MsgEventUpdate {
-	meu.mutation.SetModes(s)
-	return meu
+func (_u *MsgEventUpdate) SetModes(v string) *MsgEventUpdate {
+	_u.mutation.SetModes(v)
+	return _u
 }
 
 // SetNillableModes sets the "modes" field if the given value is not nil.
-func (meu *MsgEventUpdate) SetNillableModes(s *string) *MsgEventUpdate {
-	if s != nil {
-		meu.SetModes(*s)
+func (_u *MsgEventUpdate) SetNillableModes(v *string) *MsgEventUpdate {
+	if v != nil {
+		_u.SetModes(*v)
 	}
-	return meu
+	return _u
 }
 
 // SetMsgType sets the "msg_type" edge to the MsgType entity.
-func (meu *MsgEventUpdate) SetMsgType(m *MsgType) *MsgEventUpdate {
-	return meu.SetMsgTypeID(m.ID)
+func (_u *MsgEventUpdate) SetMsgType(v *MsgType) *MsgEventUpdate {
+	return _u.SetMsgTypeID(v.ID)
 }
 
 // AddCustomerTemplateIDs adds the "customer_template" edge to the MsgTemplate entity by IDs.
-func (meu *MsgEventUpdate) AddCustomerTemplateIDs(ids ...int) *MsgEventUpdate {
-	meu.mutation.AddCustomerTemplateIDs(ids...)
-	return meu
+func (_u *MsgEventUpdate) AddCustomerTemplateIDs(ids ...int) *MsgEventUpdate {
+	_u.mutation.AddCustomerTemplateIDs(ids...)
+	return _u
 }
 
 // AddCustomerTemplate adds the "customer_template" edges to the MsgTemplate entity.
-func (meu *MsgEventUpdate) AddCustomerTemplate(m ...*MsgTemplate) *MsgEventUpdate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *MsgEventUpdate) AddCustomerTemplate(v ...*MsgTemplate) *MsgEventUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return meu.AddCustomerTemplateIDs(ids...)
+	return _u.AddCustomerTemplateIDs(ids...)
 }
 
 // Mutation returns the MsgEventMutation object of the builder.
-func (meu *MsgEventUpdate) Mutation() *MsgEventMutation {
-	return meu.mutation
+func (_u *MsgEventUpdate) Mutation() *MsgEventMutation {
+	return _u.mutation
 }
 
 // ClearMsgType clears the "msg_type" edge to the MsgType entity.
-func (meu *MsgEventUpdate) ClearMsgType() *MsgEventUpdate {
-	meu.mutation.ClearMsgType()
-	return meu
+func (_u *MsgEventUpdate) ClearMsgType() *MsgEventUpdate {
+	_u.mutation.ClearMsgType()
+	return _u
 }
 
 // ClearCustomerTemplate clears all "customer_template" edges to the MsgTemplate entity.
-func (meu *MsgEventUpdate) ClearCustomerTemplate() *MsgEventUpdate {
-	meu.mutation.ClearCustomerTemplate()
-	return meu
+func (_u *MsgEventUpdate) ClearCustomerTemplate() *MsgEventUpdate {
+	_u.mutation.ClearCustomerTemplate()
+	return _u
 }
 
 // RemoveCustomerTemplateIDs removes the "customer_template" edge to MsgTemplate entities by IDs.
-func (meu *MsgEventUpdate) RemoveCustomerTemplateIDs(ids ...int) *MsgEventUpdate {
-	meu.mutation.RemoveCustomerTemplateIDs(ids...)
-	return meu
+func (_u *MsgEventUpdate) RemoveCustomerTemplateIDs(ids ...int) *MsgEventUpdate {
+	_u.mutation.RemoveCustomerTemplateIDs(ids...)
+	return _u
 }
 
 // RemoveCustomerTemplate removes "customer_template" edges to MsgTemplate entities.
-func (meu *MsgEventUpdate) RemoveCustomerTemplate(m ...*MsgTemplate) *MsgEventUpdate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *MsgEventUpdate) RemoveCustomerTemplate(v ...*MsgTemplate) *MsgEventUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return meu.RemoveCustomerTemplateIDs(ids...)
+	return _u.RemoveCustomerTemplateIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (meu *MsgEventUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, meu.sqlSave, meu.mutation, meu.hooks)
+func (_u *MsgEventUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (meu *MsgEventUpdate) SaveX(ctx context.Context) int {
-	affected, err := meu.Save(ctx)
+func (_u *MsgEventUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -242,93 +242,93 @@ func (meu *MsgEventUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (meu *MsgEventUpdate) Exec(ctx context.Context) error {
-	_, err := meu.Save(ctx)
+func (_u *MsgEventUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (meu *MsgEventUpdate) ExecX(ctx context.Context) {
-	if err := meu.Exec(ctx); err != nil {
+func (_u *MsgEventUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (meu *MsgEventUpdate) check() error {
-	if v, ok := meu.mutation.Name(); ok {
+func (_u *MsgEventUpdate) check() error {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := msgevent.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "MsgEvent.name": %w`, err)}
 		}
 	}
-	if v, ok := meu.mutation.Status(); ok {
+	if v, ok := _u.mutation.Status(); ok {
 		if err := msgevent.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "MsgEvent.status": %w`, err)}
 		}
 	}
-	if v, ok := meu.mutation.Route(); ok {
+	if v, ok := _u.mutation.Route(); ok {
 		if err := v.Validate(); err != nil {
 			return &ValidationError{Name: "route", err: fmt.Errorf(`ent: validator failed for field "MsgEvent.route": %w`, err)}
 		}
 	}
-	if meu.mutation.MsgTypeCleared() && len(meu.mutation.MsgTypeIDs()) > 0 {
+	if _u.mutation.MsgTypeCleared() && len(_u.mutation.MsgTypeIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgEvent.msg_type"`)
 	}
 	return nil
 }
 
-func (meu *MsgEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := meu.check(); err != nil {
-		return n, err
+func (_u *MsgEventUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(msgevent.Table, msgevent.Columns, sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt))
-	if ps := meu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := meu.mutation.UpdatedBy(); ok {
+	if value, ok := _u.mutation.UpdatedBy(); ok {
 		_spec.SetField(msgevent.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if value, ok := meu.mutation.AddedUpdatedBy(); ok {
+	if value, ok := _u.mutation.AddedUpdatedBy(); ok {
 		_spec.AddField(msgevent.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if meu.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		_spec.ClearField(msgevent.FieldUpdatedBy, field.TypeInt)
 	}
-	if value, ok := meu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgevent.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if meu.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(msgevent.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := meu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(msgevent.FieldName, field.TypeString, value)
 	}
-	if value, ok := meu.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(msgevent.FieldStatus, field.TypeEnum, value)
 	}
-	if meu.mutation.StatusCleared() {
+	if _u.mutation.StatusCleared() {
 		_spec.ClearField(msgevent.FieldStatus, field.TypeEnum)
 	}
-	if value, ok := meu.mutation.Comments(); ok {
+	if value, ok := _u.mutation.Comments(); ok {
 		_spec.SetField(msgevent.FieldComments, field.TypeString, value)
 	}
-	if meu.mutation.CommentsCleared() {
+	if _u.mutation.CommentsCleared() {
 		_spec.ClearField(msgevent.FieldComments, field.TypeString)
 	}
-	if value, ok := meu.mutation.Route(); ok {
+	if value, ok := _u.mutation.Route(); ok {
 		_spec.SetField(msgevent.FieldRoute, field.TypeJSON, value)
 	}
-	if meu.mutation.RouteCleared() {
+	if _u.mutation.RouteCleared() {
 		_spec.ClearField(msgevent.FieldRoute, field.TypeJSON)
 	}
-	if value, ok := meu.mutation.Modes(); ok {
+	if value, ok := _u.mutation.Modes(); ok {
 		_spec.SetField(msgevent.FieldModes, field.TypeString, value)
 	}
-	if meu.mutation.MsgTypeCleared() {
+	if _u.mutation.MsgTypeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -339,10 +339,10 @@ func (meu *MsgEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = meu.schemaConfig.MsgEvent
+		edge.Schema = _u.schemaConfig.MsgEvent
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := meu.mutation.MsgTypeIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.MsgTypeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -353,13 +353,13 @@ func (meu *MsgEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = meu.schemaConfig.MsgEvent
+		edge.Schema = _u.schemaConfig.MsgEvent
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if meu.mutation.CustomerTemplateCleared() {
+	if _u.mutation.CustomerTemplateCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -370,10 +370,10 @@ func (meu *MsgEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = meu.schemaConfig.MsgTemplate
+		edge.Schema = _u.schemaConfig.MsgTemplate
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := meu.mutation.RemovedCustomerTemplateIDs(); len(nodes) > 0 && !meu.mutation.CustomerTemplateCleared() {
+	if nodes := _u.mutation.RemovedCustomerTemplateIDs(); len(nodes) > 0 && !_u.mutation.CustomerTemplateCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -384,13 +384,13 @@ func (meu *MsgEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = meu.schemaConfig.MsgTemplate
+		edge.Schema = _u.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := meu.mutation.CustomerTemplateIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CustomerTemplateIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -401,15 +401,15 @@ func (meu *MsgEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = meu.schemaConfig.MsgTemplate
+		edge.Schema = _u.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Node.Schema = meu.schemaConfig.MsgEvent
-	ctx = internal.NewSchemaConfigContext(ctx, meu.schemaConfig)
-	if n, err = sqlgraph.UpdateNodes(ctx, meu.driver, _spec); err != nil {
+	_spec.Node.Schema = _u.schemaConfig.MsgEvent
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgevent.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -417,8 +417,8 @@ func (meu *MsgEventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	meu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // MsgEventUpdateOne is the builder for updating a single MsgEvent entity.
@@ -430,219 +430,219 @@ type MsgEventUpdateOne struct {
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (meuo *MsgEventUpdateOne) SetUpdatedBy(i int) *MsgEventUpdateOne {
-	meuo.mutation.ResetUpdatedBy()
-	meuo.mutation.SetUpdatedBy(i)
-	return meuo
+func (_u *MsgEventUpdateOne) SetUpdatedBy(v int) *MsgEventUpdateOne {
+	_u.mutation.ResetUpdatedBy()
+	_u.mutation.SetUpdatedBy(v)
+	return _u
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (meuo *MsgEventUpdateOne) SetNillableUpdatedBy(i *int) *MsgEventUpdateOne {
-	if i != nil {
-		meuo.SetUpdatedBy(*i)
+func (_u *MsgEventUpdateOne) SetNillableUpdatedBy(v *int) *MsgEventUpdateOne {
+	if v != nil {
+		_u.SetUpdatedBy(*v)
 	}
-	return meuo
+	return _u
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (meuo *MsgEventUpdateOne) AddUpdatedBy(i int) *MsgEventUpdateOne {
-	meuo.mutation.AddUpdatedBy(i)
-	return meuo
+// AddUpdatedBy adds value to the "updated_by" field.
+func (_u *MsgEventUpdateOne) AddUpdatedBy(v int) *MsgEventUpdateOne {
+	_u.mutation.AddUpdatedBy(v)
+	return _u
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (meuo *MsgEventUpdateOne) ClearUpdatedBy() *MsgEventUpdateOne {
-	meuo.mutation.ClearUpdatedBy()
-	return meuo
+func (_u *MsgEventUpdateOne) ClearUpdatedBy() *MsgEventUpdateOne {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (meuo *MsgEventUpdateOne) SetUpdatedAt(t time.Time) *MsgEventUpdateOne {
-	meuo.mutation.SetUpdatedAt(t)
-	return meuo
+func (_u *MsgEventUpdateOne) SetUpdatedAt(v time.Time) *MsgEventUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (meuo *MsgEventUpdateOne) SetNillableUpdatedAt(t *time.Time) *MsgEventUpdateOne {
-	if t != nil {
-		meuo.SetUpdatedAt(*t)
+func (_u *MsgEventUpdateOne) SetNillableUpdatedAt(v *time.Time) *MsgEventUpdateOne {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return meuo
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (meuo *MsgEventUpdateOne) ClearUpdatedAt() *MsgEventUpdateOne {
-	meuo.mutation.ClearUpdatedAt()
-	return meuo
+func (_u *MsgEventUpdateOne) ClearUpdatedAt() *MsgEventUpdateOne {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetMsgTypeID sets the "msg_type_id" field.
-func (meuo *MsgEventUpdateOne) SetMsgTypeID(i int) *MsgEventUpdateOne {
-	meuo.mutation.SetMsgTypeID(i)
-	return meuo
+func (_u *MsgEventUpdateOne) SetMsgTypeID(v int) *MsgEventUpdateOne {
+	_u.mutation.SetMsgTypeID(v)
+	return _u
 }
 
 // SetNillableMsgTypeID sets the "msg_type_id" field if the given value is not nil.
-func (meuo *MsgEventUpdateOne) SetNillableMsgTypeID(i *int) *MsgEventUpdateOne {
-	if i != nil {
-		meuo.SetMsgTypeID(*i)
+func (_u *MsgEventUpdateOne) SetNillableMsgTypeID(v *int) *MsgEventUpdateOne {
+	if v != nil {
+		_u.SetMsgTypeID(*v)
 	}
-	return meuo
+	return _u
 }
 
 // SetName sets the "name" field.
-func (meuo *MsgEventUpdateOne) SetName(s string) *MsgEventUpdateOne {
-	meuo.mutation.SetName(s)
-	return meuo
+func (_u *MsgEventUpdateOne) SetName(v string) *MsgEventUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (meuo *MsgEventUpdateOne) SetNillableName(s *string) *MsgEventUpdateOne {
-	if s != nil {
-		meuo.SetName(*s)
+func (_u *MsgEventUpdateOne) SetNillableName(v *string) *MsgEventUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return meuo
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (meuo *MsgEventUpdateOne) SetStatus(ts typex.SimpleStatus) *MsgEventUpdateOne {
-	meuo.mutation.SetStatus(ts)
-	return meuo
+func (_u *MsgEventUpdateOne) SetStatus(v typex.SimpleStatus) *MsgEventUpdateOne {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (meuo *MsgEventUpdateOne) SetNillableStatus(ts *typex.SimpleStatus) *MsgEventUpdateOne {
-	if ts != nil {
-		meuo.SetStatus(*ts)
+func (_u *MsgEventUpdateOne) SetNillableStatus(v *typex.SimpleStatus) *MsgEventUpdateOne {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return meuo
+	return _u
 }
 
 // ClearStatus clears the value of the "status" field.
-func (meuo *MsgEventUpdateOne) ClearStatus() *MsgEventUpdateOne {
-	meuo.mutation.ClearStatus()
-	return meuo
+func (_u *MsgEventUpdateOne) ClearStatus() *MsgEventUpdateOne {
+	_u.mutation.ClearStatus()
+	return _u
 }
 
 // SetComments sets the "comments" field.
-func (meuo *MsgEventUpdateOne) SetComments(s string) *MsgEventUpdateOne {
-	meuo.mutation.SetComments(s)
-	return meuo
+func (_u *MsgEventUpdateOne) SetComments(v string) *MsgEventUpdateOne {
+	_u.mutation.SetComments(v)
+	return _u
 }
 
 // SetNillableComments sets the "comments" field if the given value is not nil.
-func (meuo *MsgEventUpdateOne) SetNillableComments(s *string) *MsgEventUpdateOne {
-	if s != nil {
-		meuo.SetComments(*s)
+func (_u *MsgEventUpdateOne) SetNillableComments(v *string) *MsgEventUpdateOne {
+	if v != nil {
+		_u.SetComments(*v)
 	}
-	return meuo
+	return _u
 }
 
 // ClearComments clears the value of the "comments" field.
-func (meuo *MsgEventUpdateOne) ClearComments() *MsgEventUpdateOne {
-	meuo.mutation.ClearComments()
-	return meuo
+func (_u *MsgEventUpdateOne) ClearComments() *MsgEventUpdateOne {
+	_u.mutation.ClearComments()
+	return _u
 }
 
 // SetRoute sets the "route" field.
-func (meuo *MsgEventUpdateOne) SetRoute(pr *profile.Route) *MsgEventUpdateOne {
-	meuo.mutation.SetRoute(pr)
-	return meuo
+func (_u *MsgEventUpdateOne) SetRoute(v *profile.Route) *MsgEventUpdateOne {
+	_u.mutation.SetRoute(v)
+	return _u
 }
 
 // ClearRoute clears the value of the "route" field.
-func (meuo *MsgEventUpdateOne) ClearRoute() *MsgEventUpdateOne {
-	meuo.mutation.ClearRoute()
-	return meuo
+func (_u *MsgEventUpdateOne) ClearRoute() *MsgEventUpdateOne {
+	_u.mutation.ClearRoute()
+	return _u
 }
 
 // SetModes sets the "modes" field.
-func (meuo *MsgEventUpdateOne) SetModes(s string) *MsgEventUpdateOne {
-	meuo.mutation.SetModes(s)
-	return meuo
+func (_u *MsgEventUpdateOne) SetModes(v string) *MsgEventUpdateOne {
+	_u.mutation.SetModes(v)
+	return _u
 }
 
 // SetNillableModes sets the "modes" field if the given value is not nil.
-func (meuo *MsgEventUpdateOne) SetNillableModes(s *string) *MsgEventUpdateOne {
-	if s != nil {
-		meuo.SetModes(*s)
+func (_u *MsgEventUpdateOne) SetNillableModes(v *string) *MsgEventUpdateOne {
+	if v != nil {
+		_u.SetModes(*v)
 	}
-	return meuo
+	return _u
 }
 
 // SetMsgType sets the "msg_type" edge to the MsgType entity.
-func (meuo *MsgEventUpdateOne) SetMsgType(m *MsgType) *MsgEventUpdateOne {
-	return meuo.SetMsgTypeID(m.ID)
+func (_u *MsgEventUpdateOne) SetMsgType(v *MsgType) *MsgEventUpdateOne {
+	return _u.SetMsgTypeID(v.ID)
 }
 
 // AddCustomerTemplateIDs adds the "customer_template" edge to the MsgTemplate entity by IDs.
-func (meuo *MsgEventUpdateOne) AddCustomerTemplateIDs(ids ...int) *MsgEventUpdateOne {
-	meuo.mutation.AddCustomerTemplateIDs(ids...)
-	return meuo
+func (_u *MsgEventUpdateOne) AddCustomerTemplateIDs(ids ...int) *MsgEventUpdateOne {
+	_u.mutation.AddCustomerTemplateIDs(ids...)
+	return _u
 }
 
 // AddCustomerTemplate adds the "customer_template" edges to the MsgTemplate entity.
-func (meuo *MsgEventUpdateOne) AddCustomerTemplate(m ...*MsgTemplate) *MsgEventUpdateOne {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *MsgEventUpdateOne) AddCustomerTemplate(v ...*MsgTemplate) *MsgEventUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return meuo.AddCustomerTemplateIDs(ids...)
+	return _u.AddCustomerTemplateIDs(ids...)
 }
 
 // Mutation returns the MsgEventMutation object of the builder.
-func (meuo *MsgEventUpdateOne) Mutation() *MsgEventMutation {
-	return meuo.mutation
+func (_u *MsgEventUpdateOne) Mutation() *MsgEventMutation {
+	return _u.mutation
 }
 
 // ClearMsgType clears the "msg_type" edge to the MsgType entity.
-func (meuo *MsgEventUpdateOne) ClearMsgType() *MsgEventUpdateOne {
-	meuo.mutation.ClearMsgType()
-	return meuo
+func (_u *MsgEventUpdateOne) ClearMsgType() *MsgEventUpdateOne {
+	_u.mutation.ClearMsgType()
+	return _u
 }
 
 // ClearCustomerTemplate clears all "customer_template" edges to the MsgTemplate entity.
-func (meuo *MsgEventUpdateOne) ClearCustomerTemplate() *MsgEventUpdateOne {
-	meuo.mutation.ClearCustomerTemplate()
-	return meuo
+func (_u *MsgEventUpdateOne) ClearCustomerTemplate() *MsgEventUpdateOne {
+	_u.mutation.ClearCustomerTemplate()
+	return _u
 }
 
 // RemoveCustomerTemplateIDs removes the "customer_template" edge to MsgTemplate entities by IDs.
-func (meuo *MsgEventUpdateOne) RemoveCustomerTemplateIDs(ids ...int) *MsgEventUpdateOne {
-	meuo.mutation.RemoveCustomerTemplateIDs(ids...)
-	return meuo
+func (_u *MsgEventUpdateOne) RemoveCustomerTemplateIDs(ids ...int) *MsgEventUpdateOne {
+	_u.mutation.RemoveCustomerTemplateIDs(ids...)
+	return _u
 }
 
 // RemoveCustomerTemplate removes "customer_template" edges to MsgTemplate entities.
-func (meuo *MsgEventUpdateOne) RemoveCustomerTemplate(m ...*MsgTemplate) *MsgEventUpdateOne {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *MsgEventUpdateOne) RemoveCustomerTemplate(v ...*MsgTemplate) *MsgEventUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return meuo.RemoveCustomerTemplateIDs(ids...)
+	return _u.RemoveCustomerTemplateIDs(ids...)
 }
 
 // Where appends a list predicates to the MsgEventUpdate builder.
-func (meuo *MsgEventUpdateOne) Where(ps ...predicate.MsgEvent) *MsgEventUpdateOne {
-	meuo.mutation.Where(ps...)
-	return meuo
+func (_u *MsgEventUpdateOne) Where(ps ...predicate.MsgEvent) *MsgEventUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (meuo *MsgEventUpdateOne) Select(field string, fields ...string) *MsgEventUpdateOne {
-	meuo.fields = append([]string{field}, fields...)
-	return meuo
+func (_u *MsgEventUpdateOne) Select(field string, fields ...string) *MsgEventUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated MsgEvent entity.
-func (meuo *MsgEventUpdateOne) Save(ctx context.Context) (*MsgEvent, error) {
-	return withHooks(ctx, meuo.sqlSave, meuo.mutation, meuo.hooks)
+func (_u *MsgEventUpdateOne) Save(ctx context.Context) (*MsgEvent, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (meuo *MsgEventUpdateOne) SaveX(ctx context.Context) *MsgEvent {
-	node, err := meuo.Save(ctx)
+func (_u *MsgEventUpdateOne) SaveX(ctx context.Context) *MsgEvent {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -650,52 +650,52 @@ func (meuo *MsgEventUpdateOne) SaveX(ctx context.Context) *MsgEvent {
 }
 
 // Exec executes the query on the entity.
-func (meuo *MsgEventUpdateOne) Exec(ctx context.Context) error {
-	_, err := meuo.Save(ctx)
+func (_u *MsgEventUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (meuo *MsgEventUpdateOne) ExecX(ctx context.Context) {
-	if err := meuo.Exec(ctx); err != nil {
+func (_u *MsgEventUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (meuo *MsgEventUpdateOne) check() error {
-	if v, ok := meuo.mutation.Name(); ok {
+func (_u *MsgEventUpdateOne) check() error {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := msgevent.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "MsgEvent.name": %w`, err)}
 		}
 	}
-	if v, ok := meuo.mutation.Status(); ok {
+	if v, ok := _u.mutation.Status(); ok {
 		if err := msgevent.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "MsgEvent.status": %w`, err)}
 		}
 	}
-	if v, ok := meuo.mutation.Route(); ok {
+	if v, ok := _u.mutation.Route(); ok {
 		if err := v.Validate(); err != nil {
 			return &ValidationError{Name: "route", err: fmt.Errorf(`ent: validator failed for field "MsgEvent.route": %w`, err)}
 		}
 	}
-	if meuo.mutation.MsgTypeCleared() && len(meuo.mutation.MsgTypeIDs()) > 0 {
+	if _u.mutation.MsgTypeCleared() && len(_u.mutation.MsgTypeIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgEvent.msg_type"`)
 	}
 	return nil
 }
 
-func (meuo *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, err error) {
-	if err := meuo.check(); err != nil {
+func (_u *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(msgevent.Table, msgevent.Columns, sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt))
-	id, ok := meuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "MsgEvent.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := meuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, msgevent.FieldID)
 		for _, f := range fields {
@@ -707,53 +707,53 @@ func (meuo *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, er
 			}
 		}
 	}
-	if ps := meuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := meuo.mutation.UpdatedBy(); ok {
+	if value, ok := _u.mutation.UpdatedBy(); ok {
 		_spec.SetField(msgevent.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if value, ok := meuo.mutation.AddedUpdatedBy(); ok {
+	if value, ok := _u.mutation.AddedUpdatedBy(); ok {
 		_spec.AddField(msgevent.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if meuo.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		_spec.ClearField(msgevent.FieldUpdatedBy, field.TypeInt)
 	}
-	if value, ok := meuo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgevent.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if meuo.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(msgevent.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := meuo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(msgevent.FieldName, field.TypeString, value)
 	}
-	if value, ok := meuo.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(msgevent.FieldStatus, field.TypeEnum, value)
 	}
-	if meuo.mutation.StatusCleared() {
+	if _u.mutation.StatusCleared() {
 		_spec.ClearField(msgevent.FieldStatus, field.TypeEnum)
 	}
-	if value, ok := meuo.mutation.Comments(); ok {
+	if value, ok := _u.mutation.Comments(); ok {
 		_spec.SetField(msgevent.FieldComments, field.TypeString, value)
 	}
-	if meuo.mutation.CommentsCleared() {
+	if _u.mutation.CommentsCleared() {
 		_spec.ClearField(msgevent.FieldComments, field.TypeString)
 	}
-	if value, ok := meuo.mutation.Route(); ok {
+	if value, ok := _u.mutation.Route(); ok {
 		_spec.SetField(msgevent.FieldRoute, field.TypeJSON, value)
 	}
-	if meuo.mutation.RouteCleared() {
+	if _u.mutation.RouteCleared() {
 		_spec.ClearField(msgevent.FieldRoute, field.TypeJSON)
 	}
-	if value, ok := meuo.mutation.Modes(); ok {
+	if value, ok := _u.mutation.Modes(); ok {
 		_spec.SetField(msgevent.FieldModes, field.TypeString, value)
 	}
-	if meuo.mutation.MsgTypeCleared() {
+	if _u.mutation.MsgTypeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -764,10 +764,10 @@ func (meuo *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, er
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = meuo.schemaConfig.MsgEvent
+		edge.Schema = _u.schemaConfig.MsgEvent
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := meuo.mutation.MsgTypeIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.MsgTypeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -778,13 +778,13 @@ func (meuo *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, er
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = meuo.schemaConfig.MsgEvent
+		edge.Schema = _u.schemaConfig.MsgEvent
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if meuo.mutation.CustomerTemplateCleared() {
+	if _u.mutation.CustomerTemplateCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -795,10 +795,10 @@ func (meuo *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, er
 				IDSpec: sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = meuo.schemaConfig.MsgTemplate
+		edge.Schema = _u.schemaConfig.MsgTemplate
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := meuo.mutation.RemovedCustomerTemplateIDs(); len(nodes) > 0 && !meuo.mutation.CustomerTemplateCleared() {
+	if nodes := _u.mutation.RemovedCustomerTemplateIDs(); len(nodes) > 0 && !_u.mutation.CustomerTemplateCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -809,13 +809,13 @@ func (meuo *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, er
 				IDSpec: sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = meuo.schemaConfig.MsgTemplate
+		edge.Schema = _u.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := meuo.mutation.CustomerTemplateIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CustomerTemplateIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -826,18 +826,18 @@ func (meuo *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, er
 				IDSpec: sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = meuo.schemaConfig.MsgTemplate
+		edge.Schema = _u.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Node.Schema = meuo.schemaConfig.MsgEvent
-	ctx = internal.NewSchemaConfigContext(ctx, meuo.schemaConfig)
-	_node = &MsgEvent{config: meuo.config}
+	_spec.Node.Schema = _u.schemaConfig.MsgEvent
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	_node = &MsgEvent{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, meuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgevent.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -845,6 +845,6 @@ func (meuo *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, er
 		}
 		return nil, err
 	}
-	meuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

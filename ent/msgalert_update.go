@@ -29,250 +29,250 @@ type MsgAlertUpdate struct {
 }
 
 // Where appends a list predicates to the MsgAlertUpdate builder.
-func (mau *MsgAlertUpdate) Where(ps ...predicate.MsgAlert) *MsgAlertUpdate {
-	mau.mutation.Where(ps...)
-	return mau
+func (_u *MsgAlertUpdate) Where(ps ...predicate.MsgAlert) *MsgAlertUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetLabels sets the "labels" field.
-func (mau *MsgAlertUpdate) SetLabels(ls *label.LabelSet) *MsgAlertUpdate {
-	mau.mutation.SetLabels(ls)
-	return mau
+func (_u *MsgAlertUpdate) SetLabels(v *label.LabelSet) *MsgAlertUpdate {
+	_u.mutation.SetLabels(v)
+	return _u
 }
 
 // ClearLabels clears the value of the "labels" field.
-func (mau *MsgAlertUpdate) ClearLabels() *MsgAlertUpdate {
-	mau.mutation.ClearLabels()
-	return mau
+func (_u *MsgAlertUpdate) ClearLabels() *MsgAlertUpdate {
+	_u.mutation.ClearLabels()
+	return _u
 }
 
 // SetAnnotations sets the "annotations" field.
-func (mau *MsgAlertUpdate) SetAnnotations(ls *label.LabelSet) *MsgAlertUpdate {
-	mau.mutation.SetAnnotations(ls)
-	return mau
+func (_u *MsgAlertUpdate) SetAnnotations(v *label.LabelSet) *MsgAlertUpdate {
+	_u.mutation.SetAnnotations(v)
+	return _u
 }
 
 // ClearAnnotations clears the value of the "annotations" field.
-func (mau *MsgAlertUpdate) ClearAnnotations() *MsgAlertUpdate {
-	mau.mutation.ClearAnnotations()
-	return mau
+func (_u *MsgAlertUpdate) ClearAnnotations() *MsgAlertUpdate {
+	_u.mutation.ClearAnnotations()
+	return _u
 }
 
 // SetStartsAt sets the "starts_at" field.
-func (mau *MsgAlertUpdate) SetStartsAt(t time.Time) *MsgAlertUpdate {
-	mau.mutation.SetStartsAt(t)
-	return mau
+func (_u *MsgAlertUpdate) SetStartsAt(v time.Time) *MsgAlertUpdate {
+	_u.mutation.SetStartsAt(v)
+	return _u
 }
 
 // SetNillableStartsAt sets the "starts_at" field if the given value is not nil.
-func (mau *MsgAlertUpdate) SetNillableStartsAt(t *time.Time) *MsgAlertUpdate {
-	if t != nil {
-		mau.SetStartsAt(*t)
+func (_u *MsgAlertUpdate) SetNillableStartsAt(v *time.Time) *MsgAlertUpdate {
+	if v != nil {
+		_u.SetStartsAt(*v)
 	}
-	return mau
+	return _u
 }
 
 // SetEndsAt sets the "ends_at" field.
-func (mau *MsgAlertUpdate) SetEndsAt(t time.Time) *MsgAlertUpdate {
-	mau.mutation.SetEndsAt(t)
-	return mau
+func (_u *MsgAlertUpdate) SetEndsAt(v time.Time) *MsgAlertUpdate {
+	_u.mutation.SetEndsAt(v)
+	return _u
 }
 
 // SetNillableEndsAt sets the "ends_at" field if the given value is not nil.
-func (mau *MsgAlertUpdate) SetNillableEndsAt(t *time.Time) *MsgAlertUpdate {
-	if t != nil {
-		mau.SetEndsAt(*t)
+func (_u *MsgAlertUpdate) SetNillableEndsAt(v *time.Time) *MsgAlertUpdate {
+	if v != nil {
+		_u.SetEndsAt(*v)
 	}
-	return mau
+	return _u
 }
 
 // ClearEndsAt clears the value of the "ends_at" field.
-func (mau *MsgAlertUpdate) ClearEndsAt() *MsgAlertUpdate {
-	mau.mutation.ClearEndsAt()
-	return mau
+func (_u *MsgAlertUpdate) ClearEndsAt() *MsgAlertUpdate {
+	_u.mutation.ClearEndsAt()
+	return _u
 }
 
 // SetURL sets the "url" field.
-func (mau *MsgAlertUpdate) SetURL(s string) *MsgAlertUpdate {
-	mau.mutation.SetURL(s)
-	return mau
+func (_u *MsgAlertUpdate) SetURL(v string) *MsgAlertUpdate {
+	_u.mutation.SetURL(v)
+	return _u
 }
 
 // SetNillableURL sets the "url" field if the given value is not nil.
-func (mau *MsgAlertUpdate) SetNillableURL(s *string) *MsgAlertUpdate {
-	if s != nil {
-		mau.SetURL(*s)
+func (_u *MsgAlertUpdate) SetNillableURL(v *string) *MsgAlertUpdate {
+	if v != nil {
+		_u.SetURL(*v)
 	}
-	return mau
+	return _u
 }
 
 // ClearURL clears the value of the "url" field.
-func (mau *MsgAlertUpdate) ClearURL() *MsgAlertUpdate {
-	mau.mutation.ClearURL()
-	return mau
+func (_u *MsgAlertUpdate) ClearURL() *MsgAlertUpdate {
+	_u.mutation.ClearURL()
+	return _u
 }
 
 // SetTimeout sets the "timeout" field.
-func (mau *MsgAlertUpdate) SetTimeout(b bool) *MsgAlertUpdate {
-	mau.mutation.SetTimeout(b)
-	return mau
+func (_u *MsgAlertUpdate) SetTimeout(v bool) *MsgAlertUpdate {
+	_u.mutation.SetTimeout(v)
+	return _u
 }
 
 // SetNillableTimeout sets the "timeout" field if the given value is not nil.
-func (mau *MsgAlertUpdate) SetNillableTimeout(b *bool) *MsgAlertUpdate {
-	if b != nil {
-		mau.SetTimeout(*b)
+func (_u *MsgAlertUpdate) SetNillableTimeout(v *bool) *MsgAlertUpdate {
+	if v != nil {
+		_u.SetTimeout(*v)
 	}
-	return mau
+	return _u
 }
 
 // SetFingerprint sets the "fingerprint" field.
-func (mau *MsgAlertUpdate) SetFingerprint(s string) *MsgAlertUpdate {
-	mau.mutation.SetFingerprint(s)
-	return mau
+func (_u *MsgAlertUpdate) SetFingerprint(v string) *MsgAlertUpdate {
+	_u.mutation.SetFingerprint(v)
+	return _u
 }
 
 // SetNillableFingerprint sets the "fingerprint" field if the given value is not nil.
-func (mau *MsgAlertUpdate) SetNillableFingerprint(s *string) *MsgAlertUpdate {
-	if s != nil {
-		mau.SetFingerprint(*s)
+func (_u *MsgAlertUpdate) SetNillableFingerprint(v *string) *MsgAlertUpdate {
+	if v != nil {
+		_u.SetFingerprint(*v)
 	}
-	return mau
+	return _u
 }
 
 // SetState sets the "state" field.
-func (mau *MsgAlertUpdate) SetState(as alert.AlertStatus) *MsgAlertUpdate {
-	mau.mutation.SetState(as)
-	return mau
+func (_u *MsgAlertUpdate) SetState(v alert.AlertStatus) *MsgAlertUpdate {
+	_u.mutation.SetState(v)
+	return _u
 }
 
 // SetNillableState sets the "state" field if the given value is not nil.
-func (mau *MsgAlertUpdate) SetNillableState(as *alert.AlertStatus) *MsgAlertUpdate {
-	if as != nil {
-		mau.SetState(*as)
+func (_u *MsgAlertUpdate) SetNillableState(v *alert.AlertStatus) *MsgAlertUpdate {
+	if v != nil {
+		_u.SetState(*v)
 	}
-	return mau
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (mau *MsgAlertUpdate) SetUpdatedAt(t time.Time) *MsgAlertUpdate {
-	mau.mutation.SetUpdatedAt(t)
-	return mau
+func (_u *MsgAlertUpdate) SetUpdatedAt(v time.Time) *MsgAlertUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (mau *MsgAlertUpdate) SetNillableUpdatedAt(t *time.Time) *MsgAlertUpdate {
-	if t != nil {
-		mau.SetUpdatedAt(*t)
+func (_u *MsgAlertUpdate) SetNillableUpdatedAt(v *time.Time) *MsgAlertUpdate {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return mau
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (mau *MsgAlertUpdate) ClearUpdatedAt() *MsgAlertUpdate {
-	mau.mutation.ClearUpdatedAt()
-	return mau
+func (_u *MsgAlertUpdate) ClearUpdatedAt() *MsgAlertUpdate {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetDeleted sets the "deleted" field.
-func (mau *MsgAlertUpdate) SetDeleted(b bool) *MsgAlertUpdate {
-	mau.mutation.SetDeleted(b)
-	return mau
+func (_u *MsgAlertUpdate) SetDeleted(v bool) *MsgAlertUpdate {
+	_u.mutation.SetDeleted(v)
+	return _u
 }
 
 // SetNillableDeleted sets the "deleted" field if the given value is not nil.
-func (mau *MsgAlertUpdate) SetNillableDeleted(b *bool) *MsgAlertUpdate {
-	if b != nil {
-		mau.SetDeleted(*b)
+func (_u *MsgAlertUpdate) SetNillableDeleted(v *bool) *MsgAlertUpdate {
+	if v != nil {
+		_u.SetDeleted(*v)
 	}
-	return mau
+	return _u
 }
 
 // AddNlogIDs adds the "nlog" edge to the Nlog entity by IDs.
-func (mau *MsgAlertUpdate) AddNlogIDs(ids ...int) *MsgAlertUpdate {
-	mau.mutation.AddNlogIDs(ids...)
-	return mau
+func (_u *MsgAlertUpdate) AddNlogIDs(ids ...int) *MsgAlertUpdate {
+	_u.mutation.AddNlogIDs(ids...)
+	return _u
 }
 
 // AddNlog adds the "nlog" edges to the Nlog entity.
-func (mau *MsgAlertUpdate) AddNlog(n ...*Nlog) *MsgAlertUpdate {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *MsgAlertUpdate) AddNlog(v ...*Nlog) *MsgAlertUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return mau.AddNlogIDs(ids...)
+	return _u.AddNlogIDs(ids...)
 }
 
 // AddNlogAlertIDs adds the "nlog_alerts" edge to the NlogAlert entity by IDs.
-func (mau *MsgAlertUpdate) AddNlogAlertIDs(ids ...int) *MsgAlertUpdate {
-	mau.mutation.AddNlogAlertIDs(ids...)
-	return mau
+func (_u *MsgAlertUpdate) AddNlogAlertIDs(ids ...int) *MsgAlertUpdate {
+	_u.mutation.AddNlogAlertIDs(ids...)
+	return _u
 }
 
 // AddNlogAlerts adds the "nlog_alerts" edges to the NlogAlert entity.
-func (mau *MsgAlertUpdate) AddNlogAlerts(n ...*NlogAlert) *MsgAlertUpdate {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *MsgAlertUpdate) AddNlogAlerts(v ...*NlogAlert) *MsgAlertUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return mau.AddNlogAlertIDs(ids...)
+	return _u.AddNlogAlertIDs(ids...)
 }
 
 // Mutation returns the MsgAlertMutation object of the builder.
-func (mau *MsgAlertUpdate) Mutation() *MsgAlertMutation {
-	return mau.mutation
+func (_u *MsgAlertUpdate) Mutation() *MsgAlertMutation {
+	return _u.mutation
 }
 
 // ClearNlog clears all "nlog" edges to the Nlog entity.
-func (mau *MsgAlertUpdate) ClearNlog() *MsgAlertUpdate {
-	mau.mutation.ClearNlog()
-	return mau
+func (_u *MsgAlertUpdate) ClearNlog() *MsgAlertUpdate {
+	_u.mutation.ClearNlog()
+	return _u
 }
 
 // RemoveNlogIDs removes the "nlog" edge to Nlog entities by IDs.
-func (mau *MsgAlertUpdate) RemoveNlogIDs(ids ...int) *MsgAlertUpdate {
-	mau.mutation.RemoveNlogIDs(ids...)
-	return mau
+func (_u *MsgAlertUpdate) RemoveNlogIDs(ids ...int) *MsgAlertUpdate {
+	_u.mutation.RemoveNlogIDs(ids...)
+	return _u
 }
 
 // RemoveNlog removes "nlog" edges to Nlog entities.
-func (mau *MsgAlertUpdate) RemoveNlog(n ...*Nlog) *MsgAlertUpdate {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *MsgAlertUpdate) RemoveNlog(v ...*Nlog) *MsgAlertUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return mau.RemoveNlogIDs(ids...)
+	return _u.RemoveNlogIDs(ids...)
 }
 
 // ClearNlogAlerts clears all "nlog_alerts" edges to the NlogAlert entity.
-func (mau *MsgAlertUpdate) ClearNlogAlerts() *MsgAlertUpdate {
-	mau.mutation.ClearNlogAlerts()
-	return mau
+func (_u *MsgAlertUpdate) ClearNlogAlerts() *MsgAlertUpdate {
+	_u.mutation.ClearNlogAlerts()
+	return _u
 }
 
 // RemoveNlogAlertIDs removes the "nlog_alerts" edge to NlogAlert entities by IDs.
-func (mau *MsgAlertUpdate) RemoveNlogAlertIDs(ids ...int) *MsgAlertUpdate {
-	mau.mutation.RemoveNlogAlertIDs(ids...)
-	return mau
+func (_u *MsgAlertUpdate) RemoveNlogAlertIDs(ids ...int) *MsgAlertUpdate {
+	_u.mutation.RemoveNlogAlertIDs(ids...)
+	return _u
 }
 
 // RemoveNlogAlerts removes "nlog_alerts" edges to NlogAlert entities.
-func (mau *MsgAlertUpdate) RemoveNlogAlerts(n ...*NlogAlert) *MsgAlertUpdate {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *MsgAlertUpdate) RemoveNlogAlerts(v ...*NlogAlert) *MsgAlertUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return mau.RemoveNlogAlertIDs(ids...)
+	return _u.RemoveNlogAlertIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (mau *MsgAlertUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, mau.sqlSave, mau.mutation, mau.hooks)
+func (_u *MsgAlertUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mau *MsgAlertUpdate) SaveX(ctx context.Context) int {
-	affected, err := mau.Save(ctx)
+func (_u *MsgAlertUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -280,96 +280,99 @@ func (mau *MsgAlertUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (mau *MsgAlertUpdate) Exec(ctx context.Context) error {
-	_, err := mau.Save(ctx)
+func (_u *MsgAlertUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mau *MsgAlertUpdate) ExecX(ctx context.Context) {
-	if err := mau.Exec(ctx); err != nil {
+func (_u *MsgAlertUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mau *MsgAlertUpdate) check() error {
-	if v, ok := mau.mutation.Labels(); ok {
+func (_u *MsgAlertUpdate) check() error {
+	if v, ok := _u.mutation.Labels(); ok {
 		if err := v.Validate(); err != nil {
 			return &ValidationError{Name: "labels", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.labels": %w`, err)}
 		}
 	}
-	if v, ok := mau.mutation.Annotations(); ok {
+	if v, ok := _u.mutation.Annotations(); ok {
 		if err := v.Validate(); err != nil {
 			return &ValidationError{Name: "annotations", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.annotations": %w`, err)}
 		}
 	}
-	if v, ok := mau.mutation.State(); ok {
+	if v, ok := _u.mutation.State(); ok {
 		if err := msgalert.StateValidator(v); err != nil {
 			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.state": %w`, err)}
 		}
 	}
+	if _u.mutation.OrgCleared() && len(_u.mutation.OrgIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "MsgAlert.org"`)
+	}
 	return nil
 }
 
-func (mau *MsgAlertUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := mau.check(); err != nil {
-		return n, err
+func (_u *MsgAlertUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(msgalert.Table, msgalert.Columns, sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt))
-	if ps := mau.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := mau.mutation.Labels(); ok {
+	if value, ok := _u.mutation.Labels(); ok {
 		_spec.SetField(msgalert.FieldLabels, field.TypeJSON, value)
 	}
-	if mau.mutation.LabelsCleared() {
+	if _u.mutation.LabelsCleared() {
 		_spec.ClearField(msgalert.FieldLabels, field.TypeJSON)
 	}
-	if value, ok := mau.mutation.Annotations(); ok {
+	if value, ok := _u.mutation.Annotations(); ok {
 		_spec.SetField(msgalert.FieldAnnotations, field.TypeJSON, value)
 	}
-	if mau.mutation.AnnotationsCleared() {
+	if _u.mutation.AnnotationsCleared() {
 		_spec.ClearField(msgalert.FieldAnnotations, field.TypeJSON)
 	}
-	if value, ok := mau.mutation.StartsAt(); ok {
+	if value, ok := _u.mutation.StartsAt(); ok {
 		_spec.SetField(msgalert.FieldStartsAt, field.TypeTime, value)
 	}
-	if value, ok := mau.mutation.EndsAt(); ok {
+	if value, ok := _u.mutation.EndsAt(); ok {
 		_spec.SetField(msgalert.FieldEndsAt, field.TypeTime, value)
 	}
-	if mau.mutation.EndsAtCleared() {
+	if _u.mutation.EndsAtCleared() {
 		_spec.ClearField(msgalert.FieldEndsAt, field.TypeTime)
 	}
-	if value, ok := mau.mutation.URL(); ok {
+	if value, ok := _u.mutation.URL(); ok {
 		_spec.SetField(msgalert.FieldURL, field.TypeString, value)
 	}
-	if mau.mutation.URLCleared() {
+	if _u.mutation.URLCleared() {
 		_spec.ClearField(msgalert.FieldURL, field.TypeString)
 	}
-	if value, ok := mau.mutation.Timeout(); ok {
+	if value, ok := _u.mutation.Timeout(); ok {
 		_spec.SetField(msgalert.FieldTimeout, field.TypeBool, value)
 	}
-	if value, ok := mau.mutation.Fingerprint(); ok {
+	if value, ok := _u.mutation.Fingerprint(); ok {
 		_spec.SetField(msgalert.FieldFingerprint, field.TypeString, value)
 	}
-	if value, ok := mau.mutation.State(); ok {
+	if value, ok := _u.mutation.State(); ok {
 		_spec.SetField(msgalert.FieldState, field.TypeEnum, value)
 	}
-	if value, ok := mau.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgalert.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if mau.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(msgalert.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := mau.mutation.Deleted(); ok {
+	if value, ok := _u.mutation.Deleted(); ok {
 		_spec.SetField(msgalert.FieldDeleted, field.TypeBool, value)
 	}
-	if mau.mutation.NlogCleared() {
+	if _u.mutation.NlogCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -380,14 +383,14 @@ func (mau *MsgAlertUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(nlog.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mau.schemaConfig.NlogAlert
-		createE := &NlogAlertCreate{config: mau.config, mutation: newNlogAlertMutation(mau.config, OpCreate)}
+		edge.Schema = _u.schemaConfig.NlogAlert
+		createE := &NlogAlertCreate{config: _u.config, mutation: newNlogAlertMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mau.mutation.RemovedNlogIDs(); len(nodes) > 0 && !mau.mutation.NlogCleared() {
+	if nodes := _u.mutation.RemovedNlogIDs(); len(nodes) > 0 && !_u.mutation.NlogCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -398,17 +401,17 @@ func (mau *MsgAlertUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(nlog.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mau.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &NlogAlertCreate{config: mau.config, mutation: newNlogAlertMutation(mau.config, OpCreate)}
+		createE := &NlogAlertCreate{config: _u.config, mutation: newNlogAlertMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mau.mutation.NlogIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NlogIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -419,17 +422,17 @@ func (mau *MsgAlertUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(nlog.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mau.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &NlogAlertCreate{config: mau.config, mutation: newNlogAlertMutation(mau.config, OpCreate)}
+		createE := &NlogAlertCreate{config: _u.config, mutation: newNlogAlertMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if mau.mutation.NlogAlertsCleared() {
+	if _u.mutation.NlogAlertsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -440,10 +443,10 @@ func (mau *MsgAlertUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(nlogalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mau.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mau.mutation.RemovedNlogAlertsIDs(); len(nodes) > 0 && !mau.mutation.NlogAlertsCleared() {
+	if nodes := _u.mutation.RemovedNlogAlertsIDs(); len(nodes) > 0 && !_u.mutation.NlogAlertsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -454,13 +457,13 @@ func (mau *MsgAlertUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(nlogalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mau.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mau.mutation.NlogAlertsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NlogAlertsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -471,15 +474,15 @@ func (mau *MsgAlertUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(nlogalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mau.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Node.Schema = mau.schemaConfig.MsgAlert
-	ctx = internal.NewSchemaConfigContext(ctx, mau.schemaConfig)
-	if n, err = sqlgraph.UpdateNodes(ctx, mau.driver, _spec); err != nil {
+	_spec.Node.Schema = _u.schemaConfig.MsgAlert
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgalert.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -487,8 +490,8 @@ func (mau *MsgAlertUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	mau.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // MsgAlertUpdateOne is the builder for updating a single MsgAlert entity.
@@ -500,257 +503,257 @@ type MsgAlertUpdateOne struct {
 }
 
 // SetLabels sets the "labels" field.
-func (mauo *MsgAlertUpdateOne) SetLabels(ls *label.LabelSet) *MsgAlertUpdateOne {
-	mauo.mutation.SetLabels(ls)
-	return mauo
+func (_u *MsgAlertUpdateOne) SetLabels(v *label.LabelSet) *MsgAlertUpdateOne {
+	_u.mutation.SetLabels(v)
+	return _u
 }
 
 // ClearLabels clears the value of the "labels" field.
-func (mauo *MsgAlertUpdateOne) ClearLabels() *MsgAlertUpdateOne {
-	mauo.mutation.ClearLabels()
-	return mauo
+func (_u *MsgAlertUpdateOne) ClearLabels() *MsgAlertUpdateOne {
+	_u.mutation.ClearLabels()
+	return _u
 }
 
 // SetAnnotations sets the "annotations" field.
-func (mauo *MsgAlertUpdateOne) SetAnnotations(ls *label.LabelSet) *MsgAlertUpdateOne {
-	mauo.mutation.SetAnnotations(ls)
-	return mauo
+func (_u *MsgAlertUpdateOne) SetAnnotations(v *label.LabelSet) *MsgAlertUpdateOne {
+	_u.mutation.SetAnnotations(v)
+	return _u
 }
 
 // ClearAnnotations clears the value of the "annotations" field.
-func (mauo *MsgAlertUpdateOne) ClearAnnotations() *MsgAlertUpdateOne {
-	mauo.mutation.ClearAnnotations()
-	return mauo
+func (_u *MsgAlertUpdateOne) ClearAnnotations() *MsgAlertUpdateOne {
+	_u.mutation.ClearAnnotations()
+	return _u
 }
 
 // SetStartsAt sets the "starts_at" field.
-func (mauo *MsgAlertUpdateOne) SetStartsAt(t time.Time) *MsgAlertUpdateOne {
-	mauo.mutation.SetStartsAt(t)
-	return mauo
+func (_u *MsgAlertUpdateOne) SetStartsAt(v time.Time) *MsgAlertUpdateOne {
+	_u.mutation.SetStartsAt(v)
+	return _u
 }
 
 // SetNillableStartsAt sets the "starts_at" field if the given value is not nil.
-func (mauo *MsgAlertUpdateOne) SetNillableStartsAt(t *time.Time) *MsgAlertUpdateOne {
-	if t != nil {
-		mauo.SetStartsAt(*t)
+func (_u *MsgAlertUpdateOne) SetNillableStartsAt(v *time.Time) *MsgAlertUpdateOne {
+	if v != nil {
+		_u.SetStartsAt(*v)
 	}
-	return mauo
+	return _u
 }
 
 // SetEndsAt sets the "ends_at" field.
-func (mauo *MsgAlertUpdateOne) SetEndsAt(t time.Time) *MsgAlertUpdateOne {
-	mauo.mutation.SetEndsAt(t)
-	return mauo
+func (_u *MsgAlertUpdateOne) SetEndsAt(v time.Time) *MsgAlertUpdateOne {
+	_u.mutation.SetEndsAt(v)
+	return _u
 }
 
 // SetNillableEndsAt sets the "ends_at" field if the given value is not nil.
-func (mauo *MsgAlertUpdateOne) SetNillableEndsAt(t *time.Time) *MsgAlertUpdateOne {
-	if t != nil {
-		mauo.SetEndsAt(*t)
+func (_u *MsgAlertUpdateOne) SetNillableEndsAt(v *time.Time) *MsgAlertUpdateOne {
+	if v != nil {
+		_u.SetEndsAt(*v)
 	}
-	return mauo
+	return _u
 }
 
 // ClearEndsAt clears the value of the "ends_at" field.
-func (mauo *MsgAlertUpdateOne) ClearEndsAt() *MsgAlertUpdateOne {
-	mauo.mutation.ClearEndsAt()
-	return mauo
+func (_u *MsgAlertUpdateOne) ClearEndsAt() *MsgAlertUpdateOne {
+	_u.mutation.ClearEndsAt()
+	return _u
 }
 
 // SetURL sets the "url" field.
-func (mauo *MsgAlertUpdateOne) SetURL(s string) *MsgAlertUpdateOne {
-	mauo.mutation.SetURL(s)
-	return mauo
+func (_u *MsgAlertUpdateOne) SetURL(v string) *MsgAlertUpdateOne {
+	_u.mutation.SetURL(v)
+	return _u
 }
 
 // SetNillableURL sets the "url" field if the given value is not nil.
-func (mauo *MsgAlertUpdateOne) SetNillableURL(s *string) *MsgAlertUpdateOne {
-	if s != nil {
-		mauo.SetURL(*s)
+func (_u *MsgAlertUpdateOne) SetNillableURL(v *string) *MsgAlertUpdateOne {
+	if v != nil {
+		_u.SetURL(*v)
 	}
-	return mauo
+	return _u
 }
 
 // ClearURL clears the value of the "url" field.
-func (mauo *MsgAlertUpdateOne) ClearURL() *MsgAlertUpdateOne {
-	mauo.mutation.ClearURL()
-	return mauo
+func (_u *MsgAlertUpdateOne) ClearURL() *MsgAlertUpdateOne {
+	_u.mutation.ClearURL()
+	return _u
 }
 
 // SetTimeout sets the "timeout" field.
-func (mauo *MsgAlertUpdateOne) SetTimeout(b bool) *MsgAlertUpdateOne {
-	mauo.mutation.SetTimeout(b)
-	return mauo
+func (_u *MsgAlertUpdateOne) SetTimeout(v bool) *MsgAlertUpdateOne {
+	_u.mutation.SetTimeout(v)
+	return _u
 }
 
 // SetNillableTimeout sets the "timeout" field if the given value is not nil.
-func (mauo *MsgAlertUpdateOne) SetNillableTimeout(b *bool) *MsgAlertUpdateOne {
-	if b != nil {
-		mauo.SetTimeout(*b)
+func (_u *MsgAlertUpdateOne) SetNillableTimeout(v *bool) *MsgAlertUpdateOne {
+	if v != nil {
+		_u.SetTimeout(*v)
 	}
-	return mauo
+	return _u
 }
 
 // SetFingerprint sets the "fingerprint" field.
-func (mauo *MsgAlertUpdateOne) SetFingerprint(s string) *MsgAlertUpdateOne {
-	mauo.mutation.SetFingerprint(s)
-	return mauo
+func (_u *MsgAlertUpdateOne) SetFingerprint(v string) *MsgAlertUpdateOne {
+	_u.mutation.SetFingerprint(v)
+	return _u
 }
 
 // SetNillableFingerprint sets the "fingerprint" field if the given value is not nil.
-func (mauo *MsgAlertUpdateOne) SetNillableFingerprint(s *string) *MsgAlertUpdateOne {
-	if s != nil {
-		mauo.SetFingerprint(*s)
+func (_u *MsgAlertUpdateOne) SetNillableFingerprint(v *string) *MsgAlertUpdateOne {
+	if v != nil {
+		_u.SetFingerprint(*v)
 	}
-	return mauo
+	return _u
 }
 
 // SetState sets the "state" field.
-func (mauo *MsgAlertUpdateOne) SetState(as alert.AlertStatus) *MsgAlertUpdateOne {
-	mauo.mutation.SetState(as)
-	return mauo
+func (_u *MsgAlertUpdateOne) SetState(v alert.AlertStatus) *MsgAlertUpdateOne {
+	_u.mutation.SetState(v)
+	return _u
 }
 
 // SetNillableState sets the "state" field if the given value is not nil.
-func (mauo *MsgAlertUpdateOne) SetNillableState(as *alert.AlertStatus) *MsgAlertUpdateOne {
-	if as != nil {
-		mauo.SetState(*as)
+func (_u *MsgAlertUpdateOne) SetNillableState(v *alert.AlertStatus) *MsgAlertUpdateOne {
+	if v != nil {
+		_u.SetState(*v)
 	}
-	return mauo
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (mauo *MsgAlertUpdateOne) SetUpdatedAt(t time.Time) *MsgAlertUpdateOne {
-	mauo.mutation.SetUpdatedAt(t)
-	return mauo
+func (_u *MsgAlertUpdateOne) SetUpdatedAt(v time.Time) *MsgAlertUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (mauo *MsgAlertUpdateOne) SetNillableUpdatedAt(t *time.Time) *MsgAlertUpdateOne {
-	if t != nil {
-		mauo.SetUpdatedAt(*t)
+func (_u *MsgAlertUpdateOne) SetNillableUpdatedAt(v *time.Time) *MsgAlertUpdateOne {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return mauo
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (mauo *MsgAlertUpdateOne) ClearUpdatedAt() *MsgAlertUpdateOne {
-	mauo.mutation.ClearUpdatedAt()
-	return mauo
+func (_u *MsgAlertUpdateOne) ClearUpdatedAt() *MsgAlertUpdateOne {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetDeleted sets the "deleted" field.
-func (mauo *MsgAlertUpdateOne) SetDeleted(b bool) *MsgAlertUpdateOne {
-	mauo.mutation.SetDeleted(b)
-	return mauo
+func (_u *MsgAlertUpdateOne) SetDeleted(v bool) *MsgAlertUpdateOne {
+	_u.mutation.SetDeleted(v)
+	return _u
 }
 
 // SetNillableDeleted sets the "deleted" field if the given value is not nil.
-func (mauo *MsgAlertUpdateOne) SetNillableDeleted(b *bool) *MsgAlertUpdateOne {
-	if b != nil {
-		mauo.SetDeleted(*b)
+func (_u *MsgAlertUpdateOne) SetNillableDeleted(v *bool) *MsgAlertUpdateOne {
+	if v != nil {
+		_u.SetDeleted(*v)
 	}
-	return mauo
+	return _u
 }
 
 // AddNlogIDs adds the "nlog" edge to the Nlog entity by IDs.
-func (mauo *MsgAlertUpdateOne) AddNlogIDs(ids ...int) *MsgAlertUpdateOne {
-	mauo.mutation.AddNlogIDs(ids...)
-	return mauo
+func (_u *MsgAlertUpdateOne) AddNlogIDs(ids ...int) *MsgAlertUpdateOne {
+	_u.mutation.AddNlogIDs(ids...)
+	return _u
 }
 
 // AddNlog adds the "nlog" edges to the Nlog entity.
-func (mauo *MsgAlertUpdateOne) AddNlog(n ...*Nlog) *MsgAlertUpdateOne {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *MsgAlertUpdateOne) AddNlog(v ...*Nlog) *MsgAlertUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return mauo.AddNlogIDs(ids...)
+	return _u.AddNlogIDs(ids...)
 }
 
 // AddNlogAlertIDs adds the "nlog_alerts" edge to the NlogAlert entity by IDs.
-func (mauo *MsgAlertUpdateOne) AddNlogAlertIDs(ids ...int) *MsgAlertUpdateOne {
-	mauo.mutation.AddNlogAlertIDs(ids...)
-	return mauo
+func (_u *MsgAlertUpdateOne) AddNlogAlertIDs(ids ...int) *MsgAlertUpdateOne {
+	_u.mutation.AddNlogAlertIDs(ids...)
+	return _u
 }
 
 // AddNlogAlerts adds the "nlog_alerts" edges to the NlogAlert entity.
-func (mauo *MsgAlertUpdateOne) AddNlogAlerts(n ...*NlogAlert) *MsgAlertUpdateOne {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *MsgAlertUpdateOne) AddNlogAlerts(v ...*NlogAlert) *MsgAlertUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return mauo.AddNlogAlertIDs(ids...)
+	return _u.AddNlogAlertIDs(ids...)
 }
 
 // Mutation returns the MsgAlertMutation object of the builder.
-func (mauo *MsgAlertUpdateOne) Mutation() *MsgAlertMutation {
-	return mauo.mutation
+func (_u *MsgAlertUpdateOne) Mutation() *MsgAlertMutation {
+	return _u.mutation
 }
 
 // ClearNlog clears all "nlog" edges to the Nlog entity.
-func (mauo *MsgAlertUpdateOne) ClearNlog() *MsgAlertUpdateOne {
-	mauo.mutation.ClearNlog()
-	return mauo
+func (_u *MsgAlertUpdateOne) ClearNlog() *MsgAlertUpdateOne {
+	_u.mutation.ClearNlog()
+	return _u
 }
 
 // RemoveNlogIDs removes the "nlog" edge to Nlog entities by IDs.
-func (mauo *MsgAlertUpdateOne) RemoveNlogIDs(ids ...int) *MsgAlertUpdateOne {
-	mauo.mutation.RemoveNlogIDs(ids...)
-	return mauo
+func (_u *MsgAlertUpdateOne) RemoveNlogIDs(ids ...int) *MsgAlertUpdateOne {
+	_u.mutation.RemoveNlogIDs(ids...)
+	return _u
 }
 
 // RemoveNlog removes "nlog" edges to Nlog entities.
-func (mauo *MsgAlertUpdateOne) RemoveNlog(n ...*Nlog) *MsgAlertUpdateOne {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *MsgAlertUpdateOne) RemoveNlog(v ...*Nlog) *MsgAlertUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return mauo.RemoveNlogIDs(ids...)
+	return _u.RemoveNlogIDs(ids...)
 }
 
 // ClearNlogAlerts clears all "nlog_alerts" edges to the NlogAlert entity.
-func (mauo *MsgAlertUpdateOne) ClearNlogAlerts() *MsgAlertUpdateOne {
-	mauo.mutation.ClearNlogAlerts()
-	return mauo
+func (_u *MsgAlertUpdateOne) ClearNlogAlerts() *MsgAlertUpdateOne {
+	_u.mutation.ClearNlogAlerts()
+	return _u
 }
 
 // RemoveNlogAlertIDs removes the "nlog_alerts" edge to NlogAlert entities by IDs.
-func (mauo *MsgAlertUpdateOne) RemoveNlogAlertIDs(ids ...int) *MsgAlertUpdateOne {
-	mauo.mutation.RemoveNlogAlertIDs(ids...)
-	return mauo
+func (_u *MsgAlertUpdateOne) RemoveNlogAlertIDs(ids ...int) *MsgAlertUpdateOne {
+	_u.mutation.RemoveNlogAlertIDs(ids...)
+	return _u
 }
 
 // RemoveNlogAlerts removes "nlog_alerts" edges to NlogAlert entities.
-func (mauo *MsgAlertUpdateOne) RemoveNlogAlerts(n ...*NlogAlert) *MsgAlertUpdateOne {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *MsgAlertUpdateOne) RemoveNlogAlerts(v ...*NlogAlert) *MsgAlertUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return mauo.RemoveNlogAlertIDs(ids...)
+	return _u.RemoveNlogAlertIDs(ids...)
 }
 
 // Where appends a list predicates to the MsgAlertUpdate builder.
-func (mauo *MsgAlertUpdateOne) Where(ps ...predicate.MsgAlert) *MsgAlertUpdateOne {
-	mauo.mutation.Where(ps...)
-	return mauo
+func (_u *MsgAlertUpdateOne) Where(ps ...predicate.MsgAlert) *MsgAlertUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (mauo *MsgAlertUpdateOne) Select(field string, fields ...string) *MsgAlertUpdateOne {
-	mauo.fields = append([]string{field}, fields...)
-	return mauo
+func (_u *MsgAlertUpdateOne) Select(field string, fields ...string) *MsgAlertUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated MsgAlert entity.
-func (mauo *MsgAlertUpdateOne) Save(ctx context.Context) (*MsgAlert, error) {
-	return withHooks(ctx, mauo.sqlSave, mauo.mutation, mauo.hooks)
+func (_u *MsgAlertUpdateOne) Save(ctx context.Context) (*MsgAlert, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mauo *MsgAlertUpdateOne) SaveX(ctx context.Context) *MsgAlert {
-	node, err := mauo.Save(ctx)
+func (_u *MsgAlertUpdateOne) SaveX(ctx context.Context) *MsgAlert {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -758,49 +761,52 @@ func (mauo *MsgAlertUpdateOne) SaveX(ctx context.Context) *MsgAlert {
 }
 
 // Exec executes the query on the entity.
-func (mauo *MsgAlertUpdateOne) Exec(ctx context.Context) error {
-	_, err := mauo.Save(ctx)
+func (_u *MsgAlertUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mauo *MsgAlertUpdateOne) ExecX(ctx context.Context) {
-	if err := mauo.Exec(ctx); err != nil {
+func (_u *MsgAlertUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mauo *MsgAlertUpdateOne) check() error {
-	if v, ok := mauo.mutation.Labels(); ok {
+func (_u *MsgAlertUpdateOne) check() error {
+	if v, ok := _u.mutation.Labels(); ok {
 		if err := v.Validate(); err != nil {
 			return &ValidationError{Name: "labels", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.labels": %w`, err)}
 		}
 	}
-	if v, ok := mauo.mutation.Annotations(); ok {
+	if v, ok := _u.mutation.Annotations(); ok {
 		if err := v.Validate(); err != nil {
 			return &ValidationError{Name: "annotations", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.annotations": %w`, err)}
 		}
 	}
-	if v, ok := mauo.mutation.State(); ok {
+	if v, ok := _u.mutation.State(); ok {
 		if err := msgalert.StateValidator(v); err != nil {
 			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.state": %w`, err)}
 		}
 	}
+	if _u.mutation.OrgCleared() && len(_u.mutation.OrgIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "MsgAlert.org"`)
+	}
 	return nil
 }
 
-func (mauo *MsgAlertUpdateOne) sqlSave(ctx context.Context) (_node *MsgAlert, err error) {
-	if err := mauo.check(); err != nil {
+func (_u *MsgAlertUpdateOne) sqlSave(ctx context.Context) (_node *MsgAlert, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(msgalert.Table, msgalert.Columns, sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt))
-	id, ok := mauo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "MsgAlert.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := mauo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, msgalert.FieldID)
 		for _, f := range fields {
@@ -812,59 +818,59 @@ func (mauo *MsgAlertUpdateOne) sqlSave(ctx context.Context) (_node *MsgAlert, er
 			}
 		}
 	}
-	if ps := mauo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := mauo.mutation.Labels(); ok {
+	if value, ok := _u.mutation.Labels(); ok {
 		_spec.SetField(msgalert.FieldLabels, field.TypeJSON, value)
 	}
-	if mauo.mutation.LabelsCleared() {
+	if _u.mutation.LabelsCleared() {
 		_spec.ClearField(msgalert.FieldLabels, field.TypeJSON)
 	}
-	if value, ok := mauo.mutation.Annotations(); ok {
+	if value, ok := _u.mutation.Annotations(); ok {
 		_spec.SetField(msgalert.FieldAnnotations, field.TypeJSON, value)
 	}
-	if mauo.mutation.AnnotationsCleared() {
+	if _u.mutation.AnnotationsCleared() {
 		_spec.ClearField(msgalert.FieldAnnotations, field.TypeJSON)
 	}
-	if value, ok := mauo.mutation.StartsAt(); ok {
+	if value, ok := _u.mutation.StartsAt(); ok {
 		_spec.SetField(msgalert.FieldStartsAt, field.TypeTime, value)
 	}
-	if value, ok := mauo.mutation.EndsAt(); ok {
+	if value, ok := _u.mutation.EndsAt(); ok {
 		_spec.SetField(msgalert.FieldEndsAt, field.TypeTime, value)
 	}
-	if mauo.mutation.EndsAtCleared() {
+	if _u.mutation.EndsAtCleared() {
 		_spec.ClearField(msgalert.FieldEndsAt, field.TypeTime)
 	}
-	if value, ok := mauo.mutation.URL(); ok {
+	if value, ok := _u.mutation.URL(); ok {
 		_spec.SetField(msgalert.FieldURL, field.TypeString, value)
 	}
-	if mauo.mutation.URLCleared() {
+	if _u.mutation.URLCleared() {
 		_spec.ClearField(msgalert.FieldURL, field.TypeString)
 	}
-	if value, ok := mauo.mutation.Timeout(); ok {
+	if value, ok := _u.mutation.Timeout(); ok {
 		_spec.SetField(msgalert.FieldTimeout, field.TypeBool, value)
 	}
-	if value, ok := mauo.mutation.Fingerprint(); ok {
+	if value, ok := _u.mutation.Fingerprint(); ok {
 		_spec.SetField(msgalert.FieldFingerprint, field.TypeString, value)
 	}
-	if value, ok := mauo.mutation.State(); ok {
+	if value, ok := _u.mutation.State(); ok {
 		_spec.SetField(msgalert.FieldState, field.TypeEnum, value)
 	}
-	if value, ok := mauo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgalert.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if mauo.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(msgalert.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := mauo.mutation.Deleted(); ok {
+	if value, ok := _u.mutation.Deleted(); ok {
 		_spec.SetField(msgalert.FieldDeleted, field.TypeBool, value)
 	}
-	if mauo.mutation.NlogCleared() {
+	if _u.mutation.NlogCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -875,14 +881,14 @@ func (mauo *MsgAlertUpdateOne) sqlSave(ctx context.Context) (_node *MsgAlert, er
 				IDSpec: sqlgraph.NewFieldSpec(nlog.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mauo.schemaConfig.NlogAlert
-		createE := &NlogAlertCreate{config: mauo.config, mutation: newNlogAlertMutation(mauo.config, OpCreate)}
+		edge.Schema = _u.schemaConfig.NlogAlert
+		createE := &NlogAlertCreate{config: _u.config, mutation: newNlogAlertMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mauo.mutation.RemovedNlogIDs(); len(nodes) > 0 && !mauo.mutation.NlogCleared() {
+	if nodes := _u.mutation.RemovedNlogIDs(); len(nodes) > 0 && !_u.mutation.NlogCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -893,17 +899,17 @@ func (mauo *MsgAlertUpdateOne) sqlSave(ctx context.Context) (_node *MsgAlert, er
 				IDSpec: sqlgraph.NewFieldSpec(nlog.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mauo.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &NlogAlertCreate{config: mauo.config, mutation: newNlogAlertMutation(mauo.config, OpCreate)}
+		createE := &NlogAlertCreate{config: _u.config, mutation: newNlogAlertMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mauo.mutation.NlogIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NlogIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -914,17 +920,17 @@ func (mauo *MsgAlertUpdateOne) sqlSave(ctx context.Context) (_node *MsgAlert, er
 				IDSpec: sqlgraph.NewFieldSpec(nlog.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mauo.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &NlogAlertCreate{config: mauo.config, mutation: newNlogAlertMutation(mauo.config, OpCreate)}
+		createE := &NlogAlertCreate{config: _u.config, mutation: newNlogAlertMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if mauo.mutation.NlogAlertsCleared() {
+	if _u.mutation.NlogAlertsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -935,10 +941,10 @@ func (mauo *MsgAlertUpdateOne) sqlSave(ctx context.Context) (_node *MsgAlert, er
 				IDSpec: sqlgraph.NewFieldSpec(nlogalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mauo.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mauo.mutation.RemovedNlogAlertsIDs(); len(nodes) > 0 && !mauo.mutation.NlogAlertsCleared() {
+	if nodes := _u.mutation.RemovedNlogAlertsIDs(); len(nodes) > 0 && !_u.mutation.NlogAlertsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -949,13 +955,13 @@ func (mauo *MsgAlertUpdateOne) sqlSave(ctx context.Context) (_node *MsgAlert, er
 				IDSpec: sqlgraph.NewFieldSpec(nlogalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mauo.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mauo.mutation.NlogAlertsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NlogAlertsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -966,18 +972,18 @@ func (mauo *MsgAlertUpdateOne) sqlSave(ctx context.Context) (_node *MsgAlert, er
 				IDSpec: sqlgraph.NewFieldSpec(nlogalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mauo.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Node.Schema = mauo.schemaConfig.MsgAlert
-	ctx = internal.NewSchemaConfigContext(ctx, mauo.schemaConfig)
-	_node = &MsgAlert{config: mauo.config}
+	_spec.Node.Schema = _u.schemaConfig.MsgAlert
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	_node = &MsgAlert{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, mauo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgalert.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -985,6 +991,6 @@ func (mauo *MsgAlertUpdateOne) sqlSave(ctx context.Context) (_node *MsgAlert, er
 		}
 		return nil, err
 	}
-	mauo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

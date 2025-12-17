@@ -36,44 +36,44 @@ type MsgInternalToQuery struct {
 }
 
 // Where adds a new predicate for the MsgInternalToQuery builder.
-func (mitq *MsgInternalToQuery) Where(ps ...predicate.MsgInternalTo) *MsgInternalToQuery {
-	mitq.predicates = append(mitq.predicates, ps...)
-	return mitq
+func (_q *MsgInternalToQuery) Where(ps ...predicate.MsgInternalTo) *MsgInternalToQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (mitq *MsgInternalToQuery) Limit(limit int) *MsgInternalToQuery {
-	mitq.ctx.Limit = &limit
-	return mitq
+func (_q *MsgInternalToQuery) Limit(limit int) *MsgInternalToQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (mitq *MsgInternalToQuery) Offset(offset int) *MsgInternalToQuery {
-	mitq.ctx.Offset = &offset
-	return mitq
+func (_q *MsgInternalToQuery) Offset(offset int) *MsgInternalToQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (mitq *MsgInternalToQuery) Unique(unique bool) *MsgInternalToQuery {
-	mitq.ctx.Unique = &unique
-	return mitq
+func (_q *MsgInternalToQuery) Unique(unique bool) *MsgInternalToQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (mitq *MsgInternalToQuery) Order(o ...msginternalto.OrderOption) *MsgInternalToQuery {
-	mitq.order = append(mitq.order, o...)
-	return mitq
+func (_q *MsgInternalToQuery) Order(o ...msginternalto.OrderOption) *MsgInternalToQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryMsgInternal chains the current query on the "msg_internal" edge.
-func (mitq *MsgInternalToQuery) QueryMsgInternal() *MsgInternalQuery {
-	query := (&MsgInternalClient{config: mitq.config}).Query()
+func (_q *MsgInternalToQuery) QueryMsgInternal() *MsgInternalQuery {
+	query := (&MsgInternalClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := mitq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := mitq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -82,23 +82,23 @@ func (mitq *MsgInternalToQuery) QueryMsgInternal() *MsgInternalQuery {
 			sqlgraph.To(msginternal.Table, msginternal.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, msginternalto.MsgInternalTable, msginternalto.MsgInternalColumn),
 		)
-		schemaConfig := mitq.schemaConfig
+		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.MsgInternal
 		step.Edge.Schema = schemaConfig.MsgInternalTo
-		fromU = sqlgraph.SetNeighbors(mitq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryUser chains the current query on the "user" edge.
-func (mitq *MsgInternalToQuery) QueryUser() *UserQuery {
-	query := (&UserClient{config: mitq.config}).Query()
+func (_q *MsgInternalToQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := mitq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := mitq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -107,10 +107,10 @@ func (mitq *MsgInternalToQuery) QueryUser() *UserQuery {
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, msginternalto.UserTable, msginternalto.UserColumn),
 		)
-		schemaConfig := mitq.schemaConfig
+		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.User
 		step.Edge.Schema = schemaConfig.MsgInternalTo
-		fromU = sqlgraph.SetNeighbors(mitq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -118,8 +118,8 @@ func (mitq *MsgInternalToQuery) QueryUser() *UserQuery {
 
 // First returns the first MsgInternalTo entity from the query.
 // Returns a *NotFoundError when no MsgInternalTo was found.
-func (mitq *MsgInternalToQuery) First(ctx context.Context) (*MsgInternalTo, error) {
-	nodes, err := mitq.Limit(1).All(setContextOp(ctx, mitq.ctx, ent.OpQueryFirst))
+func (_q *MsgInternalToQuery) First(ctx context.Context) (*MsgInternalTo, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +130,8 @@ func (mitq *MsgInternalToQuery) First(ctx context.Context) (*MsgInternalTo, erro
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (mitq *MsgInternalToQuery) FirstX(ctx context.Context) *MsgInternalTo {
-	node, err := mitq.First(ctx)
+func (_q *MsgInternalToQuery) FirstX(ctx context.Context) *MsgInternalTo {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -140,9 +140,9 @@ func (mitq *MsgInternalToQuery) FirstX(ctx context.Context) *MsgInternalTo {
 
 // FirstID returns the first MsgInternalTo ID from the query.
 // Returns a *NotFoundError when no MsgInternalTo ID was found.
-func (mitq *MsgInternalToQuery) FirstID(ctx context.Context) (id int, err error) {
+func (_q *MsgInternalToQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = mitq.Limit(1).IDs(setContextOp(ctx, mitq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -153,8 +153,8 @@ func (mitq *MsgInternalToQuery) FirstID(ctx context.Context) (id int, err error)
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (mitq *MsgInternalToQuery) FirstIDX(ctx context.Context) int {
-	id, err := mitq.FirstID(ctx)
+func (_q *MsgInternalToQuery) FirstIDX(ctx context.Context) int {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -164,8 +164,8 @@ func (mitq *MsgInternalToQuery) FirstIDX(ctx context.Context) int {
 // Only returns a single MsgInternalTo entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one MsgInternalTo entity is found.
 // Returns a *NotFoundError when no MsgInternalTo entities are found.
-func (mitq *MsgInternalToQuery) Only(ctx context.Context) (*MsgInternalTo, error) {
-	nodes, err := mitq.Limit(2).All(setContextOp(ctx, mitq.ctx, ent.OpQueryOnly))
+func (_q *MsgInternalToQuery) Only(ctx context.Context) (*MsgInternalTo, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -180,8 +180,8 @@ func (mitq *MsgInternalToQuery) Only(ctx context.Context) (*MsgInternalTo, error
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (mitq *MsgInternalToQuery) OnlyX(ctx context.Context) *MsgInternalTo {
-	node, err := mitq.Only(ctx)
+func (_q *MsgInternalToQuery) OnlyX(ctx context.Context) *MsgInternalTo {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -191,9 +191,9 @@ func (mitq *MsgInternalToQuery) OnlyX(ctx context.Context) *MsgInternalTo {
 // OnlyID is like Only, but returns the only MsgInternalTo ID in the query.
 // Returns a *NotSingularError when more than one MsgInternalTo ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (mitq *MsgInternalToQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *MsgInternalToQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = mitq.Limit(2).IDs(setContextOp(ctx, mitq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -208,8 +208,8 @@ func (mitq *MsgInternalToQuery) OnlyID(ctx context.Context) (id int, err error) 
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (mitq *MsgInternalToQuery) OnlyIDX(ctx context.Context) int {
-	id, err := mitq.OnlyID(ctx)
+func (_q *MsgInternalToQuery) OnlyIDX(ctx context.Context) int {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -217,18 +217,18 @@ func (mitq *MsgInternalToQuery) OnlyIDX(ctx context.Context) int {
 }
 
 // All executes the query and returns a list of MsgInternalTos.
-func (mitq *MsgInternalToQuery) All(ctx context.Context) ([]*MsgInternalTo, error) {
-	ctx = setContextOp(ctx, mitq.ctx, ent.OpQueryAll)
-	if err := mitq.prepareQuery(ctx); err != nil {
+func (_q *MsgInternalToQuery) All(ctx context.Context) ([]*MsgInternalTo, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*MsgInternalTo, *MsgInternalToQuery]()
-	return withInterceptors[[]*MsgInternalTo](ctx, mitq, qr, mitq.inters)
+	return withInterceptors[[]*MsgInternalTo](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (mitq *MsgInternalToQuery) AllX(ctx context.Context) []*MsgInternalTo {
-	nodes, err := mitq.All(ctx)
+func (_q *MsgInternalToQuery) AllX(ctx context.Context) []*MsgInternalTo {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -236,20 +236,20 @@ func (mitq *MsgInternalToQuery) AllX(ctx context.Context) []*MsgInternalTo {
 }
 
 // IDs executes the query and returns a list of MsgInternalTo IDs.
-func (mitq *MsgInternalToQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if mitq.ctx.Unique == nil && mitq.path != nil {
-		mitq.Unique(true)
+func (_q *MsgInternalToQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, mitq.ctx, ent.OpQueryIDs)
-	if err = mitq.Select(msginternalto.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(msginternalto.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (mitq *MsgInternalToQuery) IDsX(ctx context.Context) []int {
-	ids, err := mitq.IDs(ctx)
+func (_q *MsgInternalToQuery) IDsX(ctx context.Context) []int {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -257,17 +257,17 @@ func (mitq *MsgInternalToQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (mitq *MsgInternalToQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, mitq.ctx, ent.OpQueryCount)
-	if err := mitq.prepareQuery(ctx); err != nil {
+func (_q *MsgInternalToQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, mitq, querierCount[*MsgInternalToQuery](), mitq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*MsgInternalToQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (mitq *MsgInternalToQuery) CountX(ctx context.Context) int {
-	count, err := mitq.Count(ctx)
+func (_q *MsgInternalToQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -275,9 +275,9 @@ func (mitq *MsgInternalToQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (mitq *MsgInternalToQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, mitq.ctx, ent.OpQueryExist)
-	switch _, err := mitq.FirstID(ctx); {
+func (_q *MsgInternalToQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -288,8 +288,8 @@ func (mitq *MsgInternalToQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (mitq *MsgInternalToQuery) ExistX(ctx context.Context) bool {
-	exist, err := mitq.Exist(ctx)
+func (_q *MsgInternalToQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -298,44 +298,44 @@ func (mitq *MsgInternalToQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the MsgInternalToQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (mitq *MsgInternalToQuery) Clone() *MsgInternalToQuery {
-	if mitq == nil {
+func (_q *MsgInternalToQuery) Clone() *MsgInternalToQuery {
+	if _q == nil {
 		return nil
 	}
 	return &MsgInternalToQuery{
-		config:          mitq.config,
-		ctx:             mitq.ctx.Clone(),
-		order:           append([]msginternalto.OrderOption{}, mitq.order...),
-		inters:          append([]Interceptor{}, mitq.inters...),
-		predicates:      append([]predicate.MsgInternalTo{}, mitq.predicates...),
-		withMsgInternal: mitq.withMsgInternal.Clone(),
-		withUser:        mitq.withUser.Clone(),
+		config:          _q.config,
+		ctx:             _q.ctx.Clone(),
+		order:           append([]msginternalto.OrderOption{}, _q.order...),
+		inters:          append([]Interceptor{}, _q.inters...),
+		predicates:      append([]predicate.MsgInternalTo{}, _q.predicates...),
+		withMsgInternal: _q.withMsgInternal.Clone(),
+		withUser:        _q.withUser.Clone(),
 		// clone intermediate query.
-		sql:  mitq.sql.Clone(),
-		path: mitq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
 // WithMsgInternal tells the query-builder to eager-load the nodes that are connected to
 // the "msg_internal" edge. The optional arguments are used to configure the query builder of the edge.
-func (mitq *MsgInternalToQuery) WithMsgInternal(opts ...func(*MsgInternalQuery)) *MsgInternalToQuery {
-	query := (&MsgInternalClient{config: mitq.config}).Query()
+func (_q *MsgInternalToQuery) WithMsgInternal(opts ...func(*MsgInternalQuery)) *MsgInternalToQuery {
+	query := (&MsgInternalClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	mitq.withMsgInternal = query
-	return mitq
+	_q.withMsgInternal = query
+	return _q
 }
 
 // WithUser tells the query-builder to eager-load the nodes that are connected to
 // the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (mitq *MsgInternalToQuery) WithUser(opts ...func(*UserQuery)) *MsgInternalToQuery {
-	query := (&UserClient{config: mitq.config}).Query()
+func (_q *MsgInternalToQuery) WithUser(opts ...func(*UserQuery)) *MsgInternalToQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	mitq.withUser = query
-	return mitq
+	_q.withUser = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -352,10 +352,10 @@ func (mitq *MsgInternalToQuery) WithUser(opts ...func(*UserQuery)) *MsgInternalT
 //		GroupBy(msginternalto.FieldTenantID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (mitq *MsgInternalToQuery) GroupBy(field string, fields ...string) *MsgInternalToGroupBy {
-	mitq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &MsgInternalToGroupBy{build: mitq}
-	grbuild.flds = &mitq.ctx.Fields
+func (_q *MsgInternalToQuery) GroupBy(field string, fields ...string) *MsgInternalToGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &MsgInternalToGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = msginternalto.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -373,98 +373,98 @@ func (mitq *MsgInternalToQuery) GroupBy(field string, fields ...string) *MsgInte
 //	client.MsgInternalTo.Query().
 //		Select(msginternalto.FieldTenantID).
 //		Scan(ctx, &v)
-func (mitq *MsgInternalToQuery) Select(fields ...string) *MsgInternalToSelect {
-	mitq.ctx.Fields = append(mitq.ctx.Fields, fields...)
-	sbuild := &MsgInternalToSelect{MsgInternalToQuery: mitq}
+func (_q *MsgInternalToQuery) Select(fields ...string) *MsgInternalToSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &MsgInternalToSelect{MsgInternalToQuery: _q}
 	sbuild.label = msginternalto.Label
-	sbuild.flds, sbuild.scan = &mitq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a MsgInternalToSelect configured with the given aggregations.
-func (mitq *MsgInternalToQuery) Aggregate(fns ...AggregateFunc) *MsgInternalToSelect {
-	return mitq.Select().Aggregate(fns...)
+func (_q *MsgInternalToQuery) Aggregate(fns ...AggregateFunc) *MsgInternalToSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (mitq *MsgInternalToQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range mitq.inters {
+func (_q *MsgInternalToQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, mitq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range mitq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !msginternalto.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if mitq.path != nil {
-		prev, err := mitq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		mitq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (mitq *MsgInternalToQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*MsgInternalTo, error) {
+func (_q *MsgInternalToQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*MsgInternalTo, error) {
 	var (
 		nodes       = []*MsgInternalTo{}
-		_spec       = mitq.querySpec()
+		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
-			mitq.withMsgInternal != nil,
-			mitq.withUser != nil,
+			_q.withMsgInternal != nil,
+			_q.withUser != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*MsgInternalTo).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &MsgInternalTo{config: mitq.config}
+		node := &MsgInternalTo{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	_spec.Node.Schema = mitq.schemaConfig.MsgInternalTo
-	ctx = internal.NewSchemaConfigContext(ctx, mitq.schemaConfig)
-	if len(mitq.modifiers) > 0 {
-		_spec.Modifiers = mitq.modifiers
+	_spec.Node.Schema = _q.schemaConfig.MsgInternalTo
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, mitq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := mitq.withMsgInternal; query != nil {
-		if err := mitq.loadMsgInternal(ctx, query, nodes, nil,
+	if query := _q.withMsgInternal; query != nil {
+		if err := _q.loadMsgInternal(ctx, query, nodes, nil,
 			func(n *MsgInternalTo, e *MsgInternal) { n.Edges.MsgInternal = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := mitq.withUser; query != nil {
-		if err := mitq.loadUser(ctx, query, nodes, nil,
+	if query := _q.withUser; query != nil {
+		if err := _q.loadUser(ctx, query, nodes, nil,
 			func(n *MsgInternalTo, e *User) { n.Edges.User = e }); err != nil {
 			return nil, err
 		}
 	}
-	for i := range mitq.loadTotal {
-		if err := mitq.loadTotal[i](ctx, nodes); err != nil {
+	for i := range _q.loadTotal {
+		if err := _q.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (mitq *MsgInternalToQuery) loadMsgInternal(ctx context.Context, query *MsgInternalQuery, nodes []*MsgInternalTo, init func(*MsgInternalTo), assign func(*MsgInternalTo, *MsgInternal)) error {
+func (_q *MsgInternalToQuery) loadMsgInternal(ctx context.Context, query *MsgInternalQuery, nodes []*MsgInternalTo, init func(*MsgInternalTo), assign func(*MsgInternalTo, *MsgInternal)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*MsgInternalTo)
 	for i := range nodes {
@@ -493,7 +493,7 @@ func (mitq *MsgInternalToQuery) loadMsgInternal(ctx context.Context, query *MsgI
 	}
 	return nil
 }
-func (mitq *MsgInternalToQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*MsgInternalTo, init func(*MsgInternalTo), assign func(*MsgInternalTo, *User)) error {
+func (_q *MsgInternalToQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*MsgInternalTo, init func(*MsgInternalTo), assign func(*MsgInternalTo, *User)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*MsgInternalTo)
 	for i := range nodes {
@@ -523,29 +523,29 @@ func (mitq *MsgInternalToQuery) loadUser(ctx context.Context, query *UserQuery, 
 	return nil
 }
 
-func (mitq *MsgInternalToQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := mitq.querySpec()
-	_spec.Node.Schema = mitq.schemaConfig.MsgInternalTo
-	ctx = internal.NewSchemaConfigContext(ctx, mitq.schemaConfig)
-	if len(mitq.modifiers) > 0 {
-		_spec.Modifiers = mitq.modifiers
+func (_q *MsgInternalToQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	_spec.Node.Schema = _q.schemaConfig.MsgInternalTo
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = mitq.ctx.Fields
-	if len(mitq.ctx.Fields) > 0 {
-		_spec.Unique = mitq.ctx.Unique != nil && *mitq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, mitq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (mitq *MsgInternalToQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *MsgInternalToQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(msginternalto.Table, msginternalto.Columns, sqlgraph.NewFieldSpec(msginternalto.FieldID, field.TypeInt))
-	_spec.From = mitq.sql
-	if unique := mitq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if mitq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := mitq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, msginternalto.FieldID)
 		for i := range fields {
@@ -553,27 +553,27 @@ func (mitq *MsgInternalToQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if mitq.withMsgInternal != nil {
+		if _q.withMsgInternal != nil {
 			_spec.Node.AddColumnOnce(msginternalto.FieldMsgInternalID)
 		}
-		if mitq.withUser != nil {
+		if _q.withUser != nil {
 			_spec.Node.AddColumnOnce(msginternalto.FieldUserID)
 		}
 	}
-	if ps := mitq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := mitq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := mitq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := mitq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -583,36 +583,36 @@ func (mitq *MsgInternalToQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (mitq *MsgInternalToQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(mitq.driver.Dialect())
+func (_q *MsgInternalToQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(msginternalto.Table)
-	columns := mitq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = msginternalto.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if mitq.sql != nil {
-		selector = mitq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if mitq.ctx.Unique != nil && *mitq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	t1.Schema(mitq.schemaConfig.MsgInternalTo)
-	ctx = internal.NewSchemaConfigContext(ctx, mitq.schemaConfig)
+	t1.Schema(_q.schemaConfig.MsgInternalTo)
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
 	selector.WithContext(ctx)
-	for _, p := range mitq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range mitq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := mitq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := mitq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -625,41 +625,41 @@ type MsgInternalToGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (mitgb *MsgInternalToGroupBy) Aggregate(fns ...AggregateFunc) *MsgInternalToGroupBy {
-	mitgb.fns = append(mitgb.fns, fns...)
-	return mitgb
+func (_g *MsgInternalToGroupBy) Aggregate(fns ...AggregateFunc) *MsgInternalToGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (mitgb *MsgInternalToGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mitgb.build.ctx, ent.OpQueryGroupBy)
-	if err := mitgb.build.prepareQuery(ctx); err != nil {
+func (_g *MsgInternalToGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*MsgInternalToQuery, *MsgInternalToGroupBy](ctx, mitgb.build, mitgb, mitgb.build.inters, v)
+	return scanWithInterceptors[*MsgInternalToQuery, *MsgInternalToGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (mitgb *MsgInternalToGroupBy) sqlScan(ctx context.Context, root *MsgInternalToQuery, v any) error {
+func (_g *MsgInternalToGroupBy) sqlScan(ctx context.Context, root *MsgInternalToQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(mitgb.fns))
-	for _, fn := range mitgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*mitgb.flds)+len(mitgb.fns))
-		for _, f := range *mitgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*mitgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := mitgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -673,27 +673,27 @@ type MsgInternalToSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (mits *MsgInternalToSelect) Aggregate(fns ...AggregateFunc) *MsgInternalToSelect {
-	mits.fns = append(mits.fns, fns...)
-	return mits
+func (_s *MsgInternalToSelect) Aggregate(fns ...AggregateFunc) *MsgInternalToSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (mits *MsgInternalToSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mits.ctx, ent.OpQuerySelect)
-	if err := mits.prepareQuery(ctx); err != nil {
+func (_s *MsgInternalToSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*MsgInternalToQuery, *MsgInternalToSelect](ctx, mits.MsgInternalToQuery, mits, mits.inters, v)
+	return scanWithInterceptors[*MsgInternalToQuery, *MsgInternalToSelect](ctx, _s.MsgInternalToQuery, _s, _s.inters, v)
 }
 
-func (mits *MsgInternalToSelect) sqlScan(ctx context.Context, root *MsgInternalToQuery, v any) error {
+func (_s *MsgInternalToSelect) sqlScan(ctx context.Context, root *MsgInternalToQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(mits.fns))
-	for _, fn := range mits.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*mits.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -701,7 +701,7 @@ func (mits *MsgInternalToSelect) sqlScan(ctx context.Context, root *MsgInternalT
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := mits.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

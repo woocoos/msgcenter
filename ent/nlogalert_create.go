@@ -25,55 +25,55 @@ type NlogAlertCreate struct {
 }
 
 // SetNlogID sets the "nlog_id" field.
-func (nac *NlogAlertCreate) SetNlogID(i int) *NlogAlertCreate {
-	nac.mutation.SetNlogID(i)
-	return nac
+func (_c *NlogAlertCreate) SetNlogID(v int) *NlogAlertCreate {
+	_c.mutation.SetNlogID(v)
+	return _c
 }
 
 // SetAlertID sets the "alert_id" field.
-func (nac *NlogAlertCreate) SetAlertID(i int) *NlogAlertCreate {
-	nac.mutation.SetAlertID(i)
-	return nac
+func (_c *NlogAlertCreate) SetAlertID(v int) *NlogAlertCreate {
+	_c.mutation.SetAlertID(v)
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (nac *NlogAlertCreate) SetCreatedAt(t time.Time) *NlogAlertCreate {
-	nac.mutation.SetCreatedAt(t)
-	return nac
+func (_c *NlogAlertCreate) SetCreatedAt(v time.Time) *NlogAlertCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (nac *NlogAlertCreate) SetNillableCreatedAt(t *time.Time) *NlogAlertCreate {
-	if t != nil {
-		nac.SetCreatedAt(*t)
+func (_c *NlogAlertCreate) SetNillableCreatedAt(v *time.Time) *NlogAlertCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return nac
+	return _c
 }
 
 // SetNlog sets the "nlog" edge to the Nlog entity.
-func (nac *NlogAlertCreate) SetNlog(n *Nlog) *NlogAlertCreate {
-	return nac.SetNlogID(n.ID)
+func (_c *NlogAlertCreate) SetNlog(v *Nlog) *NlogAlertCreate {
+	return _c.SetNlogID(v.ID)
 }
 
 // SetAlert sets the "alert" edge to the MsgAlert entity.
-func (nac *NlogAlertCreate) SetAlert(m *MsgAlert) *NlogAlertCreate {
-	return nac.SetAlertID(m.ID)
+func (_c *NlogAlertCreate) SetAlert(v *MsgAlert) *NlogAlertCreate {
+	return _c.SetAlertID(v.ID)
 }
 
 // Mutation returns the NlogAlertMutation object of the builder.
-func (nac *NlogAlertCreate) Mutation() *NlogAlertMutation {
-	return nac.mutation
+func (_c *NlogAlertCreate) Mutation() *NlogAlertMutation {
+	return _c.mutation
 }
 
 // Save creates the NlogAlert in the database.
-func (nac *NlogAlertCreate) Save(ctx context.Context) (*NlogAlert, error) {
-	nac.defaults()
-	return withHooks(ctx, nac.sqlSave, nac.mutation, nac.hooks)
+func (_c *NlogAlertCreate) Save(ctx context.Context) (*NlogAlert, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (nac *NlogAlertCreate) SaveX(ctx context.Context) *NlogAlert {
-	v, err := nac.Save(ctx)
+func (_c *NlogAlertCreate) SaveX(ctx context.Context) *NlogAlert {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -81,52 +81,52 @@ func (nac *NlogAlertCreate) SaveX(ctx context.Context) *NlogAlert {
 }
 
 // Exec executes the query.
-func (nac *NlogAlertCreate) Exec(ctx context.Context) error {
-	_, err := nac.Save(ctx)
+func (_c *NlogAlertCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (nac *NlogAlertCreate) ExecX(ctx context.Context) {
-	if err := nac.Exec(ctx); err != nil {
+func (_c *NlogAlertCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (nac *NlogAlertCreate) defaults() {
-	if _, ok := nac.mutation.CreatedAt(); !ok {
+func (_c *NlogAlertCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := nlogalert.DefaultCreatedAt()
-		nac.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (nac *NlogAlertCreate) check() error {
-	if _, ok := nac.mutation.NlogID(); !ok {
+func (_c *NlogAlertCreate) check() error {
+	if _, ok := _c.mutation.NlogID(); !ok {
 		return &ValidationError{Name: "nlog_id", err: errors.New(`ent: missing required field "NlogAlert.nlog_id"`)}
 	}
-	if _, ok := nac.mutation.AlertID(); !ok {
+	if _, ok := _c.mutation.AlertID(); !ok {
 		return &ValidationError{Name: "alert_id", err: errors.New(`ent: missing required field "NlogAlert.alert_id"`)}
 	}
-	if _, ok := nac.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "NlogAlert.created_at"`)}
 	}
-	if len(nac.mutation.NlogIDs()) == 0 {
+	if len(_c.mutation.NlogIDs()) == 0 {
 		return &ValidationError{Name: "nlog", err: errors.New(`ent: missing required edge "NlogAlert.nlog"`)}
 	}
-	if len(nac.mutation.AlertIDs()) == 0 {
+	if len(_c.mutation.AlertIDs()) == 0 {
 		return &ValidationError{Name: "alert", err: errors.New(`ent: missing required edge "NlogAlert.alert"`)}
 	}
 	return nil
 }
 
-func (nac *NlogAlertCreate) sqlSave(ctx context.Context) (*NlogAlert, error) {
-	if err := nac.check(); err != nil {
+func (_c *NlogAlertCreate) sqlSave(ctx context.Context) (*NlogAlert, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := nac.createSpec()
-	if err := sqlgraph.CreateNode(ctx, nac.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -134,23 +134,23 @@ func (nac *NlogAlertCreate) sqlSave(ctx context.Context) (*NlogAlert, error) {
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	nac.mutation.id = &_node.ID
-	nac.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (nac *NlogAlertCreate) createSpec() (*NlogAlert, *sqlgraph.CreateSpec) {
+func (_c *NlogAlertCreate) createSpec() (*NlogAlert, *sqlgraph.CreateSpec) {
 	var (
-		_node = &NlogAlert{config: nac.config}
+		_node = &NlogAlert{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(nlogalert.Table, sqlgraph.NewFieldSpec(nlogalert.FieldID, field.TypeInt))
 	)
-	_spec.Schema = nac.schemaConfig.NlogAlert
-	_spec.OnConflict = nac.conflict
-	if value, ok := nac.mutation.CreatedAt(); ok {
+	_spec.Schema = _c.schemaConfig.NlogAlert
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(nlogalert.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if nodes := nac.mutation.NlogIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.NlogIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -161,14 +161,14 @@ func (nac *NlogAlertCreate) createSpec() (*NlogAlert, *sqlgraph.CreateSpec) {
 				IDSpec: sqlgraph.NewFieldSpec(nlog.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = nac.schemaConfig.NlogAlert
+		edge.Schema = _c.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.NlogID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nac.mutation.AlertIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.AlertIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -179,7 +179,7 @@ func (nac *NlogAlertCreate) createSpec() (*NlogAlert, *sqlgraph.CreateSpec) {
 				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = nac.schemaConfig.NlogAlert
+		edge.Schema = _c.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -205,10 +205,10 @@ func (nac *NlogAlertCreate) createSpec() (*NlogAlert, *sqlgraph.CreateSpec) {
 //			SetNlogID(v+v).
 //		}).
 //		Exec(ctx)
-func (nac *NlogAlertCreate) OnConflict(opts ...sql.ConflictOption) *NlogAlertUpsertOne {
-	nac.conflict = opts
+func (_c *NlogAlertCreate) OnConflict(opts ...sql.ConflictOption) *NlogAlertUpsertOne {
+	_c.conflict = opts
 	return &NlogAlertUpsertOne{
-		create: nac,
+		create: _c,
 	}
 }
 
@@ -218,10 +218,10 @@ func (nac *NlogAlertCreate) OnConflict(opts ...sql.ConflictOption) *NlogAlertUps
 //	client.NlogAlert.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (nac *NlogAlertCreate) OnConflictColumns(columns ...string) *NlogAlertUpsertOne {
-	nac.conflict = append(nac.conflict, sql.ConflictColumns(columns...))
+func (_c *NlogAlertCreate) OnConflictColumns(columns ...string) *NlogAlertUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &NlogAlertUpsertOne{
-		create: nac,
+		create: _c,
 	}
 }
 
@@ -377,16 +377,16 @@ type NlogAlertCreateBulk struct {
 }
 
 // Save creates the NlogAlert entities in the database.
-func (nacb *NlogAlertCreateBulk) Save(ctx context.Context) ([]*NlogAlert, error) {
-	if nacb.err != nil {
-		return nil, nacb.err
+func (_c *NlogAlertCreateBulk) Save(ctx context.Context) ([]*NlogAlert, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(nacb.builders))
-	nodes := make([]*NlogAlert, len(nacb.builders))
-	mutators := make([]Mutator, len(nacb.builders))
-	for i := range nacb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*NlogAlert, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := nacb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*NlogAlertMutation)
@@ -400,12 +400,12 @@ func (nacb *NlogAlertCreateBulk) Save(ctx context.Context) ([]*NlogAlert, error)
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, nacb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = nacb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, nacb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -429,7 +429,7 @@ func (nacb *NlogAlertCreateBulk) Save(ctx context.Context) ([]*NlogAlert, error)
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, nacb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -437,8 +437,8 @@ func (nacb *NlogAlertCreateBulk) Save(ctx context.Context) ([]*NlogAlert, error)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (nacb *NlogAlertCreateBulk) SaveX(ctx context.Context) []*NlogAlert {
-	v, err := nacb.Save(ctx)
+func (_c *NlogAlertCreateBulk) SaveX(ctx context.Context) []*NlogAlert {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -446,14 +446,14 @@ func (nacb *NlogAlertCreateBulk) SaveX(ctx context.Context) []*NlogAlert {
 }
 
 // Exec executes the query.
-func (nacb *NlogAlertCreateBulk) Exec(ctx context.Context) error {
-	_, err := nacb.Save(ctx)
+func (_c *NlogAlertCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (nacb *NlogAlertCreateBulk) ExecX(ctx context.Context) {
-	if err := nacb.Exec(ctx); err != nil {
+func (_c *NlogAlertCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -473,10 +473,10 @@ func (nacb *NlogAlertCreateBulk) ExecX(ctx context.Context) {
 //			SetNlogID(v+v).
 //		}).
 //		Exec(ctx)
-func (nacb *NlogAlertCreateBulk) OnConflict(opts ...sql.ConflictOption) *NlogAlertUpsertBulk {
-	nacb.conflict = opts
+func (_c *NlogAlertCreateBulk) OnConflict(opts ...sql.ConflictOption) *NlogAlertUpsertBulk {
+	_c.conflict = opts
 	return &NlogAlertUpsertBulk{
-		create: nacb,
+		create: _c,
 	}
 }
 
@@ -486,10 +486,10 @@ func (nacb *NlogAlertCreateBulk) OnConflict(opts ...sql.ConflictOption) *NlogAle
 //	client.NlogAlert.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (nacb *NlogAlertCreateBulk) OnConflictColumns(columns ...string) *NlogAlertUpsertBulk {
-	nacb.conflict = append(nacb.conflict, sql.ConflictColumns(columns...))
+func (_c *NlogAlertCreateBulk) OnConflictColumns(columns ...string) *NlogAlertUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &NlogAlertUpsertBulk{
-		create: nacb,
+		create: _c,
 	}
 }
 

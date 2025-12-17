@@ -92,6 +92,7 @@ func open(ctx context.Context, driverName, dsn string) (*ent.Client, error) {
 	client, err := ent.Open(driverName, dsn,
 		ent.Debug(), ent.AlternateSchema(ent.SchemaConfig{
 			User:        "portal",
+			Org:         "portal",
 			OrgRoleUser: "portal",
 			UserAddr:    "portal",
 		}),

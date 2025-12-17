@@ -84,7 +84,7 @@ func (*NlogAlert) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the NlogAlert fields.
-func (na *NlogAlert) assignValues(columns []string, values []any) error {
+func (_m *NlogAlert) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -95,27 +95,27 @@ func (na *NlogAlert) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			na.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case nlogalert.FieldNlogID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field nlog_id", values[i])
 			} else if value.Valid {
-				na.NlogID = int(value.Int64)
+				_m.NlogID = int(value.Int64)
 			}
 		case nlogalert.FieldAlertID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field alert_id", values[i])
 			} else if value.Valid {
-				na.AlertID = int(value.Int64)
+				_m.AlertID = int(value.Int64)
 			}
 		case nlogalert.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				na.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		default:
-			na.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -123,51 +123,51 @@ func (na *NlogAlert) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the NlogAlert.
 // This includes values selected through modifiers, order, etc.
-func (na *NlogAlert) Value(name string) (ent.Value, error) {
-	return na.selectValues.Get(name)
+func (_m *NlogAlert) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryNlog queries the "nlog" edge of the NlogAlert entity.
-func (na *NlogAlert) QueryNlog() *NlogQuery {
-	return NewNlogAlertClient(na.config).QueryNlog(na)
+func (_m *NlogAlert) QueryNlog() *NlogQuery {
+	return NewNlogAlertClient(_m.config).QueryNlog(_m)
 }
 
 // QueryAlert queries the "alert" edge of the NlogAlert entity.
-func (na *NlogAlert) QueryAlert() *MsgAlertQuery {
-	return NewNlogAlertClient(na.config).QueryAlert(na)
+func (_m *NlogAlert) QueryAlert() *MsgAlertQuery {
+	return NewNlogAlertClient(_m.config).QueryAlert(_m)
 }
 
 // Update returns a builder for updating this NlogAlert.
 // Note that you need to call NlogAlert.Unwrap() before calling this method if this NlogAlert
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (na *NlogAlert) Update() *NlogAlertUpdateOne {
-	return NewNlogAlertClient(na.config).UpdateOne(na)
+func (_m *NlogAlert) Update() *NlogAlertUpdateOne {
+	return NewNlogAlertClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the NlogAlert entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (na *NlogAlert) Unwrap() *NlogAlert {
-	_tx, ok := na.config.driver.(*txDriver)
+func (_m *NlogAlert) Unwrap() *NlogAlert {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: NlogAlert is not a transactional entity")
 	}
-	na.config.driver = _tx.drv
-	return na
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (na *NlogAlert) String() string {
+func (_m *NlogAlert) String() string {
 	var builder strings.Builder
 	builder.WriteString("NlogAlert(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", na.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("nlog_id=")
-	builder.WriteString(fmt.Sprintf("%v", na.NlogID))
+	builder.WriteString(fmt.Sprintf("%v", _m.NlogID))
 	builder.WriteString(", ")
 	builder.WriteString("alert_id=")
-	builder.WriteString(fmt.Sprintf("%v", na.AlertID))
+	builder.WriteString(fmt.Sprintf("%v", _m.AlertID))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(na.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

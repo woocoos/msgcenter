@@ -28,207 +28,207 @@ type NlogUpdate struct {
 }
 
 // Where appends a list predicates to the NlogUpdate builder.
-func (nu *NlogUpdate) Where(ps ...predicate.Nlog) *NlogUpdate {
-	nu.mutation.Where(ps...)
-	return nu
+func (_u *NlogUpdate) Where(ps ...predicate.Nlog) *NlogUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetGroupKey sets the "group_key" field.
-func (nu *NlogUpdate) SetGroupKey(s string) *NlogUpdate {
-	nu.mutation.SetGroupKey(s)
-	return nu
+func (_u *NlogUpdate) SetGroupKey(v string) *NlogUpdate {
+	_u.mutation.SetGroupKey(v)
+	return _u
 }
 
 // SetNillableGroupKey sets the "group_key" field if the given value is not nil.
-func (nu *NlogUpdate) SetNillableGroupKey(s *string) *NlogUpdate {
-	if s != nil {
-		nu.SetGroupKey(*s)
+func (_u *NlogUpdate) SetNillableGroupKey(v *string) *NlogUpdate {
+	if v != nil {
+		_u.SetGroupKey(*v)
 	}
-	return nu
+	return _u
 }
 
 // SetReceiver sets the "receiver" field.
-func (nu *NlogUpdate) SetReceiver(s string) *NlogUpdate {
-	nu.mutation.SetReceiver(s)
-	return nu
+func (_u *NlogUpdate) SetReceiver(v string) *NlogUpdate {
+	_u.mutation.SetReceiver(v)
+	return _u
 }
 
 // SetNillableReceiver sets the "receiver" field if the given value is not nil.
-func (nu *NlogUpdate) SetNillableReceiver(s *string) *NlogUpdate {
-	if s != nil {
-		nu.SetReceiver(*s)
+func (_u *NlogUpdate) SetNillableReceiver(v *string) *NlogUpdate {
+	if v != nil {
+		_u.SetReceiver(*v)
 	}
-	return nu
+	return _u
 }
 
 // SetReceiverType sets the "receiver_type" field.
-func (nu *NlogUpdate) SetReceiverType(pt profile.ReceiverType) *NlogUpdate {
-	nu.mutation.SetReceiverType(pt)
-	return nu
+func (_u *NlogUpdate) SetReceiverType(v profile.ReceiverType) *NlogUpdate {
+	_u.mutation.SetReceiverType(v)
+	return _u
 }
 
 // SetNillableReceiverType sets the "receiver_type" field if the given value is not nil.
-func (nu *NlogUpdate) SetNillableReceiverType(pt *profile.ReceiverType) *NlogUpdate {
-	if pt != nil {
-		nu.SetReceiverType(*pt)
+func (_u *NlogUpdate) SetNillableReceiverType(v *profile.ReceiverType) *NlogUpdate {
+	if v != nil {
+		_u.SetReceiverType(*v)
 	}
-	return nu
+	return _u
 }
 
 // SetIdx sets the "idx" field.
-func (nu *NlogUpdate) SetIdx(i int) *NlogUpdate {
-	nu.mutation.ResetIdx()
-	nu.mutation.SetIdx(i)
-	return nu
+func (_u *NlogUpdate) SetIdx(v int) *NlogUpdate {
+	_u.mutation.ResetIdx()
+	_u.mutation.SetIdx(v)
+	return _u
 }
 
 // SetNillableIdx sets the "idx" field if the given value is not nil.
-func (nu *NlogUpdate) SetNillableIdx(i *int) *NlogUpdate {
-	if i != nil {
-		nu.SetIdx(*i)
+func (_u *NlogUpdate) SetNillableIdx(v *int) *NlogUpdate {
+	if v != nil {
+		_u.SetIdx(*v)
 	}
-	return nu
+	return _u
 }
 
-// AddIdx adds i to the "idx" field.
-func (nu *NlogUpdate) AddIdx(i int) *NlogUpdate {
-	nu.mutation.AddIdx(i)
-	return nu
+// AddIdx adds value to the "idx" field.
+func (_u *NlogUpdate) AddIdx(v int) *NlogUpdate {
+	_u.mutation.AddIdx(v)
+	return _u
 }
 
 // SetSendAt sets the "send_at" field.
-func (nu *NlogUpdate) SetSendAt(t time.Time) *NlogUpdate {
-	nu.mutation.SetSendAt(t)
-	return nu
+func (_u *NlogUpdate) SetSendAt(v time.Time) *NlogUpdate {
+	_u.mutation.SetSendAt(v)
+	return _u
 }
 
 // SetNillableSendAt sets the "send_at" field if the given value is not nil.
-func (nu *NlogUpdate) SetNillableSendAt(t *time.Time) *NlogUpdate {
-	if t != nil {
-		nu.SetSendAt(*t)
+func (_u *NlogUpdate) SetNillableSendAt(v *time.Time) *NlogUpdate {
+	if v != nil {
+		_u.SetSendAt(*v)
 	}
-	return nu
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (nu *NlogUpdate) SetUpdatedAt(t time.Time) *NlogUpdate {
-	nu.mutation.SetUpdatedAt(t)
-	return nu
+func (_u *NlogUpdate) SetUpdatedAt(v time.Time) *NlogUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (nu *NlogUpdate) SetNillableUpdatedAt(t *time.Time) *NlogUpdate {
-	if t != nil {
-		nu.SetUpdatedAt(*t)
+func (_u *NlogUpdate) SetNillableUpdatedAt(v *time.Time) *NlogUpdate {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return nu
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (nu *NlogUpdate) ClearUpdatedAt() *NlogUpdate {
-	nu.mutation.ClearUpdatedAt()
-	return nu
+func (_u *NlogUpdate) ClearUpdatedAt() *NlogUpdate {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetExpiresAt sets the "expires_at" field.
-func (nu *NlogUpdate) SetExpiresAt(t time.Time) *NlogUpdate {
-	nu.mutation.SetExpiresAt(t)
-	return nu
+func (_u *NlogUpdate) SetExpiresAt(v time.Time) *NlogUpdate {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
-func (nu *NlogUpdate) SetNillableExpiresAt(t *time.Time) *NlogUpdate {
-	if t != nil {
-		nu.SetExpiresAt(*t)
+func (_u *NlogUpdate) SetNillableExpiresAt(v *time.Time) *NlogUpdate {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return nu
+	return _u
 }
 
 // AddAlertIDs adds the "alerts" edge to the MsgAlert entity by IDs.
-func (nu *NlogUpdate) AddAlertIDs(ids ...int) *NlogUpdate {
-	nu.mutation.AddAlertIDs(ids...)
-	return nu
+func (_u *NlogUpdate) AddAlertIDs(ids ...int) *NlogUpdate {
+	_u.mutation.AddAlertIDs(ids...)
+	return _u
 }
 
 // AddAlerts adds the "alerts" edges to the MsgAlert entity.
-func (nu *NlogUpdate) AddAlerts(m ...*MsgAlert) *NlogUpdate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *NlogUpdate) AddAlerts(v ...*MsgAlert) *NlogUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.AddAlertIDs(ids...)
+	return _u.AddAlertIDs(ids...)
 }
 
 // AddNlogAlertIDs adds the "nlog_alert" edge to the NlogAlert entity by IDs.
-func (nu *NlogUpdate) AddNlogAlertIDs(ids ...int) *NlogUpdate {
-	nu.mutation.AddNlogAlertIDs(ids...)
-	return nu
+func (_u *NlogUpdate) AddNlogAlertIDs(ids ...int) *NlogUpdate {
+	_u.mutation.AddNlogAlertIDs(ids...)
+	return _u
 }
 
 // AddNlogAlert adds the "nlog_alert" edges to the NlogAlert entity.
-func (nu *NlogUpdate) AddNlogAlert(n ...*NlogAlert) *NlogUpdate {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *NlogUpdate) AddNlogAlert(v ...*NlogAlert) *NlogUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.AddNlogAlertIDs(ids...)
+	return _u.AddNlogAlertIDs(ids...)
 }
 
 // Mutation returns the NlogMutation object of the builder.
-func (nu *NlogUpdate) Mutation() *NlogMutation {
-	return nu.mutation
+func (_u *NlogUpdate) Mutation() *NlogMutation {
+	return _u.mutation
 }
 
 // ClearAlerts clears all "alerts" edges to the MsgAlert entity.
-func (nu *NlogUpdate) ClearAlerts() *NlogUpdate {
-	nu.mutation.ClearAlerts()
-	return nu
+func (_u *NlogUpdate) ClearAlerts() *NlogUpdate {
+	_u.mutation.ClearAlerts()
+	return _u
 }
 
 // RemoveAlertIDs removes the "alerts" edge to MsgAlert entities by IDs.
-func (nu *NlogUpdate) RemoveAlertIDs(ids ...int) *NlogUpdate {
-	nu.mutation.RemoveAlertIDs(ids...)
-	return nu
+func (_u *NlogUpdate) RemoveAlertIDs(ids ...int) *NlogUpdate {
+	_u.mutation.RemoveAlertIDs(ids...)
+	return _u
 }
 
 // RemoveAlerts removes "alerts" edges to MsgAlert entities.
-func (nu *NlogUpdate) RemoveAlerts(m ...*MsgAlert) *NlogUpdate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *NlogUpdate) RemoveAlerts(v ...*MsgAlert) *NlogUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.RemoveAlertIDs(ids...)
+	return _u.RemoveAlertIDs(ids...)
 }
 
 // ClearNlogAlert clears all "nlog_alert" edges to the NlogAlert entity.
-func (nu *NlogUpdate) ClearNlogAlert() *NlogUpdate {
-	nu.mutation.ClearNlogAlert()
-	return nu
+func (_u *NlogUpdate) ClearNlogAlert() *NlogUpdate {
+	_u.mutation.ClearNlogAlert()
+	return _u
 }
 
 // RemoveNlogAlertIDs removes the "nlog_alert" edge to NlogAlert entities by IDs.
-func (nu *NlogUpdate) RemoveNlogAlertIDs(ids ...int) *NlogUpdate {
-	nu.mutation.RemoveNlogAlertIDs(ids...)
-	return nu
+func (_u *NlogUpdate) RemoveNlogAlertIDs(ids ...int) *NlogUpdate {
+	_u.mutation.RemoveNlogAlertIDs(ids...)
+	return _u
 }
 
 // RemoveNlogAlert removes "nlog_alert" edges to NlogAlert entities.
-func (nu *NlogUpdate) RemoveNlogAlert(n ...*NlogAlert) *NlogUpdate {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *NlogUpdate) RemoveNlogAlert(v ...*NlogAlert) *NlogUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.RemoveNlogAlertIDs(ids...)
+	return _u.RemoveNlogAlertIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (nu *NlogUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, nu.sqlSave, nu.mutation, nu.hooks)
+func (_u *NlogUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (nu *NlogUpdate) SaveX(ctx context.Context) int {
-	affected, err := nu.Save(ctx)
+func (_u *NlogUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -236,21 +236,21 @@ func (nu *NlogUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (nu *NlogUpdate) Exec(ctx context.Context) error {
-	_, err := nu.Save(ctx)
+func (_u *NlogUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (nu *NlogUpdate) ExecX(ctx context.Context) {
-	if err := nu.Exec(ctx); err != nil {
+func (_u *NlogUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (nu *NlogUpdate) check() error {
-	if v, ok := nu.mutation.ReceiverType(); ok {
+func (_u *NlogUpdate) check() error {
+	if v, ok := _u.mutation.ReceiverType(); ok {
 		if err := nlog.ReceiverTypeValidator(v); err != nil {
 			return &ValidationError{Name: "receiver_type", err: fmt.Errorf(`ent: validator failed for field "Nlog.receiver_type": %w`, err)}
 		}
@@ -258,46 +258,46 @@ func (nu *NlogUpdate) check() error {
 	return nil
 }
 
-func (nu *NlogUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := nu.check(); err != nil {
-		return n, err
+func (_u *NlogUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(nlog.Table, nlog.Columns, sqlgraph.NewFieldSpec(nlog.FieldID, field.TypeInt))
-	if ps := nu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := nu.mutation.GroupKey(); ok {
+	if value, ok := _u.mutation.GroupKey(); ok {
 		_spec.SetField(nlog.FieldGroupKey, field.TypeString, value)
 	}
-	if value, ok := nu.mutation.Receiver(); ok {
+	if value, ok := _u.mutation.Receiver(); ok {
 		_spec.SetField(nlog.FieldReceiver, field.TypeString, value)
 	}
-	if value, ok := nu.mutation.ReceiverType(); ok {
+	if value, ok := _u.mutation.ReceiverType(); ok {
 		_spec.SetField(nlog.FieldReceiverType, field.TypeEnum, value)
 	}
-	if value, ok := nu.mutation.Idx(); ok {
+	if value, ok := _u.mutation.Idx(); ok {
 		_spec.SetField(nlog.FieldIdx, field.TypeInt, value)
 	}
-	if value, ok := nu.mutation.AddedIdx(); ok {
+	if value, ok := _u.mutation.AddedIdx(); ok {
 		_spec.AddField(nlog.FieldIdx, field.TypeInt, value)
 	}
-	if value, ok := nu.mutation.SendAt(); ok {
+	if value, ok := _u.mutation.SendAt(); ok {
 		_spec.SetField(nlog.FieldSendAt, field.TypeTime, value)
 	}
-	if value, ok := nu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(nlog.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if nu.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(nlog.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := nu.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(nlog.FieldExpiresAt, field.TypeTime, value)
 	}
-	if nu.mutation.AlertsCleared() {
+	if _u.mutation.AlertsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -308,14 +308,14 @@ func (nu *NlogUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = nu.schemaConfig.NlogAlert
-		createE := &NlogAlertCreate{config: nu.config, mutation: newNlogAlertMutation(nu.config, OpCreate)}
+		edge.Schema = _u.schemaConfig.NlogAlert
+		createE := &NlogAlertCreate{config: _u.config, mutation: newNlogAlertMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.RemovedAlertsIDs(); len(nodes) > 0 && !nu.mutation.AlertsCleared() {
+	if nodes := _u.mutation.RemovedAlertsIDs(); len(nodes) > 0 && !_u.mutation.AlertsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -326,17 +326,17 @@ func (nu *NlogUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = nu.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &NlogAlertCreate{config: nu.config, mutation: newNlogAlertMutation(nu.config, OpCreate)}
+		createE := &NlogAlertCreate{config: _u.config, mutation: newNlogAlertMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.AlertsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AlertsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -347,17 +347,17 @@ func (nu *NlogUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = nu.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &NlogAlertCreate{config: nu.config, mutation: newNlogAlertMutation(nu.config, OpCreate)}
+		createE := &NlogAlertCreate{config: _u.config, mutation: newNlogAlertMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.NlogAlertCleared() {
+	if _u.mutation.NlogAlertCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -368,10 +368,10 @@ func (nu *NlogUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(nlogalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = nu.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.RemovedNlogAlertIDs(); len(nodes) > 0 && !nu.mutation.NlogAlertCleared() {
+	if nodes := _u.mutation.RemovedNlogAlertIDs(); len(nodes) > 0 && !_u.mutation.NlogAlertCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -382,13 +382,13 @@ func (nu *NlogUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(nlogalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = nu.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.NlogAlertIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NlogAlertIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -399,15 +399,15 @@ func (nu *NlogUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(nlogalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = nu.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Node.Schema = nu.schemaConfig.Nlog
-	ctx = internal.NewSchemaConfigContext(ctx, nu.schemaConfig)
-	if n, err = sqlgraph.UpdateNodes(ctx, nu.driver, _spec); err != nil {
+	_spec.Node.Schema = _u.schemaConfig.Nlog
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{nlog.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -415,8 +415,8 @@ func (nu *NlogUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	nu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // NlogUpdateOne is the builder for updating a single Nlog entity.
@@ -428,214 +428,214 @@ type NlogUpdateOne struct {
 }
 
 // SetGroupKey sets the "group_key" field.
-func (nuo *NlogUpdateOne) SetGroupKey(s string) *NlogUpdateOne {
-	nuo.mutation.SetGroupKey(s)
-	return nuo
+func (_u *NlogUpdateOne) SetGroupKey(v string) *NlogUpdateOne {
+	_u.mutation.SetGroupKey(v)
+	return _u
 }
 
 // SetNillableGroupKey sets the "group_key" field if the given value is not nil.
-func (nuo *NlogUpdateOne) SetNillableGroupKey(s *string) *NlogUpdateOne {
-	if s != nil {
-		nuo.SetGroupKey(*s)
+func (_u *NlogUpdateOne) SetNillableGroupKey(v *string) *NlogUpdateOne {
+	if v != nil {
+		_u.SetGroupKey(*v)
 	}
-	return nuo
+	return _u
 }
 
 // SetReceiver sets the "receiver" field.
-func (nuo *NlogUpdateOne) SetReceiver(s string) *NlogUpdateOne {
-	nuo.mutation.SetReceiver(s)
-	return nuo
+func (_u *NlogUpdateOne) SetReceiver(v string) *NlogUpdateOne {
+	_u.mutation.SetReceiver(v)
+	return _u
 }
 
 // SetNillableReceiver sets the "receiver" field if the given value is not nil.
-func (nuo *NlogUpdateOne) SetNillableReceiver(s *string) *NlogUpdateOne {
-	if s != nil {
-		nuo.SetReceiver(*s)
+func (_u *NlogUpdateOne) SetNillableReceiver(v *string) *NlogUpdateOne {
+	if v != nil {
+		_u.SetReceiver(*v)
 	}
-	return nuo
+	return _u
 }
 
 // SetReceiverType sets the "receiver_type" field.
-func (nuo *NlogUpdateOne) SetReceiverType(pt profile.ReceiverType) *NlogUpdateOne {
-	nuo.mutation.SetReceiverType(pt)
-	return nuo
+func (_u *NlogUpdateOne) SetReceiverType(v profile.ReceiverType) *NlogUpdateOne {
+	_u.mutation.SetReceiverType(v)
+	return _u
 }
 
 // SetNillableReceiverType sets the "receiver_type" field if the given value is not nil.
-func (nuo *NlogUpdateOne) SetNillableReceiverType(pt *profile.ReceiverType) *NlogUpdateOne {
-	if pt != nil {
-		nuo.SetReceiverType(*pt)
+func (_u *NlogUpdateOne) SetNillableReceiverType(v *profile.ReceiverType) *NlogUpdateOne {
+	if v != nil {
+		_u.SetReceiverType(*v)
 	}
-	return nuo
+	return _u
 }
 
 // SetIdx sets the "idx" field.
-func (nuo *NlogUpdateOne) SetIdx(i int) *NlogUpdateOne {
-	nuo.mutation.ResetIdx()
-	nuo.mutation.SetIdx(i)
-	return nuo
+func (_u *NlogUpdateOne) SetIdx(v int) *NlogUpdateOne {
+	_u.mutation.ResetIdx()
+	_u.mutation.SetIdx(v)
+	return _u
 }
 
 // SetNillableIdx sets the "idx" field if the given value is not nil.
-func (nuo *NlogUpdateOne) SetNillableIdx(i *int) *NlogUpdateOne {
-	if i != nil {
-		nuo.SetIdx(*i)
+func (_u *NlogUpdateOne) SetNillableIdx(v *int) *NlogUpdateOne {
+	if v != nil {
+		_u.SetIdx(*v)
 	}
-	return nuo
+	return _u
 }
 
-// AddIdx adds i to the "idx" field.
-func (nuo *NlogUpdateOne) AddIdx(i int) *NlogUpdateOne {
-	nuo.mutation.AddIdx(i)
-	return nuo
+// AddIdx adds value to the "idx" field.
+func (_u *NlogUpdateOne) AddIdx(v int) *NlogUpdateOne {
+	_u.mutation.AddIdx(v)
+	return _u
 }
 
 // SetSendAt sets the "send_at" field.
-func (nuo *NlogUpdateOne) SetSendAt(t time.Time) *NlogUpdateOne {
-	nuo.mutation.SetSendAt(t)
-	return nuo
+func (_u *NlogUpdateOne) SetSendAt(v time.Time) *NlogUpdateOne {
+	_u.mutation.SetSendAt(v)
+	return _u
 }
 
 // SetNillableSendAt sets the "send_at" field if the given value is not nil.
-func (nuo *NlogUpdateOne) SetNillableSendAt(t *time.Time) *NlogUpdateOne {
-	if t != nil {
-		nuo.SetSendAt(*t)
+func (_u *NlogUpdateOne) SetNillableSendAt(v *time.Time) *NlogUpdateOne {
+	if v != nil {
+		_u.SetSendAt(*v)
 	}
-	return nuo
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (nuo *NlogUpdateOne) SetUpdatedAt(t time.Time) *NlogUpdateOne {
-	nuo.mutation.SetUpdatedAt(t)
-	return nuo
+func (_u *NlogUpdateOne) SetUpdatedAt(v time.Time) *NlogUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (nuo *NlogUpdateOne) SetNillableUpdatedAt(t *time.Time) *NlogUpdateOne {
-	if t != nil {
-		nuo.SetUpdatedAt(*t)
+func (_u *NlogUpdateOne) SetNillableUpdatedAt(v *time.Time) *NlogUpdateOne {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return nuo
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (nuo *NlogUpdateOne) ClearUpdatedAt() *NlogUpdateOne {
-	nuo.mutation.ClearUpdatedAt()
-	return nuo
+func (_u *NlogUpdateOne) ClearUpdatedAt() *NlogUpdateOne {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetExpiresAt sets the "expires_at" field.
-func (nuo *NlogUpdateOne) SetExpiresAt(t time.Time) *NlogUpdateOne {
-	nuo.mutation.SetExpiresAt(t)
-	return nuo
+func (_u *NlogUpdateOne) SetExpiresAt(v time.Time) *NlogUpdateOne {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
-func (nuo *NlogUpdateOne) SetNillableExpiresAt(t *time.Time) *NlogUpdateOne {
-	if t != nil {
-		nuo.SetExpiresAt(*t)
+func (_u *NlogUpdateOne) SetNillableExpiresAt(v *time.Time) *NlogUpdateOne {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return nuo
+	return _u
 }
 
 // AddAlertIDs adds the "alerts" edge to the MsgAlert entity by IDs.
-func (nuo *NlogUpdateOne) AddAlertIDs(ids ...int) *NlogUpdateOne {
-	nuo.mutation.AddAlertIDs(ids...)
-	return nuo
+func (_u *NlogUpdateOne) AddAlertIDs(ids ...int) *NlogUpdateOne {
+	_u.mutation.AddAlertIDs(ids...)
+	return _u
 }
 
 // AddAlerts adds the "alerts" edges to the MsgAlert entity.
-func (nuo *NlogUpdateOne) AddAlerts(m ...*MsgAlert) *NlogUpdateOne {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *NlogUpdateOne) AddAlerts(v ...*MsgAlert) *NlogUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.AddAlertIDs(ids...)
+	return _u.AddAlertIDs(ids...)
 }
 
 // AddNlogAlertIDs adds the "nlog_alert" edge to the NlogAlert entity by IDs.
-func (nuo *NlogUpdateOne) AddNlogAlertIDs(ids ...int) *NlogUpdateOne {
-	nuo.mutation.AddNlogAlertIDs(ids...)
-	return nuo
+func (_u *NlogUpdateOne) AddNlogAlertIDs(ids ...int) *NlogUpdateOne {
+	_u.mutation.AddNlogAlertIDs(ids...)
+	return _u
 }
 
 // AddNlogAlert adds the "nlog_alert" edges to the NlogAlert entity.
-func (nuo *NlogUpdateOne) AddNlogAlert(n ...*NlogAlert) *NlogUpdateOne {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *NlogUpdateOne) AddNlogAlert(v ...*NlogAlert) *NlogUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.AddNlogAlertIDs(ids...)
+	return _u.AddNlogAlertIDs(ids...)
 }
 
 // Mutation returns the NlogMutation object of the builder.
-func (nuo *NlogUpdateOne) Mutation() *NlogMutation {
-	return nuo.mutation
+func (_u *NlogUpdateOne) Mutation() *NlogMutation {
+	return _u.mutation
 }
 
 // ClearAlerts clears all "alerts" edges to the MsgAlert entity.
-func (nuo *NlogUpdateOne) ClearAlerts() *NlogUpdateOne {
-	nuo.mutation.ClearAlerts()
-	return nuo
+func (_u *NlogUpdateOne) ClearAlerts() *NlogUpdateOne {
+	_u.mutation.ClearAlerts()
+	return _u
 }
 
 // RemoveAlertIDs removes the "alerts" edge to MsgAlert entities by IDs.
-func (nuo *NlogUpdateOne) RemoveAlertIDs(ids ...int) *NlogUpdateOne {
-	nuo.mutation.RemoveAlertIDs(ids...)
-	return nuo
+func (_u *NlogUpdateOne) RemoveAlertIDs(ids ...int) *NlogUpdateOne {
+	_u.mutation.RemoveAlertIDs(ids...)
+	return _u
 }
 
 // RemoveAlerts removes "alerts" edges to MsgAlert entities.
-func (nuo *NlogUpdateOne) RemoveAlerts(m ...*MsgAlert) *NlogUpdateOne {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *NlogUpdateOne) RemoveAlerts(v ...*MsgAlert) *NlogUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.RemoveAlertIDs(ids...)
+	return _u.RemoveAlertIDs(ids...)
 }
 
 // ClearNlogAlert clears all "nlog_alert" edges to the NlogAlert entity.
-func (nuo *NlogUpdateOne) ClearNlogAlert() *NlogUpdateOne {
-	nuo.mutation.ClearNlogAlert()
-	return nuo
+func (_u *NlogUpdateOne) ClearNlogAlert() *NlogUpdateOne {
+	_u.mutation.ClearNlogAlert()
+	return _u
 }
 
 // RemoveNlogAlertIDs removes the "nlog_alert" edge to NlogAlert entities by IDs.
-func (nuo *NlogUpdateOne) RemoveNlogAlertIDs(ids ...int) *NlogUpdateOne {
-	nuo.mutation.RemoveNlogAlertIDs(ids...)
-	return nuo
+func (_u *NlogUpdateOne) RemoveNlogAlertIDs(ids ...int) *NlogUpdateOne {
+	_u.mutation.RemoveNlogAlertIDs(ids...)
+	return _u
 }
 
 // RemoveNlogAlert removes "nlog_alert" edges to NlogAlert entities.
-func (nuo *NlogUpdateOne) RemoveNlogAlert(n ...*NlogAlert) *NlogUpdateOne {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *NlogUpdateOne) RemoveNlogAlert(v ...*NlogAlert) *NlogUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.RemoveNlogAlertIDs(ids...)
+	return _u.RemoveNlogAlertIDs(ids...)
 }
 
 // Where appends a list predicates to the NlogUpdate builder.
-func (nuo *NlogUpdateOne) Where(ps ...predicate.Nlog) *NlogUpdateOne {
-	nuo.mutation.Where(ps...)
-	return nuo
+func (_u *NlogUpdateOne) Where(ps ...predicate.Nlog) *NlogUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (nuo *NlogUpdateOne) Select(field string, fields ...string) *NlogUpdateOne {
-	nuo.fields = append([]string{field}, fields...)
-	return nuo
+func (_u *NlogUpdateOne) Select(field string, fields ...string) *NlogUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Nlog entity.
-func (nuo *NlogUpdateOne) Save(ctx context.Context) (*Nlog, error) {
-	return withHooks(ctx, nuo.sqlSave, nuo.mutation, nuo.hooks)
+func (_u *NlogUpdateOne) Save(ctx context.Context) (*Nlog, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (nuo *NlogUpdateOne) SaveX(ctx context.Context) *Nlog {
-	node, err := nuo.Save(ctx)
+func (_u *NlogUpdateOne) SaveX(ctx context.Context) *Nlog {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -643,21 +643,21 @@ func (nuo *NlogUpdateOne) SaveX(ctx context.Context) *Nlog {
 }
 
 // Exec executes the query on the entity.
-func (nuo *NlogUpdateOne) Exec(ctx context.Context) error {
-	_, err := nuo.Save(ctx)
+func (_u *NlogUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (nuo *NlogUpdateOne) ExecX(ctx context.Context) {
-	if err := nuo.Exec(ctx); err != nil {
+func (_u *NlogUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (nuo *NlogUpdateOne) check() error {
-	if v, ok := nuo.mutation.ReceiverType(); ok {
+func (_u *NlogUpdateOne) check() error {
+	if v, ok := _u.mutation.ReceiverType(); ok {
 		if err := nlog.ReceiverTypeValidator(v); err != nil {
 			return &ValidationError{Name: "receiver_type", err: fmt.Errorf(`ent: validator failed for field "Nlog.receiver_type": %w`, err)}
 		}
@@ -665,17 +665,17 @@ func (nuo *NlogUpdateOne) check() error {
 	return nil
 }
 
-func (nuo *NlogUpdateOne) sqlSave(ctx context.Context) (_node *Nlog, err error) {
-	if err := nuo.check(); err != nil {
+func (_u *NlogUpdateOne) sqlSave(ctx context.Context) (_node *Nlog, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(nlog.Table, nlog.Columns, sqlgraph.NewFieldSpec(nlog.FieldID, field.TypeInt))
-	id, ok := nuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Nlog.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := nuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, nlog.FieldID)
 		for _, f := range fields {
@@ -687,41 +687,41 @@ func (nuo *NlogUpdateOne) sqlSave(ctx context.Context) (_node *Nlog, err error) 
 			}
 		}
 	}
-	if ps := nuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := nuo.mutation.GroupKey(); ok {
+	if value, ok := _u.mutation.GroupKey(); ok {
 		_spec.SetField(nlog.FieldGroupKey, field.TypeString, value)
 	}
-	if value, ok := nuo.mutation.Receiver(); ok {
+	if value, ok := _u.mutation.Receiver(); ok {
 		_spec.SetField(nlog.FieldReceiver, field.TypeString, value)
 	}
-	if value, ok := nuo.mutation.ReceiverType(); ok {
+	if value, ok := _u.mutation.ReceiverType(); ok {
 		_spec.SetField(nlog.FieldReceiverType, field.TypeEnum, value)
 	}
-	if value, ok := nuo.mutation.Idx(); ok {
+	if value, ok := _u.mutation.Idx(); ok {
 		_spec.SetField(nlog.FieldIdx, field.TypeInt, value)
 	}
-	if value, ok := nuo.mutation.AddedIdx(); ok {
+	if value, ok := _u.mutation.AddedIdx(); ok {
 		_spec.AddField(nlog.FieldIdx, field.TypeInt, value)
 	}
-	if value, ok := nuo.mutation.SendAt(); ok {
+	if value, ok := _u.mutation.SendAt(); ok {
 		_spec.SetField(nlog.FieldSendAt, field.TypeTime, value)
 	}
-	if value, ok := nuo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(nlog.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if nuo.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(nlog.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := nuo.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(nlog.FieldExpiresAt, field.TypeTime, value)
 	}
-	if nuo.mutation.AlertsCleared() {
+	if _u.mutation.AlertsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -732,14 +732,14 @@ func (nuo *NlogUpdateOne) sqlSave(ctx context.Context) (_node *Nlog, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = nuo.schemaConfig.NlogAlert
-		createE := &NlogAlertCreate{config: nuo.config, mutation: newNlogAlertMutation(nuo.config, OpCreate)}
+		edge.Schema = _u.schemaConfig.NlogAlert
+		createE := &NlogAlertCreate{config: _u.config, mutation: newNlogAlertMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.RemovedAlertsIDs(); len(nodes) > 0 && !nuo.mutation.AlertsCleared() {
+	if nodes := _u.mutation.RemovedAlertsIDs(); len(nodes) > 0 && !_u.mutation.AlertsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -750,17 +750,17 @@ func (nuo *NlogUpdateOne) sqlSave(ctx context.Context) (_node *Nlog, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = nuo.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &NlogAlertCreate{config: nuo.config, mutation: newNlogAlertMutation(nuo.config, OpCreate)}
+		createE := &NlogAlertCreate{config: _u.config, mutation: newNlogAlertMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.AlertsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AlertsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -771,17 +771,17 @@ func (nuo *NlogUpdateOne) sqlSave(ctx context.Context) (_node *Nlog, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = nuo.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &NlogAlertCreate{config: nuo.config, mutation: newNlogAlertMutation(nuo.config, OpCreate)}
+		createE := &NlogAlertCreate{config: _u.config, mutation: newNlogAlertMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.NlogAlertCleared() {
+	if _u.mutation.NlogAlertCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -792,10 +792,10 @@ func (nuo *NlogUpdateOne) sqlSave(ctx context.Context) (_node *Nlog, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(nlogalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = nuo.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.RemovedNlogAlertIDs(); len(nodes) > 0 && !nuo.mutation.NlogAlertCleared() {
+	if nodes := _u.mutation.RemovedNlogAlertIDs(); len(nodes) > 0 && !_u.mutation.NlogAlertCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -806,13 +806,13 @@ func (nuo *NlogUpdateOne) sqlSave(ctx context.Context) (_node *Nlog, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(nlogalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = nuo.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.NlogAlertIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NlogAlertIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -823,18 +823,18 @@ func (nuo *NlogUpdateOne) sqlSave(ctx context.Context) (_node *Nlog, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(nlogalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = nuo.schemaConfig.NlogAlert
+		edge.Schema = _u.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Node.Schema = nuo.schemaConfig.Nlog
-	ctx = internal.NewSchemaConfigContext(ctx, nuo.schemaConfig)
-	_node = &Nlog{config: nuo.config}
+	_spec.Node.Schema = _u.schemaConfig.Nlog
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	_node = &Nlog{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, nuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{nlog.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -842,6 +842,6 @@ func (nuo *NlogUpdateOne) sqlSave(ctx context.Context) (_node *Nlog, err error) 
 		}
 		return nil, err
 	}
-	nuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

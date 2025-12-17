@@ -27,195 +27,195 @@ type MsgSubscriberUpdate struct {
 }
 
 // Where appends a list predicates to the MsgSubscriberUpdate builder.
-func (msu *MsgSubscriberUpdate) Where(ps ...predicate.MsgSubscriber) *MsgSubscriberUpdate {
-	msu.mutation.Where(ps...)
-	return msu
+func (_u *MsgSubscriberUpdate) Where(ps ...predicate.MsgSubscriber) *MsgSubscriberUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (msu *MsgSubscriberUpdate) SetUpdatedBy(i int) *MsgSubscriberUpdate {
-	msu.mutation.ResetUpdatedBy()
-	msu.mutation.SetUpdatedBy(i)
-	return msu
+func (_u *MsgSubscriberUpdate) SetUpdatedBy(v int) *MsgSubscriberUpdate {
+	_u.mutation.ResetUpdatedBy()
+	_u.mutation.SetUpdatedBy(v)
+	return _u
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (msu *MsgSubscriberUpdate) SetNillableUpdatedBy(i *int) *MsgSubscriberUpdate {
-	if i != nil {
-		msu.SetUpdatedBy(*i)
+func (_u *MsgSubscriberUpdate) SetNillableUpdatedBy(v *int) *MsgSubscriberUpdate {
+	if v != nil {
+		_u.SetUpdatedBy(*v)
 	}
-	return msu
+	return _u
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (msu *MsgSubscriberUpdate) AddUpdatedBy(i int) *MsgSubscriberUpdate {
-	msu.mutation.AddUpdatedBy(i)
-	return msu
+// AddUpdatedBy adds value to the "updated_by" field.
+func (_u *MsgSubscriberUpdate) AddUpdatedBy(v int) *MsgSubscriberUpdate {
+	_u.mutation.AddUpdatedBy(v)
+	return _u
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (msu *MsgSubscriberUpdate) ClearUpdatedBy() *MsgSubscriberUpdate {
-	msu.mutation.ClearUpdatedBy()
-	return msu
+func (_u *MsgSubscriberUpdate) ClearUpdatedBy() *MsgSubscriberUpdate {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (msu *MsgSubscriberUpdate) SetUpdatedAt(t time.Time) *MsgSubscriberUpdate {
-	msu.mutation.SetUpdatedAt(t)
-	return msu
+func (_u *MsgSubscriberUpdate) SetUpdatedAt(v time.Time) *MsgSubscriberUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (msu *MsgSubscriberUpdate) SetNillableUpdatedAt(t *time.Time) *MsgSubscriberUpdate {
-	if t != nil {
-		msu.SetUpdatedAt(*t)
+func (_u *MsgSubscriberUpdate) SetNillableUpdatedAt(v *time.Time) *MsgSubscriberUpdate {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return msu
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (msu *MsgSubscriberUpdate) ClearUpdatedAt() *MsgSubscriberUpdate {
-	msu.mutation.ClearUpdatedAt()
-	return msu
+func (_u *MsgSubscriberUpdate) ClearUpdatedAt() *MsgSubscriberUpdate {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetMsgTypeID sets the "msg_type_id" field.
-func (msu *MsgSubscriberUpdate) SetMsgTypeID(i int) *MsgSubscriberUpdate {
-	msu.mutation.SetMsgTypeID(i)
-	return msu
+func (_u *MsgSubscriberUpdate) SetMsgTypeID(v int) *MsgSubscriberUpdate {
+	_u.mutation.SetMsgTypeID(v)
+	return _u
 }
 
 // SetNillableMsgTypeID sets the "msg_type_id" field if the given value is not nil.
-func (msu *MsgSubscriberUpdate) SetNillableMsgTypeID(i *int) *MsgSubscriberUpdate {
-	if i != nil {
-		msu.SetMsgTypeID(*i)
+func (_u *MsgSubscriberUpdate) SetNillableMsgTypeID(v *int) *MsgSubscriberUpdate {
+	if v != nil {
+		_u.SetMsgTypeID(*v)
 	}
-	return msu
+	return _u
 }
 
 // SetTenantID sets the "tenant_id" field.
-func (msu *MsgSubscriberUpdate) SetTenantID(i int) *MsgSubscriberUpdate {
-	msu.mutation.ResetTenantID()
-	msu.mutation.SetTenantID(i)
-	return msu
+func (_u *MsgSubscriberUpdate) SetTenantID(v int) *MsgSubscriberUpdate {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
 }
 
 // SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (msu *MsgSubscriberUpdate) SetNillableTenantID(i *int) *MsgSubscriberUpdate {
-	if i != nil {
-		msu.SetTenantID(*i)
+func (_u *MsgSubscriberUpdate) SetNillableTenantID(v *int) *MsgSubscriberUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
 	}
-	return msu
+	return _u
 }
 
-// AddTenantID adds i to the "tenant_id" field.
-func (msu *MsgSubscriberUpdate) AddTenantID(i int) *MsgSubscriberUpdate {
-	msu.mutation.AddTenantID(i)
-	return msu
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *MsgSubscriberUpdate) AddTenantID(v int) *MsgSubscriberUpdate {
+	_u.mutation.AddTenantID(v)
+	return _u
 }
 
 // SetUserID sets the "user_id" field.
-func (msu *MsgSubscriberUpdate) SetUserID(i int) *MsgSubscriberUpdate {
-	msu.mutation.SetUserID(i)
-	return msu
+func (_u *MsgSubscriberUpdate) SetUserID(v int) *MsgSubscriberUpdate {
+	_u.mutation.SetUserID(v)
+	return _u
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (msu *MsgSubscriberUpdate) SetNillableUserID(i *int) *MsgSubscriberUpdate {
-	if i != nil {
-		msu.SetUserID(*i)
+func (_u *MsgSubscriberUpdate) SetNillableUserID(v *int) *MsgSubscriberUpdate {
+	if v != nil {
+		_u.SetUserID(*v)
 	}
-	return msu
+	return _u
 }
 
 // ClearUserID clears the value of the "user_id" field.
-func (msu *MsgSubscriberUpdate) ClearUserID() *MsgSubscriberUpdate {
-	msu.mutation.ClearUserID()
-	return msu
+func (_u *MsgSubscriberUpdate) ClearUserID() *MsgSubscriberUpdate {
+	_u.mutation.ClearUserID()
+	return _u
 }
 
 // SetOrgRoleID sets the "org_role_id" field.
-func (msu *MsgSubscriberUpdate) SetOrgRoleID(i int) *MsgSubscriberUpdate {
-	msu.mutation.ResetOrgRoleID()
-	msu.mutation.SetOrgRoleID(i)
-	return msu
+func (_u *MsgSubscriberUpdate) SetOrgRoleID(v int) *MsgSubscriberUpdate {
+	_u.mutation.ResetOrgRoleID()
+	_u.mutation.SetOrgRoleID(v)
+	return _u
 }
 
 // SetNillableOrgRoleID sets the "org_role_id" field if the given value is not nil.
-func (msu *MsgSubscriberUpdate) SetNillableOrgRoleID(i *int) *MsgSubscriberUpdate {
-	if i != nil {
-		msu.SetOrgRoleID(*i)
+func (_u *MsgSubscriberUpdate) SetNillableOrgRoleID(v *int) *MsgSubscriberUpdate {
+	if v != nil {
+		_u.SetOrgRoleID(*v)
 	}
-	return msu
+	return _u
 }
 
-// AddOrgRoleID adds i to the "org_role_id" field.
-func (msu *MsgSubscriberUpdate) AddOrgRoleID(i int) *MsgSubscriberUpdate {
-	msu.mutation.AddOrgRoleID(i)
-	return msu
+// AddOrgRoleID adds value to the "org_role_id" field.
+func (_u *MsgSubscriberUpdate) AddOrgRoleID(v int) *MsgSubscriberUpdate {
+	_u.mutation.AddOrgRoleID(v)
+	return _u
 }
 
 // ClearOrgRoleID clears the value of the "org_role_id" field.
-func (msu *MsgSubscriberUpdate) ClearOrgRoleID() *MsgSubscriberUpdate {
-	msu.mutation.ClearOrgRoleID()
-	return msu
+func (_u *MsgSubscriberUpdate) ClearOrgRoleID() *MsgSubscriberUpdate {
+	_u.mutation.ClearOrgRoleID()
+	return _u
 }
 
 // SetExclude sets the "exclude" field.
-func (msu *MsgSubscriberUpdate) SetExclude(b bool) *MsgSubscriberUpdate {
-	msu.mutation.SetExclude(b)
-	return msu
+func (_u *MsgSubscriberUpdate) SetExclude(v bool) *MsgSubscriberUpdate {
+	_u.mutation.SetExclude(v)
+	return _u
 }
 
 // SetNillableExclude sets the "exclude" field if the given value is not nil.
-func (msu *MsgSubscriberUpdate) SetNillableExclude(b *bool) *MsgSubscriberUpdate {
-	if b != nil {
-		msu.SetExclude(*b)
+func (_u *MsgSubscriberUpdate) SetNillableExclude(v *bool) *MsgSubscriberUpdate {
+	if v != nil {
+		_u.SetExclude(*v)
 	}
-	return msu
+	return _u
 }
 
 // ClearExclude clears the value of the "exclude" field.
-func (msu *MsgSubscriberUpdate) ClearExclude() *MsgSubscriberUpdate {
-	msu.mutation.ClearExclude()
-	return msu
+func (_u *MsgSubscriberUpdate) ClearExclude() *MsgSubscriberUpdate {
+	_u.mutation.ClearExclude()
+	return _u
 }
 
 // SetMsgType sets the "msg_type" edge to the MsgType entity.
-func (msu *MsgSubscriberUpdate) SetMsgType(m *MsgType) *MsgSubscriberUpdate {
-	return msu.SetMsgTypeID(m.ID)
+func (_u *MsgSubscriberUpdate) SetMsgType(v *MsgType) *MsgSubscriberUpdate {
+	return _u.SetMsgTypeID(v.ID)
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (msu *MsgSubscriberUpdate) SetUser(u *User) *MsgSubscriberUpdate {
-	return msu.SetUserID(u.ID)
+func (_u *MsgSubscriberUpdate) SetUser(v *User) *MsgSubscriberUpdate {
+	return _u.SetUserID(v.ID)
 }
 
 // Mutation returns the MsgSubscriberMutation object of the builder.
-func (msu *MsgSubscriberUpdate) Mutation() *MsgSubscriberMutation {
-	return msu.mutation
+func (_u *MsgSubscriberUpdate) Mutation() *MsgSubscriberMutation {
+	return _u.mutation
 }
 
 // ClearMsgType clears the "msg_type" edge to the MsgType entity.
-func (msu *MsgSubscriberUpdate) ClearMsgType() *MsgSubscriberUpdate {
-	msu.mutation.ClearMsgType()
-	return msu
+func (_u *MsgSubscriberUpdate) ClearMsgType() *MsgSubscriberUpdate {
+	_u.mutation.ClearMsgType()
+	return _u
 }
 
 // ClearUser clears the "user" edge to the User entity.
-func (msu *MsgSubscriberUpdate) ClearUser() *MsgSubscriberUpdate {
-	msu.mutation.ClearUser()
-	return msu
+func (_u *MsgSubscriberUpdate) ClearUser() *MsgSubscriberUpdate {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (msu *MsgSubscriberUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, msu.sqlSave, msu.mutation, msu.hooks)
+func (_u *MsgSubscriberUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (msu *MsgSubscriberUpdate) SaveX(ctx context.Context) int {
-	affected, err := msu.Save(ctx)
+func (_u *MsgSubscriberUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -223,75 +223,75 @@ func (msu *MsgSubscriberUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (msu *MsgSubscriberUpdate) Exec(ctx context.Context) error {
-	_, err := msu.Save(ctx)
+func (_u *MsgSubscriberUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (msu *MsgSubscriberUpdate) ExecX(ctx context.Context) {
-	if err := msu.Exec(ctx); err != nil {
+func (_u *MsgSubscriberUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (msu *MsgSubscriberUpdate) check() error {
-	if msu.mutation.MsgTypeCleared() && len(msu.mutation.MsgTypeIDs()) > 0 {
+func (_u *MsgSubscriberUpdate) check() error {
+	if _u.mutation.MsgTypeCleared() && len(_u.mutation.MsgTypeIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgSubscriber.msg_type"`)
 	}
 	return nil
 }
 
-func (msu *MsgSubscriberUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := msu.check(); err != nil {
-		return n, err
+func (_u *MsgSubscriberUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(msgsubscriber.Table, msgsubscriber.Columns, sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt))
-	if ps := msu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := msu.mutation.UpdatedBy(); ok {
+	if value, ok := _u.mutation.UpdatedBy(); ok {
 		_spec.SetField(msgsubscriber.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if value, ok := msu.mutation.AddedUpdatedBy(); ok {
+	if value, ok := _u.mutation.AddedUpdatedBy(); ok {
 		_spec.AddField(msgsubscriber.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if msu.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		_spec.ClearField(msgsubscriber.FieldUpdatedBy, field.TypeInt)
 	}
-	if value, ok := msu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgsubscriber.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if msu.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(msgsubscriber.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := msu.mutation.TenantID(); ok {
+	if value, ok := _u.mutation.TenantID(); ok {
 		_spec.SetField(msgsubscriber.FieldTenantID, field.TypeInt, value)
 	}
-	if value, ok := msu.mutation.AddedTenantID(); ok {
+	if value, ok := _u.mutation.AddedTenantID(); ok {
 		_spec.AddField(msgsubscriber.FieldTenantID, field.TypeInt, value)
 	}
-	if value, ok := msu.mutation.OrgRoleID(); ok {
+	if value, ok := _u.mutation.OrgRoleID(); ok {
 		_spec.SetField(msgsubscriber.FieldOrgRoleID, field.TypeInt, value)
 	}
-	if value, ok := msu.mutation.AddedOrgRoleID(); ok {
+	if value, ok := _u.mutation.AddedOrgRoleID(); ok {
 		_spec.AddField(msgsubscriber.FieldOrgRoleID, field.TypeInt, value)
 	}
-	if msu.mutation.OrgRoleIDCleared() {
+	if _u.mutation.OrgRoleIDCleared() {
 		_spec.ClearField(msgsubscriber.FieldOrgRoleID, field.TypeInt)
 	}
-	if value, ok := msu.mutation.Exclude(); ok {
+	if value, ok := _u.mutation.Exclude(); ok {
 		_spec.SetField(msgsubscriber.FieldExclude, field.TypeBool, value)
 	}
-	if msu.mutation.ExcludeCleared() {
+	if _u.mutation.ExcludeCleared() {
 		_spec.ClearField(msgsubscriber.FieldExclude, field.TypeBool)
 	}
-	if msu.mutation.MsgTypeCleared() {
+	if _u.mutation.MsgTypeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -302,10 +302,10 @@ func (msu *MsgSubscriberUpdate) sqlSave(ctx context.Context) (n int, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = msu.schemaConfig.MsgSubscriber
+		edge.Schema = _u.schemaConfig.MsgSubscriber
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := msu.mutation.MsgTypeIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.MsgTypeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -316,13 +316,13 @@ func (msu *MsgSubscriberUpdate) sqlSave(ctx context.Context) (n int, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = msu.schemaConfig.MsgSubscriber
+		edge.Schema = _u.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if msu.mutation.UserCleared() {
+	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -333,10 +333,10 @@ func (msu *MsgSubscriberUpdate) sqlSave(ctx context.Context) (n int, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = msu.schemaConfig.MsgSubscriber
+		edge.Schema = _u.schemaConfig.MsgSubscriber
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := msu.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -347,15 +347,15 @@ func (msu *MsgSubscriberUpdate) sqlSave(ctx context.Context) (n int, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = msu.schemaConfig.MsgSubscriber
+		edge.Schema = _u.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Node.Schema = msu.schemaConfig.MsgSubscriber
-	ctx = internal.NewSchemaConfigContext(ctx, msu.schemaConfig)
-	if n, err = sqlgraph.UpdateNodes(ctx, msu.driver, _spec); err != nil {
+	_spec.Node.Schema = _u.schemaConfig.MsgSubscriber
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgsubscriber.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -363,8 +363,8 @@ func (msu *MsgSubscriberUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		return 0, err
 	}
-	msu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // MsgSubscriberUpdateOne is the builder for updating a single MsgSubscriber entity.
@@ -376,202 +376,202 @@ type MsgSubscriberUpdateOne struct {
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (msuo *MsgSubscriberUpdateOne) SetUpdatedBy(i int) *MsgSubscriberUpdateOne {
-	msuo.mutation.ResetUpdatedBy()
-	msuo.mutation.SetUpdatedBy(i)
-	return msuo
+func (_u *MsgSubscriberUpdateOne) SetUpdatedBy(v int) *MsgSubscriberUpdateOne {
+	_u.mutation.ResetUpdatedBy()
+	_u.mutation.SetUpdatedBy(v)
+	return _u
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (msuo *MsgSubscriberUpdateOne) SetNillableUpdatedBy(i *int) *MsgSubscriberUpdateOne {
-	if i != nil {
-		msuo.SetUpdatedBy(*i)
+func (_u *MsgSubscriberUpdateOne) SetNillableUpdatedBy(v *int) *MsgSubscriberUpdateOne {
+	if v != nil {
+		_u.SetUpdatedBy(*v)
 	}
-	return msuo
+	return _u
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (msuo *MsgSubscriberUpdateOne) AddUpdatedBy(i int) *MsgSubscriberUpdateOne {
-	msuo.mutation.AddUpdatedBy(i)
-	return msuo
+// AddUpdatedBy adds value to the "updated_by" field.
+func (_u *MsgSubscriberUpdateOne) AddUpdatedBy(v int) *MsgSubscriberUpdateOne {
+	_u.mutation.AddUpdatedBy(v)
+	return _u
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (msuo *MsgSubscriberUpdateOne) ClearUpdatedBy() *MsgSubscriberUpdateOne {
-	msuo.mutation.ClearUpdatedBy()
-	return msuo
+func (_u *MsgSubscriberUpdateOne) ClearUpdatedBy() *MsgSubscriberUpdateOne {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (msuo *MsgSubscriberUpdateOne) SetUpdatedAt(t time.Time) *MsgSubscriberUpdateOne {
-	msuo.mutation.SetUpdatedAt(t)
-	return msuo
+func (_u *MsgSubscriberUpdateOne) SetUpdatedAt(v time.Time) *MsgSubscriberUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (msuo *MsgSubscriberUpdateOne) SetNillableUpdatedAt(t *time.Time) *MsgSubscriberUpdateOne {
-	if t != nil {
-		msuo.SetUpdatedAt(*t)
+func (_u *MsgSubscriberUpdateOne) SetNillableUpdatedAt(v *time.Time) *MsgSubscriberUpdateOne {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return msuo
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (msuo *MsgSubscriberUpdateOne) ClearUpdatedAt() *MsgSubscriberUpdateOne {
-	msuo.mutation.ClearUpdatedAt()
-	return msuo
+func (_u *MsgSubscriberUpdateOne) ClearUpdatedAt() *MsgSubscriberUpdateOne {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetMsgTypeID sets the "msg_type_id" field.
-func (msuo *MsgSubscriberUpdateOne) SetMsgTypeID(i int) *MsgSubscriberUpdateOne {
-	msuo.mutation.SetMsgTypeID(i)
-	return msuo
+func (_u *MsgSubscriberUpdateOne) SetMsgTypeID(v int) *MsgSubscriberUpdateOne {
+	_u.mutation.SetMsgTypeID(v)
+	return _u
 }
 
 // SetNillableMsgTypeID sets the "msg_type_id" field if the given value is not nil.
-func (msuo *MsgSubscriberUpdateOne) SetNillableMsgTypeID(i *int) *MsgSubscriberUpdateOne {
-	if i != nil {
-		msuo.SetMsgTypeID(*i)
+func (_u *MsgSubscriberUpdateOne) SetNillableMsgTypeID(v *int) *MsgSubscriberUpdateOne {
+	if v != nil {
+		_u.SetMsgTypeID(*v)
 	}
-	return msuo
+	return _u
 }
 
 // SetTenantID sets the "tenant_id" field.
-func (msuo *MsgSubscriberUpdateOne) SetTenantID(i int) *MsgSubscriberUpdateOne {
-	msuo.mutation.ResetTenantID()
-	msuo.mutation.SetTenantID(i)
-	return msuo
+func (_u *MsgSubscriberUpdateOne) SetTenantID(v int) *MsgSubscriberUpdateOne {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
 }
 
 // SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (msuo *MsgSubscriberUpdateOne) SetNillableTenantID(i *int) *MsgSubscriberUpdateOne {
-	if i != nil {
-		msuo.SetTenantID(*i)
+func (_u *MsgSubscriberUpdateOne) SetNillableTenantID(v *int) *MsgSubscriberUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
 	}
-	return msuo
+	return _u
 }
 
-// AddTenantID adds i to the "tenant_id" field.
-func (msuo *MsgSubscriberUpdateOne) AddTenantID(i int) *MsgSubscriberUpdateOne {
-	msuo.mutation.AddTenantID(i)
-	return msuo
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *MsgSubscriberUpdateOne) AddTenantID(v int) *MsgSubscriberUpdateOne {
+	_u.mutation.AddTenantID(v)
+	return _u
 }
 
 // SetUserID sets the "user_id" field.
-func (msuo *MsgSubscriberUpdateOne) SetUserID(i int) *MsgSubscriberUpdateOne {
-	msuo.mutation.SetUserID(i)
-	return msuo
+func (_u *MsgSubscriberUpdateOne) SetUserID(v int) *MsgSubscriberUpdateOne {
+	_u.mutation.SetUserID(v)
+	return _u
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (msuo *MsgSubscriberUpdateOne) SetNillableUserID(i *int) *MsgSubscriberUpdateOne {
-	if i != nil {
-		msuo.SetUserID(*i)
+func (_u *MsgSubscriberUpdateOne) SetNillableUserID(v *int) *MsgSubscriberUpdateOne {
+	if v != nil {
+		_u.SetUserID(*v)
 	}
-	return msuo
+	return _u
 }
 
 // ClearUserID clears the value of the "user_id" field.
-func (msuo *MsgSubscriberUpdateOne) ClearUserID() *MsgSubscriberUpdateOne {
-	msuo.mutation.ClearUserID()
-	return msuo
+func (_u *MsgSubscriberUpdateOne) ClearUserID() *MsgSubscriberUpdateOne {
+	_u.mutation.ClearUserID()
+	return _u
 }
 
 // SetOrgRoleID sets the "org_role_id" field.
-func (msuo *MsgSubscriberUpdateOne) SetOrgRoleID(i int) *MsgSubscriberUpdateOne {
-	msuo.mutation.ResetOrgRoleID()
-	msuo.mutation.SetOrgRoleID(i)
-	return msuo
+func (_u *MsgSubscriberUpdateOne) SetOrgRoleID(v int) *MsgSubscriberUpdateOne {
+	_u.mutation.ResetOrgRoleID()
+	_u.mutation.SetOrgRoleID(v)
+	return _u
 }
 
 // SetNillableOrgRoleID sets the "org_role_id" field if the given value is not nil.
-func (msuo *MsgSubscriberUpdateOne) SetNillableOrgRoleID(i *int) *MsgSubscriberUpdateOne {
-	if i != nil {
-		msuo.SetOrgRoleID(*i)
+func (_u *MsgSubscriberUpdateOne) SetNillableOrgRoleID(v *int) *MsgSubscriberUpdateOne {
+	if v != nil {
+		_u.SetOrgRoleID(*v)
 	}
-	return msuo
+	return _u
 }
 
-// AddOrgRoleID adds i to the "org_role_id" field.
-func (msuo *MsgSubscriberUpdateOne) AddOrgRoleID(i int) *MsgSubscriberUpdateOne {
-	msuo.mutation.AddOrgRoleID(i)
-	return msuo
+// AddOrgRoleID adds value to the "org_role_id" field.
+func (_u *MsgSubscriberUpdateOne) AddOrgRoleID(v int) *MsgSubscriberUpdateOne {
+	_u.mutation.AddOrgRoleID(v)
+	return _u
 }
 
 // ClearOrgRoleID clears the value of the "org_role_id" field.
-func (msuo *MsgSubscriberUpdateOne) ClearOrgRoleID() *MsgSubscriberUpdateOne {
-	msuo.mutation.ClearOrgRoleID()
-	return msuo
+func (_u *MsgSubscriberUpdateOne) ClearOrgRoleID() *MsgSubscriberUpdateOne {
+	_u.mutation.ClearOrgRoleID()
+	return _u
 }
 
 // SetExclude sets the "exclude" field.
-func (msuo *MsgSubscriberUpdateOne) SetExclude(b bool) *MsgSubscriberUpdateOne {
-	msuo.mutation.SetExclude(b)
-	return msuo
+func (_u *MsgSubscriberUpdateOne) SetExclude(v bool) *MsgSubscriberUpdateOne {
+	_u.mutation.SetExclude(v)
+	return _u
 }
 
 // SetNillableExclude sets the "exclude" field if the given value is not nil.
-func (msuo *MsgSubscriberUpdateOne) SetNillableExclude(b *bool) *MsgSubscriberUpdateOne {
-	if b != nil {
-		msuo.SetExclude(*b)
+func (_u *MsgSubscriberUpdateOne) SetNillableExclude(v *bool) *MsgSubscriberUpdateOne {
+	if v != nil {
+		_u.SetExclude(*v)
 	}
-	return msuo
+	return _u
 }
 
 // ClearExclude clears the value of the "exclude" field.
-func (msuo *MsgSubscriberUpdateOne) ClearExclude() *MsgSubscriberUpdateOne {
-	msuo.mutation.ClearExclude()
-	return msuo
+func (_u *MsgSubscriberUpdateOne) ClearExclude() *MsgSubscriberUpdateOne {
+	_u.mutation.ClearExclude()
+	return _u
 }
 
 // SetMsgType sets the "msg_type" edge to the MsgType entity.
-func (msuo *MsgSubscriberUpdateOne) SetMsgType(m *MsgType) *MsgSubscriberUpdateOne {
-	return msuo.SetMsgTypeID(m.ID)
+func (_u *MsgSubscriberUpdateOne) SetMsgType(v *MsgType) *MsgSubscriberUpdateOne {
+	return _u.SetMsgTypeID(v.ID)
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (msuo *MsgSubscriberUpdateOne) SetUser(u *User) *MsgSubscriberUpdateOne {
-	return msuo.SetUserID(u.ID)
+func (_u *MsgSubscriberUpdateOne) SetUser(v *User) *MsgSubscriberUpdateOne {
+	return _u.SetUserID(v.ID)
 }
 
 // Mutation returns the MsgSubscriberMutation object of the builder.
-func (msuo *MsgSubscriberUpdateOne) Mutation() *MsgSubscriberMutation {
-	return msuo.mutation
+func (_u *MsgSubscriberUpdateOne) Mutation() *MsgSubscriberMutation {
+	return _u.mutation
 }
 
 // ClearMsgType clears the "msg_type" edge to the MsgType entity.
-func (msuo *MsgSubscriberUpdateOne) ClearMsgType() *MsgSubscriberUpdateOne {
-	msuo.mutation.ClearMsgType()
-	return msuo
+func (_u *MsgSubscriberUpdateOne) ClearMsgType() *MsgSubscriberUpdateOne {
+	_u.mutation.ClearMsgType()
+	return _u
 }
 
 // ClearUser clears the "user" edge to the User entity.
-func (msuo *MsgSubscriberUpdateOne) ClearUser() *MsgSubscriberUpdateOne {
-	msuo.mutation.ClearUser()
-	return msuo
+func (_u *MsgSubscriberUpdateOne) ClearUser() *MsgSubscriberUpdateOne {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Where appends a list predicates to the MsgSubscriberUpdate builder.
-func (msuo *MsgSubscriberUpdateOne) Where(ps ...predicate.MsgSubscriber) *MsgSubscriberUpdateOne {
-	msuo.mutation.Where(ps...)
-	return msuo
+func (_u *MsgSubscriberUpdateOne) Where(ps ...predicate.MsgSubscriber) *MsgSubscriberUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (msuo *MsgSubscriberUpdateOne) Select(field string, fields ...string) *MsgSubscriberUpdateOne {
-	msuo.fields = append([]string{field}, fields...)
-	return msuo
+func (_u *MsgSubscriberUpdateOne) Select(field string, fields ...string) *MsgSubscriberUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated MsgSubscriber entity.
-func (msuo *MsgSubscriberUpdateOne) Save(ctx context.Context) (*MsgSubscriber, error) {
-	return withHooks(ctx, msuo.sqlSave, msuo.mutation, msuo.hooks)
+func (_u *MsgSubscriberUpdateOne) Save(ctx context.Context) (*MsgSubscriber, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (msuo *MsgSubscriberUpdateOne) SaveX(ctx context.Context) *MsgSubscriber {
-	node, err := msuo.Save(ctx)
+func (_u *MsgSubscriberUpdateOne) SaveX(ctx context.Context) *MsgSubscriber {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -579,37 +579,37 @@ func (msuo *MsgSubscriberUpdateOne) SaveX(ctx context.Context) *MsgSubscriber {
 }
 
 // Exec executes the query on the entity.
-func (msuo *MsgSubscriberUpdateOne) Exec(ctx context.Context) error {
-	_, err := msuo.Save(ctx)
+func (_u *MsgSubscriberUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (msuo *MsgSubscriberUpdateOne) ExecX(ctx context.Context) {
-	if err := msuo.Exec(ctx); err != nil {
+func (_u *MsgSubscriberUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (msuo *MsgSubscriberUpdateOne) check() error {
-	if msuo.mutation.MsgTypeCleared() && len(msuo.mutation.MsgTypeIDs()) > 0 {
+func (_u *MsgSubscriberUpdateOne) check() error {
+	if _u.mutation.MsgTypeCleared() && len(_u.mutation.MsgTypeIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgSubscriber.msg_type"`)
 	}
 	return nil
 }
 
-func (msuo *MsgSubscriberUpdateOne) sqlSave(ctx context.Context) (_node *MsgSubscriber, err error) {
-	if err := msuo.check(); err != nil {
+func (_u *MsgSubscriberUpdateOne) sqlSave(ctx context.Context) (_node *MsgSubscriber, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(msgsubscriber.Table, msgsubscriber.Columns, sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt))
-	id, ok := msuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "MsgSubscriber.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := msuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, msgsubscriber.FieldID)
 		for _, f := range fields {
@@ -621,50 +621,50 @@ func (msuo *MsgSubscriberUpdateOne) sqlSave(ctx context.Context) (_node *MsgSubs
 			}
 		}
 	}
-	if ps := msuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := msuo.mutation.UpdatedBy(); ok {
+	if value, ok := _u.mutation.UpdatedBy(); ok {
 		_spec.SetField(msgsubscriber.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if value, ok := msuo.mutation.AddedUpdatedBy(); ok {
+	if value, ok := _u.mutation.AddedUpdatedBy(); ok {
 		_spec.AddField(msgsubscriber.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if msuo.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		_spec.ClearField(msgsubscriber.FieldUpdatedBy, field.TypeInt)
 	}
-	if value, ok := msuo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgsubscriber.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if msuo.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(msgsubscriber.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := msuo.mutation.TenantID(); ok {
+	if value, ok := _u.mutation.TenantID(); ok {
 		_spec.SetField(msgsubscriber.FieldTenantID, field.TypeInt, value)
 	}
-	if value, ok := msuo.mutation.AddedTenantID(); ok {
+	if value, ok := _u.mutation.AddedTenantID(); ok {
 		_spec.AddField(msgsubscriber.FieldTenantID, field.TypeInt, value)
 	}
-	if value, ok := msuo.mutation.OrgRoleID(); ok {
+	if value, ok := _u.mutation.OrgRoleID(); ok {
 		_spec.SetField(msgsubscriber.FieldOrgRoleID, field.TypeInt, value)
 	}
-	if value, ok := msuo.mutation.AddedOrgRoleID(); ok {
+	if value, ok := _u.mutation.AddedOrgRoleID(); ok {
 		_spec.AddField(msgsubscriber.FieldOrgRoleID, field.TypeInt, value)
 	}
-	if msuo.mutation.OrgRoleIDCleared() {
+	if _u.mutation.OrgRoleIDCleared() {
 		_spec.ClearField(msgsubscriber.FieldOrgRoleID, field.TypeInt)
 	}
-	if value, ok := msuo.mutation.Exclude(); ok {
+	if value, ok := _u.mutation.Exclude(); ok {
 		_spec.SetField(msgsubscriber.FieldExclude, field.TypeBool, value)
 	}
-	if msuo.mutation.ExcludeCleared() {
+	if _u.mutation.ExcludeCleared() {
 		_spec.ClearField(msgsubscriber.FieldExclude, field.TypeBool)
 	}
-	if msuo.mutation.MsgTypeCleared() {
+	if _u.mutation.MsgTypeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -675,10 +675,10 @@ func (msuo *MsgSubscriberUpdateOne) sqlSave(ctx context.Context) (_node *MsgSubs
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = msuo.schemaConfig.MsgSubscriber
+		edge.Schema = _u.schemaConfig.MsgSubscriber
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := msuo.mutation.MsgTypeIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.MsgTypeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -689,13 +689,13 @@ func (msuo *MsgSubscriberUpdateOne) sqlSave(ctx context.Context) (_node *MsgSubs
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = msuo.schemaConfig.MsgSubscriber
+		edge.Schema = _u.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if msuo.mutation.UserCleared() {
+	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -706,10 +706,10 @@ func (msuo *MsgSubscriberUpdateOne) sqlSave(ctx context.Context) (_node *MsgSubs
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = msuo.schemaConfig.MsgSubscriber
+		edge.Schema = _u.schemaConfig.MsgSubscriber
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := msuo.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -720,18 +720,18 @@ func (msuo *MsgSubscriberUpdateOne) sqlSave(ctx context.Context) (_node *MsgSubs
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = msuo.schemaConfig.MsgSubscriber
+		edge.Schema = _u.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Node.Schema = msuo.schemaConfig.MsgSubscriber
-	ctx = internal.NewSchemaConfigContext(ctx, msuo.schemaConfig)
-	_node = &MsgSubscriber{config: msuo.config}
+	_spec.Node.Schema = _u.schemaConfig.MsgSubscriber
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	_node = &MsgSubscriber{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, msuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgsubscriber.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -739,6 +739,6 @@ func (msuo *MsgSubscriberUpdateOne) sqlSave(ctx context.Context) (_node *MsgSubs
 		}
 		return nil, err
 	}
-	msuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

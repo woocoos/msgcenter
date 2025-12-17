@@ -85,7 +85,7 @@ func (*MsgInternal) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the MsgInternal fields.
-func (mi *MsgInternal) assignValues(columns []string, values []any) error {
+func (_m *MsgInternal) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -96,69 +96,69 @@ func (mi *MsgInternal) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			mi.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case msginternal.FieldCreatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_by", values[i])
 			} else if value.Valid {
-				mi.CreatedBy = int(value.Int64)
+				_m.CreatedBy = int(value.Int64)
 			}
 		case msginternal.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				mi.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case msginternal.FieldUpdatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
 			} else if value.Valid {
-				mi.UpdatedBy = int(value.Int64)
+				_m.UpdatedBy = int(value.Int64)
 			}
 		case msginternal.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				mi.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case msginternal.FieldTenantID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
 			} else if value.Valid {
-				mi.TenantID = int(value.Int64)
+				_m.TenantID = int(value.Int64)
 			}
 		case msginternal.FieldCategory:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field category", values[i])
 			} else if value.Valid {
-				mi.Category = value.String
+				_m.Category = value.String
 			}
 		case msginternal.FieldSubject:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field subject", values[i])
 			} else if value.Valid {
-				mi.Subject = value.String
+				_m.Subject = value.String
 			}
 		case msginternal.FieldBody:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field body", values[i])
 			} else if value.Valid {
-				mi.Body = value.String
+				_m.Body = value.String
 			}
 		case msginternal.FieldFormat:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field format", values[i])
 			} else if value.Valid {
-				mi.Format = value.String
+				_m.Format = value.String
 			}
 		case msginternal.FieldRedirect:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field redirect", values[i])
 			} else if value.Valid {
-				mi.Redirect = value.String
+				_m.Redirect = value.String
 			}
 		default:
-			mi.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -166,92 +166,92 @@ func (mi *MsgInternal) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the MsgInternal.
 // This includes values selected through modifiers, order, etc.
-func (mi *MsgInternal) Value(name string) (ent.Value, error) {
-	return mi.selectValues.Get(name)
+func (_m *MsgInternal) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryMsgInternalTo queries the "msg_internal_to" edge of the MsgInternal entity.
-func (mi *MsgInternal) QueryMsgInternalTo() *MsgInternalToQuery {
-	return NewMsgInternalClient(mi.config).QueryMsgInternalTo(mi)
+func (_m *MsgInternal) QueryMsgInternalTo() *MsgInternalToQuery {
+	return NewMsgInternalClient(_m.config).QueryMsgInternalTo(_m)
 }
 
 // Update returns a builder for updating this MsgInternal.
 // Note that you need to call MsgInternal.Unwrap() before calling this method if this MsgInternal
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (mi *MsgInternal) Update() *MsgInternalUpdateOne {
-	return NewMsgInternalClient(mi.config).UpdateOne(mi)
+func (_m *MsgInternal) Update() *MsgInternalUpdateOne {
+	return NewMsgInternalClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the MsgInternal entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (mi *MsgInternal) Unwrap() *MsgInternal {
-	_tx, ok := mi.config.driver.(*txDriver)
+func (_m *MsgInternal) Unwrap() *MsgInternal {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: MsgInternal is not a transactional entity")
 	}
-	mi.config.driver = _tx.drv
-	return mi
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (mi *MsgInternal) String() string {
+func (_m *MsgInternal) String() string {
 	var builder strings.Builder
 	builder.WriteString("MsgInternal(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", mi.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", mi.CreatedBy))
+	builder.WriteString(fmt.Sprintf("%v", _m.CreatedBy))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(mi.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", mi.UpdatedBy))
+	builder.WriteString(fmt.Sprintf("%v", _m.UpdatedBy))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(mi.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("tenant_id=")
-	builder.WriteString(fmt.Sprintf("%v", mi.TenantID))
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
 	builder.WriteString(", ")
 	builder.WriteString("category=")
-	builder.WriteString(mi.Category)
+	builder.WriteString(_m.Category)
 	builder.WriteString(", ")
 	builder.WriteString("subject=")
-	builder.WriteString(mi.Subject)
+	builder.WriteString(_m.Subject)
 	builder.WriteString(", ")
 	builder.WriteString("body=")
-	builder.WriteString(mi.Body)
+	builder.WriteString(_m.Body)
 	builder.WriteString(", ")
 	builder.WriteString("format=")
-	builder.WriteString(mi.Format)
+	builder.WriteString(_m.Format)
 	builder.WriteString(", ")
 	builder.WriteString("redirect=")
-	builder.WriteString(mi.Redirect)
+	builder.WriteString(_m.Redirect)
 	builder.WriteByte(')')
 	return builder.String()
 }
 
 // NamedMsgInternalTo returns the MsgInternalTo named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (mi *MsgInternal) NamedMsgInternalTo(name string) ([]*MsgInternalTo, error) {
-	if mi.Edges.namedMsgInternalTo == nil {
+func (_m *MsgInternal) NamedMsgInternalTo(name string) ([]*MsgInternalTo, error) {
+	if _m.Edges.namedMsgInternalTo == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := mi.Edges.namedMsgInternalTo[name]
+	nodes, ok := _m.Edges.namedMsgInternalTo[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (mi *MsgInternal) appendNamedMsgInternalTo(name string, edges ...*MsgInternalTo) {
-	if mi.Edges.namedMsgInternalTo == nil {
-		mi.Edges.namedMsgInternalTo = make(map[string][]*MsgInternalTo)
+func (_m *MsgInternal) appendNamedMsgInternalTo(name string, edges ...*MsgInternalTo) {
+	if _m.Edges.namedMsgInternalTo == nil {
+		_m.Edges.namedMsgInternalTo = make(map[string][]*MsgInternalTo)
 	}
 	if len(edges) == 0 {
-		mi.Edges.namedMsgInternalTo[name] = []*MsgInternalTo{}
+		_m.Edges.namedMsgInternalTo[name] = []*MsgInternalTo{}
 	} else {
-		mi.Edges.namedMsgInternalTo[name] = append(mi.Edges.namedMsgInternalTo[name], edges...)
+		_m.Edges.namedMsgInternalTo[name] = append(_m.Edges.namedMsgInternalTo[name], edges...)
 	}
 }
 

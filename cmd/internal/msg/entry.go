@@ -51,6 +51,7 @@ func (s *Server) buildEntClient() {
 
 	scfg := ent.AlternateSchema(ent.SchemaConfig{
 		User:        "portal",
+		Org:         "portal",
 		OrgRoleUser: "portal",
 		UserAddr:    "portal",
 	})

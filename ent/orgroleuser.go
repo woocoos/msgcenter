@@ -44,7 +44,7 @@ func (*OrgRoleUser) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the OrgRoleUser fields.
-func (oru *OrgRoleUser) assignValues(columns []string, values []any) error {
+func (_m *OrgRoleUser) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -55,33 +55,33 @@ func (oru *OrgRoleUser) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			oru.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case orgroleuser.FieldOrgRoleID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field org_role_id", values[i])
 			} else if value.Valid {
-				oru.OrgRoleID = int(value.Int64)
+				_m.OrgRoleID = int(value.Int64)
 			}
 		case orgroleuser.FieldOrgUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field org_user_id", values[i])
 			} else if value.Valid {
-				oru.OrgUserID = int(value.Int64)
+				_m.OrgUserID = int(value.Int64)
 			}
 		case orgroleuser.FieldOrgID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field org_id", values[i])
 			} else if value.Valid {
-				oru.OrgID = int(value.Int64)
+				_m.OrgID = int(value.Int64)
 			}
 		case orgroleuser.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				oru.UserID = int(value.Int64)
+				_m.UserID = int(value.Int64)
 			}
 		default:
-			oru.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -89,44 +89,44 @@ func (oru *OrgRoleUser) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the OrgRoleUser.
 // This includes values selected through modifiers, order, etc.
-func (oru *OrgRoleUser) Value(name string) (ent.Value, error) {
-	return oru.selectValues.Get(name)
+func (_m *OrgRoleUser) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this OrgRoleUser.
 // Note that you need to call OrgRoleUser.Unwrap() before calling this method if this OrgRoleUser
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (oru *OrgRoleUser) Update() *OrgRoleUserUpdateOne {
-	return NewOrgRoleUserClient(oru.config).UpdateOne(oru)
+func (_m *OrgRoleUser) Update() *OrgRoleUserUpdateOne {
+	return NewOrgRoleUserClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the OrgRoleUser entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (oru *OrgRoleUser) Unwrap() *OrgRoleUser {
-	_tx, ok := oru.config.driver.(*txDriver)
+func (_m *OrgRoleUser) Unwrap() *OrgRoleUser {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: OrgRoleUser is not a transactional entity")
 	}
-	oru.config.driver = _tx.drv
-	return oru
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (oru *OrgRoleUser) String() string {
+func (_m *OrgRoleUser) String() string {
 	var builder strings.Builder
 	builder.WriteString("OrgRoleUser(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", oru.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("org_role_id=")
-	builder.WriteString(fmt.Sprintf("%v", oru.OrgRoleID))
+	builder.WriteString(fmt.Sprintf("%v", _m.OrgRoleID))
 	builder.WriteString(", ")
 	builder.WriteString("org_user_id=")
-	builder.WriteString(fmt.Sprintf("%v", oru.OrgUserID))
+	builder.WriteString(fmt.Sprintf("%v", _m.OrgUserID))
 	builder.WriteString(", ")
 	builder.WriteString("org_id=")
-	builder.WriteString(fmt.Sprintf("%v", oru.OrgID))
+	builder.WriteString(fmt.Sprintf("%v", _m.OrgID))
 	builder.WriteString(", ")
 	builder.WriteString("user_id=")
-	builder.WriteString(fmt.Sprintf("%v", oru.UserID))
+	builder.WriteString(fmt.Sprintf("%v", _m.UserID))
 	builder.WriteByte(')')
 	return builder.String()
 }

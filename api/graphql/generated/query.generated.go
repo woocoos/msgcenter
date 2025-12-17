@@ -51,7 +51,7 @@ func (ec *executionContext) _EmailConfig_to(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.To, nil
 	})
@@ -95,7 +95,7 @@ func (ec *executionContext) _EmailConfig_from(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.From, nil
 	})
@@ -136,7 +136,7 @@ func (ec *executionContext) _EmailConfig_smartHost(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.SmartHost, nil
 	})
@@ -180,7 +180,7 @@ func (ec *executionContext) _EmailConfig_authType(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.AuthType, nil
 	})
@@ -224,7 +224,7 @@ func (ec *executionContext) _EmailConfig_authUsername(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.AuthUsername, nil
 	})
@@ -268,7 +268,7 @@ func (ec *executionContext) _EmailConfig_authPassword(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.AuthPassword, nil
 	})
@@ -312,7 +312,7 @@ func (ec *executionContext) _EmailConfig_authSecret(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.AuthSecret, nil
 	})
@@ -356,7 +356,7 @@ func (ec *executionContext) _EmailConfig_authIdentity(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.AuthIdentity, nil
 	})
@@ -400,7 +400,7 @@ func (ec *executionContext) _EmailConfig_headers(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Headers, nil
 	})
@@ -441,7 +441,7 @@ func (ec *executionContext) _FormatMsgAlert_id(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -485,7 +485,7 @@ func (ec *executionContext) _FormatMsgAlert_tenantID(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.TenantID, nil
 	})
@@ -529,7 +529,7 @@ func (ec *executionContext) _FormatMsgAlert_startsAt(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.StartsAt, nil
 	})
@@ -573,7 +573,7 @@ func (ec *executionContext) _FormatMsgAlert_endsAt(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.EndsAt, nil
 	})
@@ -614,7 +614,7 @@ func (ec *executionContext) _FormatMsgAlert_msgEventComments(ctx context.Context
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.MsgEventComments, nil
 	})
@@ -655,7 +655,7 @@ func (ec *executionContext) _FormatMsgAlert_msgChannelComments(ctx context.Conte
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.MsgChannelComments, nil
 	})
@@ -696,7 +696,7 @@ func (ec *executionContext) _FormatMsgAlert_receiverType(ctx context.Context, fi
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ReceiverType, nil
 	})
@@ -740,7 +740,7 @@ func (ec *executionContext) _FormatMsgAlert_receiver(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Receiver, nil
 	})
@@ -784,7 +784,7 @@ func (ec *executionContext) _FormatMsgAlert_msgTemplateTitle(ctx context.Context
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.MsgTemplateTitle, nil
 	})
@@ -825,7 +825,7 @@ func (ec *executionContext) _FormatMsgAlert_users(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Users, nil
 	})
@@ -876,7 +876,7 @@ func (ec *executionContext) _FormatMsgAlert_hasMultiMsg(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.HasMultiMsg, nil
 	})
@@ -920,7 +920,7 @@ func (ec *executionContext) _FormatMsgAlert_state(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.State, nil
 	})
@@ -964,7 +964,7 @@ func (ec *executionContext) _FormatMsgAlert_createdAt(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.CreatedAt, nil
 	})
@@ -1008,7 +1008,7 @@ func (ec *executionContext) _FormatMsgAlertConnection_edges(ctx context.Context,
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Edges, nil
 	})
@@ -1055,7 +1055,7 @@ func (ec *executionContext) _FormatMsgAlertConnection_pageInfo(ctx context.Conte
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.PageInfo, nil
 	})
@@ -1109,7 +1109,7 @@ func (ec *executionContext) _FormatMsgAlertConnection_totalCount(ctx context.Con
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.TotalCount, nil
 	})
@@ -1153,7 +1153,7 @@ func (ec *executionContext) _FormatMsgAlertEdge_node(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Node, nil
 	})
@@ -1222,7 +1222,7 @@ func (ec *executionContext) _FormatMsgAlertEdge_cursor(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Cursor, nil
 	})
@@ -1266,7 +1266,7 @@ func (ec *executionContext) _Matcher_type(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Type, nil
 	})
@@ -1310,7 +1310,7 @@ func (ec *executionContext) _Matcher_name(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -1354,7 +1354,7 @@ func (ec *executionContext) _Matcher_value(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Value, nil
 	})
@@ -1398,7 +1398,7 @@ func (ec *executionContext) _MessageConfig_to(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.To, nil
 	})
@@ -1439,7 +1439,7 @@ func (ec *executionContext) _MessageConfig_subject(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Subject, nil
 	})
@@ -1480,7 +1480,7 @@ func (ec *executionContext) _MessageConfig_redirect(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Redirect, nil
 	})
@@ -1521,7 +1521,7 @@ func (ec *executionContext) _Receiver_name(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -1565,7 +1565,7 @@ func (ec *executionContext) _Receiver_emailConfigs(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.EmailConfigs, nil
 	})
@@ -1626,7 +1626,7 @@ func (ec *executionContext) _Receiver_messageConfig(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.MessageConfig, nil
 	})
@@ -1675,7 +1675,7 @@ func (ec *executionContext) _Route_receiver(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Receiver, nil
 	})
@@ -1716,7 +1716,7 @@ func (ec *executionContext) _Route_groupBy(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.GroupBy, nil
 	})
@@ -1757,7 +1757,7 @@ func (ec *executionContext) _Route_matchers(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Route().Matchers(rctx, obj)
 	})
@@ -1806,7 +1806,7 @@ func (ec *executionContext) _Route_muteTimeIntervals(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.MuteTimeIntervals, nil
 	})
@@ -1847,7 +1847,7 @@ func (ec *executionContext) _Route_activeTimeIntervals(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ActiveTimeIntervals, nil
 	})
@@ -1888,7 +1888,7 @@ func (ec *executionContext) _Route_continue(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Continue, nil
 	})
@@ -1929,7 +1929,7 @@ func (ec *executionContext) _Route_routes(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Routes, nil
 	})
@@ -1992,7 +1992,7 @@ func (ec *executionContext) _Route_groupWait(ctx context.Context, field graphql.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.GroupWait, nil
 	})
@@ -2033,7 +2033,7 @@ func (ec *executionContext) _Route_GroupInterval(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.GroupInterval, nil
 	})
@@ -2074,7 +2074,7 @@ func (ec *executionContext) _Route_repeatInterval(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.RepeatInterval, nil
 	})
@@ -2115,7 +2115,7 @@ func (ec *executionContext) _UserInfo_userID(ctx context.Context, field graphql.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.UserID, nil
 	})
@@ -2156,7 +2156,7 @@ func (ec *executionContext) _UserInfo_name(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -2197,7 +2197,7 @@ func (ec *executionContext) _UserInfo_email(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Email, nil
 	})
@@ -2238,7 +2238,7 @@ func (ec *executionContext) _UserInfo_mobile(ctx context.Context, field graphql.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Mobile, nil
 	})
@@ -2800,7 +2800,7 @@ func (ec *executionContext) marshalNFormatMsgAlertConnection2ᚖgithubᚗcomᚋw
 	return ec._FormatMsgAlertConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNHostPort2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐHostPort(ctx context.Context, v interface{}) (profile.HostPort, error) {
+func (ec *executionContext) unmarshalNHostPort2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐHostPort(ctx context.Context, v any) (profile.HostPort, error) {
 	var res profile.HostPort
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2810,7 +2810,7 @@ func (ec *executionContext) marshalNHostPort2githubᚗcomᚋwoocoosᚋmsgcenter�
 	return v
 }
 
-func (ec *executionContext) unmarshalNMapString2map(ctx context.Context, v interface{}) (map[string]string, error) {
+func (ec *executionContext) unmarshalNMapString2map(ctx context.Context, v any) (map[string]string, error) {
 	res, err := typex.UnmarshalMapString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -2831,7 +2831,7 @@ func (ec *executionContext) marshalNMapString2map(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) unmarshalNMatchType2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐMatchType(ctx context.Context, v interface{}) (label.MatchType, error) {
+func (ec *executionContext) unmarshalNMatchType2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐMatchType(ctx context.Context, v any) (label.MatchType, error) {
 	var res label.MatchType
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2841,7 +2841,7 @@ func (ec *executionContext) marshalNMatchType2githubᚗcomᚋwoocoosᚋmsgcenter
 	return v
 }
 
-func (ec *executionContext) unmarshalNRouteStrType2githubᚗcomᚋwoocoosᚋmsgcenterᚋapiᚋgraphqlᚋmodelᚐRouteStrType(ctx context.Context, v interface{}) (model.RouteStrType, error) {
+func (ec *executionContext) unmarshalNRouteStrType2githubᚗcomᚋwoocoosᚋmsgcenterᚋapiᚋgraphqlᚋmodelᚐRouteStrType(ctx context.Context, v any) (model.RouteStrType, error) {
 	var res model.RouteStrType
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -2851,7 +2851,7 @@ func (ec *executionContext) marshalNRouteStrType2githubᚗcomᚋwoocoosᚋmsgcen
 	return v
 }
 
-func (ec *executionContext) unmarshalODuration2ᚖtimeᚐDuration(ctx context.Context, v interface{}) (*time.Duration, error) {
+func (ec *executionContext) unmarshalODuration2ᚖtimeᚐDuration(ctx context.Context, v any) (*time.Duration, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -3011,7 +3011,7 @@ func (ec *executionContext) marshalOFormatMsgAlertEdge2ᚖgithubᚗcomᚋwoocoos
 	return ec._FormatMsgAlertEdge(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOLabelName2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐLabelName(ctx context.Context, v interface{}) (label.LabelName, error) {
+func (ec *executionContext) unmarshalOLabelName2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐLabelName(ctx context.Context, v any) (label.LabelName, error) {
 	tmp, err := graphql.UnmarshalString(v)
 	res := label.LabelName(tmp)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3022,14 +3022,12 @@ func (ec *executionContext) marshalOLabelName2githubᚗcomᚋwoocoosᚋmsgcenter
 	return res
 }
 
-func (ec *executionContext) unmarshalOLabelName2ᚕgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐLabelName(ctx context.Context, v interface{}) ([]label.LabelName, error) {
+func (ec *executionContext) unmarshalOLabelName2ᚕgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐLabelName(ctx context.Context, v any) ([]label.LabelName, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]label.LabelName, len(vSlice))
 	for i := range vSlice {
@@ -3054,7 +3052,7 @@ func (ec *executionContext) marshalOLabelName2ᚕgithubᚗcomᚋwoocoosᚋmsgcen
 	return ret
 }
 
-func (ec *executionContext) unmarshalOMapString2map(ctx context.Context, v interface{}) (map[string]string, error) {
+func (ec *executionContext) unmarshalOMapString2map(ctx context.Context, v any) (map[string]string, error) {
 	if v == nil {
 		return nil, nil
 	}

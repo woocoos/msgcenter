@@ -139,6 +139,7 @@ func (am *AlertManager) buildDBClient(cnf *conf.AppConfiguration) {
 	drv := ents["msgcenter"]
 	scfg := ent.AlternateSchema(ent.SchemaConfig{
 		User:        "portal",
+		Org:         "portal",
 		OrgRoleUser: "portal",
 		UserAddr:    "portal",
 	})

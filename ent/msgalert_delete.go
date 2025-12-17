@@ -22,58 +22,58 @@ type MsgAlertDelete struct {
 }
 
 // Where appends a list predicates to the MsgAlertDelete builder.
-func (mad *MsgAlertDelete) Where(ps ...predicate.MsgAlert) *MsgAlertDelete {
-	mad.mutation.Where(ps...)
-	return mad
+func (_d *MsgAlertDelete) Where(ps ...predicate.MsgAlert) *MsgAlertDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (mad *MsgAlertDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, mad.sqlExec, mad.mutation, mad.hooks)
+func (_d *MsgAlertDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mad *MsgAlertDelete) ExecX(ctx context.Context) int {
-	n, err := mad.Exec(ctx)
+func (_d *MsgAlertDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (mad *MsgAlertDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *MsgAlertDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(msgalert.Table, sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt))
-	_spec.Node.Schema = mad.schemaConfig.MsgAlert
-	ctx = internal.NewSchemaConfigContext(ctx, mad.schemaConfig)
-	if ps := mad.mutation.predicates; len(ps) > 0 {
+	_spec.Node.Schema = _d.schemaConfig.MsgAlert
+	ctx = internal.NewSchemaConfigContext(ctx, _d.schemaConfig)
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, mad.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	mad.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // MsgAlertDeleteOne is the builder for deleting a single MsgAlert entity.
 type MsgAlertDeleteOne struct {
-	mad *MsgAlertDelete
+	_d *MsgAlertDelete
 }
 
 // Where appends a list predicates to the MsgAlertDelete builder.
-func (mado *MsgAlertDeleteOne) Where(ps ...predicate.MsgAlert) *MsgAlertDeleteOne {
-	mado.mad.mutation.Where(ps...)
-	return mado
+func (_d *MsgAlertDeleteOne) Where(ps ...predicate.MsgAlert) *MsgAlertDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (mado *MsgAlertDeleteOne) Exec(ctx context.Context) error {
-	n, err := mado.mad.Exec(ctx)
+func (_d *MsgAlertDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -85,8 +85,8 @@ func (mado *MsgAlertDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mado *MsgAlertDeleteOne) ExecX(ctx context.Context) {
-	if err := mado.Exec(ctx); err != nil {
+func (_d *MsgAlertDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

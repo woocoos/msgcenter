@@ -66,6 +66,7 @@ func (MsgAlert) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("nlog", Nlog.Type).Ref("alerts").Through("nlog_alerts", NlogAlert.Type).
 			Annotations(entgql.RelayConnection()).Comment("消息日志"),
+		edge.From("org", Org.Type).Ref("msg_alerts").Field(schemax.FieldTenantID).Required().Unique().Immutable(),
 	}
 }
 

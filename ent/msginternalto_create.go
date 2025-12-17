@@ -25,97 +25,97 @@ type MsgInternalToCreate struct {
 }
 
 // SetTenantID sets the "tenant_id" field.
-func (mitc *MsgInternalToCreate) SetTenantID(i int) *MsgInternalToCreate {
-	mitc.mutation.SetTenantID(i)
-	return mitc
+func (_c *MsgInternalToCreate) SetTenantID(v int) *MsgInternalToCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
 }
 
 // SetMsgInternalID sets the "msg_internal_id" field.
-func (mitc *MsgInternalToCreate) SetMsgInternalID(i int) *MsgInternalToCreate {
-	mitc.mutation.SetMsgInternalID(i)
-	return mitc
+func (_c *MsgInternalToCreate) SetMsgInternalID(v int) *MsgInternalToCreate {
+	_c.mutation.SetMsgInternalID(v)
+	return _c
 }
 
 // SetUserID sets the "user_id" field.
-func (mitc *MsgInternalToCreate) SetUserID(i int) *MsgInternalToCreate {
-	mitc.mutation.SetUserID(i)
-	return mitc
+func (_c *MsgInternalToCreate) SetUserID(v int) *MsgInternalToCreate {
+	_c.mutation.SetUserID(v)
+	return _c
 }
 
 // SetReadAt sets the "read_at" field.
-func (mitc *MsgInternalToCreate) SetReadAt(t time.Time) *MsgInternalToCreate {
-	mitc.mutation.SetReadAt(t)
-	return mitc
+func (_c *MsgInternalToCreate) SetReadAt(v time.Time) *MsgInternalToCreate {
+	_c.mutation.SetReadAt(v)
+	return _c
 }
 
 // SetNillableReadAt sets the "read_at" field if the given value is not nil.
-func (mitc *MsgInternalToCreate) SetNillableReadAt(t *time.Time) *MsgInternalToCreate {
-	if t != nil {
-		mitc.SetReadAt(*t)
+func (_c *MsgInternalToCreate) SetNillableReadAt(v *time.Time) *MsgInternalToCreate {
+	if v != nil {
+		_c.SetReadAt(*v)
 	}
-	return mitc
+	return _c
 }
 
 // SetDeleteAt sets the "delete_at" field.
-func (mitc *MsgInternalToCreate) SetDeleteAt(t time.Time) *MsgInternalToCreate {
-	mitc.mutation.SetDeleteAt(t)
-	return mitc
+func (_c *MsgInternalToCreate) SetDeleteAt(v time.Time) *MsgInternalToCreate {
+	_c.mutation.SetDeleteAt(v)
+	return _c
 }
 
 // SetNillableDeleteAt sets the "delete_at" field if the given value is not nil.
-func (mitc *MsgInternalToCreate) SetNillableDeleteAt(t *time.Time) *MsgInternalToCreate {
-	if t != nil {
-		mitc.SetDeleteAt(*t)
+func (_c *MsgInternalToCreate) SetNillableDeleteAt(v *time.Time) *MsgInternalToCreate {
+	if v != nil {
+		_c.SetDeleteAt(*v)
 	}
-	return mitc
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (mitc *MsgInternalToCreate) SetCreatedAt(t time.Time) *MsgInternalToCreate {
-	mitc.mutation.SetCreatedAt(t)
-	return mitc
+func (_c *MsgInternalToCreate) SetCreatedAt(v time.Time) *MsgInternalToCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (mitc *MsgInternalToCreate) SetNillableCreatedAt(t *time.Time) *MsgInternalToCreate {
-	if t != nil {
-		mitc.SetCreatedAt(*t)
+func (_c *MsgInternalToCreate) SetNillableCreatedAt(v *time.Time) *MsgInternalToCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return mitc
+	return _c
 }
 
 // SetID sets the "id" field.
-func (mitc *MsgInternalToCreate) SetID(i int) *MsgInternalToCreate {
-	mitc.mutation.SetID(i)
-	return mitc
+func (_c *MsgInternalToCreate) SetID(v int) *MsgInternalToCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetMsgInternal sets the "msg_internal" edge to the MsgInternal entity.
-func (mitc *MsgInternalToCreate) SetMsgInternal(m *MsgInternal) *MsgInternalToCreate {
-	return mitc.SetMsgInternalID(m.ID)
+func (_c *MsgInternalToCreate) SetMsgInternal(v *MsgInternal) *MsgInternalToCreate {
+	return _c.SetMsgInternalID(v.ID)
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (mitc *MsgInternalToCreate) SetUser(u *User) *MsgInternalToCreate {
-	return mitc.SetUserID(u.ID)
+func (_c *MsgInternalToCreate) SetUser(v *User) *MsgInternalToCreate {
+	return _c.SetUserID(v.ID)
 }
 
 // Mutation returns the MsgInternalToMutation object of the builder.
-func (mitc *MsgInternalToCreate) Mutation() *MsgInternalToMutation {
-	return mitc.mutation
+func (_c *MsgInternalToCreate) Mutation() *MsgInternalToMutation {
+	return _c.mutation
 }
 
 // Save creates the MsgInternalTo in the database.
-func (mitc *MsgInternalToCreate) Save(ctx context.Context) (*MsgInternalTo, error) {
-	if err := mitc.defaults(); err != nil {
+func (_c *MsgInternalToCreate) Save(ctx context.Context) (*MsgInternalTo, error) {
+	if err := _c.defaults(); err != nil {
 		return nil, err
 	}
-	return withHooks(ctx, mitc.sqlSave, mitc.mutation, mitc.hooks)
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (mitc *MsgInternalToCreate) SaveX(ctx context.Context) *MsgInternalTo {
-	v, err := mitc.Save(ctx)
+func (_c *MsgInternalToCreate) SaveX(ctx context.Context) *MsgInternalTo {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -123,59 +123,59 @@ func (mitc *MsgInternalToCreate) SaveX(ctx context.Context) *MsgInternalTo {
 }
 
 // Exec executes the query.
-func (mitc *MsgInternalToCreate) Exec(ctx context.Context) error {
-	_, err := mitc.Save(ctx)
+func (_c *MsgInternalToCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mitc *MsgInternalToCreate) ExecX(ctx context.Context) {
-	if err := mitc.Exec(ctx); err != nil {
+func (_c *MsgInternalToCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (mitc *MsgInternalToCreate) defaults() error {
-	if _, ok := mitc.mutation.CreatedAt(); !ok {
+func (_c *MsgInternalToCreate) defaults() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		if msginternalto.DefaultCreatedAt == nil {
 			return fmt.Errorf("ent: uninitialized msginternalto.DefaultCreatedAt (forgotten import ent/runtime?)")
 		}
 		v := msginternalto.DefaultCreatedAt()
-		mitc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mitc *MsgInternalToCreate) check() error {
-	if _, ok := mitc.mutation.TenantID(); !ok {
+func (_c *MsgInternalToCreate) check() error {
+	if _, ok := _c.mutation.TenantID(); !ok {
 		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "MsgInternalTo.tenant_id"`)}
 	}
-	if _, ok := mitc.mutation.MsgInternalID(); !ok {
+	if _, ok := _c.mutation.MsgInternalID(); !ok {
 		return &ValidationError{Name: "msg_internal_id", err: errors.New(`ent: missing required field "MsgInternalTo.msg_internal_id"`)}
 	}
-	if _, ok := mitc.mutation.UserID(); !ok {
+	if _, ok := _c.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "MsgInternalTo.user_id"`)}
 	}
-	if _, ok := mitc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "MsgInternalTo.created_at"`)}
 	}
-	if len(mitc.mutation.MsgInternalIDs()) == 0 {
+	if len(_c.mutation.MsgInternalIDs()) == 0 {
 		return &ValidationError{Name: "msg_internal", err: errors.New(`ent: missing required edge "MsgInternalTo.msg_internal"`)}
 	}
-	if len(mitc.mutation.UserIDs()) == 0 {
+	if len(_c.mutation.UserIDs()) == 0 {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "MsgInternalTo.user"`)}
 	}
 	return nil
 }
 
-func (mitc *MsgInternalToCreate) sqlSave(ctx context.Context) (*MsgInternalTo, error) {
-	if err := mitc.check(); err != nil {
+func (_c *MsgInternalToCreate) sqlSave(ctx context.Context) (*MsgInternalTo, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := mitc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, mitc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -185,39 +185,39 @@ func (mitc *MsgInternalToCreate) sqlSave(ctx context.Context) (*MsgInternalTo, e
 		id := _spec.ID.Value.(int64)
 		_node.ID = int(id)
 	}
-	mitc.mutation.id = &_node.ID
-	mitc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (mitc *MsgInternalToCreate) createSpec() (*MsgInternalTo, *sqlgraph.CreateSpec) {
+func (_c *MsgInternalToCreate) createSpec() (*MsgInternalTo, *sqlgraph.CreateSpec) {
 	var (
-		_node = &MsgInternalTo{config: mitc.config}
+		_node = &MsgInternalTo{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(msginternalto.Table, sqlgraph.NewFieldSpec(msginternalto.FieldID, field.TypeInt))
 	)
-	_spec.Schema = mitc.schemaConfig.MsgInternalTo
-	_spec.OnConflict = mitc.conflict
-	if id, ok := mitc.mutation.ID(); ok {
+	_spec.Schema = _c.schemaConfig.MsgInternalTo
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := mitc.mutation.TenantID(); ok {
+	if value, ok := _c.mutation.TenantID(); ok {
 		_spec.SetField(msginternalto.FieldTenantID, field.TypeInt, value)
 		_node.TenantID = value
 	}
-	if value, ok := mitc.mutation.ReadAt(); ok {
+	if value, ok := _c.mutation.ReadAt(); ok {
 		_spec.SetField(msginternalto.FieldReadAt, field.TypeTime, value)
 		_node.ReadAt = value
 	}
-	if value, ok := mitc.mutation.DeleteAt(); ok {
+	if value, ok := _c.mutation.DeleteAt(); ok {
 		_spec.SetField(msginternalto.FieldDeleteAt, field.TypeTime, value)
 		_node.DeleteAt = value
 	}
-	if value, ok := mitc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(msginternalto.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if nodes := mitc.mutation.MsgInternalIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.MsgInternalIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -228,14 +228,14 @@ func (mitc *MsgInternalToCreate) createSpec() (*MsgInternalTo, *sqlgraph.CreateS
 				IDSpec: sqlgraph.NewFieldSpec(msginternal.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mitc.schemaConfig.MsgInternalTo
+		edge.Schema = _c.schemaConfig.MsgInternalTo
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.MsgInternalID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := mitc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -246,7 +246,7 @@ func (mitc *MsgInternalToCreate) createSpec() (*MsgInternalTo, *sqlgraph.CreateS
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mitc.schemaConfig.MsgInternalTo
+		edge.Schema = _c.schemaConfig.MsgInternalTo
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -272,10 +272,10 @@ func (mitc *MsgInternalToCreate) createSpec() (*MsgInternalTo, *sqlgraph.CreateS
 //			SetTenantID(v+v).
 //		}).
 //		Exec(ctx)
-func (mitc *MsgInternalToCreate) OnConflict(opts ...sql.ConflictOption) *MsgInternalToUpsertOne {
-	mitc.conflict = opts
+func (_c *MsgInternalToCreate) OnConflict(opts ...sql.ConflictOption) *MsgInternalToUpsertOne {
+	_c.conflict = opts
 	return &MsgInternalToUpsertOne{
-		create: mitc,
+		create: _c,
 	}
 }
 
@@ -285,10 +285,10 @@ func (mitc *MsgInternalToCreate) OnConflict(opts ...sql.ConflictOption) *MsgInte
 //	client.MsgInternalTo.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (mitc *MsgInternalToCreate) OnConflictColumns(columns ...string) *MsgInternalToUpsertOne {
-	mitc.conflict = append(mitc.conflict, sql.ConflictColumns(columns...))
+func (_c *MsgInternalToCreate) OnConflictColumns(columns ...string) *MsgInternalToUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &MsgInternalToUpsertOne{
-		create: mitc,
+		create: _c,
 	}
 }
 
@@ -485,16 +485,16 @@ type MsgInternalToCreateBulk struct {
 }
 
 // Save creates the MsgInternalTo entities in the database.
-func (mitcb *MsgInternalToCreateBulk) Save(ctx context.Context) ([]*MsgInternalTo, error) {
-	if mitcb.err != nil {
-		return nil, mitcb.err
+func (_c *MsgInternalToCreateBulk) Save(ctx context.Context) ([]*MsgInternalTo, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(mitcb.builders))
-	nodes := make([]*MsgInternalTo, len(mitcb.builders))
-	mutators := make([]Mutator, len(mitcb.builders))
-	for i := range mitcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*MsgInternalTo, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := mitcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MsgInternalToMutation)
@@ -508,12 +508,12 @@ func (mitcb *MsgInternalToCreateBulk) Save(ctx context.Context) ([]*MsgInternalT
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, mitcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = mitcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, mitcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -537,7 +537,7 @@ func (mitcb *MsgInternalToCreateBulk) Save(ctx context.Context) ([]*MsgInternalT
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, mitcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -545,8 +545,8 @@ func (mitcb *MsgInternalToCreateBulk) Save(ctx context.Context) ([]*MsgInternalT
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mitcb *MsgInternalToCreateBulk) SaveX(ctx context.Context) []*MsgInternalTo {
-	v, err := mitcb.Save(ctx)
+func (_c *MsgInternalToCreateBulk) SaveX(ctx context.Context) []*MsgInternalTo {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -554,14 +554,14 @@ func (mitcb *MsgInternalToCreateBulk) SaveX(ctx context.Context) []*MsgInternalT
 }
 
 // Exec executes the query.
-func (mitcb *MsgInternalToCreateBulk) Exec(ctx context.Context) error {
-	_, err := mitcb.Save(ctx)
+func (_c *MsgInternalToCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mitcb *MsgInternalToCreateBulk) ExecX(ctx context.Context) {
-	if err := mitcb.Exec(ctx); err != nil {
+func (_c *MsgInternalToCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -581,10 +581,10 @@ func (mitcb *MsgInternalToCreateBulk) ExecX(ctx context.Context) {
 //			SetTenantID(v+v).
 //		}).
 //		Exec(ctx)
-func (mitcb *MsgInternalToCreateBulk) OnConflict(opts ...sql.ConflictOption) *MsgInternalToUpsertBulk {
-	mitcb.conflict = opts
+func (_c *MsgInternalToCreateBulk) OnConflict(opts ...sql.ConflictOption) *MsgInternalToUpsertBulk {
+	_c.conflict = opts
 	return &MsgInternalToUpsertBulk{
-		create: mitcb,
+		create: _c,
 	}
 }
 
@@ -594,10 +594,10 @@ func (mitcb *MsgInternalToCreateBulk) OnConflict(opts ...sql.ConflictOption) *Ms
 //	client.MsgInternalTo.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (mitcb *MsgInternalToCreateBulk) OnConflictColumns(columns ...string) *MsgInternalToUpsertBulk {
-	mitcb.conflict = append(mitcb.conflict, sql.ConflictColumns(columns...))
+func (_c *MsgInternalToCreateBulk) OnConflictColumns(columns ...string) *MsgInternalToUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &MsgInternalToUpsertBulk{
-		create: mitcb,
+		create: _c,
 	}
 }
 

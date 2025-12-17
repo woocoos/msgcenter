@@ -28,151 +28,151 @@ type SilenceUpdate struct {
 }
 
 // Where appends a list predicates to the SilenceUpdate builder.
-func (su *SilenceUpdate) Where(ps ...predicate.Silence) *SilenceUpdate {
-	su.mutation.Where(ps...)
-	return su
+func (_u *SilenceUpdate) Where(ps ...predicate.Silence) *SilenceUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (su *SilenceUpdate) SetUpdatedBy(i int) *SilenceUpdate {
-	su.mutation.ResetUpdatedBy()
-	su.mutation.SetUpdatedBy(i)
-	return su
+func (_u *SilenceUpdate) SetUpdatedBy(v int) *SilenceUpdate {
+	_u.mutation.ResetUpdatedBy()
+	_u.mutation.SetUpdatedBy(v)
+	return _u
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (su *SilenceUpdate) SetNillableUpdatedBy(i *int) *SilenceUpdate {
-	if i != nil {
-		su.SetUpdatedBy(*i)
+func (_u *SilenceUpdate) SetNillableUpdatedBy(v *int) *SilenceUpdate {
+	if v != nil {
+		_u.SetUpdatedBy(*v)
 	}
-	return su
+	return _u
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (su *SilenceUpdate) AddUpdatedBy(i int) *SilenceUpdate {
-	su.mutation.AddUpdatedBy(i)
-	return su
+// AddUpdatedBy adds value to the "updated_by" field.
+func (_u *SilenceUpdate) AddUpdatedBy(v int) *SilenceUpdate {
+	_u.mutation.AddUpdatedBy(v)
+	return _u
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (su *SilenceUpdate) ClearUpdatedBy() *SilenceUpdate {
-	su.mutation.ClearUpdatedBy()
-	return su
+func (_u *SilenceUpdate) ClearUpdatedBy() *SilenceUpdate {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (su *SilenceUpdate) SetUpdatedAt(t time.Time) *SilenceUpdate {
-	su.mutation.SetUpdatedAt(t)
-	return su
+func (_u *SilenceUpdate) SetUpdatedAt(v time.Time) *SilenceUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (su *SilenceUpdate) SetNillableUpdatedAt(t *time.Time) *SilenceUpdate {
-	if t != nil {
-		su.SetUpdatedAt(*t)
+func (_u *SilenceUpdate) SetNillableUpdatedAt(v *time.Time) *SilenceUpdate {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return su
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (su *SilenceUpdate) ClearUpdatedAt() *SilenceUpdate {
-	su.mutation.ClearUpdatedAt()
-	return su
+func (_u *SilenceUpdate) ClearUpdatedAt() *SilenceUpdate {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetMatchers sets the "matchers" field.
-func (su *SilenceUpdate) SetMatchers(l []*label.Matcher) *SilenceUpdate {
-	su.mutation.SetMatchers(l)
-	return su
+func (_u *SilenceUpdate) SetMatchers(v []*label.Matcher) *SilenceUpdate {
+	_u.mutation.SetMatchers(v)
+	return _u
 }
 
-// AppendMatchers appends l to the "matchers" field.
-func (su *SilenceUpdate) AppendMatchers(l []*label.Matcher) *SilenceUpdate {
-	su.mutation.AppendMatchers(l)
-	return su
+// AppendMatchers appends value to the "matchers" field.
+func (_u *SilenceUpdate) AppendMatchers(v []*label.Matcher) *SilenceUpdate {
+	_u.mutation.AppendMatchers(v)
+	return _u
 }
 
 // ClearMatchers clears the value of the "matchers" field.
-func (su *SilenceUpdate) ClearMatchers() *SilenceUpdate {
-	su.mutation.ClearMatchers()
-	return su
+func (_u *SilenceUpdate) ClearMatchers() *SilenceUpdate {
+	_u.mutation.ClearMatchers()
+	return _u
 }
 
 // SetStartsAt sets the "starts_at" field.
-func (su *SilenceUpdate) SetStartsAt(t time.Time) *SilenceUpdate {
-	su.mutation.SetStartsAt(t)
-	return su
+func (_u *SilenceUpdate) SetStartsAt(v time.Time) *SilenceUpdate {
+	_u.mutation.SetStartsAt(v)
+	return _u
 }
 
 // SetNillableStartsAt sets the "starts_at" field if the given value is not nil.
-func (su *SilenceUpdate) SetNillableStartsAt(t *time.Time) *SilenceUpdate {
-	if t != nil {
-		su.SetStartsAt(*t)
+func (_u *SilenceUpdate) SetNillableStartsAt(v *time.Time) *SilenceUpdate {
+	if v != nil {
+		_u.SetStartsAt(*v)
 	}
-	return su
+	return _u
 }
 
 // SetEndsAt sets the "ends_at" field.
-func (su *SilenceUpdate) SetEndsAt(t time.Time) *SilenceUpdate {
-	su.mutation.SetEndsAt(t)
-	return su
+func (_u *SilenceUpdate) SetEndsAt(v time.Time) *SilenceUpdate {
+	_u.mutation.SetEndsAt(v)
+	return _u
 }
 
 // SetNillableEndsAt sets the "ends_at" field if the given value is not nil.
-func (su *SilenceUpdate) SetNillableEndsAt(t *time.Time) *SilenceUpdate {
-	if t != nil {
-		su.SetEndsAt(*t)
+func (_u *SilenceUpdate) SetNillableEndsAt(v *time.Time) *SilenceUpdate {
+	if v != nil {
+		_u.SetEndsAt(*v)
 	}
-	return su
+	return _u
 }
 
 // SetComments sets the "comments" field.
-func (su *SilenceUpdate) SetComments(s string) *SilenceUpdate {
-	su.mutation.SetComments(s)
-	return su
+func (_u *SilenceUpdate) SetComments(v string) *SilenceUpdate {
+	_u.mutation.SetComments(v)
+	return _u
 }
 
 // SetNillableComments sets the "comments" field if the given value is not nil.
-func (su *SilenceUpdate) SetNillableComments(s *string) *SilenceUpdate {
-	if s != nil {
-		su.SetComments(*s)
+func (_u *SilenceUpdate) SetNillableComments(v *string) *SilenceUpdate {
+	if v != nil {
+		_u.SetComments(*v)
 	}
-	return su
+	return _u
 }
 
 // ClearComments clears the value of the "comments" field.
-func (su *SilenceUpdate) ClearComments() *SilenceUpdate {
-	su.mutation.ClearComments()
-	return su
+func (_u *SilenceUpdate) ClearComments() *SilenceUpdate {
+	_u.mutation.ClearComments()
+	return _u
 }
 
 // SetState sets the "state" field.
-func (su *SilenceUpdate) SetState(as alert.SilenceState) *SilenceUpdate {
-	su.mutation.SetState(as)
-	return su
+func (_u *SilenceUpdate) SetState(v alert.SilenceState) *SilenceUpdate {
+	_u.mutation.SetState(v)
+	return _u
 }
 
 // SetNillableState sets the "state" field if the given value is not nil.
-func (su *SilenceUpdate) SetNillableState(as *alert.SilenceState) *SilenceUpdate {
-	if as != nil {
-		su.SetState(*as)
+func (_u *SilenceUpdate) SetNillableState(v *alert.SilenceState) *SilenceUpdate {
+	if v != nil {
+		_u.SetState(*v)
 	}
-	return su
+	return _u
 }
 
 // Mutation returns the SilenceMutation object of the builder.
-func (su *SilenceUpdate) Mutation() *SilenceMutation {
-	return su.mutation
+func (_u *SilenceUpdate) Mutation() *SilenceMutation {
+	return _u.mutation
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (su *SilenceUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, su.sqlSave, su.mutation, su.hooks)
+func (_u *SilenceUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (su *SilenceUpdate) SaveX(ctx context.Context) int {
-	affected, err := su.Save(ctx)
+func (_u *SilenceUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -180,87 +180,87 @@ func (su *SilenceUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (su *SilenceUpdate) Exec(ctx context.Context) error {
-	_, err := su.Save(ctx)
+func (_u *SilenceUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (su *SilenceUpdate) ExecX(ctx context.Context) {
-	if err := su.Exec(ctx); err != nil {
+func (_u *SilenceUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (su *SilenceUpdate) check() error {
-	if v, ok := su.mutation.State(); ok {
+func (_u *SilenceUpdate) check() error {
+	if v, ok := _u.mutation.State(); ok {
 		if err := silence.StateValidator(v); err != nil {
 			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "Silence.state": %w`, err)}
 		}
 	}
-	if su.mutation.UserCleared() && len(su.mutation.UserIDs()) > 0 {
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Silence.user"`)
 	}
 	return nil
 }
 
-func (su *SilenceUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := su.check(); err != nil {
-		return n, err
+func (_u *SilenceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(silence.Table, silence.Columns, sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt))
-	if ps := su.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := su.mutation.UpdatedBy(); ok {
+	if value, ok := _u.mutation.UpdatedBy(); ok {
 		_spec.SetField(silence.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if value, ok := su.mutation.AddedUpdatedBy(); ok {
+	if value, ok := _u.mutation.AddedUpdatedBy(); ok {
 		_spec.AddField(silence.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if su.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		_spec.ClearField(silence.FieldUpdatedBy, field.TypeInt)
 	}
-	if value, ok := su.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(silence.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if su.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(silence.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := su.mutation.Matchers(); ok {
+	if value, ok := _u.mutation.Matchers(); ok {
 		_spec.SetField(silence.FieldMatchers, field.TypeJSON, value)
 	}
-	if value, ok := su.mutation.AppendedMatchers(); ok {
+	if value, ok := _u.mutation.AppendedMatchers(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, silence.FieldMatchers, value)
 		})
 	}
-	if su.mutation.MatchersCleared() {
+	if _u.mutation.MatchersCleared() {
 		_spec.ClearField(silence.FieldMatchers, field.TypeJSON)
 	}
-	if value, ok := su.mutation.StartsAt(); ok {
+	if value, ok := _u.mutation.StartsAt(); ok {
 		_spec.SetField(silence.FieldStartsAt, field.TypeTime, value)
 	}
-	if value, ok := su.mutation.EndsAt(); ok {
+	if value, ok := _u.mutation.EndsAt(); ok {
 		_spec.SetField(silence.FieldEndsAt, field.TypeTime, value)
 	}
-	if value, ok := su.mutation.Comments(); ok {
+	if value, ok := _u.mutation.Comments(); ok {
 		_spec.SetField(silence.FieldComments, field.TypeString, value)
 	}
-	if su.mutation.CommentsCleared() {
+	if _u.mutation.CommentsCleared() {
 		_spec.ClearField(silence.FieldComments, field.TypeString)
 	}
-	if value, ok := su.mutation.State(); ok {
+	if value, ok := _u.mutation.State(); ok {
 		_spec.SetField(silence.FieldState, field.TypeEnum, value)
 	}
-	_spec.Node.Schema = su.schemaConfig.Silence
-	ctx = internal.NewSchemaConfigContext(ctx, su.schemaConfig)
-	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
+	_spec.Node.Schema = _u.schemaConfig.Silence
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{silence.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -268,8 +268,8 @@ func (su *SilenceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	su.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // SilenceUpdateOne is the builder for updating a single Silence entity.
@@ -281,158 +281,158 @@ type SilenceUpdateOne struct {
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (suo *SilenceUpdateOne) SetUpdatedBy(i int) *SilenceUpdateOne {
-	suo.mutation.ResetUpdatedBy()
-	suo.mutation.SetUpdatedBy(i)
-	return suo
+func (_u *SilenceUpdateOne) SetUpdatedBy(v int) *SilenceUpdateOne {
+	_u.mutation.ResetUpdatedBy()
+	_u.mutation.SetUpdatedBy(v)
+	return _u
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (suo *SilenceUpdateOne) SetNillableUpdatedBy(i *int) *SilenceUpdateOne {
-	if i != nil {
-		suo.SetUpdatedBy(*i)
+func (_u *SilenceUpdateOne) SetNillableUpdatedBy(v *int) *SilenceUpdateOne {
+	if v != nil {
+		_u.SetUpdatedBy(*v)
 	}
-	return suo
+	return _u
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (suo *SilenceUpdateOne) AddUpdatedBy(i int) *SilenceUpdateOne {
-	suo.mutation.AddUpdatedBy(i)
-	return suo
+// AddUpdatedBy adds value to the "updated_by" field.
+func (_u *SilenceUpdateOne) AddUpdatedBy(v int) *SilenceUpdateOne {
+	_u.mutation.AddUpdatedBy(v)
+	return _u
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (suo *SilenceUpdateOne) ClearUpdatedBy() *SilenceUpdateOne {
-	suo.mutation.ClearUpdatedBy()
-	return suo
+func (_u *SilenceUpdateOne) ClearUpdatedBy() *SilenceUpdateOne {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (suo *SilenceUpdateOne) SetUpdatedAt(t time.Time) *SilenceUpdateOne {
-	suo.mutation.SetUpdatedAt(t)
-	return suo
+func (_u *SilenceUpdateOne) SetUpdatedAt(v time.Time) *SilenceUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (suo *SilenceUpdateOne) SetNillableUpdatedAt(t *time.Time) *SilenceUpdateOne {
-	if t != nil {
-		suo.SetUpdatedAt(*t)
+func (_u *SilenceUpdateOne) SetNillableUpdatedAt(v *time.Time) *SilenceUpdateOne {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return suo
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (suo *SilenceUpdateOne) ClearUpdatedAt() *SilenceUpdateOne {
-	suo.mutation.ClearUpdatedAt()
-	return suo
+func (_u *SilenceUpdateOne) ClearUpdatedAt() *SilenceUpdateOne {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetMatchers sets the "matchers" field.
-func (suo *SilenceUpdateOne) SetMatchers(l []*label.Matcher) *SilenceUpdateOne {
-	suo.mutation.SetMatchers(l)
-	return suo
+func (_u *SilenceUpdateOne) SetMatchers(v []*label.Matcher) *SilenceUpdateOne {
+	_u.mutation.SetMatchers(v)
+	return _u
 }
 
-// AppendMatchers appends l to the "matchers" field.
-func (suo *SilenceUpdateOne) AppendMatchers(l []*label.Matcher) *SilenceUpdateOne {
-	suo.mutation.AppendMatchers(l)
-	return suo
+// AppendMatchers appends value to the "matchers" field.
+func (_u *SilenceUpdateOne) AppendMatchers(v []*label.Matcher) *SilenceUpdateOne {
+	_u.mutation.AppendMatchers(v)
+	return _u
 }
 
 // ClearMatchers clears the value of the "matchers" field.
-func (suo *SilenceUpdateOne) ClearMatchers() *SilenceUpdateOne {
-	suo.mutation.ClearMatchers()
-	return suo
+func (_u *SilenceUpdateOne) ClearMatchers() *SilenceUpdateOne {
+	_u.mutation.ClearMatchers()
+	return _u
 }
 
 // SetStartsAt sets the "starts_at" field.
-func (suo *SilenceUpdateOne) SetStartsAt(t time.Time) *SilenceUpdateOne {
-	suo.mutation.SetStartsAt(t)
-	return suo
+func (_u *SilenceUpdateOne) SetStartsAt(v time.Time) *SilenceUpdateOne {
+	_u.mutation.SetStartsAt(v)
+	return _u
 }
 
 // SetNillableStartsAt sets the "starts_at" field if the given value is not nil.
-func (suo *SilenceUpdateOne) SetNillableStartsAt(t *time.Time) *SilenceUpdateOne {
-	if t != nil {
-		suo.SetStartsAt(*t)
+func (_u *SilenceUpdateOne) SetNillableStartsAt(v *time.Time) *SilenceUpdateOne {
+	if v != nil {
+		_u.SetStartsAt(*v)
 	}
-	return suo
+	return _u
 }
 
 // SetEndsAt sets the "ends_at" field.
-func (suo *SilenceUpdateOne) SetEndsAt(t time.Time) *SilenceUpdateOne {
-	suo.mutation.SetEndsAt(t)
-	return suo
+func (_u *SilenceUpdateOne) SetEndsAt(v time.Time) *SilenceUpdateOne {
+	_u.mutation.SetEndsAt(v)
+	return _u
 }
 
 // SetNillableEndsAt sets the "ends_at" field if the given value is not nil.
-func (suo *SilenceUpdateOne) SetNillableEndsAt(t *time.Time) *SilenceUpdateOne {
-	if t != nil {
-		suo.SetEndsAt(*t)
+func (_u *SilenceUpdateOne) SetNillableEndsAt(v *time.Time) *SilenceUpdateOne {
+	if v != nil {
+		_u.SetEndsAt(*v)
 	}
-	return suo
+	return _u
 }
 
 // SetComments sets the "comments" field.
-func (suo *SilenceUpdateOne) SetComments(s string) *SilenceUpdateOne {
-	suo.mutation.SetComments(s)
-	return suo
+func (_u *SilenceUpdateOne) SetComments(v string) *SilenceUpdateOne {
+	_u.mutation.SetComments(v)
+	return _u
 }
 
 // SetNillableComments sets the "comments" field if the given value is not nil.
-func (suo *SilenceUpdateOne) SetNillableComments(s *string) *SilenceUpdateOne {
-	if s != nil {
-		suo.SetComments(*s)
+func (_u *SilenceUpdateOne) SetNillableComments(v *string) *SilenceUpdateOne {
+	if v != nil {
+		_u.SetComments(*v)
 	}
-	return suo
+	return _u
 }
 
 // ClearComments clears the value of the "comments" field.
-func (suo *SilenceUpdateOne) ClearComments() *SilenceUpdateOne {
-	suo.mutation.ClearComments()
-	return suo
+func (_u *SilenceUpdateOne) ClearComments() *SilenceUpdateOne {
+	_u.mutation.ClearComments()
+	return _u
 }
 
 // SetState sets the "state" field.
-func (suo *SilenceUpdateOne) SetState(as alert.SilenceState) *SilenceUpdateOne {
-	suo.mutation.SetState(as)
-	return suo
+func (_u *SilenceUpdateOne) SetState(v alert.SilenceState) *SilenceUpdateOne {
+	_u.mutation.SetState(v)
+	return _u
 }
 
 // SetNillableState sets the "state" field if the given value is not nil.
-func (suo *SilenceUpdateOne) SetNillableState(as *alert.SilenceState) *SilenceUpdateOne {
-	if as != nil {
-		suo.SetState(*as)
+func (_u *SilenceUpdateOne) SetNillableState(v *alert.SilenceState) *SilenceUpdateOne {
+	if v != nil {
+		_u.SetState(*v)
 	}
-	return suo
+	return _u
 }
 
 // Mutation returns the SilenceMutation object of the builder.
-func (suo *SilenceUpdateOne) Mutation() *SilenceMutation {
-	return suo.mutation
+func (_u *SilenceUpdateOne) Mutation() *SilenceMutation {
+	return _u.mutation
 }
 
 // Where appends a list predicates to the SilenceUpdate builder.
-func (suo *SilenceUpdateOne) Where(ps ...predicate.Silence) *SilenceUpdateOne {
-	suo.mutation.Where(ps...)
-	return suo
+func (_u *SilenceUpdateOne) Where(ps ...predicate.Silence) *SilenceUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (suo *SilenceUpdateOne) Select(field string, fields ...string) *SilenceUpdateOne {
-	suo.fields = append([]string{field}, fields...)
-	return suo
+func (_u *SilenceUpdateOne) Select(field string, fields ...string) *SilenceUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Silence entity.
-func (suo *SilenceUpdateOne) Save(ctx context.Context) (*Silence, error) {
-	return withHooks(ctx, suo.sqlSave, suo.mutation, suo.hooks)
+func (_u *SilenceUpdateOne) Save(ctx context.Context) (*Silence, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (suo *SilenceUpdateOne) SaveX(ctx context.Context) *Silence {
-	node, err := suo.Save(ctx)
+func (_u *SilenceUpdateOne) SaveX(ctx context.Context) *Silence {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -440,42 +440,42 @@ func (suo *SilenceUpdateOne) SaveX(ctx context.Context) *Silence {
 }
 
 // Exec executes the query on the entity.
-func (suo *SilenceUpdateOne) Exec(ctx context.Context) error {
-	_, err := suo.Save(ctx)
+func (_u *SilenceUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (suo *SilenceUpdateOne) ExecX(ctx context.Context) {
-	if err := suo.Exec(ctx); err != nil {
+func (_u *SilenceUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (suo *SilenceUpdateOne) check() error {
-	if v, ok := suo.mutation.State(); ok {
+func (_u *SilenceUpdateOne) check() error {
+	if v, ok := _u.mutation.State(); ok {
 		if err := silence.StateValidator(v); err != nil {
 			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "Silence.state": %w`, err)}
 		}
 	}
-	if suo.mutation.UserCleared() && len(suo.mutation.UserIDs()) > 0 {
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Silence.user"`)
 	}
 	return nil
 }
 
-func (suo *SilenceUpdateOne) sqlSave(ctx context.Context) (_node *Silence, err error) {
-	if err := suo.check(); err != nil {
+func (_u *SilenceUpdateOne) sqlSave(ctx context.Context) (_node *Silence, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(silence.Table, silence.Columns, sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt))
-	id, ok := suo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Silence.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := suo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, silence.FieldID)
 		for _, f := range fields {
@@ -487,60 +487,60 @@ func (suo *SilenceUpdateOne) sqlSave(ctx context.Context) (_node *Silence, err e
 			}
 		}
 	}
-	if ps := suo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := suo.mutation.UpdatedBy(); ok {
+	if value, ok := _u.mutation.UpdatedBy(); ok {
 		_spec.SetField(silence.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if value, ok := suo.mutation.AddedUpdatedBy(); ok {
+	if value, ok := _u.mutation.AddedUpdatedBy(); ok {
 		_spec.AddField(silence.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if suo.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		_spec.ClearField(silence.FieldUpdatedBy, field.TypeInt)
 	}
-	if value, ok := suo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(silence.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if suo.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(silence.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := suo.mutation.Matchers(); ok {
+	if value, ok := _u.mutation.Matchers(); ok {
 		_spec.SetField(silence.FieldMatchers, field.TypeJSON, value)
 	}
-	if value, ok := suo.mutation.AppendedMatchers(); ok {
+	if value, ok := _u.mutation.AppendedMatchers(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, silence.FieldMatchers, value)
 		})
 	}
-	if suo.mutation.MatchersCleared() {
+	if _u.mutation.MatchersCleared() {
 		_spec.ClearField(silence.FieldMatchers, field.TypeJSON)
 	}
-	if value, ok := suo.mutation.StartsAt(); ok {
+	if value, ok := _u.mutation.StartsAt(); ok {
 		_spec.SetField(silence.FieldStartsAt, field.TypeTime, value)
 	}
-	if value, ok := suo.mutation.EndsAt(); ok {
+	if value, ok := _u.mutation.EndsAt(); ok {
 		_spec.SetField(silence.FieldEndsAt, field.TypeTime, value)
 	}
-	if value, ok := suo.mutation.Comments(); ok {
+	if value, ok := _u.mutation.Comments(); ok {
 		_spec.SetField(silence.FieldComments, field.TypeString, value)
 	}
-	if suo.mutation.CommentsCleared() {
+	if _u.mutation.CommentsCleared() {
 		_spec.ClearField(silence.FieldComments, field.TypeString)
 	}
-	if value, ok := suo.mutation.State(); ok {
+	if value, ok := _u.mutation.State(); ok {
 		_spec.SetField(silence.FieldState, field.TypeEnum, value)
 	}
-	_spec.Node.Schema = suo.schemaConfig.Silence
-	ctx = internal.NewSchemaConfigContext(ctx, suo.schemaConfig)
-	_node = &Silence{config: suo.config}
+	_spec.Node.Schema = _u.schemaConfig.Silence
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	_node = &Silence{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, suo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{silence.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -548,6 +548,6 @@ func (suo *SilenceUpdateOne) sqlSave(ctx context.Context) (_node *Silence, err e
 		}
 		return nil, err
 	}
-	suo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

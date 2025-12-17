@@ -25,127 +25,127 @@ type MsgChannelCreate struct {
 }
 
 // SetCreatedBy sets the "created_by" field.
-func (mcc *MsgChannelCreate) SetCreatedBy(i int) *MsgChannelCreate {
-	mcc.mutation.SetCreatedBy(i)
-	return mcc
+func (_c *MsgChannelCreate) SetCreatedBy(v int) *MsgChannelCreate {
+	_c.mutation.SetCreatedBy(v)
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (mcc *MsgChannelCreate) SetCreatedAt(t time.Time) *MsgChannelCreate {
-	mcc.mutation.SetCreatedAt(t)
-	return mcc
+func (_c *MsgChannelCreate) SetCreatedAt(v time.Time) *MsgChannelCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (mcc *MsgChannelCreate) SetNillableCreatedAt(t *time.Time) *MsgChannelCreate {
-	if t != nil {
-		mcc.SetCreatedAt(*t)
+func (_c *MsgChannelCreate) SetNillableCreatedAt(v *time.Time) *MsgChannelCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return mcc
+	return _c
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (mcc *MsgChannelCreate) SetUpdatedBy(i int) *MsgChannelCreate {
-	mcc.mutation.SetUpdatedBy(i)
-	return mcc
+func (_c *MsgChannelCreate) SetUpdatedBy(v int) *MsgChannelCreate {
+	_c.mutation.SetUpdatedBy(v)
+	return _c
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (mcc *MsgChannelCreate) SetNillableUpdatedBy(i *int) *MsgChannelCreate {
-	if i != nil {
-		mcc.SetUpdatedBy(*i)
+func (_c *MsgChannelCreate) SetNillableUpdatedBy(v *int) *MsgChannelCreate {
+	if v != nil {
+		_c.SetUpdatedBy(*v)
 	}
-	return mcc
+	return _c
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (mcc *MsgChannelCreate) SetUpdatedAt(t time.Time) *MsgChannelCreate {
-	mcc.mutation.SetUpdatedAt(t)
-	return mcc
+func (_c *MsgChannelCreate) SetUpdatedAt(v time.Time) *MsgChannelCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (mcc *MsgChannelCreate) SetNillableUpdatedAt(t *time.Time) *MsgChannelCreate {
-	if t != nil {
-		mcc.SetUpdatedAt(*t)
+func (_c *MsgChannelCreate) SetNillableUpdatedAt(v *time.Time) *MsgChannelCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
 	}
-	return mcc
+	return _c
 }
 
 // SetName sets the "name" field.
-func (mcc *MsgChannelCreate) SetName(s string) *MsgChannelCreate {
-	mcc.mutation.SetName(s)
-	return mcc
+func (_c *MsgChannelCreate) SetName(v string) *MsgChannelCreate {
+	_c.mutation.SetName(v)
+	return _c
 }
 
 // SetTenantID sets the "tenant_id" field.
-func (mcc *MsgChannelCreate) SetTenantID(i int) *MsgChannelCreate {
-	mcc.mutation.SetTenantID(i)
-	return mcc
+func (_c *MsgChannelCreate) SetTenantID(v int) *MsgChannelCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
 }
 
 // SetReceiverType sets the "receiver_type" field.
-func (mcc *MsgChannelCreate) SetReceiverType(pt profile.ReceiverType) *MsgChannelCreate {
-	mcc.mutation.SetReceiverType(pt)
-	return mcc
+func (_c *MsgChannelCreate) SetReceiverType(v profile.ReceiverType) *MsgChannelCreate {
+	_c.mutation.SetReceiverType(v)
+	return _c
 }
 
 // SetStatus sets the "status" field.
-func (mcc *MsgChannelCreate) SetStatus(ts typex.SimpleStatus) *MsgChannelCreate {
-	mcc.mutation.SetStatus(ts)
-	return mcc
+func (_c *MsgChannelCreate) SetStatus(v typex.SimpleStatus) *MsgChannelCreate {
+	_c.mutation.SetStatus(v)
+	return _c
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (mcc *MsgChannelCreate) SetNillableStatus(ts *typex.SimpleStatus) *MsgChannelCreate {
-	if ts != nil {
-		mcc.SetStatus(*ts)
+func (_c *MsgChannelCreate) SetNillableStatus(v *typex.SimpleStatus) *MsgChannelCreate {
+	if v != nil {
+		_c.SetStatus(*v)
 	}
-	return mcc
+	return _c
 }
 
 // SetReceiver sets the "receiver" field.
-func (mcc *MsgChannelCreate) SetReceiver(pr *profile.Receiver) *MsgChannelCreate {
-	mcc.mutation.SetReceiver(pr)
-	return mcc
+func (_c *MsgChannelCreate) SetReceiver(v *profile.Receiver) *MsgChannelCreate {
+	_c.mutation.SetReceiver(v)
+	return _c
 }
 
 // SetComments sets the "comments" field.
-func (mcc *MsgChannelCreate) SetComments(s string) *MsgChannelCreate {
-	mcc.mutation.SetComments(s)
-	return mcc
+func (_c *MsgChannelCreate) SetComments(v string) *MsgChannelCreate {
+	_c.mutation.SetComments(v)
+	return _c
 }
 
 // SetNillableComments sets the "comments" field if the given value is not nil.
-func (mcc *MsgChannelCreate) SetNillableComments(s *string) *MsgChannelCreate {
-	if s != nil {
-		mcc.SetComments(*s)
+func (_c *MsgChannelCreate) SetNillableComments(v *string) *MsgChannelCreate {
+	if v != nil {
+		_c.SetComments(*v)
 	}
-	return mcc
+	return _c
 }
 
 // SetID sets the "id" field.
-func (mcc *MsgChannelCreate) SetID(i int) *MsgChannelCreate {
-	mcc.mutation.SetID(i)
-	return mcc
+func (_c *MsgChannelCreate) SetID(v int) *MsgChannelCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // Mutation returns the MsgChannelMutation object of the builder.
-func (mcc *MsgChannelCreate) Mutation() *MsgChannelMutation {
-	return mcc.mutation
+func (_c *MsgChannelCreate) Mutation() *MsgChannelMutation {
+	return _c.mutation
 }
 
 // Save creates the MsgChannel in the database.
-func (mcc *MsgChannelCreate) Save(ctx context.Context) (*MsgChannel, error) {
-	if err := mcc.defaults(); err != nil {
+func (_c *MsgChannelCreate) Save(ctx context.Context) (*MsgChannel, error) {
+	if err := _c.defaults(); err != nil {
 		return nil, err
 	}
-	return withHooks(ctx, mcc.sqlSave, mcc.mutation, mcc.hooks)
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (mcc *MsgChannelCreate) SaveX(ctx context.Context) *MsgChannel {
-	v, err := mcc.Save(ctx)
+func (_c *MsgChannelCreate) SaveX(ctx context.Context) *MsgChannel {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -153,62 +153,62 @@ func (mcc *MsgChannelCreate) SaveX(ctx context.Context) *MsgChannel {
 }
 
 // Exec executes the query.
-func (mcc *MsgChannelCreate) Exec(ctx context.Context) error {
-	_, err := mcc.Save(ctx)
+func (_c *MsgChannelCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mcc *MsgChannelCreate) ExecX(ctx context.Context) {
-	if err := mcc.Exec(ctx); err != nil {
+func (_c *MsgChannelCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (mcc *MsgChannelCreate) defaults() error {
-	if _, ok := mcc.mutation.CreatedAt(); !ok {
+func (_c *MsgChannelCreate) defaults() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		if msgchannel.DefaultCreatedAt == nil {
 			return fmt.Errorf("ent: uninitialized msgchannel.DefaultCreatedAt (forgotten import ent/runtime?)")
 		}
 		v := msgchannel.DefaultCreatedAt()
-		mcc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := mcc.mutation.Status(); !ok {
+	if _, ok := _c.mutation.Status(); !ok {
 		v := msgchannel.DefaultStatus
-		mcc.mutation.SetStatus(v)
+		_c.mutation.SetStatus(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mcc *MsgChannelCreate) check() error {
-	if _, ok := mcc.mutation.CreatedBy(); !ok {
+func (_c *MsgChannelCreate) check() error {
+	if _, ok := _c.mutation.CreatedBy(); !ok {
 		return &ValidationError{Name: "created_by", err: errors.New(`ent: missing required field "MsgChannel.created_by"`)}
 	}
-	if _, ok := mcc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "MsgChannel.created_at"`)}
 	}
-	if _, ok := mcc.mutation.Name(); !ok {
+	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "MsgChannel.name"`)}
 	}
-	if v, ok := mcc.mutation.Name(); ok {
+	if v, ok := _c.mutation.Name(); ok {
 		if err := msgchannel.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "MsgChannel.name": %w`, err)}
 		}
 	}
-	if _, ok := mcc.mutation.TenantID(); !ok {
+	if _, ok := _c.mutation.TenantID(); !ok {
 		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "MsgChannel.tenant_id"`)}
 	}
-	if _, ok := mcc.mutation.ReceiverType(); !ok {
+	if _, ok := _c.mutation.ReceiverType(); !ok {
 		return &ValidationError{Name: "receiver_type", err: errors.New(`ent: missing required field "MsgChannel.receiver_type"`)}
 	}
-	if v, ok := mcc.mutation.ReceiverType(); ok {
+	if v, ok := _c.mutation.ReceiverType(); ok {
 		if err := msgchannel.ReceiverTypeValidator(v); err != nil {
 			return &ValidationError{Name: "receiver_type", err: fmt.Errorf(`ent: validator failed for field "MsgChannel.receiver_type": %w`, err)}
 		}
 	}
-	if v, ok := mcc.mutation.Status(); ok {
+	if v, ok := _c.mutation.Status(); ok {
 		if err := msgchannel.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "MsgChannel.status": %w`, err)}
 		}
@@ -216,12 +216,12 @@ func (mcc *MsgChannelCreate) check() error {
 	return nil
 }
 
-func (mcc *MsgChannelCreate) sqlSave(ctx context.Context) (*MsgChannel, error) {
-	if err := mcc.check(); err != nil {
+func (_c *MsgChannelCreate) sqlSave(ctx context.Context) (*MsgChannel, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := mcc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, mcc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -231,59 +231,59 @@ func (mcc *MsgChannelCreate) sqlSave(ctx context.Context) (*MsgChannel, error) {
 		id := _spec.ID.Value.(int64)
 		_node.ID = int(id)
 	}
-	mcc.mutation.id = &_node.ID
-	mcc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (mcc *MsgChannelCreate) createSpec() (*MsgChannel, *sqlgraph.CreateSpec) {
+func (_c *MsgChannelCreate) createSpec() (*MsgChannel, *sqlgraph.CreateSpec) {
 	var (
-		_node = &MsgChannel{config: mcc.config}
+		_node = &MsgChannel{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(msgchannel.Table, sqlgraph.NewFieldSpec(msgchannel.FieldID, field.TypeInt))
 	)
-	_spec.Schema = mcc.schemaConfig.MsgChannel
-	_spec.OnConflict = mcc.conflict
-	if id, ok := mcc.mutation.ID(); ok {
+	_spec.Schema = _c.schemaConfig.MsgChannel
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := mcc.mutation.CreatedBy(); ok {
+	if value, ok := _c.mutation.CreatedBy(); ok {
 		_spec.SetField(msgchannel.FieldCreatedBy, field.TypeInt, value)
 		_node.CreatedBy = value
 	}
-	if value, ok := mcc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(msgchannel.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := mcc.mutation.UpdatedBy(); ok {
+	if value, ok := _c.mutation.UpdatedBy(); ok {
 		_spec.SetField(msgchannel.FieldUpdatedBy, field.TypeInt, value)
 		_node.UpdatedBy = value
 	}
-	if value, ok := mcc.mutation.UpdatedAt(); ok {
+	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgchannel.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := mcc.mutation.Name(); ok {
+	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(msgchannel.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := mcc.mutation.TenantID(); ok {
+	if value, ok := _c.mutation.TenantID(); ok {
 		_spec.SetField(msgchannel.FieldTenantID, field.TypeInt, value)
 		_node.TenantID = value
 	}
-	if value, ok := mcc.mutation.ReceiverType(); ok {
+	if value, ok := _c.mutation.ReceiverType(); ok {
 		_spec.SetField(msgchannel.FieldReceiverType, field.TypeEnum, value)
 		_node.ReceiverType = value
 	}
-	if value, ok := mcc.mutation.Status(); ok {
+	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(msgchannel.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
 	}
-	if value, ok := mcc.mutation.Receiver(); ok {
+	if value, ok := _c.mutation.Receiver(); ok {
 		_spec.SetField(msgchannel.FieldReceiver, field.TypeJSON, value)
 		_node.Receiver = value
 	}
-	if value, ok := mcc.mutation.Comments(); ok {
+	if value, ok := _c.mutation.Comments(); ok {
 		_spec.SetField(msgchannel.FieldComments, field.TypeString, value)
 		_node.Comments = value
 	}
@@ -306,10 +306,10 @@ func (mcc *MsgChannelCreate) createSpec() (*MsgChannel, *sqlgraph.CreateSpec) {
 //			SetCreatedBy(v+v).
 //		}).
 //		Exec(ctx)
-func (mcc *MsgChannelCreate) OnConflict(opts ...sql.ConflictOption) *MsgChannelUpsertOne {
-	mcc.conflict = opts
+func (_c *MsgChannelCreate) OnConflict(opts ...sql.ConflictOption) *MsgChannelUpsertOne {
+	_c.conflict = opts
 	return &MsgChannelUpsertOne{
-		create: mcc,
+		create: _c,
 	}
 }
 
@@ -319,10 +319,10 @@ func (mcc *MsgChannelCreate) OnConflict(opts ...sql.ConflictOption) *MsgChannelU
 //	client.MsgChannel.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (mcc *MsgChannelCreate) OnConflictColumns(columns ...string) *MsgChannelUpsertOne {
-	mcc.conflict = append(mcc.conflict, sql.ConflictColumns(columns...))
+func (_c *MsgChannelCreate) OnConflictColumns(columns ...string) *MsgChannelUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &MsgChannelUpsertOne{
-		create: mcc,
+		create: _c,
 	}
 }
 
@@ -734,16 +734,16 @@ type MsgChannelCreateBulk struct {
 }
 
 // Save creates the MsgChannel entities in the database.
-func (mccb *MsgChannelCreateBulk) Save(ctx context.Context) ([]*MsgChannel, error) {
-	if mccb.err != nil {
-		return nil, mccb.err
+func (_c *MsgChannelCreateBulk) Save(ctx context.Context) ([]*MsgChannel, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(mccb.builders))
-	nodes := make([]*MsgChannel, len(mccb.builders))
-	mutators := make([]Mutator, len(mccb.builders))
-	for i := range mccb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*MsgChannel, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := mccb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MsgChannelMutation)
@@ -757,12 +757,12 @@ func (mccb *MsgChannelCreateBulk) Save(ctx context.Context) ([]*MsgChannel, erro
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, mccb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = mccb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, mccb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -786,7 +786,7 @@ func (mccb *MsgChannelCreateBulk) Save(ctx context.Context) ([]*MsgChannel, erro
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, mccb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -794,8 +794,8 @@ func (mccb *MsgChannelCreateBulk) Save(ctx context.Context) ([]*MsgChannel, erro
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mccb *MsgChannelCreateBulk) SaveX(ctx context.Context) []*MsgChannel {
-	v, err := mccb.Save(ctx)
+func (_c *MsgChannelCreateBulk) SaveX(ctx context.Context) []*MsgChannel {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -803,14 +803,14 @@ func (mccb *MsgChannelCreateBulk) SaveX(ctx context.Context) []*MsgChannel {
 }
 
 // Exec executes the query.
-func (mccb *MsgChannelCreateBulk) Exec(ctx context.Context) error {
-	_, err := mccb.Save(ctx)
+func (_c *MsgChannelCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mccb *MsgChannelCreateBulk) ExecX(ctx context.Context) {
-	if err := mccb.Exec(ctx); err != nil {
+func (_c *MsgChannelCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -830,10 +830,10 @@ func (mccb *MsgChannelCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedBy(v+v).
 //		}).
 //		Exec(ctx)
-func (mccb *MsgChannelCreateBulk) OnConflict(opts ...sql.ConflictOption) *MsgChannelUpsertBulk {
-	mccb.conflict = opts
+func (_c *MsgChannelCreateBulk) OnConflict(opts ...sql.ConflictOption) *MsgChannelUpsertBulk {
+	_c.conflict = opts
 	return &MsgChannelUpsertBulk{
-		create: mccb,
+		create: _c,
 	}
 }
 
@@ -843,10 +843,10 @@ func (mccb *MsgChannelCreateBulk) OnConflict(opts ...sql.ConflictOption) *MsgCha
 //	client.MsgChannel.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (mccb *MsgChannelCreateBulk) OnConflictColumns(columns ...string) *MsgChannelUpsertBulk {
-	mccb.conflict = append(mccb.conflict, sql.ConflictColumns(columns...))
+func (_c *MsgChannelCreateBulk) OnConflictColumns(columns ...string) *MsgChannelUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &MsgChannelUpsertBulk{
-		create: mccb,
+		create: _c,
 	}
 }
 

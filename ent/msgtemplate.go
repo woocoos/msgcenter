@@ -111,7 +111,7 @@ func (*MsgTemplate) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the MsgTemplate fields.
-func (mt *MsgTemplate) assignValues(columns []string, values []any) error {
+func (_m *MsgTemplate) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -122,120 +122,120 @@ func (mt *MsgTemplate) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			mt.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case msgtemplate.FieldCreatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_by", values[i])
 			} else if value.Valid {
-				mt.CreatedBy = int(value.Int64)
+				_m.CreatedBy = int(value.Int64)
 			}
 		case msgtemplate.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				mt.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case msgtemplate.FieldUpdatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
 			} else if value.Valid {
-				mt.UpdatedBy = int(value.Int64)
+				_m.UpdatedBy = int(value.Int64)
 			}
 		case msgtemplate.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				mt.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case msgtemplate.FieldMsgTypeID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field msg_type_id", values[i])
 			} else if value.Valid {
-				mt.MsgTypeID = int(value.Int64)
+				_m.MsgTypeID = int(value.Int64)
 			}
 		case msgtemplate.FieldMsgEventID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field msg_event_id", values[i])
 			} else if value.Valid {
-				mt.MsgEventID = int(value.Int64)
+				_m.MsgEventID = int(value.Int64)
 			}
 		case msgtemplate.FieldTenantID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
 			} else if value.Valid {
-				mt.TenantID = int(value.Int64)
+				_m.TenantID = int(value.Int64)
 			}
 		case msgtemplate.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				mt.Name = value.String
+				_m.Name = value.String
 			}
 		case msgtemplate.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				mt.Status = typex.SimpleStatus(value.String)
+				_m.Status = typex.SimpleStatus(value.String)
 			}
 		case msgtemplate.FieldReceiverType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field receiver_type", values[i])
 			} else if value.Valid {
-				mt.ReceiverType = profile.ReceiverType(value.String)
+				_m.ReceiverType = profile.ReceiverType(value.String)
 			}
 		case msgtemplate.FieldFormat:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field format", values[i])
 			} else if value.Valid {
-				mt.Format = msgtemplate.Format(value.String)
+				_m.Format = msgtemplate.Format(value.String)
 			}
 		case msgtemplate.FieldSubject:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field subject", values[i])
 			} else if value.Valid {
-				mt.Subject = value.String
+				_m.Subject = value.String
 			}
 		case msgtemplate.FieldFrom:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field from", values[i])
 			} else if value.Valid {
-				mt.From = value.String
+				_m.From = value.String
 			}
 		case msgtemplate.FieldTo:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field to", values[i])
 			} else if value.Valid {
-				mt.To = value.String
+				_m.To = value.String
 			}
 		case msgtemplate.FieldCc:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field cc", values[i])
 			} else if value.Valid {
-				mt.Cc = value.String
+				_m.Cc = value.String
 			}
 		case msgtemplate.FieldBcc:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field bcc", values[i])
 			} else if value.Valid {
-				mt.Bcc = value.String
+				_m.Bcc = value.String
 			}
 		case msgtemplate.FieldBody:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field body", values[i])
 			} else if value.Valid {
-				mt.Body = value.String
+				_m.Body = value.String
 			}
 		case msgtemplate.FieldTpl:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field tpl", values[i])
 			} else if value.Valid {
-				mt.Tpl = value.String
+				_m.Tpl = value.String
 			}
 		case msgtemplate.FieldAttachments:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field attachments", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &mt.Attachments); err != nil {
+				if err := json.Unmarshal(*value, &_m.Attachments); err != nil {
 					return fmt.Errorf("unmarshal field attachments: %w", err)
 				}
 			}
@@ -243,10 +243,10 @@ func (mt *MsgTemplate) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field comments", values[i])
 			} else if value.Valid {
-				mt.Comments = value.String
+				_m.Comments = value.String
 			}
 		default:
-			mt.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -254,97 +254,97 @@ func (mt *MsgTemplate) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the MsgTemplate.
 // This includes values selected through modifiers, order, etc.
-func (mt *MsgTemplate) Value(name string) (ent.Value, error) {
-	return mt.selectValues.Get(name)
+func (_m *MsgTemplate) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryEvent queries the "event" edge of the MsgTemplate entity.
-func (mt *MsgTemplate) QueryEvent() *MsgEventQuery {
-	return NewMsgTemplateClient(mt.config).QueryEvent(mt)
+func (_m *MsgTemplate) QueryEvent() *MsgEventQuery {
+	return NewMsgTemplateClient(_m.config).QueryEvent(_m)
 }
 
 // Update returns a builder for updating this MsgTemplate.
 // Note that you need to call MsgTemplate.Unwrap() before calling this method if this MsgTemplate
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (mt *MsgTemplate) Update() *MsgTemplateUpdateOne {
-	return NewMsgTemplateClient(mt.config).UpdateOne(mt)
+func (_m *MsgTemplate) Update() *MsgTemplateUpdateOne {
+	return NewMsgTemplateClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the MsgTemplate entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (mt *MsgTemplate) Unwrap() *MsgTemplate {
-	_tx, ok := mt.config.driver.(*txDriver)
+func (_m *MsgTemplate) Unwrap() *MsgTemplate {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: MsgTemplate is not a transactional entity")
 	}
-	mt.config.driver = _tx.drv
-	return mt
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (mt *MsgTemplate) String() string {
+func (_m *MsgTemplate) String() string {
 	var builder strings.Builder
 	builder.WriteString("MsgTemplate(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", mt.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", mt.CreatedBy))
+	builder.WriteString(fmt.Sprintf("%v", _m.CreatedBy))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(mt.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", mt.UpdatedBy))
+	builder.WriteString(fmt.Sprintf("%v", _m.UpdatedBy))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(mt.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("msg_type_id=")
-	builder.WriteString(fmt.Sprintf("%v", mt.MsgTypeID))
+	builder.WriteString(fmt.Sprintf("%v", _m.MsgTypeID))
 	builder.WriteString(", ")
 	builder.WriteString("msg_event_id=")
-	builder.WriteString(fmt.Sprintf("%v", mt.MsgEventID))
+	builder.WriteString(fmt.Sprintf("%v", _m.MsgEventID))
 	builder.WriteString(", ")
 	builder.WriteString("tenant_id=")
-	builder.WriteString(fmt.Sprintf("%v", mt.TenantID))
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(mt.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", mt.Status))
+	builder.WriteString(fmt.Sprintf("%v", _m.Status))
 	builder.WriteString(", ")
 	builder.WriteString("receiver_type=")
-	builder.WriteString(fmt.Sprintf("%v", mt.ReceiverType))
+	builder.WriteString(fmt.Sprintf("%v", _m.ReceiverType))
 	builder.WriteString(", ")
 	builder.WriteString("format=")
-	builder.WriteString(fmt.Sprintf("%v", mt.Format))
+	builder.WriteString(fmt.Sprintf("%v", _m.Format))
 	builder.WriteString(", ")
 	builder.WriteString("subject=")
-	builder.WriteString(mt.Subject)
+	builder.WriteString(_m.Subject)
 	builder.WriteString(", ")
 	builder.WriteString("from=")
-	builder.WriteString(mt.From)
+	builder.WriteString(_m.From)
 	builder.WriteString(", ")
 	builder.WriteString("to=")
-	builder.WriteString(mt.To)
+	builder.WriteString(_m.To)
 	builder.WriteString(", ")
 	builder.WriteString("cc=")
-	builder.WriteString(mt.Cc)
+	builder.WriteString(_m.Cc)
 	builder.WriteString(", ")
 	builder.WriteString("bcc=")
-	builder.WriteString(mt.Bcc)
+	builder.WriteString(_m.Bcc)
 	builder.WriteString(", ")
 	builder.WriteString("body=")
-	builder.WriteString(mt.Body)
+	builder.WriteString(_m.Body)
 	builder.WriteString(", ")
 	builder.WriteString("tpl=")
-	builder.WriteString(mt.Tpl)
+	builder.WriteString(_m.Tpl)
 	builder.WriteString(", ")
 	builder.WriteString("attachments=")
-	builder.WriteString(fmt.Sprintf("%v", mt.Attachments))
+	builder.WriteString(fmt.Sprintf("%v", _m.Attachments))
 	builder.WriteString(", ")
 	builder.WriteString("comments=")
-	builder.WriteString(mt.Comments)
+	builder.WriteString(_m.Comments)
 	builder.WriteByte(')')
 	return builder.String()
 }

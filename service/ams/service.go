@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"fmt"
+	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/dispatch"
@@ -15,6 +16,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/nlog"
+	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
@@ -75,7 +77,17 @@ func (s *Service) FormatMsgAlerts(ctx context.Context, after *entgql.Cursor[int]
 		}
 		w = append(w, usr)
 	}
-	msgAlerts, err := s.client.MsgAlert.Query().Where(w...).Paginate(ctx, after, first, before, last,
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	o, err := s.client.Org.Get(ctx, tid)
+	if err != nil {
+		return nil, err
+	}
+	// 查询所有子租户
+	w = append(w, msgalert.HasOrgWith(org.Or(org.PathContains(o.Path), org.Path(o.Path))))
+	msgAlerts, err := s.client.MsgAlert.Query().Where(w...).Paginate(schemax.SkipTenantPrivacy(ctx), after, first, before, last,
 		ent.WithMsgAlertOrder(orderBy), ent.WithMsgAlertFilter(where.Filter))
 	if err != nil {
 		return nil, err
@@ -251,7 +263,7 @@ func (s *Service) findMsgTemplate(ctx context.Context, receiver string, a alert.
 }
 
 func (s *Service) FormatMsgAlertMore(ctx context.Context, msgAlertID int) ([]*model.FormatMsgAlert, error) {
-	ma, err := s.client.MsgAlert.Get(ctx, msgAlertID)
+	ma, err := s.client.MsgAlert.Get(schemax.SkipTenantPrivacy(ctx), msgAlertID)
 	if err != nil {
 		return nil, err
 	}
@@ -273,7 +285,7 @@ func (s *Service) FormatMsgAlertMore(ctx context.Context, msgAlertID int) ([]*mo
 }
 
 func (s *Service) RenderMsgAlert(ctx context.Context, msgAlertID int, receiver string) (*string, error) {
-	msgAlert, err := s.client.MsgAlert.Query().Where(msgalert.ID(msgAlertID)).Only(ctx)
+	msgAlert, err := s.client.MsgAlert.Query().Where(msgalert.ID(msgAlertID)).Only(schemax.SkipTenantPrivacy(ctx))
 	if err != nil {
 		return nil, err
 	}

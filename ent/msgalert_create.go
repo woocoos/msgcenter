@@ -14,6 +14,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
+	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 )
@@ -27,185 +28,196 @@ type MsgAlertCreate struct {
 }
 
 // SetTenantID sets the "tenant_id" field.
-func (mac *MsgAlertCreate) SetTenantID(i int) *MsgAlertCreate {
-	mac.mutation.SetTenantID(i)
-	return mac
+func (_c *MsgAlertCreate) SetTenantID(v int) *MsgAlertCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
 }
 
 // SetLabels sets the "labels" field.
-func (mac *MsgAlertCreate) SetLabels(ls *label.LabelSet) *MsgAlertCreate {
-	mac.mutation.SetLabels(ls)
-	return mac
+func (_c *MsgAlertCreate) SetLabels(v *label.LabelSet) *MsgAlertCreate {
+	_c.mutation.SetLabels(v)
+	return _c
 }
 
 // SetAnnotations sets the "annotations" field.
-func (mac *MsgAlertCreate) SetAnnotations(ls *label.LabelSet) *MsgAlertCreate {
-	mac.mutation.SetAnnotations(ls)
-	return mac
+func (_c *MsgAlertCreate) SetAnnotations(v *label.LabelSet) *MsgAlertCreate {
+	_c.mutation.SetAnnotations(v)
+	return _c
 }
 
 // SetStartsAt sets the "starts_at" field.
-func (mac *MsgAlertCreate) SetStartsAt(t time.Time) *MsgAlertCreate {
-	mac.mutation.SetStartsAt(t)
-	return mac
+func (_c *MsgAlertCreate) SetStartsAt(v time.Time) *MsgAlertCreate {
+	_c.mutation.SetStartsAt(v)
+	return _c
 }
 
 // SetEndsAt sets the "ends_at" field.
-func (mac *MsgAlertCreate) SetEndsAt(t time.Time) *MsgAlertCreate {
-	mac.mutation.SetEndsAt(t)
-	return mac
+func (_c *MsgAlertCreate) SetEndsAt(v time.Time) *MsgAlertCreate {
+	_c.mutation.SetEndsAt(v)
+	return _c
 }
 
 // SetNillableEndsAt sets the "ends_at" field if the given value is not nil.
-func (mac *MsgAlertCreate) SetNillableEndsAt(t *time.Time) *MsgAlertCreate {
-	if t != nil {
-		mac.SetEndsAt(*t)
+func (_c *MsgAlertCreate) SetNillableEndsAt(v *time.Time) *MsgAlertCreate {
+	if v != nil {
+		_c.SetEndsAt(*v)
 	}
-	return mac
+	return _c
 }
 
 // SetURL sets the "url" field.
-func (mac *MsgAlertCreate) SetURL(s string) *MsgAlertCreate {
-	mac.mutation.SetURL(s)
-	return mac
+func (_c *MsgAlertCreate) SetURL(v string) *MsgAlertCreate {
+	_c.mutation.SetURL(v)
+	return _c
 }
 
 // SetNillableURL sets the "url" field if the given value is not nil.
-func (mac *MsgAlertCreate) SetNillableURL(s *string) *MsgAlertCreate {
-	if s != nil {
-		mac.SetURL(*s)
+func (_c *MsgAlertCreate) SetNillableURL(v *string) *MsgAlertCreate {
+	if v != nil {
+		_c.SetURL(*v)
 	}
-	return mac
+	return _c
 }
 
 // SetTimeout sets the "timeout" field.
-func (mac *MsgAlertCreate) SetTimeout(b bool) *MsgAlertCreate {
-	mac.mutation.SetTimeout(b)
-	return mac
+func (_c *MsgAlertCreate) SetTimeout(v bool) *MsgAlertCreate {
+	_c.mutation.SetTimeout(v)
+	return _c
 }
 
 // SetNillableTimeout sets the "timeout" field if the given value is not nil.
-func (mac *MsgAlertCreate) SetNillableTimeout(b *bool) *MsgAlertCreate {
-	if b != nil {
-		mac.SetTimeout(*b)
+func (_c *MsgAlertCreate) SetNillableTimeout(v *bool) *MsgAlertCreate {
+	if v != nil {
+		_c.SetTimeout(*v)
 	}
-	return mac
+	return _c
 }
 
 // SetFingerprint sets the "fingerprint" field.
-func (mac *MsgAlertCreate) SetFingerprint(s string) *MsgAlertCreate {
-	mac.mutation.SetFingerprint(s)
-	return mac
+func (_c *MsgAlertCreate) SetFingerprint(v string) *MsgAlertCreate {
+	_c.mutation.SetFingerprint(v)
+	return _c
 }
 
 // SetState sets the "state" field.
-func (mac *MsgAlertCreate) SetState(as alert.AlertStatus) *MsgAlertCreate {
-	mac.mutation.SetState(as)
-	return mac
+func (_c *MsgAlertCreate) SetState(v alert.AlertStatus) *MsgAlertCreate {
+	_c.mutation.SetState(v)
+	return _c
 }
 
 // SetNillableState sets the "state" field if the given value is not nil.
-func (mac *MsgAlertCreate) SetNillableState(as *alert.AlertStatus) *MsgAlertCreate {
-	if as != nil {
-		mac.SetState(*as)
+func (_c *MsgAlertCreate) SetNillableState(v *alert.AlertStatus) *MsgAlertCreate {
+	if v != nil {
+		_c.SetState(*v)
 	}
-	return mac
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (mac *MsgAlertCreate) SetCreatedAt(t time.Time) *MsgAlertCreate {
-	mac.mutation.SetCreatedAt(t)
-	return mac
+func (_c *MsgAlertCreate) SetCreatedAt(v time.Time) *MsgAlertCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (mac *MsgAlertCreate) SetNillableCreatedAt(t *time.Time) *MsgAlertCreate {
-	if t != nil {
-		mac.SetCreatedAt(*t)
+func (_c *MsgAlertCreate) SetNillableCreatedAt(v *time.Time) *MsgAlertCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return mac
+	return _c
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (mac *MsgAlertCreate) SetUpdatedAt(t time.Time) *MsgAlertCreate {
-	mac.mutation.SetUpdatedAt(t)
-	return mac
+func (_c *MsgAlertCreate) SetUpdatedAt(v time.Time) *MsgAlertCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (mac *MsgAlertCreate) SetNillableUpdatedAt(t *time.Time) *MsgAlertCreate {
-	if t != nil {
-		mac.SetUpdatedAt(*t)
+func (_c *MsgAlertCreate) SetNillableUpdatedAt(v *time.Time) *MsgAlertCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
 	}
-	return mac
+	return _c
 }
 
 // SetDeleted sets the "deleted" field.
-func (mac *MsgAlertCreate) SetDeleted(b bool) *MsgAlertCreate {
-	mac.mutation.SetDeleted(b)
-	return mac
+func (_c *MsgAlertCreate) SetDeleted(v bool) *MsgAlertCreate {
+	_c.mutation.SetDeleted(v)
+	return _c
 }
 
 // SetNillableDeleted sets the "deleted" field if the given value is not nil.
-func (mac *MsgAlertCreate) SetNillableDeleted(b *bool) *MsgAlertCreate {
-	if b != nil {
-		mac.SetDeleted(*b)
+func (_c *MsgAlertCreate) SetNillableDeleted(v *bool) *MsgAlertCreate {
+	if v != nil {
+		_c.SetDeleted(*v)
 	}
-	return mac
+	return _c
 }
 
 // SetID sets the "id" field.
-func (mac *MsgAlertCreate) SetID(i int) *MsgAlertCreate {
-	mac.mutation.SetID(i)
-	return mac
+func (_c *MsgAlertCreate) SetID(v int) *MsgAlertCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // AddNlogIDs adds the "nlog" edge to the Nlog entity by IDs.
-func (mac *MsgAlertCreate) AddNlogIDs(ids ...int) *MsgAlertCreate {
-	mac.mutation.AddNlogIDs(ids...)
-	return mac
+func (_c *MsgAlertCreate) AddNlogIDs(ids ...int) *MsgAlertCreate {
+	_c.mutation.AddNlogIDs(ids...)
+	return _c
 }
 
 // AddNlog adds the "nlog" edges to the Nlog entity.
-func (mac *MsgAlertCreate) AddNlog(n ...*Nlog) *MsgAlertCreate {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_c *MsgAlertCreate) AddNlog(v ...*Nlog) *MsgAlertCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return mac.AddNlogIDs(ids...)
+	return _c.AddNlogIDs(ids...)
+}
+
+// SetOrgID sets the "org" edge to the Org entity by ID.
+func (_c *MsgAlertCreate) SetOrgID(id int) *MsgAlertCreate {
+	_c.mutation.SetOrgID(id)
+	return _c
+}
+
+// SetOrg sets the "org" edge to the Org entity.
+func (_c *MsgAlertCreate) SetOrg(v *Org) *MsgAlertCreate {
+	return _c.SetOrgID(v.ID)
 }
 
 // AddNlogAlertIDs adds the "nlog_alerts" edge to the NlogAlert entity by IDs.
-func (mac *MsgAlertCreate) AddNlogAlertIDs(ids ...int) *MsgAlertCreate {
-	mac.mutation.AddNlogAlertIDs(ids...)
-	return mac
+func (_c *MsgAlertCreate) AddNlogAlertIDs(ids ...int) *MsgAlertCreate {
+	_c.mutation.AddNlogAlertIDs(ids...)
+	return _c
 }
 
 // AddNlogAlerts adds the "nlog_alerts" edges to the NlogAlert entity.
-func (mac *MsgAlertCreate) AddNlogAlerts(n ...*NlogAlert) *MsgAlertCreate {
-	ids := make([]int, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_c *MsgAlertCreate) AddNlogAlerts(v ...*NlogAlert) *MsgAlertCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return mac.AddNlogAlertIDs(ids...)
+	return _c.AddNlogAlertIDs(ids...)
 }
 
 // Mutation returns the MsgAlertMutation object of the builder.
-func (mac *MsgAlertCreate) Mutation() *MsgAlertMutation {
-	return mac.mutation
+func (_c *MsgAlertCreate) Mutation() *MsgAlertMutation {
+	return _c.mutation
 }
 
 // Save creates the MsgAlert in the database.
-func (mac *MsgAlertCreate) Save(ctx context.Context) (*MsgAlert, error) {
-	if err := mac.defaults(); err != nil {
+func (_c *MsgAlertCreate) Save(ctx context.Context) (*MsgAlert, error) {
+	if err := _c.defaults(); err != nil {
 		return nil, err
 	}
-	return withHooks(ctx, mac.sqlSave, mac.mutation, mac.hooks)
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (mac *MsgAlertCreate) SaveX(ctx context.Context) *MsgAlert {
-	v, err := mac.Save(ctx)
+func (_c *MsgAlertCreate) SaveX(ctx context.Context) *MsgAlert {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -213,89 +225,92 @@ func (mac *MsgAlertCreate) SaveX(ctx context.Context) *MsgAlert {
 }
 
 // Exec executes the query.
-func (mac *MsgAlertCreate) Exec(ctx context.Context) error {
-	_, err := mac.Save(ctx)
+func (_c *MsgAlertCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mac *MsgAlertCreate) ExecX(ctx context.Context) {
-	if err := mac.Exec(ctx); err != nil {
+func (_c *MsgAlertCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (mac *MsgAlertCreate) defaults() error {
-	if _, ok := mac.mutation.Timeout(); !ok {
+func (_c *MsgAlertCreate) defaults() error {
+	if _, ok := _c.mutation.Timeout(); !ok {
 		v := msgalert.DefaultTimeout
-		mac.mutation.SetTimeout(v)
+		_c.mutation.SetTimeout(v)
 	}
-	if _, ok := mac.mutation.State(); !ok {
+	if _, ok := _c.mutation.State(); !ok {
 		v := msgalert.DefaultState
-		mac.mutation.SetState(v)
+		_c.mutation.SetState(v)
 	}
-	if _, ok := mac.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		if msgalert.DefaultCreatedAt == nil {
 			return fmt.Errorf("ent: uninitialized msgalert.DefaultCreatedAt (forgotten import ent/runtime?)")
 		}
 		v := msgalert.DefaultCreatedAt()
-		mac.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := mac.mutation.Deleted(); !ok {
+	if _, ok := _c.mutation.Deleted(); !ok {
 		v := msgalert.DefaultDeleted
-		mac.mutation.SetDeleted(v)
+		_c.mutation.SetDeleted(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mac *MsgAlertCreate) check() error {
-	if _, ok := mac.mutation.TenantID(); !ok {
+func (_c *MsgAlertCreate) check() error {
+	if _, ok := _c.mutation.TenantID(); !ok {
 		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "MsgAlert.tenant_id"`)}
 	}
-	if v, ok := mac.mutation.Labels(); ok {
+	if v, ok := _c.mutation.Labels(); ok {
 		if err := v.Validate(); err != nil {
 			return &ValidationError{Name: "labels", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.labels": %w`, err)}
 		}
 	}
-	if v, ok := mac.mutation.Annotations(); ok {
+	if v, ok := _c.mutation.Annotations(); ok {
 		if err := v.Validate(); err != nil {
 			return &ValidationError{Name: "annotations", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.annotations": %w`, err)}
 		}
 	}
-	if _, ok := mac.mutation.StartsAt(); !ok {
+	if _, ok := _c.mutation.StartsAt(); !ok {
 		return &ValidationError{Name: "starts_at", err: errors.New(`ent: missing required field "MsgAlert.starts_at"`)}
 	}
-	if _, ok := mac.mutation.Timeout(); !ok {
+	if _, ok := _c.mutation.Timeout(); !ok {
 		return &ValidationError{Name: "timeout", err: errors.New(`ent: missing required field "MsgAlert.timeout"`)}
 	}
-	if _, ok := mac.mutation.Fingerprint(); !ok {
+	if _, ok := _c.mutation.Fingerprint(); !ok {
 		return &ValidationError{Name: "fingerprint", err: errors.New(`ent: missing required field "MsgAlert.fingerprint"`)}
 	}
-	if _, ok := mac.mutation.State(); !ok {
+	if _, ok := _c.mutation.State(); !ok {
 		return &ValidationError{Name: "state", err: errors.New(`ent: missing required field "MsgAlert.state"`)}
 	}
-	if v, ok := mac.mutation.State(); ok {
+	if v, ok := _c.mutation.State(); ok {
 		if err := msgalert.StateValidator(v); err != nil {
 			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "MsgAlert.state": %w`, err)}
 		}
 	}
-	if _, ok := mac.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "MsgAlert.created_at"`)}
 	}
-	if _, ok := mac.mutation.Deleted(); !ok {
+	if _, ok := _c.mutation.Deleted(); !ok {
 		return &ValidationError{Name: "deleted", err: errors.New(`ent: missing required field "MsgAlert.deleted"`)}
+	}
+	if len(_c.mutation.OrgIDs()) == 0 {
+		return &ValidationError{Name: "org", err: errors.New(`ent: missing required edge "MsgAlert.org"`)}
 	}
 	return nil
 }
 
-func (mac *MsgAlertCreate) sqlSave(ctx context.Context) (*MsgAlert, error) {
-	if err := mac.check(); err != nil {
+func (_c *MsgAlertCreate) sqlSave(ctx context.Context) (*MsgAlert, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := mac.createSpec()
-	if err := sqlgraph.CreateNode(ctx, mac.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -305,71 +320,67 @@ func (mac *MsgAlertCreate) sqlSave(ctx context.Context) (*MsgAlert, error) {
 		id := _spec.ID.Value.(int64)
 		_node.ID = int(id)
 	}
-	mac.mutation.id = &_node.ID
-	mac.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (mac *MsgAlertCreate) createSpec() (*MsgAlert, *sqlgraph.CreateSpec) {
+func (_c *MsgAlertCreate) createSpec() (*MsgAlert, *sqlgraph.CreateSpec) {
 	var (
-		_node = &MsgAlert{config: mac.config}
+		_node = &MsgAlert{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(msgalert.Table, sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt))
 	)
-	_spec.Schema = mac.schemaConfig.MsgAlert
-	_spec.OnConflict = mac.conflict
-	if id, ok := mac.mutation.ID(); ok {
+	_spec.Schema = _c.schemaConfig.MsgAlert
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := mac.mutation.TenantID(); ok {
-		_spec.SetField(msgalert.FieldTenantID, field.TypeInt, value)
-		_node.TenantID = value
-	}
-	if value, ok := mac.mutation.Labels(); ok {
+	if value, ok := _c.mutation.Labels(); ok {
 		_spec.SetField(msgalert.FieldLabels, field.TypeJSON, value)
 		_node.Labels = value
 	}
-	if value, ok := mac.mutation.Annotations(); ok {
+	if value, ok := _c.mutation.Annotations(); ok {
 		_spec.SetField(msgalert.FieldAnnotations, field.TypeJSON, value)
 		_node.Annotations = value
 	}
-	if value, ok := mac.mutation.StartsAt(); ok {
+	if value, ok := _c.mutation.StartsAt(); ok {
 		_spec.SetField(msgalert.FieldStartsAt, field.TypeTime, value)
 		_node.StartsAt = value
 	}
-	if value, ok := mac.mutation.EndsAt(); ok {
+	if value, ok := _c.mutation.EndsAt(); ok {
 		_spec.SetField(msgalert.FieldEndsAt, field.TypeTime, value)
 		_node.EndsAt = value
 	}
-	if value, ok := mac.mutation.URL(); ok {
+	if value, ok := _c.mutation.URL(); ok {
 		_spec.SetField(msgalert.FieldURL, field.TypeString, value)
 		_node.URL = value
 	}
-	if value, ok := mac.mutation.Timeout(); ok {
+	if value, ok := _c.mutation.Timeout(); ok {
 		_spec.SetField(msgalert.FieldTimeout, field.TypeBool, value)
 		_node.Timeout = value
 	}
-	if value, ok := mac.mutation.Fingerprint(); ok {
+	if value, ok := _c.mutation.Fingerprint(); ok {
 		_spec.SetField(msgalert.FieldFingerprint, field.TypeString, value)
 		_node.Fingerprint = value
 	}
-	if value, ok := mac.mutation.State(); ok {
+	if value, ok := _c.mutation.State(); ok {
 		_spec.SetField(msgalert.FieldState, field.TypeEnum, value)
 		_node.State = value
 	}
-	if value, ok := mac.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(msgalert.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := mac.mutation.UpdatedAt(); ok {
+	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgalert.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := mac.mutation.Deleted(); ok {
+	if value, ok := _c.mutation.Deleted(); ok {
 		_spec.SetField(msgalert.FieldDeleted, field.TypeBool, value)
 		_node.Deleted = value
 	}
-	if nodes := mac.mutation.NlogIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.NlogIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -380,17 +391,35 @@ func (mac *MsgAlertCreate) createSpec() (*MsgAlert, *sqlgraph.CreateSpec) {
 				IDSpec: sqlgraph.NewFieldSpec(nlog.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mac.schemaConfig.NlogAlert
+		edge.Schema = _c.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &NlogAlertCreate{config: mac.config, mutation: newNlogAlertMutation(mac.config, OpCreate)}
+		createE := &NlogAlertCreate{config: _c.config, mutation: newNlogAlertMutation(_c.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := mac.mutation.NlogAlertsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.OrgIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   msgalert.OrgTable,
+			Columns: []string{msgalert.OrgColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(org.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _c.schemaConfig.MsgAlert
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.TenantID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.NlogAlertsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -401,7 +430,7 @@ func (mac *MsgAlertCreate) createSpec() (*MsgAlert, *sqlgraph.CreateSpec) {
 				IDSpec: sqlgraph.NewFieldSpec(nlogalert.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mac.schemaConfig.NlogAlert
+		edge.Schema = _c.schemaConfig.NlogAlert
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -426,10 +455,10 @@ func (mac *MsgAlertCreate) createSpec() (*MsgAlert, *sqlgraph.CreateSpec) {
 //			SetTenantID(v+v).
 //		}).
 //		Exec(ctx)
-func (mac *MsgAlertCreate) OnConflict(opts ...sql.ConflictOption) *MsgAlertUpsertOne {
-	mac.conflict = opts
+func (_c *MsgAlertCreate) OnConflict(opts ...sql.ConflictOption) *MsgAlertUpsertOne {
+	_c.conflict = opts
 	return &MsgAlertUpsertOne{
-		create: mac,
+		create: _c,
 	}
 }
 
@@ -439,10 +468,10 @@ func (mac *MsgAlertCreate) OnConflict(opts ...sql.ConflictOption) *MsgAlertUpser
 //	client.MsgAlert.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (mac *MsgAlertCreate) OnConflictColumns(columns ...string) *MsgAlertUpsertOne {
-	mac.conflict = append(mac.conflict, sql.ConflictColumns(columns...))
+func (_c *MsgAlertCreate) OnConflictColumns(columns ...string) *MsgAlertUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &MsgAlertUpsertOne{
-		create: mac,
+		create: _c,
 	}
 }
 
@@ -880,16 +909,16 @@ type MsgAlertCreateBulk struct {
 }
 
 // Save creates the MsgAlert entities in the database.
-func (macb *MsgAlertCreateBulk) Save(ctx context.Context) ([]*MsgAlert, error) {
-	if macb.err != nil {
-		return nil, macb.err
+func (_c *MsgAlertCreateBulk) Save(ctx context.Context) ([]*MsgAlert, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(macb.builders))
-	nodes := make([]*MsgAlert, len(macb.builders))
-	mutators := make([]Mutator, len(macb.builders))
-	for i := range macb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*MsgAlert, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := macb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MsgAlertMutation)
@@ -903,12 +932,12 @@ func (macb *MsgAlertCreateBulk) Save(ctx context.Context) ([]*MsgAlert, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, macb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = macb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, macb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -932,7 +961,7 @@ func (macb *MsgAlertCreateBulk) Save(ctx context.Context) ([]*MsgAlert, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, macb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -940,8 +969,8 @@ func (macb *MsgAlertCreateBulk) Save(ctx context.Context) ([]*MsgAlert, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (macb *MsgAlertCreateBulk) SaveX(ctx context.Context) []*MsgAlert {
-	v, err := macb.Save(ctx)
+func (_c *MsgAlertCreateBulk) SaveX(ctx context.Context) []*MsgAlert {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -949,14 +978,14 @@ func (macb *MsgAlertCreateBulk) SaveX(ctx context.Context) []*MsgAlert {
 }
 
 // Exec executes the query.
-func (macb *MsgAlertCreateBulk) Exec(ctx context.Context) error {
-	_, err := macb.Save(ctx)
+func (_c *MsgAlertCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (macb *MsgAlertCreateBulk) ExecX(ctx context.Context) {
-	if err := macb.Exec(ctx); err != nil {
+func (_c *MsgAlertCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -976,10 +1005,10 @@ func (macb *MsgAlertCreateBulk) ExecX(ctx context.Context) {
 //			SetTenantID(v+v).
 //		}).
 //		Exec(ctx)
-func (macb *MsgAlertCreateBulk) OnConflict(opts ...sql.ConflictOption) *MsgAlertUpsertBulk {
-	macb.conflict = opts
+func (_c *MsgAlertCreateBulk) OnConflict(opts ...sql.ConflictOption) *MsgAlertUpsertBulk {
+	_c.conflict = opts
 	return &MsgAlertUpsertBulk{
-		create: macb,
+		create: _c,
 	}
 }
 
@@ -989,10 +1018,10 @@ func (macb *MsgAlertCreateBulk) OnConflict(opts ...sql.ConflictOption) *MsgAlert
 //	client.MsgAlert.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (macb *MsgAlertCreateBulk) OnConflictColumns(columns ...string) *MsgAlertUpsertBulk {
-	macb.conflict = append(macb.conflict, sql.ConflictColumns(columns...))
+func (_c *MsgAlertCreateBulk) OnConflictColumns(columns ...string) *MsgAlertUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &MsgAlertUpsertBulk{
-		create: macb,
+		create: _c,
 	}
 }
 

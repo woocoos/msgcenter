@@ -26,146 +26,146 @@ type SilenceCreate struct {
 }
 
 // SetCreatedBy sets the "created_by" field.
-func (sc *SilenceCreate) SetCreatedBy(i int) *SilenceCreate {
-	sc.mutation.SetCreatedBy(i)
-	return sc
+func (_c *SilenceCreate) SetCreatedBy(v int) *SilenceCreate {
+	_c.mutation.SetCreatedBy(v)
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (sc *SilenceCreate) SetCreatedAt(t time.Time) *SilenceCreate {
-	sc.mutation.SetCreatedAt(t)
-	return sc
+func (_c *SilenceCreate) SetCreatedAt(v time.Time) *SilenceCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (sc *SilenceCreate) SetNillableCreatedAt(t *time.Time) *SilenceCreate {
-	if t != nil {
-		sc.SetCreatedAt(*t)
+func (_c *SilenceCreate) SetNillableCreatedAt(v *time.Time) *SilenceCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (sc *SilenceCreate) SetUpdatedBy(i int) *SilenceCreate {
-	sc.mutation.SetUpdatedBy(i)
-	return sc
+func (_c *SilenceCreate) SetUpdatedBy(v int) *SilenceCreate {
+	_c.mutation.SetUpdatedBy(v)
+	return _c
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (sc *SilenceCreate) SetNillableUpdatedBy(i *int) *SilenceCreate {
-	if i != nil {
-		sc.SetUpdatedBy(*i)
+func (_c *SilenceCreate) SetNillableUpdatedBy(v *int) *SilenceCreate {
+	if v != nil {
+		_c.SetUpdatedBy(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (sc *SilenceCreate) SetUpdatedAt(t time.Time) *SilenceCreate {
-	sc.mutation.SetUpdatedAt(t)
-	return sc
+func (_c *SilenceCreate) SetUpdatedAt(v time.Time) *SilenceCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (sc *SilenceCreate) SetNillableUpdatedAt(t *time.Time) *SilenceCreate {
-	if t != nil {
-		sc.SetUpdatedAt(*t)
+func (_c *SilenceCreate) SetNillableUpdatedAt(v *time.Time) *SilenceCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetTenantID sets the "tenant_id" field.
-func (sc *SilenceCreate) SetTenantID(i int) *SilenceCreate {
-	sc.mutation.SetTenantID(i)
-	return sc
+func (_c *SilenceCreate) SetTenantID(v int) *SilenceCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
 }
 
 // SetMatchers sets the "matchers" field.
-func (sc *SilenceCreate) SetMatchers(l []*label.Matcher) *SilenceCreate {
-	sc.mutation.SetMatchers(l)
-	return sc
+func (_c *SilenceCreate) SetMatchers(v []*label.Matcher) *SilenceCreate {
+	_c.mutation.SetMatchers(v)
+	return _c
 }
 
 // SetStartsAt sets the "starts_at" field.
-func (sc *SilenceCreate) SetStartsAt(t time.Time) *SilenceCreate {
-	sc.mutation.SetStartsAt(t)
-	return sc
+func (_c *SilenceCreate) SetStartsAt(v time.Time) *SilenceCreate {
+	_c.mutation.SetStartsAt(v)
+	return _c
 }
 
 // SetEndsAt sets the "ends_at" field.
-func (sc *SilenceCreate) SetEndsAt(t time.Time) *SilenceCreate {
-	sc.mutation.SetEndsAt(t)
-	return sc
+func (_c *SilenceCreate) SetEndsAt(v time.Time) *SilenceCreate {
+	_c.mutation.SetEndsAt(v)
+	return _c
 }
 
 // SetComments sets the "comments" field.
-func (sc *SilenceCreate) SetComments(s string) *SilenceCreate {
-	sc.mutation.SetComments(s)
-	return sc
+func (_c *SilenceCreate) SetComments(v string) *SilenceCreate {
+	_c.mutation.SetComments(v)
+	return _c
 }
 
 // SetNillableComments sets the "comments" field if the given value is not nil.
-func (sc *SilenceCreate) SetNillableComments(s *string) *SilenceCreate {
-	if s != nil {
-		sc.SetComments(*s)
+func (_c *SilenceCreate) SetNillableComments(v *string) *SilenceCreate {
+	if v != nil {
+		_c.SetComments(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetState sets the "state" field.
-func (sc *SilenceCreate) SetState(as alert.SilenceState) *SilenceCreate {
-	sc.mutation.SetState(as)
-	return sc
+func (_c *SilenceCreate) SetState(v alert.SilenceState) *SilenceCreate {
+	_c.mutation.SetState(v)
+	return _c
 }
 
 // SetNillableState sets the "state" field if the given value is not nil.
-func (sc *SilenceCreate) SetNillableState(as *alert.SilenceState) *SilenceCreate {
-	if as != nil {
-		sc.SetState(*as)
+func (_c *SilenceCreate) SetNillableState(v *alert.SilenceState) *SilenceCreate {
+	if v != nil {
+		_c.SetState(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetID sets the "id" field.
-func (sc *SilenceCreate) SetID(i int) *SilenceCreate {
-	sc.mutation.SetID(i)
-	return sc
+func (_c *SilenceCreate) SetID(v int) *SilenceCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (sc *SilenceCreate) SetNillableID(i *int) *SilenceCreate {
-	if i != nil {
-		sc.SetID(*i)
+func (_c *SilenceCreate) SetNillableID(v *int) *SilenceCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return sc
+	return _c
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (sc *SilenceCreate) SetUserID(id int) *SilenceCreate {
-	sc.mutation.SetUserID(id)
-	return sc
+func (_c *SilenceCreate) SetUserID(id int) *SilenceCreate {
+	_c.mutation.SetUserID(id)
+	return _c
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (sc *SilenceCreate) SetUser(u *User) *SilenceCreate {
-	return sc.SetUserID(u.ID)
+func (_c *SilenceCreate) SetUser(v *User) *SilenceCreate {
+	return _c.SetUserID(v.ID)
 }
 
 // Mutation returns the SilenceMutation object of the builder.
-func (sc *SilenceCreate) Mutation() *SilenceMutation {
-	return sc.mutation
+func (_c *SilenceCreate) Mutation() *SilenceMutation {
+	return _c.mutation
 }
 
 // Save creates the Silence in the database.
-func (sc *SilenceCreate) Save(ctx context.Context) (*Silence, error) {
-	if err := sc.defaults(); err != nil {
+func (_c *SilenceCreate) Save(ctx context.Context) (*Silence, error) {
+	if err := _c.defaults(); err != nil {
 		return nil, err
 	}
-	return withHooks(ctx, sc.sqlSave, sc.mutation, sc.hooks)
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (sc *SilenceCreate) SaveX(ctx context.Context) *Silence {
-	v, err := sc.Save(ctx)
+func (_c *SilenceCreate) SaveX(ctx context.Context) *Silence {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -173,78 +173,78 @@ func (sc *SilenceCreate) SaveX(ctx context.Context) *Silence {
 }
 
 // Exec executes the query.
-func (sc *SilenceCreate) Exec(ctx context.Context) error {
-	_, err := sc.Save(ctx)
+func (_c *SilenceCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (sc *SilenceCreate) ExecX(ctx context.Context) {
-	if err := sc.Exec(ctx); err != nil {
+func (_c *SilenceCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (sc *SilenceCreate) defaults() error {
-	if _, ok := sc.mutation.CreatedAt(); !ok {
+func (_c *SilenceCreate) defaults() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		if silence.DefaultCreatedAt == nil {
 			return fmt.Errorf("ent: uninitialized silence.DefaultCreatedAt (forgotten import ent/runtime?)")
 		}
 		v := silence.DefaultCreatedAt()
-		sc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := sc.mutation.State(); !ok {
+	if _, ok := _c.mutation.State(); !ok {
 		v := silence.DefaultState
-		sc.mutation.SetState(v)
+		_c.mutation.SetState(v)
 	}
-	if _, ok := sc.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		if silence.DefaultID == nil {
 			return fmt.Errorf("ent: uninitialized silence.DefaultID (forgotten import ent/runtime?)")
 		}
 		v := silence.DefaultID()
-		sc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (sc *SilenceCreate) check() error {
-	if _, ok := sc.mutation.CreatedBy(); !ok {
+func (_c *SilenceCreate) check() error {
+	if _, ok := _c.mutation.CreatedBy(); !ok {
 		return &ValidationError{Name: "created_by", err: errors.New(`ent: missing required field "Silence.created_by"`)}
 	}
-	if _, ok := sc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Silence.created_at"`)}
 	}
-	if _, ok := sc.mutation.TenantID(); !ok {
+	if _, ok := _c.mutation.TenantID(); !ok {
 		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "Silence.tenant_id"`)}
 	}
-	if _, ok := sc.mutation.StartsAt(); !ok {
+	if _, ok := _c.mutation.StartsAt(); !ok {
 		return &ValidationError{Name: "starts_at", err: errors.New(`ent: missing required field "Silence.starts_at"`)}
 	}
-	if _, ok := sc.mutation.EndsAt(); !ok {
+	if _, ok := _c.mutation.EndsAt(); !ok {
 		return &ValidationError{Name: "ends_at", err: errors.New(`ent: missing required field "Silence.ends_at"`)}
 	}
-	if _, ok := sc.mutation.State(); !ok {
+	if _, ok := _c.mutation.State(); !ok {
 		return &ValidationError{Name: "state", err: errors.New(`ent: missing required field "Silence.state"`)}
 	}
-	if v, ok := sc.mutation.State(); ok {
+	if v, ok := _c.mutation.State(); ok {
 		if err := silence.StateValidator(v); err != nil {
 			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "Silence.state": %w`, err)}
 		}
 	}
-	if len(sc.mutation.UserIDs()) == 0 {
+	if len(_c.mutation.UserIDs()) == 0 {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Silence.user"`)}
 	}
 	return nil
 }
 
-func (sc *SilenceCreate) sqlSave(ctx context.Context) (*Silence, error) {
-	if err := sc.check(); err != nil {
+func (_c *SilenceCreate) sqlSave(ctx context.Context) (*Silence, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := sc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, sc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -254,59 +254,59 @@ func (sc *SilenceCreate) sqlSave(ctx context.Context) (*Silence, error) {
 		id := _spec.ID.Value.(int64)
 		_node.ID = int(id)
 	}
-	sc.mutation.id = &_node.ID
-	sc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (sc *SilenceCreate) createSpec() (*Silence, *sqlgraph.CreateSpec) {
+func (_c *SilenceCreate) createSpec() (*Silence, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Silence{config: sc.config}
+		_node = &Silence{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(silence.Table, sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt))
 	)
-	_spec.Schema = sc.schemaConfig.Silence
-	_spec.OnConflict = sc.conflict
-	if id, ok := sc.mutation.ID(); ok {
+	_spec.Schema = _c.schemaConfig.Silence
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := sc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(silence.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := sc.mutation.UpdatedBy(); ok {
+	if value, ok := _c.mutation.UpdatedBy(); ok {
 		_spec.SetField(silence.FieldUpdatedBy, field.TypeInt, value)
 		_node.UpdatedBy = value
 	}
-	if value, ok := sc.mutation.UpdatedAt(); ok {
+	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(silence.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := sc.mutation.TenantID(); ok {
+	if value, ok := _c.mutation.TenantID(); ok {
 		_spec.SetField(silence.FieldTenantID, field.TypeInt, value)
 		_node.TenantID = value
 	}
-	if value, ok := sc.mutation.Matchers(); ok {
+	if value, ok := _c.mutation.Matchers(); ok {
 		_spec.SetField(silence.FieldMatchers, field.TypeJSON, value)
 		_node.Matchers = value
 	}
-	if value, ok := sc.mutation.StartsAt(); ok {
+	if value, ok := _c.mutation.StartsAt(); ok {
 		_spec.SetField(silence.FieldStartsAt, field.TypeTime, value)
 		_node.StartsAt = value
 	}
-	if value, ok := sc.mutation.EndsAt(); ok {
+	if value, ok := _c.mutation.EndsAt(); ok {
 		_spec.SetField(silence.FieldEndsAt, field.TypeTime, value)
 		_node.EndsAt = value
 	}
-	if value, ok := sc.mutation.Comments(); ok {
+	if value, ok := _c.mutation.Comments(); ok {
 		_spec.SetField(silence.FieldComments, field.TypeString, value)
 		_node.Comments = value
 	}
-	if value, ok := sc.mutation.State(); ok {
+	if value, ok := _c.mutation.State(); ok {
 		_spec.SetField(silence.FieldState, field.TypeEnum, value)
 		_node.State = value
 	}
-	if nodes := sc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -317,7 +317,7 @@ func (sc *SilenceCreate) createSpec() (*Silence, *sqlgraph.CreateSpec) {
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = sc.schemaConfig.Silence
+		edge.Schema = _c.schemaConfig.Silence
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -343,10 +343,10 @@ func (sc *SilenceCreate) createSpec() (*Silence, *sqlgraph.CreateSpec) {
 //			SetCreatedBy(v+v).
 //		}).
 //		Exec(ctx)
-func (sc *SilenceCreate) OnConflict(opts ...sql.ConflictOption) *SilenceUpsertOne {
-	sc.conflict = opts
+func (_c *SilenceCreate) OnConflict(opts ...sql.ConflictOption) *SilenceUpsertOne {
+	_c.conflict = opts
 	return &SilenceUpsertOne{
-		create: sc,
+		create: _c,
 	}
 }
 
@@ -356,10 +356,10 @@ func (sc *SilenceCreate) OnConflict(opts ...sql.ConflictOption) *SilenceUpsertOn
 //	client.Silence.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (sc *SilenceCreate) OnConflictColumns(columns ...string) *SilenceUpsertOne {
-	sc.conflict = append(sc.conflict, sql.ConflictColumns(columns...))
+func (_c *SilenceCreate) OnConflictColumns(columns ...string) *SilenceUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &SilenceUpsertOne{
-		create: sc,
+		create: _c,
 	}
 }
 
@@ -722,16 +722,16 @@ type SilenceCreateBulk struct {
 }
 
 // Save creates the Silence entities in the database.
-func (scb *SilenceCreateBulk) Save(ctx context.Context) ([]*Silence, error) {
-	if scb.err != nil {
-		return nil, scb.err
+func (_c *SilenceCreateBulk) Save(ctx context.Context) ([]*Silence, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(scb.builders))
-	nodes := make([]*Silence, len(scb.builders))
-	mutators := make([]Mutator, len(scb.builders))
-	for i := range scb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Silence, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := scb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*SilenceMutation)
@@ -745,12 +745,12 @@ func (scb *SilenceCreateBulk) Save(ctx context.Context) ([]*Silence, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, scb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = scb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, scb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -774,7 +774,7 @@ func (scb *SilenceCreateBulk) Save(ctx context.Context) ([]*Silence, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, scb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -782,8 +782,8 @@ func (scb *SilenceCreateBulk) Save(ctx context.Context) ([]*Silence, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (scb *SilenceCreateBulk) SaveX(ctx context.Context) []*Silence {
-	v, err := scb.Save(ctx)
+func (_c *SilenceCreateBulk) SaveX(ctx context.Context) []*Silence {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -791,14 +791,14 @@ func (scb *SilenceCreateBulk) SaveX(ctx context.Context) []*Silence {
 }
 
 // Exec executes the query.
-func (scb *SilenceCreateBulk) Exec(ctx context.Context) error {
-	_, err := scb.Save(ctx)
+func (_c *SilenceCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (scb *SilenceCreateBulk) ExecX(ctx context.Context) {
-	if err := scb.Exec(ctx); err != nil {
+func (_c *SilenceCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -818,10 +818,10 @@ func (scb *SilenceCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedBy(v+v).
 //		}).
 //		Exec(ctx)
-func (scb *SilenceCreateBulk) OnConflict(opts ...sql.ConflictOption) *SilenceUpsertBulk {
-	scb.conflict = opts
+func (_c *SilenceCreateBulk) OnConflict(opts ...sql.ConflictOption) *SilenceUpsertBulk {
+	_c.conflict = opts
 	return &SilenceUpsertBulk{
-		create: scb,
+		create: _c,
 	}
 }
 
@@ -831,10 +831,10 @@ func (scb *SilenceCreateBulk) OnConflict(opts ...sql.ConflictOption) *SilenceUps
 //	client.Silence.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (scb *SilenceCreateBulk) OnConflictColumns(columns ...string) *SilenceUpsertBulk {
-	scb.conflict = append(scb.conflict, sql.ConflictColumns(columns...))
+func (_c *SilenceCreateBulk) OnConflictColumns(columns ...string) *SilenceUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &SilenceUpsertBulk{
-		create: scb,
+		create: _c,
 	}
 }
 

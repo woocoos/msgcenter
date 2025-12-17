@@ -24,108 +24,108 @@ type OrgRoleUserUpdate struct {
 }
 
 // Where appends a list predicates to the OrgRoleUserUpdate builder.
-func (oruu *OrgRoleUserUpdate) Where(ps ...predicate.OrgRoleUser) *OrgRoleUserUpdate {
-	oruu.mutation.Where(ps...)
-	return oruu
+func (_u *OrgRoleUserUpdate) Where(ps ...predicate.OrgRoleUser) *OrgRoleUserUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetOrgRoleID sets the "org_role_id" field.
-func (oruu *OrgRoleUserUpdate) SetOrgRoleID(i int) *OrgRoleUserUpdate {
-	oruu.mutation.ResetOrgRoleID()
-	oruu.mutation.SetOrgRoleID(i)
-	return oruu
+func (_u *OrgRoleUserUpdate) SetOrgRoleID(v int) *OrgRoleUserUpdate {
+	_u.mutation.ResetOrgRoleID()
+	_u.mutation.SetOrgRoleID(v)
+	return _u
 }
 
 // SetNillableOrgRoleID sets the "org_role_id" field if the given value is not nil.
-func (oruu *OrgRoleUserUpdate) SetNillableOrgRoleID(i *int) *OrgRoleUserUpdate {
-	if i != nil {
-		oruu.SetOrgRoleID(*i)
+func (_u *OrgRoleUserUpdate) SetNillableOrgRoleID(v *int) *OrgRoleUserUpdate {
+	if v != nil {
+		_u.SetOrgRoleID(*v)
 	}
-	return oruu
+	return _u
 }
 
-// AddOrgRoleID adds i to the "org_role_id" field.
-func (oruu *OrgRoleUserUpdate) AddOrgRoleID(i int) *OrgRoleUserUpdate {
-	oruu.mutation.AddOrgRoleID(i)
-	return oruu
+// AddOrgRoleID adds value to the "org_role_id" field.
+func (_u *OrgRoleUserUpdate) AddOrgRoleID(v int) *OrgRoleUserUpdate {
+	_u.mutation.AddOrgRoleID(v)
+	return _u
 }
 
 // SetOrgUserID sets the "org_user_id" field.
-func (oruu *OrgRoleUserUpdate) SetOrgUserID(i int) *OrgRoleUserUpdate {
-	oruu.mutation.ResetOrgUserID()
-	oruu.mutation.SetOrgUserID(i)
-	return oruu
+func (_u *OrgRoleUserUpdate) SetOrgUserID(v int) *OrgRoleUserUpdate {
+	_u.mutation.ResetOrgUserID()
+	_u.mutation.SetOrgUserID(v)
+	return _u
 }
 
 // SetNillableOrgUserID sets the "org_user_id" field if the given value is not nil.
-func (oruu *OrgRoleUserUpdate) SetNillableOrgUserID(i *int) *OrgRoleUserUpdate {
-	if i != nil {
-		oruu.SetOrgUserID(*i)
+func (_u *OrgRoleUserUpdate) SetNillableOrgUserID(v *int) *OrgRoleUserUpdate {
+	if v != nil {
+		_u.SetOrgUserID(*v)
 	}
-	return oruu
+	return _u
 }
 
-// AddOrgUserID adds i to the "org_user_id" field.
-func (oruu *OrgRoleUserUpdate) AddOrgUserID(i int) *OrgRoleUserUpdate {
-	oruu.mutation.AddOrgUserID(i)
-	return oruu
+// AddOrgUserID adds value to the "org_user_id" field.
+func (_u *OrgRoleUserUpdate) AddOrgUserID(v int) *OrgRoleUserUpdate {
+	_u.mutation.AddOrgUserID(v)
+	return _u
 }
 
 // SetOrgID sets the "org_id" field.
-func (oruu *OrgRoleUserUpdate) SetOrgID(i int) *OrgRoleUserUpdate {
-	oruu.mutation.ResetOrgID()
-	oruu.mutation.SetOrgID(i)
-	return oruu
+func (_u *OrgRoleUserUpdate) SetOrgID(v int) *OrgRoleUserUpdate {
+	_u.mutation.ResetOrgID()
+	_u.mutation.SetOrgID(v)
+	return _u
 }
 
 // SetNillableOrgID sets the "org_id" field if the given value is not nil.
-func (oruu *OrgRoleUserUpdate) SetNillableOrgID(i *int) *OrgRoleUserUpdate {
-	if i != nil {
-		oruu.SetOrgID(*i)
+func (_u *OrgRoleUserUpdate) SetNillableOrgID(v *int) *OrgRoleUserUpdate {
+	if v != nil {
+		_u.SetOrgID(*v)
 	}
-	return oruu
+	return _u
 }
 
-// AddOrgID adds i to the "org_id" field.
-func (oruu *OrgRoleUserUpdate) AddOrgID(i int) *OrgRoleUserUpdate {
-	oruu.mutation.AddOrgID(i)
-	return oruu
+// AddOrgID adds value to the "org_id" field.
+func (_u *OrgRoleUserUpdate) AddOrgID(v int) *OrgRoleUserUpdate {
+	_u.mutation.AddOrgID(v)
+	return _u
 }
 
 // SetUserID sets the "user_id" field.
-func (oruu *OrgRoleUserUpdate) SetUserID(i int) *OrgRoleUserUpdate {
-	oruu.mutation.ResetUserID()
-	oruu.mutation.SetUserID(i)
-	return oruu
+func (_u *OrgRoleUserUpdate) SetUserID(v int) *OrgRoleUserUpdate {
+	_u.mutation.ResetUserID()
+	_u.mutation.SetUserID(v)
+	return _u
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (oruu *OrgRoleUserUpdate) SetNillableUserID(i *int) *OrgRoleUserUpdate {
-	if i != nil {
-		oruu.SetUserID(*i)
+func (_u *OrgRoleUserUpdate) SetNillableUserID(v *int) *OrgRoleUserUpdate {
+	if v != nil {
+		_u.SetUserID(*v)
 	}
-	return oruu
+	return _u
 }
 
-// AddUserID adds i to the "user_id" field.
-func (oruu *OrgRoleUserUpdate) AddUserID(i int) *OrgRoleUserUpdate {
-	oruu.mutation.AddUserID(i)
-	return oruu
+// AddUserID adds value to the "user_id" field.
+func (_u *OrgRoleUserUpdate) AddUserID(v int) *OrgRoleUserUpdate {
+	_u.mutation.AddUserID(v)
+	return _u
 }
 
 // Mutation returns the OrgRoleUserMutation object of the builder.
-func (oruu *OrgRoleUserUpdate) Mutation() *OrgRoleUserMutation {
-	return oruu.mutation
+func (_u *OrgRoleUserUpdate) Mutation() *OrgRoleUserMutation {
+	return _u.mutation
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (oruu *OrgRoleUserUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, oruu.sqlSave, oruu.mutation, oruu.hooks)
+func (_u *OrgRoleUserUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (oruu *OrgRoleUserUpdate) SaveX(ctx context.Context) int {
-	affected, err := oruu.Save(ctx)
+func (_u *OrgRoleUserUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -133,54 +133,54 @@ func (oruu *OrgRoleUserUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (oruu *OrgRoleUserUpdate) Exec(ctx context.Context) error {
-	_, err := oruu.Save(ctx)
+func (_u *OrgRoleUserUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (oruu *OrgRoleUserUpdate) ExecX(ctx context.Context) {
-	if err := oruu.Exec(ctx); err != nil {
+func (_u *OrgRoleUserUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
-func (oruu *OrgRoleUserUpdate) sqlSave(ctx context.Context) (n int, err error) {
+func (_u *OrgRoleUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(orgroleuser.Table, orgroleuser.Columns, sqlgraph.NewFieldSpec(orgroleuser.FieldID, field.TypeInt))
-	if ps := oruu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := oruu.mutation.OrgRoleID(); ok {
+	if value, ok := _u.mutation.OrgRoleID(); ok {
 		_spec.SetField(orgroleuser.FieldOrgRoleID, field.TypeInt, value)
 	}
-	if value, ok := oruu.mutation.AddedOrgRoleID(); ok {
+	if value, ok := _u.mutation.AddedOrgRoleID(); ok {
 		_spec.AddField(orgroleuser.FieldOrgRoleID, field.TypeInt, value)
 	}
-	if value, ok := oruu.mutation.OrgUserID(); ok {
+	if value, ok := _u.mutation.OrgUserID(); ok {
 		_spec.SetField(orgroleuser.FieldOrgUserID, field.TypeInt, value)
 	}
-	if value, ok := oruu.mutation.AddedOrgUserID(); ok {
+	if value, ok := _u.mutation.AddedOrgUserID(); ok {
 		_spec.AddField(orgroleuser.FieldOrgUserID, field.TypeInt, value)
 	}
-	if value, ok := oruu.mutation.OrgID(); ok {
+	if value, ok := _u.mutation.OrgID(); ok {
 		_spec.SetField(orgroleuser.FieldOrgID, field.TypeInt, value)
 	}
-	if value, ok := oruu.mutation.AddedOrgID(); ok {
+	if value, ok := _u.mutation.AddedOrgID(); ok {
 		_spec.AddField(orgroleuser.FieldOrgID, field.TypeInt, value)
 	}
-	if value, ok := oruu.mutation.UserID(); ok {
+	if value, ok := _u.mutation.UserID(); ok {
 		_spec.SetField(orgroleuser.FieldUserID, field.TypeInt, value)
 	}
-	if value, ok := oruu.mutation.AddedUserID(); ok {
+	if value, ok := _u.mutation.AddedUserID(); ok {
 		_spec.AddField(orgroleuser.FieldUserID, field.TypeInt, value)
 	}
-	_spec.Node.Schema = oruu.schemaConfig.OrgRoleUser
-	ctx = internal.NewSchemaConfigContext(ctx, oruu.schemaConfig)
-	if n, err = sqlgraph.UpdateNodes(ctx, oruu.driver, _spec); err != nil {
+	_spec.Node.Schema = _u.schemaConfig.OrgRoleUser
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{orgroleuser.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -188,8 +188,8 @@ func (oruu *OrgRoleUserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	oruu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // OrgRoleUserUpdateOne is the builder for updating a single OrgRoleUser entity.
@@ -201,115 +201,115 @@ type OrgRoleUserUpdateOne struct {
 }
 
 // SetOrgRoleID sets the "org_role_id" field.
-func (oruuo *OrgRoleUserUpdateOne) SetOrgRoleID(i int) *OrgRoleUserUpdateOne {
-	oruuo.mutation.ResetOrgRoleID()
-	oruuo.mutation.SetOrgRoleID(i)
-	return oruuo
+func (_u *OrgRoleUserUpdateOne) SetOrgRoleID(v int) *OrgRoleUserUpdateOne {
+	_u.mutation.ResetOrgRoleID()
+	_u.mutation.SetOrgRoleID(v)
+	return _u
 }
 
 // SetNillableOrgRoleID sets the "org_role_id" field if the given value is not nil.
-func (oruuo *OrgRoleUserUpdateOne) SetNillableOrgRoleID(i *int) *OrgRoleUserUpdateOne {
-	if i != nil {
-		oruuo.SetOrgRoleID(*i)
+func (_u *OrgRoleUserUpdateOne) SetNillableOrgRoleID(v *int) *OrgRoleUserUpdateOne {
+	if v != nil {
+		_u.SetOrgRoleID(*v)
 	}
-	return oruuo
+	return _u
 }
 
-// AddOrgRoleID adds i to the "org_role_id" field.
-func (oruuo *OrgRoleUserUpdateOne) AddOrgRoleID(i int) *OrgRoleUserUpdateOne {
-	oruuo.mutation.AddOrgRoleID(i)
-	return oruuo
+// AddOrgRoleID adds value to the "org_role_id" field.
+func (_u *OrgRoleUserUpdateOne) AddOrgRoleID(v int) *OrgRoleUserUpdateOne {
+	_u.mutation.AddOrgRoleID(v)
+	return _u
 }
 
 // SetOrgUserID sets the "org_user_id" field.
-func (oruuo *OrgRoleUserUpdateOne) SetOrgUserID(i int) *OrgRoleUserUpdateOne {
-	oruuo.mutation.ResetOrgUserID()
-	oruuo.mutation.SetOrgUserID(i)
-	return oruuo
+func (_u *OrgRoleUserUpdateOne) SetOrgUserID(v int) *OrgRoleUserUpdateOne {
+	_u.mutation.ResetOrgUserID()
+	_u.mutation.SetOrgUserID(v)
+	return _u
 }
 
 // SetNillableOrgUserID sets the "org_user_id" field if the given value is not nil.
-func (oruuo *OrgRoleUserUpdateOne) SetNillableOrgUserID(i *int) *OrgRoleUserUpdateOne {
-	if i != nil {
-		oruuo.SetOrgUserID(*i)
+func (_u *OrgRoleUserUpdateOne) SetNillableOrgUserID(v *int) *OrgRoleUserUpdateOne {
+	if v != nil {
+		_u.SetOrgUserID(*v)
 	}
-	return oruuo
+	return _u
 }
 
-// AddOrgUserID adds i to the "org_user_id" field.
-func (oruuo *OrgRoleUserUpdateOne) AddOrgUserID(i int) *OrgRoleUserUpdateOne {
-	oruuo.mutation.AddOrgUserID(i)
-	return oruuo
+// AddOrgUserID adds value to the "org_user_id" field.
+func (_u *OrgRoleUserUpdateOne) AddOrgUserID(v int) *OrgRoleUserUpdateOne {
+	_u.mutation.AddOrgUserID(v)
+	return _u
 }
 
 // SetOrgID sets the "org_id" field.
-func (oruuo *OrgRoleUserUpdateOne) SetOrgID(i int) *OrgRoleUserUpdateOne {
-	oruuo.mutation.ResetOrgID()
-	oruuo.mutation.SetOrgID(i)
-	return oruuo
+func (_u *OrgRoleUserUpdateOne) SetOrgID(v int) *OrgRoleUserUpdateOne {
+	_u.mutation.ResetOrgID()
+	_u.mutation.SetOrgID(v)
+	return _u
 }
 
 // SetNillableOrgID sets the "org_id" field if the given value is not nil.
-func (oruuo *OrgRoleUserUpdateOne) SetNillableOrgID(i *int) *OrgRoleUserUpdateOne {
-	if i != nil {
-		oruuo.SetOrgID(*i)
+func (_u *OrgRoleUserUpdateOne) SetNillableOrgID(v *int) *OrgRoleUserUpdateOne {
+	if v != nil {
+		_u.SetOrgID(*v)
 	}
-	return oruuo
+	return _u
 }
 
-// AddOrgID adds i to the "org_id" field.
-func (oruuo *OrgRoleUserUpdateOne) AddOrgID(i int) *OrgRoleUserUpdateOne {
-	oruuo.mutation.AddOrgID(i)
-	return oruuo
+// AddOrgID adds value to the "org_id" field.
+func (_u *OrgRoleUserUpdateOne) AddOrgID(v int) *OrgRoleUserUpdateOne {
+	_u.mutation.AddOrgID(v)
+	return _u
 }
 
 // SetUserID sets the "user_id" field.
-func (oruuo *OrgRoleUserUpdateOne) SetUserID(i int) *OrgRoleUserUpdateOne {
-	oruuo.mutation.ResetUserID()
-	oruuo.mutation.SetUserID(i)
-	return oruuo
+func (_u *OrgRoleUserUpdateOne) SetUserID(v int) *OrgRoleUserUpdateOne {
+	_u.mutation.ResetUserID()
+	_u.mutation.SetUserID(v)
+	return _u
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (oruuo *OrgRoleUserUpdateOne) SetNillableUserID(i *int) *OrgRoleUserUpdateOne {
-	if i != nil {
-		oruuo.SetUserID(*i)
+func (_u *OrgRoleUserUpdateOne) SetNillableUserID(v *int) *OrgRoleUserUpdateOne {
+	if v != nil {
+		_u.SetUserID(*v)
 	}
-	return oruuo
+	return _u
 }
 
-// AddUserID adds i to the "user_id" field.
-func (oruuo *OrgRoleUserUpdateOne) AddUserID(i int) *OrgRoleUserUpdateOne {
-	oruuo.mutation.AddUserID(i)
-	return oruuo
+// AddUserID adds value to the "user_id" field.
+func (_u *OrgRoleUserUpdateOne) AddUserID(v int) *OrgRoleUserUpdateOne {
+	_u.mutation.AddUserID(v)
+	return _u
 }
 
 // Mutation returns the OrgRoleUserMutation object of the builder.
-func (oruuo *OrgRoleUserUpdateOne) Mutation() *OrgRoleUserMutation {
-	return oruuo.mutation
+func (_u *OrgRoleUserUpdateOne) Mutation() *OrgRoleUserMutation {
+	return _u.mutation
 }
 
 // Where appends a list predicates to the OrgRoleUserUpdate builder.
-func (oruuo *OrgRoleUserUpdateOne) Where(ps ...predicate.OrgRoleUser) *OrgRoleUserUpdateOne {
-	oruuo.mutation.Where(ps...)
-	return oruuo
+func (_u *OrgRoleUserUpdateOne) Where(ps ...predicate.OrgRoleUser) *OrgRoleUserUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (oruuo *OrgRoleUserUpdateOne) Select(field string, fields ...string) *OrgRoleUserUpdateOne {
-	oruuo.fields = append([]string{field}, fields...)
-	return oruuo
+func (_u *OrgRoleUserUpdateOne) Select(field string, fields ...string) *OrgRoleUserUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated OrgRoleUser entity.
-func (oruuo *OrgRoleUserUpdateOne) Save(ctx context.Context) (*OrgRoleUser, error) {
-	return withHooks(ctx, oruuo.sqlSave, oruuo.mutation, oruuo.hooks)
+func (_u *OrgRoleUserUpdateOne) Save(ctx context.Context) (*OrgRoleUser, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (oruuo *OrgRoleUserUpdateOne) SaveX(ctx context.Context) *OrgRoleUser {
-	node, err := oruuo.Save(ctx)
+func (_u *OrgRoleUserUpdateOne) SaveX(ctx context.Context) *OrgRoleUser {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -317,26 +317,26 @@ func (oruuo *OrgRoleUserUpdateOne) SaveX(ctx context.Context) *OrgRoleUser {
 }
 
 // Exec executes the query on the entity.
-func (oruuo *OrgRoleUserUpdateOne) Exec(ctx context.Context) error {
-	_, err := oruuo.Save(ctx)
+func (_u *OrgRoleUserUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (oruuo *OrgRoleUserUpdateOne) ExecX(ctx context.Context) {
-	if err := oruuo.Exec(ctx); err != nil {
+func (_u *OrgRoleUserUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
-func (oruuo *OrgRoleUserUpdateOne) sqlSave(ctx context.Context) (_node *OrgRoleUser, err error) {
+func (_u *OrgRoleUserUpdateOne) sqlSave(ctx context.Context) (_node *OrgRoleUser, err error) {
 	_spec := sqlgraph.NewUpdateSpec(orgroleuser.Table, orgroleuser.Columns, sqlgraph.NewFieldSpec(orgroleuser.FieldID, field.TypeInt))
-	id, ok := oruuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "OrgRoleUser.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := oruuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, orgroleuser.FieldID)
 		for _, f := range fields {
@@ -348,43 +348,43 @@ func (oruuo *OrgRoleUserUpdateOne) sqlSave(ctx context.Context) (_node *OrgRoleU
 			}
 		}
 	}
-	if ps := oruuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := oruuo.mutation.OrgRoleID(); ok {
+	if value, ok := _u.mutation.OrgRoleID(); ok {
 		_spec.SetField(orgroleuser.FieldOrgRoleID, field.TypeInt, value)
 	}
-	if value, ok := oruuo.mutation.AddedOrgRoleID(); ok {
+	if value, ok := _u.mutation.AddedOrgRoleID(); ok {
 		_spec.AddField(orgroleuser.FieldOrgRoleID, field.TypeInt, value)
 	}
-	if value, ok := oruuo.mutation.OrgUserID(); ok {
+	if value, ok := _u.mutation.OrgUserID(); ok {
 		_spec.SetField(orgroleuser.FieldOrgUserID, field.TypeInt, value)
 	}
-	if value, ok := oruuo.mutation.AddedOrgUserID(); ok {
+	if value, ok := _u.mutation.AddedOrgUserID(); ok {
 		_spec.AddField(orgroleuser.FieldOrgUserID, field.TypeInt, value)
 	}
-	if value, ok := oruuo.mutation.OrgID(); ok {
+	if value, ok := _u.mutation.OrgID(); ok {
 		_spec.SetField(orgroleuser.FieldOrgID, field.TypeInt, value)
 	}
-	if value, ok := oruuo.mutation.AddedOrgID(); ok {
+	if value, ok := _u.mutation.AddedOrgID(); ok {
 		_spec.AddField(orgroleuser.FieldOrgID, field.TypeInt, value)
 	}
-	if value, ok := oruuo.mutation.UserID(); ok {
+	if value, ok := _u.mutation.UserID(); ok {
 		_spec.SetField(orgroleuser.FieldUserID, field.TypeInt, value)
 	}
-	if value, ok := oruuo.mutation.AddedUserID(); ok {
+	if value, ok := _u.mutation.AddedUserID(); ok {
 		_spec.AddField(orgroleuser.FieldUserID, field.TypeInt, value)
 	}
-	_spec.Node.Schema = oruuo.schemaConfig.OrgRoleUser
-	ctx = internal.NewSchemaConfigContext(ctx, oruuo.schemaConfig)
-	_node = &OrgRoleUser{config: oruuo.config}
+	_spec.Node.Schema = _u.schemaConfig.OrgRoleUser
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	_node = &OrgRoleUser{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, oruuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{orgroleuser.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -392,6 +392,6 @@ func (oruuo *OrgRoleUserUpdateOne) sqlSave(ctx context.Context) (_node *OrgRoleU
 		}
 		return nil, err
 	}
-	oruuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

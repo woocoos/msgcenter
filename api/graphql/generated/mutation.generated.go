@@ -57,9 +57,9 @@ type RouteInputResolver interface {
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_createMsgChannel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_createMsgChannel_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_createMsgChannel_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -69,13 +69,9 @@ func (ec *executionContext) field_Mutation_createMsgChannel_args(ctx context.Con
 }
 func (ec *executionContext) field_Mutation_createMsgChannel_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (ent.CreateMsgChannelInput, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["input"]
-	if !ok {
+	if _, ok := rawArgs["input"]; !ok {
 		var zeroVal ent.CreateMsgChannelInput
 		return zeroVal, nil
 	}
@@ -89,9 +85,9 @@ func (ec *executionContext) field_Mutation_createMsgChannel_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_createMsgEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_createMsgEvent_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_createMsgEvent_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -101,13 +97,9 @@ func (ec *executionContext) field_Mutation_createMsgEvent_args(ctx context.Conte
 }
 func (ec *executionContext) field_Mutation_createMsgEvent_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (ent.CreateMsgEventInput, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["input"]
-	if !ok {
+	if _, ok := rawArgs["input"]; !ok {
 		var zeroVal ent.CreateMsgEventInput
 		return zeroVal, nil
 	}
@@ -121,9 +113,9 @@ func (ec *executionContext) field_Mutation_createMsgEvent_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_createMsgSubscriber_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_createMsgSubscriber_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_createMsgSubscriber_argsInputs(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -133,13 +125,9 @@ func (ec *executionContext) field_Mutation_createMsgSubscriber_args(ctx context.
 }
 func (ec *executionContext) field_Mutation_createMsgSubscriber_argsInputs(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) ([]*ent.CreateMsgSubscriberInput, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["inputs"]
-	if !ok {
+	if _, ok := rawArgs["inputs"]; !ok {
 		var zeroVal []*ent.CreateMsgSubscriberInput
 		return zeroVal, nil
 	}
@@ -153,9 +141,9 @@ func (ec *executionContext) field_Mutation_createMsgSubscriber_argsInputs(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_createMsgTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_createMsgTemplate_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_createMsgTemplate_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -165,13 +153,9 @@ func (ec *executionContext) field_Mutation_createMsgTemplate_args(ctx context.Co
 }
 func (ec *executionContext) field_Mutation_createMsgTemplate_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (ent.CreateMsgTemplateInput, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["input"]
-	if !ok {
+	if _, ok := rawArgs["input"]; !ok {
 		var zeroVal ent.CreateMsgTemplateInput
 		return zeroVal, nil
 	}
@@ -185,9 +169,9 @@ func (ec *executionContext) field_Mutation_createMsgTemplate_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_createMsgType_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_createMsgType_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_createMsgType_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -197,13 +181,9 @@ func (ec *executionContext) field_Mutation_createMsgType_args(ctx context.Contex
 }
 func (ec *executionContext) field_Mutation_createMsgType_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (ent.CreateMsgTypeInput, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["input"]
-	if !ok {
+	if _, ok := rawArgs["input"]; !ok {
 		var zeroVal ent.CreateMsgTypeInput
 		return zeroVal, nil
 	}
@@ -217,9 +197,9 @@ func (ec *executionContext) field_Mutation_createMsgType_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_createSilence_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_createSilence_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_createSilence_argsInput(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -229,13 +209,9 @@ func (ec *executionContext) field_Mutation_createSilence_args(ctx context.Contex
 }
 func (ec *executionContext) field_Mutation_createSilence_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (ent.CreateSilenceInput, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["input"]
-	if !ok {
+	if _, ok := rawArgs["input"]; !ok {
 		var zeroVal ent.CreateSilenceInput
 		return zeroVal, nil
 	}
@@ -249,9 +225,9 @@ func (ec *executionContext) field_Mutation_createSilence_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteMsgChannel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_deleteMsgChannel_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_deleteMsgChannel_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -261,13 +237,9 @@ func (ec *executionContext) field_Mutation_deleteMsgChannel_args(ctx context.Con
 }
 func (ec *executionContext) field_Mutation_deleteMsgChannel_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -281,9 +253,9 @@ func (ec *executionContext) field_Mutation_deleteMsgChannel_argsID(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteMsgEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_deleteMsgEvent_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_deleteMsgEvent_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -293,13 +265,9 @@ func (ec *executionContext) field_Mutation_deleteMsgEvent_args(ctx context.Conte
 }
 func (ec *executionContext) field_Mutation_deleteMsgEvent_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -313,9 +281,9 @@ func (ec *executionContext) field_Mutation_deleteMsgEvent_argsID(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteMsgSubscriber_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_deleteMsgSubscriber_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_deleteMsgSubscriber_argsIds(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -325,13 +293,9 @@ func (ec *executionContext) field_Mutation_deleteMsgSubscriber_args(ctx context.
 }
 func (ec *executionContext) field_Mutation_deleteMsgSubscriber_argsIds(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) ([]int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["ids"]
-	if !ok {
+	if _, ok := rawArgs["ids"]; !ok {
 		var zeroVal []int
 		return zeroVal, nil
 	}
@@ -345,9 +309,9 @@ func (ec *executionContext) field_Mutation_deleteMsgSubscriber_argsIds(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteMsgTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_deleteMsgTemplate_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_deleteMsgTemplate_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -357,13 +321,9 @@ func (ec *executionContext) field_Mutation_deleteMsgTemplate_args(ctx context.Co
 }
 func (ec *executionContext) field_Mutation_deleteMsgTemplate_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -377,9 +337,9 @@ func (ec *executionContext) field_Mutation_deleteMsgTemplate_argsID(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteMsgType_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_deleteMsgType_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_deleteMsgType_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -389,13 +349,9 @@ func (ec *executionContext) field_Mutation_deleteMsgType_args(ctx context.Contex
 }
 func (ec *executionContext) field_Mutation_deleteMsgType_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -409,9 +365,9 @@ func (ec *executionContext) field_Mutation_deleteMsgType_argsID(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_deleteSilence_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_deleteSilence_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_deleteSilence_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -421,13 +377,9 @@ func (ec *executionContext) field_Mutation_deleteSilence_args(ctx context.Contex
 }
 func (ec *executionContext) field_Mutation_deleteSilence_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -441,9 +393,9 @@ func (ec *executionContext) field_Mutation_deleteSilence_argsID(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_disableMsgChannel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_disableMsgChannel_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_disableMsgChannel_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -453,13 +405,9 @@ func (ec *executionContext) field_Mutation_disableMsgChannel_args(ctx context.Co
 }
 func (ec *executionContext) field_Mutation_disableMsgChannel_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -473,9 +421,9 @@ func (ec *executionContext) field_Mutation_disableMsgChannel_argsID(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_disableMsgEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_disableMsgEvent_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_disableMsgEvent_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -485,13 +433,9 @@ func (ec *executionContext) field_Mutation_disableMsgEvent_args(ctx context.Cont
 }
 func (ec *executionContext) field_Mutation_disableMsgEvent_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -505,9 +449,9 @@ func (ec *executionContext) field_Mutation_disableMsgEvent_argsID(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_disableMsgTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_disableMsgTemplate_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_disableMsgTemplate_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -517,13 +461,9 @@ func (ec *executionContext) field_Mutation_disableMsgTemplate_args(ctx context.C
 }
 func (ec *executionContext) field_Mutation_disableMsgTemplate_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -537,9 +477,9 @@ func (ec *executionContext) field_Mutation_disableMsgTemplate_argsID(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_enableMsgChannel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_enableMsgChannel_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_enableMsgChannel_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -549,13 +489,9 @@ func (ec *executionContext) field_Mutation_enableMsgChannel_args(ctx context.Con
 }
 func (ec *executionContext) field_Mutation_enableMsgChannel_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -569,9 +505,9 @@ func (ec *executionContext) field_Mutation_enableMsgChannel_argsID(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_enableMsgEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_enableMsgEvent_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_enableMsgEvent_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -581,13 +517,9 @@ func (ec *executionContext) field_Mutation_enableMsgEvent_args(ctx context.Conte
 }
 func (ec *executionContext) field_Mutation_enableMsgEvent_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -601,9 +533,9 @@ func (ec *executionContext) field_Mutation_enableMsgEvent_argsID(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_enableMsgTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_enableMsgTemplate_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_enableMsgTemplate_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -613,13 +545,9 @@ func (ec *executionContext) field_Mutation_enableMsgTemplate_args(ctx context.Co
 }
 func (ec *executionContext) field_Mutation_enableMsgTemplate_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -633,9 +561,9 @@ func (ec *executionContext) field_Mutation_enableMsgTemplate_argsID(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_markMsgInternalToDeleted_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_markMsgInternalToDeleted_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_markMsgInternalToDeleted_argsIds(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -645,13 +573,9 @@ func (ec *executionContext) field_Mutation_markMsgInternalToDeleted_args(ctx con
 }
 func (ec *executionContext) field_Mutation_markMsgInternalToDeleted_argsIds(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) ([]int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["ids"]
-	if !ok {
+	if _, ok := rawArgs["ids"]; !ok {
 		var zeroVal []int
 		return zeroVal, nil
 	}
@@ -665,9 +589,9 @@ func (ec *executionContext) field_Mutation_markMsgInternalToDeleted_argsIds(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_markMsgInternalToReadOrUnRead_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_markMsgInternalToReadOrUnRead_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_markMsgInternalToReadOrUnRead_argsIds(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -682,13 +606,9 @@ func (ec *executionContext) field_Mutation_markMsgInternalToReadOrUnRead_args(ct
 }
 func (ec *executionContext) field_Mutation_markMsgInternalToReadOrUnRead_argsIds(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) ([]int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["ids"]
-	if !ok {
+	if _, ok := rawArgs["ids"]; !ok {
 		var zeroVal []int
 		return zeroVal, nil
 	}
@@ -704,13 +624,9 @@ func (ec *executionContext) field_Mutation_markMsgInternalToReadOrUnRead_argsIds
 
 func (ec *executionContext) field_Mutation_markMsgInternalToReadOrUnRead_argsRead(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (bool, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["read"]
-	if !ok {
+	if _, ok := rawArgs["read"]; !ok {
 		var zeroVal bool
 		return zeroVal, nil
 	}
@@ -724,9 +640,9 @@ func (ec *executionContext) field_Mutation_markMsgInternalToReadOrUnRead_argsRea
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_testSendEmailTpl_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_testSendEmailTpl_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_testSendEmailTpl_argsTplID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -751,13 +667,9 @@ func (ec *executionContext) field_Mutation_testSendEmailTpl_args(ctx context.Con
 }
 func (ec *executionContext) field_Mutation_testSendEmailTpl_argsTplID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["tplID"]
-	if !ok {
+	if _, ok := rawArgs["tplID"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -773,13 +685,9 @@ func (ec *executionContext) field_Mutation_testSendEmailTpl_argsTplID(
 
 func (ec *executionContext) field_Mutation_testSendEmailTpl_argsEmail(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (string, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["email"]
-	if !ok {
+	if _, ok := rawArgs["email"]; !ok {
 		var zeroVal string
 		return zeroVal, nil
 	}
@@ -795,13 +703,9 @@ func (ec *executionContext) field_Mutation_testSendEmailTpl_argsEmail(
 
 func (ec *executionContext) field_Mutation_testSendEmailTpl_argsLabels(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (map[string]string, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["labels"]
-	if !ok {
+	if _, ok := rawArgs["labels"]; !ok {
 		var zeroVal map[string]string
 		return zeroVal, nil
 	}
@@ -817,13 +721,9 @@ func (ec *executionContext) field_Mutation_testSendEmailTpl_argsLabels(
 
 func (ec *executionContext) field_Mutation_testSendEmailTpl_argsAnnotations(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (map[string]string, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["annotations"]
-	if !ok {
+	if _, ok := rawArgs["annotations"]; !ok {
 		var zeroVal map[string]string
 		return zeroVal, nil
 	}
@@ -837,9 +737,9 @@ func (ec *executionContext) field_Mutation_testSendEmailTpl_argsAnnotations(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_testSendMessageTpl_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_testSendMessageTpl_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_testSendMessageTpl_argsTplID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -864,13 +764,9 @@ func (ec *executionContext) field_Mutation_testSendMessageTpl_args(ctx context.C
 }
 func (ec *executionContext) field_Mutation_testSendMessageTpl_argsTplID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["tplID"]
-	if !ok {
+	if _, ok := rawArgs["tplID"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -886,13 +782,9 @@ func (ec *executionContext) field_Mutation_testSendMessageTpl_argsTplID(
 
 func (ec *executionContext) field_Mutation_testSendMessageTpl_argsUserID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["userID"]
-	if !ok {
+	if _, ok := rawArgs["userID"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -908,13 +800,9 @@ func (ec *executionContext) field_Mutation_testSendMessageTpl_argsUserID(
 
 func (ec *executionContext) field_Mutation_testSendMessageTpl_argsLabels(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (map[string]string, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["labels"]
-	if !ok {
+	if _, ok := rawArgs["labels"]; !ok {
 		var zeroVal map[string]string
 		return zeroVal, nil
 	}
@@ -930,13 +818,9 @@ func (ec *executionContext) field_Mutation_testSendMessageTpl_argsLabels(
 
 func (ec *executionContext) field_Mutation_testSendMessageTpl_argsAnnotations(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (map[string]string, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["annotations"]
-	if !ok {
+	if _, ok := rawArgs["annotations"]; !ok {
 		var zeroVal map[string]string
 		return zeroVal, nil
 	}
@@ -950,9 +834,9 @@ func (ec *executionContext) field_Mutation_testSendMessageTpl_argsAnnotations(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_updateMsgChannel_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateMsgChannel_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_updateMsgChannel_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -967,13 +851,9 @@ func (ec *executionContext) field_Mutation_updateMsgChannel_args(ctx context.Con
 }
 func (ec *executionContext) field_Mutation_updateMsgChannel_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -989,13 +869,9 @@ func (ec *executionContext) field_Mutation_updateMsgChannel_argsID(
 
 func (ec *executionContext) field_Mutation_updateMsgChannel_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (ent.UpdateMsgChannelInput, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["input"]
-	if !ok {
+	if _, ok := rawArgs["input"]; !ok {
 		var zeroVal ent.UpdateMsgChannelInput
 		return zeroVal, nil
 	}
@@ -1009,9 +885,9 @@ func (ec *executionContext) field_Mutation_updateMsgChannel_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_updateMsgEvent_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateMsgEvent_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_updateMsgEvent_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1026,13 +902,9 @@ func (ec *executionContext) field_Mutation_updateMsgEvent_args(ctx context.Conte
 }
 func (ec *executionContext) field_Mutation_updateMsgEvent_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -1048,13 +920,9 @@ func (ec *executionContext) field_Mutation_updateMsgEvent_argsID(
 
 func (ec *executionContext) field_Mutation_updateMsgEvent_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (ent.UpdateMsgEventInput, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["input"]
-	if !ok {
+	if _, ok := rawArgs["input"]; !ok {
 		var zeroVal ent.UpdateMsgEventInput
 		return zeroVal, nil
 	}
@@ -1068,9 +936,9 @@ func (ec *executionContext) field_Mutation_updateMsgEvent_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_updateMsgTemplate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateMsgTemplate_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_updateMsgTemplate_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1085,13 +953,9 @@ func (ec *executionContext) field_Mutation_updateMsgTemplate_args(ctx context.Co
 }
 func (ec *executionContext) field_Mutation_updateMsgTemplate_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -1107,13 +971,9 @@ func (ec *executionContext) field_Mutation_updateMsgTemplate_argsID(
 
 func (ec *executionContext) field_Mutation_updateMsgTemplate_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (ent.UpdateMsgTemplateInput, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["input"]
-	if !ok {
+	if _, ok := rawArgs["input"]; !ok {
 		var zeroVal ent.UpdateMsgTemplateInput
 		return zeroVal, nil
 	}
@@ -1127,9 +987,9 @@ func (ec *executionContext) field_Mutation_updateMsgTemplate_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_updateMsgType_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateMsgType_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_updateMsgType_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1144,13 +1004,9 @@ func (ec *executionContext) field_Mutation_updateMsgType_args(ctx context.Contex
 }
 func (ec *executionContext) field_Mutation_updateMsgType_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -1166,13 +1022,9 @@ func (ec *executionContext) field_Mutation_updateMsgType_argsID(
 
 func (ec *executionContext) field_Mutation_updateMsgType_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (ent.UpdateMsgTypeInput, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["input"]
-	if !ok {
+	if _, ok := rawArgs["input"]; !ok {
 		var zeroVal ent.UpdateMsgTypeInput
 		return zeroVal, nil
 	}
@@ -1186,9 +1038,9 @@ func (ec *executionContext) field_Mutation_updateMsgType_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_updateSilence_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_updateSilence_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
+	args := map[string]any{}
 	arg0, err := ec.field_Mutation_updateSilence_argsID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
@@ -1203,13 +1055,9 @@ func (ec *executionContext) field_Mutation_updateSilence_args(ctx context.Contex
 }
 func (ec *executionContext) field_Mutation_updateSilence_argsID(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (int, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["id"]
-	if !ok {
+	if _, ok := rawArgs["id"]; !ok {
 		var zeroVal int
 		return zeroVal, nil
 	}
@@ -1225,13 +1073,9 @@ func (ec *executionContext) field_Mutation_updateSilence_argsID(
 
 func (ec *executionContext) field_Mutation_updateSilence_argsInput(
 	ctx context.Context,
-	rawArgs map[string]interface{},
+	rawArgs map[string]any,
 ) (ent.UpdateSilenceInput, error) {
-	// We won't call the directive if the argument is null.
-	// Set call_argument_directives_with_null to true to call directives
-	// even if the argument is null.
-	_, ok := rawArgs["input"]
-	if !ok {
+	if _, ok := rawArgs["input"]; !ok {
 		var zeroVal ent.UpdateSilenceInput
 		return zeroVal, nil
 	}
@@ -1265,7 +1109,7 @@ func (ec *executionContext) _Mutation_createMsgType(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().CreateMsgType(rctx, fc.Args["input"].(ent.CreateMsgTypeInput))
 	})
@@ -1356,7 +1200,7 @@ func (ec *executionContext) _Mutation_updateMsgType(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateMsgType(rctx, fc.Args["id"].(int), fc.Args["input"].(ent.UpdateMsgTypeInput))
 	})
@@ -1447,7 +1291,7 @@ func (ec *executionContext) _Mutation_deleteMsgType(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteMsgType(rctx, fc.Args["id"].(int))
 	})
@@ -1502,7 +1346,7 @@ func (ec *executionContext) _Mutation_createMsgEvent(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().CreateMsgEvent(rctx, fc.Args["input"].(ent.CreateMsgEventInput))
 	})
@@ -1587,7 +1431,7 @@ func (ec *executionContext) _Mutation_updateMsgEvent(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateMsgEvent(rctx, fc.Args["id"].(int), fc.Args["input"].(ent.UpdateMsgEventInput))
 	})
@@ -1672,7 +1516,7 @@ func (ec *executionContext) _Mutation_deleteMsgEvent(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteMsgEvent(rctx, fc.Args["id"].(int))
 	})
@@ -1727,7 +1571,7 @@ func (ec *executionContext) _Mutation_enableMsgEvent(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().EnableMsgEvent(rctx, fc.Args["id"].(int))
 	})
@@ -1812,7 +1656,7 @@ func (ec *executionContext) _Mutation_disableMsgEvent(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DisableMsgEvent(rctx, fc.Args["id"].(int))
 	})
@@ -1897,7 +1741,7 @@ func (ec *executionContext) _Mutation_createMsgChannel(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().CreateMsgChannel(rctx, fc.Args["input"].(ent.CreateMsgChannelInput))
 	})
@@ -1976,7 +1820,7 @@ func (ec *executionContext) _Mutation_updateMsgChannel(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateMsgChannel(rctx, fc.Args["id"].(int), fc.Args["input"].(ent.UpdateMsgChannelInput))
 	})
@@ -2055,7 +1899,7 @@ func (ec *executionContext) _Mutation_deleteMsgChannel(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteMsgChannel(rctx, fc.Args["id"].(int))
 	})
@@ -2110,7 +1954,7 @@ func (ec *executionContext) _Mutation_enableMsgChannel(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().EnableMsgChannel(rctx, fc.Args["id"].(int))
 	})
@@ -2189,7 +2033,7 @@ func (ec *executionContext) _Mutation_disableMsgChannel(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DisableMsgChannel(rctx, fc.Args["id"].(int))
 	})
@@ -2268,7 +2112,7 @@ func (ec *executionContext) _Mutation_createMsgTemplate(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().CreateMsgTemplate(rctx, fc.Args["input"].(ent.CreateMsgTemplateInput))
 	})
@@ -2369,7 +2213,7 @@ func (ec *executionContext) _Mutation_updateMsgTemplate(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateMsgTemplate(rctx, fc.Args["id"].(int), fc.Args["input"].(ent.UpdateMsgTemplateInput))
 	})
@@ -2470,7 +2314,7 @@ func (ec *executionContext) _Mutation_deleteMsgTemplate(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteMsgTemplate(rctx, fc.Args["id"].(int))
 	})
@@ -2525,7 +2369,7 @@ func (ec *executionContext) _Mutation_enableMsgTemplate(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().EnableMsgTemplate(rctx, fc.Args["id"].(int))
 	})
@@ -2626,7 +2470,7 @@ func (ec *executionContext) _Mutation_disableMsgTemplate(ctx context.Context, fi
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DisableMsgTemplate(rctx, fc.Args["id"].(int))
 	})
@@ -2727,7 +2571,7 @@ func (ec *executionContext) _Mutation_createMsgSubscriber(ctx context.Context, f
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().CreateMsgSubscriber(rctx, fc.Args["inputs"].([]*ent.CreateMsgSubscriberInput))
 	})
@@ -2808,7 +2652,7 @@ func (ec *executionContext) _Mutation_deleteMsgSubscriber(ctx context.Context, f
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteMsgSubscriber(rctx, fc.Args["ids"].([]int))
 	})
@@ -2863,7 +2707,7 @@ func (ec *executionContext) _Mutation_createSilence(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().CreateSilence(rctx, fc.Args["input"].(ent.CreateSilenceInput))
 	})
@@ -2944,7 +2788,7 @@ func (ec *executionContext) _Mutation_updateSilence(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateSilence(rctx, fc.Args["id"].(int), fc.Args["input"].(ent.UpdateSilenceInput))
 	})
@@ -3025,7 +2869,7 @@ func (ec *executionContext) _Mutation_deleteSilence(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteSilence(rctx, fc.Args["id"].(int))
 	})
@@ -3080,7 +2924,7 @@ func (ec *executionContext) _Mutation_markMsgInternalToReadOrUnRead(ctx context.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().MarkMsgInternalToReadOrUnRead(rctx, fc.Args["ids"].([]int), fc.Args["read"].(bool))
 	})
@@ -3135,7 +2979,7 @@ func (ec *executionContext) _Mutation_markMsgInternalToDeleted(ctx context.Conte
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().MarkMsgInternalToDeleted(rctx, fc.Args["ids"].([]int))
 	})
@@ -3190,7 +3034,7 @@ func (ec *executionContext) _Mutation_testSendEmailTpl(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().TestSendEmailTpl(rctx, fc.Args["tplID"].(int), fc.Args["email"].(string), fc.Args["labels"].(map[string]string), fc.Args["annotations"].(map[string]string))
 	})
@@ -3245,7 +3089,7 @@ func (ec *executionContext) _Mutation_testSendMessageTpl(ctx context.Context, fi
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().TestSendMessageTpl(rctx, fc.Args["tplID"].(int), fc.Args["userID"].(int), fc.Args["labels"].(map[string]string), fc.Args["annotations"].(map[string]string))
 	})
@@ -3300,7 +3144,7 @@ func (ec *executionContext) _Mutation_refreshTemplateParams(ctx context.Context,
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().RefreshTemplateParams(rctx)
 	})
@@ -3336,10 +3180,10 @@ func (ec *executionContext) fieldContext_Mutation_refreshTemplateParams(_ contex
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, obj interface{}) (profile.EmailConfig, error) {
+func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, obj any) (profile.EmailConfig, error) {
 	var it profile.EmailConfig
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -3419,10 +3263,10 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputMatcherInput(ctx context.Context, obj interface{}) (label.Matcher, error) {
+func (ec *executionContext) unmarshalInputMatcherInput(ctx context.Context, obj any) (label.Matcher, error) {
 	var it label.Matcher
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -3460,10 +3304,10 @@ func (ec *executionContext) unmarshalInputMatcherInput(ctx context.Context, obj 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputMessageConfigInput(ctx context.Context, obj interface{}) (profile.MessageConfig, error) {
+func (ec *executionContext) unmarshalInputMessageConfigInput(ctx context.Context, obj any) (profile.MessageConfig, error) {
 	var it profile.MessageConfig
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -3501,10 +3345,10 @@ func (ec *executionContext) unmarshalInputMessageConfigInput(ctx context.Context
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj interface{}) (profile.Receiver, error) {
+func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj any) (profile.Receiver, error) {
 	var it profile.Receiver
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -3542,10 +3386,10 @@ func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj interface{}) (profile.Route, error) {
+func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj any) (profile.Route, error) {
 	var it profile.Route
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -3884,14 +3728,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) unmarshalOEmailConfigInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐEmailConfig(ctx context.Context, v interface{}) ([]*profile.EmailConfig, error) {
+func (ec *executionContext) unmarshalOEmailConfigInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐEmailConfig(ctx context.Context, v any) ([]*profile.EmailConfig, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]*profile.EmailConfig, len(vSlice))
 	for i := range vSlice {
@@ -3904,7 +3746,7 @@ func (ec *executionContext) unmarshalOEmailConfigInput2ᚕᚖgithubᚗcomᚋwooc
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOEmailConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐEmailConfig(ctx context.Context, v interface{}) (*profile.EmailConfig, error) {
+func (ec *executionContext) unmarshalOEmailConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐEmailConfig(ctx context.Context, v any) (*profile.EmailConfig, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -3912,14 +3754,12 @@ func (ec *executionContext) unmarshalOEmailConfigInput2ᚖgithubᚗcomᚋwoocoos
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOMatcherInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐMatcher(ctx context.Context, v interface{}) ([]*label.Matcher, error) {
+func (ec *executionContext) unmarshalOMatcherInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐMatcher(ctx context.Context, v any) ([]*label.Matcher, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]*label.Matcher, len(vSlice))
 	for i := range vSlice {
@@ -3932,7 +3772,7 @@ func (ec *executionContext) unmarshalOMatcherInput2ᚕᚖgithubᚗcomᚋwoocoos�
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOMatcherInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐMatcher(ctx context.Context, v interface{}) (*label.Matcher, error) {
+func (ec *executionContext) unmarshalOMatcherInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋlabelᚐMatcher(ctx context.Context, v any) (*label.Matcher, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -3940,7 +3780,7 @@ func (ec *executionContext) unmarshalOMatcherInput2ᚖgithubᚗcomᚋwoocoosᚋm
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOMessageConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐMessageConfig(ctx context.Context, v interface{}) (*profile.MessageConfig, error) {
+func (ec *executionContext) unmarshalOMessageConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐMessageConfig(ctx context.Context, v any) (*profile.MessageConfig, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -3948,7 +3788,7 @@ func (ec *executionContext) unmarshalOMessageConfigInput2ᚖgithubᚗcomᚋwooco
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOReceiverInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiver(ctx context.Context, v interface{}) (*profile.Receiver, error) {
+func (ec *executionContext) unmarshalOReceiverInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiver(ctx context.Context, v any) (*profile.Receiver, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -3956,14 +3796,12 @@ func (ec *executionContext) unmarshalOReceiverInput2ᚖgithubᚗcomᚋwoocoosᚋ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalORouteInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐRoute(ctx context.Context, v interface{}) ([]*profile.Route, error) {
+func (ec *executionContext) unmarshalORouteInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐRoute(ctx context.Context, v any) ([]*profile.Route, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]*profile.Route, len(vSlice))
 	for i := range vSlice {
@@ -3976,7 +3814,7 @@ func (ec *executionContext) unmarshalORouteInput2ᚕᚖgithubᚗcomᚋwoocoosᚋ
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalORouteInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐRoute(ctx context.Context, v interface{}) (*profile.Route, error) {
+func (ec *executionContext) unmarshalORouteInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐRoute(ctx context.Context, v any) (*profile.Route, error) {
 	if v == nil {
 		return nil, nil
 	}

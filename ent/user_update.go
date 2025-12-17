@@ -26,124 +26,124 @@ type UserUpdate struct {
 }
 
 // Where appends a list predicates to the UserUpdate builder.
-func (uu *UserUpdate) Where(ps ...predicate.User) *UserUpdate {
-	uu.mutation.Where(ps...)
-	return uu
+func (_u *UserUpdate) Where(ps ...predicate.User) *UserUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetPrincipalName sets the "principal_name" field.
-func (uu *UserUpdate) SetPrincipalName(s string) *UserUpdate {
-	uu.mutation.SetPrincipalName(s)
-	return uu
+func (_u *UserUpdate) SetPrincipalName(v string) *UserUpdate {
+	_u.mutation.SetPrincipalName(v)
+	return _u
 }
 
 // SetNillablePrincipalName sets the "principal_name" field if the given value is not nil.
-func (uu *UserUpdate) SetNillablePrincipalName(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetPrincipalName(*s)
+func (_u *UserUpdate) SetNillablePrincipalName(v *string) *UserUpdate {
+	if v != nil {
+		_u.SetPrincipalName(*v)
 	}
-	return uu
+	return _u
 }
 
 // SetDisplayName sets the "display_name" field.
-func (uu *UserUpdate) SetDisplayName(s string) *UserUpdate {
-	uu.mutation.SetDisplayName(s)
-	return uu
+func (_u *UserUpdate) SetDisplayName(v string) *UserUpdate {
+	_u.mutation.SetDisplayName(v)
+	return _u
 }
 
 // SetNillableDisplayName sets the "display_name" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableDisplayName(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetDisplayName(*s)
+func (_u *UserUpdate) SetNillableDisplayName(v *string) *UserUpdate {
+	if v != nil {
+		_u.SetDisplayName(*v)
 	}
-	return uu
+	return _u
 }
 
 // AddSilenceIDs adds the "silences" edge to the Silence entity by IDs.
-func (uu *UserUpdate) AddSilenceIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddSilenceIDs(ids...)
-	return uu
+func (_u *UserUpdate) AddSilenceIDs(ids ...int) *UserUpdate {
+	_u.mutation.AddSilenceIDs(ids...)
+	return _u
 }
 
 // AddSilences adds the "silences" edges to the Silence entity.
-func (uu *UserUpdate) AddSilences(s ...*Silence) *UserUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+func (_u *UserUpdate) AddSilences(v ...*Silence) *UserUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uu.AddSilenceIDs(ids...)
+	return _u.AddSilenceIDs(ids...)
 }
 
 // AddAddressIDs adds the "addresses" edge to the UserAddr entity by IDs.
-func (uu *UserUpdate) AddAddressIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddAddressIDs(ids...)
-	return uu
+func (_u *UserUpdate) AddAddressIDs(ids ...int) *UserUpdate {
+	_u.mutation.AddAddressIDs(ids...)
+	return _u
 }
 
 // AddAddresses adds the "addresses" edges to the UserAddr entity.
-func (uu *UserUpdate) AddAddresses(u ...*UserAddr) *UserUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *UserUpdate) AddAddresses(v ...*UserAddr) *UserUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uu.AddAddressIDs(ids...)
+	return _u.AddAddressIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
-func (uu *UserUpdate) Mutation() *UserMutation {
-	return uu.mutation
+func (_u *UserUpdate) Mutation() *UserMutation {
+	return _u.mutation
 }
 
 // ClearSilences clears all "silences" edges to the Silence entity.
-func (uu *UserUpdate) ClearSilences() *UserUpdate {
-	uu.mutation.ClearSilences()
-	return uu
+func (_u *UserUpdate) ClearSilences() *UserUpdate {
+	_u.mutation.ClearSilences()
+	return _u
 }
 
 // RemoveSilenceIDs removes the "silences" edge to Silence entities by IDs.
-func (uu *UserUpdate) RemoveSilenceIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveSilenceIDs(ids...)
-	return uu
+func (_u *UserUpdate) RemoveSilenceIDs(ids ...int) *UserUpdate {
+	_u.mutation.RemoveSilenceIDs(ids...)
+	return _u
 }
 
 // RemoveSilences removes "silences" edges to Silence entities.
-func (uu *UserUpdate) RemoveSilences(s ...*Silence) *UserUpdate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+func (_u *UserUpdate) RemoveSilences(v ...*Silence) *UserUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uu.RemoveSilenceIDs(ids...)
+	return _u.RemoveSilenceIDs(ids...)
 }
 
 // ClearAddresses clears all "addresses" edges to the UserAddr entity.
-func (uu *UserUpdate) ClearAddresses() *UserUpdate {
-	uu.mutation.ClearAddresses()
-	return uu
+func (_u *UserUpdate) ClearAddresses() *UserUpdate {
+	_u.mutation.ClearAddresses()
+	return _u
 }
 
 // RemoveAddressIDs removes the "addresses" edge to UserAddr entities by IDs.
-func (uu *UserUpdate) RemoveAddressIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveAddressIDs(ids...)
-	return uu
+func (_u *UserUpdate) RemoveAddressIDs(ids ...int) *UserUpdate {
+	_u.mutation.RemoveAddressIDs(ids...)
+	return _u
 }
 
 // RemoveAddresses removes "addresses" edges to UserAddr entities.
-func (uu *UserUpdate) RemoveAddresses(u ...*UserAddr) *UserUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *UserUpdate) RemoveAddresses(v ...*UserAddr) *UserUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uu.RemoveAddressIDs(ids...)
+	return _u.RemoveAddressIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (uu *UserUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, uu.sqlSave, uu.mutation, uu.hooks)
+func (_u *UserUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (uu *UserUpdate) SaveX(ctx context.Context) int {
-	affected, err := uu.Save(ctx)
+func (_u *UserUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -151,34 +151,34 @@ func (uu *UserUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (uu *UserUpdate) Exec(ctx context.Context) error {
-	_, err := uu.Save(ctx)
+func (_u *UserUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (uu *UserUpdate) ExecX(ctx context.Context) {
-	if err := uu.Exec(ctx); err != nil {
+func (_u *UserUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
-func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
+func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt))
-	if ps := uu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := uu.mutation.PrincipalName(); ok {
+	if value, ok := _u.mutation.PrincipalName(); ok {
 		_spec.SetField(user.FieldPrincipalName, field.TypeString, value)
 	}
-	if value, ok := uu.mutation.DisplayName(); ok {
+	if value, ok := _u.mutation.DisplayName(); ok {
 		_spec.SetField(user.FieldDisplayName, field.TypeString, value)
 	}
-	if uu.mutation.SilencesCleared() {
+	if _u.mutation.SilencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -189,10 +189,10 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = uu.schemaConfig.Silence
+		edge.Schema = _u.schemaConfig.Silence
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedSilencesIDs(); len(nodes) > 0 && !uu.mutation.SilencesCleared() {
+	if nodes := _u.mutation.RemovedSilencesIDs(); len(nodes) > 0 && !_u.mutation.SilencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -203,13 +203,13 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = uu.schemaConfig.Silence
+		edge.Schema = _u.schemaConfig.Silence
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.SilencesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.SilencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -220,13 +220,13 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = uu.schemaConfig.Silence
+		edge.Schema = _u.schemaConfig.Silence
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uu.mutation.AddressesCleared() {
+	if _u.mutation.AddressesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -237,10 +237,10 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(useraddr.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = uu.schemaConfig.UserAddr
+		edge.Schema = _u.schemaConfig.UserAddr
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.RemovedAddressesIDs(); len(nodes) > 0 && !uu.mutation.AddressesCleared() {
+	if nodes := _u.mutation.RemovedAddressesIDs(); len(nodes) > 0 && !_u.mutation.AddressesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -251,13 +251,13 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(useraddr.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = uu.schemaConfig.UserAddr
+		edge.Schema = _u.schemaConfig.UserAddr
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uu.mutation.AddressesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AddressesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -268,15 +268,15 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(useraddr.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = uu.schemaConfig.UserAddr
+		edge.Schema = _u.schemaConfig.UserAddr
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Node.Schema = uu.schemaConfig.User
-	ctx = internal.NewSchemaConfigContext(ctx, uu.schemaConfig)
-	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
+	_spec.Node.Schema = _u.schemaConfig.User
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -284,8 +284,8 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	uu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // UserUpdateOne is the builder for updating a single User entity.
@@ -297,131 +297,131 @@ type UserUpdateOne struct {
 }
 
 // SetPrincipalName sets the "principal_name" field.
-func (uuo *UserUpdateOne) SetPrincipalName(s string) *UserUpdateOne {
-	uuo.mutation.SetPrincipalName(s)
-	return uuo
+func (_u *UserUpdateOne) SetPrincipalName(v string) *UserUpdateOne {
+	_u.mutation.SetPrincipalName(v)
+	return _u
 }
 
 // SetNillablePrincipalName sets the "principal_name" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillablePrincipalName(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetPrincipalName(*s)
+func (_u *UserUpdateOne) SetNillablePrincipalName(v *string) *UserUpdateOne {
+	if v != nil {
+		_u.SetPrincipalName(*v)
 	}
-	return uuo
+	return _u
 }
 
 // SetDisplayName sets the "display_name" field.
-func (uuo *UserUpdateOne) SetDisplayName(s string) *UserUpdateOne {
-	uuo.mutation.SetDisplayName(s)
-	return uuo
+func (_u *UserUpdateOne) SetDisplayName(v string) *UserUpdateOne {
+	_u.mutation.SetDisplayName(v)
+	return _u
 }
 
 // SetNillableDisplayName sets the "display_name" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableDisplayName(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetDisplayName(*s)
+func (_u *UserUpdateOne) SetNillableDisplayName(v *string) *UserUpdateOne {
+	if v != nil {
+		_u.SetDisplayName(*v)
 	}
-	return uuo
+	return _u
 }
 
 // AddSilenceIDs adds the "silences" edge to the Silence entity by IDs.
-func (uuo *UserUpdateOne) AddSilenceIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddSilenceIDs(ids...)
-	return uuo
+func (_u *UserUpdateOne) AddSilenceIDs(ids ...int) *UserUpdateOne {
+	_u.mutation.AddSilenceIDs(ids...)
+	return _u
 }
 
 // AddSilences adds the "silences" edges to the Silence entity.
-func (uuo *UserUpdateOne) AddSilences(s ...*Silence) *UserUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+func (_u *UserUpdateOne) AddSilences(v ...*Silence) *UserUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uuo.AddSilenceIDs(ids...)
+	return _u.AddSilenceIDs(ids...)
 }
 
 // AddAddressIDs adds the "addresses" edge to the UserAddr entity by IDs.
-func (uuo *UserUpdateOne) AddAddressIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddAddressIDs(ids...)
-	return uuo
+func (_u *UserUpdateOne) AddAddressIDs(ids ...int) *UserUpdateOne {
+	_u.mutation.AddAddressIDs(ids...)
+	return _u
 }
 
 // AddAddresses adds the "addresses" edges to the UserAddr entity.
-func (uuo *UserUpdateOne) AddAddresses(u ...*UserAddr) *UserUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *UserUpdateOne) AddAddresses(v ...*UserAddr) *UserUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uuo.AddAddressIDs(ids...)
+	return _u.AddAddressIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
-func (uuo *UserUpdateOne) Mutation() *UserMutation {
-	return uuo.mutation
+func (_u *UserUpdateOne) Mutation() *UserMutation {
+	return _u.mutation
 }
 
 // ClearSilences clears all "silences" edges to the Silence entity.
-func (uuo *UserUpdateOne) ClearSilences() *UserUpdateOne {
-	uuo.mutation.ClearSilences()
-	return uuo
+func (_u *UserUpdateOne) ClearSilences() *UserUpdateOne {
+	_u.mutation.ClearSilences()
+	return _u
 }
 
 // RemoveSilenceIDs removes the "silences" edge to Silence entities by IDs.
-func (uuo *UserUpdateOne) RemoveSilenceIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveSilenceIDs(ids...)
-	return uuo
+func (_u *UserUpdateOne) RemoveSilenceIDs(ids ...int) *UserUpdateOne {
+	_u.mutation.RemoveSilenceIDs(ids...)
+	return _u
 }
 
 // RemoveSilences removes "silences" edges to Silence entities.
-func (uuo *UserUpdateOne) RemoveSilences(s ...*Silence) *UserUpdateOne {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+func (_u *UserUpdateOne) RemoveSilences(v ...*Silence) *UserUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uuo.RemoveSilenceIDs(ids...)
+	return _u.RemoveSilenceIDs(ids...)
 }
 
 // ClearAddresses clears all "addresses" edges to the UserAddr entity.
-func (uuo *UserUpdateOne) ClearAddresses() *UserUpdateOne {
-	uuo.mutation.ClearAddresses()
-	return uuo
+func (_u *UserUpdateOne) ClearAddresses() *UserUpdateOne {
+	_u.mutation.ClearAddresses()
+	return _u
 }
 
 // RemoveAddressIDs removes the "addresses" edge to UserAddr entities by IDs.
-func (uuo *UserUpdateOne) RemoveAddressIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveAddressIDs(ids...)
-	return uuo
+func (_u *UserUpdateOne) RemoveAddressIDs(ids ...int) *UserUpdateOne {
+	_u.mutation.RemoveAddressIDs(ids...)
+	return _u
 }
 
 // RemoveAddresses removes "addresses" edges to UserAddr entities.
-func (uuo *UserUpdateOne) RemoveAddresses(u ...*UserAddr) *UserUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *UserUpdateOne) RemoveAddresses(v ...*UserAddr) *UserUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return uuo.RemoveAddressIDs(ids...)
+	return _u.RemoveAddressIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
-func (uuo *UserUpdateOne) Where(ps ...predicate.User) *UserUpdateOne {
-	uuo.mutation.Where(ps...)
-	return uuo
+func (_u *UserUpdateOne) Where(ps ...predicate.User) *UserUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (uuo *UserUpdateOne) Select(field string, fields ...string) *UserUpdateOne {
-	uuo.fields = append([]string{field}, fields...)
-	return uuo
+func (_u *UserUpdateOne) Select(field string, fields ...string) *UserUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated User entity.
-func (uuo *UserUpdateOne) Save(ctx context.Context) (*User, error) {
-	return withHooks(ctx, uuo.sqlSave, uuo.mutation, uuo.hooks)
+func (_u *UserUpdateOne) Save(ctx context.Context) (*User, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (uuo *UserUpdateOne) SaveX(ctx context.Context) *User {
-	node, err := uuo.Save(ctx)
+func (_u *UserUpdateOne) SaveX(ctx context.Context) *User {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -429,26 +429,26 @@ func (uuo *UserUpdateOne) SaveX(ctx context.Context) *User {
 }
 
 // Exec executes the query on the entity.
-func (uuo *UserUpdateOne) Exec(ctx context.Context) error {
-	_, err := uuo.Save(ctx)
+func (_u *UserUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (uuo *UserUpdateOne) ExecX(ctx context.Context) {
-	if err := uuo.Exec(ctx); err != nil {
+func (_u *UserUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
-func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
+func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt))
-	id, ok := uuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "User.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := uuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, user.FieldID)
 		for _, f := range fields {
@@ -460,20 +460,20 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			}
 		}
 	}
-	if ps := uuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := uuo.mutation.PrincipalName(); ok {
+	if value, ok := _u.mutation.PrincipalName(); ok {
 		_spec.SetField(user.FieldPrincipalName, field.TypeString, value)
 	}
-	if value, ok := uuo.mutation.DisplayName(); ok {
+	if value, ok := _u.mutation.DisplayName(); ok {
 		_spec.SetField(user.FieldDisplayName, field.TypeString, value)
 	}
-	if uuo.mutation.SilencesCleared() {
+	if _u.mutation.SilencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -484,10 +484,10 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = uuo.schemaConfig.Silence
+		edge.Schema = _u.schemaConfig.Silence
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedSilencesIDs(); len(nodes) > 0 && !uuo.mutation.SilencesCleared() {
+	if nodes := _u.mutation.RemovedSilencesIDs(); len(nodes) > 0 && !_u.mutation.SilencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -498,13 +498,13 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = uuo.schemaConfig.Silence
+		edge.Schema = _u.schemaConfig.Silence
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.SilencesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.SilencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -515,13 +515,13 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = uuo.schemaConfig.Silence
+		edge.Schema = _u.schemaConfig.Silence
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if uuo.mutation.AddressesCleared() {
+	if _u.mutation.AddressesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -532,10 +532,10 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(useraddr.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = uuo.schemaConfig.UserAddr
+		edge.Schema = _u.schemaConfig.UserAddr
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.RemovedAddressesIDs(); len(nodes) > 0 && !uuo.mutation.AddressesCleared() {
+	if nodes := _u.mutation.RemovedAddressesIDs(); len(nodes) > 0 && !_u.mutation.AddressesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -546,13 +546,13 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(useraddr.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = uuo.schemaConfig.UserAddr
+		edge.Schema = _u.schemaConfig.UserAddr
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := uuo.mutation.AddressesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AddressesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -563,18 +563,18 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(useraddr.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = uuo.schemaConfig.UserAddr
+		edge.Schema = _u.schemaConfig.UserAddr
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Node.Schema = uuo.schemaConfig.User
-	ctx = internal.NewSchemaConfigContext(ctx, uuo.schemaConfig)
-	_node = &User{config: uuo.config}
+	_spec.Node.Schema = _u.schemaConfig.User
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	_node = &User{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, uuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -582,6 +582,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		}
 		return nil, err
 	}
-	uuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

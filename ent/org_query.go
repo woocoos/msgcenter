@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -11,62 +12,63 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/woocoos/msgcenter/ent/msgalert"
+	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/predicate"
-	"github.com/woocoos/msgcenter/ent/user"
-	"github.com/woocoos/msgcenter/ent/useraddr"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
 
-// UserAddrQuery is the builder for querying UserAddr entities.
-type UserAddrQuery struct {
+// OrgQuery is the builder for querying Org entities.
+type OrgQuery struct {
 	config
-	ctx        *QueryContext
-	order      []useraddr.OrderOption
-	inters     []Interceptor
-	predicates []predicate.UserAddr
-	withUser   *UserQuery
-	modifiers  []func(*sql.Selector)
-	loadTotal  []func(context.Context, []*UserAddr) error
+	ctx                *QueryContext
+	order              []org.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Org
+	withMsgAlerts      *MsgAlertQuery
+	modifiers          []func(*sql.Selector)
+	loadTotal          []func(context.Context, []*Org) error
+	withNamedMsgAlerts map[string]*MsgAlertQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the UserAddrQuery builder.
-func (_q *UserAddrQuery) Where(ps ...predicate.UserAddr) *UserAddrQuery {
+// Where adds a new predicate for the OrgQuery builder.
+func (_q *OrgQuery) Where(ps ...predicate.Org) *OrgQuery {
 	_q.predicates = append(_q.predicates, ps...)
 	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (_q *UserAddrQuery) Limit(limit int) *UserAddrQuery {
+func (_q *OrgQuery) Limit(limit int) *OrgQuery {
 	_q.ctx.Limit = &limit
 	return _q
 }
 
 // Offset to start from.
-func (_q *UserAddrQuery) Offset(offset int) *UserAddrQuery {
+func (_q *OrgQuery) Offset(offset int) *OrgQuery {
 	_q.ctx.Offset = &offset
 	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (_q *UserAddrQuery) Unique(unique bool) *UserAddrQuery {
+func (_q *OrgQuery) Unique(unique bool) *OrgQuery {
 	_q.ctx.Unique = &unique
 	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (_q *UserAddrQuery) Order(o ...useraddr.OrderOption) *UserAddrQuery {
+func (_q *OrgQuery) Order(o ...org.OrderOption) *OrgQuery {
 	_q.order = append(_q.order, o...)
 	return _q
 }
 
-// QueryUser chains the current query on the "user" edge.
-func (_q *UserAddrQuery) QueryUser() *UserQuery {
-	query := (&UserClient{config: _q.config}).Query()
+// QueryMsgAlerts chains the current query on the "msg_alerts" edge.
+func (_q *OrgQuery) QueryMsgAlerts() *MsgAlertQuery {
+	query := (&MsgAlertClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -76,34 +78,34 @@ func (_q *UserAddrQuery) QueryUser() *UserQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(useraddr.Table, useraddr.FieldID, selector),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, useraddr.UserTable, useraddr.UserColumn),
+			sqlgraph.From(org.Table, org.FieldID, selector),
+			sqlgraph.To(msgalert.Table, msgalert.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, org.MsgAlertsTable, org.MsgAlertsColumn),
 		)
 		schemaConfig := _q.schemaConfig
-		step.To.Schema = schemaConfig.User
-		step.Edge.Schema = schemaConfig.UserAddr
+		step.To.Schema = schemaConfig.MsgAlert
+		step.Edge.Schema = schemaConfig.MsgAlert
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
-// First returns the first UserAddr entity from the query.
-// Returns a *NotFoundError when no UserAddr was found.
-func (_q *UserAddrQuery) First(ctx context.Context) (*UserAddr, error) {
+// First returns the first Org entity from the query.
+// Returns a *NotFoundError when no Org was found.
+func (_q *OrgQuery) First(ctx context.Context) (*Org, error) {
 	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{useraddr.Label}
+		return nil, &NotFoundError{org.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (_q *UserAddrQuery) FirstX(ctx context.Context) *UserAddr {
+func (_q *OrgQuery) FirstX(ctx context.Context) *Org {
 	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -111,22 +113,22 @@ func (_q *UserAddrQuery) FirstX(ctx context.Context) *UserAddr {
 	return node
 }
 
-// FirstID returns the first UserAddr ID from the query.
-// Returns a *NotFoundError when no UserAddr ID was found.
-func (_q *UserAddrQuery) FirstID(ctx context.Context) (id int, err error) {
+// FirstID returns the first Org ID from the query.
+// Returns a *NotFoundError when no Org ID was found.
+func (_q *OrgQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{useraddr.Label}
+		err = &NotFoundError{org.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *UserAddrQuery) FirstIDX(ctx context.Context) int {
+func (_q *OrgQuery) FirstIDX(ctx context.Context) int {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -134,10 +136,10 @@ func (_q *UserAddrQuery) FirstIDX(ctx context.Context) int {
 	return id
 }
 
-// Only returns a single UserAddr entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one UserAddr entity is found.
-// Returns a *NotFoundError when no UserAddr entities are found.
-func (_q *UserAddrQuery) Only(ctx context.Context) (*UserAddr, error) {
+// Only returns a single Org entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one Org entity is found.
+// Returns a *NotFoundError when no Org entities are found.
+func (_q *OrgQuery) Only(ctx context.Context) (*Org, error) {
 	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
@@ -146,14 +148,14 @@ func (_q *UserAddrQuery) Only(ctx context.Context) (*UserAddr, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{useraddr.Label}
+		return nil, &NotFoundError{org.Label}
 	default:
-		return nil, &NotSingularError{useraddr.Label}
+		return nil, &NotSingularError{org.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (_q *UserAddrQuery) OnlyX(ctx context.Context) *UserAddr {
+func (_q *OrgQuery) OnlyX(ctx context.Context) *Org {
 	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -161,10 +163,10 @@ func (_q *UserAddrQuery) OnlyX(ctx context.Context) *UserAddr {
 	return node
 }
 
-// OnlyID is like Only, but returns the only UserAddr ID in the query.
-// Returns a *NotSingularError when more than one UserAddr ID is found.
+// OnlyID is like Only, but returns the only Org ID in the query.
+// Returns a *NotSingularError when more than one Org ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *UserAddrQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *OrgQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
@@ -173,15 +175,15 @@ func (_q *UserAddrQuery) OnlyID(ctx context.Context) (id int, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{useraddr.Label}
+		err = &NotFoundError{org.Label}
 	default:
-		err = &NotSingularError{useraddr.Label}
+		err = &NotSingularError{org.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *UserAddrQuery) OnlyIDX(ctx context.Context) int {
+func (_q *OrgQuery) OnlyIDX(ctx context.Context) int {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -189,18 +191,18 @@ func (_q *UserAddrQuery) OnlyIDX(ctx context.Context) int {
 	return id
 }
 
-// All executes the query and returns a list of UserAddrs.
-func (_q *UserAddrQuery) All(ctx context.Context) ([]*UserAddr, error) {
+// All executes the query and returns a list of Orgs.
+func (_q *OrgQuery) All(ctx context.Context) ([]*Org, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*UserAddr, *UserAddrQuery]()
-	return withInterceptors[[]*UserAddr](ctx, _q, qr, _q.inters)
+	qr := querierAll[[]*Org, *OrgQuery]()
+	return withInterceptors[[]*Org](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (_q *UserAddrQuery) AllX(ctx context.Context) []*UserAddr {
+func (_q *OrgQuery) AllX(ctx context.Context) []*Org {
 	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
@@ -208,20 +210,20 @@ func (_q *UserAddrQuery) AllX(ctx context.Context) []*UserAddr {
 	return nodes
 }
 
-// IDs executes the query and returns a list of UserAddr IDs.
-func (_q *UserAddrQuery) IDs(ctx context.Context) (ids []int, err error) {
+// IDs executes the query and returns a list of Org IDs.
+func (_q *OrgQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
-	if err = _q.Select(useraddr.FieldID).Scan(ctx, &ids); err != nil {
+	if err = _q.Select(org.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *UserAddrQuery) IDsX(ctx context.Context) []int {
+func (_q *OrgQuery) IDsX(ctx context.Context) []int {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -230,16 +232,16 @@ func (_q *UserAddrQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (_q *UserAddrQuery) Count(ctx context.Context) (int, error) {
+func (_q *OrgQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, _q, querierCount[*UserAddrQuery](), _q.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*OrgQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (_q *UserAddrQuery) CountX(ctx context.Context) int {
+func (_q *OrgQuery) CountX(ctx context.Context) int {
 	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -248,7 +250,7 @@ func (_q *UserAddrQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (_q *UserAddrQuery) Exist(ctx context.Context) (bool, error) {
+func (_q *OrgQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
 	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
@@ -261,7 +263,7 @@ func (_q *UserAddrQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (_q *UserAddrQuery) ExistX(ctx context.Context) bool {
+func (_q *OrgQuery) ExistX(ctx context.Context) bool {
 	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -269,33 +271,33 @@ func (_q *UserAddrQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the UserAddrQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the OrgQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (_q *UserAddrQuery) Clone() *UserAddrQuery {
+func (_q *OrgQuery) Clone() *OrgQuery {
 	if _q == nil {
 		return nil
 	}
-	return &UserAddrQuery{
-		config:     _q.config,
-		ctx:        _q.ctx.Clone(),
-		order:      append([]useraddr.OrderOption{}, _q.order...),
-		inters:     append([]Interceptor{}, _q.inters...),
-		predicates: append([]predicate.UserAddr{}, _q.predicates...),
-		withUser:   _q.withUser.Clone(),
+	return &OrgQuery{
+		config:        _q.config,
+		ctx:           _q.ctx.Clone(),
+		order:         append([]org.OrderOption{}, _q.order...),
+		inters:        append([]Interceptor{}, _q.inters...),
+		predicates:    append([]predicate.Org{}, _q.predicates...),
+		withMsgAlerts: _q.withMsgAlerts.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
 	}
 }
 
-// WithUser tells the query-builder to eager-load the nodes that are connected to
-// the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *UserAddrQuery) WithUser(opts ...func(*UserQuery)) *UserAddrQuery {
-	query := (&UserClient{config: _q.config}).Query()
+// WithMsgAlerts tells the query-builder to eager-load the nodes that are connected to
+// the "msg_alerts" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *OrgQuery) WithMsgAlerts(opts ...func(*MsgAlertQuery)) *OrgQuery {
+	query := (&MsgAlertClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	_q.withUser = query
+	_q.withMsgAlerts = query
 	return _q
 }
 
@@ -305,19 +307,19 @@ func (_q *UserAddrQuery) WithUser(opts ...func(*UserQuery)) *UserAddrQuery {
 // Example:
 //
 //	var v []struct {
-//		UserID int `json:"user_id,omitempty"`
+//		OwnerID int `json:"owner_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.UserAddr.Query().
-//		GroupBy(useraddr.FieldUserID).
+//	client.Org.Query().
+//		GroupBy(org.FieldOwnerID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (_q *UserAddrQuery) GroupBy(field string, fields ...string) *UserAddrGroupBy {
+func (_q *OrgQuery) GroupBy(field string, fields ...string) *OrgGroupBy {
 	_q.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &UserAddrGroupBy{build: _q}
+	grbuild := &OrgGroupBy{build: _q}
 	grbuild.flds = &_q.ctx.Fields
-	grbuild.label = useraddr.Label
+	grbuild.label = org.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -328,26 +330,26 @@ func (_q *UserAddrQuery) GroupBy(field string, fields ...string) *UserAddrGroupB
 // Example:
 //
 //	var v []struct {
-//		UserID int `json:"user_id,omitempty"`
+//		OwnerID int `json:"owner_id,omitempty"`
 //	}
 //
-//	client.UserAddr.Query().
-//		Select(useraddr.FieldUserID).
+//	client.Org.Query().
+//		Select(org.FieldOwnerID).
 //		Scan(ctx, &v)
-func (_q *UserAddrQuery) Select(fields ...string) *UserAddrSelect {
+func (_q *OrgQuery) Select(fields ...string) *OrgSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
-	sbuild := &UserAddrSelect{UserAddrQuery: _q}
-	sbuild.label = useraddr.Label
+	sbuild := &OrgSelect{OrgQuery: _q}
+	sbuild.label = org.Label
 	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a UserAddrSelect configured with the given aggregations.
-func (_q *UserAddrQuery) Aggregate(fns ...AggregateFunc) *UserAddrSelect {
+// Aggregate returns a OrgSelect configured with the given aggregations.
+func (_q *OrgQuery) Aggregate(fns ...AggregateFunc) *OrgSelect {
 	return _q.Select().Aggregate(fns...)
 }
 
-func (_q *UserAddrQuery) prepareQuery(ctx context.Context) error {
+func (_q *OrgQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
@@ -359,7 +361,7 @@ func (_q *UserAddrQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range _q.ctx.Fields {
-		if !useraddr.ValidColumn(f) {
+		if !org.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -373,24 +375,24 @@ func (_q *UserAddrQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (_q *UserAddrQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*UserAddr, error) {
+func (_q *OrgQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Org, error) {
 	var (
-		nodes       = []*UserAddr{}
+		nodes       = []*Org{}
 		_spec       = _q.querySpec()
 		loadedTypes = [1]bool{
-			_q.withUser != nil,
+			_q.withMsgAlerts != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*UserAddr).scanValues(nil, columns)
+		return (*Org).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &UserAddr{config: _q.config}
+		node := &Org{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	_spec.Node.Schema = _q.schemaConfig.UserAddr
+	_spec.Node.Schema = _q.schemaConfig.Org
 	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
 	if len(_q.modifiers) > 0 {
 		_spec.Modifiers = _q.modifiers
@@ -404,9 +406,17 @@ func (_q *UserAddrQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Use
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := _q.withUser; query != nil {
-		if err := _q.loadUser(ctx, query, nodes, nil,
-			func(n *UserAddr, e *User) { n.Edges.User = e }); err != nil {
+	if query := _q.withMsgAlerts; query != nil {
+		if err := _q.loadMsgAlerts(ctx, query, nodes,
+			func(n *Org) { n.Edges.MsgAlerts = []*MsgAlert{} },
+			func(n *Org, e *MsgAlert) { n.Edges.MsgAlerts = append(n.Edges.MsgAlerts, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range _q.withNamedMsgAlerts {
+		if err := _q.loadMsgAlerts(ctx, query, nodes,
+			func(n *Org) { n.appendNamedMsgAlerts(name) },
+			func(n *Org, e *MsgAlert) { n.appendNamedMsgAlerts(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -418,39 +428,40 @@ func (_q *UserAddrQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Use
 	return nodes, nil
 }
 
-func (_q *UserAddrQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*UserAddr, init func(*UserAddr), assign func(*UserAddr, *User)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*UserAddr)
+func (_q *OrgQuery) loadMsgAlerts(ctx context.Context, query *MsgAlertQuery, nodes []*Org, init func(*Org), assign func(*Org, *MsgAlert)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Org)
 	for i := range nodes {
-		fk := nodes[i].UserID
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
 		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(ids) == 0 {
-		return nil
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(msgalert.FieldTenantID)
 	}
-	query.Where(user.IDIn(ids...))
+	query.Where(predicate.MsgAlert(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(org.MsgAlertsColumn), fks...))
+	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		fk := n.TenantID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "tenant_id" returned %v for node %v`, fk, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
+		assign(node, n)
 	}
 	return nil
 }
 
-func (_q *UserAddrQuery) sqlCount(ctx context.Context) (int, error) {
+func (_q *OrgQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
-	_spec.Node.Schema = _q.schemaConfig.UserAddr
+	_spec.Node.Schema = _q.schemaConfig.Org
 	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
 	if len(_q.modifiers) > 0 {
 		_spec.Modifiers = _q.modifiers
@@ -462,8 +473,8 @@ func (_q *UserAddrQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (_q *UserAddrQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(useraddr.Table, useraddr.Columns, sqlgraph.NewFieldSpec(useraddr.FieldID, field.TypeInt))
+func (_q *OrgQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(org.Table, org.Columns, sqlgraph.NewFieldSpec(org.FieldID, field.TypeInt))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -472,14 +483,11 @@ func (_q *UserAddrQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, useraddr.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, org.FieldID)
 		for i := range fields {
-			if fields[i] != useraddr.FieldID {
+			if fields[i] != org.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
-		}
-		if _q.withUser != nil {
-			_spec.Node.AddColumnOnce(useraddr.FieldUserID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {
@@ -505,12 +513,12 @@ func (_q *UserAddrQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (_q *UserAddrQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (_q *OrgQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(_q.driver.Dialect())
-	t1 := builder.Table(useraddr.Table)
+	t1 := builder.Table(org.Table)
 	columns := _q.ctx.Fields
 	if len(columns) == 0 {
-		columns = useraddr.Columns
+		columns = org.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if _q.sql != nil {
@@ -520,7 +528,7 @@ func (_q *UserAddrQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	t1.Schema(_q.schemaConfig.UserAddr)
+	t1.Schema(_q.schemaConfig.Org)
 	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
 	selector.WithContext(ctx)
 	for _, p := range _q.predicates {
@@ -540,28 +548,42 @@ func (_q *UserAddrQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// UserAddrGroupBy is the group-by builder for UserAddr entities.
-type UserAddrGroupBy struct {
+// WithNamedMsgAlerts tells the query-builder to eager-load the nodes that are connected to the "msg_alerts"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (_q *OrgQuery) WithNamedMsgAlerts(name string, opts ...func(*MsgAlertQuery)) *OrgQuery {
+	query := (&MsgAlertClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if _q.withNamedMsgAlerts == nil {
+		_q.withNamedMsgAlerts = make(map[string]*MsgAlertQuery)
+	}
+	_q.withNamedMsgAlerts[name] = query
+	return _q
+}
+
+// OrgGroupBy is the group-by builder for Org entities.
+type OrgGroupBy struct {
 	selector
-	build *UserAddrQuery
+	build *OrgQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (_g *UserAddrGroupBy) Aggregate(fns ...AggregateFunc) *UserAddrGroupBy {
+func (_g *OrgGroupBy) Aggregate(fns ...AggregateFunc) *OrgGroupBy {
 	_g.fns = append(_g.fns, fns...)
 	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_g *UserAddrGroupBy) Scan(ctx context.Context, v any) error {
+func (_g *OrgGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
 	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*UserAddrQuery, *UserAddrGroupBy](ctx, _g.build, _g, _g.build.inters, v)
+	return scanWithInterceptors[*OrgQuery, *OrgGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (_g *UserAddrGroupBy) sqlScan(ctx context.Context, root *UserAddrQuery, v any) error {
+func (_g *OrgGroupBy) sqlScan(ctx context.Context, root *OrgQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(_g.fns))
 	for _, fn := range _g.fns {
@@ -588,28 +610,28 @@ func (_g *UserAddrGroupBy) sqlScan(ctx context.Context, root *UserAddrQuery, v a
 	return sql.ScanSlice(rows, v)
 }
 
-// UserAddrSelect is the builder for selecting fields of UserAddr entities.
-type UserAddrSelect struct {
-	*UserAddrQuery
+// OrgSelect is the builder for selecting fields of Org entities.
+type OrgSelect struct {
+	*OrgQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (_s *UserAddrSelect) Aggregate(fns ...AggregateFunc) *UserAddrSelect {
+func (_s *OrgSelect) Aggregate(fns ...AggregateFunc) *OrgSelect {
 	_s.fns = append(_s.fns, fns...)
 	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_s *UserAddrSelect) Scan(ctx context.Context, v any) error {
+func (_s *OrgSelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
 	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*UserAddrQuery, *UserAddrSelect](ctx, _s.UserAddrQuery, _s, _s.inters, v)
+	return scanWithInterceptors[*OrgQuery, *OrgSelect](ctx, _s.OrgQuery, _s, _s.inters, v)
 }
 
-func (_s *UserAddrSelect) sqlScan(ctx context.Context, root *UserAddrQuery, v any) error {
+func (_s *OrgSelect) sqlScan(ctx context.Context, root *OrgQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(_s.fns))
 	for _, fn := range _s.fns {

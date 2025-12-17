@@ -104,7 +104,7 @@ func (*MsgEvent) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the MsgEvent fields.
-func (me *MsgEvent) assignValues(columns []string, values []any) error {
+func (_m *MsgEvent) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -115,60 +115,60 @@ func (me *MsgEvent) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			me.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case msgevent.FieldCreatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_by", values[i])
 			} else if value.Valid {
-				me.CreatedBy = int(value.Int64)
+				_m.CreatedBy = int(value.Int64)
 			}
 		case msgevent.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				me.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case msgevent.FieldUpdatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
 			} else if value.Valid {
-				me.UpdatedBy = int(value.Int64)
+				_m.UpdatedBy = int(value.Int64)
 			}
 		case msgevent.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				me.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case msgevent.FieldMsgTypeID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field msg_type_id", values[i])
 			} else if value.Valid {
-				me.MsgTypeID = int(value.Int64)
+				_m.MsgTypeID = int(value.Int64)
 			}
 		case msgevent.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				me.Name = value.String
+				_m.Name = value.String
 			}
 		case msgevent.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				me.Status = typex.SimpleStatus(value.String)
+				_m.Status = typex.SimpleStatus(value.String)
 			}
 		case msgevent.FieldComments:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field comments", values[i])
 			} else if value.Valid {
-				me.Comments = value.String
+				_m.Comments = value.String
 			}
 		case msgevent.FieldRoute:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field route", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &me.Route); err != nil {
+				if err := json.Unmarshal(*value, &_m.Route); err != nil {
 					return fmt.Errorf("unmarshal field route: %w", err)
 				}
 			}
@@ -176,10 +176,10 @@ func (me *MsgEvent) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field modes", values[i])
 			} else if value.Valid {
-				me.Modes = value.String
+				_m.Modes = value.String
 			}
 		default:
-			me.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -187,97 +187,97 @@ func (me *MsgEvent) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the MsgEvent.
 // This includes values selected through modifiers, order, etc.
-func (me *MsgEvent) Value(name string) (ent.Value, error) {
-	return me.selectValues.Get(name)
+func (_m *MsgEvent) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryMsgType queries the "msg_type" edge of the MsgEvent entity.
-func (me *MsgEvent) QueryMsgType() *MsgTypeQuery {
-	return NewMsgEventClient(me.config).QueryMsgType(me)
+func (_m *MsgEvent) QueryMsgType() *MsgTypeQuery {
+	return NewMsgEventClient(_m.config).QueryMsgType(_m)
 }
 
 // QueryCustomerTemplate queries the "customer_template" edge of the MsgEvent entity.
-func (me *MsgEvent) QueryCustomerTemplate() *MsgTemplateQuery {
-	return NewMsgEventClient(me.config).QueryCustomerTemplate(me)
+func (_m *MsgEvent) QueryCustomerTemplate() *MsgTemplateQuery {
+	return NewMsgEventClient(_m.config).QueryCustomerTemplate(_m)
 }
 
 // Update returns a builder for updating this MsgEvent.
 // Note that you need to call MsgEvent.Unwrap() before calling this method if this MsgEvent
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (me *MsgEvent) Update() *MsgEventUpdateOne {
-	return NewMsgEventClient(me.config).UpdateOne(me)
+func (_m *MsgEvent) Update() *MsgEventUpdateOne {
+	return NewMsgEventClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the MsgEvent entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (me *MsgEvent) Unwrap() *MsgEvent {
-	_tx, ok := me.config.driver.(*txDriver)
+func (_m *MsgEvent) Unwrap() *MsgEvent {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: MsgEvent is not a transactional entity")
 	}
-	me.config.driver = _tx.drv
-	return me
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (me *MsgEvent) String() string {
+func (_m *MsgEvent) String() string {
 	var builder strings.Builder
 	builder.WriteString("MsgEvent(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", me.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", me.CreatedBy))
+	builder.WriteString(fmt.Sprintf("%v", _m.CreatedBy))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(me.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", me.UpdatedBy))
+	builder.WriteString(fmt.Sprintf("%v", _m.UpdatedBy))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(me.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("msg_type_id=")
-	builder.WriteString(fmt.Sprintf("%v", me.MsgTypeID))
+	builder.WriteString(fmt.Sprintf("%v", _m.MsgTypeID))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(me.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", me.Status))
+	builder.WriteString(fmt.Sprintf("%v", _m.Status))
 	builder.WriteString(", ")
 	builder.WriteString("comments=")
-	builder.WriteString(me.Comments)
+	builder.WriteString(_m.Comments)
 	builder.WriteString(", ")
 	builder.WriteString("route=")
-	builder.WriteString(fmt.Sprintf("%v", me.Route))
+	builder.WriteString(fmt.Sprintf("%v", _m.Route))
 	builder.WriteString(", ")
 	builder.WriteString("modes=")
-	builder.WriteString(me.Modes)
+	builder.WriteString(_m.Modes)
 	builder.WriteByte(')')
 	return builder.String()
 }
 
 // NamedCustomerTemplate returns the CustomerTemplate named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (me *MsgEvent) NamedCustomerTemplate(name string) ([]*MsgTemplate, error) {
-	if me.Edges.namedCustomerTemplate == nil {
+func (_m *MsgEvent) NamedCustomerTemplate(name string) ([]*MsgTemplate, error) {
+	if _m.Edges.namedCustomerTemplate == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := me.Edges.namedCustomerTemplate[name]
+	nodes, ok := _m.Edges.namedCustomerTemplate[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (me *MsgEvent) appendNamedCustomerTemplate(name string, edges ...*MsgTemplate) {
-	if me.Edges.namedCustomerTemplate == nil {
-		me.Edges.namedCustomerTemplate = make(map[string][]*MsgTemplate)
+func (_m *MsgEvent) appendNamedCustomerTemplate(name string, edges ...*MsgTemplate) {
+	if _m.Edges.namedCustomerTemplate == nil {
+		_m.Edges.namedCustomerTemplate = make(map[string][]*MsgTemplate)
 	}
 	if len(edges) == 0 {
-		me.Edges.namedCustomerTemplate[name] = []*MsgTemplate{}
+		_m.Edges.namedCustomerTemplate[name] = []*MsgTemplate{}
 	} else {
-		me.Edges.namedCustomerTemplate[name] = append(me.Edges.namedCustomerTemplate[name], edges...)
+		_m.Edges.namedCustomerTemplate[name] = append(_m.Edges.namedCustomerTemplate[name], edges...)
 	}
 }
 

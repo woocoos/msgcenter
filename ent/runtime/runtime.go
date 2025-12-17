@@ -16,6 +16,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
+	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
@@ -220,6 +221,8 @@ func init() {
 	nlogalertDescCreatedAt := nlogalertFields[2].Descriptor()
 	// nlogalert.DefaultCreatedAt holds the default value on creation for the created_at field.
 	nlogalert.DefaultCreatedAt = nlogalertDescCreatedAt.Default.(func() time.Time)
+	orgHooks := schema.Org{}.Hooks()
+	org.Hooks[0] = orgHooks[0]
 	orgroleuserHooks := schema.OrgRoleUser{}.Hooks()
 	orgroleuser.Hooks[0] = orgroleuserHooks[0]
 	silenceMixin := schema.Silence{}.Mixin()
@@ -282,6 +285,6 @@ func init() {
 }
 
 const (
-	Version = "v0.14.2"                                         // Version of ent codegen.
-	Sum     = "h1:ywld/j2Rx4EmnIKs8eZ29cbFA1zpB+DA9TLL5l3rlq0=" // Sum of ent codegen.
+	Version = "v0.14.5"                                         // Version of ent codegen.
+	Sum     = "h1:Rj2WOYJtCkWyFo6a+5wB3EfBRP0rnx1fMk6gGA0UUe4=" // Sum of ent codegen.
 )

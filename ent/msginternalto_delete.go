@@ -22,58 +22,58 @@ type MsgInternalToDelete struct {
 }
 
 // Where appends a list predicates to the MsgInternalToDelete builder.
-func (mitd *MsgInternalToDelete) Where(ps ...predicate.MsgInternalTo) *MsgInternalToDelete {
-	mitd.mutation.Where(ps...)
-	return mitd
+func (_d *MsgInternalToDelete) Where(ps ...predicate.MsgInternalTo) *MsgInternalToDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (mitd *MsgInternalToDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, mitd.sqlExec, mitd.mutation, mitd.hooks)
+func (_d *MsgInternalToDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mitd *MsgInternalToDelete) ExecX(ctx context.Context) int {
-	n, err := mitd.Exec(ctx)
+func (_d *MsgInternalToDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (mitd *MsgInternalToDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *MsgInternalToDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(msginternalto.Table, sqlgraph.NewFieldSpec(msginternalto.FieldID, field.TypeInt))
-	_spec.Node.Schema = mitd.schemaConfig.MsgInternalTo
-	ctx = internal.NewSchemaConfigContext(ctx, mitd.schemaConfig)
-	if ps := mitd.mutation.predicates; len(ps) > 0 {
+	_spec.Node.Schema = _d.schemaConfig.MsgInternalTo
+	ctx = internal.NewSchemaConfigContext(ctx, _d.schemaConfig)
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, mitd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	mitd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // MsgInternalToDeleteOne is the builder for deleting a single MsgInternalTo entity.
 type MsgInternalToDeleteOne struct {
-	mitd *MsgInternalToDelete
+	_d *MsgInternalToDelete
 }
 
 // Where appends a list predicates to the MsgInternalToDelete builder.
-func (mitdo *MsgInternalToDeleteOne) Where(ps ...predicate.MsgInternalTo) *MsgInternalToDeleteOne {
-	mitdo.mitd.mutation.Where(ps...)
-	return mitdo
+func (_d *MsgInternalToDeleteOne) Where(ps ...predicate.MsgInternalTo) *MsgInternalToDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (mitdo *MsgInternalToDeleteOne) Exec(ctx context.Context) error {
-	n, err := mitdo.mitd.Exec(ctx)
+func (_d *MsgInternalToDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -85,8 +85,8 @@ func (mitdo *MsgInternalToDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mitdo *MsgInternalToDeleteOne) ExecX(ctx context.Context) {
-	if err := mitdo.Exec(ctx); err != nil {
+func (_d *MsgInternalToDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

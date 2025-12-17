@@ -36,44 +36,44 @@ type MsgSubscriberQuery struct {
 }
 
 // Where adds a new predicate for the MsgSubscriberQuery builder.
-func (msq *MsgSubscriberQuery) Where(ps ...predicate.MsgSubscriber) *MsgSubscriberQuery {
-	msq.predicates = append(msq.predicates, ps...)
-	return msq
+func (_q *MsgSubscriberQuery) Where(ps ...predicate.MsgSubscriber) *MsgSubscriberQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (msq *MsgSubscriberQuery) Limit(limit int) *MsgSubscriberQuery {
-	msq.ctx.Limit = &limit
-	return msq
+func (_q *MsgSubscriberQuery) Limit(limit int) *MsgSubscriberQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (msq *MsgSubscriberQuery) Offset(offset int) *MsgSubscriberQuery {
-	msq.ctx.Offset = &offset
-	return msq
+func (_q *MsgSubscriberQuery) Offset(offset int) *MsgSubscriberQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (msq *MsgSubscriberQuery) Unique(unique bool) *MsgSubscriberQuery {
-	msq.ctx.Unique = &unique
-	return msq
+func (_q *MsgSubscriberQuery) Unique(unique bool) *MsgSubscriberQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (msq *MsgSubscriberQuery) Order(o ...msgsubscriber.OrderOption) *MsgSubscriberQuery {
-	msq.order = append(msq.order, o...)
-	return msq
+func (_q *MsgSubscriberQuery) Order(o ...msgsubscriber.OrderOption) *MsgSubscriberQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryMsgType chains the current query on the "msg_type" edge.
-func (msq *MsgSubscriberQuery) QueryMsgType() *MsgTypeQuery {
-	query := (&MsgTypeClient{config: msq.config}).Query()
+func (_q *MsgSubscriberQuery) QueryMsgType() *MsgTypeQuery {
+	query := (&MsgTypeClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := msq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := msq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -82,23 +82,23 @@ func (msq *MsgSubscriberQuery) QueryMsgType() *MsgTypeQuery {
 			sqlgraph.To(msgtype.Table, msgtype.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, msgsubscriber.MsgTypeTable, msgsubscriber.MsgTypeColumn),
 		)
-		schemaConfig := msq.schemaConfig
+		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.MsgType
 		step.Edge.Schema = schemaConfig.MsgSubscriber
-		fromU = sqlgraph.SetNeighbors(msq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryUser chains the current query on the "user" edge.
-func (msq *MsgSubscriberQuery) QueryUser() *UserQuery {
-	query := (&UserClient{config: msq.config}).Query()
+func (_q *MsgSubscriberQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := msq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := msq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -107,10 +107,10 @@ func (msq *MsgSubscriberQuery) QueryUser() *UserQuery {
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, msgsubscriber.UserTable, msgsubscriber.UserColumn),
 		)
-		schemaConfig := msq.schemaConfig
+		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.User
 		step.Edge.Schema = schemaConfig.MsgSubscriber
-		fromU = sqlgraph.SetNeighbors(msq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -118,8 +118,8 @@ func (msq *MsgSubscriberQuery) QueryUser() *UserQuery {
 
 // First returns the first MsgSubscriber entity from the query.
 // Returns a *NotFoundError when no MsgSubscriber was found.
-func (msq *MsgSubscriberQuery) First(ctx context.Context) (*MsgSubscriber, error) {
-	nodes, err := msq.Limit(1).All(setContextOp(ctx, msq.ctx, ent.OpQueryFirst))
+func (_q *MsgSubscriberQuery) First(ctx context.Context) (*MsgSubscriber, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +130,8 @@ func (msq *MsgSubscriberQuery) First(ctx context.Context) (*MsgSubscriber, error
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (msq *MsgSubscriberQuery) FirstX(ctx context.Context) *MsgSubscriber {
-	node, err := msq.First(ctx)
+func (_q *MsgSubscriberQuery) FirstX(ctx context.Context) *MsgSubscriber {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -140,9 +140,9 @@ func (msq *MsgSubscriberQuery) FirstX(ctx context.Context) *MsgSubscriber {
 
 // FirstID returns the first MsgSubscriber ID from the query.
 // Returns a *NotFoundError when no MsgSubscriber ID was found.
-func (msq *MsgSubscriberQuery) FirstID(ctx context.Context) (id int, err error) {
+func (_q *MsgSubscriberQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = msq.Limit(1).IDs(setContextOp(ctx, msq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -153,8 +153,8 @@ func (msq *MsgSubscriberQuery) FirstID(ctx context.Context) (id int, err error) 
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (msq *MsgSubscriberQuery) FirstIDX(ctx context.Context) int {
-	id, err := msq.FirstID(ctx)
+func (_q *MsgSubscriberQuery) FirstIDX(ctx context.Context) int {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -164,8 +164,8 @@ func (msq *MsgSubscriberQuery) FirstIDX(ctx context.Context) int {
 // Only returns a single MsgSubscriber entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one MsgSubscriber entity is found.
 // Returns a *NotFoundError when no MsgSubscriber entities are found.
-func (msq *MsgSubscriberQuery) Only(ctx context.Context) (*MsgSubscriber, error) {
-	nodes, err := msq.Limit(2).All(setContextOp(ctx, msq.ctx, ent.OpQueryOnly))
+func (_q *MsgSubscriberQuery) Only(ctx context.Context) (*MsgSubscriber, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -180,8 +180,8 @@ func (msq *MsgSubscriberQuery) Only(ctx context.Context) (*MsgSubscriber, error)
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (msq *MsgSubscriberQuery) OnlyX(ctx context.Context) *MsgSubscriber {
-	node, err := msq.Only(ctx)
+func (_q *MsgSubscriberQuery) OnlyX(ctx context.Context) *MsgSubscriber {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -191,9 +191,9 @@ func (msq *MsgSubscriberQuery) OnlyX(ctx context.Context) *MsgSubscriber {
 // OnlyID is like Only, but returns the only MsgSubscriber ID in the query.
 // Returns a *NotSingularError when more than one MsgSubscriber ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (msq *MsgSubscriberQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *MsgSubscriberQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = msq.Limit(2).IDs(setContextOp(ctx, msq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -208,8 +208,8 @@ func (msq *MsgSubscriberQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (msq *MsgSubscriberQuery) OnlyIDX(ctx context.Context) int {
-	id, err := msq.OnlyID(ctx)
+func (_q *MsgSubscriberQuery) OnlyIDX(ctx context.Context) int {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -217,18 +217,18 @@ func (msq *MsgSubscriberQuery) OnlyIDX(ctx context.Context) int {
 }
 
 // All executes the query and returns a list of MsgSubscribers.
-func (msq *MsgSubscriberQuery) All(ctx context.Context) ([]*MsgSubscriber, error) {
-	ctx = setContextOp(ctx, msq.ctx, ent.OpQueryAll)
-	if err := msq.prepareQuery(ctx); err != nil {
+func (_q *MsgSubscriberQuery) All(ctx context.Context) ([]*MsgSubscriber, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*MsgSubscriber, *MsgSubscriberQuery]()
-	return withInterceptors[[]*MsgSubscriber](ctx, msq, qr, msq.inters)
+	return withInterceptors[[]*MsgSubscriber](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (msq *MsgSubscriberQuery) AllX(ctx context.Context) []*MsgSubscriber {
-	nodes, err := msq.All(ctx)
+func (_q *MsgSubscriberQuery) AllX(ctx context.Context) []*MsgSubscriber {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -236,20 +236,20 @@ func (msq *MsgSubscriberQuery) AllX(ctx context.Context) []*MsgSubscriber {
 }
 
 // IDs executes the query and returns a list of MsgSubscriber IDs.
-func (msq *MsgSubscriberQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if msq.ctx.Unique == nil && msq.path != nil {
-		msq.Unique(true)
+func (_q *MsgSubscriberQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, msq.ctx, ent.OpQueryIDs)
-	if err = msq.Select(msgsubscriber.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(msgsubscriber.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (msq *MsgSubscriberQuery) IDsX(ctx context.Context) []int {
-	ids, err := msq.IDs(ctx)
+func (_q *MsgSubscriberQuery) IDsX(ctx context.Context) []int {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -257,17 +257,17 @@ func (msq *MsgSubscriberQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (msq *MsgSubscriberQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, msq.ctx, ent.OpQueryCount)
-	if err := msq.prepareQuery(ctx); err != nil {
+func (_q *MsgSubscriberQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, msq, querierCount[*MsgSubscriberQuery](), msq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*MsgSubscriberQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (msq *MsgSubscriberQuery) CountX(ctx context.Context) int {
-	count, err := msq.Count(ctx)
+func (_q *MsgSubscriberQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -275,9 +275,9 @@ func (msq *MsgSubscriberQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (msq *MsgSubscriberQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, msq.ctx, ent.OpQueryExist)
-	switch _, err := msq.FirstID(ctx); {
+func (_q *MsgSubscriberQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -288,8 +288,8 @@ func (msq *MsgSubscriberQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (msq *MsgSubscriberQuery) ExistX(ctx context.Context) bool {
-	exist, err := msq.Exist(ctx)
+func (_q *MsgSubscriberQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -298,44 +298,44 @@ func (msq *MsgSubscriberQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the MsgSubscriberQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (msq *MsgSubscriberQuery) Clone() *MsgSubscriberQuery {
-	if msq == nil {
+func (_q *MsgSubscriberQuery) Clone() *MsgSubscriberQuery {
+	if _q == nil {
 		return nil
 	}
 	return &MsgSubscriberQuery{
-		config:      msq.config,
-		ctx:         msq.ctx.Clone(),
-		order:       append([]msgsubscriber.OrderOption{}, msq.order...),
-		inters:      append([]Interceptor{}, msq.inters...),
-		predicates:  append([]predicate.MsgSubscriber{}, msq.predicates...),
-		withMsgType: msq.withMsgType.Clone(),
-		withUser:    msq.withUser.Clone(),
+		config:      _q.config,
+		ctx:         _q.ctx.Clone(),
+		order:       append([]msgsubscriber.OrderOption{}, _q.order...),
+		inters:      append([]Interceptor{}, _q.inters...),
+		predicates:  append([]predicate.MsgSubscriber{}, _q.predicates...),
+		withMsgType: _q.withMsgType.Clone(),
+		withUser:    _q.withUser.Clone(),
 		// clone intermediate query.
-		sql:  msq.sql.Clone(),
-		path: msq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
 // WithMsgType tells the query-builder to eager-load the nodes that are connected to
 // the "msg_type" edge. The optional arguments are used to configure the query builder of the edge.
-func (msq *MsgSubscriberQuery) WithMsgType(opts ...func(*MsgTypeQuery)) *MsgSubscriberQuery {
-	query := (&MsgTypeClient{config: msq.config}).Query()
+func (_q *MsgSubscriberQuery) WithMsgType(opts ...func(*MsgTypeQuery)) *MsgSubscriberQuery {
+	query := (&MsgTypeClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	msq.withMsgType = query
-	return msq
+	_q.withMsgType = query
+	return _q
 }
 
 // WithUser tells the query-builder to eager-load the nodes that are connected to
 // the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (msq *MsgSubscriberQuery) WithUser(opts ...func(*UserQuery)) *MsgSubscriberQuery {
-	query := (&UserClient{config: msq.config}).Query()
+func (_q *MsgSubscriberQuery) WithUser(opts ...func(*UserQuery)) *MsgSubscriberQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	msq.withUser = query
-	return msq
+	_q.withUser = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -352,10 +352,10 @@ func (msq *MsgSubscriberQuery) WithUser(opts ...func(*UserQuery)) *MsgSubscriber
 //		GroupBy(msgsubscriber.FieldCreatedBy).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (msq *MsgSubscriberQuery) GroupBy(field string, fields ...string) *MsgSubscriberGroupBy {
-	msq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &MsgSubscriberGroupBy{build: msq}
-	grbuild.flds = &msq.ctx.Fields
+func (_q *MsgSubscriberQuery) GroupBy(field string, fields ...string) *MsgSubscriberGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &MsgSubscriberGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = msgsubscriber.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -373,98 +373,98 @@ func (msq *MsgSubscriberQuery) GroupBy(field string, fields ...string) *MsgSubsc
 //	client.MsgSubscriber.Query().
 //		Select(msgsubscriber.FieldCreatedBy).
 //		Scan(ctx, &v)
-func (msq *MsgSubscriberQuery) Select(fields ...string) *MsgSubscriberSelect {
-	msq.ctx.Fields = append(msq.ctx.Fields, fields...)
-	sbuild := &MsgSubscriberSelect{MsgSubscriberQuery: msq}
+func (_q *MsgSubscriberQuery) Select(fields ...string) *MsgSubscriberSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &MsgSubscriberSelect{MsgSubscriberQuery: _q}
 	sbuild.label = msgsubscriber.Label
-	sbuild.flds, sbuild.scan = &msq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a MsgSubscriberSelect configured with the given aggregations.
-func (msq *MsgSubscriberQuery) Aggregate(fns ...AggregateFunc) *MsgSubscriberSelect {
-	return msq.Select().Aggregate(fns...)
+func (_q *MsgSubscriberQuery) Aggregate(fns ...AggregateFunc) *MsgSubscriberSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (msq *MsgSubscriberQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range msq.inters {
+func (_q *MsgSubscriberQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, msq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range msq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !msgsubscriber.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if msq.path != nil {
-		prev, err := msq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		msq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (msq *MsgSubscriberQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*MsgSubscriber, error) {
+func (_q *MsgSubscriberQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*MsgSubscriber, error) {
 	var (
 		nodes       = []*MsgSubscriber{}
-		_spec       = msq.querySpec()
+		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
-			msq.withMsgType != nil,
-			msq.withUser != nil,
+			_q.withMsgType != nil,
+			_q.withUser != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*MsgSubscriber).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &MsgSubscriber{config: msq.config}
+		node := &MsgSubscriber{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	_spec.Node.Schema = msq.schemaConfig.MsgSubscriber
-	ctx = internal.NewSchemaConfigContext(ctx, msq.schemaConfig)
-	if len(msq.modifiers) > 0 {
-		_spec.Modifiers = msq.modifiers
+	_spec.Node.Schema = _q.schemaConfig.MsgSubscriber
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, msq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := msq.withMsgType; query != nil {
-		if err := msq.loadMsgType(ctx, query, nodes, nil,
+	if query := _q.withMsgType; query != nil {
+		if err := _q.loadMsgType(ctx, query, nodes, nil,
 			func(n *MsgSubscriber, e *MsgType) { n.Edges.MsgType = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := msq.withUser; query != nil {
-		if err := msq.loadUser(ctx, query, nodes, nil,
+	if query := _q.withUser; query != nil {
+		if err := _q.loadUser(ctx, query, nodes, nil,
 			func(n *MsgSubscriber, e *User) { n.Edges.User = e }); err != nil {
 			return nil, err
 		}
 	}
-	for i := range msq.loadTotal {
-		if err := msq.loadTotal[i](ctx, nodes); err != nil {
+	for i := range _q.loadTotal {
+		if err := _q.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (msq *MsgSubscriberQuery) loadMsgType(ctx context.Context, query *MsgTypeQuery, nodes []*MsgSubscriber, init func(*MsgSubscriber), assign func(*MsgSubscriber, *MsgType)) error {
+func (_q *MsgSubscriberQuery) loadMsgType(ctx context.Context, query *MsgTypeQuery, nodes []*MsgSubscriber, init func(*MsgSubscriber), assign func(*MsgSubscriber, *MsgType)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*MsgSubscriber)
 	for i := range nodes {
@@ -493,7 +493,7 @@ func (msq *MsgSubscriberQuery) loadMsgType(ctx context.Context, query *MsgTypeQu
 	}
 	return nil
 }
-func (msq *MsgSubscriberQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*MsgSubscriber, init func(*MsgSubscriber), assign func(*MsgSubscriber, *User)) error {
+func (_q *MsgSubscriberQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*MsgSubscriber, init func(*MsgSubscriber), assign func(*MsgSubscriber, *User)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*MsgSubscriber)
 	for i := range nodes {
@@ -523,29 +523,29 @@ func (msq *MsgSubscriberQuery) loadUser(ctx context.Context, query *UserQuery, n
 	return nil
 }
 
-func (msq *MsgSubscriberQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := msq.querySpec()
-	_spec.Node.Schema = msq.schemaConfig.MsgSubscriber
-	ctx = internal.NewSchemaConfigContext(ctx, msq.schemaConfig)
-	if len(msq.modifiers) > 0 {
-		_spec.Modifiers = msq.modifiers
+func (_q *MsgSubscriberQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	_spec.Node.Schema = _q.schemaConfig.MsgSubscriber
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = msq.ctx.Fields
-	if len(msq.ctx.Fields) > 0 {
-		_spec.Unique = msq.ctx.Unique != nil && *msq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, msq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (msq *MsgSubscriberQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *MsgSubscriberQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(msgsubscriber.Table, msgsubscriber.Columns, sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt))
-	_spec.From = msq.sql
-	if unique := msq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if msq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := msq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, msgsubscriber.FieldID)
 		for i := range fields {
@@ -553,27 +553,27 @@ func (msq *MsgSubscriberQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if msq.withMsgType != nil {
+		if _q.withMsgType != nil {
 			_spec.Node.AddColumnOnce(msgsubscriber.FieldMsgTypeID)
 		}
-		if msq.withUser != nil {
+		if _q.withUser != nil {
 			_spec.Node.AddColumnOnce(msgsubscriber.FieldUserID)
 		}
 	}
-	if ps := msq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := msq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := msq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := msq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -583,36 +583,36 @@ func (msq *MsgSubscriberQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (msq *MsgSubscriberQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(msq.driver.Dialect())
+func (_q *MsgSubscriberQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(msgsubscriber.Table)
-	columns := msq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = msgsubscriber.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if msq.sql != nil {
-		selector = msq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if msq.ctx.Unique != nil && *msq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	t1.Schema(msq.schemaConfig.MsgSubscriber)
-	ctx = internal.NewSchemaConfigContext(ctx, msq.schemaConfig)
+	t1.Schema(_q.schemaConfig.MsgSubscriber)
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
 	selector.WithContext(ctx)
-	for _, p := range msq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range msq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := msq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := msq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -625,41 +625,41 @@ type MsgSubscriberGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (msgb *MsgSubscriberGroupBy) Aggregate(fns ...AggregateFunc) *MsgSubscriberGroupBy {
-	msgb.fns = append(msgb.fns, fns...)
-	return msgb
+func (_g *MsgSubscriberGroupBy) Aggregate(fns ...AggregateFunc) *MsgSubscriberGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (msgb *MsgSubscriberGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, msgb.build.ctx, ent.OpQueryGroupBy)
-	if err := msgb.build.prepareQuery(ctx); err != nil {
+func (_g *MsgSubscriberGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*MsgSubscriberQuery, *MsgSubscriberGroupBy](ctx, msgb.build, msgb, msgb.build.inters, v)
+	return scanWithInterceptors[*MsgSubscriberQuery, *MsgSubscriberGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (msgb *MsgSubscriberGroupBy) sqlScan(ctx context.Context, root *MsgSubscriberQuery, v any) error {
+func (_g *MsgSubscriberGroupBy) sqlScan(ctx context.Context, root *MsgSubscriberQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(msgb.fns))
-	for _, fn := range msgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*msgb.flds)+len(msgb.fns))
-		for _, f := range *msgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*msgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := msgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -673,27 +673,27 @@ type MsgSubscriberSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (mss *MsgSubscriberSelect) Aggregate(fns ...AggregateFunc) *MsgSubscriberSelect {
-	mss.fns = append(mss.fns, fns...)
-	return mss
+func (_s *MsgSubscriberSelect) Aggregate(fns ...AggregateFunc) *MsgSubscriberSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (mss *MsgSubscriberSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mss.ctx, ent.OpQuerySelect)
-	if err := mss.prepareQuery(ctx); err != nil {
+func (_s *MsgSubscriberSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*MsgSubscriberQuery, *MsgSubscriberSelect](ctx, mss.MsgSubscriberQuery, mss, mss.inters, v)
+	return scanWithInterceptors[*MsgSubscriberQuery, *MsgSubscriberSelect](ctx, _s.MsgSubscriberQuery, _s, _s.inters, v)
 }
 
-func (mss *MsgSubscriberSelect) sqlScan(ctx context.Context, root *MsgSubscriberQuery, v any) error {
+func (_s *MsgSubscriberSelect) sqlScan(ctx context.Context, root *MsgSubscriberQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(mss.fns))
-	for _, fn := range mss.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*mss.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -701,7 +701,7 @@ func (mss *MsgSubscriberSelect) sqlScan(ctx context.Context, root *MsgSubscriber
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := mss.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

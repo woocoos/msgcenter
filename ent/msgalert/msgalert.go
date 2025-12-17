@@ -44,6 +44,8 @@ const (
 	FieldDeleted = "deleted"
 	// EdgeNlog holds the string denoting the nlog edge name in mutations.
 	EdgeNlog = "nlog"
+	// EdgeOrg holds the string denoting the org edge name in mutations.
+	EdgeOrg = "org"
 	// EdgeNlogAlerts holds the string denoting the nlog_alerts edge name in mutations.
 	EdgeNlogAlerts = "nlog_alerts"
 	// Table holds the table name of the msgalert in the database.
@@ -53,6 +55,13 @@ const (
 	// NlogInverseTable is the table name for the Nlog entity.
 	// It exists in this package in order to avoid circular dependency with the "nlog" package.
 	NlogInverseTable = "msg_nlog"
+	// OrgTable is the table that holds the org relation/edge.
+	OrgTable = "msg_alert"
+	// OrgInverseTable is the table name for the Org entity.
+	// It exists in this package in order to avoid circular dependency with the "org" package.
+	OrgInverseTable = "org"
+	// OrgColumn is the table column denoting the org relation/edge.
+	OrgColumn = "tenant_id"
 	// NlogAlertsTable is the table that holds the nlog_alerts relation/edge.
 	NlogAlertsTable = "msg_nlog_alert"
 	// NlogAlertsInverseTable is the table name for the NlogAlert entity.
@@ -195,6 +204,13 @@ func ByNlog(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByOrgField orders the results by org field.
+func ByOrgField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOrgStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByNlogAlertsCount orders the results by nlog_alerts count.
 func ByNlogAlertsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -213,6 +229,13 @@ func newNlogStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(NlogInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, NlogTable, NlogPrimaryKey...),
+	)
+}
+func newOrgStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OrgInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, OrgTable, OrgColumn),
 	)
 }
 func newNlogAlertsStep() *sqlgraph.Step {

@@ -12,7 +12,6 @@ var (
 	// MsgAlertColumns holds the columns for the "msg_alert" table.
 	MsgAlertColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "labels", Type: field.TypeJSON, Nullable: true},
 		{Name: "annotations", Type: field.TypeJSON, Nullable: true},
 		{Name: "starts_at", Type: field.TypeTime},
@@ -24,17 +23,26 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "deleted", Type: field.TypeBool, Default: false},
+		{Name: "tenant_id", Type: field.TypeInt},
 	}
 	// MsgAlertTable holds the schema information for the "msg_alert" table.
 	MsgAlertTable = &schema.Table{
 		Name:       "msg_alert",
 		Columns:    MsgAlertColumns,
 		PrimaryKey: []*schema.Column{MsgAlertColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "msg_alert_org_msg_alerts",
+				Columns:    []*schema.Column{MsgAlertColumns[12]},
+				RefColumns: []*schema.Column{OrgColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 		Indexes: []*schema.Index{
 			{
 				Name:    "msgalert_fingerprint",
 				Unique:  false,
-				Columns: []*schema.Column{MsgAlertColumns[8]},
+				Columns: []*schema.Column{MsgAlertColumns[7]},
 			},
 		},
 	}
@@ -281,6 +289,20 @@ var (
 			},
 		},
 	}
+	// OrgColumns holds the columns for the "org" table.
+	OrgColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "owner_id", Type: field.TypeInt, Nullable: true},
+		{Name: "kind", Type: field.TypeString, Nullable: true},
+		{Name: "parent_id", Type: field.TypeInt, Nullable: true},
+		{Name: "path", Type: field.TypeString, Nullable: true, Size: 2147483647},
+	}
+	// OrgTable holds the schema information for the "org" table.
+	OrgTable = &schema.Table{
+		Name:       "org",
+		Columns:    OrgColumns,
+		PrimaryKey: []*schema.Column{OrgColumns[0]},
+	}
 	// OrgRoleUserColumns holds the columns for the "org_role_user" table.
 	OrgRoleUserColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -376,6 +398,7 @@ var (
 		MsgTypeTable,
 		MsgNlogTable,
 		MsgNlogAlertTable,
+		OrgTable,
 		OrgRoleUserTable,
 		MsgSilenceTable,
 		UserTable,
@@ -384,6 +407,7 @@ var (
 )
 
 func init() {
+	MsgAlertTable.ForeignKeys[0].RefTable = OrgTable
 	MsgAlertTable.Annotation = &entsql.Annotation{
 		Table: "msg_alert",
 	}
@@ -421,6 +445,9 @@ func init() {
 	MsgNlogAlertTable.ForeignKeys[1].RefTable = MsgAlertTable
 	MsgNlogAlertTable.Annotation = &entsql.Annotation{
 		Table: "msg_nlog_alert",
+	}
+	OrgTable.Annotation = &entsql.Annotation{
+		Table: "org",
 	}
 	OrgRoleUserTable.Annotation = &entsql.Annotation{
 		Table: "org_role_user",

@@ -10,15 +10,18 @@ import (
 	"fmt"
 
 	"entgo.io/contrib/entgql"
+	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/label"
@@ -148,9 +151,19 @@ func (r *queryResolver) Silences(ctx context.Context, after *entgql.Cursor[int],
 
 // MsgAlerts is the resolver for the msgAlerts field.
 func (r *queryResolver) MsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) (*ent.MsgAlertConnection, error) {
-	return r.client.MsgAlert.Query().Paginate(ctx, after, first, before, last,
-		ent.WithMsgAlertOrder(orderBy),
-		ent.WithMsgAlertFilter(where.Filter))
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	o, err := r.client.Org.Get(ctx, tid)
+	if err != nil {
+		return nil, err
+	}
+	// 查询所有子组织
+	return r.client.MsgAlert.Query().Where(msgalert.HasOrgWith(org.Or(org.PathContains(o.Path), org.Path(o.Path)))).
+		Paginate(schemax.SkipTenantPrivacy(ctx), after, first, before, last,
+			ent.WithMsgAlertOrder(orderBy),
+			ent.WithMsgAlertFilter(where.Filter))
 }
 
 // FormatMsgAlerts is the resolver for the formatMsgAlerts field.

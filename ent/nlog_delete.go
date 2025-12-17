@@ -22,58 +22,58 @@ type NlogDelete struct {
 }
 
 // Where appends a list predicates to the NlogDelete builder.
-func (nd *NlogDelete) Where(ps ...predicate.Nlog) *NlogDelete {
-	nd.mutation.Where(ps...)
-	return nd
+func (_d *NlogDelete) Where(ps ...predicate.Nlog) *NlogDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (nd *NlogDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, nd.sqlExec, nd.mutation, nd.hooks)
+func (_d *NlogDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (nd *NlogDelete) ExecX(ctx context.Context) int {
-	n, err := nd.Exec(ctx)
+func (_d *NlogDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (nd *NlogDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *NlogDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(nlog.Table, sqlgraph.NewFieldSpec(nlog.FieldID, field.TypeInt))
-	_spec.Node.Schema = nd.schemaConfig.Nlog
-	ctx = internal.NewSchemaConfigContext(ctx, nd.schemaConfig)
-	if ps := nd.mutation.predicates; len(ps) > 0 {
+	_spec.Node.Schema = _d.schemaConfig.Nlog
+	ctx = internal.NewSchemaConfigContext(ctx, _d.schemaConfig)
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, nd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	nd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // NlogDeleteOne is the builder for deleting a single Nlog entity.
 type NlogDeleteOne struct {
-	nd *NlogDelete
+	_d *NlogDelete
 }
 
 // Where appends a list predicates to the NlogDelete builder.
-func (ndo *NlogDeleteOne) Where(ps ...predicate.Nlog) *NlogDeleteOne {
-	ndo.nd.mutation.Where(ps...)
-	return ndo
+func (_d *NlogDeleteOne) Where(ps ...predicate.Nlog) *NlogDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (ndo *NlogDeleteOne) Exec(ctx context.Context) error {
-	n, err := ndo.nd.Exec(ctx)
+func (_d *NlogDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -85,8 +85,8 @@ func (ndo *NlogDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ndo *NlogDeleteOne) ExecX(ctx context.Context) {
-	if err := ndo.Exec(ctx); err != nil {
+func (_d *NlogDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

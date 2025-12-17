@@ -25,64 +25,64 @@ type MsgInternalToUpdate struct {
 }
 
 // Where appends a list predicates to the MsgInternalToUpdate builder.
-func (mitu *MsgInternalToUpdate) Where(ps ...predicate.MsgInternalTo) *MsgInternalToUpdate {
-	mitu.mutation.Where(ps...)
-	return mitu
+func (_u *MsgInternalToUpdate) Where(ps ...predicate.MsgInternalTo) *MsgInternalToUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetReadAt sets the "read_at" field.
-func (mitu *MsgInternalToUpdate) SetReadAt(t time.Time) *MsgInternalToUpdate {
-	mitu.mutation.SetReadAt(t)
-	return mitu
+func (_u *MsgInternalToUpdate) SetReadAt(v time.Time) *MsgInternalToUpdate {
+	_u.mutation.SetReadAt(v)
+	return _u
 }
 
 // SetNillableReadAt sets the "read_at" field if the given value is not nil.
-func (mitu *MsgInternalToUpdate) SetNillableReadAt(t *time.Time) *MsgInternalToUpdate {
-	if t != nil {
-		mitu.SetReadAt(*t)
+func (_u *MsgInternalToUpdate) SetNillableReadAt(v *time.Time) *MsgInternalToUpdate {
+	if v != nil {
+		_u.SetReadAt(*v)
 	}
-	return mitu
+	return _u
 }
 
 // ClearReadAt clears the value of the "read_at" field.
-func (mitu *MsgInternalToUpdate) ClearReadAt() *MsgInternalToUpdate {
-	mitu.mutation.ClearReadAt()
-	return mitu
+func (_u *MsgInternalToUpdate) ClearReadAt() *MsgInternalToUpdate {
+	_u.mutation.ClearReadAt()
+	return _u
 }
 
 // SetDeleteAt sets the "delete_at" field.
-func (mitu *MsgInternalToUpdate) SetDeleteAt(t time.Time) *MsgInternalToUpdate {
-	mitu.mutation.SetDeleteAt(t)
-	return mitu
+func (_u *MsgInternalToUpdate) SetDeleteAt(v time.Time) *MsgInternalToUpdate {
+	_u.mutation.SetDeleteAt(v)
+	return _u
 }
 
 // SetNillableDeleteAt sets the "delete_at" field if the given value is not nil.
-func (mitu *MsgInternalToUpdate) SetNillableDeleteAt(t *time.Time) *MsgInternalToUpdate {
-	if t != nil {
-		mitu.SetDeleteAt(*t)
+func (_u *MsgInternalToUpdate) SetNillableDeleteAt(v *time.Time) *MsgInternalToUpdate {
+	if v != nil {
+		_u.SetDeleteAt(*v)
 	}
-	return mitu
+	return _u
 }
 
 // ClearDeleteAt clears the value of the "delete_at" field.
-func (mitu *MsgInternalToUpdate) ClearDeleteAt() *MsgInternalToUpdate {
-	mitu.mutation.ClearDeleteAt()
-	return mitu
+func (_u *MsgInternalToUpdate) ClearDeleteAt() *MsgInternalToUpdate {
+	_u.mutation.ClearDeleteAt()
+	return _u
 }
 
 // Mutation returns the MsgInternalToMutation object of the builder.
-func (mitu *MsgInternalToUpdate) Mutation() *MsgInternalToMutation {
-	return mitu.mutation
+func (_u *MsgInternalToUpdate) Mutation() *MsgInternalToMutation {
+	return _u.mutation
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (mitu *MsgInternalToUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, mitu.sqlSave, mitu.mutation, mitu.hooks)
+func (_u *MsgInternalToUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mitu *MsgInternalToUpdate) SaveX(ctx context.Context) int {
-	affected, err := mitu.Save(ctx)
+func (_u *MsgInternalToUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -90,56 +90,56 @@ func (mitu *MsgInternalToUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (mitu *MsgInternalToUpdate) Exec(ctx context.Context) error {
-	_, err := mitu.Save(ctx)
+func (_u *MsgInternalToUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mitu *MsgInternalToUpdate) ExecX(ctx context.Context) {
-	if err := mitu.Exec(ctx); err != nil {
+func (_u *MsgInternalToUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mitu *MsgInternalToUpdate) check() error {
-	if mitu.mutation.MsgInternalCleared() && len(mitu.mutation.MsgInternalIDs()) > 0 {
+func (_u *MsgInternalToUpdate) check() error {
+	if _u.mutation.MsgInternalCleared() && len(_u.mutation.MsgInternalIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgInternalTo.msg_internal"`)
 	}
-	if mitu.mutation.UserCleared() && len(mitu.mutation.UserIDs()) > 0 {
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgInternalTo.user"`)
 	}
 	return nil
 }
 
-func (mitu *MsgInternalToUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := mitu.check(); err != nil {
-		return n, err
+func (_u *MsgInternalToUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(msginternalto.Table, msginternalto.Columns, sqlgraph.NewFieldSpec(msginternalto.FieldID, field.TypeInt))
-	if ps := mitu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := mitu.mutation.ReadAt(); ok {
+	if value, ok := _u.mutation.ReadAt(); ok {
 		_spec.SetField(msginternalto.FieldReadAt, field.TypeTime, value)
 	}
-	if mitu.mutation.ReadAtCleared() {
+	if _u.mutation.ReadAtCleared() {
 		_spec.ClearField(msginternalto.FieldReadAt, field.TypeTime)
 	}
-	if value, ok := mitu.mutation.DeleteAt(); ok {
+	if value, ok := _u.mutation.DeleteAt(); ok {
 		_spec.SetField(msginternalto.FieldDeleteAt, field.TypeTime, value)
 	}
-	if mitu.mutation.DeleteAtCleared() {
+	if _u.mutation.DeleteAtCleared() {
 		_spec.ClearField(msginternalto.FieldDeleteAt, field.TypeTime)
 	}
-	_spec.Node.Schema = mitu.schemaConfig.MsgInternalTo
-	ctx = internal.NewSchemaConfigContext(ctx, mitu.schemaConfig)
-	if n, err = sqlgraph.UpdateNodes(ctx, mitu.driver, _spec); err != nil {
+	_spec.Node.Schema = _u.schemaConfig.MsgInternalTo
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msginternalto.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -147,8 +147,8 @@ func (mitu *MsgInternalToUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		return 0, err
 	}
-	mitu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // MsgInternalToUpdateOne is the builder for updating a single MsgInternalTo entity.
@@ -160,71 +160,71 @@ type MsgInternalToUpdateOne struct {
 }
 
 // SetReadAt sets the "read_at" field.
-func (mituo *MsgInternalToUpdateOne) SetReadAt(t time.Time) *MsgInternalToUpdateOne {
-	mituo.mutation.SetReadAt(t)
-	return mituo
+func (_u *MsgInternalToUpdateOne) SetReadAt(v time.Time) *MsgInternalToUpdateOne {
+	_u.mutation.SetReadAt(v)
+	return _u
 }
 
 // SetNillableReadAt sets the "read_at" field if the given value is not nil.
-func (mituo *MsgInternalToUpdateOne) SetNillableReadAt(t *time.Time) *MsgInternalToUpdateOne {
-	if t != nil {
-		mituo.SetReadAt(*t)
+func (_u *MsgInternalToUpdateOne) SetNillableReadAt(v *time.Time) *MsgInternalToUpdateOne {
+	if v != nil {
+		_u.SetReadAt(*v)
 	}
-	return mituo
+	return _u
 }
 
 // ClearReadAt clears the value of the "read_at" field.
-func (mituo *MsgInternalToUpdateOne) ClearReadAt() *MsgInternalToUpdateOne {
-	mituo.mutation.ClearReadAt()
-	return mituo
+func (_u *MsgInternalToUpdateOne) ClearReadAt() *MsgInternalToUpdateOne {
+	_u.mutation.ClearReadAt()
+	return _u
 }
 
 // SetDeleteAt sets the "delete_at" field.
-func (mituo *MsgInternalToUpdateOne) SetDeleteAt(t time.Time) *MsgInternalToUpdateOne {
-	mituo.mutation.SetDeleteAt(t)
-	return mituo
+func (_u *MsgInternalToUpdateOne) SetDeleteAt(v time.Time) *MsgInternalToUpdateOne {
+	_u.mutation.SetDeleteAt(v)
+	return _u
 }
 
 // SetNillableDeleteAt sets the "delete_at" field if the given value is not nil.
-func (mituo *MsgInternalToUpdateOne) SetNillableDeleteAt(t *time.Time) *MsgInternalToUpdateOne {
-	if t != nil {
-		mituo.SetDeleteAt(*t)
+func (_u *MsgInternalToUpdateOne) SetNillableDeleteAt(v *time.Time) *MsgInternalToUpdateOne {
+	if v != nil {
+		_u.SetDeleteAt(*v)
 	}
-	return mituo
+	return _u
 }
 
 // ClearDeleteAt clears the value of the "delete_at" field.
-func (mituo *MsgInternalToUpdateOne) ClearDeleteAt() *MsgInternalToUpdateOne {
-	mituo.mutation.ClearDeleteAt()
-	return mituo
+func (_u *MsgInternalToUpdateOne) ClearDeleteAt() *MsgInternalToUpdateOne {
+	_u.mutation.ClearDeleteAt()
+	return _u
 }
 
 // Mutation returns the MsgInternalToMutation object of the builder.
-func (mituo *MsgInternalToUpdateOne) Mutation() *MsgInternalToMutation {
-	return mituo.mutation
+func (_u *MsgInternalToUpdateOne) Mutation() *MsgInternalToMutation {
+	return _u.mutation
 }
 
 // Where appends a list predicates to the MsgInternalToUpdate builder.
-func (mituo *MsgInternalToUpdateOne) Where(ps ...predicate.MsgInternalTo) *MsgInternalToUpdateOne {
-	mituo.mutation.Where(ps...)
-	return mituo
+func (_u *MsgInternalToUpdateOne) Where(ps ...predicate.MsgInternalTo) *MsgInternalToUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (mituo *MsgInternalToUpdateOne) Select(field string, fields ...string) *MsgInternalToUpdateOne {
-	mituo.fields = append([]string{field}, fields...)
-	return mituo
+func (_u *MsgInternalToUpdateOne) Select(field string, fields ...string) *MsgInternalToUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated MsgInternalTo entity.
-func (mituo *MsgInternalToUpdateOne) Save(ctx context.Context) (*MsgInternalTo, error) {
-	return withHooks(ctx, mituo.sqlSave, mituo.mutation, mituo.hooks)
+func (_u *MsgInternalToUpdateOne) Save(ctx context.Context) (*MsgInternalTo, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mituo *MsgInternalToUpdateOne) SaveX(ctx context.Context) *MsgInternalTo {
-	node, err := mituo.Save(ctx)
+func (_u *MsgInternalToUpdateOne) SaveX(ctx context.Context) *MsgInternalTo {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -232,40 +232,40 @@ func (mituo *MsgInternalToUpdateOne) SaveX(ctx context.Context) *MsgInternalTo {
 }
 
 // Exec executes the query on the entity.
-func (mituo *MsgInternalToUpdateOne) Exec(ctx context.Context) error {
-	_, err := mituo.Save(ctx)
+func (_u *MsgInternalToUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mituo *MsgInternalToUpdateOne) ExecX(ctx context.Context) {
-	if err := mituo.Exec(ctx); err != nil {
+func (_u *MsgInternalToUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mituo *MsgInternalToUpdateOne) check() error {
-	if mituo.mutation.MsgInternalCleared() && len(mituo.mutation.MsgInternalIDs()) > 0 {
+func (_u *MsgInternalToUpdateOne) check() error {
+	if _u.mutation.MsgInternalCleared() && len(_u.mutation.MsgInternalIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgInternalTo.msg_internal"`)
 	}
-	if mituo.mutation.UserCleared() && len(mituo.mutation.UserIDs()) > 0 {
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgInternalTo.user"`)
 	}
 	return nil
 }
 
-func (mituo *MsgInternalToUpdateOne) sqlSave(ctx context.Context) (_node *MsgInternalTo, err error) {
-	if err := mituo.check(); err != nil {
+func (_u *MsgInternalToUpdateOne) sqlSave(ctx context.Context) (_node *MsgInternalTo, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(msginternalto.Table, msginternalto.Columns, sqlgraph.NewFieldSpec(msginternalto.FieldID, field.TypeInt))
-	id, ok := mituo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "MsgInternalTo.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := mituo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, msginternalto.FieldID)
 		for _, f := range fields {
@@ -277,31 +277,31 @@ func (mituo *MsgInternalToUpdateOne) sqlSave(ctx context.Context) (_node *MsgInt
 			}
 		}
 	}
-	if ps := mituo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := mituo.mutation.ReadAt(); ok {
+	if value, ok := _u.mutation.ReadAt(); ok {
 		_spec.SetField(msginternalto.FieldReadAt, field.TypeTime, value)
 	}
-	if mituo.mutation.ReadAtCleared() {
+	if _u.mutation.ReadAtCleared() {
 		_spec.ClearField(msginternalto.FieldReadAt, field.TypeTime)
 	}
-	if value, ok := mituo.mutation.DeleteAt(); ok {
+	if value, ok := _u.mutation.DeleteAt(); ok {
 		_spec.SetField(msginternalto.FieldDeleteAt, field.TypeTime, value)
 	}
-	if mituo.mutation.DeleteAtCleared() {
+	if _u.mutation.DeleteAtCleared() {
 		_spec.ClearField(msginternalto.FieldDeleteAt, field.TypeTime)
 	}
-	_spec.Node.Schema = mituo.schemaConfig.MsgInternalTo
-	ctx = internal.NewSchemaConfigContext(ctx, mituo.schemaConfig)
-	_node = &MsgInternalTo{config: mituo.config}
+	_spec.Node.Schema = _u.schemaConfig.MsgInternalTo
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	_node = &MsgInternalTo{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, mituo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msginternalto.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -309,6 +309,6 @@ func (mituo *MsgInternalToUpdateOne) sqlSave(ctx context.Context) (_node *MsgInt
 		}
 		return nil, err
 	}
-	mituo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

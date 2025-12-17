@@ -130,6 +130,7 @@ type ComplexityRoot struct {
 		Labels      func(childComplexity int) int
 		Nlog        func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.NlogOrder, where *ent.NlogWhereInput) int
 		NlogAlerts  func(childComplexity int) int
+		Org         func(childComplexity int) int
 		StartsAt    func(childComplexity int) int
 		State       func(childComplexity int) int
 		TenantID    func(childComplexity int) int
@@ -401,6 +402,15 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	Org struct {
+		ID        func(childComplexity int) int
+		Kind      func(childComplexity int) int
+		MsgAlerts func(childComplexity int) int
+		OwnerID   func(childComplexity int) int
+		ParentID  func(childComplexity int) int
+		Path      func(childComplexity int) int
+	}
+
 	PageInfo struct {
 		EndCursor       func(childComplexity int) int
 		HasNextPage     func(childComplexity int) int
@@ -508,7 +518,7 @@ func (e *executableSchema) Schema() *ast.Schema {
 	return parsedSchema
 }
 
-func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]interface{}) (int, bool) {
+func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]any) (int, bool) {
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
@@ -888,6 +898,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgAlert.NlogAlerts(childComplexity), true
+
+	case "MsgAlert.org":
+		if e.complexity.MsgAlert.Org == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.Org(childComplexity), true
 
 	case "MsgAlert.startsAt":
 		if e.complexity.MsgAlert.StartsAt == nil {
@@ -2366,6 +2383,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.NlogEdge.Node(childComplexity), true
 
+	case "Org.id":
+		if e.complexity.Org.ID == nil {
+			break
+		}
+
+		return e.complexity.Org.ID(childComplexity), true
+
+	case "Org.kind":
+		if e.complexity.Org.Kind == nil {
+			break
+		}
+
+		return e.complexity.Org.Kind(childComplexity), true
+
+	case "Org.msgAlerts":
+		if e.complexity.Org.MsgAlerts == nil {
+			break
+		}
+
+		return e.complexity.Org.MsgAlerts(childComplexity), true
+
+	case "Org.ownerID":
+		if e.complexity.Org.OwnerID == nil {
+			break
+		}
+
+		return e.complexity.Org.OwnerID(childComplexity), true
+
+	case "Org.parentID":
+		if e.complexity.Org.ParentID == nil {
+			break
+		}
+
+		return e.complexity.Org.ParentID(childComplexity), true
+
+	case "Org.path":
+		if e.complexity.Org.Path == nil {
+			break
+		}
+
+		return e.complexity.Org.Path(childComplexity), true
+
 	case "PageInfo.endCursor":
 		if e.complexity.PageInfo.EndCursor == nil {
 			break
@@ -3258,7 +3317,7 @@ type MsgAlert implements Node {
   """
   租户ID
   """
-  tenantID: Int!
+  tenantID: ID!
   """
   标签
   """
@@ -3328,6 +3387,7 @@ type MsgAlert implements Node {
     """
     where: NlogWhereInput
   ): NlogConnection!
+  org: Org!
   nlogAlerts: [NlogAlert!]
 }
 """
@@ -3409,14 +3469,10 @@ input MsgAlertWhereInput {
   """
   tenant_id field predicates
   """
-  tenantID: Int
-  tenantIDNEQ: Int
-  tenantIDIn: [Int!]
-  tenantIDNotIn: [Int!]
-  tenantIDGT: Int
-  tenantIDGTE: Int
-  tenantIDLT: Int
-  tenantIDLTE: Int
+  tenantID: ID
+  tenantIDNEQ: ID
+  tenantIDIn: [ID!]
+  tenantIDNotIn: [ID!]
   """
   starts_at field predicates
   """
@@ -5495,6 +5551,20 @@ enum OrderDirection {
   Specifies a descending order for a given ` + "`" + `orderBy` + "`" + ` argument.
   """
   DESC
+}
+type Org implements Node {
+  """
+  组织ID
+  """
+  id: ID!
+  ownerID: Int
+  kind: String
+  parentID: Int
+  path: String
+  """
+  消息列表
+  """
+  msgAlerts: [MsgAlert!]
 }
 """
 Information about pagination in a connection.
