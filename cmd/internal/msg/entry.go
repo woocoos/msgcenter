@@ -16,6 +16,7 @@ import (
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/tsingsun/woocoo/web"
 	"github.com/vektah/gqlparser/v2/ast"
+	"github.com/woocoos/knockout-go/pkg/fmterr"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/knockout-go/pkg/koapp"
 	"github.com/woocoos/knockout-go/pkg/middleware"
@@ -38,6 +39,10 @@ type Server struct {
 func NewServer(cnf *conf.AppConfiguration) *Server {
 	s := &Server{
 		appCnf: cnf,
+	}
+	// 初始化错误处理
+	if err := fmterr.InitErrorHandler(cnf.Sub("errors")); err != nil {
+		panic(err)
 	}
 	s.buildEntClient()
 	s.buildPubSub()

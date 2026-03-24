@@ -1,13 +1,13 @@
 module github.com/woocoos/msgcenter
 
-go 1.24.0
+go 1.24.2
 
 toolchain go1.24.9
 
 require (
 	entgo.io/contrib v0.7.0
 	entgo.io/ent v0.14.5
-	github.com/99designs/gqlgen v0.17.68
+	github.com/99designs/gqlgen v0.17.69
 	github.com/alicebob/miniredis/v2 v2.33.0
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/gin-contrib/static v0.0.1
@@ -23,16 +23,16 @@ require (
 	github.com/knadh/koanf/v2 v2.3.0
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/prometheus/client_golang v1.20.5
-	github.com/redis/go-redis/v9 v9.0.5
+	github.com/redis/go-redis/v9 v9.7.3
 	github.com/stretchr/testify v1.11.1
 	github.com/tsingsun/members v0.0.0-20231020035013-99de08e2d5dd
-	github.com/tsingsun/woocoo v0.7.1-0.20251118091455-81c8671f3655
-	github.com/tsingsun/woocoo/contrib/gql v0.1.4-0.20251118091455-81c8671f3655
+	github.com/tsingsun/woocoo v0.7.2-0.20260320104241-46404b61c134
+	github.com/tsingsun/woocoo/contrib/gql v0.1.4-0.20260320104241-46404b61c134
 	github.com/tsingsun/woocoo/contrib/telemetry v0.58.3
 	github.com/vektah/gqlparser/v2 v2.5.23
 	github.com/vmihailenco/msgpack/v5 v5.3.5
-	github.com/woocoos/entcache v0.3.0
-	github.com/woocoos/knockout-go v0.5.1
+	github.com/woocoos/entcache v0.3.1-0.20260202131644-50a86f0add1c
+	github.com/woocoos/knockout-go v0.5.2-0.20260324060636-9781d946cb48
 	go.uber.org/zap v1.26.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/sync v0.16.0

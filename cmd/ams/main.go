@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/woocoos/knockout-go/ent/clientx"
+	"github.com/woocoos/knockout-go/pkg/fmterr"
 	"github.com/woocoos/knockout-go/pkg/koapp"
 	"github.com/woocoos/msgcenter/api/graphql"
 	"github.com/woocoos/msgcenter/api/oas"
@@ -29,6 +30,11 @@ func main() {
 	defer func() {
 		am.Stop()
 	}()
+
+	// 初始化错误处理
+	if err := fmterr.InitErrorHandler(cnf.Sub("errors")); err != nil {
+		panic(err)
+	}
 
 	adm, err := graphql.NewServer(app, am)
 	if err != nil {
