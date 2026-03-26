@@ -13,6 +13,84 @@ import (
 	"strings"
 )
 
+// splitEmailAddresses splits a comma-separated list of email addresses,
+// but ignores commas inside quoted strings or angle brackets.
+// For example: `"Company, Ltd" <test@example.com>, user2@example.com`
+// will be split into `["Company, Ltd" <test@example.com>, user2@example.com]`
+// It also fixes addresses missing angle brackets: `"Name" email@example.com` -> `"Name" <email@example.com>`
+func splitEmailAddresses(s string) []string {
+	var addresses []string
+	var current strings.Builder
+	inQuotes := false
+	inAngleBrackets := false
+
+	for _, r := range s {
+		switch r {
+		case '"':
+			inQuotes = !inQuotes
+			current.WriteRune(r)
+		case '<':
+			inAngleBrackets = true
+			current.WriteRune(r)
+		case '>':
+			inAngleBrackets = false
+			current.WriteRune(r)
+		case ',':
+			if inQuotes || inAngleBrackets {
+				// Inside quotes or angle brackets, comma is part of the address
+				current.WriteRune(r)
+			} else {
+				// Outside quotes and angle brackets, comma is a separator
+				addr := strings.TrimSpace(current.String())
+				if addr != "" {
+					addresses = append(addresses, fixAddressFormat(addr))
+				}
+				current.Reset()
+			}
+		default:
+			current.WriteRune(r)
+		}
+	}
+
+	// Add the last address
+	addr := strings.TrimSpace(current.String())
+	if addr != "" {
+		addresses = append(addresses, fixAddressFormat(addr))
+	}
+
+	return addresses
+}
+
+// fixAddressFormat fixes common email address format issues.
+// For example: converts `"Name" email@example.com` to `"Name" <email@example.com>`.
+func fixAddressFormat(addr string) string {
+	addr = strings.TrimSpace(addr)
+	// If the address already contains angle brackets, it's likely already in correct format
+	if strings.Contains(addr, "<") && strings.Contains(addr, ">") {
+		return addr
+	}
+
+	// Try to find pattern: "Name" email@domain.com (quoted name followed by email without angle brackets)
+	if len(addr) > 0 && addr[0] == '"' {
+		// Find the closing quote
+		endQuote := strings.Index(addr[1:], `"`)
+		if endQuote > 0 {
+			endQuote += 1 // Adjust for the offset
+			remaining := strings.TrimSpace(addr[endQuote+1:])
+			if remaining != "" && strings.Contains(remaining, "@") {
+				// Check if remaining looks like an email address (has @ and no spaces)
+				parts := strings.Fields(remaining)
+				if len(parts) == 1 && strings.Contains(parts[0], "@") {
+					// Format: "Name" <email>
+					return fmt.Sprintf("%s <%s>", addr[:endQuote+1], parts[0])
+				}
+			}
+		}
+	}
+
+	return addr
+}
+
 // Notifier email notifier
 //
 // tmpl include all of receiver's template.
@@ -80,7 +158,7 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 	if err != nil {
 		return false, fmt.Errorf("execute 'to' template: %w", err)
 	}
-	email.AddTo(strings.Split(to, ",")...)
+	email.AddTo(splitEmailAddresses(to)...)
 
 	sub := tmpl(config.Subject)
 	if err != nil {
@@ -117,7 +195,7 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 				return false, fmt.Errorf("execute %q header template: %w", header, err)
 			}
 			if value != "" {
-				email.AddCc(strings.Split(value, ",")...)
+				email.AddCc(splitEmailAddresses(value)...)
 			}
 		case "bcc":
 			value, err := n.tmpl.ExecuteTextString(t, data)
@@ -125,7 +203,7 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 				return false, fmt.Errorf("execute %q header template: %w", header, err)
 			}
 			if value != "" {
-				email.AddBcc(strings.Split(value, ",")...)
+				email.AddBcc(splitEmailAddresses(value)...)
 			}
 		default:
 			value, err := n.tmpl.ExecuteTextString(t, data)

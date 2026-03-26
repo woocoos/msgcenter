@@ -288,7 +288,7 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetBody(`{{ template "1.msggroupby.txt" . }}`).SaveX(ctx)
 
 	client.User.Create().SetID(1).SetDisplayName("admin").SetPrincipalName("admin").SaveX(ctx)
-	client.UserAddr.Create().SetID(1).SetUserID(1).SetEmail("admin@localhost").
+	client.UserAddr.Create().SetID(1).SetUserID(1).SetEmail("alerts@example.com").
 		SetMobile("13800138000").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)
 	client.User.Create().SetID(2).SetDisplayName("user").SetPrincipalName("user").SaveX(ctx)
 	client.UserAddr.Create().SetID(2).SetUserID(2).SetEmail("user@localhost").

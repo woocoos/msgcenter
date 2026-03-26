@@ -98,6 +98,83 @@ func TestEmailSuite(t *testing.T) {
 	suite.Run(t, new(EmailSuite))
 }
 
+func TestSplitEmailAddresses(t *testing.T) {
+	for _, tc := range []struct {
+		name     string
+		input    string
+		expected []string
+	}{
+		{
+			name:     "single email without name",
+			input:    "test@example.com",
+			expected: []string{"test@example.com"},
+		},
+		{
+			name:     "single email with name",
+			input:    "Test User <test@example.com>",
+			expected: []string{"Test User <test@example.com>"},
+		},
+		{
+			name:     "single email with quoted name containing comma",
+			input:    `"Company, Ltd" <test@example.com>`,
+			expected: []string{`"Company, Ltd" <test@example.com>`},
+		},
+		{
+			name:     "multiple emails separated by comma",
+			input:    "user1@example.com, user2@example.com",
+			expected: []string{"user1@example.com", "user2@example.com"},
+		},
+		{
+			name:     "multiple emails with names",
+			input:    "User1 <user1@example.com>, User2 <user2@example.com>",
+			expected: []string{"User1 <user1@example.com>", "User2 <user2@example.com>"},
+		},
+		{
+			name:     "multiple emails with quoted names containing commas",
+			input:    `"Company, Ltd" <test@example.com>, "Org, Inc" <org@example.com>`,
+			expected: []string{`"Company, Ltd" <test@example.com>`, `"Org, Inc" <org@example.com>`},
+		},
+		{
+			name:     "mixed format emails",
+			input:    `user1@example.com, "Company, Ltd" <test@example.com>, user3@example.com`,
+			expected: []string{"user1@example.com", `"Company, Ltd" <test@example.com>`, "user3@example.com"},
+		},
+		{
+			name:     "email with spaces around comma",
+			input:    "user1@example.com , user2@example.com",
+			expected: []string{"user1@example.com", "user2@example.com"},
+		},
+		{
+			name:     "empty input",
+			input:    "",
+			expected: []string{},
+		},
+		{
+			name:     "input with only spaces",
+			input:    "   ",
+			expected: []string{},
+		},
+		{
+			name:     "quoted name without angle brackets (bug fix)",
+			input:    `"Hong Kong Orange Peak Capital Group Co.,Limited" 584737690@qq.com`,
+			expected: []string{`"Hong Kong Orange Peak Capital Group Co.,Limited" <584737690@qq.com>`},
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			result := splitEmailAddresses(tc.input)
+			if len(result) != len(tc.expected) {
+				t.Errorf("Expected %d addresses, got %d", len(tc.expected), len(result))
+				return
+			}
+			for i, exp := range tc.expected {
+				if result[i] != exp {
+					t.Errorf("Expected address %d to be %q, got %q", i, exp, result[i])
+				}
+			}
+		})
+	}
+}
+
 func (ts *EmailSuite) TestEmailNotifyWithErrors() {
 	for _, tc := range []struct {
 		title     string
