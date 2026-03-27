@@ -3,6 +3,7 @@ package email
 import (
 	"context"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
@@ -99,77 +100,71 @@ func TestEmailSuite(t *testing.T) {
 }
 
 func TestSplitEmailAddresses(t *testing.T) {
-	for _, tc := range []struct {
+	tests := []struct {
 		name     string
 		input    string
 		expected []string
+		hasError bool
 	}{
 		{
-			name:     "single email without name",
+			name:     "single email address",
 			input:    "test@example.com",
-			expected: []string{"test@example.com"},
+			expected: []string{"<test@example.com>"},
+			hasError: false,
 		},
 		{
-			name:     "single email with name",
-			input:    "Test User <test@example.com>",
-			expected: []string{"Test User <test@example.com>"},
+			name:     "multiple email addresses",
+			input:    "test1@example.com,test2@example.com,test3@example.com",
+			expected: []string{"<test1@example.com>", "<test2@example.com>", "<test3@example.com>"},
+			hasError: false,
 		},
 		{
-			name:     "single email with quoted name containing comma",
-			input:    `"Company, Ltd" <test@example.com>`,
-			expected: []string{`"Company, Ltd" <test@example.com>`},
-		},
-		{
-			name:     "multiple emails separated by comma",
-			input:    "user1@example.com, user2@example.com",
-			expected: []string{"user1@example.com", "user2@example.com"},
-		},
-		{
-			name:     "multiple emails with names",
-			input:    "User1 <user1@example.com>, User2 <user2@example.com>",
-			expected: []string{"User1 <user1@example.com>", "User2 <user2@example.com>"},
-		},
-		{
-			name:     "multiple emails with quoted names containing commas",
-			input:    `"Company, Ltd" <test@example.com>, "Org, Inc" <org@example.com>`,
+			name:     "email addresses with display names",
+			input:    `"Company, Ltd" <test@example.com>,"Org, Inc" <org@example.com>`,
 			expected: []string{`"Company, Ltd" <test@example.com>`, `"Org, Inc" <org@example.com>`},
+			hasError: false,
 		},
 		{
-			name:     "mixed format emails",
-			input:    `user1@example.com, "Company, Ltd" <test@example.com>, user3@example.com`,
-			expected: []string{"user1@example.com", `"Company, Ltd" <test@example.com>`, "user3@example.com"},
+			name:     "mixed email addresses",
+			input:    `"Company, Ltd" <test@example.com>,org@example.com,OrgInc <org2@example.com>`,
+			expected: []string{`"Company, Ltd" <test@example.com>`, `<org@example.com>`, `"OrgInc" <org2@example.com>`},
+			hasError: false,
 		},
 		{
-			name:     "email with spaces around comma",
-			input:    "user1@example.com , user2@example.com",
-			expected: []string{"user1@example.com", "user2@example.com"},
+			name:     "email addresses with spaces",
+			input:    "test1@example.com, test2@example.com , test3@example.com",
+			expected: []string{"<test1@example.com>", "<test2@example.com>", "<test3@example.com>"},
+			hasError: false,
 		},
 		{
-			name:     "empty input",
+			name:     "empty string",
 			input:    "",
-			expected: []string{},
+			expected: nil,
+			hasError: true,
 		},
 		{
-			name:     "input with only spaces",
-			input:    "   ",
-			expected: []string{},
+			name:     "invalid email address",
+			input:    "invalid-email",
+			expected: nil,
+			hasError: true,
 		},
 		{
-			name:     "quoted name without angle brackets (bug fix)",
-			input:    `"Hong Kong Orange Peak Capital Group Co.,Limited" 584737690@qq.com`,
-			expected: []string{`"Hong Kong Orange Peak Capital Group Co.,Limited" <584737690@qq.com>`},
+			name:     "mixed valid and invalid email addresses",
+			input:    "test@example.com,invalid-email",
+			expected: nil,
+			hasError: true,
 		},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			result := splitEmailAddresses(tc.input)
-			if len(result) != len(tc.expected) {
-				t.Errorf("Expected %d addresses, got %d", len(tc.expected), len(result))
-				return
-			}
-			for i, exp := range tc.expected {
-				if result[i] != exp {
-					t.Errorf("Expected address %d to be %q, got %q", i, exp, result[i])
-				}
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := splitEmailAddresses(tt.input)
+			if tt.hasError {
+				assert.Error(t, err)
+				assert.Nil(t, result)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expected, result)
 			}
 		})
 	}
@@ -209,7 +204,7 @@ func (ts *EmailSuite) TestEmailNotifyWithErrors() {
 			updateCfg: func(cfg *profile.EmailConfig) {
 				cfg.To = `xxx`
 			},
-			errMsg: "invalid to address:",
+			errMsg: "parse 'to' string:",
 		},
 		{
 			title: "invalid 'subject' template",

@@ -287,7 +287,7 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
 		SetBody(`{{ template "1.msggroupby.txt" . }}`).SaveX(ctx)
 
-	client.User.Create().SetID(1).SetDisplayName("admin").SetPrincipalName("admin").SaveX(ctx)
+	client.User.Create().SetID(1).SetDisplayName("admin,.").SetPrincipalName("admin").SaveX(ctx)
 	client.UserAddr.Create().SetID(1).SetUserID(1).SetEmail("alerts@example.com").
 		SetMobile("13800138000").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)
 	client.User.Create().SetID(2).SetDisplayName("user").SetPrincipalName("user").SaveX(ctx)
@@ -296,6 +296,7 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 	client.User.Create().SetID(3).SetDisplayName("nobody").SetPrincipalName("nobody").SaveX(ctx)
 	client.UserAddr.Create().SetID(3).SetUserID(3).SetEmail("nobody@localhost").
 		SetMobile("13800138002").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)
+	client.Org.Create().SetID(1).SetOwnerID(1).SetKind("root").SetParentID(0).SaveX(ctx)
 	client.OrgRoleUser.Create().SetID(1).SetOrgID(1).SetUserID(1).SetOrgRoleID(12).SetOrgUserID(3).
 		SaveX(ctx)
 	client.OrgRoleUser.Create().SetID(2).SetOrgID(1).SetUserID(2).SetOrgRoleID(13).SetOrgUserID(4).
