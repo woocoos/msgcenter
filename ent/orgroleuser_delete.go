@@ -22,58 +22,58 @@ type OrgRoleUserDelete struct {
 }
 
 // Where appends a list predicates to the OrgRoleUserDelete builder.
-func (orud *OrgRoleUserDelete) Where(ps ...predicate.OrgRoleUser) *OrgRoleUserDelete {
-	orud.mutation.Where(ps...)
-	return orud
+func (_d *OrgRoleUserDelete) Where(ps ...predicate.OrgRoleUser) *OrgRoleUserDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (orud *OrgRoleUserDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, orud.sqlExec, orud.mutation, orud.hooks)
+func (_d *OrgRoleUserDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (orud *OrgRoleUserDelete) ExecX(ctx context.Context) int {
-	n, err := orud.Exec(ctx)
+func (_d *OrgRoleUserDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (orud *OrgRoleUserDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *OrgRoleUserDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(orgroleuser.Table, sqlgraph.NewFieldSpec(orgroleuser.FieldID, field.TypeInt))
-	_spec.Node.Schema = orud.schemaConfig.OrgRoleUser
-	ctx = internal.NewSchemaConfigContext(ctx, orud.schemaConfig)
-	if ps := orud.mutation.predicates; len(ps) > 0 {
+	_spec.Node.Schema = _d.schemaConfig.OrgRoleUser
+	ctx = internal.NewSchemaConfigContext(ctx, _d.schemaConfig)
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, orud.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	orud.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // OrgRoleUserDeleteOne is the builder for deleting a single OrgRoleUser entity.
 type OrgRoleUserDeleteOne struct {
-	orud *OrgRoleUserDelete
+	_d *OrgRoleUserDelete
 }
 
 // Where appends a list predicates to the OrgRoleUserDelete builder.
-func (orudo *OrgRoleUserDeleteOne) Where(ps ...predicate.OrgRoleUser) *OrgRoleUserDeleteOne {
-	orudo.orud.mutation.Where(ps...)
-	return orudo
+func (_d *OrgRoleUserDeleteOne) Where(ps ...predicate.OrgRoleUser) *OrgRoleUserDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (orudo *OrgRoleUserDeleteOne) Exec(ctx context.Context) error {
-	n, err := orudo.orud.Exec(ctx)
+func (_d *OrgRoleUserDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -85,8 +85,8 @@ func (orudo *OrgRoleUserDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (orudo *OrgRoleUserDeleteOne) ExecX(ctx context.Context) {
-	if err := orudo.Exec(ctx); err != nil {
+func (_d *OrgRoleUserDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

@@ -26,6 +26,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
+	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
@@ -59,6 +60,8 @@ type Client struct {
 	Nlog *NlogClient
 	// NlogAlert is the client for interacting with the NlogAlert builders.
 	NlogAlert *NlogAlertClient
+	// Org is the client for interacting with the Org builders.
+	Org *OrgClient
 	// OrgRoleUser is the client for interacting with the OrgRoleUser builders.
 	OrgRoleUser *OrgRoleUserClient
 	// Silence is the client for interacting with the Silence builders.
@@ -90,6 +93,7 @@ func (c *Client) init() {
 	c.MsgType = NewMsgTypeClient(c.config)
 	c.Nlog = NewNlogClient(c.config)
 	c.NlogAlert = NewNlogAlertClient(c.config)
+	c.Org = NewOrgClient(c.config)
 	c.OrgRoleUser = NewOrgRoleUserClient(c.config)
 	c.Silence = NewSilenceClient(c.config)
 	c.User = NewUserClient(c.config)
@@ -198,6 +202,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		MsgType:       NewMsgTypeClient(cfg),
 		Nlog:          NewNlogClient(cfg),
 		NlogAlert:     NewNlogAlertClient(cfg),
+		Org:           NewOrgClient(cfg),
 		OrgRoleUser:   NewOrgRoleUserClient(cfg),
 		Silence:       NewSilenceClient(cfg),
 		User:          NewUserClient(cfg),
@@ -231,6 +236,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		MsgType:       NewMsgTypeClient(cfg),
 		Nlog:          NewNlogClient(cfg),
 		NlogAlert:     NewNlogAlertClient(cfg),
+		Org:           NewOrgClient(cfg),
 		OrgRoleUser:   NewOrgRoleUserClient(cfg),
 		Silence:       NewSilenceClient(cfg),
 		User:          NewUserClient(cfg),
@@ -265,8 +271,8 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal, c.MsgInternalTo,
-		c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert, c.OrgRoleUser,
-		c.Silence, c.User, c.UserAddr,
+		c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert, c.Org,
+		c.OrgRoleUser, c.Silence, c.User, c.UserAddr,
 	} {
 		n.Use(hooks...)
 	}
@@ -277,8 +283,8 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal, c.MsgInternalTo,
-		c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert, c.OrgRoleUser,
-		c.Silence, c.User, c.UserAddr,
+		c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert, c.Org,
+		c.OrgRoleUser, c.Silence, c.User, c.UserAddr,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -307,6 +313,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Nlog.mutate(ctx, m)
 	case *NlogAlertMutation:
 		return c.NlogAlert.mutate(ctx, m)
+	case *OrgMutation:
+		return c.Org.mutate(ctx, m)
 	case *OrgRoleUserMutation:
 		return c.OrgRoleUser.mutate(ctx, m)
 	case *SilenceMutation:
@@ -375,8 +383,8 @@ func (c *MsgAlertClient) Update() *MsgAlertUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *MsgAlertClient) UpdateOne(ma *MsgAlert) *MsgAlertUpdateOne {
-	mutation := newMsgAlertMutation(c.config, OpUpdateOne, withMsgAlert(ma))
+func (c *MsgAlertClient) UpdateOne(_m *MsgAlert) *MsgAlertUpdateOne {
+	mutation := newMsgAlertMutation(c.config, OpUpdateOne, withMsgAlert(_m))
 	return &MsgAlertUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -393,8 +401,8 @@ func (c *MsgAlertClient) Delete() *MsgAlertDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *MsgAlertClient) DeleteOne(ma *MsgAlert) *MsgAlertDeleteOne {
-	return c.DeleteOneID(ma.ID)
+func (c *MsgAlertClient) DeleteOne(_m *MsgAlert) *MsgAlertDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -429,38 +437,57 @@ func (c *MsgAlertClient) GetX(ctx context.Context, id int) *MsgAlert {
 }
 
 // QueryNlog queries the nlog edge of a MsgAlert.
-func (c *MsgAlertClient) QueryNlog(ma *MsgAlert) *NlogQuery {
+func (c *MsgAlertClient) QueryNlog(_m *MsgAlert) *NlogQuery {
 	query := (&NlogClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ma.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(msgalert.Table, msgalert.FieldID, id),
 			sqlgraph.To(nlog.Table, nlog.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, msgalert.NlogTable, msgalert.NlogPrimaryKey...),
 		)
-		schemaConfig := ma.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.Nlog
 		step.Edge.Schema = schemaConfig.NlogAlert
-		fromV = sqlgraph.Neighbors(ma.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOrg queries the org edge of a MsgAlert.
+func (c *MsgAlertClient) QueryOrg(_m *MsgAlert) *OrgQuery {
+	query := (&OrgClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msgalert.Table, msgalert.FieldID, id),
+			sqlgraph.To(org.Table, org.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, msgalert.OrgTable, msgalert.OrgColumn),
+		)
+		schemaConfig := _m.schemaConfig
+		step.To.Schema = schemaConfig.Org
+		step.Edge.Schema = schemaConfig.MsgAlert
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryNlogAlerts queries the nlog_alerts edge of a MsgAlert.
-func (c *MsgAlertClient) QueryNlogAlerts(ma *MsgAlert) *NlogAlertQuery {
+func (c *MsgAlertClient) QueryNlogAlerts(_m *MsgAlert) *NlogAlertQuery {
 	query := (&NlogAlertClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ma.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(msgalert.Table, msgalert.FieldID, id),
 			sqlgraph.To(nlogalert.Table, nlogalert.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, msgalert.NlogAlertsTable, msgalert.NlogAlertsColumn),
 		)
-		schemaConfig := ma.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.NlogAlert
 		step.Edge.Schema = schemaConfig.NlogAlert
-		fromV = sqlgraph.Neighbors(ma.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -548,8 +575,8 @@ func (c *MsgChannelClient) Update() *MsgChannelUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *MsgChannelClient) UpdateOne(mc *MsgChannel) *MsgChannelUpdateOne {
-	mutation := newMsgChannelMutation(c.config, OpUpdateOne, withMsgChannel(mc))
+func (c *MsgChannelClient) UpdateOne(_m *MsgChannel) *MsgChannelUpdateOne {
+	mutation := newMsgChannelMutation(c.config, OpUpdateOne, withMsgChannel(_m))
 	return &MsgChannelUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -566,8 +593,8 @@ func (c *MsgChannelClient) Delete() *MsgChannelDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *MsgChannelClient) DeleteOne(mc *MsgChannel) *MsgChannelDeleteOne {
-	return c.DeleteOneID(mc.ID)
+func (c *MsgChannelClient) DeleteOne(_m *MsgChannel) *MsgChannelDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -682,8 +709,8 @@ func (c *MsgEventClient) Update() *MsgEventUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *MsgEventClient) UpdateOne(me *MsgEvent) *MsgEventUpdateOne {
-	mutation := newMsgEventMutation(c.config, OpUpdateOne, withMsgEvent(me))
+func (c *MsgEventClient) UpdateOne(_m *MsgEvent) *MsgEventUpdateOne {
+	mutation := newMsgEventMutation(c.config, OpUpdateOne, withMsgEvent(_m))
 	return &MsgEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -700,8 +727,8 @@ func (c *MsgEventClient) Delete() *MsgEventDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *MsgEventClient) DeleteOne(me *MsgEvent) *MsgEventDeleteOne {
-	return c.DeleteOneID(me.ID)
+func (c *MsgEventClient) DeleteOne(_m *MsgEvent) *MsgEventDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -736,38 +763,38 @@ func (c *MsgEventClient) GetX(ctx context.Context, id int) *MsgEvent {
 }
 
 // QueryMsgType queries the msg_type edge of a MsgEvent.
-func (c *MsgEventClient) QueryMsgType(me *MsgEvent) *MsgTypeQuery {
+func (c *MsgEventClient) QueryMsgType(_m *MsgEvent) *MsgTypeQuery {
 	query := (&MsgTypeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := me.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(msgevent.Table, msgevent.FieldID, id),
 			sqlgraph.To(msgtype.Table, msgtype.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, msgevent.MsgTypeTable, msgevent.MsgTypeColumn),
 		)
-		schemaConfig := me.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.MsgType
 		step.Edge.Schema = schemaConfig.MsgEvent
-		fromV = sqlgraph.Neighbors(me.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryCustomerTemplate queries the customer_template edge of a MsgEvent.
-func (c *MsgEventClient) QueryCustomerTemplate(me *MsgEvent) *MsgTemplateQuery {
+func (c *MsgEventClient) QueryCustomerTemplate(_m *MsgEvent) *MsgTemplateQuery {
 	query := (&MsgTemplateClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := me.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(msgevent.Table, msgevent.FieldID, id),
 			sqlgraph.To(msgtemplate.Table, msgtemplate.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, msgevent.CustomerTemplateTable, msgevent.CustomerTemplateColumn),
 		)
-		schemaConfig := me.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.MsgTemplate
 		step.Edge.Schema = schemaConfig.MsgTemplate
-		fromV = sqlgraph.Neighbors(me.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -854,8 +881,8 @@ func (c *MsgInternalClient) Update() *MsgInternalUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *MsgInternalClient) UpdateOne(mi *MsgInternal) *MsgInternalUpdateOne {
-	mutation := newMsgInternalMutation(c.config, OpUpdateOne, withMsgInternal(mi))
+func (c *MsgInternalClient) UpdateOne(_m *MsgInternal) *MsgInternalUpdateOne {
+	mutation := newMsgInternalMutation(c.config, OpUpdateOne, withMsgInternal(_m))
 	return &MsgInternalUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -872,8 +899,8 @@ func (c *MsgInternalClient) Delete() *MsgInternalDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *MsgInternalClient) DeleteOne(mi *MsgInternal) *MsgInternalDeleteOne {
-	return c.DeleteOneID(mi.ID)
+func (c *MsgInternalClient) DeleteOne(_m *MsgInternal) *MsgInternalDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -908,19 +935,19 @@ func (c *MsgInternalClient) GetX(ctx context.Context, id int) *MsgInternal {
 }
 
 // QueryMsgInternalTo queries the msg_internal_to edge of a MsgInternal.
-func (c *MsgInternalClient) QueryMsgInternalTo(mi *MsgInternal) *MsgInternalToQuery {
+func (c *MsgInternalClient) QueryMsgInternalTo(_m *MsgInternal) *MsgInternalToQuery {
 	query := (&MsgInternalToClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := mi.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(msginternal.Table, msginternal.FieldID, id),
 			sqlgraph.To(msginternalto.Table, msginternalto.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, msginternal.MsgInternalToTable, msginternal.MsgInternalToColumn),
 		)
-		schemaConfig := mi.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.MsgInternalTo
 		step.Edge.Schema = schemaConfig.MsgInternalTo
-		fromV = sqlgraph.Neighbors(mi.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -1008,8 +1035,8 @@ func (c *MsgInternalToClient) Update() *MsgInternalToUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *MsgInternalToClient) UpdateOne(mit *MsgInternalTo) *MsgInternalToUpdateOne {
-	mutation := newMsgInternalToMutation(c.config, OpUpdateOne, withMsgInternalTo(mit))
+func (c *MsgInternalToClient) UpdateOne(_m *MsgInternalTo) *MsgInternalToUpdateOne {
+	mutation := newMsgInternalToMutation(c.config, OpUpdateOne, withMsgInternalTo(_m))
 	return &MsgInternalToUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -1026,8 +1053,8 @@ func (c *MsgInternalToClient) Delete() *MsgInternalToDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *MsgInternalToClient) DeleteOne(mit *MsgInternalTo) *MsgInternalToDeleteOne {
-	return c.DeleteOneID(mit.ID)
+func (c *MsgInternalToClient) DeleteOne(_m *MsgInternalTo) *MsgInternalToDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -1062,38 +1089,38 @@ func (c *MsgInternalToClient) GetX(ctx context.Context, id int) *MsgInternalTo {
 }
 
 // QueryMsgInternal queries the msg_internal edge of a MsgInternalTo.
-func (c *MsgInternalToClient) QueryMsgInternal(mit *MsgInternalTo) *MsgInternalQuery {
+func (c *MsgInternalToClient) QueryMsgInternal(_m *MsgInternalTo) *MsgInternalQuery {
 	query := (&MsgInternalClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := mit.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(msginternalto.Table, msginternalto.FieldID, id),
 			sqlgraph.To(msginternal.Table, msginternal.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, msginternalto.MsgInternalTable, msginternalto.MsgInternalColumn),
 		)
-		schemaConfig := mit.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.MsgInternal
 		step.Edge.Schema = schemaConfig.MsgInternalTo
-		fromV = sqlgraph.Neighbors(mit.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryUser queries the user edge of a MsgInternalTo.
-func (c *MsgInternalToClient) QueryUser(mit *MsgInternalTo) *UserQuery {
+func (c *MsgInternalToClient) QueryUser(_m *MsgInternalTo) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := mit.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(msginternalto.Table, msginternalto.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, msginternalto.UserTable, msginternalto.UserColumn),
 		)
-		schemaConfig := mit.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.User
 		step.Edge.Schema = schemaConfig.MsgInternalTo
-		fromV = sqlgraph.Neighbors(mit.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -1181,8 +1208,8 @@ func (c *MsgSubscriberClient) Update() *MsgSubscriberUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *MsgSubscriberClient) UpdateOne(ms *MsgSubscriber) *MsgSubscriberUpdateOne {
-	mutation := newMsgSubscriberMutation(c.config, OpUpdateOne, withMsgSubscriber(ms))
+func (c *MsgSubscriberClient) UpdateOne(_m *MsgSubscriber) *MsgSubscriberUpdateOne {
+	mutation := newMsgSubscriberMutation(c.config, OpUpdateOne, withMsgSubscriber(_m))
 	return &MsgSubscriberUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -1199,8 +1226,8 @@ func (c *MsgSubscriberClient) Delete() *MsgSubscriberDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *MsgSubscriberClient) DeleteOne(ms *MsgSubscriber) *MsgSubscriberDeleteOne {
-	return c.DeleteOneID(ms.ID)
+func (c *MsgSubscriberClient) DeleteOne(_m *MsgSubscriber) *MsgSubscriberDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -1235,38 +1262,38 @@ func (c *MsgSubscriberClient) GetX(ctx context.Context, id int) *MsgSubscriber {
 }
 
 // QueryMsgType queries the msg_type edge of a MsgSubscriber.
-func (c *MsgSubscriberClient) QueryMsgType(ms *MsgSubscriber) *MsgTypeQuery {
+func (c *MsgSubscriberClient) QueryMsgType(_m *MsgSubscriber) *MsgTypeQuery {
 	query := (&MsgTypeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ms.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(msgsubscriber.Table, msgsubscriber.FieldID, id),
 			sqlgraph.To(msgtype.Table, msgtype.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, msgsubscriber.MsgTypeTable, msgsubscriber.MsgTypeColumn),
 		)
-		schemaConfig := ms.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.MsgType
 		step.Edge.Schema = schemaConfig.MsgSubscriber
-		fromV = sqlgraph.Neighbors(ms.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryUser queries the user edge of a MsgSubscriber.
-func (c *MsgSubscriberClient) QueryUser(ms *MsgSubscriber) *UserQuery {
+func (c *MsgSubscriberClient) QueryUser(_m *MsgSubscriber) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ms.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(msgsubscriber.Table, msgsubscriber.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, msgsubscriber.UserTable, msgsubscriber.UserColumn),
 		)
-		schemaConfig := ms.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.User
 		step.Edge.Schema = schemaConfig.MsgSubscriber
-		fromV = sqlgraph.Neighbors(ms.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -1353,8 +1380,8 @@ func (c *MsgTemplateClient) Update() *MsgTemplateUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *MsgTemplateClient) UpdateOne(mt *MsgTemplate) *MsgTemplateUpdateOne {
-	mutation := newMsgTemplateMutation(c.config, OpUpdateOne, withMsgTemplate(mt))
+func (c *MsgTemplateClient) UpdateOne(_m *MsgTemplate) *MsgTemplateUpdateOne {
+	mutation := newMsgTemplateMutation(c.config, OpUpdateOne, withMsgTemplate(_m))
 	return &MsgTemplateUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -1371,8 +1398,8 @@ func (c *MsgTemplateClient) Delete() *MsgTemplateDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *MsgTemplateClient) DeleteOne(mt *MsgTemplate) *MsgTemplateDeleteOne {
-	return c.DeleteOneID(mt.ID)
+func (c *MsgTemplateClient) DeleteOne(_m *MsgTemplate) *MsgTemplateDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -1407,19 +1434,19 @@ func (c *MsgTemplateClient) GetX(ctx context.Context, id int) *MsgTemplate {
 }
 
 // QueryEvent queries the event edge of a MsgTemplate.
-func (c *MsgTemplateClient) QueryEvent(mt *MsgTemplate) *MsgEventQuery {
+func (c *MsgTemplateClient) QueryEvent(_m *MsgTemplate) *MsgEventQuery {
 	query := (&MsgEventClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := mt.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(msgtemplate.Table, msgtemplate.FieldID, id),
 			sqlgraph.To(msgevent.Table, msgevent.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, msgtemplate.EventTable, msgtemplate.EventColumn),
 		)
-		schemaConfig := mt.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.MsgEvent
 		step.Edge.Schema = schemaConfig.MsgTemplate
-		fromV = sqlgraph.Neighbors(mt.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -1506,8 +1533,8 @@ func (c *MsgTypeClient) Update() *MsgTypeUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *MsgTypeClient) UpdateOne(mt *MsgType) *MsgTypeUpdateOne {
-	mutation := newMsgTypeMutation(c.config, OpUpdateOne, withMsgType(mt))
+func (c *MsgTypeClient) UpdateOne(_m *MsgType) *MsgTypeUpdateOne {
+	mutation := newMsgTypeMutation(c.config, OpUpdateOne, withMsgType(_m))
 	return &MsgTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -1524,8 +1551,8 @@ func (c *MsgTypeClient) Delete() *MsgTypeDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *MsgTypeClient) DeleteOne(mt *MsgType) *MsgTypeDeleteOne {
-	return c.DeleteOneID(mt.ID)
+func (c *MsgTypeClient) DeleteOne(_m *MsgType) *MsgTypeDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -1560,38 +1587,38 @@ func (c *MsgTypeClient) GetX(ctx context.Context, id int) *MsgType {
 }
 
 // QueryEvents queries the events edge of a MsgType.
-func (c *MsgTypeClient) QueryEvents(mt *MsgType) *MsgEventQuery {
+func (c *MsgTypeClient) QueryEvents(_m *MsgType) *MsgEventQuery {
 	query := (&MsgEventClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := mt.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(msgtype.Table, msgtype.FieldID, id),
 			sqlgraph.To(msgevent.Table, msgevent.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, msgtype.EventsTable, msgtype.EventsColumn),
 		)
-		schemaConfig := mt.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.MsgEvent
 		step.Edge.Schema = schemaConfig.MsgEvent
-		fromV = sqlgraph.Neighbors(mt.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QuerySubscribers queries the subscribers edge of a MsgType.
-func (c *MsgTypeClient) QuerySubscribers(mt *MsgType) *MsgSubscriberQuery {
+func (c *MsgTypeClient) QuerySubscribers(_m *MsgType) *MsgSubscriberQuery {
 	query := (&MsgSubscriberClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := mt.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(msgtype.Table, msgtype.FieldID, id),
 			sqlgraph.To(msgsubscriber.Table, msgsubscriber.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, msgtype.SubscribersTable, msgtype.SubscribersColumn),
 		)
-		schemaConfig := mt.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.MsgSubscriber
 		step.Edge.Schema = schemaConfig.MsgSubscriber
-		fromV = sqlgraph.Neighbors(mt.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -1678,8 +1705,8 @@ func (c *NlogClient) Update() *NlogUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *NlogClient) UpdateOne(n *Nlog) *NlogUpdateOne {
-	mutation := newNlogMutation(c.config, OpUpdateOne, withNlog(n))
+func (c *NlogClient) UpdateOne(_m *Nlog) *NlogUpdateOne {
+	mutation := newNlogMutation(c.config, OpUpdateOne, withNlog(_m))
 	return &NlogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -1696,8 +1723,8 @@ func (c *NlogClient) Delete() *NlogDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *NlogClient) DeleteOne(n *Nlog) *NlogDeleteOne {
-	return c.DeleteOneID(n.ID)
+func (c *NlogClient) DeleteOne(_m *Nlog) *NlogDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -1732,38 +1759,38 @@ func (c *NlogClient) GetX(ctx context.Context, id int) *Nlog {
 }
 
 // QueryAlerts queries the alerts edge of a Nlog.
-func (c *NlogClient) QueryAlerts(n *Nlog) *MsgAlertQuery {
+func (c *NlogClient) QueryAlerts(_m *Nlog) *MsgAlertQuery {
 	query := (&MsgAlertClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := n.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(nlog.Table, nlog.FieldID, id),
 			sqlgraph.To(msgalert.Table, msgalert.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, nlog.AlertsTable, nlog.AlertsPrimaryKey...),
 		)
-		schemaConfig := n.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.MsgAlert
 		step.Edge.Schema = schemaConfig.NlogAlert
-		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryNlogAlert queries the nlog_alert edge of a Nlog.
-func (c *NlogClient) QueryNlogAlert(n *Nlog) *NlogAlertQuery {
+func (c *NlogClient) QueryNlogAlert(_m *Nlog) *NlogAlertQuery {
 	query := (&NlogAlertClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := n.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(nlog.Table, nlog.FieldID, id),
 			sqlgraph.To(nlogalert.Table, nlogalert.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, nlog.NlogAlertTable, nlog.NlogAlertColumn),
 		)
-		schemaConfig := n.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.NlogAlert
 		step.Edge.Schema = schemaConfig.NlogAlert
-		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -1851,8 +1878,8 @@ func (c *NlogAlertClient) Update() *NlogAlertUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *NlogAlertClient) UpdateOne(na *NlogAlert) *NlogAlertUpdateOne {
-	mutation := newNlogAlertMutation(c.config, OpUpdateOne, withNlogAlert(na))
+func (c *NlogAlertClient) UpdateOne(_m *NlogAlert) *NlogAlertUpdateOne {
+	mutation := newNlogAlertMutation(c.config, OpUpdateOne, withNlogAlert(_m))
 	return &NlogAlertUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -1869,8 +1896,8 @@ func (c *NlogAlertClient) Delete() *NlogAlertDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *NlogAlertClient) DeleteOne(na *NlogAlert) *NlogAlertDeleteOne {
-	return c.DeleteOneID(na.ID)
+func (c *NlogAlertClient) DeleteOne(_m *NlogAlert) *NlogAlertDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -1905,38 +1932,38 @@ func (c *NlogAlertClient) GetX(ctx context.Context, id int) *NlogAlert {
 }
 
 // QueryNlog queries the nlog edge of a NlogAlert.
-func (c *NlogAlertClient) QueryNlog(na *NlogAlert) *NlogQuery {
+func (c *NlogAlertClient) QueryNlog(_m *NlogAlert) *NlogQuery {
 	query := (&NlogClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := na.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(nlogalert.Table, nlogalert.FieldID, id),
 			sqlgraph.To(nlog.Table, nlog.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, nlogalert.NlogTable, nlogalert.NlogColumn),
 		)
-		schemaConfig := na.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.Nlog
 		step.Edge.Schema = schemaConfig.NlogAlert
-		fromV = sqlgraph.Neighbors(na.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryAlert queries the alert edge of a NlogAlert.
-func (c *NlogAlertClient) QueryAlert(na *NlogAlert) *MsgAlertQuery {
+func (c *NlogAlertClient) QueryAlert(_m *NlogAlert) *MsgAlertQuery {
 	query := (&MsgAlertClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := na.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(nlogalert.Table, nlogalert.FieldID, id),
 			sqlgraph.To(msgalert.Table, msgalert.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, nlogalert.AlertTable, nlogalert.AlertColumn),
 		)
-		schemaConfig := na.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.MsgAlert
 		step.Edge.Schema = schemaConfig.NlogAlert
-		fromV = sqlgraph.Neighbors(na.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -1964,6 +1991,159 @@ func (c *NlogAlertClient) mutate(ctx context.Context, m *NlogAlertMutation) (Val
 		return (&NlogAlertDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown NlogAlert mutation op: %q", m.Op())
+	}
+}
+
+// OrgClient is a client for the Org schema.
+type OrgClient struct {
+	config
+}
+
+// NewOrgClient returns a client for the Org from the given config.
+func NewOrgClient(c config) *OrgClient {
+	return &OrgClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `org.Hooks(f(g(h())))`.
+func (c *OrgClient) Use(hooks ...Hook) {
+	c.hooks.Org = append(c.hooks.Org, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `org.Intercept(f(g(h())))`.
+func (c *OrgClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Org = append(c.inters.Org, interceptors...)
+}
+
+// Create returns a builder for creating a Org entity.
+func (c *OrgClient) Create() *OrgCreate {
+	mutation := newOrgMutation(c.config, OpCreate)
+	return &OrgCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Org entities.
+func (c *OrgClient) CreateBulk(builders ...*OrgCreate) *OrgCreateBulk {
+	return &OrgCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OrgClient) MapCreateBulk(slice any, setFunc func(*OrgCreate, int)) *OrgCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OrgCreateBulk{err: fmt.Errorf("calling to OrgClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OrgCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OrgCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Org.
+func (c *OrgClient) Update() *OrgUpdate {
+	mutation := newOrgMutation(c.config, OpUpdate)
+	return &OrgUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OrgClient) UpdateOne(_m *Org) *OrgUpdateOne {
+	mutation := newOrgMutation(c.config, OpUpdateOne, withOrg(_m))
+	return &OrgUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OrgClient) UpdateOneID(id int) *OrgUpdateOne {
+	mutation := newOrgMutation(c.config, OpUpdateOne, withOrgID(id))
+	return &OrgUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Org.
+func (c *OrgClient) Delete() *OrgDelete {
+	mutation := newOrgMutation(c.config, OpDelete)
+	return &OrgDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OrgClient) DeleteOne(_m *Org) *OrgDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OrgClient) DeleteOneID(id int) *OrgDeleteOne {
+	builder := c.Delete().Where(org.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OrgDeleteOne{builder}
+}
+
+// Query returns a query builder for Org.
+func (c *OrgClient) Query() *OrgQuery {
+	return &OrgQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOrg},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Org entity by its id.
+func (c *OrgClient) Get(ctx context.Context, id int) (*Org, error) {
+	return c.Query().Where(org.ID(id)).Only(entcache.WithEntryKey(ctx, "Org", id))
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OrgClient) GetX(ctx context.Context, id int) *Org {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryMsgAlerts queries the msg_alerts edge of a Org.
+func (c *OrgClient) QueryMsgAlerts(_m *Org) *MsgAlertQuery {
+	query := (&MsgAlertClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(org.Table, org.FieldID, id),
+			sqlgraph.To(msgalert.Table, msgalert.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, org.MsgAlertsTable, org.MsgAlertsColumn),
+		)
+		schemaConfig := _m.schemaConfig
+		step.To.Schema = schemaConfig.MsgAlert
+		step.Edge.Schema = schemaConfig.MsgAlert
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *OrgClient) Hooks() []Hook {
+	hooks := c.hooks.Org
+	return append(hooks[:len(hooks):len(hooks)], org.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *OrgClient) Interceptors() []Interceptor {
+	return c.inters.Org
+}
+
+func (c *OrgClient) mutate(ctx context.Context, m *OrgMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OrgCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OrgUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OrgUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OrgDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Org mutation op: %q", m.Op())
 	}
 }
 
@@ -2022,8 +2202,8 @@ func (c *OrgRoleUserClient) Update() *OrgRoleUserUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *OrgRoleUserClient) UpdateOne(oru *OrgRoleUser) *OrgRoleUserUpdateOne {
-	mutation := newOrgRoleUserMutation(c.config, OpUpdateOne, withOrgRoleUser(oru))
+func (c *OrgRoleUserClient) UpdateOne(_m *OrgRoleUser) *OrgRoleUserUpdateOne {
+	mutation := newOrgRoleUserMutation(c.config, OpUpdateOne, withOrgRoleUser(_m))
 	return &OrgRoleUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -2040,8 +2220,8 @@ func (c *OrgRoleUserClient) Delete() *OrgRoleUserDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *OrgRoleUserClient) DeleteOne(oru *OrgRoleUser) *OrgRoleUserDeleteOne {
-	return c.DeleteOneID(oru.ID)
+func (c *OrgRoleUserClient) DeleteOne(_m *OrgRoleUser) *OrgRoleUserDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -2156,8 +2336,8 @@ func (c *SilenceClient) Update() *SilenceUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *SilenceClient) UpdateOne(s *Silence) *SilenceUpdateOne {
-	mutation := newSilenceMutation(c.config, OpUpdateOne, withSilence(s))
+func (c *SilenceClient) UpdateOne(_m *Silence) *SilenceUpdateOne {
+	mutation := newSilenceMutation(c.config, OpUpdateOne, withSilence(_m))
 	return &SilenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -2174,8 +2354,8 @@ func (c *SilenceClient) Delete() *SilenceDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *SilenceClient) DeleteOne(s *Silence) *SilenceDeleteOne {
-	return c.DeleteOneID(s.ID)
+func (c *SilenceClient) DeleteOne(_m *Silence) *SilenceDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -2210,19 +2390,19 @@ func (c *SilenceClient) GetX(ctx context.Context, id int) *Silence {
 }
 
 // QueryUser queries the user edge of a Silence.
-func (c *SilenceClient) QueryUser(s *Silence) *UserQuery {
+func (c *SilenceClient) QueryUser(_m *Silence) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(silence.Table, silence.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, silence.UserTable, silence.UserColumn),
 		)
-		schemaConfig := s.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.User
 		step.Edge.Schema = schemaConfig.Silence
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -2310,8 +2490,8 @@ func (c *UserClient) Update() *UserUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *UserClient) UpdateOne(u *User) *UserUpdateOne {
-	mutation := newUserMutation(c.config, OpUpdateOne, withUser(u))
+func (c *UserClient) UpdateOne(_m *User) *UserUpdateOne {
+	mutation := newUserMutation(c.config, OpUpdateOne, withUser(_m))
 	return &UserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -2328,8 +2508,8 @@ func (c *UserClient) Delete() *UserDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *UserClient) DeleteOne(u *User) *UserDeleteOne {
-	return c.DeleteOneID(u.ID)
+func (c *UserClient) DeleteOne(_m *User) *UserDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -2364,38 +2544,38 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 }
 
 // QuerySilences queries the silences edge of a User.
-func (c *UserClient) QuerySilences(u *User) *SilenceQuery {
+func (c *UserClient) QuerySilences(_m *User) *SilenceQuery {
 	query := (&SilenceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(silence.Table, silence.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.SilencesTable, user.SilencesColumn),
 		)
-		schemaConfig := u.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.Silence
 		step.Edge.Schema = schemaConfig.Silence
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // QueryAddresses queries the addresses edge of a User.
-func (c *UserClient) QueryAddresses(u *User) *UserAddrQuery {
+func (c *UserClient) QueryAddresses(_m *User) *UserAddrQuery {
 	query := (&UserAddrClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := u.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(useraddr.Table, useraddr.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.AddressesTable, user.AddressesColumn),
 		)
-		schemaConfig := u.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.UserAddr
 		step.Edge.Schema = schemaConfig.UserAddr
-		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -2482,8 +2662,8 @@ func (c *UserAddrClient) Update() *UserAddrUpdate {
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *UserAddrClient) UpdateOne(ua *UserAddr) *UserAddrUpdateOne {
-	mutation := newUserAddrMutation(c.config, OpUpdateOne, withUserAddr(ua))
+func (c *UserAddrClient) UpdateOne(_m *UserAddr) *UserAddrUpdateOne {
+	mutation := newUserAddrMutation(c.config, OpUpdateOne, withUserAddr(_m))
 	return &UserAddrUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -2500,8 +2680,8 @@ func (c *UserAddrClient) Delete() *UserAddrDelete {
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *UserAddrClient) DeleteOne(ua *UserAddr) *UserAddrDeleteOne {
-	return c.DeleteOneID(ua.ID)
+func (c *UserAddrClient) DeleteOne(_m *UserAddr) *UserAddrDeleteOne {
+	return c.DeleteOneID(_m.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
@@ -2536,19 +2716,19 @@ func (c *UserAddrClient) GetX(ctx context.Context, id int) *UserAddr {
 }
 
 // QueryUser queries the user edge of a UserAddr.
-func (c *UserAddrClient) QueryUser(ua *UserAddr) *UserQuery {
+func (c *UserAddrClient) QueryUser(_m *UserAddr) *UserQuery {
 	query := (&UserClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ua.ID
+		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(useraddr.Table, useraddr.FieldID, id),
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, useraddr.UserTable, useraddr.UserColumn),
 		)
-		schemaConfig := ua.schemaConfig
+		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.User
 		step.Edge.Schema = schemaConfig.UserAddr
-		fromV = sqlgraph.Neighbors(ua.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
@@ -2584,12 +2764,12 @@ func (c *UserAddrClient) mutate(ctx context.Context, m *UserAddrMutation) (Value
 type (
 	hooks struct {
 		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSubscriber,
-		MsgTemplate, MsgType, Nlog, NlogAlert, OrgRoleUser, Silence, User,
+		MsgTemplate, MsgType, Nlog, NlogAlert, Org, OrgRoleUser, Silence, User,
 		UserAddr []ent.Hook
 	}
 	inters struct {
 		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSubscriber,
-		MsgTemplate, MsgType, Nlog, NlogAlert, OrgRoleUser, Silence, User,
+		MsgTemplate, MsgType, Nlog, NlogAlert, Org, OrgRoleUser, Silence, User,
 		UserAddr []ent.Interceptor
 	}
 )

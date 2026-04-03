@@ -90,7 +90,7 @@ func (*MsgInternalTo) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the MsgInternalTo fields.
-func (mit *MsgInternalTo) assignValues(columns []string, values []any) error {
+func (_m *MsgInternalTo) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -101,45 +101,45 @@ func (mit *MsgInternalTo) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			mit.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case msginternalto.FieldTenantID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
 			} else if value.Valid {
-				mit.TenantID = int(value.Int64)
+				_m.TenantID = int(value.Int64)
 			}
 		case msginternalto.FieldMsgInternalID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field msg_internal_id", values[i])
 			} else if value.Valid {
-				mit.MsgInternalID = int(value.Int64)
+				_m.MsgInternalID = int(value.Int64)
 			}
 		case msginternalto.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				mit.UserID = int(value.Int64)
+				_m.UserID = int(value.Int64)
 			}
 		case msginternalto.FieldReadAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field read_at", values[i])
 			} else if value.Valid {
-				mit.ReadAt = value.Time
+				_m.ReadAt = value.Time
 			}
 		case msginternalto.FieldDeleteAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field delete_at", values[i])
 			} else if value.Valid {
-				mit.DeleteAt = value.Time
+				_m.DeleteAt = value.Time
 			}
 		case msginternalto.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				mit.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		default:
-			mit.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -147,60 +147,60 @@ func (mit *MsgInternalTo) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the MsgInternalTo.
 // This includes values selected through modifiers, order, etc.
-func (mit *MsgInternalTo) Value(name string) (ent.Value, error) {
-	return mit.selectValues.Get(name)
+func (_m *MsgInternalTo) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryMsgInternal queries the "msg_internal" edge of the MsgInternalTo entity.
-func (mit *MsgInternalTo) QueryMsgInternal() *MsgInternalQuery {
-	return NewMsgInternalToClient(mit.config).QueryMsgInternal(mit)
+func (_m *MsgInternalTo) QueryMsgInternal() *MsgInternalQuery {
+	return NewMsgInternalToClient(_m.config).QueryMsgInternal(_m)
 }
 
 // QueryUser queries the "user" edge of the MsgInternalTo entity.
-func (mit *MsgInternalTo) QueryUser() *UserQuery {
-	return NewMsgInternalToClient(mit.config).QueryUser(mit)
+func (_m *MsgInternalTo) QueryUser() *UserQuery {
+	return NewMsgInternalToClient(_m.config).QueryUser(_m)
 }
 
 // Update returns a builder for updating this MsgInternalTo.
 // Note that you need to call MsgInternalTo.Unwrap() before calling this method if this MsgInternalTo
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (mit *MsgInternalTo) Update() *MsgInternalToUpdateOne {
-	return NewMsgInternalToClient(mit.config).UpdateOne(mit)
+func (_m *MsgInternalTo) Update() *MsgInternalToUpdateOne {
+	return NewMsgInternalToClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the MsgInternalTo entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (mit *MsgInternalTo) Unwrap() *MsgInternalTo {
-	_tx, ok := mit.config.driver.(*txDriver)
+func (_m *MsgInternalTo) Unwrap() *MsgInternalTo {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: MsgInternalTo is not a transactional entity")
 	}
-	mit.config.driver = _tx.drv
-	return mit
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (mit *MsgInternalTo) String() string {
+func (_m *MsgInternalTo) String() string {
 	var builder strings.Builder
 	builder.WriteString("MsgInternalTo(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", mit.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("tenant_id=")
-	builder.WriteString(fmt.Sprintf("%v", mit.TenantID))
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
 	builder.WriteString(", ")
 	builder.WriteString("msg_internal_id=")
-	builder.WriteString(fmt.Sprintf("%v", mit.MsgInternalID))
+	builder.WriteString(fmt.Sprintf("%v", _m.MsgInternalID))
 	builder.WriteString(", ")
 	builder.WriteString("user_id=")
-	builder.WriteString(fmt.Sprintf("%v", mit.UserID))
+	builder.WriteString(fmt.Sprintf("%v", _m.UserID))
 	builder.WriteString(", ")
 	builder.WriteString("read_at=")
-	builder.WriteString(mit.ReadAt.Format(time.ANSIC))
+	builder.WriteString(_m.ReadAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("delete_at=")
-	builder.WriteString(mit.DeleteAt.Format(time.ANSIC))
+	builder.WriteString(_m.DeleteAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(mit.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

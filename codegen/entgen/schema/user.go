@@ -62,6 +62,43 @@ func (User) Edges() []ent.Edge {
 	}
 }
 
+// Org holds the schema definition for the Org entity.
+type Org struct {
+	ent.Schema
+}
+
+// Annotations of the Org.
+func (Org) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entsql.Annotation{Table: "org"},
+		entgql.Skip(entgql.SkipEnumField, entgql.SkipOrderField, entgql.SkipWhereInput, entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
+	}
+}
+
+// Fields of the Org.
+func (Org) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("id").Comment("组织ID"),
+		field.Int("owner_id").Optional(),
+		field.String("kind").Optional(),
+		field.Int("parent_id").Optional(),
+		field.Text("path").Optional(),
+	}
+}
+
+// Hooks of the Org.
+func (Org) Hooks() []ent.Hook {
+	return []ent.Hook{
+		readonlyHook(),
+	}
+}
+
+func (Org) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("msg_alerts", MsgAlert.Type).Comment("消息列表"),
+	}
+}
+
 type OrgRoleUser struct {
 	ent.Schema
 }

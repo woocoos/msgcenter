@@ -46,10 +46,6 @@ type MsgAlertWhereInput struct {
 	TenantIDNEQ   *int  `json:"tenantIDNEQ,omitempty"`
 	TenantIDIn    []int `json:"tenantIDIn,omitempty"`
 	TenantIDNotIn []int `json:"tenantIDNotIn,omitempty"`
-	TenantIDGT    *int  `json:"tenantIDGT,omitempty"`
-	TenantIDGTE   *int  `json:"tenantIDGTE,omitempty"`
-	TenantIDLT    *int  `json:"tenantIDLT,omitempty"`
-	TenantIDLTE   *int  `json:"tenantIDLTE,omitempty"`
 
 	// "starts_at" field predicates.
 	StartsAt      *time.Time  `json:"startsAt,omitempty"`
@@ -256,18 +252,6 @@ func (i *MsgAlertWhereInput) P() (predicate.MsgAlert, error) {
 	}
 	if len(i.TenantIDNotIn) > 0 {
 		predicates = append(predicates, msgalert.TenantIDNotIn(i.TenantIDNotIn...))
-	}
-	if i.TenantIDGT != nil {
-		predicates = append(predicates, msgalert.TenantIDGT(*i.TenantIDGT))
-	}
-	if i.TenantIDGTE != nil {
-		predicates = append(predicates, msgalert.TenantIDGTE(*i.TenantIDGTE))
-	}
-	if i.TenantIDLT != nil {
-		predicates = append(predicates, msgalert.TenantIDLT(*i.TenantIDLT))
-	}
-	if i.TenantIDLTE != nil {
-		predicates = append(predicates, msgalert.TenantIDLTE(*i.TenantIDLTE))
 	}
 	if i.StartsAt != nil {
 		predicates = append(predicates, msgalert.StartsAtEQ(*i.StartsAt))
@@ -1092,6 +1076,23 @@ type MsgEventWhereInput struct {
 	StatusIsNil  bool                 `json:"statusIsNil,omitempty"`
 	StatusNotNil bool                 `json:"statusNotNil,omitempty"`
 
+	// "comments" field predicates.
+	Comments             *string  `json:"comments,omitempty"`
+	CommentsNEQ          *string  `json:"commentsNEQ,omitempty"`
+	CommentsIn           []string `json:"commentsIn,omitempty"`
+	CommentsNotIn        []string `json:"commentsNotIn,omitempty"`
+	CommentsGT           *string  `json:"commentsGT,omitempty"`
+	CommentsGTE          *string  `json:"commentsGTE,omitempty"`
+	CommentsLT           *string  `json:"commentsLT,omitempty"`
+	CommentsLTE          *string  `json:"commentsLTE,omitempty"`
+	CommentsContains     *string  `json:"commentsContains,omitempty"`
+	CommentsHasPrefix    *string  `json:"commentsHasPrefix,omitempty"`
+	CommentsHasSuffix    *string  `json:"commentsHasSuffix,omitempty"`
+	CommentsIsNil        bool     `json:"commentsIsNil,omitempty"`
+	CommentsNotNil       bool     `json:"commentsNotNil,omitempty"`
+	CommentsEqualFold    *string  `json:"commentsEqualFold,omitempty"`
+	CommentsContainsFold *string  `json:"commentsContainsFold,omitempty"`
+
 	// "modes" field predicates.
 	Modes             *string  `json:"modes,omitempty"`
 	ModesNEQ          *string  `json:"modesNEQ,omitempty"`
@@ -1387,6 +1388,51 @@ func (i *MsgEventWhereInput) P() (predicate.MsgEvent, error) {
 	}
 	if i.StatusNotNil {
 		predicates = append(predicates, msgevent.StatusNotNil())
+	}
+	if i.Comments != nil {
+		predicates = append(predicates, msgevent.CommentsEQ(*i.Comments))
+	}
+	if i.CommentsNEQ != nil {
+		predicates = append(predicates, msgevent.CommentsNEQ(*i.CommentsNEQ))
+	}
+	if len(i.CommentsIn) > 0 {
+		predicates = append(predicates, msgevent.CommentsIn(i.CommentsIn...))
+	}
+	if len(i.CommentsNotIn) > 0 {
+		predicates = append(predicates, msgevent.CommentsNotIn(i.CommentsNotIn...))
+	}
+	if i.CommentsGT != nil {
+		predicates = append(predicates, msgevent.CommentsGT(*i.CommentsGT))
+	}
+	if i.CommentsGTE != nil {
+		predicates = append(predicates, msgevent.CommentsGTE(*i.CommentsGTE))
+	}
+	if i.CommentsLT != nil {
+		predicates = append(predicates, msgevent.CommentsLT(*i.CommentsLT))
+	}
+	if i.CommentsLTE != nil {
+		predicates = append(predicates, msgevent.CommentsLTE(*i.CommentsLTE))
+	}
+	if i.CommentsContains != nil {
+		predicates = append(predicates, msgevent.CommentsContains(*i.CommentsContains))
+	}
+	if i.CommentsHasPrefix != nil {
+		predicates = append(predicates, msgevent.CommentsHasPrefix(*i.CommentsHasPrefix))
+	}
+	if i.CommentsHasSuffix != nil {
+		predicates = append(predicates, msgevent.CommentsHasSuffix(*i.CommentsHasSuffix))
+	}
+	if i.CommentsIsNil {
+		predicates = append(predicates, msgevent.CommentsIsNil())
+	}
+	if i.CommentsNotNil {
+		predicates = append(predicates, msgevent.CommentsNotNil())
+	}
+	if i.CommentsEqualFold != nil {
+		predicates = append(predicates, msgevent.CommentsEqualFold(*i.CommentsEqualFold))
+	}
+	if i.CommentsContainsFold != nil {
+		predicates = append(predicates, msgevent.CommentsContainsFold(*i.CommentsContainsFold))
 	}
 	if i.Modes != nil {
 		predicates = append(predicates, msgevent.ModesEQ(*i.Modes))

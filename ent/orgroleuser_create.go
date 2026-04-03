@@ -22,48 +22,48 @@ type OrgRoleUserCreate struct {
 }
 
 // SetOrgRoleID sets the "org_role_id" field.
-func (oruc *OrgRoleUserCreate) SetOrgRoleID(i int) *OrgRoleUserCreate {
-	oruc.mutation.SetOrgRoleID(i)
-	return oruc
+func (_c *OrgRoleUserCreate) SetOrgRoleID(v int) *OrgRoleUserCreate {
+	_c.mutation.SetOrgRoleID(v)
+	return _c
 }
 
 // SetOrgUserID sets the "org_user_id" field.
-func (oruc *OrgRoleUserCreate) SetOrgUserID(i int) *OrgRoleUserCreate {
-	oruc.mutation.SetOrgUserID(i)
-	return oruc
+func (_c *OrgRoleUserCreate) SetOrgUserID(v int) *OrgRoleUserCreate {
+	_c.mutation.SetOrgUserID(v)
+	return _c
 }
 
 // SetOrgID sets the "org_id" field.
-func (oruc *OrgRoleUserCreate) SetOrgID(i int) *OrgRoleUserCreate {
-	oruc.mutation.SetOrgID(i)
-	return oruc
+func (_c *OrgRoleUserCreate) SetOrgID(v int) *OrgRoleUserCreate {
+	_c.mutation.SetOrgID(v)
+	return _c
 }
 
 // SetUserID sets the "user_id" field.
-func (oruc *OrgRoleUserCreate) SetUserID(i int) *OrgRoleUserCreate {
-	oruc.mutation.SetUserID(i)
-	return oruc
+func (_c *OrgRoleUserCreate) SetUserID(v int) *OrgRoleUserCreate {
+	_c.mutation.SetUserID(v)
+	return _c
 }
 
 // SetID sets the "id" field.
-func (oruc *OrgRoleUserCreate) SetID(i int) *OrgRoleUserCreate {
-	oruc.mutation.SetID(i)
-	return oruc
+func (_c *OrgRoleUserCreate) SetID(v int) *OrgRoleUserCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // Mutation returns the OrgRoleUserMutation object of the builder.
-func (oruc *OrgRoleUserCreate) Mutation() *OrgRoleUserMutation {
-	return oruc.mutation
+func (_c *OrgRoleUserCreate) Mutation() *OrgRoleUserMutation {
+	return _c.mutation
 }
 
 // Save creates the OrgRoleUser in the database.
-func (oruc *OrgRoleUserCreate) Save(ctx context.Context) (*OrgRoleUser, error) {
-	return withHooks(ctx, oruc.sqlSave, oruc.mutation, oruc.hooks)
+func (_c *OrgRoleUserCreate) Save(ctx context.Context) (*OrgRoleUser, error) {
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (oruc *OrgRoleUserCreate) SaveX(ctx context.Context) *OrgRoleUser {
-	v, err := oruc.Save(ctx)
+func (_c *OrgRoleUserCreate) SaveX(ctx context.Context) *OrgRoleUser {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -71,41 +71,41 @@ func (oruc *OrgRoleUserCreate) SaveX(ctx context.Context) *OrgRoleUser {
 }
 
 // Exec executes the query.
-func (oruc *OrgRoleUserCreate) Exec(ctx context.Context) error {
-	_, err := oruc.Save(ctx)
+func (_c *OrgRoleUserCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (oruc *OrgRoleUserCreate) ExecX(ctx context.Context) {
-	if err := oruc.Exec(ctx); err != nil {
+func (_c *OrgRoleUserCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (oruc *OrgRoleUserCreate) check() error {
-	if _, ok := oruc.mutation.OrgRoleID(); !ok {
+func (_c *OrgRoleUserCreate) check() error {
+	if _, ok := _c.mutation.OrgRoleID(); !ok {
 		return &ValidationError{Name: "org_role_id", err: errors.New(`ent: missing required field "OrgRoleUser.org_role_id"`)}
 	}
-	if _, ok := oruc.mutation.OrgUserID(); !ok {
+	if _, ok := _c.mutation.OrgUserID(); !ok {
 		return &ValidationError{Name: "org_user_id", err: errors.New(`ent: missing required field "OrgRoleUser.org_user_id"`)}
 	}
-	if _, ok := oruc.mutation.OrgID(); !ok {
+	if _, ok := _c.mutation.OrgID(); !ok {
 		return &ValidationError{Name: "org_id", err: errors.New(`ent: missing required field "OrgRoleUser.org_id"`)}
 	}
-	if _, ok := oruc.mutation.UserID(); !ok {
+	if _, ok := _c.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "OrgRoleUser.user_id"`)}
 	}
 	return nil
 }
 
-func (oruc *OrgRoleUserCreate) sqlSave(ctx context.Context) (*OrgRoleUser, error) {
-	if err := oruc.check(); err != nil {
+func (_c *OrgRoleUserCreate) sqlSave(ctx context.Context) (*OrgRoleUser, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := oruc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, oruc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -115,35 +115,35 @@ func (oruc *OrgRoleUserCreate) sqlSave(ctx context.Context) (*OrgRoleUser, error
 		id := _spec.ID.Value.(int64)
 		_node.ID = int(id)
 	}
-	oruc.mutation.id = &_node.ID
-	oruc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (oruc *OrgRoleUserCreate) createSpec() (*OrgRoleUser, *sqlgraph.CreateSpec) {
+func (_c *OrgRoleUserCreate) createSpec() (*OrgRoleUser, *sqlgraph.CreateSpec) {
 	var (
-		_node = &OrgRoleUser{config: oruc.config}
+		_node = &OrgRoleUser{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(orgroleuser.Table, sqlgraph.NewFieldSpec(orgroleuser.FieldID, field.TypeInt))
 	)
-	_spec.Schema = oruc.schemaConfig.OrgRoleUser
-	_spec.OnConflict = oruc.conflict
-	if id, ok := oruc.mutation.ID(); ok {
+	_spec.Schema = _c.schemaConfig.OrgRoleUser
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := oruc.mutation.OrgRoleID(); ok {
+	if value, ok := _c.mutation.OrgRoleID(); ok {
 		_spec.SetField(orgroleuser.FieldOrgRoleID, field.TypeInt, value)
 		_node.OrgRoleID = value
 	}
-	if value, ok := oruc.mutation.OrgUserID(); ok {
+	if value, ok := _c.mutation.OrgUserID(); ok {
 		_spec.SetField(orgroleuser.FieldOrgUserID, field.TypeInt, value)
 		_node.OrgUserID = value
 	}
-	if value, ok := oruc.mutation.OrgID(); ok {
+	if value, ok := _c.mutation.OrgID(); ok {
 		_spec.SetField(orgroleuser.FieldOrgID, field.TypeInt, value)
 		_node.OrgID = value
 	}
-	if value, ok := oruc.mutation.UserID(); ok {
+	if value, ok := _c.mutation.UserID(); ok {
 		_spec.SetField(orgroleuser.FieldUserID, field.TypeInt, value)
 		_node.UserID = value
 	}
@@ -166,10 +166,10 @@ func (oruc *OrgRoleUserCreate) createSpec() (*OrgRoleUser, *sqlgraph.CreateSpec)
 //			SetOrgRoleID(v+v).
 //		}).
 //		Exec(ctx)
-func (oruc *OrgRoleUserCreate) OnConflict(opts ...sql.ConflictOption) *OrgRoleUserUpsertOne {
-	oruc.conflict = opts
+func (_c *OrgRoleUserCreate) OnConflict(opts ...sql.ConflictOption) *OrgRoleUserUpsertOne {
+	_c.conflict = opts
 	return &OrgRoleUserUpsertOne{
-		create: oruc,
+		create: _c,
 	}
 }
 
@@ -179,10 +179,10 @@ func (oruc *OrgRoleUserCreate) OnConflict(opts ...sql.ConflictOption) *OrgRoleUs
 //	client.OrgRoleUser.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (oruc *OrgRoleUserCreate) OnConflictColumns(columns ...string) *OrgRoleUserUpsertOne {
-	oruc.conflict = append(oruc.conflict, sql.ConflictColumns(columns...))
+func (_c *OrgRoleUserCreate) OnConflictColumns(columns ...string) *OrgRoleUserUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &OrgRoleUserUpsertOne{
-		create: oruc,
+		create: _c,
 	}
 }
 
@@ -445,16 +445,16 @@ type OrgRoleUserCreateBulk struct {
 }
 
 // Save creates the OrgRoleUser entities in the database.
-func (orucb *OrgRoleUserCreateBulk) Save(ctx context.Context) ([]*OrgRoleUser, error) {
-	if orucb.err != nil {
-		return nil, orucb.err
+func (_c *OrgRoleUserCreateBulk) Save(ctx context.Context) ([]*OrgRoleUser, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(orucb.builders))
-	nodes := make([]*OrgRoleUser, len(orucb.builders))
-	mutators := make([]Mutator, len(orucb.builders))
-	for i := range orucb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*OrgRoleUser, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := orucb.builders[i]
+			builder := _c.builders[i]
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*OrgRoleUserMutation)
 				if !ok {
@@ -467,12 +467,12 @@ func (orucb *OrgRoleUserCreateBulk) Save(ctx context.Context) ([]*OrgRoleUser, e
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, orucb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = orucb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, orucb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -496,7 +496,7 @@ func (orucb *OrgRoleUserCreateBulk) Save(ctx context.Context) ([]*OrgRoleUser, e
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, orucb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -504,8 +504,8 @@ func (orucb *OrgRoleUserCreateBulk) Save(ctx context.Context) ([]*OrgRoleUser, e
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (orucb *OrgRoleUserCreateBulk) SaveX(ctx context.Context) []*OrgRoleUser {
-	v, err := orucb.Save(ctx)
+func (_c *OrgRoleUserCreateBulk) SaveX(ctx context.Context) []*OrgRoleUser {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -513,14 +513,14 @@ func (orucb *OrgRoleUserCreateBulk) SaveX(ctx context.Context) []*OrgRoleUser {
 }
 
 // Exec executes the query.
-func (orucb *OrgRoleUserCreateBulk) Exec(ctx context.Context) error {
-	_, err := orucb.Save(ctx)
+func (_c *OrgRoleUserCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (orucb *OrgRoleUserCreateBulk) ExecX(ctx context.Context) {
-	if err := orucb.Exec(ctx); err != nil {
+func (_c *OrgRoleUserCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -540,10 +540,10 @@ func (orucb *OrgRoleUserCreateBulk) ExecX(ctx context.Context) {
 //			SetOrgRoleID(v+v).
 //		}).
 //		Exec(ctx)
-func (orucb *OrgRoleUserCreateBulk) OnConflict(opts ...sql.ConflictOption) *OrgRoleUserUpsertBulk {
-	orucb.conflict = opts
+func (_c *OrgRoleUserCreateBulk) OnConflict(opts ...sql.ConflictOption) *OrgRoleUserUpsertBulk {
+	_c.conflict = opts
 	return &OrgRoleUserUpsertBulk{
-		create: orucb,
+		create: _c,
 	}
 }
 
@@ -553,10 +553,10 @@ func (orucb *OrgRoleUserCreateBulk) OnConflict(opts ...sql.ConflictOption) *OrgR
 //	client.OrgRoleUser.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (orucb *OrgRoleUserCreateBulk) OnConflictColumns(columns ...string) *OrgRoleUserUpsertBulk {
-	orucb.conflict = append(orucb.conflict, sql.ConflictColumns(columns...))
+func (_c *OrgRoleUserCreateBulk) OnConflictColumns(columns ...string) *OrgRoleUserUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &OrgRoleUserUpsertBulk{
-		create: orucb,
+		create: _c,
 	}
 }
 

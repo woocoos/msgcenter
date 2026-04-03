@@ -22,58 +22,58 @@ type MsgTypeDelete struct {
 }
 
 // Where appends a list predicates to the MsgTypeDelete builder.
-func (mtd *MsgTypeDelete) Where(ps ...predicate.MsgType) *MsgTypeDelete {
-	mtd.mutation.Where(ps...)
-	return mtd
+func (_d *MsgTypeDelete) Where(ps ...predicate.MsgType) *MsgTypeDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (mtd *MsgTypeDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, mtd.sqlExec, mtd.mutation, mtd.hooks)
+func (_d *MsgTypeDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mtd *MsgTypeDelete) ExecX(ctx context.Context) int {
-	n, err := mtd.Exec(ctx)
+func (_d *MsgTypeDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (mtd *MsgTypeDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *MsgTypeDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(msgtype.Table, sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt))
-	_spec.Node.Schema = mtd.schemaConfig.MsgType
-	ctx = internal.NewSchemaConfigContext(ctx, mtd.schemaConfig)
-	if ps := mtd.mutation.predicates; len(ps) > 0 {
+	_spec.Node.Schema = _d.schemaConfig.MsgType
+	ctx = internal.NewSchemaConfigContext(ctx, _d.schemaConfig)
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, mtd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	mtd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // MsgTypeDeleteOne is the builder for deleting a single MsgType entity.
 type MsgTypeDeleteOne struct {
-	mtd *MsgTypeDelete
+	_d *MsgTypeDelete
 }
 
 // Where appends a list predicates to the MsgTypeDelete builder.
-func (mtdo *MsgTypeDeleteOne) Where(ps ...predicate.MsgType) *MsgTypeDeleteOne {
-	mtdo.mtd.mutation.Where(ps...)
-	return mtdo
+func (_d *MsgTypeDeleteOne) Where(ps ...predicate.MsgType) *MsgTypeDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (mtdo *MsgTypeDeleteOne) Exec(ctx context.Context) error {
-	n, err := mtdo.mtd.Exec(ctx)
+func (_d *MsgTypeDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -85,8 +85,8 @@ func (mtdo *MsgTypeDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mtdo *MsgTypeDeleteOne) ExecX(ctx context.Context) {
-	if err := mtdo.Exec(ctx); err != nil {
+func (_d *MsgTypeDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

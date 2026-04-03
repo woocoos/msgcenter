@@ -88,7 +88,7 @@ func (*UserAddr) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the UserAddr fields.
-func (ua *UserAddr) assignValues(columns []string, values []any) error {
+func (_m *UserAddr) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -99,76 +99,76 @@ func (ua *UserAddr) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			ua.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case useraddr.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				ua.UserID = int(value.Int64)
+				_m.UserID = int(value.Int64)
 			}
 		case useraddr.FieldAddrType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field addr_type", values[i])
 			} else if value.Valid {
-				ua.AddrType = useraddr.AddrType(value.String)
+				_m.AddrType = useraddr.AddrType(value.String)
 			}
 		case useraddr.FieldRegionID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field region_id", values[i])
 			} else if value.Valid {
-				ua.RegionID = new(int)
-				*ua.RegionID = int(value.Int64)
+				_m.RegionID = new(int)
+				*_m.RegionID = int(value.Int64)
 			}
 		case useraddr.FieldAddr:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field addr", values[i])
 			} else if value.Valid {
-				ua.Addr = value.String
+				_m.Addr = value.String
 			}
 		case useraddr.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field email", values[i])
 			} else if value.Valid {
-				ua.Email = value.String
+				_m.Email = value.String
 			}
 		case useraddr.FieldFax:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field fax", values[i])
 			} else if value.Valid {
-				ua.Fax = value.String
+				_m.Fax = value.String
 			}
 		case useraddr.FieldZipCode:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field zip_code", values[i])
 			} else if value.Valid {
-				ua.ZipCode = value.String
+				_m.ZipCode = value.String
 			}
 		case useraddr.FieldTel:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field tel", values[i])
 			} else if value.Valid {
-				ua.Tel = value.String
+				_m.Tel = value.String
 			}
 		case useraddr.FieldMobile:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field mobile", values[i])
 			} else if value.Valid {
-				ua.Mobile = value.String
+				_m.Mobile = value.String
 			}
 		case useraddr.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				ua.Name = value.String
+				_m.Name = value.String
 			}
 		case useraddr.FieldIsDefault:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field is_default", values[i])
 			} else if value.Valid {
-				ua.IsDefault = value.Bool
+				_m.IsDefault = value.Bool
 			}
 		default:
-			ua.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -176,72 +176,72 @@ func (ua *UserAddr) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the UserAddr.
 // This includes values selected through modifiers, order, etc.
-func (ua *UserAddr) Value(name string) (ent.Value, error) {
-	return ua.selectValues.Get(name)
+func (_m *UserAddr) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryUser queries the "user" edge of the UserAddr entity.
-func (ua *UserAddr) QueryUser() *UserQuery {
-	return NewUserAddrClient(ua.config).QueryUser(ua)
+func (_m *UserAddr) QueryUser() *UserQuery {
+	return NewUserAddrClient(_m.config).QueryUser(_m)
 }
 
 // Update returns a builder for updating this UserAddr.
 // Note that you need to call UserAddr.Unwrap() before calling this method if this UserAddr
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (ua *UserAddr) Update() *UserAddrUpdateOne {
-	return NewUserAddrClient(ua.config).UpdateOne(ua)
+func (_m *UserAddr) Update() *UserAddrUpdateOne {
+	return NewUserAddrClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the UserAddr entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (ua *UserAddr) Unwrap() *UserAddr {
-	_tx, ok := ua.config.driver.(*txDriver)
+func (_m *UserAddr) Unwrap() *UserAddr {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: UserAddr is not a transactional entity")
 	}
-	ua.config.driver = _tx.drv
-	return ua
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (ua *UserAddr) String() string {
+func (_m *UserAddr) String() string {
 	var builder strings.Builder
 	builder.WriteString("UserAddr(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", ua.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("user_id=")
-	builder.WriteString(fmt.Sprintf("%v", ua.UserID))
+	builder.WriteString(fmt.Sprintf("%v", _m.UserID))
 	builder.WriteString(", ")
 	builder.WriteString("addr_type=")
-	builder.WriteString(fmt.Sprintf("%v", ua.AddrType))
+	builder.WriteString(fmt.Sprintf("%v", _m.AddrType))
 	builder.WriteString(", ")
-	if v := ua.RegionID; v != nil {
+	if v := _m.RegionID; v != nil {
 		builder.WriteString("region_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("addr=")
-	builder.WriteString(ua.Addr)
+	builder.WriteString(_m.Addr)
 	builder.WriteString(", ")
 	builder.WriteString("email=")
-	builder.WriteString(ua.Email)
+	builder.WriteString(_m.Email)
 	builder.WriteString(", ")
 	builder.WriteString("fax=")
-	builder.WriteString(ua.Fax)
+	builder.WriteString(_m.Fax)
 	builder.WriteString(", ")
 	builder.WriteString("zip_code=")
-	builder.WriteString(ua.ZipCode)
+	builder.WriteString(_m.ZipCode)
 	builder.WriteString(", ")
 	builder.WriteString("tel=")
-	builder.WriteString(ua.Tel)
+	builder.WriteString(_m.Tel)
 	builder.WriteString(", ")
 	builder.WriteString("mobile=")
-	builder.WriteString(ua.Mobile)
+	builder.WriteString(_m.Mobile)
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(ua.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("is_default=")
-	builder.WriteString(fmt.Sprintf("%v", ua.IsDefault))
+	builder.WriteString(fmt.Sprintf("%v", _m.IsDefault))
 	builder.WriteByte(')')
 	return builder.String()
 }

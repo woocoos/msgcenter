@@ -69,6 +69,25 @@ func TestServiceSuite(t *testing.T) {
 				if s.webhookHandler != nil {
 					s.webhookHandler.ServeHTTP(w, r)
 				}
+			} else if r.URL.Path == "/graphql/query" {
+				w.Header().Set("Content-Type", "application/json")
+				d, err := json.Marshal(map[string]string{})
+				require.NoError(t, err)
+				w.Write(d)
+				return
+			} else if r.URL.Path == "/org/domain" {
+				w.Header().Set("Content-Type", "application/json")
+				d, err := json.Marshal(map[string]any{
+					"id":              2,
+					"local_currency":  "HKD",
+					"name":            "组织1",
+					"parent_id":       1,
+					"parent_name":     "组织2",
+					"parent_currency": "HKD",
+				})
+				require.NoError(t, err)
+				w.Write(d)
+				return
 			}
 			return
 		}))
@@ -132,7 +151,9 @@ func (s *serviceSuite) TestPostAlerts() {
 		{
 			Alert: &Alert{
 				Labels: map[string]string{
-					"alertname": "test",
+					"alertname":         "AlterPassword",
+					label.TenantLabel:   "1",
+					label.ToUserIDLabel: "1",
 				},
 			},
 			Annotations: map[string]string{
@@ -158,7 +179,7 @@ func (s *serviceSuite) TestPostAlertsWithParams() {
 			Alert: &Alert{
 				Labels: map[string]string{
 					"alertname":       "AlterPassword",
-					label.TenantLabel: "1",
+					label.TenantLabel: "3",
 				},
 			},
 			Annotations: map[string]string{
@@ -392,17 +413,19 @@ func (s *serviceSuite) TestWebhook() {
 					"event":    "app:approve",
 					"receiver": "webhook",
 					"skipSub":  "Y",
+					"tenant":   "1000",
 				},
 			},
 			Annotations: map[string]string{
 				"summary": "webhook test",
+				"mobile":  "8618359260323",
 			},
 			StartsAt: time.Now(),
 			EndsAt:   time.Now().Add(time.Hour),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
-	time.Sleep(time.Second * 2)
+	time.Sleep(time.Second * 20)
 	s.Require().NotNil(got.Data)
 	s.Require().Equal("webhook test", got.Data.CommonAnnotations["summary"])
 }

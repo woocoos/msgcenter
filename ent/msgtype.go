@@ -102,7 +102,7 @@ func (*MsgType) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the MsgType fields.
-func (mt *MsgType) assignValues(columns []string, values []any) error {
+func (_m *MsgType) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -113,75 +113,75 @@ func (mt *MsgType) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			mt.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case msgtype.FieldCreatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_by", values[i])
 			} else if value.Valid {
-				mt.CreatedBy = int(value.Int64)
+				_m.CreatedBy = int(value.Int64)
 			}
 		case msgtype.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				mt.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case msgtype.FieldUpdatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
 			} else if value.Valid {
-				mt.UpdatedBy = int(value.Int64)
+				_m.UpdatedBy = int(value.Int64)
 			}
 		case msgtype.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				mt.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case msgtype.FieldAppID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field app_id", values[i])
 			} else if value.Valid {
-				mt.AppID = int(value.Int64)
+				_m.AppID = int(value.Int64)
 			}
 		case msgtype.FieldCategory:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field category", values[i])
 			} else if value.Valid {
-				mt.Category = value.String
+				_m.Category = value.String
 			}
 		case msgtype.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				mt.Name = value.String
+				_m.Name = value.String
 			}
 		case msgtype.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				mt.Status = typex.SimpleStatus(value.String)
+				_m.Status = typex.SimpleStatus(value.String)
 			}
 		case msgtype.FieldComments:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field comments", values[i])
 			} else if value.Valid {
-				mt.Comments = value.String
+				_m.Comments = value.String
 			}
 		case msgtype.FieldCanSubs:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field can_subs", values[i])
 			} else if value.Valid {
-				mt.CanSubs = value.Bool
+				_m.CanSubs = value.Bool
 			}
 		case msgtype.FieldCanCustom:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field can_custom", values[i])
 			} else if value.Valid {
-				mt.CanCustom = value.Bool
+				_m.CanCustom = value.Bool
 			}
 		default:
-			mt.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -189,124 +189,124 @@ func (mt *MsgType) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the MsgType.
 // This includes values selected through modifiers, order, etc.
-func (mt *MsgType) Value(name string) (ent.Value, error) {
-	return mt.selectValues.Get(name)
+func (_m *MsgType) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryEvents queries the "events" edge of the MsgType entity.
-func (mt *MsgType) QueryEvents() *MsgEventQuery {
-	return NewMsgTypeClient(mt.config).QueryEvents(mt)
+func (_m *MsgType) QueryEvents() *MsgEventQuery {
+	return NewMsgTypeClient(_m.config).QueryEvents(_m)
 }
 
 // QuerySubscribers queries the "subscribers" edge of the MsgType entity.
-func (mt *MsgType) QuerySubscribers() *MsgSubscriberQuery {
-	return NewMsgTypeClient(mt.config).QuerySubscribers(mt)
+func (_m *MsgType) QuerySubscribers() *MsgSubscriberQuery {
+	return NewMsgTypeClient(_m.config).QuerySubscribers(_m)
 }
 
 // Update returns a builder for updating this MsgType.
 // Note that you need to call MsgType.Unwrap() before calling this method if this MsgType
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (mt *MsgType) Update() *MsgTypeUpdateOne {
-	return NewMsgTypeClient(mt.config).UpdateOne(mt)
+func (_m *MsgType) Update() *MsgTypeUpdateOne {
+	return NewMsgTypeClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the MsgType entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (mt *MsgType) Unwrap() *MsgType {
-	_tx, ok := mt.config.driver.(*txDriver)
+func (_m *MsgType) Unwrap() *MsgType {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: MsgType is not a transactional entity")
 	}
-	mt.config.driver = _tx.drv
-	return mt
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (mt *MsgType) String() string {
+func (_m *MsgType) String() string {
 	var builder strings.Builder
 	builder.WriteString("MsgType(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", mt.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", mt.CreatedBy))
+	builder.WriteString(fmt.Sprintf("%v", _m.CreatedBy))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(mt.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", mt.UpdatedBy))
+	builder.WriteString(fmt.Sprintf("%v", _m.UpdatedBy))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(mt.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("app_id=")
-	builder.WriteString(fmt.Sprintf("%v", mt.AppID))
+	builder.WriteString(fmt.Sprintf("%v", _m.AppID))
 	builder.WriteString(", ")
 	builder.WriteString("category=")
-	builder.WriteString(mt.Category)
+	builder.WriteString(_m.Category)
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(mt.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", mt.Status))
+	builder.WriteString(fmt.Sprintf("%v", _m.Status))
 	builder.WriteString(", ")
 	builder.WriteString("comments=")
-	builder.WriteString(mt.Comments)
+	builder.WriteString(_m.Comments)
 	builder.WriteString(", ")
 	builder.WriteString("can_subs=")
-	builder.WriteString(fmt.Sprintf("%v", mt.CanSubs))
+	builder.WriteString(fmt.Sprintf("%v", _m.CanSubs))
 	builder.WriteString(", ")
 	builder.WriteString("can_custom=")
-	builder.WriteString(fmt.Sprintf("%v", mt.CanCustom))
+	builder.WriteString(fmt.Sprintf("%v", _m.CanCustom))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
 // NamedEvents returns the Events named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (mt *MsgType) NamedEvents(name string) ([]*MsgEvent, error) {
-	if mt.Edges.namedEvents == nil {
+func (_m *MsgType) NamedEvents(name string) ([]*MsgEvent, error) {
+	if _m.Edges.namedEvents == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := mt.Edges.namedEvents[name]
+	nodes, ok := _m.Edges.namedEvents[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (mt *MsgType) appendNamedEvents(name string, edges ...*MsgEvent) {
-	if mt.Edges.namedEvents == nil {
-		mt.Edges.namedEvents = make(map[string][]*MsgEvent)
+func (_m *MsgType) appendNamedEvents(name string, edges ...*MsgEvent) {
+	if _m.Edges.namedEvents == nil {
+		_m.Edges.namedEvents = make(map[string][]*MsgEvent)
 	}
 	if len(edges) == 0 {
-		mt.Edges.namedEvents[name] = []*MsgEvent{}
+		_m.Edges.namedEvents[name] = []*MsgEvent{}
 	} else {
-		mt.Edges.namedEvents[name] = append(mt.Edges.namedEvents[name], edges...)
+		_m.Edges.namedEvents[name] = append(_m.Edges.namedEvents[name], edges...)
 	}
 }
 
 // NamedSubscribers returns the Subscribers named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (mt *MsgType) NamedSubscribers(name string) ([]*MsgSubscriber, error) {
-	if mt.Edges.namedSubscribers == nil {
+func (_m *MsgType) NamedSubscribers(name string) ([]*MsgSubscriber, error) {
+	if _m.Edges.namedSubscribers == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := mt.Edges.namedSubscribers[name]
+	nodes, ok := _m.Edges.namedSubscribers[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (mt *MsgType) appendNamedSubscribers(name string, edges ...*MsgSubscriber) {
-	if mt.Edges.namedSubscribers == nil {
-		mt.Edges.namedSubscribers = make(map[string][]*MsgSubscriber)
+func (_m *MsgType) appendNamedSubscribers(name string, edges ...*MsgSubscriber) {
+	if _m.Edges.namedSubscribers == nil {
+		_m.Edges.namedSubscribers = make(map[string][]*MsgSubscriber)
 	}
 	if len(edges) == 0 {
-		mt.Edges.namedSubscribers[name] = []*MsgSubscriber{}
+		_m.Edges.namedSubscribers[name] = []*MsgSubscriber{}
 	} else {
-		mt.Edges.namedSubscribers[name] = append(mt.Edges.namedSubscribers[name], edges...)
+		_m.Edges.namedSubscribers[name] = append(_m.Edges.namedSubscribers[name], edges...)
 	}
 }
 

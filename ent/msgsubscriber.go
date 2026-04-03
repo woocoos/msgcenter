@@ -98,7 +98,7 @@ func (*MsgSubscriber) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the MsgSubscriber fields.
-func (ms *MsgSubscriber) assignValues(columns []string, values []any) error {
+func (_m *MsgSubscriber) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -109,63 +109,63 @@ func (ms *MsgSubscriber) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			ms.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case msgsubscriber.FieldCreatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_by", values[i])
 			} else if value.Valid {
-				ms.CreatedBy = int(value.Int64)
+				_m.CreatedBy = int(value.Int64)
 			}
 		case msgsubscriber.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				ms.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case msgsubscriber.FieldUpdatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
 			} else if value.Valid {
-				ms.UpdatedBy = int(value.Int64)
+				_m.UpdatedBy = int(value.Int64)
 			}
 		case msgsubscriber.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				ms.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case msgsubscriber.FieldMsgTypeID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field msg_type_id", values[i])
 			} else if value.Valid {
-				ms.MsgTypeID = int(value.Int64)
+				_m.MsgTypeID = int(value.Int64)
 			}
 		case msgsubscriber.FieldTenantID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
 			} else if value.Valid {
-				ms.TenantID = int(value.Int64)
+				_m.TenantID = int(value.Int64)
 			}
 		case msgsubscriber.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				ms.UserID = int(value.Int64)
+				_m.UserID = int(value.Int64)
 			}
 		case msgsubscriber.FieldOrgRoleID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field org_role_id", values[i])
 			} else if value.Valid {
-				ms.OrgRoleID = int(value.Int64)
+				_m.OrgRoleID = int(value.Int64)
 			}
 		case msgsubscriber.FieldExclude:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field exclude", values[i])
 			} else if value.Valid {
-				ms.Exclude = value.Bool
+				_m.Exclude = value.Bool
 			}
 		default:
-			ms.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -173,69 +173,69 @@ func (ms *MsgSubscriber) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the MsgSubscriber.
 // This includes values selected through modifiers, order, etc.
-func (ms *MsgSubscriber) Value(name string) (ent.Value, error) {
-	return ms.selectValues.Get(name)
+func (_m *MsgSubscriber) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryMsgType queries the "msg_type" edge of the MsgSubscriber entity.
-func (ms *MsgSubscriber) QueryMsgType() *MsgTypeQuery {
-	return NewMsgSubscriberClient(ms.config).QueryMsgType(ms)
+func (_m *MsgSubscriber) QueryMsgType() *MsgTypeQuery {
+	return NewMsgSubscriberClient(_m.config).QueryMsgType(_m)
 }
 
 // QueryUser queries the "user" edge of the MsgSubscriber entity.
-func (ms *MsgSubscriber) QueryUser() *UserQuery {
-	return NewMsgSubscriberClient(ms.config).QueryUser(ms)
+func (_m *MsgSubscriber) QueryUser() *UserQuery {
+	return NewMsgSubscriberClient(_m.config).QueryUser(_m)
 }
 
 // Update returns a builder for updating this MsgSubscriber.
 // Note that you need to call MsgSubscriber.Unwrap() before calling this method if this MsgSubscriber
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (ms *MsgSubscriber) Update() *MsgSubscriberUpdateOne {
-	return NewMsgSubscriberClient(ms.config).UpdateOne(ms)
+func (_m *MsgSubscriber) Update() *MsgSubscriberUpdateOne {
+	return NewMsgSubscriberClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the MsgSubscriber entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (ms *MsgSubscriber) Unwrap() *MsgSubscriber {
-	_tx, ok := ms.config.driver.(*txDriver)
+func (_m *MsgSubscriber) Unwrap() *MsgSubscriber {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: MsgSubscriber is not a transactional entity")
 	}
-	ms.config.driver = _tx.drv
-	return ms
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (ms *MsgSubscriber) String() string {
+func (_m *MsgSubscriber) String() string {
 	var builder strings.Builder
 	builder.WriteString("MsgSubscriber(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", ms.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", ms.CreatedBy))
+	builder.WriteString(fmt.Sprintf("%v", _m.CreatedBy))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(ms.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", ms.UpdatedBy))
+	builder.WriteString(fmt.Sprintf("%v", _m.UpdatedBy))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(ms.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("msg_type_id=")
-	builder.WriteString(fmt.Sprintf("%v", ms.MsgTypeID))
+	builder.WriteString(fmt.Sprintf("%v", _m.MsgTypeID))
 	builder.WriteString(", ")
 	builder.WriteString("tenant_id=")
-	builder.WriteString(fmt.Sprintf("%v", ms.TenantID))
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
 	builder.WriteString(", ")
 	builder.WriteString("user_id=")
-	builder.WriteString(fmt.Sprintf("%v", ms.UserID))
+	builder.WriteString(fmt.Sprintf("%v", _m.UserID))
 	builder.WriteString(", ")
 	builder.WriteString("org_role_id=")
-	builder.WriteString(fmt.Sprintf("%v", ms.OrgRoleID))
+	builder.WriteString(fmt.Sprintf("%v", _m.OrgRoleID))
 	builder.WriteString(", ")
 	builder.WriteString("exclude=")
-	builder.WriteString(fmt.Sprintf("%v", ms.Exclude))
+	builder.WriteString(fmt.Sprintf("%v", _m.Exclude))
 	builder.WriteByte(')')
 	return builder.String()
 }

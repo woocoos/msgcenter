@@ -53,6 +53,7 @@ type AlertManager struct {
 	Subscribe       *UserSubscribe
 	DB              *ent.Client
 	Peer            *members.Peer
+	Route           *dispatch.Route
 }
 
 func NewAlertManager(app *woocoo.App, opts ...AmOption) (*AlertManager, error) {
@@ -138,6 +139,7 @@ func (am *AlertManager) buildDBClient(cnf *conf.AppConfiguration) {
 	drv := ents["msgcenter"]
 	scfg := ent.AlternateSchema(ent.SchemaConfig{
 		User:        "portal",
+		Org:         "portal",
 		OrgRoleUser: "portal",
 		UserAddr:    "portal",
 	})
@@ -202,6 +204,7 @@ func (am *AlertManager) Start(co *Coordinator, config *profile.Config) error {
 	)
 	am.Dispatcher = dispatch.NewDispatcher(am.Alerts, routes, pipeline, am.Marker, timeoutFunc)
 	routes.Apply(am.cnf)
+	am.Route = routes
 
 	go am.Dispatcher.Run()
 	go am.Inhibitor.Start(context.Background())

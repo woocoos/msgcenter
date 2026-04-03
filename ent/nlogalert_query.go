@@ -36,44 +36,44 @@ type NlogAlertQuery struct {
 }
 
 // Where adds a new predicate for the NlogAlertQuery builder.
-func (naq *NlogAlertQuery) Where(ps ...predicate.NlogAlert) *NlogAlertQuery {
-	naq.predicates = append(naq.predicates, ps...)
-	return naq
+func (_q *NlogAlertQuery) Where(ps ...predicate.NlogAlert) *NlogAlertQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (naq *NlogAlertQuery) Limit(limit int) *NlogAlertQuery {
-	naq.ctx.Limit = &limit
-	return naq
+func (_q *NlogAlertQuery) Limit(limit int) *NlogAlertQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (naq *NlogAlertQuery) Offset(offset int) *NlogAlertQuery {
-	naq.ctx.Offset = &offset
-	return naq
+func (_q *NlogAlertQuery) Offset(offset int) *NlogAlertQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (naq *NlogAlertQuery) Unique(unique bool) *NlogAlertQuery {
-	naq.ctx.Unique = &unique
-	return naq
+func (_q *NlogAlertQuery) Unique(unique bool) *NlogAlertQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (naq *NlogAlertQuery) Order(o ...nlogalert.OrderOption) *NlogAlertQuery {
-	naq.order = append(naq.order, o...)
-	return naq
+func (_q *NlogAlertQuery) Order(o ...nlogalert.OrderOption) *NlogAlertQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryNlog chains the current query on the "nlog" edge.
-func (naq *NlogAlertQuery) QueryNlog() *NlogQuery {
-	query := (&NlogClient{config: naq.config}).Query()
+func (_q *NlogAlertQuery) QueryNlog() *NlogQuery {
+	query := (&NlogClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := naq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := naq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -82,23 +82,23 @@ func (naq *NlogAlertQuery) QueryNlog() *NlogQuery {
 			sqlgraph.To(nlog.Table, nlog.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, nlogalert.NlogTable, nlogalert.NlogColumn),
 		)
-		schemaConfig := naq.schemaConfig
+		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.Nlog
 		step.Edge.Schema = schemaConfig.NlogAlert
-		fromU = sqlgraph.SetNeighbors(naq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryAlert chains the current query on the "alert" edge.
-func (naq *NlogAlertQuery) QueryAlert() *MsgAlertQuery {
-	query := (&MsgAlertClient{config: naq.config}).Query()
+func (_q *NlogAlertQuery) QueryAlert() *MsgAlertQuery {
+	query := (&MsgAlertClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := naq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := naq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -107,10 +107,10 @@ func (naq *NlogAlertQuery) QueryAlert() *MsgAlertQuery {
 			sqlgraph.To(msgalert.Table, msgalert.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, nlogalert.AlertTable, nlogalert.AlertColumn),
 		)
-		schemaConfig := naq.schemaConfig
+		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.MsgAlert
 		step.Edge.Schema = schemaConfig.NlogAlert
-		fromU = sqlgraph.SetNeighbors(naq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -118,8 +118,8 @@ func (naq *NlogAlertQuery) QueryAlert() *MsgAlertQuery {
 
 // First returns the first NlogAlert entity from the query.
 // Returns a *NotFoundError when no NlogAlert was found.
-func (naq *NlogAlertQuery) First(ctx context.Context) (*NlogAlert, error) {
-	nodes, err := naq.Limit(1).All(setContextOp(ctx, naq.ctx, ent.OpQueryFirst))
+func (_q *NlogAlertQuery) First(ctx context.Context) (*NlogAlert, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +130,8 @@ func (naq *NlogAlertQuery) First(ctx context.Context) (*NlogAlert, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (naq *NlogAlertQuery) FirstX(ctx context.Context) *NlogAlert {
-	node, err := naq.First(ctx)
+func (_q *NlogAlertQuery) FirstX(ctx context.Context) *NlogAlert {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -140,9 +140,9 @@ func (naq *NlogAlertQuery) FirstX(ctx context.Context) *NlogAlert {
 
 // FirstID returns the first NlogAlert ID from the query.
 // Returns a *NotFoundError when no NlogAlert ID was found.
-func (naq *NlogAlertQuery) FirstID(ctx context.Context) (id int, err error) {
+func (_q *NlogAlertQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = naq.Limit(1).IDs(setContextOp(ctx, naq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -153,8 +153,8 @@ func (naq *NlogAlertQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (naq *NlogAlertQuery) FirstIDX(ctx context.Context) int {
-	id, err := naq.FirstID(ctx)
+func (_q *NlogAlertQuery) FirstIDX(ctx context.Context) int {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -164,8 +164,8 @@ func (naq *NlogAlertQuery) FirstIDX(ctx context.Context) int {
 // Only returns a single NlogAlert entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one NlogAlert entity is found.
 // Returns a *NotFoundError when no NlogAlert entities are found.
-func (naq *NlogAlertQuery) Only(ctx context.Context) (*NlogAlert, error) {
-	nodes, err := naq.Limit(2).All(setContextOp(ctx, naq.ctx, ent.OpQueryOnly))
+func (_q *NlogAlertQuery) Only(ctx context.Context) (*NlogAlert, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -180,8 +180,8 @@ func (naq *NlogAlertQuery) Only(ctx context.Context) (*NlogAlert, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (naq *NlogAlertQuery) OnlyX(ctx context.Context) *NlogAlert {
-	node, err := naq.Only(ctx)
+func (_q *NlogAlertQuery) OnlyX(ctx context.Context) *NlogAlert {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -191,9 +191,9 @@ func (naq *NlogAlertQuery) OnlyX(ctx context.Context) *NlogAlert {
 // OnlyID is like Only, but returns the only NlogAlert ID in the query.
 // Returns a *NotSingularError when more than one NlogAlert ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (naq *NlogAlertQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *NlogAlertQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = naq.Limit(2).IDs(setContextOp(ctx, naq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -208,8 +208,8 @@ func (naq *NlogAlertQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (naq *NlogAlertQuery) OnlyIDX(ctx context.Context) int {
-	id, err := naq.OnlyID(ctx)
+func (_q *NlogAlertQuery) OnlyIDX(ctx context.Context) int {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -217,18 +217,18 @@ func (naq *NlogAlertQuery) OnlyIDX(ctx context.Context) int {
 }
 
 // All executes the query and returns a list of NlogAlerts.
-func (naq *NlogAlertQuery) All(ctx context.Context) ([]*NlogAlert, error) {
-	ctx = setContextOp(ctx, naq.ctx, ent.OpQueryAll)
-	if err := naq.prepareQuery(ctx); err != nil {
+func (_q *NlogAlertQuery) All(ctx context.Context) ([]*NlogAlert, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*NlogAlert, *NlogAlertQuery]()
-	return withInterceptors[[]*NlogAlert](ctx, naq, qr, naq.inters)
+	return withInterceptors[[]*NlogAlert](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (naq *NlogAlertQuery) AllX(ctx context.Context) []*NlogAlert {
-	nodes, err := naq.All(ctx)
+func (_q *NlogAlertQuery) AllX(ctx context.Context) []*NlogAlert {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -236,20 +236,20 @@ func (naq *NlogAlertQuery) AllX(ctx context.Context) []*NlogAlert {
 }
 
 // IDs executes the query and returns a list of NlogAlert IDs.
-func (naq *NlogAlertQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if naq.ctx.Unique == nil && naq.path != nil {
-		naq.Unique(true)
+func (_q *NlogAlertQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, naq.ctx, ent.OpQueryIDs)
-	if err = naq.Select(nlogalert.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(nlogalert.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (naq *NlogAlertQuery) IDsX(ctx context.Context) []int {
-	ids, err := naq.IDs(ctx)
+func (_q *NlogAlertQuery) IDsX(ctx context.Context) []int {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -257,17 +257,17 @@ func (naq *NlogAlertQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (naq *NlogAlertQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, naq.ctx, ent.OpQueryCount)
-	if err := naq.prepareQuery(ctx); err != nil {
+func (_q *NlogAlertQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, naq, querierCount[*NlogAlertQuery](), naq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*NlogAlertQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (naq *NlogAlertQuery) CountX(ctx context.Context) int {
-	count, err := naq.Count(ctx)
+func (_q *NlogAlertQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -275,9 +275,9 @@ func (naq *NlogAlertQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (naq *NlogAlertQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, naq.ctx, ent.OpQueryExist)
-	switch _, err := naq.FirstID(ctx); {
+func (_q *NlogAlertQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -288,8 +288,8 @@ func (naq *NlogAlertQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (naq *NlogAlertQuery) ExistX(ctx context.Context) bool {
-	exist, err := naq.Exist(ctx)
+func (_q *NlogAlertQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -298,44 +298,44 @@ func (naq *NlogAlertQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the NlogAlertQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (naq *NlogAlertQuery) Clone() *NlogAlertQuery {
-	if naq == nil {
+func (_q *NlogAlertQuery) Clone() *NlogAlertQuery {
+	if _q == nil {
 		return nil
 	}
 	return &NlogAlertQuery{
-		config:     naq.config,
-		ctx:        naq.ctx.Clone(),
-		order:      append([]nlogalert.OrderOption{}, naq.order...),
-		inters:     append([]Interceptor{}, naq.inters...),
-		predicates: append([]predicate.NlogAlert{}, naq.predicates...),
-		withNlog:   naq.withNlog.Clone(),
-		withAlert:  naq.withAlert.Clone(),
+		config:     _q.config,
+		ctx:        _q.ctx.Clone(),
+		order:      append([]nlogalert.OrderOption{}, _q.order...),
+		inters:     append([]Interceptor{}, _q.inters...),
+		predicates: append([]predicate.NlogAlert{}, _q.predicates...),
+		withNlog:   _q.withNlog.Clone(),
+		withAlert:  _q.withAlert.Clone(),
 		// clone intermediate query.
-		sql:  naq.sql.Clone(),
-		path: naq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
 // WithNlog tells the query-builder to eager-load the nodes that are connected to
 // the "nlog" edge. The optional arguments are used to configure the query builder of the edge.
-func (naq *NlogAlertQuery) WithNlog(opts ...func(*NlogQuery)) *NlogAlertQuery {
-	query := (&NlogClient{config: naq.config}).Query()
+func (_q *NlogAlertQuery) WithNlog(opts ...func(*NlogQuery)) *NlogAlertQuery {
+	query := (&NlogClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	naq.withNlog = query
-	return naq
+	_q.withNlog = query
+	return _q
 }
 
 // WithAlert tells the query-builder to eager-load the nodes that are connected to
 // the "alert" edge. The optional arguments are used to configure the query builder of the edge.
-func (naq *NlogAlertQuery) WithAlert(opts ...func(*MsgAlertQuery)) *NlogAlertQuery {
-	query := (&MsgAlertClient{config: naq.config}).Query()
+func (_q *NlogAlertQuery) WithAlert(opts ...func(*MsgAlertQuery)) *NlogAlertQuery {
+	query := (&MsgAlertClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	naq.withAlert = query
-	return naq
+	_q.withAlert = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -352,10 +352,10 @@ func (naq *NlogAlertQuery) WithAlert(opts ...func(*MsgAlertQuery)) *NlogAlertQue
 //		GroupBy(nlogalert.FieldNlogID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (naq *NlogAlertQuery) GroupBy(field string, fields ...string) *NlogAlertGroupBy {
-	naq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &NlogAlertGroupBy{build: naq}
-	grbuild.flds = &naq.ctx.Fields
+func (_q *NlogAlertQuery) GroupBy(field string, fields ...string) *NlogAlertGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &NlogAlertGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = nlogalert.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -373,98 +373,98 @@ func (naq *NlogAlertQuery) GroupBy(field string, fields ...string) *NlogAlertGro
 //	client.NlogAlert.Query().
 //		Select(nlogalert.FieldNlogID).
 //		Scan(ctx, &v)
-func (naq *NlogAlertQuery) Select(fields ...string) *NlogAlertSelect {
-	naq.ctx.Fields = append(naq.ctx.Fields, fields...)
-	sbuild := &NlogAlertSelect{NlogAlertQuery: naq}
+func (_q *NlogAlertQuery) Select(fields ...string) *NlogAlertSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &NlogAlertSelect{NlogAlertQuery: _q}
 	sbuild.label = nlogalert.Label
-	sbuild.flds, sbuild.scan = &naq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a NlogAlertSelect configured with the given aggregations.
-func (naq *NlogAlertQuery) Aggregate(fns ...AggregateFunc) *NlogAlertSelect {
-	return naq.Select().Aggregate(fns...)
+func (_q *NlogAlertQuery) Aggregate(fns ...AggregateFunc) *NlogAlertSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (naq *NlogAlertQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range naq.inters {
+func (_q *NlogAlertQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, naq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range naq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !nlogalert.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if naq.path != nil {
-		prev, err := naq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		naq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (naq *NlogAlertQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*NlogAlert, error) {
+func (_q *NlogAlertQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*NlogAlert, error) {
 	var (
 		nodes       = []*NlogAlert{}
-		_spec       = naq.querySpec()
+		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
-			naq.withNlog != nil,
-			naq.withAlert != nil,
+			_q.withNlog != nil,
+			_q.withAlert != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*NlogAlert).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &NlogAlert{config: naq.config}
+		node := &NlogAlert{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	_spec.Node.Schema = naq.schemaConfig.NlogAlert
-	ctx = internal.NewSchemaConfigContext(ctx, naq.schemaConfig)
-	if len(naq.modifiers) > 0 {
-		_spec.Modifiers = naq.modifiers
+	_spec.Node.Schema = _q.schemaConfig.NlogAlert
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, naq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := naq.withNlog; query != nil {
-		if err := naq.loadNlog(ctx, query, nodes, nil,
+	if query := _q.withNlog; query != nil {
+		if err := _q.loadNlog(ctx, query, nodes, nil,
 			func(n *NlogAlert, e *Nlog) { n.Edges.Nlog = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := naq.withAlert; query != nil {
-		if err := naq.loadAlert(ctx, query, nodes, nil,
+	if query := _q.withAlert; query != nil {
+		if err := _q.loadAlert(ctx, query, nodes, nil,
 			func(n *NlogAlert, e *MsgAlert) { n.Edges.Alert = e }); err != nil {
 			return nil, err
 		}
 	}
-	for i := range naq.loadTotal {
-		if err := naq.loadTotal[i](ctx, nodes); err != nil {
+	for i := range _q.loadTotal {
+		if err := _q.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (naq *NlogAlertQuery) loadNlog(ctx context.Context, query *NlogQuery, nodes []*NlogAlert, init func(*NlogAlert), assign func(*NlogAlert, *Nlog)) error {
+func (_q *NlogAlertQuery) loadNlog(ctx context.Context, query *NlogQuery, nodes []*NlogAlert, init func(*NlogAlert), assign func(*NlogAlert, *Nlog)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*NlogAlert)
 	for i := range nodes {
@@ -493,7 +493,7 @@ func (naq *NlogAlertQuery) loadNlog(ctx context.Context, query *NlogQuery, nodes
 	}
 	return nil
 }
-func (naq *NlogAlertQuery) loadAlert(ctx context.Context, query *MsgAlertQuery, nodes []*NlogAlert, init func(*NlogAlert), assign func(*NlogAlert, *MsgAlert)) error {
+func (_q *NlogAlertQuery) loadAlert(ctx context.Context, query *MsgAlertQuery, nodes []*NlogAlert, init func(*NlogAlert), assign func(*NlogAlert, *MsgAlert)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*NlogAlert)
 	for i := range nodes {
@@ -523,29 +523,29 @@ func (naq *NlogAlertQuery) loadAlert(ctx context.Context, query *MsgAlertQuery, 
 	return nil
 }
 
-func (naq *NlogAlertQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := naq.querySpec()
-	_spec.Node.Schema = naq.schemaConfig.NlogAlert
-	ctx = internal.NewSchemaConfigContext(ctx, naq.schemaConfig)
-	if len(naq.modifiers) > 0 {
-		_spec.Modifiers = naq.modifiers
+func (_q *NlogAlertQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	_spec.Node.Schema = _q.schemaConfig.NlogAlert
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = naq.ctx.Fields
-	if len(naq.ctx.Fields) > 0 {
-		_spec.Unique = naq.ctx.Unique != nil && *naq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, naq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (naq *NlogAlertQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *NlogAlertQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(nlogalert.Table, nlogalert.Columns, sqlgraph.NewFieldSpec(nlogalert.FieldID, field.TypeInt))
-	_spec.From = naq.sql
-	if unique := naq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if naq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := naq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, nlogalert.FieldID)
 		for i := range fields {
@@ -553,27 +553,27 @@ func (naq *NlogAlertQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if naq.withNlog != nil {
+		if _q.withNlog != nil {
 			_spec.Node.AddColumnOnce(nlogalert.FieldNlogID)
 		}
-		if naq.withAlert != nil {
+		if _q.withAlert != nil {
 			_spec.Node.AddColumnOnce(nlogalert.FieldAlertID)
 		}
 	}
-	if ps := naq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := naq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := naq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := naq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -583,36 +583,36 @@ func (naq *NlogAlertQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (naq *NlogAlertQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(naq.driver.Dialect())
+func (_q *NlogAlertQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(nlogalert.Table)
-	columns := naq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = nlogalert.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if naq.sql != nil {
-		selector = naq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if naq.ctx.Unique != nil && *naq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	t1.Schema(naq.schemaConfig.NlogAlert)
-	ctx = internal.NewSchemaConfigContext(ctx, naq.schemaConfig)
+	t1.Schema(_q.schemaConfig.NlogAlert)
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
 	selector.WithContext(ctx)
-	for _, p := range naq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range naq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := naq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := naq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -625,41 +625,41 @@ type NlogAlertGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (nagb *NlogAlertGroupBy) Aggregate(fns ...AggregateFunc) *NlogAlertGroupBy {
-	nagb.fns = append(nagb.fns, fns...)
-	return nagb
+func (_g *NlogAlertGroupBy) Aggregate(fns ...AggregateFunc) *NlogAlertGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (nagb *NlogAlertGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, nagb.build.ctx, ent.OpQueryGroupBy)
-	if err := nagb.build.prepareQuery(ctx); err != nil {
+func (_g *NlogAlertGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*NlogAlertQuery, *NlogAlertGroupBy](ctx, nagb.build, nagb, nagb.build.inters, v)
+	return scanWithInterceptors[*NlogAlertQuery, *NlogAlertGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (nagb *NlogAlertGroupBy) sqlScan(ctx context.Context, root *NlogAlertQuery, v any) error {
+func (_g *NlogAlertGroupBy) sqlScan(ctx context.Context, root *NlogAlertQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(nagb.fns))
-	for _, fn := range nagb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*nagb.flds)+len(nagb.fns))
-		for _, f := range *nagb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*nagb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := nagb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -673,27 +673,27 @@ type NlogAlertSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (nas *NlogAlertSelect) Aggregate(fns ...AggregateFunc) *NlogAlertSelect {
-	nas.fns = append(nas.fns, fns...)
-	return nas
+func (_s *NlogAlertSelect) Aggregate(fns ...AggregateFunc) *NlogAlertSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (nas *NlogAlertSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, nas.ctx, ent.OpQuerySelect)
-	if err := nas.prepareQuery(ctx); err != nil {
+func (_s *NlogAlertSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*NlogAlertQuery, *NlogAlertSelect](ctx, nas.NlogAlertQuery, nas, nas.inters, v)
+	return scanWithInterceptors[*NlogAlertQuery, *NlogAlertSelect](ctx, _s.NlogAlertQuery, _s, _s.inters, v)
 }
 
-func (nas *NlogAlertSelect) sqlScan(ctx context.Context, root *NlogAlertQuery, v any) error {
+func (_s *NlogAlertSelect) sqlScan(ctx context.Context, root *NlogAlertQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(nas.fns))
-	for _, fn := range nas.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*nas.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -701,7 +701,7 @@ func (nas *NlogAlertSelect) sqlScan(ctx context.Context, root *NlogAlertQuery, v
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := nas.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

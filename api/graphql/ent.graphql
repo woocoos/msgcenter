@@ -210,7 +210,7 @@ type MsgAlert implements Node {
   """
   租户ID
   """
-  tenantID: Int!
+  tenantID: ID!
   """
   标签
   """
@@ -280,6 +280,7 @@ type MsgAlert implements Node {
     """
     where: NlogWhereInput
   ): NlogConnection!
+  org: Org!
   nlogAlerts: [NlogAlert!]
 }
 """
@@ -361,14 +362,10 @@ input MsgAlertWhereInput {
   """
   tenant_id field predicates
   """
-  tenantID: Int
-  tenantIDNEQ: Int
-  tenantIDIn: [Int!]
-  tenantIDNotIn: [Int!]
-  tenantIDGT: Int
-  tenantIDGTE: Int
-  tenantIDLT: Int
-  tenantIDLTE: Int
+  tenantID: ID
+  tenantIDNEQ: ID
+  tenantIDIn: [ID!]
+  tenantIDNotIn: [ID!]
   """
   starts_at field predicates
   """
@@ -901,6 +898,24 @@ input MsgEventWhereInput {
   statusNotIn: [MsgEventSimpleStatus!]
   statusIsNil: Boolean
   statusNotNil: Boolean
+  """
+  comments field predicates
+  """
+  comments: String
+  commentsNEQ: String
+  commentsIn: [String!]
+  commentsNotIn: [String!]
+  commentsGT: String
+  commentsGTE: String
+  commentsLT: String
+  commentsLTE: String
+  commentsContains: String
+  commentsHasPrefix: String
+  commentsHasSuffix: String
+  commentsIsNil: Boolean
+  commentsNotNil: Boolean
+  commentsEqualFold: String
+  commentsContainsFold: String
   """
   modes field predicates
   """
@@ -2429,6 +2444,20 @@ enum OrderDirection {
   Specifies a descending order for a given `orderBy` argument.
   """
   DESC
+}
+type Org implements Node {
+  """
+  组织ID
+  """
+  id: ID!
+  ownerID: Int
+  kind: String
+  parentID: Int
+  path: String
+  """
+  消息列表
+  """
+  msgAlerts: [MsgAlert!]
 }
 """
 Information about pagination in a connection.

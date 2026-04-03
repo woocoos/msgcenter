@@ -16,7 +16,9 @@ type SchemaConfig struct {
 	MsgTemplate   string // MsgTemplate table.
 	MsgType       string // MsgType table.
 	Nlog          string // Nlog table.
+	NlogAlerts    string // Nlog-alerts->MsgAlert table.
 	NlogAlert     string // NlogAlert table.
+	Org           string // Org table.
 	OrgRoleUser   string // OrgRoleUser table.
 	Silence       string // Silence table.
 	User          string // User table.

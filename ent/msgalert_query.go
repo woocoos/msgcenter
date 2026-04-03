@@ -15,6 +15,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
+	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/predicate"
 
 	"github.com/woocoos/msgcenter/ent/internal"
@@ -28,6 +29,7 @@ type MsgAlertQuery struct {
 	inters              []Interceptor
 	predicates          []predicate.MsgAlert
 	withNlog            *NlogQuery
+	withOrg             *OrgQuery
 	withNlogAlerts      *NlogAlertQuery
 	modifiers           []func(*sql.Selector)
 	loadTotal           []func(context.Context, []*MsgAlert) error
@@ -39,44 +41,44 @@ type MsgAlertQuery struct {
 }
 
 // Where adds a new predicate for the MsgAlertQuery builder.
-func (maq *MsgAlertQuery) Where(ps ...predicate.MsgAlert) *MsgAlertQuery {
-	maq.predicates = append(maq.predicates, ps...)
-	return maq
+func (_q *MsgAlertQuery) Where(ps ...predicate.MsgAlert) *MsgAlertQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (maq *MsgAlertQuery) Limit(limit int) *MsgAlertQuery {
-	maq.ctx.Limit = &limit
-	return maq
+func (_q *MsgAlertQuery) Limit(limit int) *MsgAlertQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (maq *MsgAlertQuery) Offset(offset int) *MsgAlertQuery {
-	maq.ctx.Offset = &offset
-	return maq
+func (_q *MsgAlertQuery) Offset(offset int) *MsgAlertQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (maq *MsgAlertQuery) Unique(unique bool) *MsgAlertQuery {
-	maq.ctx.Unique = &unique
-	return maq
+func (_q *MsgAlertQuery) Unique(unique bool) *MsgAlertQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (maq *MsgAlertQuery) Order(o ...msgalert.OrderOption) *MsgAlertQuery {
-	maq.order = append(maq.order, o...)
-	return maq
+func (_q *MsgAlertQuery) Order(o ...msgalert.OrderOption) *MsgAlertQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryNlog chains the current query on the "nlog" edge.
-func (maq *MsgAlertQuery) QueryNlog() *NlogQuery {
-	query := (&NlogClient{config: maq.config}).Query()
+func (_q *MsgAlertQuery) QueryNlog() *NlogQuery {
+	query := (&NlogClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := maq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := maq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -85,23 +87,48 @@ func (maq *MsgAlertQuery) QueryNlog() *NlogQuery {
 			sqlgraph.To(nlog.Table, nlog.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, msgalert.NlogTable, msgalert.NlogPrimaryKey...),
 		)
-		schemaConfig := maq.schemaConfig
+		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.Nlog
 		step.Edge.Schema = schemaConfig.NlogAlert
-		fromU = sqlgraph.SetNeighbors(maq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOrg chains the current query on the "org" edge.
+func (_q *MsgAlertQuery) QueryOrg() *OrgQuery {
+	query := (&OrgClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msgalert.Table, msgalert.FieldID, selector),
+			sqlgraph.To(org.Table, org.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, msgalert.OrgTable, msgalert.OrgColumn),
+		)
+		schemaConfig := _q.schemaConfig
+		step.To.Schema = schemaConfig.Org
+		step.Edge.Schema = schemaConfig.MsgAlert
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryNlogAlerts chains the current query on the "nlog_alerts" edge.
-func (maq *MsgAlertQuery) QueryNlogAlerts() *NlogAlertQuery {
-	query := (&NlogAlertClient{config: maq.config}).Query()
+func (_q *MsgAlertQuery) QueryNlogAlerts() *NlogAlertQuery {
+	query := (&NlogAlertClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := maq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := maq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -110,10 +137,10 @@ func (maq *MsgAlertQuery) QueryNlogAlerts() *NlogAlertQuery {
 			sqlgraph.To(nlogalert.Table, nlogalert.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, msgalert.NlogAlertsTable, msgalert.NlogAlertsColumn),
 		)
-		schemaConfig := maq.schemaConfig
+		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.NlogAlert
 		step.Edge.Schema = schemaConfig.NlogAlert
-		fromU = sqlgraph.SetNeighbors(maq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -121,8 +148,8 @@ func (maq *MsgAlertQuery) QueryNlogAlerts() *NlogAlertQuery {
 
 // First returns the first MsgAlert entity from the query.
 // Returns a *NotFoundError when no MsgAlert was found.
-func (maq *MsgAlertQuery) First(ctx context.Context) (*MsgAlert, error) {
-	nodes, err := maq.Limit(1).All(setContextOp(ctx, maq.ctx, ent.OpQueryFirst))
+func (_q *MsgAlertQuery) First(ctx context.Context) (*MsgAlert, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -133,8 +160,8 @@ func (maq *MsgAlertQuery) First(ctx context.Context) (*MsgAlert, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (maq *MsgAlertQuery) FirstX(ctx context.Context) *MsgAlert {
-	node, err := maq.First(ctx)
+func (_q *MsgAlertQuery) FirstX(ctx context.Context) *MsgAlert {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -143,9 +170,9 @@ func (maq *MsgAlertQuery) FirstX(ctx context.Context) *MsgAlert {
 
 // FirstID returns the first MsgAlert ID from the query.
 // Returns a *NotFoundError when no MsgAlert ID was found.
-func (maq *MsgAlertQuery) FirstID(ctx context.Context) (id int, err error) {
+func (_q *MsgAlertQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = maq.Limit(1).IDs(setContextOp(ctx, maq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -156,8 +183,8 @@ func (maq *MsgAlertQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (maq *MsgAlertQuery) FirstIDX(ctx context.Context) int {
-	id, err := maq.FirstID(ctx)
+func (_q *MsgAlertQuery) FirstIDX(ctx context.Context) int {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -167,8 +194,8 @@ func (maq *MsgAlertQuery) FirstIDX(ctx context.Context) int {
 // Only returns a single MsgAlert entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one MsgAlert entity is found.
 // Returns a *NotFoundError when no MsgAlert entities are found.
-func (maq *MsgAlertQuery) Only(ctx context.Context) (*MsgAlert, error) {
-	nodes, err := maq.Limit(2).All(setContextOp(ctx, maq.ctx, ent.OpQueryOnly))
+func (_q *MsgAlertQuery) Only(ctx context.Context) (*MsgAlert, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -183,8 +210,8 @@ func (maq *MsgAlertQuery) Only(ctx context.Context) (*MsgAlert, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (maq *MsgAlertQuery) OnlyX(ctx context.Context) *MsgAlert {
-	node, err := maq.Only(ctx)
+func (_q *MsgAlertQuery) OnlyX(ctx context.Context) *MsgAlert {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -194,9 +221,9 @@ func (maq *MsgAlertQuery) OnlyX(ctx context.Context) *MsgAlert {
 // OnlyID is like Only, but returns the only MsgAlert ID in the query.
 // Returns a *NotSingularError when more than one MsgAlert ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (maq *MsgAlertQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *MsgAlertQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = maq.Limit(2).IDs(setContextOp(ctx, maq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -211,8 +238,8 @@ func (maq *MsgAlertQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (maq *MsgAlertQuery) OnlyIDX(ctx context.Context) int {
-	id, err := maq.OnlyID(ctx)
+func (_q *MsgAlertQuery) OnlyIDX(ctx context.Context) int {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -220,18 +247,18 @@ func (maq *MsgAlertQuery) OnlyIDX(ctx context.Context) int {
 }
 
 // All executes the query and returns a list of MsgAlerts.
-func (maq *MsgAlertQuery) All(ctx context.Context) ([]*MsgAlert, error) {
-	ctx = setContextOp(ctx, maq.ctx, ent.OpQueryAll)
-	if err := maq.prepareQuery(ctx); err != nil {
+func (_q *MsgAlertQuery) All(ctx context.Context) ([]*MsgAlert, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*MsgAlert, *MsgAlertQuery]()
-	return withInterceptors[[]*MsgAlert](ctx, maq, qr, maq.inters)
+	return withInterceptors[[]*MsgAlert](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (maq *MsgAlertQuery) AllX(ctx context.Context) []*MsgAlert {
-	nodes, err := maq.All(ctx)
+func (_q *MsgAlertQuery) AllX(ctx context.Context) []*MsgAlert {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -239,20 +266,20 @@ func (maq *MsgAlertQuery) AllX(ctx context.Context) []*MsgAlert {
 }
 
 // IDs executes the query and returns a list of MsgAlert IDs.
-func (maq *MsgAlertQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if maq.ctx.Unique == nil && maq.path != nil {
-		maq.Unique(true)
+func (_q *MsgAlertQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, maq.ctx, ent.OpQueryIDs)
-	if err = maq.Select(msgalert.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(msgalert.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (maq *MsgAlertQuery) IDsX(ctx context.Context) []int {
-	ids, err := maq.IDs(ctx)
+func (_q *MsgAlertQuery) IDsX(ctx context.Context) []int {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -260,17 +287,17 @@ func (maq *MsgAlertQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (maq *MsgAlertQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, maq.ctx, ent.OpQueryCount)
-	if err := maq.prepareQuery(ctx); err != nil {
+func (_q *MsgAlertQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, maq, querierCount[*MsgAlertQuery](), maq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*MsgAlertQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (maq *MsgAlertQuery) CountX(ctx context.Context) int {
-	count, err := maq.Count(ctx)
+func (_q *MsgAlertQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -278,9 +305,9 @@ func (maq *MsgAlertQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (maq *MsgAlertQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, maq.ctx, ent.OpQueryExist)
-	switch _, err := maq.FirstID(ctx); {
+func (_q *MsgAlertQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -291,8 +318,8 @@ func (maq *MsgAlertQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (maq *MsgAlertQuery) ExistX(ctx context.Context) bool {
-	exist, err := maq.Exist(ctx)
+func (_q *MsgAlertQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -301,44 +328,56 @@ func (maq *MsgAlertQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the MsgAlertQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (maq *MsgAlertQuery) Clone() *MsgAlertQuery {
-	if maq == nil {
+func (_q *MsgAlertQuery) Clone() *MsgAlertQuery {
+	if _q == nil {
 		return nil
 	}
 	return &MsgAlertQuery{
-		config:         maq.config,
-		ctx:            maq.ctx.Clone(),
-		order:          append([]msgalert.OrderOption{}, maq.order...),
-		inters:         append([]Interceptor{}, maq.inters...),
-		predicates:     append([]predicate.MsgAlert{}, maq.predicates...),
-		withNlog:       maq.withNlog.Clone(),
-		withNlogAlerts: maq.withNlogAlerts.Clone(),
+		config:         _q.config,
+		ctx:            _q.ctx.Clone(),
+		order:          append([]msgalert.OrderOption{}, _q.order...),
+		inters:         append([]Interceptor{}, _q.inters...),
+		predicates:     append([]predicate.MsgAlert{}, _q.predicates...),
+		withNlog:       _q.withNlog.Clone(),
+		withOrg:        _q.withOrg.Clone(),
+		withNlogAlerts: _q.withNlogAlerts.Clone(),
 		// clone intermediate query.
-		sql:  maq.sql.Clone(),
-		path: maq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
 // WithNlog tells the query-builder to eager-load the nodes that are connected to
 // the "nlog" edge. The optional arguments are used to configure the query builder of the edge.
-func (maq *MsgAlertQuery) WithNlog(opts ...func(*NlogQuery)) *MsgAlertQuery {
-	query := (&NlogClient{config: maq.config}).Query()
+func (_q *MsgAlertQuery) WithNlog(opts ...func(*NlogQuery)) *MsgAlertQuery {
+	query := (&NlogClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	maq.withNlog = query
-	return maq
+	_q.withNlog = query
+	return _q
+}
+
+// WithOrg tells the query-builder to eager-load the nodes that are connected to
+// the "org" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *MsgAlertQuery) WithOrg(opts ...func(*OrgQuery)) *MsgAlertQuery {
+	query := (&OrgClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withOrg = query
+	return _q
 }
 
 // WithNlogAlerts tells the query-builder to eager-load the nodes that are connected to
 // the "nlog_alerts" edge. The optional arguments are used to configure the query builder of the edge.
-func (maq *MsgAlertQuery) WithNlogAlerts(opts ...func(*NlogAlertQuery)) *MsgAlertQuery {
-	query := (&NlogAlertClient{config: maq.config}).Query()
+func (_q *MsgAlertQuery) WithNlogAlerts(opts ...func(*NlogAlertQuery)) *MsgAlertQuery {
+	query := (&NlogAlertClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	maq.withNlogAlerts = query
-	return maq
+	_q.withNlogAlerts = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -355,10 +394,10 @@ func (maq *MsgAlertQuery) WithNlogAlerts(opts ...func(*NlogAlertQuery)) *MsgAler
 //		GroupBy(msgalert.FieldTenantID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (maq *MsgAlertQuery) GroupBy(field string, fields ...string) *MsgAlertGroupBy {
-	maq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &MsgAlertGroupBy{build: maq}
-	grbuild.flds = &maq.ctx.Fields
+func (_q *MsgAlertQuery) GroupBy(field string, fields ...string) *MsgAlertGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &MsgAlertGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = msgalert.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -376,114 +415,121 @@ func (maq *MsgAlertQuery) GroupBy(field string, fields ...string) *MsgAlertGroup
 //	client.MsgAlert.Query().
 //		Select(msgalert.FieldTenantID).
 //		Scan(ctx, &v)
-func (maq *MsgAlertQuery) Select(fields ...string) *MsgAlertSelect {
-	maq.ctx.Fields = append(maq.ctx.Fields, fields...)
-	sbuild := &MsgAlertSelect{MsgAlertQuery: maq}
+func (_q *MsgAlertQuery) Select(fields ...string) *MsgAlertSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &MsgAlertSelect{MsgAlertQuery: _q}
 	sbuild.label = msgalert.Label
-	sbuild.flds, sbuild.scan = &maq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a MsgAlertSelect configured with the given aggregations.
-func (maq *MsgAlertQuery) Aggregate(fns ...AggregateFunc) *MsgAlertSelect {
-	return maq.Select().Aggregate(fns...)
+func (_q *MsgAlertQuery) Aggregate(fns ...AggregateFunc) *MsgAlertSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (maq *MsgAlertQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range maq.inters {
+func (_q *MsgAlertQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, maq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range maq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !msgalert.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if maq.path != nil {
-		prev, err := maq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		maq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (maq *MsgAlertQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*MsgAlert, error) {
+func (_q *MsgAlertQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*MsgAlert, error) {
 	var (
 		nodes       = []*MsgAlert{}
-		_spec       = maq.querySpec()
-		loadedTypes = [2]bool{
-			maq.withNlog != nil,
-			maq.withNlogAlerts != nil,
+		_spec       = _q.querySpec()
+		loadedTypes = [3]bool{
+			_q.withNlog != nil,
+			_q.withOrg != nil,
+			_q.withNlogAlerts != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*MsgAlert).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &MsgAlert{config: maq.config}
+		node := &MsgAlert{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	_spec.Node.Schema = maq.schemaConfig.MsgAlert
-	ctx = internal.NewSchemaConfigContext(ctx, maq.schemaConfig)
-	if len(maq.modifiers) > 0 {
-		_spec.Modifiers = maq.modifiers
+	_spec.Node.Schema = _q.schemaConfig.MsgAlert
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, maq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := maq.withNlog; query != nil {
-		if err := maq.loadNlog(ctx, query, nodes,
+	if query := _q.withNlog; query != nil {
+		if err := _q.loadNlog(ctx, query, nodes,
 			func(n *MsgAlert) { n.Edges.Nlog = []*Nlog{} },
 			func(n *MsgAlert, e *Nlog) { n.Edges.Nlog = append(n.Edges.Nlog, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := maq.withNlogAlerts; query != nil {
-		if err := maq.loadNlogAlerts(ctx, query, nodes,
+	if query := _q.withOrg; query != nil {
+		if err := _q.loadOrg(ctx, query, nodes, nil,
+			func(n *MsgAlert, e *Org) { n.Edges.Org = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withNlogAlerts; query != nil {
+		if err := _q.loadNlogAlerts(ctx, query, nodes,
 			func(n *MsgAlert) { n.Edges.NlogAlerts = []*NlogAlert{} },
 			func(n *MsgAlert, e *NlogAlert) { n.Edges.NlogAlerts = append(n.Edges.NlogAlerts, e) }); err != nil {
 			return nil, err
 		}
 	}
-	for name, query := range maq.withNamedNlog {
-		if err := maq.loadNlog(ctx, query, nodes,
+	for name, query := range _q.withNamedNlog {
+		if err := _q.loadNlog(ctx, query, nodes,
 			func(n *MsgAlert) { n.appendNamedNlog(name) },
 			func(n *MsgAlert, e *Nlog) { n.appendNamedNlog(name, e) }); err != nil {
 			return nil, err
 		}
 	}
-	for name, query := range maq.withNamedNlogAlerts {
-		if err := maq.loadNlogAlerts(ctx, query, nodes,
+	for name, query := range _q.withNamedNlogAlerts {
+		if err := _q.loadNlogAlerts(ctx, query, nodes,
 			func(n *MsgAlert) { n.appendNamedNlogAlerts(name) },
 			func(n *MsgAlert, e *NlogAlert) { n.appendNamedNlogAlerts(name, e) }); err != nil {
 			return nil, err
 		}
 	}
-	for i := range maq.loadTotal {
-		if err := maq.loadTotal[i](ctx, nodes); err != nil {
+	for i := range _q.loadTotal {
+		if err := _q.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (maq *MsgAlertQuery) loadNlog(ctx context.Context, query *NlogQuery, nodes []*MsgAlert, init func(*MsgAlert), assign func(*MsgAlert, *Nlog)) error {
+func (_q *MsgAlertQuery) loadNlog(ctx context.Context, query *NlogQuery, nodes []*MsgAlert, init func(*MsgAlert), assign func(*MsgAlert, *Nlog)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*MsgAlert)
 	nids := make(map[int]map[*MsgAlert]struct{})
@@ -496,7 +542,7 @@ func (maq *MsgAlertQuery) loadNlog(ctx context.Context, query *NlogQuery, nodes 
 	}
 	query.Where(func(s *sql.Selector) {
 		joinT := sql.Table(msgalert.NlogTable)
-		joinT.Schema(maq.schemaConfig.NlogAlert)
+		joinT.Schema(_q.schemaConfig.NlogAlert)
 		s.Join(joinT).On(s.C(nlog.FieldID), joinT.C(msgalert.NlogPrimaryKey[0]))
 		s.Where(sql.InValues(joinT.C(msgalert.NlogPrimaryKey[1]), edgeIDs...))
 		columns := s.SelectedColumns()
@@ -545,7 +591,36 @@ func (maq *MsgAlertQuery) loadNlog(ctx context.Context, query *NlogQuery, nodes 
 	}
 	return nil
 }
-func (maq *MsgAlertQuery) loadNlogAlerts(ctx context.Context, query *NlogAlertQuery, nodes []*MsgAlert, init func(*MsgAlert), assign func(*MsgAlert, *NlogAlert)) error {
+func (_q *MsgAlertQuery) loadOrg(ctx context.Context, query *OrgQuery, nodes []*MsgAlert, init func(*MsgAlert), assign func(*MsgAlert, *Org)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*MsgAlert)
+	for i := range nodes {
+		fk := nodes[i].TenantID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(org.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "tenant_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *MsgAlertQuery) loadNlogAlerts(ctx context.Context, query *NlogAlertQuery, nodes []*MsgAlert, init func(*MsgAlert), assign func(*MsgAlert, *NlogAlert)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*MsgAlert)
 	for i := range nodes {
@@ -576,29 +651,29 @@ func (maq *MsgAlertQuery) loadNlogAlerts(ctx context.Context, query *NlogAlertQu
 	return nil
 }
 
-func (maq *MsgAlertQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := maq.querySpec()
-	_spec.Node.Schema = maq.schemaConfig.MsgAlert
-	ctx = internal.NewSchemaConfigContext(ctx, maq.schemaConfig)
-	if len(maq.modifiers) > 0 {
-		_spec.Modifiers = maq.modifiers
+func (_q *MsgAlertQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	_spec.Node.Schema = _q.schemaConfig.MsgAlert
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = maq.ctx.Fields
-	if len(maq.ctx.Fields) > 0 {
-		_spec.Unique = maq.ctx.Unique != nil && *maq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, maq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (maq *MsgAlertQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *MsgAlertQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(msgalert.Table, msgalert.Columns, sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt))
-	_spec.From = maq.sql
-	if unique := maq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if maq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := maq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, msgalert.FieldID)
 		for i := range fields {
@@ -606,21 +681,24 @@ func (maq *MsgAlertQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
+		if _q.withOrg != nil {
+			_spec.Node.AddColumnOnce(msgalert.FieldTenantID)
+		}
 	}
-	if ps := maq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := maq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := maq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := maq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -630,36 +708,36 @@ func (maq *MsgAlertQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (maq *MsgAlertQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(maq.driver.Dialect())
+func (_q *MsgAlertQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(msgalert.Table)
-	columns := maq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = msgalert.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if maq.sql != nil {
-		selector = maq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if maq.ctx.Unique != nil && *maq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	t1.Schema(maq.schemaConfig.MsgAlert)
-	ctx = internal.NewSchemaConfigContext(ctx, maq.schemaConfig)
+	t1.Schema(_q.schemaConfig.MsgAlert)
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
 	selector.WithContext(ctx)
-	for _, p := range maq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range maq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := maq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := maq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -667,30 +745,30 @@ func (maq *MsgAlertQuery) sqlQuery(ctx context.Context) *sql.Selector {
 
 // WithNamedNlog tells the query-builder to eager-load the nodes that are connected to the "nlog"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (maq *MsgAlertQuery) WithNamedNlog(name string, opts ...func(*NlogQuery)) *MsgAlertQuery {
-	query := (&NlogClient{config: maq.config}).Query()
+func (_q *MsgAlertQuery) WithNamedNlog(name string, opts ...func(*NlogQuery)) *MsgAlertQuery {
+	query := (&NlogClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	if maq.withNamedNlog == nil {
-		maq.withNamedNlog = make(map[string]*NlogQuery)
+	if _q.withNamedNlog == nil {
+		_q.withNamedNlog = make(map[string]*NlogQuery)
 	}
-	maq.withNamedNlog[name] = query
-	return maq
+	_q.withNamedNlog[name] = query
+	return _q
 }
 
 // WithNamedNlogAlerts tells the query-builder to eager-load the nodes that are connected to the "nlog_alerts"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (maq *MsgAlertQuery) WithNamedNlogAlerts(name string, opts ...func(*NlogAlertQuery)) *MsgAlertQuery {
-	query := (&NlogAlertClient{config: maq.config}).Query()
+func (_q *MsgAlertQuery) WithNamedNlogAlerts(name string, opts ...func(*NlogAlertQuery)) *MsgAlertQuery {
+	query := (&NlogAlertClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	if maq.withNamedNlogAlerts == nil {
-		maq.withNamedNlogAlerts = make(map[string]*NlogAlertQuery)
+	if _q.withNamedNlogAlerts == nil {
+		_q.withNamedNlogAlerts = make(map[string]*NlogAlertQuery)
 	}
-	maq.withNamedNlogAlerts[name] = query
-	return maq
+	_q.withNamedNlogAlerts[name] = query
+	return _q
 }
 
 // MsgAlertGroupBy is the group-by builder for MsgAlert entities.
@@ -700,41 +778,41 @@ type MsgAlertGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (magb *MsgAlertGroupBy) Aggregate(fns ...AggregateFunc) *MsgAlertGroupBy {
-	magb.fns = append(magb.fns, fns...)
-	return magb
+func (_g *MsgAlertGroupBy) Aggregate(fns ...AggregateFunc) *MsgAlertGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (magb *MsgAlertGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, magb.build.ctx, ent.OpQueryGroupBy)
-	if err := magb.build.prepareQuery(ctx); err != nil {
+func (_g *MsgAlertGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*MsgAlertQuery, *MsgAlertGroupBy](ctx, magb.build, magb, magb.build.inters, v)
+	return scanWithInterceptors[*MsgAlertQuery, *MsgAlertGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (magb *MsgAlertGroupBy) sqlScan(ctx context.Context, root *MsgAlertQuery, v any) error {
+func (_g *MsgAlertGroupBy) sqlScan(ctx context.Context, root *MsgAlertQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(magb.fns))
-	for _, fn := range magb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*magb.flds)+len(magb.fns))
-		for _, f := range *magb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*magb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := magb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -748,27 +826,27 @@ type MsgAlertSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (mas *MsgAlertSelect) Aggregate(fns ...AggregateFunc) *MsgAlertSelect {
-	mas.fns = append(mas.fns, fns...)
-	return mas
+func (_s *MsgAlertSelect) Aggregate(fns ...AggregateFunc) *MsgAlertSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (mas *MsgAlertSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mas.ctx, ent.OpQuerySelect)
-	if err := mas.prepareQuery(ctx); err != nil {
+func (_s *MsgAlertSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*MsgAlertQuery, *MsgAlertSelect](ctx, mas.MsgAlertQuery, mas, mas.inters, v)
+	return scanWithInterceptors[*MsgAlertQuery, *MsgAlertSelect](ctx, _s.MsgAlertQuery, _s, _s.inters, v)
 }
 
-func (mas *MsgAlertSelect) sqlScan(ctx context.Context, root *MsgAlertQuery, v any) error {
+func (_s *MsgAlertSelect) sqlScan(ctx context.Context, root *MsgAlertQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(mas.fns))
-	for _, fn := range mas.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*mas.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -776,7 +854,7 @@ func (mas *MsgAlertSelect) sqlScan(ctx context.Context, root *MsgAlertQuery, v a
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := mas.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

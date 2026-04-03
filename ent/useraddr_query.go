@@ -34,44 +34,44 @@ type UserAddrQuery struct {
 }
 
 // Where adds a new predicate for the UserAddrQuery builder.
-func (uaq *UserAddrQuery) Where(ps ...predicate.UserAddr) *UserAddrQuery {
-	uaq.predicates = append(uaq.predicates, ps...)
-	return uaq
+func (_q *UserAddrQuery) Where(ps ...predicate.UserAddr) *UserAddrQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (uaq *UserAddrQuery) Limit(limit int) *UserAddrQuery {
-	uaq.ctx.Limit = &limit
-	return uaq
+func (_q *UserAddrQuery) Limit(limit int) *UserAddrQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (uaq *UserAddrQuery) Offset(offset int) *UserAddrQuery {
-	uaq.ctx.Offset = &offset
-	return uaq
+func (_q *UserAddrQuery) Offset(offset int) *UserAddrQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (uaq *UserAddrQuery) Unique(unique bool) *UserAddrQuery {
-	uaq.ctx.Unique = &unique
-	return uaq
+func (_q *UserAddrQuery) Unique(unique bool) *UserAddrQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (uaq *UserAddrQuery) Order(o ...useraddr.OrderOption) *UserAddrQuery {
-	uaq.order = append(uaq.order, o...)
-	return uaq
+func (_q *UserAddrQuery) Order(o ...useraddr.OrderOption) *UserAddrQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryUser chains the current query on the "user" edge.
-func (uaq *UserAddrQuery) QueryUser() *UserQuery {
-	query := (&UserClient{config: uaq.config}).Query()
+func (_q *UserAddrQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uaq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := uaq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -80,10 +80,10 @@ func (uaq *UserAddrQuery) QueryUser() *UserQuery {
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, useraddr.UserTable, useraddr.UserColumn),
 		)
-		schemaConfig := uaq.schemaConfig
+		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.User
 		step.Edge.Schema = schemaConfig.UserAddr
-		fromU = sqlgraph.SetNeighbors(uaq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -91,8 +91,8 @@ func (uaq *UserAddrQuery) QueryUser() *UserQuery {
 
 // First returns the first UserAddr entity from the query.
 // Returns a *NotFoundError when no UserAddr was found.
-func (uaq *UserAddrQuery) First(ctx context.Context) (*UserAddr, error) {
-	nodes, err := uaq.Limit(1).All(setContextOp(ctx, uaq.ctx, ent.OpQueryFirst))
+func (_q *UserAddrQuery) First(ctx context.Context) (*UserAddr, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -103,8 +103,8 @@ func (uaq *UserAddrQuery) First(ctx context.Context) (*UserAddr, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (uaq *UserAddrQuery) FirstX(ctx context.Context) *UserAddr {
-	node, err := uaq.First(ctx)
+func (_q *UserAddrQuery) FirstX(ctx context.Context) *UserAddr {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -113,9 +113,9 @@ func (uaq *UserAddrQuery) FirstX(ctx context.Context) *UserAddr {
 
 // FirstID returns the first UserAddr ID from the query.
 // Returns a *NotFoundError when no UserAddr ID was found.
-func (uaq *UserAddrQuery) FirstID(ctx context.Context) (id int, err error) {
+func (_q *UserAddrQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = uaq.Limit(1).IDs(setContextOp(ctx, uaq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -126,8 +126,8 @@ func (uaq *UserAddrQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (uaq *UserAddrQuery) FirstIDX(ctx context.Context) int {
-	id, err := uaq.FirstID(ctx)
+func (_q *UserAddrQuery) FirstIDX(ctx context.Context) int {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -137,8 +137,8 @@ func (uaq *UserAddrQuery) FirstIDX(ctx context.Context) int {
 // Only returns a single UserAddr entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one UserAddr entity is found.
 // Returns a *NotFoundError when no UserAddr entities are found.
-func (uaq *UserAddrQuery) Only(ctx context.Context) (*UserAddr, error) {
-	nodes, err := uaq.Limit(2).All(setContextOp(ctx, uaq.ctx, ent.OpQueryOnly))
+func (_q *UserAddrQuery) Only(ctx context.Context) (*UserAddr, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -153,8 +153,8 @@ func (uaq *UserAddrQuery) Only(ctx context.Context) (*UserAddr, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (uaq *UserAddrQuery) OnlyX(ctx context.Context) *UserAddr {
-	node, err := uaq.Only(ctx)
+func (_q *UserAddrQuery) OnlyX(ctx context.Context) *UserAddr {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -164,9 +164,9 @@ func (uaq *UserAddrQuery) OnlyX(ctx context.Context) *UserAddr {
 // OnlyID is like Only, but returns the only UserAddr ID in the query.
 // Returns a *NotSingularError when more than one UserAddr ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (uaq *UserAddrQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *UserAddrQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = uaq.Limit(2).IDs(setContextOp(ctx, uaq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -181,8 +181,8 @@ func (uaq *UserAddrQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (uaq *UserAddrQuery) OnlyIDX(ctx context.Context) int {
-	id, err := uaq.OnlyID(ctx)
+func (_q *UserAddrQuery) OnlyIDX(ctx context.Context) int {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -190,18 +190,18 @@ func (uaq *UserAddrQuery) OnlyIDX(ctx context.Context) int {
 }
 
 // All executes the query and returns a list of UserAddrs.
-func (uaq *UserAddrQuery) All(ctx context.Context) ([]*UserAddr, error) {
-	ctx = setContextOp(ctx, uaq.ctx, ent.OpQueryAll)
-	if err := uaq.prepareQuery(ctx); err != nil {
+func (_q *UserAddrQuery) All(ctx context.Context) ([]*UserAddr, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*UserAddr, *UserAddrQuery]()
-	return withInterceptors[[]*UserAddr](ctx, uaq, qr, uaq.inters)
+	return withInterceptors[[]*UserAddr](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (uaq *UserAddrQuery) AllX(ctx context.Context) []*UserAddr {
-	nodes, err := uaq.All(ctx)
+func (_q *UserAddrQuery) AllX(ctx context.Context) []*UserAddr {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -209,20 +209,20 @@ func (uaq *UserAddrQuery) AllX(ctx context.Context) []*UserAddr {
 }
 
 // IDs executes the query and returns a list of UserAddr IDs.
-func (uaq *UserAddrQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if uaq.ctx.Unique == nil && uaq.path != nil {
-		uaq.Unique(true)
+func (_q *UserAddrQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, uaq.ctx, ent.OpQueryIDs)
-	if err = uaq.Select(useraddr.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(useraddr.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (uaq *UserAddrQuery) IDsX(ctx context.Context) []int {
-	ids, err := uaq.IDs(ctx)
+func (_q *UserAddrQuery) IDsX(ctx context.Context) []int {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -230,17 +230,17 @@ func (uaq *UserAddrQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (uaq *UserAddrQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, uaq.ctx, ent.OpQueryCount)
-	if err := uaq.prepareQuery(ctx); err != nil {
+func (_q *UserAddrQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, uaq, querierCount[*UserAddrQuery](), uaq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*UserAddrQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (uaq *UserAddrQuery) CountX(ctx context.Context) int {
-	count, err := uaq.Count(ctx)
+func (_q *UserAddrQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -248,9 +248,9 @@ func (uaq *UserAddrQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (uaq *UserAddrQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, uaq.ctx, ent.OpQueryExist)
-	switch _, err := uaq.FirstID(ctx); {
+func (_q *UserAddrQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -261,8 +261,8 @@ func (uaq *UserAddrQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (uaq *UserAddrQuery) ExistX(ctx context.Context) bool {
-	exist, err := uaq.Exist(ctx)
+func (_q *UserAddrQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -271,32 +271,32 @@ func (uaq *UserAddrQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the UserAddrQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (uaq *UserAddrQuery) Clone() *UserAddrQuery {
-	if uaq == nil {
+func (_q *UserAddrQuery) Clone() *UserAddrQuery {
+	if _q == nil {
 		return nil
 	}
 	return &UserAddrQuery{
-		config:     uaq.config,
-		ctx:        uaq.ctx.Clone(),
-		order:      append([]useraddr.OrderOption{}, uaq.order...),
-		inters:     append([]Interceptor{}, uaq.inters...),
-		predicates: append([]predicate.UserAddr{}, uaq.predicates...),
-		withUser:   uaq.withUser.Clone(),
+		config:     _q.config,
+		ctx:        _q.ctx.Clone(),
+		order:      append([]useraddr.OrderOption{}, _q.order...),
+		inters:     append([]Interceptor{}, _q.inters...),
+		predicates: append([]predicate.UserAddr{}, _q.predicates...),
+		withUser:   _q.withUser.Clone(),
 		// clone intermediate query.
-		sql:  uaq.sql.Clone(),
-		path: uaq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
 // WithUser tells the query-builder to eager-load the nodes that are connected to
 // the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (uaq *UserAddrQuery) WithUser(opts ...func(*UserQuery)) *UserAddrQuery {
-	query := (&UserClient{config: uaq.config}).Query()
+func (_q *UserAddrQuery) WithUser(opts ...func(*UserQuery)) *UserAddrQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uaq.withUser = query
-	return uaq
+	_q.withUser = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -313,10 +313,10 @@ func (uaq *UserAddrQuery) WithUser(opts ...func(*UserQuery)) *UserAddrQuery {
 //		GroupBy(useraddr.FieldUserID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (uaq *UserAddrQuery) GroupBy(field string, fields ...string) *UserAddrGroupBy {
-	uaq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &UserAddrGroupBy{build: uaq}
-	grbuild.flds = &uaq.ctx.Fields
+func (_q *UserAddrQuery) GroupBy(field string, fields ...string) *UserAddrGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &UserAddrGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = useraddr.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -334,91 +334,91 @@ func (uaq *UserAddrQuery) GroupBy(field string, fields ...string) *UserAddrGroup
 //	client.UserAddr.Query().
 //		Select(useraddr.FieldUserID).
 //		Scan(ctx, &v)
-func (uaq *UserAddrQuery) Select(fields ...string) *UserAddrSelect {
-	uaq.ctx.Fields = append(uaq.ctx.Fields, fields...)
-	sbuild := &UserAddrSelect{UserAddrQuery: uaq}
+func (_q *UserAddrQuery) Select(fields ...string) *UserAddrSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &UserAddrSelect{UserAddrQuery: _q}
 	sbuild.label = useraddr.Label
-	sbuild.flds, sbuild.scan = &uaq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a UserAddrSelect configured with the given aggregations.
-func (uaq *UserAddrQuery) Aggregate(fns ...AggregateFunc) *UserAddrSelect {
-	return uaq.Select().Aggregate(fns...)
+func (_q *UserAddrQuery) Aggregate(fns ...AggregateFunc) *UserAddrSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (uaq *UserAddrQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range uaq.inters {
+func (_q *UserAddrQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, uaq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range uaq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !useraddr.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if uaq.path != nil {
-		prev, err := uaq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		uaq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (uaq *UserAddrQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*UserAddr, error) {
+func (_q *UserAddrQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*UserAddr, error) {
 	var (
 		nodes       = []*UserAddr{}
-		_spec       = uaq.querySpec()
+		_spec       = _q.querySpec()
 		loadedTypes = [1]bool{
-			uaq.withUser != nil,
+			_q.withUser != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*UserAddr).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &UserAddr{config: uaq.config}
+		node := &UserAddr{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	_spec.Node.Schema = uaq.schemaConfig.UserAddr
-	ctx = internal.NewSchemaConfigContext(ctx, uaq.schemaConfig)
-	if len(uaq.modifiers) > 0 {
-		_spec.Modifiers = uaq.modifiers
+	_spec.Node.Schema = _q.schemaConfig.UserAddr
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, uaq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := uaq.withUser; query != nil {
-		if err := uaq.loadUser(ctx, query, nodes, nil,
+	if query := _q.withUser; query != nil {
+		if err := _q.loadUser(ctx, query, nodes, nil,
 			func(n *UserAddr, e *User) { n.Edges.User = e }); err != nil {
 			return nil, err
 		}
 	}
-	for i := range uaq.loadTotal {
-		if err := uaq.loadTotal[i](ctx, nodes); err != nil {
+	for i := range _q.loadTotal {
+		if err := _q.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (uaq *UserAddrQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*UserAddr, init func(*UserAddr), assign func(*UserAddr, *User)) error {
+func (_q *UserAddrQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*UserAddr, init func(*UserAddr), assign func(*UserAddr, *User)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*UserAddr)
 	for i := range nodes {
@@ -448,29 +448,29 @@ func (uaq *UserAddrQuery) loadUser(ctx context.Context, query *UserQuery, nodes 
 	return nil
 }
 
-func (uaq *UserAddrQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := uaq.querySpec()
-	_spec.Node.Schema = uaq.schemaConfig.UserAddr
-	ctx = internal.NewSchemaConfigContext(ctx, uaq.schemaConfig)
-	if len(uaq.modifiers) > 0 {
-		_spec.Modifiers = uaq.modifiers
+func (_q *UserAddrQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	_spec.Node.Schema = _q.schemaConfig.UserAddr
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = uaq.ctx.Fields
-	if len(uaq.ctx.Fields) > 0 {
-		_spec.Unique = uaq.ctx.Unique != nil && *uaq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, uaq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (uaq *UserAddrQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *UserAddrQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(useraddr.Table, useraddr.Columns, sqlgraph.NewFieldSpec(useraddr.FieldID, field.TypeInt))
-	_spec.From = uaq.sql
-	if unique := uaq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if uaq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := uaq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, useraddr.FieldID)
 		for i := range fields {
@@ -478,24 +478,24 @@ func (uaq *UserAddrQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if uaq.withUser != nil {
+		if _q.withUser != nil {
 			_spec.Node.AddColumnOnce(useraddr.FieldUserID)
 		}
 	}
-	if ps := uaq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := uaq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := uaq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := uaq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -505,36 +505,36 @@ func (uaq *UserAddrQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (uaq *UserAddrQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(uaq.driver.Dialect())
+func (_q *UserAddrQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(useraddr.Table)
-	columns := uaq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = useraddr.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if uaq.sql != nil {
-		selector = uaq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if uaq.ctx.Unique != nil && *uaq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	t1.Schema(uaq.schemaConfig.UserAddr)
-	ctx = internal.NewSchemaConfigContext(ctx, uaq.schemaConfig)
+	t1.Schema(_q.schemaConfig.UserAddr)
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
 	selector.WithContext(ctx)
-	for _, p := range uaq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range uaq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := uaq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := uaq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -547,41 +547,41 @@ type UserAddrGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (uagb *UserAddrGroupBy) Aggregate(fns ...AggregateFunc) *UserAddrGroupBy {
-	uagb.fns = append(uagb.fns, fns...)
-	return uagb
+func (_g *UserAddrGroupBy) Aggregate(fns ...AggregateFunc) *UserAddrGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (uagb *UserAddrGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, uagb.build.ctx, ent.OpQueryGroupBy)
-	if err := uagb.build.prepareQuery(ctx); err != nil {
+func (_g *UserAddrGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*UserAddrQuery, *UserAddrGroupBy](ctx, uagb.build, uagb, uagb.build.inters, v)
+	return scanWithInterceptors[*UserAddrQuery, *UserAddrGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (uagb *UserAddrGroupBy) sqlScan(ctx context.Context, root *UserAddrQuery, v any) error {
+func (_g *UserAddrGroupBy) sqlScan(ctx context.Context, root *UserAddrQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(uagb.fns))
-	for _, fn := range uagb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*uagb.flds)+len(uagb.fns))
-		for _, f := range *uagb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*uagb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := uagb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -595,27 +595,27 @@ type UserAddrSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (uas *UserAddrSelect) Aggregate(fns ...AggregateFunc) *UserAddrSelect {
-	uas.fns = append(uas.fns, fns...)
-	return uas
+func (_s *UserAddrSelect) Aggregate(fns ...AggregateFunc) *UserAddrSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (uas *UserAddrSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, uas.ctx, ent.OpQuerySelect)
-	if err := uas.prepareQuery(ctx); err != nil {
+func (_s *UserAddrSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*UserAddrQuery, *UserAddrSelect](ctx, uas.UserAddrQuery, uas, uas.inters, v)
+	return scanWithInterceptors[*UserAddrQuery, *UserAddrSelect](ctx, _s.UserAddrQuery, _s, _s.inters, v)
 }
 
-func (uas *UserAddrSelect) sqlScan(ctx context.Context, root *UserAddrQuery, v any) error {
+func (_s *UserAddrSelect) sqlScan(ctx context.Context, root *UserAddrQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(uas.fns))
-	for _, fn := range uas.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*uas.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -623,7 +623,7 @@ func (uas *UserAddrSelect) sqlScan(ctx context.Context, root *UserAddrQuery, v a
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := uas.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

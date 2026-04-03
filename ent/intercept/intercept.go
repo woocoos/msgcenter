@@ -18,6 +18,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
+	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/ent/silence"
@@ -351,6 +352,33 @@ func (f TraverseNlogAlert) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.NlogAlertQuery", q)
 }
 
+// The OrgFunc type is an adapter to allow the use of ordinary function as a Querier.
+type OrgFunc func(context.Context, *ent.OrgQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f OrgFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.OrgQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.OrgQuery", q)
+}
+
+// The TraverseOrg type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseOrg func(context.Context, *ent.OrgQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseOrg) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseOrg) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.OrgQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.OrgQuery", q)
+}
+
 // The OrgRoleUserFunc type is an adapter to allow the use of ordinary function as a Querier.
 type OrgRoleUserFunc func(context.Context, *ent.OrgRoleUserQuery) (ent.Value, error)
 
@@ -482,6 +510,8 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.NlogQuery, predicate.Nlog, nlog.OrderOption]{typ: ent.TypeNlog, tq: q}, nil
 	case *ent.NlogAlertQuery:
 		return &query[*ent.NlogAlertQuery, predicate.NlogAlert, nlogalert.OrderOption]{typ: ent.TypeNlogAlert, tq: q}, nil
+	case *ent.OrgQuery:
+		return &query[*ent.OrgQuery, predicate.Org, org.OrderOption]{typ: ent.TypeOrg, tq: q}, nil
 	case *ent.OrgRoleUserQuery:
 		return &query[*ent.OrgRoleUserQuery, predicate.OrgRoleUser, orgroleuser.OrderOption]{typ: ent.TypeOrgRoleUser, tq: q}, nil
 	case *ent.SilenceQuery:

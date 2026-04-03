@@ -22,6 +22,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
+	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
@@ -83,7 +84,7 @@ var (
 )
 
 // checkColumn checks if the column exists in the given table.
-func checkColumn(table, column string) error {
+func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			msgalert.Table:      msgalert.ValidColumn,
@@ -96,13 +97,14 @@ func checkColumn(table, column string) error {
 			msgtype.Table:       msgtype.ValidColumn,
 			nlog.Table:          nlog.ValidColumn,
 			nlogalert.Table:     nlogalert.ValidColumn,
+			org.Table:           org.ValidColumn,
 			orgroleuser.Table:   orgroleuser.ValidColumn,
 			silence.Table:       silence.ValidColumn,
 			user.Table:          user.ValidColumn,
 			useraddr.Table:      useraddr.ValidColumn,
 		})
 	})
-	return columnCheck(table, column)
+	return columnCheck(t, c)
 }
 
 // Asc applies the given fields in ASC order.

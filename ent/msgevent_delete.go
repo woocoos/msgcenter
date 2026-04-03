@@ -22,58 +22,58 @@ type MsgEventDelete struct {
 }
 
 // Where appends a list predicates to the MsgEventDelete builder.
-func (med *MsgEventDelete) Where(ps ...predicate.MsgEvent) *MsgEventDelete {
-	med.mutation.Where(ps...)
-	return med
+func (_d *MsgEventDelete) Where(ps ...predicate.MsgEvent) *MsgEventDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (med *MsgEventDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, med.sqlExec, med.mutation, med.hooks)
+func (_d *MsgEventDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (med *MsgEventDelete) ExecX(ctx context.Context) int {
-	n, err := med.Exec(ctx)
+func (_d *MsgEventDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (med *MsgEventDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *MsgEventDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(msgevent.Table, sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt))
-	_spec.Node.Schema = med.schemaConfig.MsgEvent
-	ctx = internal.NewSchemaConfigContext(ctx, med.schemaConfig)
-	if ps := med.mutation.predicates; len(ps) > 0 {
+	_spec.Node.Schema = _d.schemaConfig.MsgEvent
+	ctx = internal.NewSchemaConfigContext(ctx, _d.schemaConfig)
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, med.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	med.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // MsgEventDeleteOne is the builder for deleting a single MsgEvent entity.
 type MsgEventDeleteOne struct {
-	med *MsgEventDelete
+	_d *MsgEventDelete
 }
 
 // Where appends a list predicates to the MsgEventDelete builder.
-func (medo *MsgEventDeleteOne) Where(ps ...predicate.MsgEvent) *MsgEventDeleteOne {
-	medo.med.mutation.Where(ps...)
-	return medo
+func (_d *MsgEventDeleteOne) Where(ps ...predicate.MsgEvent) *MsgEventDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (medo *MsgEventDeleteOne) Exec(ctx context.Context) error {
-	n, err := medo.med.Exec(ctx)
+func (_d *MsgEventDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -85,8 +85,8 @@ func (medo *MsgEventDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (medo *MsgEventDeleteOne) ExecX(ctx context.Context) {
-	if err := medo.Exec(ctx); err != nil {
+func (_d *MsgEventDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

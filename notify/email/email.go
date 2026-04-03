@@ -9,6 +9,7 @@ import (
 	"github.com/woocoos/msgcenter/pkg/mail"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/template"
+	netMail "net/mail"
 	"strconv"
 	"strings"
 )
@@ -34,6 +35,19 @@ func New(cfg *profile.EmailConfig, tmpl *template.Template, fn notify.CustomerCo
 		tmpl:          tmpl,
 		customTplFunc: fn,
 	}, nil
+}
+
+// splitEmailAddresses splits a comma-separated list of email addresses,
+func splitEmailAddresses(s string) ([]string, error) {
+	var addresses []string
+	addrs, err := netMail.ParseAddressList(s)
+	if err != nil {
+		return nil, err
+	}
+	for _, addr := range addrs {
+		addresses = append(addresses, addr.String())
+	}
+	return addresses, nil
 }
 
 func (n *Notifier) getPassword() (string, error) {
@@ -80,7 +94,11 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 	if err != nil {
 		return false, fmt.Errorf("execute 'to' template: %w", err)
 	}
-	email.AddTo(strings.Split(to, ",")...)
+	tos, err := splitEmailAddresses(to)
+	if err != nil {
+		return false, fmt.Errorf("parse 'to' string: %w", err)
+	}
+	email.AddTo(tos...)
 
 	sub := tmpl(config.Subject)
 	if err != nil {
@@ -117,7 +135,11 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 				return false, fmt.Errorf("execute %q header template: %w", header, err)
 			}
 			if value != "" {
-				email.AddCc(strings.Split(value, ",")...)
+				values, err := splitEmailAddresses(value)
+				if err != nil {
+					return false, fmt.Errorf("parse 'cc' string: %w", err)
+				}
+				email.AddCc(values...)
 			}
 		case "bcc":
 			value, err := n.tmpl.ExecuteTextString(t, data)
@@ -125,7 +147,11 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 				return false, fmt.Errorf("execute %q header template: %w", header, err)
 			}
 			if value != "" {
-				email.AddBcc(strings.Split(value, ",")...)
+				values, err := splitEmailAddresses(value)
+				if err != nil {
+					return false, fmt.Errorf("parse 'bcc' string: %w", err)
+				}
+				email.AddBcc(values...)
 			}
 		default:
 			value, err := n.tmpl.ExecuteTextString(t, data)

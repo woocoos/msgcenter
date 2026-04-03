@@ -182,6 +182,46 @@ export type EmailConfigInput = {
   to: Scalars['String']['input'];
 };
 
+export type FormatMsgAlert = {
+  __typename?: 'FormatMsgAlert';
+  createdAt: Scalars['Time']['output'];
+  /** 结束时间 */
+  endsAt?: Maybe<Scalars['Time']['output']>;
+  /** 是否存在多条消息 */
+  hasMultiMsg: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  /** 消息通道描述 */
+  msgChannelComments?: Maybe<Scalars['String']['output']>;
+  /** 消息事件描述 */
+  msgEventComments?: Maybe<Scalars['String']['output']>;
+  /** 消息模板标题 */
+  msgTemplateTitle?: Maybe<Scalars['String']['output']>;
+  /** receiver名称 */
+  receiver: Scalars['String']['output'];
+  /** 接收方式 */
+  receiverType: MsgTemplateReceiverType;
+  /** 开始时间 */
+  startsAt: Scalars['Time']['output'];
+  /** 消息状态 */
+  state: MsgAlertAlertStatus;
+  tenantID: Scalars['Int']['output'];
+  /** 接收用户 */
+  users?: Maybe<Array<Maybe<UserInfo>>>;
+};
+
+export type FormatMsgAlertConnection = {
+  __typename?: 'FormatMsgAlertConnection';
+  edges?: Maybe<Array<Maybe<FormatMsgAlertEdge>>>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type FormatMsgAlertEdge = {
+  __typename?: 'FormatMsgAlertEdge';
+  cursor: Scalars['Cursor']['output'];
+  node?: Maybe<FormatMsgAlert>;
+};
+
 export enum MatchType {
   /**  =  */
   MatchEqual = 'MatchEqual',
@@ -691,6 +731,22 @@ export enum MsgEventSimpleStatus {
  */
 export type MsgEventWhereInput = {
   and?: InputMaybe<Array<MsgEventWhereInput>>;
+  /** comments field predicates */
+  comments?: InputMaybe<Scalars['String']['input']>;
+  commentsContains?: InputMaybe<Scalars['String']['input']>;
+  commentsContainsFold?: InputMaybe<Scalars['String']['input']>;
+  commentsEqualFold?: InputMaybe<Scalars['String']['input']>;
+  commentsGT?: InputMaybe<Scalars['String']['input']>;
+  commentsGTE?: InputMaybe<Scalars['String']['input']>;
+  commentsHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  commentsHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  commentsIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  commentsIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  commentsLT?: InputMaybe<Scalars['String']['input']>;
+  commentsLTE?: InputMaybe<Scalars['String']['input']>;
+  commentsNEQ?: InputMaybe<Scalars['String']['input']>;
+  commentsNotIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  commentsNotNil?: InputMaybe<Scalars['Boolean']['input']>;
   /** created_at field predicates */
   createdAt?: InputMaybe<Scalars['Time']['input']>;
   createdAtGT?: InputMaybe<Scalars['Time']['input']>;
@@ -2195,6 +2251,10 @@ export type PageInfo = {
 
 export type Query = {
   __typename?: 'Query';
+  /** 查询消息体发送的所有消息 */
+  formatMsgAlertMore?: Maybe<Array<Maybe<FormatMsgAlert>>>;
+  /** 解析过的消息列表 */
+  formatMsgAlerts: FormatMsgAlertConnection;
   /** 消息列表 */
   msgAlerts: MsgAlertConnection;
   /**  消息通道列表  */
@@ -2217,6 +2277,8 @@ export type Query = {
   node?: Maybe<Node>;
   /** Lookup nodes by a list of IDs. */
   nodes: Array<Maybe<Node>>;
+  /** 展示消息内容 */
+  renderMsgAlert?: Maybe<Scalars['String']['output']>;
   /**  静默消息  */
   silences: SilenceConnection;
   /** 获取用户的站内信 */
@@ -2227,6 +2289,24 @@ export type Query = {
   userUnreadMsgInternals: Scalars['Int']['output'];
   /** 消息分类站内信未读数 */
   userUnreadMsgInternalsFromMsgCategory: Array<Scalars['Int']['output']>;
+};
+
+
+export type QueryFormatMsgAlertMoreArgs = {
+  msgAlertID: Scalars['ID']['input'];
+};
+
+
+export type QueryFormatMsgAlertsArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  alertName?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<MsgAlertOrder>;
+  receiverType?: InputMaybe<MsgTemplateReceiverType>;
+  userID?: InputMaybe<Scalars['String']['input']>;
+  where?: InputMaybe<MsgAlertWhereInput>;
 };
 
 
@@ -2319,6 +2399,12 @@ export type QueryNodeArgs = {
 
 export type QueryNodesArgs = {
   ids: Array<Scalars['GID']['input']>;
+};
+
+
+export type QueryRenderMsgAlertArgs = {
+  msgAlertID: Scalars['ID']['input'];
+  receiver: Scalars['String']['input'];
 };
 
 
@@ -2706,6 +2792,14 @@ export type User = Node & {
   silences?: Maybe<Array<Silence>>;
 };
 
+export type UserInfo = {
+  __typename?: 'UserInfo';
+  email?: Maybe<Scalars['String']['output']>;
+  mobile?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  userID?: Maybe<Scalars['String']['output']>;
+};
+
 export type MsgChannelListQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<MsgChannelOrder>;
@@ -2897,6 +2991,33 @@ export type MsgAlertListQueryVariables = Exact<{
 
 
 export type MsgAlertListQuery = { __typename?: 'Query', msgAlerts: { __typename?: 'MsgAlertConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'MsgAlertEdge', cursor: any, node?: { __typename?: 'MsgAlert', id: string, startsAt: any, endsAt?: any | null, labels?: any | null, annotations?: any | null, state: MsgAlertAlertStatus, timeout: boolean } | null } | null> | null } };
+
+export type FormatMsgAlertsQueryVariables = Exact<{
+  first?: InputMaybe<Scalars['Int']['input']>;
+  alertName?: InputMaybe<Scalars['String']['input']>;
+  userID?: InputMaybe<Scalars['String']['input']>;
+  receiverType?: InputMaybe<MsgTemplateReceiverType>;
+  orderBy?: InputMaybe<MsgAlertOrder>;
+  where?: InputMaybe<MsgAlertWhereInput>;
+}>;
+
+
+export type FormatMsgAlertsQuery = { __typename?: 'Query', formatMsgAlerts: { __typename?: 'FormatMsgAlertConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'FormatMsgAlertEdge', cursor: any, node?: { __typename?: 'FormatMsgAlert', id: string, startsAt: any, endsAt?: any | null, tenantID: number, state: MsgAlertAlertStatus, msgEventComments?: string | null, msgChannelComments?: string | null, msgTemplateTitle?: string | null, receiverType: MsgTemplateReceiverType, receiver: string, hasMultiMsg: boolean, users?: Array<{ __typename?: 'UserInfo', name?: string | null, email?: string | null } | null> | null } | null } | null> | null } };
+
+export type FormatMsgAlertMoreQueryVariables = Exact<{
+  msgAlertID: Scalars['ID']['input'];
+}>;
+
+
+export type FormatMsgAlertMoreQuery = { __typename?: 'Query', formatMsgAlertMore?: Array<{ __typename?: 'FormatMsgAlert', id: string, startsAt: any, endsAt?: any | null, tenantID: number, state: MsgAlertAlertStatus, msgEventComments?: string | null, msgChannelComments?: string | null, msgTemplateTitle?: string | null, receiverType: MsgTemplateReceiverType, receiver: string, hasMultiMsg: boolean, users?: Array<{ __typename?: 'UserInfo', name?: string | null, email?: string | null } | null> | null } | null> | null };
+
+export type RenderMsgAlertQueryVariables = Exact<{
+  msgAlertID: Scalars['ID']['input'];
+  receiver: Scalars['String']['input'];
+}>;
+
+
+export type RenderMsgAlertQuery = { __typename?: 'Query', renderMsgAlert?: string | null };
 
 export type MsgAlertLogListQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
@@ -3134,6 +3255,9 @@ export const MarkMsgReadDocument = {"kind":"Document","definitions":[{"kind":"Op
 export const DelMarkMsgDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"delMarkMsg"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ids"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"markMsgInternalToDeleted"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"ids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ids"}}}]}]}}]} as unknown as DocumentNode<DelMarkMsgMutation, DelMarkMsgMutationVariables>;
 export const SubMsgDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"subMsg"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"extras"}},{"kind":"Field","name":{"kind":"Name","value":"format"}},{"kind":"Field","name":{"kind":"Name","value":"sendAt"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"url"}}]}}]}}]} as unknown as DocumentNode<SubMsgSubscription, SubMsgSubscriptionVariables>;
 export const MsgAlertListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"msgAlertList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MsgAlertOrder"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MsgAlertWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"msgAlerts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"startsAt"}},{"kind":"Field","name":{"kind":"Name","value":"endsAt"}},{"kind":"Field","name":{"kind":"Name","value":"labels"}},{"kind":"Field","name":{"kind":"Name","value":"annotations"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"timeout"}}]}}]}}]}}]}}]} as unknown as DocumentNode<MsgAlertListQuery, MsgAlertListQueryVariables>;
+export const FormatMsgAlertsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"formatMsgAlerts"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"alertName"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userID"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"receiverType"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MsgTemplateReceiverType"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MsgAlertOrder"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MsgAlertWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"formatMsgAlerts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"alertName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"alertName"}}},{"kind":"Argument","name":{"kind":"Name","value":"userID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userID"}}},{"kind":"Argument","name":{"kind":"Name","value":"receiverType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"receiverType"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"startsAt"}},{"kind":"Field","name":{"kind":"Name","value":"endsAt"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"msgEventComments"}},{"kind":"Field","name":{"kind":"Name","value":"msgChannelComments"}},{"kind":"Field","name":{"kind":"Name","value":"msgTemplateTitle"}},{"kind":"Field","name":{"kind":"Name","value":"receiverType"}},{"kind":"Field","name":{"kind":"Name","value":"users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"receiver"}},{"kind":"Field","name":{"kind":"Name","value":"hasMultiMsg"}}]}}]}}]}}]}}]} as unknown as DocumentNode<FormatMsgAlertsQuery, FormatMsgAlertsQueryVariables>;
+export const FormatMsgAlertMoreDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"formatMsgAlertMore"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"msgAlertID"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"formatMsgAlertMore"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"msgAlertID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"msgAlertID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"startsAt"}},{"kind":"Field","name":{"kind":"Name","value":"endsAt"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"msgEventComments"}},{"kind":"Field","name":{"kind":"Name","value":"msgChannelComments"}},{"kind":"Field","name":{"kind":"Name","value":"msgTemplateTitle"}},{"kind":"Field","name":{"kind":"Name","value":"receiverType"}},{"kind":"Field","name":{"kind":"Name","value":"users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"receiver"}},{"kind":"Field","name":{"kind":"Name","value":"hasMultiMsg"}}]}}]}}]} as unknown as DocumentNode<FormatMsgAlertMoreQuery, FormatMsgAlertMoreQueryVariables>;
+export const RenderMsgAlertDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"renderMsgAlert"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"msgAlertID"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"receiver"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"renderMsgAlert"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"msgAlertID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"msgAlertID"}}},{"kind":"Argument","name":{"kind":"Name","value":"receiver"},"value":{"kind":"Variable","name":{"kind":"Name","value":"receiver"}}}]}]}}]} as unknown as DocumentNode<RenderMsgAlertQuery, RenderMsgAlertQueryVariables>;
 export const MsgAlertLogListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"msgAlertLogList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"NlogOrder"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"NlogWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"MsgAlert"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"nlog"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"sendAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"groupKey"}},{"kind":"Field","name":{"kind":"Name","value":"receiver"}},{"kind":"Field","name":{"kind":"Name","value":"receiverType"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<MsgAlertLogListQuery, MsgAlertLogListQueryVariables>;
 export const SilenceListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"silenceList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"SilenceOrder"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"SilenceWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"silences"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"startsAt"}},{"kind":"Field","name":{"kind":"Name","value":"endsAt"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"matchers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<SilenceListQuery, SilenceListQueryVariables>;
 export const SilenceInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SilenceInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Silence"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"startsAt"}},{"kind":"Field","name":{"kind":"Name","value":"endsAt"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"matchers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"value"}}]}}]}}]}}]}}]} as unknown as DocumentNode<SilenceInfoQuery, SilenceInfoQueryVariables>;

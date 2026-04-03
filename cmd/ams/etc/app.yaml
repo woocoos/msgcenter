@@ -8,11 +8,11 @@ log:
   rotate:
 
 includeFiles:
-#  - "etc/local.yaml"
+  - "etc/local.yaml"
 
 jwt: &jwt
-  signingMethod: "HS256"
-  signingKey: "secret"
+  signingMethod: "RS256"
+  signingKey: "file:///Volumes/QEELYN/GIT/woocoo/msgcenter/cmd/ams/etc/rsa_pub.pem"
 
 web:
   server:
@@ -29,6 +29,7 @@ web:
                   - IntrospectionQuery
             - recovery:
             - errorHandle:
+                message: "系统内部异常，请联系管理员"
       - alertmanager:
           basePath: "/api/v2"
           middlewares:
@@ -38,6 +39,7 @@ web:
             - graphql:
                 group: "/graphql"
                 withAuthorization: false
+                publicErrorMsg: "系统内部异常，请联系管理员"
                 appCode: "msg"
                 middlewares:
                   operation:
@@ -130,3 +132,11 @@ kosdk:
       basePath: "http://127.0.0.1:8080"
       headers:
         "X-Tenant-ID": 1
+    auth:
+      basePath: "http://127.0.0.1:10070"
+
+errors:
+  errorMap:
+    "missing or malformed jwt": "认证信息缺失，请重新登录"
+    "invalid or expired jwt": "登录已过期，请重新登录"
+    "invalid jwt claims": "认证信息无效，请重新登录"

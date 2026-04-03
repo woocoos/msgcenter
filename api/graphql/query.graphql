@@ -86,6 +86,47 @@ extend type MsgInternal {
     hasReadCounts:Int!
 }
 
+type UserInfo {
+    userID: String
+    name:   String
+    email:  String
+    mobile: String
+}
+type FormatMsgAlert{
+    id: ID!
+    tenantID: Int!
+    """开始时间"""
+    startsAt: Time!
+    """结束时间"""
+    endsAt: Time
+    """消息事件描述"""
+    msgEventComments: String
+    """消息通道描述"""
+    msgChannelComments: String
+    """接收方式"""
+    receiverType: MsgTemplateReceiverType!
+    """receiver名称"""
+    receiver: String!
+    """消息模板标题"""
+    msgTemplateTitle: String
+    """接收用户"""
+    users: [UserInfo]
+    """是否存在多条消息"""
+    hasMultiMsg: Boolean!
+    """消息状态"""
+    state: MsgAlertAlertStatus!
+    createdAt: Time!
+}
+type FormatMsgAlertEdge {
+    node: FormatMsgAlert
+    cursor: Cursor!
+}
+type FormatMsgAlertConnection {
+    edges: [FormatMsgAlertEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
 extend type Query {
     """ 消息通道列表 """
     msgChannels(
@@ -149,6 +190,27 @@ extend type Query {
         orderBy: MsgAlertOrder
         where: MsgAlertWhereInput
     ):MsgAlertConnection!
+
+    """解析过的消息列表"""
+    formatMsgAlerts(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        alertName: String
+        userID: String
+        receiverType: MsgTemplateReceiverType
+        where: MsgAlertWhereInput
+        orderBy: MsgAlertOrder
+    ):FormatMsgAlertConnection!
+
+    """查询消息体发送的所有消息"""
+    formatMsgAlertMore(
+        msgAlertID:ID!
+    ):[FormatMsgAlert]
+
+    """展示消息内容"""
+    renderMsgAlert(msgAlertID:ID!,receiver: String!):String
 
     """获取用户的站内信"""
     userMsgInternalTos(

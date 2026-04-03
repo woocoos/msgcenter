@@ -15,74 +15,80 @@ import (
 )
 
 // GlobalID returns the global identifier for the given MsgAlert node.
-func (ma *MsgAlert) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("MsgAlert:%d", ma.ID)
+func (_m *MsgAlert) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("MsgAlert:%d", _m.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
 // GlobalID returns the global identifier for the given MsgChannel node.
-func (mc *MsgChannel) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("MsgChannel:%d", mc.ID)
+func (_m *MsgChannel) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("MsgChannel:%d", _m.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
 // GlobalID returns the global identifier for the given MsgEvent node.
-func (me *MsgEvent) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("MsgEvent:%d", me.ID)
+func (_m *MsgEvent) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("MsgEvent:%d", _m.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
 // GlobalID returns the global identifier for the given MsgInternal node.
-func (mi *MsgInternal) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("MsgInternal:%d", mi.ID)
+func (_m *MsgInternal) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("MsgInternal:%d", _m.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
 // GlobalID returns the global identifier for the given MsgInternalTo node.
-func (mit *MsgInternalTo) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("MsgInternalTo:%d", mit.ID)
+func (_m *MsgInternalTo) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("MsgInternalTo:%d", _m.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
 // GlobalID returns the global identifier for the given MsgSubscriber node.
-func (ms *MsgSubscriber) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("MsgSubscriber:%d", ms.ID)
+func (_m *MsgSubscriber) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("MsgSubscriber:%d", _m.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
 // GlobalID returns the global identifier for the given MsgTemplate node.
-func (mt *MsgTemplate) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("MsgTemplate:%d", mt.ID)
+func (_m *MsgTemplate) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("MsgTemplate:%d", _m.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
 // GlobalID returns the global identifier for the given MsgType node.
-func (mt *MsgType) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("MsgType:%d", mt.ID)
+func (_m *MsgType) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("MsgType:%d", _m.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
 // GlobalID returns the global identifier for the given Nlog node.
-func (n *Nlog) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("Nlog:%d", n.ID)
+func (_m *Nlog) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("Nlog:%d", _m.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
 // GlobalID returns the global identifier for the given NlogAlert node.
-func (na *NlogAlert) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("NlogAlert:%d", na.ID)
+func (_m *NlogAlert) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("NlogAlert:%d", _m.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
+// GlobalID returns the global identifier for the given Org node.
+func (_m *Org) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("Org:%d", _m.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
 // GlobalID returns the global identifier for the given Silence node.
-func (s *Silence) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("Silence:%d", s.ID)
+func (_m *Silence) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("Silence:%d", _m.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
 // GlobalID returns the global identifier for the given User node.
-func (u *User) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("User:%d", u.ID)
+func (_m *User) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("User:%d", _m.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
@@ -122,6 +128,8 @@ func GlobalID(tp, id string) (string, error) {
 	case "Nlog":
 		break
 	case "NlogAlert":
+		break
+	case "Org":
 		break
 	case "Silence":
 		break

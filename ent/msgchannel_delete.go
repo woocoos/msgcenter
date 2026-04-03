@@ -22,58 +22,58 @@ type MsgChannelDelete struct {
 }
 
 // Where appends a list predicates to the MsgChannelDelete builder.
-func (mcd *MsgChannelDelete) Where(ps ...predicate.MsgChannel) *MsgChannelDelete {
-	mcd.mutation.Where(ps...)
-	return mcd
+func (_d *MsgChannelDelete) Where(ps ...predicate.MsgChannel) *MsgChannelDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (mcd *MsgChannelDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, mcd.sqlExec, mcd.mutation, mcd.hooks)
+func (_d *MsgChannelDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mcd *MsgChannelDelete) ExecX(ctx context.Context) int {
-	n, err := mcd.Exec(ctx)
+func (_d *MsgChannelDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (mcd *MsgChannelDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *MsgChannelDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(msgchannel.Table, sqlgraph.NewFieldSpec(msgchannel.FieldID, field.TypeInt))
-	_spec.Node.Schema = mcd.schemaConfig.MsgChannel
-	ctx = internal.NewSchemaConfigContext(ctx, mcd.schemaConfig)
-	if ps := mcd.mutation.predicates; len(ps) > 0 {
+	_spec.Node.Schema = _d.schemaConfig.MsgChannel
+	ctx = internal.NewSchemaConfigContext(ctx, _d.schemaConfig)
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, mcd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	mcd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // MsgChannelDeleteOne is the builder for deleting a single MsgChannel entity.
 type MsgChannelDeleteOne struct {
-	mcd *MsgChannelDelete
+	_d *MsgChannelDelete
 }
 
 // Where appends a list predicates to the MsgChannelDelete builder.
-func (mcdo *MsgChannelDeleteOne) Where(ps ...predicate.MsgChannel) *MsgChannelDeleteOne {
-	mcdo.mcd.mutation.Where(ps...)
-	return mcdo
+func (_d *MsgChannelDeleteOne) Where(ps ...predicate.MsgChannel) *MsgChannelDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (mcdo *MsgChannelDeleteOne) Exec(ctx context.Context) error {
-	n, err := mcdo.mcd.Exec(ctx)
+func (_d *MsgChannelDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -85,8 +85,8 @@ func (mcdo *MsgChannelDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mcdo *MsgChannelDeleteOne) ExecX(ctx context.Context) {
-	if err := mcdo.Exec(ctx); err != nil {
+func (_d *MsgChannelDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

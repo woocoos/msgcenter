@@ -92,6 +92,7 @@ func open(ctx context.Context, driverName, dsn string) (*ent.Client, error) {
 	client, err := ent.Open(driverName, dsn,
 		ent.Debug(), ent.AlternateSchema(ent.SchemaConfig{
 			User:        "portal",
+			Org:         "portal",
 			OrgRoleUser: "portal",
 			UserAddr:    "portal",
 		}),
@@ -147,12 +148,13 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(1).SetTenantID(1).SetName(alterPassWordEventName).SetCreatedBy(1).
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
 		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
-		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
+		SetBcc(`{{ template "email.bcc" . }}`).
 		SetBody(`{{ template "1.alterpwd.txt" . }}`).SaveX(ctx)
-	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(1).SetTenantID(2).SetName(alterPassWordEventName).SetCreatedBy(1).
+	// 默认模板
+	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(1).SetName(alterPassWordEventName).SetCreatedBy(1).
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
 		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
-		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
+		SetBcc(`{{ template "email.bcc" . }}`).
 		SetBody(`{{ template "1.alterpwd.txt" . }}`).SaveX(ctx)
 
 	client.MsgChannel.Create().SetName("email").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
@@ -161,9 +163,23 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 			Name: "email",
 			EmailConfigs: []*profile.EmailConfig{
 				{
+					SmartHost:    profile.HostPort{Host: "localhost", Port: "1025"},
+					To:           `{{ template "email.to" . }}`,
+					From:         "1 <serviceSuite@localhost>",
+					AuthUsername: "user1",
+					AuthPassword: "password1",
+				},
+			},
+		}).SaveX(ctx)
+	client.MsgChannel.Create().SetName("email").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
+		SetTenantID(2).SetReceiverType(profile.ReceiverEmail).
+		SetReceiver(&profile.Receiver{
+			Name: "email",
+			EmailConfigs: []*profile.EmailConfig{
+				{
 					SmartHost: profile.HostPort{Host: "localhost", Port: "1025"},
 					To:        `{{ template "email.to" . }}`,
-					From:      "serviceSuite@localhost",
+					From:      "2 <serviceSuite@localhost>",
 				},
 			},
 		}).SaveX(ctx)
@@ -271,8 +287,8 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
 		SetBody(`{{ template "1.msggroupby.txt" . }}`).SaveX(ctx)
 
-	client.User.Create().SetID(1).SetDisplayName("admin").SetPrincipalName("admin").SaveX(ctx)
-	client.UserAddr.Create().SetID(1).SetUserID(1).SetEmail("admin@localhost").
+	client.User.Create().SetID(1).SetDisplayName("admin,.").SetPrincipalName("admin").SaveX(ctx)
+	client.UserAddr.Create().SetID(1).SetUserID(1).SetEmail("alerts@example.com").
 		SetMobile("13800138000").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)
 	client.User.Create().SetID(2).SetDisplayName("user").SetPrincipalName("user").SaveX(ctx)
 	client.UserAddr.Create().SetID(2).SetUserID(2).SetEmail("user@localhost").
@@ -280,6 +296,7 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 	client.User.Create().SetID(3).SetDisplayName("nobody").SetPrincipalName("nobody").SaveX(ctx)
 	client.UserAddr.Create().SetID(3).SetUserID(3).SetEmail("nobody@localhost").
 		SetMobile("13800138002").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)
+	client.Org.Create().SetID(1).SetOwnerID(1).SetKind("root").SetParentID(0).SaveX(ctx)
 	client.OrgRoleUser.Create().SetID(1).SetOrgID(1).SetUserID(1).SetOrgRoleID(12).SetOrgUserID(3).
 		SaveX(ctx)
 	client.OrgRoleUser.Create().SetID(2).SetOrgID(1).SetUserID(2).SetOrgRoleID(13).SetOrgUserID(4).

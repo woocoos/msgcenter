@@ -22,6 +22,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
+	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/ent/silence"
@@ -51,6 +52,7 @@ const (
 	TypeMsgType       = "MsgType"
 	TypeNlog          = "Nlog"
 	TypeNlogAlert     = "NlogAlert"
+	TypeOrg           = "Org"
 	TypeOrgRoleUser   = "OrgRoleUser"
 	TypeSilence       = "Silence"
 	TypeUser          = "User"
@@ -63,8 +65,6 @@ type MsgAlertMutation struct {
 	op                 Op
 	typ                string
 	id                 *int
-	tenant_id          *int
-	addtenant_id       *int
 	labels             **label.LabelSet
 	annotations        **label.LabelSet
 	starts_at          *time.Time
@@ -80,6 +80,8 @@ type MsgAlertMutation struct {
 	nlog               map[int]struct{}
 	removednlog        map[int]struct{}
 	clearednlog        bool
+	org                *int
+	clearedorg         bool
 	nlog_alerts        map[int]struct{}
 	removednlog_alerts map[int]struct{}
 	clearednlog_alerts bool
@@ -194,13 +196,12 @@ func (m *MsgAlertMutation) IDs(ctx context.Context) ([]int, error) {
 
 // SetTenantID sets the "tenant_id" field.
 func (m *MsgAlertMutation) SetTenantID(i int) {
-	m.tenant_id = &i
-	m.addtenant_id = nil
+	m.org = &i
 }
 
 // TenantID returns the value of the "tenant_id" field in the mutation.
 func (m *MsgAlertMutation) TenantID() (r int, exists bool) {
-	v := m.tenant_id
+	v := m.org
 	if v == nil {
 		return
 	}
@@ -224,28 +225,9 @@ func (m *MsgAlertMutation) OldTenantID(ctx context.Context) (v int, err error) {
 	return oldValue.TenantID, nil
 }
 
-// AddTenantID adds i to the "tenant_id" field.
-func (m *MsgAlertMutation) AddTenantID(i int) {
-	if m.addtenant_id != nil {
-		*m.addtenant_id += i
-	} else {
-		m.addtenant_id = &i
-	}
-}
-
-// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
-func (m *MsgAlertMutation) AddedTenantID() (r int, exists bool) {
-	v := m.addtenant_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ResetTenantID resets all changes to the "tenant_id" field.
 func (m *MsgAlertMutation) ResetTenantID() {
-	m.tenant_id = nil
-	m.addtenant_id = nil
+	m.org = nil
 }
 
 // SetLabels sets the "labels" field.
@@ -763,6 +745,46 @@ func (m *MsgAlertMutation) ResetNlog() {
 	m.removednlog = nil
 }
 
+// SetOrgID sets the "org" edge to the Org entity by id.
+func (m *MsgAlertMutation) SetOrgID(id int) {
+	m.org = &id
+}
+
+// ClearOrg clears the "org" edge to the Org entity.
+func (m *MsgAlertMutation) ClearOrg() {
+	m.clearedorg = true
+	m.clearedFields[msgalert.FieldTenantID] = struct{}{}
+}
+
+// OrgCleared reports if the "org" edge to the Org entity was cleared.
+func (m *MsgAlertMutation) OrgCleared() bool {
+	return m.clearedorg
+}
+
+// OrgID returns the "org" edge ID in the mutation.
+func (m *MsgAlertMutation) OrgID() (id int, exists bool) {
+	if m.org != nil {
+		return *m.org, true
+	}
+	return
+}
+
+// OrgIDs returns the "org" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// OrgID instead. It exists only for internal usage by the builders.
+func (m *MsgAlertMutation) OrgIDs() (ids []int) {
+	if id := m.org; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetOrg resets all changes to the "org" edge.
+func (m *MsgAlertMutation) ResetOrg() {
+	m.org = nil
+	m.clearedorg = false
+}
+
 // AddNlogAlertIDs adds the "nlog_alerts" edge to the NlogAlert entity by ids.
 func (m *MsgAlertMutation) AddNlogAlertIDs(ids ...int) {
 	if m.nlog_alerts == nil {
@@ -852,7 +874,7 @@ func (m *MsgAlertMutation) Type() string {
 // AddedFields().
 func (m *MsgAlertMutation) Fields() []string {
 	fields := make([]string, 0, 12)
-	if m.tenant_id != nil {
+	if m.org != nil {
 		fields = append(fields, msgalert.FieldTenantID)
 	}
 	if m.labels != nil {
@@ -1054,9 +1076,6 @@ func (m *MsgAlertMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *MsgAlertMutation) AddedFields() []string {
 	var fields []string
-	if m.addtenant_id != nil {
-		fields = append(fields, msgalert.FieldTenantID)
-	}
 	return fields
 }
 
@@ -1065,8 +1084,6 @@ func (m *MsgAlertMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *MsgAlertMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case msgalert.FieldTenantID:
-		return m.AddedTenantID()
 	}
 	return nil, false
 }
@@ -1076,13 +1093,6 @@ func (m *MsgAlertMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *MsgAlertMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case msgalert.FieldTenantID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddTenantID(v)
-		return nil
 	}
 	return fmt.Errorf("unknown MsgAlert numeric field %s", name)
 }
@@ -1185,9 +1195,12 @@ func (m *MsgAlertMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MsgAlertMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.nlog != nil {
 		edges = append(edges, msgalert.EdgeNlog)
+	}
+	if m.org != nil {
+		edges = append(edges, msgalert.EdgeOrg)
 	}
 	if m.nlog_alerts != nil {
 		edges = append(edges, msgalert.EdgeNlogAlerts)
@@ -1205,6 +1218,10 @@ func (m *MsgAlertMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case msgalert.EdgeOrg:
+		if id := m.org; id != nil {
+			return []ent.Value{*id}
+		}
 	case msgalert.EdgeNlogAlerts:
 		ids := make([]ent.Value, 0, len(m.nlog_alerts))
 		for id := range m.nlog_alerts {
@@ -1217,7 +1234,7 @@ func (m *MsgAlertMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MsgAlertMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removednlog != nil {
 		edges = append(edges, msgalert.EdgeNlog)
 	}
@@ -1249,9 +1266,12 @@ func (m *MsgAlertMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MsgAlertMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearednlog {
 		edges = append(edges, msgalert.EdgeNlog)
+	}
+	if m.clearedorg {
+		edges = append(edges, msgalert.EdgeOrg)
 	}
 	if m.clearednlog_alerts {
 		edges = append(edges, msgalert.EdgeNlogAlerts)
@@ -1265,6 +1285,8 @@ func (m *MsgAlertMutation) EdgeCleared(name string) bool {
 	switch name {
 	case msgalert.EdgeNlog:
 		return m.clearednlog
+	case msgalert.EdgeOrg:
+		return m.clearedorg
 	case msgalert.EdgeNlogAlerts:
 		return m.clearednlog_alerts
 	}
@@ -1275,6 +1297,9 @@ func (m *MsgAlertMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *MsgAlertMutation) ClearEdge(name string) error {
 	switch name {
+	case msgalert.EdgeOrg:
+		m.ClearOrg()
+		return nil
 	}
 	return fmt.Errorf("unknown MsgAlert unique edge %s", name)
 }
@@ -1285,6 +1310,9 @@ func (m *MsgAlertMutation) ResetEdge(name string) error {
 	switch name {
 	case msgalert.EdgeNlog:
 		m.ResetNlog()
+		return nil
+	case msgalert.EdgeOrg:
+		m.ResetOrg()
 		return nil
 	case msgalert.EdgeNlogAlerts:
 		m.ResetNlogAlerts()
@@ -11091,6 +11119,743 @@ func (m *NlogAlertMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown NlogAlert edge %s", name)
+}
+
+// OrgMutation represents an operation that mutates the Org nodes in the graph.
+type OrgMutation struct {
+	config
+	op                Op
+	typ               string
+	id                *int
+	owner_id          *int
+	addowner_id       *int
+	kind              *string
+	parent_id         *int
+	addparent_id      *int
+	_path             *string
+	clearedFields     map[string]struct{}
+	msg_alerts        map[int]struct{}
+	removedmsg_alerts map[int]struct{}
+	clearedmsg_alerts bool
+	done              bool
+	oldValue          func(context.Context) (*Org, error)
+	predicates        []predicate.Org
+}
+
+var _ ent.Mutation = (*OrgMutation)(nil)
+
+// orgOption allows management of the mutation configuration using functional options.
+type orgOption func(*OrgMutation)
+
+// newOrgMutation creates new mutation for the Org entity.
+func newOrgMutation(c config, op Op, opts ...orgOption) *OrgMutation {
+	m := &OrgMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeOrg,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withOrgID sets the ID field of the mutation.
+func withOrgID(id int) orgOption {
+	return func(m *OrgMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Org
+		)
+		m.oldValue = func(ctx context.Context) (*Org, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Org.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withOrg sets the old Org of the mutation.
+func withOrg(node *Org) orgOption {
+	return func(m *OrgMutation) {
+		m.oldValue = func(context.Context) (*Org, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m OrgMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m OrgMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Org entities.
+func (m *OrgMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *OrgMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *OrgMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Org.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetOwnerID sets the "owner_id" field.
+func (m *OrgMutation) SetOwnerID(i int) {
+	m.owner_id = &i
+	m.addowner_id = nil
+}
+
+// OwnerID returns the value of the "owner_id" field in the mutation.
+func (m *OrgMutation) OwnerID() (r int, exists bool) {
+	v := m.owner_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOwnerID returns the old "owner_id" field's value of the Org entity.
+// If the Org object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OrgMutation) OldOwnerID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOwnerID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOwnerID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOwnerID: %w", err)
+	}
+	return oldValue.OwnerID, nil
+}
+
+// AddOwnerID adds i to the "owner_id" field.
+func (m *OrgMutation) AddOwnerID(i int) {
+	if m.addowner_id != nil {
+		*m.addowner_id += i
+	} else {
+		m.addowner_id = &i
+	}
+}
+
+// AddedOwnerID returns the value that was added to the "owner_id" field in this mutation.
+func (m *OrgMutation) AddedOwnerID() (r int, exists bool) {
+	v := m.addowner_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearOwnerID clears the value of the "owner_id" field.
+func (m *OrgMutation) ClearOwnerID() {
+	m.owner_id = nil
+	m.addowner_id = nil
+	m.clearedFields[org.FieldOwnerID] = struct{}{}
+}
+
+// OwnerIDCleared returns if the "owner_id" field was cleared in this mutation.
+func (m *OrgMutation) OwnerIDCleared() bool {
+	_, ok := m.clearedFields[org.FieldOwnerID]
+	return ok
+}
+
+// ResetOwnerID resets all changes to the "owner_id" field.
+func (m *OrgMutation) ResetOwnerID() {
+	m.owner_id = nil
+	m.addowner_id = nil
+	delete(m.clearedFields, org.FieldOwnerID)
+}
+
+// SetKind sets the "kind" field.
+func (m *OrgMutation) SetKind(s string) {
+	m.kind = &s
+}
+
+// Kind returns the value of the "kind" field in the mutation.
+func (m *OrgMutation) Kind() (r string, exists bool) {
+	v := m.kind
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKind returns the old "kind" field's value of the Org entity.
+// If the Org object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OrgMutation) OldKind(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKind is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKind requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKind: %w", err)
+	}
+	return oldValue.Kind, nil
+}
+
+// ClearKind clears the value of the "kind" field.
+func (m *OrgMutation) ClearKind() {
+	m.kind = nil
+	m.clearedFields[org.FieldKind] = struct{}{}
+}
+
+// KindCleared returns if the "kind" field was cleared in this mutation.
+func (m *OrgMutation) KindCleared() bool {
+	_, ok := m.clearedFields[org.FieldKind]
+	return ok
+}
+
+// ResetKind resets all changes to the "kind" field.
+func (m *OrgMutation) ResetKind() {
+	m.kind = nil
+	delete(m.clearedFields, org.FieldKind)
+}
+
+// SetParentID sets the "parent_id" field.
+func (m *OrgMutation) SetParentID(i int) {
+	m.parent_id = &i
+	m.addparent_id = nil
+}
+
+// ParentID returns the value of the "parent_id" field in the mutation.
+func (m *OrgMutation) ParentID() (r int, exists bool) {
+	v := m.parent_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParentID returns the old "parent_id" field's value of the Org entity.
+// If the Org object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OrgMutation) OldParentID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParentID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParentID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParentID: %w", err)
+	}
+	return oldValue.ParentID, nil
+}
+
+// AddParentID adds i to the "parent_id" field.
+func (m *OrgMutation) AddParentID(i int) {
+	if m.addparent_id != nil {
+		*m.addparent_id += i
+	} else {
+		m.addparent_id = &i
+	}
+}
+
+// AddedParentID returns the value that was added to the "parent_id" field in this mutation.
+func (m *OrgMutation) AddedParentID() (r int, exists bool) {
+	v := m.addparent_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearParentID clears the value of the "parent_id" field.
+func (m *OrgMutation) ClearParentID() {
+	m.parent_id = nil
+	m.addparent_id = nil
+	m.clearedFields[org.FieldParentID] = struct{}{}
+}
+
+// ParentIDCleared returns if the "parent_id" field was cleared in this mutation.
+func (m *OrgMutation) ParentIDCleared() bool {
+	_, ok := m.clearedFields[org.FieldParentID]
+	return ok
+}
+
+// ResetParentID resets all changes to the "parent_id" field.
+func (m *OrgMutation) ResetParentID() {
+	m.parent_id = nil
+	m.addparent_id = nil
+	delete(m.clearedFields, org.FieldParentID)
+}
+
+// SetPath sets the "path" field.
+func (m *OrgMutation) SetPath(s string) {
+	m._path = &s
+}
+
+// Path returns the value of the "path" field in the mutation.
+func (m *OrgMutation) Path() (r string, exists bool) {
+	v := m._path
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPath returns the old "path" field's value of the Org entity.
+// If the Org object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OrgMutation) OldPath(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPath is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPath requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPath: %w", err)
+	}
+	return oldValue.Path, nil
+}
+
+// ClearPath clears the value of the "path" field.
+func (m *OrgMutation) ClearPath() {
+	m._path = nil
+	m.clearedFields[org.FieldPath] = struct{}{}
+}
+
+// PathCleared returns if the "path" field was cleared in this mutation.
+func (m *OrgMutation) PathCleared() bool {
+	_, ok := m.clearedFields[org.FieldPath]
+	return ok
+}
+
+// ResetPath resets all changes to the "path" field.
+func (m *OrgMutation) ResetPath() {
+	m._path = nil
+	delete(m.clearedFields, org.FieldPath)
+}
+
+// AddMsgAlertIDs adds the "msg_alerts" edge to the MsgAlert entity by ids.
+func (m *OrgMutation) AddMsgAlertIDs(ids ...int) {
+	if m.msg_alerts == nil {
+		m.msg_alerts = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.msg_alerts[ids[i]] = struct{}{}
+	}
+}
+
+// ClearMsgAlerts clears the "msg_alerts" edge to the MsgAlert entity.
+func (m *OrgMutation) ClearMsgAlerts() {
+	m.clearedmsg_alerts = true
+}
+
+// MsgAlertsCleared reports if the "msg_alerts" edge to the MsgAlert entity was cleared.
+func (m *OrgMutation) MsgAlertsCleared() bool {
+	return m.clearedmsg_alerts
+}
+
+// RemoveMsgAlertIDs removes the "msg_alerts" edge to the MsgAlert entity by IDs.
+func (m *OrgMutation) RemoveMsgAlertIDs(ids ...int) {
+	if m.removedmsg_alerts == nil {
+		m.removedmsg_alerts = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.msg_alerts, ids[i])
+		m.removedmsg_alerts[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedMsgAlerts returns the removed IDs of the "msg_alerts" edge to the MsgAlert entity.
+func (m *OrgMutation) RemovedMsgAlertsIDs() (ids []int) {
+	for id := range m.removedmsg_alerts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// MsgAlertsIDs returns the "msg_alerts" edge IDs in the mutation.
+func (m *OrgMutation) MsgAlertsIDs() (ids []int) {
+	for id := range m.msg_alerts {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetMsgAlerts resets all changes to the "msg_alerts" edge.
+func (m *OrgMutation) ResetMsgAlerts() {
+	m.msg_alerts = nil
+	m.clearedmsg_alerts = false
+	m.removedmsg_alerts = nil
+}
+
+// Where appends a list predicates to the OrgMutation builder.
+func (m *OrgMutation) Where(ps ...predicate.Org) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the OrgMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *OrgMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Org, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *OrgMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *OrgMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Org).
+func (m *OrgMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *OrgMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.owner_id != nil {
+		fields = append(fields, org.FieldOwnerID)
+	}
+	if m.kind != nil {
+		fields = append(fields, org.FieldKind)
+	}
+	if m.parent_id != nil {
+		fields = append(fields, org.FieldParentID)
+	}
+	if m._path != nil {
+		fields = append(fields, org.FieldPath)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *OrgMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case org.FieldOwnerID:
+		return m.OwnerID()
+	case org.FieldKind:
+		return m.Kind()
+	case org.FieldParentID:
+		return m.ParentID()
+	case org.FieldPath:
+		return m.Path()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *OrgMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case org.FieldOwnerID:
+		return m.OldOwnerID(ctx)
+	case org.FieldKind:
+		return m.OldKind(ctx)
+	case org.FieldParentID:
+		return m.OldParentID(ctx)
+	case org.FieldPath:
+		return m.OldPath(ctx)
+	}
+	return nil, fmt.Errorf("unknown Org field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *OrgMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case org.FieldOwnerID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOwnerID(v)
+		return nil
+	case org.FieldKind:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKind(v)
+		return nil
+	case org.FieldParentID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParentID(v)
+		return nil
+	case org.FieldPath:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPath(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Org field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *OrgMutation) AddedFields() []string {
+	var fields []string
+	if m.addowner_id != nil {
+		fields = append(fields, org.FieldOwnerID)
+	}
+	if m.addparent_id != nil {
+		fields = append(fields, org.FieldParentID)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *OrgMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case org.FieldOwnerID:
+		return m.AddedOwnerID()
+	case org.FieldParentID:
+		return m.AddedParentID()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *OrgMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case org.FieldOwnerID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddOwnerID(v)
+		return nil
+	case org.FieldParentID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddParentID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Org numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *OrgMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(org.FieldOwnerID) {
+		fields = append(fields, org.FieldOwnerID)
+	}
+	if m.FieldCleared(org.FieldKind) {
+		fields = append(fields, org.FieldKind)
+	}
+	if m.FieldCleared(org.FieldParentID) {
+		fields = append(fields, org.FieldParentID)
+	}
+	if m.FieldCleared(org.FieldPath) {
+		fields = append(fields, org.FieldPath)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *OrgMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *OrgMutation) ClearField(name string) error {
+	switch name {
+	case org.FieldOwnerID:
+		m.ClearOwnerID()
+		return nil
+	case org.FieldKind:
+		m.ClearKind()
+		return nil
+	case org.FieldParentID:
+		m.ClearParentID()
+		return nil
+	case org.FieldPath:
+		m.ClearPath()
+		return nil
+	}
+	return fmt.Errorf("unknown Org nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *OrgMutation) ResetField(name string) error {
+	switch name {
+	case org.FieldOwnerID:
+		m.ResetOwnerID()
+		return nil
+	case org.FieldKind:
+		m.ResetKind()
+		return nil
+	case org.FieldParentID:
+		m.ResetParentID()
+		return nil
+	case org.FieldPath:
+		m.ResetPath()
+		return nil
+	}
+	return fmt.Errorf("unknown Org field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *OrgMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.msg_alerts != nil {
+		edges = append(edges, org.EdgeMsgAlerts)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *OrgMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case org.EdgeMsgAlerts:
+		ids := make([]ent.Value, 0, len(m.msg_alerts))
+		for id := range m.msg_alerts {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *OrgMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedmsg_alerts != nil {
+		edges = append(edges, org.EdgeMsgAlerts)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *OrgMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case org.EdgeMsgAlerts:
+		ids := make([]ent.Value, 0, len(m.removedmsg_alerts))
+		for id := range m.removedmsg_alerts {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *OrgMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedmsg_alerts {
+		edges = append(edges, org.EdgeMsgAlerts)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *OrgMutation) EdgeCleared(name string) bool {
+	switch name {
+	case org.EdgeMsgAlerts:
+		return m.clearedmsg_alerts
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *OrgMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Org unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *OrgMutation) ResetEdge(name string) error {
+	switch name {
+	case org.EdgeMsgAlerts:
+		m.ResetMsgAlerts()
+		return nil
+	}
+	return fmt.Errorf("unknown Org edge %s", name)
 }
 
 // OrgRoleUserMutation represents an operation that mutates the OrgRoleUser nodes in the graph.

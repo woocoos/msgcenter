@@ -16,6 +16,7 @@ import (
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/tsingsun/woocoo/web"
 	"github.com/vektah/gqlparser/v2/ast"
+	"github.com/woocoos/knockout-go/pkg/fmterr"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/knockout-go/pkg/koapp"
 	"github.com/woocoos/knockout-go/pkg/middleware"
@@ -39,6 +40,10 @@ func NewServer(cnf *conf.AppConfiguration) *Server {
 	s := &Server{
 		appCnf: cnf,
 	}
+	// 初始化错误处理
+	if err := fmterr.InitErrorHandler(cnf.Sub("errors")); err != nil {
+		panic(err)
+	}
 	s.buildEntClient()
 	s.buildPubSub()
 	s.buildWebServer(cnf)
@@ -51,6 +56,7 @@ func (s *Server) buildEntClient() {
 
 	scfg := ent.AlternateSchema(ent.SchemaConfig{
 		User:        "portal",
+		Org:         "portal",
 		OrgRoleUser: "portal",
 		UserAddr:    "portal",
 	})

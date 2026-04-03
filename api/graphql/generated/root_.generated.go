@@ -16,6 +16,7 @@ import (
 	"github.com/woocoos/msgcenter/api/graphql/model"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
+	"github.com/woocoos/msgcenter/pkg/profile"
 )
 
 // NewExecutableSchema creates an ExecutableSchema from the ResolverRoot interface.
@@ -63,6 +64,33 @@ type ComplexityRoot struct {
 		To           func(childComplexity int) int
 	}
 
+	FormatMsgAlert struct {
+		CreatedAt          func(childComplexity int) int
+		EndsAt             func(childComplexity int) int
+		HasMultiMsg        func(childComplexity int) int
+		ID                 func(childComplexity int) int
+		MsgChannelComments func(childComplexity int) int
+		MsgEventComments   func(childComplexity int) int
+		MsgTemplateTitle   func(childComplexity int) int
+		Receiver           func(childComplexity int) int
+		ReceiverType       func(childComplexity int) int
+		StartsAt           func(childComplexity int) int
+		State              func(childComplexity int) int
+		TenantID           func(childComplexity int) int
+		Users              func(childComplexity int) int
+	}
+
+	FormatMsgAlertConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	FormatMsgAlertEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
 	Matcher struct {
 		Name  func(childComplexity int) int
 		Type  func(childComplexity int) int
@@ -102,6 +130,7 @@ type ComplexityRoot struct {
 		Labels      func(childComplexity int) int
 		Nlog        func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.NlogOrder, where *ent.NlogWhereInput) int
 		NlogAlerts  func(childComplexity int) int
+		Org         func(childComplexity int) int
 		StartsAt    func(childComplexity int) int
 		State       func(childComplexity int) int
 		TenantID    func(childComplexity int) int
@@ -373,6 +402,15 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	Org struct {
+		ID        func(childComplexity int) int
+		Kind      func(childComplexity int) int
+		MsgAlerts func(childComplexity int) int
+		OwnerID   func(childComplexity int) int
+		ParentID  func(childComplexity int) int
+		Path      func(childComplexity int) int
+	}
+
 	PageInfo struct {
 		EndCursor       func(childComplexity int) int
 		HasNextPage     func(childComplexity int) int
@@ -381,6 +419,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		FormatMsgAlertMore                    func(childComplexity int, msgAlertID int) int
+		FormatMsgAlerts                       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, alertName *string, userID *string, receiverType *profile.ReceiverType, where *ent.MsgAlertWhereInput, orderBy *ent.MsgAlertOrder) int
 		MsgAlerts                             func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) int
 		MsgChannels                           func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgChannelOrder, where *ent.MsgChannelWhereInput) int
 		MsgEvents                             func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) int
@@ -392,6 +432,7 @@ type ComplexityRoot struct {
 		MsgTypes                              func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTypeOrder, where *ent.MsgTypeWhereInput) int
 		Node                                  func(childComplexity int, id string) int
 		Nodes                                 func(childComplexity int, ids []string) int
+		RenderMsgAlert                        func(childComplexity int, msgAlertID int, receiver string) int
 		Silences                              func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SilenceOrder, where *ent.SilenceWhereInput) int
 		UserMsgInternalTos                    func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) int
 		UserSubMsgCategory                    func(childComplexity int) int
@@ -454,6 +495,13 @@ type ComplexityRoot struct {
 		PrincipalName func(childComplexity int) int
 		Silences      func(childComplexity int) int
 	}
+
+	UserInfo struct {
+		Email  func(childComplexity int) int
+		Mobile func(childComplexity int) int
+		Name   func(childComplexity int) int
+		UserID func(childComplexity int) int
+	}
 }
 
 type executableSchema struct {
@@ -470,7 +518,7 @@ func (e *executableSchema) Schema() *ast.Schema {
 	return parsedSchema
 }
 
-func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]interface{}) (int, bool) {
+func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]any) (int, bool) {
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
@@ -537,6 +585,132 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.EmailConfig.To(childComplexity), true
+
+	case "FormatMsgAlert.createdAt":
+		if e.complexity.FormatMsgAlert.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlert.CreatedAt(childComplexity), true
+
+	case "FormatMsgAlert.endsAt":
+		if e.complexity.FormatMsgAlert.EndsAt == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlert.EndsAt(childComplexity), true
+
+	case "FormatMsgAlert.hasMultiMsg":
+		if e.complexity.FormatMsgAlert.HasMultiMsg == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlert.HasMultiMsg(childComplexity), true
+
+	case "FormatMsgAlert.id":
+		if e.complexity.FormatMsgAlert.ID == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlert.ID(childComplexity), true
+
+	case "FormatMsgAlert.msgChannelComments":
+		if e.complexity.FormatMsgAlert.MsgChannelComments == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlert.MsgChannelComments(childComplexity), true
+
+	case "FormatMsgAlert.msgEventComments":
+		if e.complexity.FormatMsgAlert.MsgEventComments == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlert.MsgEventComments(childComplexity), true
+
+	case "FormatMsgAlert.msgTemplateTitle":
+		if e.complexity.FormatMsgAlert.MsgTemplateTitle == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlert.MsgTemplateTitle(childComplexity), true
+
+	case "FormatMsgAlert.receiver":
+		if e.complexity.FormatMsgAlert.Receiver == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlert.Receiver(childComplexity), true
+
+	case "FormatMsgAlert.receiverType":
+		if e.complexity.FormatMsgAlert.ReceiverType == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlert.ReceiverType(childComplexity), true
+
+	case "FormatMsgAlert.startsAt":
+		if e.complexity.FormatMsgAlert.StartsAt == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlert.StartsAt(childComplexity), true
+
+	case "FormatMsgAlert.state":
+		if e.complexity.FormatMsgAlert.State == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlert.State(childComplexity), true
+
+	case "FormatMsgAlert.tenantID":
+		if e.complexity.FormatMsgAlert.TenantID == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlert.TenantID(childComplexity), true
+
+	case "FormatMsgAlert.users":
+		if e.complexity.FormatMsgAlert.Users == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlert.Users(childComplexity), true
+
+	case "FormatMsgAlertConnection.edges":
+		if e.complexity.FormatMsgAlertConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlertConnection.Edges(childComplexity), true
+
+	case "FormatMsgAlertConnection.pageInfo":
+		if e.complexity.FormatMsgAlertConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlertConnection.PageInfo(childComplexity), true
+
+	case "FormatMsgAlertConnection.totalCount":
+		if e.complexity.FormatMsgAlertConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlertConnection.TotalCount(childComplexity), true
+
+	case "FormatMsgAlertEdge.cursor":
+		if e.complexity.FormatMsgAlertEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlertEdge.Cursor(childComplexity), true
+
+	case "FormatMsgAlertEdge.node":
+		if e.complexity.FormatMsgAlertEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlertEdge.Node(childComplexity), true
 
 	case "Matcher.name":
 		if e.complexity.Matcher.Name == nil {
@@ -724,6 +898,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgAlert.NlogAlerts(childComplexity), true
+
+	case "MsgAlert.org":
+		if e.complexity.MsgAlert.Org == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.Org(childComplexity), true
 
 	case "MsgAlert.startsAt":
 		if e.complexity.MsgAlert.StartsAt == nil {
@@ -2202,6 +2383,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.NlogEdge.Node(childComplexity), true
 
+	case "Org.id":
+		if e.complexity.Org.ID == nil {
+			break
+		}
+
+		return e.complexity.Org.ID(childComplexity), true
+
+	case "Org.kind":
+		if e.complexity.Org.Kind == nil {
+			break
+		}
+
+		return e.complexity.Org.Kind(childComplexity), true
+
+	case "Org.msgAlerts":
+		if e.complexity.Org.MsgAlerts == nil {
+			break
+		}
+
+		return e.complexity.Org.MsgAlerts(childComplexity), true
+
+	case "Org.ownerID":
+		if e.complexity.Org.OwnerID == nil {
+			break
+		}
+
+		return e.complexity.Org.OwnerID(childComplexity), true
+
+	case "Org.parentID":
+		if e.complexity.Org.ParentID == nil {
+			break
+		}
+
+		return e.complexity.Org.ParentID(childComplexity), true
+
+	case "Org.path":
+		if e.complexity.Org.Path == nil {
+			break
+		}
+
+		return e.complexity.Org.Path(childComplexity), true
+
 	case "PageInfo.endCursor":
 		if e.complexity.PageInfo.EndCursor == nil {
 			break
@@ -2229,6 +2452,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PageInfo.StartCursor(childComplexity), true
+
+	case "Query.formatMsgAlertMore":
+		if e.complexity.Query.FormatMsgAlertMore == nil {
+			break
+		}
+
+		args, err := ec.field_Query_formatMsgAlertMore_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FormatMsgAlertMore(childComplexity, args["msgAlertID"].(int)), true
+
+	case "Query.formatMsgAlerts":
+		if e.complexity.Query.FormatMsgAlerts == nil {
+			break
+		}
+
+		args, err := ec.field_Query_formatMsgAlerts_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FormatMsgAlerts(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["alertName"].(*string), args["userID"].(*string), args["receiverType"].(*profile.ReceiverType), args["where"].(*ent.MsgAlertWhereInput), args["orderBy"].(*ent.MsgAlertOrder)), true
 
 	case "Query.msgAlerts":
 		if e.complexity.Query.MsgAlerts == nil {
@@ -2361,6 +2608,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Nodes(childComplexity, args["ids"].([]string)), true
+
+	case "Query.renderMsgAlert":
+		if e.complexity.Query.RenderMsgAlert == nil {
+			break
+		}
+
+		args, err := ec.field_Query_renderMsgAlert_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.RenderMsgAlert(childComplexity, args["msgAlertID"].(int), args["receiver"].(string)), true
 
 	case "Query.silences":
 		if e.complexity.Query.Silences == nil {
@@ -2656,6 +2915,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.Silences(childComplexity), true
+
+	case "UserInfo.email":
+		if e.complexity.UserInfo.Email == nil {
+			break
+		}
+
+		return e.complexity.UserInfo.Email(childComplexity), true
+
+	case "UserInfo.mobile":
+		if e.complexity.UserInfo.Mobile == nil {
+			break
+		}
+
+		return e.complexity.UserInfo.Mobile(childComplexity), true
+
+	case "UserInfo.name":
+		if e.complexity.UserInfo.Name == nil {
+			break
+		}
+
+		return e.complexity.UserInfo.Name(childComplexity), true
+
+	case "UserInfo.userID":
+		if e.complexity.UserInfo.UserID == nil {
+			break
+		}
+
+		return e.complexity.UserInfo.UserID(childComplexity), true
 
 	}
 	return 0, false
@@ -3030,7 +3317,7 @@ type MsgAlert implements Node {
   """
   租户ID
   """
-  tenantID: Int!
+  tenantID: ID!
   """
   标签
   """
@@ -3100,6 +3387,7 @@ type MsgAlert implements Node {
     """
     where: NlogWhereInput
   ): NlogConnection!
+  org: Org!
   nlogAlerts: [NlogAlert!]
 }
 """
@@ -3181,14 +3469,10 @@ input MsgAlertWhereInput {
   """
   tenant_id field predicates
   """
-  tenantID: Int
-  tenantIDNEQ: Int
-  tenantIDIn: [Int!]
-  tenantIDNotIn: [Int!]
-  tenantIDGT: Int
-  tenantIDGTE: Int
-  tenantIDLT: Int
-  tenantIDLTE: Int
+  tenantID: ID
+  tenantIDNEQ: ID
+  tenantIDIn: [ID!]
+  tenantIDNotIn: [ID!]
   """
   starts_at field predicates
   """
@@ -3721,6 +4005,24 @@ input MsgEventWhereInput {
   statusNotIn: [MsgEventSimpleStatus!]
   statusIsNil: Boolean
   statusNotNil: Boolean
+  """
+  comments field predicates
+  """
+  comments: String
+  commentsNEQ: String
+  commentsIn: [String!]
+  commentsNotIn: [String!]
+  commentsGT: String
+  commentsGTE: String
+  commentsLT: String
+  commentsLTE: String
+  commentsContains: String
+  commentsHasPrefix: String
+  commentsHasSuffix: String
+  commentsIsNil: Boolean
+  commentsNotNil: Boolean
+  commentsEqualFold: String
+  commentsContainsFold: String
   """
   modes field predicates
   """
@@ -5250,6 +5552,20 @@ enum OrderDirection {
   """
   DESC
 }
+type Org implements Node {
+  """
+  组织ID
+  """
+  id: ID!
+  ownerID: Int
+  kind: String
+  parentID: Int
+  path: String
+  """
+  消息列表
+  """
+  msgAlerts: [MsgAlert!]
+}
 """
 Information about pagination in a connection.
 https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
@@ -5885,6 +6201,47 @@ extend type MsgInternal {
     hasReadCounts:Int!
 }
 
+type UserInfo {
+    userID: String
+    name:   String
+    email:  String
+    mobile: String
+}
+type FormatMsgAlert{
+    id: ID!
+    tenantID: Int!
+    """开始时间"""
+    startsAt: Time!
+    """结束时间"""
+    endsAt: Time
+    """消息事件描述"""
+    msgEventComments: String
+    """消息通道描述"""
+    msgChannelComments: String
+    """接收方式"""
+    receiverType: MsgTemplateReceiverType!
+    """receiver名称"""
+    receiver: String!
+    """消息模板标题"""
+    msgTemplateTitle: String
+    """接收用户"""
+    users: [UserInfo]
+    """是否存在多条消息"""
+    hasMultiMsg: Boolean!
+    """消息状态"""
+    state: MsgAlertAlertStatus!
+    createdAt: Time!
+}
+type FormatMsgAlertEdge {
+    node: FormatMsgAlert
+    cursor: Cursor!
+}
+type FormatMsgAlertConnection {
+    edges: [FormatMsgAlertEdge]
+    pageInfo: PageInfo!
+    totalCount: Int!
+}
+
 extend type Query {
     """ 消息通道列表 """
     msgChannels(
@@ -5948,6 +6305,27 @@ extend type Query {
         orderBy: MsgAlertOrder
         where: MsgAlertWhereInput
     ):MsgAlertConnection!
+
+    """解析过的消息列表"""
+    formatMsgAlerts(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        alertName: String
+        userID: String
+        receiverType: MsgTemplateReceiverType
+        where: MsgAlertWhereInput
+        orderBy: MsgAlertOrder
+    ):FormatMsgAlertConnection!
+
+    """查询消息体发送的所有消息"""
+    formatMsgAlertMore(
+        msgAlertID:ID!
+    ):[FormatMsgAlert]
+
+    """展示消息内容"""
+    renderMsgAlert(msgAlertID:ID!,receiver: String!):String
 
     """获取用户的站内信"""
     userMsgInternalTos(

@@ -123,26 +123,6 @@ func TenantIDNotIn(vs ...int) predicate.MsgAlert {
 	return predicate.MsgAlert(sql.FieldNotIn(FieldTenantID, vs...))
 }
 
-// TenantIDGT applies the GT predicate on the "tenant_id" field.
-func TenantIDGT(v int) predicate.MsgAlert {
-	return predicate.MsgAlert(sql.FieldGT(FieldTenantID, v))
-}
-
-// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
-func TenantIDGTE(v int) predicate.MsgAlert {
-	return predicate.MsgAlert(sql.FieldGTE(FieldTenantID, v))
-}
-
-// TenantIDLT applies the LT predicate on the "tenant_id" field.
-func TenantIDLT(v int) predicate.MsgAlert {
-	return predicate.MsgAlert(sql.FieldLT(FieldTenantID, v))
-}
-
-// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
-func TenantIDLTE(v int) predicate.MsgAlert {
-	return predicate.MsgAlert(sql.FieldLTE(FieldTenantID, v))
-}
-
 // LabelsIsNil applies the IsNil predicate on the "labels" field.
 func LabelsIsNil() predicate.MsgAlert {
 	return predicate.MsgAlert(sql.FieldIsNull(FieldLabels))
@@ -554,6 +534,35 @@ func HasNlogWith(preds ...predicate.Nlog) predicate.MsgAlert {
 		schemaConfig := internal.SchemaConfigFromContext(s.Context())
 		step.To.Schema = schemaConfig.Nlog
 		step.Edge.Schema = schemaConfig.NlogAlert
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasOrg applies the HasEdge predicate on the "org" edge.
+func HasOrg() predicate.MsgAlert {
+	return predicate.MsgAlert(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, OrgTable, OrgColumn),
+		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.Org
+		step.Edge.Schema = schemaConfig.MsgAlert
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOrgWith applies the HasEdge predicate on the "org" edge with a given conditions (other predicates).
+func HasOrgWith(preds ...predicate.Org) predicate.MsgAlert {
+	return predicate.MsgAlert(func(s *sql.Selector) {
+		step := newOrgStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.Org
+		step.Edge.Schema = schemaConfig.MsgAlert
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

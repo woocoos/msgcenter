@@ -29,390 +29,390 @@ type MsgTemplateUpdate struct {
 }
 
 // Where appends a list predicates to the MsgTemplateUpdate builder.
-func (mtu *MsgTemplateUpdate) Where(ps ...predicate.MsgTemplate) *MsgTemplateUpdate {
-	mtu.mutation.Where(ps...)
-	return mtu
+func (_u *MsgTemplateUpdate) Where(ps ...predicate.MsgTemplate) *MsgTemplateUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (mtu *MsgTemplateUpdate) SetUpdatedBy(i int) *MsgTemplateUpdate {
-	mtu.mutation.ResetUpdatedBy()
-	mtu.mutation.SetUpdatedBy(i)
-	return mtu
+func (_u *MsgTemplateUpdate) SetUpdatedBy(v int) *MsgTemplateUpdate {
+	_u.mutation.ResetUpdatedBy()
+	_u.mutation.SetUpdatedBy(v)
+	return _u
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableUpdatedBy(i *int) *MsgTemplateUpdate {
-	if i != nil {
-		mtu.SetUpdatedBy(*i)
+func (_u *MsgTemplateUpdate) SetNillableUpdatedBy(v *int) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetUpdatedBy(*v)
 	}
-	return mtu
+	return _u
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (mtu *MsgTemplateUpdate) AddUpdatedBy(i int) *MsgTemplateUpdate {
-	mtu.mutation.AddUpdatedBy(i)
-	return mtu
+// AddUpdatedBy adds value to the "updated_by" field.
+func (_u *MsgTemplateUpdate) AddUpdatedBy(v int) *MsgTemplateUpdate {
+	_u.mutation.AddUpdatedBy(v)
+	return _u
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (mtu *MsgTemplateUpdate) ClearUpdatedBy() *MsgTemplateUpdate {
-	mtu.mutation.ClearUpdatedBy()
-	return mtu
+func (_u *MsgTemplateUpdate) ClearUpdatedBy() *MsgTemplateUpdate {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (mtu *MsgTemplateUpdate) SetUpdatedAt(t time.Time) *MsgTemplateUpdate {
-	mtu.mutation.SetUpdatedAt(t)
-	return mtu
+func (_u *MsgTemplateUpdate) SetUpdatedAt(v time.Time) *MsgTemplateUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableUpdatedAt(t *time.Time) *MsgTemplateUpdate {
-	if t != nil {
-		mtu.SetUpdatedAt(*t)
+func (_u *MsgTemplateUpdate) SetNillableUpdatedAt(v *time.Time) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return mtu
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (mtu *MsgTemplateUpdate) ClearUpdatedAt() *MsgTemplateUpdate {
-	mtu.mutation.ClearUpdatedAt()
-	return mtu
+func (_u *MsgTemplateUpdate) ClearUpdatedAt() *MsgTemplateUpdate {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetMsgTypeID sets the "msg_type_id" field.
-func (mtu *MsgTemplateUpdate) SetMsgTypeID(i int) *MsgTemplateUpdate {
-	mtu.mutation.ResetMsgTypeID()
-	mtu.mutation.SetMsgTypeID(i)
-	return mtu
+func (_u *MsgTemplateUpdate) SetMsgTypeID(v int) *MsgTemplateUpdate {
+	_u.mutation.ResetMsgTypeID()
+	_u.mutation.SetMsgTypeID(v)
+	return _u
 }
 
 // SetNillableMsgTypeID sets the "msg_type_id" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableMsgTypeID(i *int) *MsgTemplateUpdate {
-	if i != nil {
-		mtu.SetMsgTypeID(*i)
+func (_u *MsgTemplateUpdate) SetNillableMsgTypeID(v *int) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetMsgTypeID(*v)
 	}
-	return mtu
+	return _u
 }
 
-// AddMsgTypeID adds i to the "msg_type_id" field.
-func (mtu *MsgTemplateUpdate) AddMsgTypeID(i int) *MsgTemplateUpdate {
-	mtu.mutation.AddMsgTypeID(i)
-	return mtu
+// AddMsgTypeID adds value to the "msg_type_id" field.
+func (_u *MsgTemplateUpdate) AddMsgTypeID(v int) *MsgTemplateUpdate {
+	_u.mutation.AddMsgTypeID(v)
+	return _u
 }
 
 // SetMsgEventID sets the "msg_event_id" field.
-func (mtu *MsgTemplateUpdate) SetMsgEventID(i int) *MsgTemplateUpdate {
-	mtu.mutation.SetMsgEventID(i)
-	return mtu
+func (_u *MsgTemplateUpdate) SetMsgEventID(v int) *MsgTemplateUpdate {
+	_u.mutation.SetMsgEventID(v)
+	return _u
 }
 
 // SetNillableMsgEventID sets the "msg_event_id" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableMsgEventID(i *int) *MsgTemplateUpdate {
-	if i != nil {
-		mtu.SetMsgEventID(*i)
+func (_u *MsgTemplateUpdate) SetNillableMsgEventID(v *int) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetMsgEventID(*v)
 	}
-	return mtu
+	return _u
 }
 
 // SetTenantID sets the "tenant_id" field.
-func (mtu *MsgTemplateUpdate) SetTenantID(i int) *MsgTemplateUpdate {
-	mtu.mutation.ResetTenantID()
-	mtu.mutation.SetTenantID(i)
-	return mtu
+func (_u *MsgTemplateUpdate) SetTenantID(v int) *MsgTemplateUpdate {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
 }
 
 // SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableTenantID(i *int) *MsgTemplateUpdate {
-	if i != nil {
-		mtu.SetTenantID(*i)
+func (_u *MsgTemplateUpdate) SetNillableTenantID(v *int) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
 	}
-	return mtu
+	return _u
 }
 
-// AddTenantID adds i to the "tenant_id" field.
-func (mtu *MsgTemplateUpdate) AddTenantID(i int) *MsgTemplateUpdate {
-	mtu.mutation.AddTenantID(i)
-	return mtu
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *MsgTemplateUpdate) AddTenantID(v int) *MsgTemplateUpdate {
+	_u.mutation.AddTenantID(v)
+	return _u
 }
 
 // ClearTenantID clears the value of the "tenant_id" field.
-func (mtu *MsgTemplateUpdate) ClearTenantID() *MsgTemplateUpdate {
-	mtu.mutation.ClearTenantID()
-	return mtu
+func (_u *MsgTemplateUpdate) ClearTenantID() *MsgTemplateUpdate {
+	_u.mutation.ClearTenantID()
+	return _u
 }
 
 // SetName sets the "name" field.
-func (mtu *MsgTemplateUpdate) SetName(s string) *MsgTemplateUpdate {
-	mtu.mutation.SetName(s)
-	return mtu
+func (_u *MsgTemplateUpdate) SetName(v string) *MsgTemplateUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableName(s *string) *MsgTemplateUpdate {
-	if s != nil {
-		mtu.SetName(*s)
+func (_u *MsgTemplateUpdate) SetNillableName(v *string) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return mtu
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (mtu *MsgTemplateUpdate) SetStatus(ts typex.SimpleStatus) *MsgTemplateUpdate {
-	mtu.mutation.SetStatus(ts)
-	return mtu
+func (_u *MsgTemplateUpdate) SetStatus(v typex.SimpleStatus) *MsgTemplateUpdate {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableStatus(ts *typex.SimpleStatus) *MsgTemplateUpdate {
-	if ts != nil {
-		mtu.SetStatus(*ts)
+func (_u *MsgTemplateUpdate) SetNillableStatus(v *typex.SimpleStatus) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return mtu
+	return _u
 }
 
 // ClearStatus clears the value of the "status" field.
-func (mtu *MsgTemplateUpdate) ClearStatus() *MsgTemplateUpdate {
-	mtu.mutation.ClearStatus()
-	return mtu
+func (_u *MsgTemplateUpdate) ClearStatus() *MsgTemplateUpdate {
+	_u.mutation.ClearStatus()
+	return _u
 }
 
 // SetReceiverType sets the "receiver_type" field.
-func (mtu *MsgTemplateUpdate) SetReceiverType(pt profile.ReceiverType) *MsgTemplateUpdate {
-	mtu.mutation.SetReceiverType(pt)
-	return mtu
+func (_u *MsgTemplateUpdate) SetReceiverType(v profile.ReceiverType) *MsgTemplateUpdate {
+	_u.mutation.SetReceiverType(v)
+	return _u
 }
 
 // SetNillableReceiverType sets the "receiver_type" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableReceiverType(pt *profile.ReceiverType) *MsgTemplateUpdate {
-	if pt != nil {
-		mtu.SetReceiverType(*pt)
+func (_u *MsgTemplateUpdate) SetNillableReceiverType(v *profile.ReceiverType) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetReceiverType(*v)
 	}
-	return mtu
+	return _u
 }
 
 // SetFormat sets the "format" field.
-func (mtu *MsgTemplateUpdate) SetFormat(m msgtemplate.Format) *MsgTemplateUpdate {
-	mtu.mutation.SetFormat(m)
-	return mtu
+func (_u *MsgTemplateUpdate) SetFormat(v msgtemplate.Format) *MsgTemplateUpdate {
+	_u.mutation.SetFormat(v)
+	return _u
 }
 
 // SetNillableFormat sets the "format" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableFormat(m *msgtemplate.Format) *MsgTemplateUpdate {
-	if m != nil {
-		mtu.SetFormat(*m)
+func (_u *MsgTemplateUpdate) SetNillableFormat(v *msgtemplate.Format) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetFormat(*v)
 	}
-	return mtu
+	return _u
 }
 
 // SetSubject sets the "subject" field.
-func (mtu *MsgTemplateUpdate) SetSubject(s string) *MsgTemplateUpdate {
-	mtu.mutation.SetSubject(s)
-	return mtu
+func (_u *MsgTemplateUpdate) SetSubject(v string) *MsgTemplateUpdate {
+	_u.mutation.SetSubject(v)
+	return _u
 }
 
 // SetNillableSubject sets the "subject" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableSubject(s *string) *MsgTemplateUpdate {
-	if s != nil {
-		mtu.SetSubject(*s)
+func (_u *MsgTemplateUpdate) SetNillableSubject(v *string) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetSubject(*v)
 	}
-	return mtu
+	return _u
 }
 
 // ClearSubject clears the value of the "subject" field.
-func (mtu *MsgTemplateUpdate) ClearSubject() *MsgTemplateUpdate {
-	mtu.mutation.ClearSubject()
-	return mtu
+func (_u *MsgTemplateUpdate) ClearSubject() *MsgTemplateUpdate {
+	_u.mutation.ClearSubject()
+	return _u
 }
 
 // SetFrom sets the "from" field.
-func (mtu *MsgTemplateUpdate) SetFrom(s string) *MsgTemplateUpdate {
-	mtu.mutation.SetFrom(s)
-	return mtu
+func (_u *MsgTemplateUpdate) SetFrom(v string) *MsgTemplateUpdate {
+	_u.mutation.SetFrom(v)
+	return _u
 }
 
 // SetNillableFrom sets the "from" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableFrom(s *string) *MsgTemplateUpdate {
-	if s != nil {
-		mtu.SetFrom(*s)
+func (_u *MsgTemplateUpdate) SetNillableFrom(v *string) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetFrom(*v)
 	}
-	return mtu
+	return _u
 }
 
 // ClearFrom clears the value of the "from" field.
-func (mtu *MsgTemplateUpdate) ClearFrom() *MsgTemplateUpdate {
-	mtu.mutation.ClearFrom()
-	return mtu
+func (_u *MsgTemplateUpdate) ClearFrom() *MsgTemplateUpdate {
+	_u.mutation.ClearFrom()
+	return _u
 }
 
 // SetTo sets the "to" field.
-func (mtu *MsgTemplateUpdate) SetTo(s string) *MsgTemplateUpdate {
-	mtu.mutation.SetTo(s)
-	return mtu
+func (_u *MsgTemplateUpdate) SetTo(v string) *MsgTemplateUpdate {
+	_u.mutation.SetTo(v)
+	return _u
 }
 
 // SetNillableTo sets the "to" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableTo(s *string) *MsgTemplateUpdate {
-	if s != nil {
-		mtu.SetTo(*s)
+func (_u *MsgTemplateUpdate) SetNillableTo(v *string) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetTo(*v)
 	}
-	return mtu
+	return _u
 }
 
 // ClearTo clears the value of the "to" field.
-func (mtu *MsgTemplateUpdate) ClearTo() *MsgTemplateUpdate {
-	mtu.mutation.ClearTo()
-	return mtu
+func (_u *MsgTemplateUpdate) ClearTo() *MsgTemplateUpdate {
+	_u.mutation.ClearTo()
+	return _u
 }
 
 // SetCc sets the "cc" field.
-func (mtu *MsgTemplateUpdate) SetCc(s string) *MsgTemplateUpdate {
-	mtu.mutation.SetCc(s)
-	return mtu
+func (_u *MsgTemplateUpdate) SetCc(v string) *MsgTemplateUpdate {
+	_u.mutation.SetCc(v)
+	return _u
 }
 
 // SetNillableCc sets the "cc" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableCc(s *string) *MsgTemplateUpdate {
-	if s != nil {
-		mtu.SetCc(*s)
+func (_u *MsgTemplateUpdate) SetNillableCc(v *string) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetCc(*v)
 	}
-	return mtu
+	return _u
 }
 
 // ClearCc clears the value of the "cc" field.
-func (mtu *MsgTemplateUpdate) ClearCc() *MsgTemplateUpdate {
-	mtu.mutation.ClearCc()
-	return mtu
+func (_u *MsgTemplateUpdate) ClearCc() *MsgTemplateUpdate {
+	_u.mutation.ClearCc()
+	return _u
 }
 
 // SetBcc sets the "bcc" field.
-func (mtu *MsgTemplateUpdate) SetBcc(s string) *MsgTemplateUpdate {
-	mtu.mutation.SetBcc(s)
-	return mtu
+func (_u *MsgTemplateUpdate) SetBcc(v string) *MsgTemplateUpdate {
+	_u.mutation.SetBcc(v)
+	return _u
 }
 
 // SetNillableBcc sets the "bcc" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableBcc(s *string) *MsgTemplateUpdate {
-	if s != nil {
-		mtu.SetBcc(*s)
+func (_u *MsgTemplateUpdate) SetNillableBcc(v *string) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetBcc(*v)
 	}
-	return mtu
+	return _u
 }
 
 // ClearBcc clears the value of the "bcc" field.
-func (mtu *MsgTemplateUpdate) ClearBcc() *MsgTemplateUpdate {
-	mtu.mutation.ClearBcc()
-	return mtu
+func (_u *MsgTemplateUpdate) ClearBcc() *MsgTemplateUpdate {
+	_u.mutation.ClearBcc()
+	return _u
 }
 
 // SetBody sets the "body" field.
-func (mtu *MsgTemplateUpdate) SetBody(s string) *MsgTemplateUpdate {
-	mtu.mutation.SetBody(s)
-	return mtu
+func (_u *MsgTemplateUpdate) SetBody(v string) *MsgTemplateUpdate {
+	_u.mutation.SetBody(v)
+	return _u
 }
 
 // SetNillableBody sets the "body" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableBody(s *string) *MsgTemplateUpdate {
-	if s != nil {
-		mtu.SetBody(*s)
+func (_u *MsgTemplateUpdate) SetNillableBody(v *string) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetBody(*v)
 	}
-	return mtu
+	return _u
 }
 
 // ClearBody clears the value of the "body" field.
-func (mtu *MsgTemplateUpdate) ClearBody() *MsgTemplateUpdate {
-	mtu.mutation.ClearBody()
-	return mtu
+func (_u *MsgTemplateUpdate) ClearBody() *MsgTemplateUpdate {
+	_u.mutation.ClearBody()
+	return _u
 }
 
 // SetTpl sets the "tpl" field.
-func (mtu *MsgTemplateUpdate) SetTpl(s string) *MsgTemplateUpdate {
-	mtu.mutation.SetTpl(s)
-	return mtu
+func (_u *MsgTemplateUpdate) SetTpl(v string) *MsgTemplateUpdate {
+	_u.mutation.SetTpl(v)
+	return _u
 }
 
 // SetNillableTpl sets the "tpl" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableTpl(s *string) *MsgTemplateUpdate {
-	if s != nil {
-		mtu.SetTpl(*s)
+func (_u *MsgTemplateUpdate) SetNillableTpl(v *string) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetTpl(*v)
 	}
-	return mtu
+	return _u
 }
 
 // ClearTpl clears the value of the "tpl" field.
-func (mtu *MsgTemplateUpdate) ClearTpl() *MsgTemplateUpdate {
-	mtu.mutation.ClearTpl()
-	return mtu
+func (_u *MsgTemplateUpdate) ClearTpl() *MsgTemplateUpdate {
+	_u.mutation.ClearTpl()
+	return _u
 }
 
 // SetAttachments sets the "attachments" field.
-func (mtu *MsgTemplateUpdate) SetAttachments(s []string) *MsgTemplateUpdate {
-	mtu.mutation.SetAttachments(s)
-	return mtu
+func (_u *MsgTemplateUpdate) SetAttachments(v []string) *MsgTemplateUpdate {
+	_u.mutation.SetAttachments(v)
+	return _u
 }
 
-// AppendAttachments appends s to the "attachments" field.
-func (mtu *MsgTemplateUpdate) AppendAttachments(s []string) *MsgTemplateUpdate {
-	mtu.mutation.AppendAttachments(s)
-	return mtu
+// AppendAttachments appends value to the "attachments" field.
+func (_u *MsgTemplateUpdate) AppendAttachments(v []string) *MsgTemplateUpdate {
+	_u.mutation.AppendAttachments(v)
+	return _u
 }
 
 // ClearAttachments clears the value of the "attachments" field.
-func (mtu *MsgTemplateUpdate) ClearAttachments() *MsgTemplateUpdate {
-	mtu.mutation.ClearAttachments()
-	return mtu
+func (_u *MsgTemplateUpdate) ClearAttachments() *MsgTemplateUpdate {
+	_u.mutation.ClearAttachments()
+	return _u
 }
 
 // SetComments sets the "comments" field.
-func (mtu *MsgTemplateUpdate) SetComments(s string) *MsgTemplateUpdate {
-	mtu.mutation.SetComments(s)
-	return mtu
+func (_u *MsgTemplateUpdate) SetComments(v string) *MsgTemplateUpdate {
+	_u.mutation.SetComments(v)
+	return _u
 }
 
 // SetNillableComments sets the "comments" field if the given value is not nil.
-func (mtu *MsgTemplateUpdate) SetNillableComments(s *string) *MsgTemplateUpdate {
-	if s != nil {
-		mtu.SetComments(*s)
+func (_u *MsgTemplateUpdate) SetNillableComments(v *string) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetComments(*v)
 	}
-	return mtu
+	return _u
 }
 
 // ClearComments clears the value of the "comments" field.
-func (mtu *MsgTemplateUpdate) ClearComments() *MsgTemplateUpdate {
-	mtu.mutation.ClearComments()
-	return mtu
+func (_u *MsgTemplateUpdate) ClearComments() *MsgTemplateUpdate {
+	_u.mutation.ClearComments()
+	return _u
 }
 
 // SetEventID sets the "event" edge to the MsgEvent entity by ID.
-func (mtu *MsgTemplateUpdate) SetEventID(id int) *MsgTemplateUpdate {
-	mtu.mutation.SetEventID(id)
-	return mtu
+func (_u *MsgTemplateUpdate) SetEventID(id int) *MsgTemplateUpdate {
+	_u.mutation.SetEventID(id)
+	return _u
 }
 
 // SetEvent sets the "event" edge to the MsgEvent entity.
-func (mtu *MsgTemplateUpdate) SetEvent(m *MsgEvent) *MsgTemplateUpdate {
-	return mtu.SetEventID(m.ID)
+func (_u *MsgTemplateUpdate) SetEvent(v *MsgEvent) *MsgTemplateUpdate {
+	return _u.SetEventID(v.ID)
 }
 
 // Mutation returns the MsgTemplateMutation object of the builder.
-func (mtu *MsgTemplateUpdate) Mutation() *MsgTemplateMutation {
-	return mtu.mutation
+func (_u *MsgTemplateUpdate) Mutation() *MsgTemplateMutation {
+	return _u.mutation
 }
 
 // ClearEvent clears the "event" edge to the MsgEvent entity.
-func (mtu *MsgTemplateUpdate) ClearEvent() *MsgTemplateUpdate {
-	mtu.mutation.ClearEvent()
-	return mtu
+func (_u *MsgTemplateUpdate) ClearEvent() *MsgTemplateUpdate {
+	_u.mutation.ClearEvent()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (mtu *MsgTemplateUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, mtu.sqlSave, mtu.mutation, mtu.hooks)
+func (_u *MsgTemplateUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mtu *MsgTemplateUpdate) SaveX(ctx context.Context) int {
-	affected, err := mtu.Save(ctx)
+func (_u *MsgTemplateUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -420,163 +420,163 @@ func (mtu *MsgTemplateUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (mtu *MsgTemplateUpdate) Exec(ctx context.Context) error {
-	_, err := mtu.Save(ctx)
+func (_u *MsgTemplateUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mtu *MsgTemplateUpdate) ExecX(ctx context.Context) {
-	if err := mtu.Exec(ctx); err != nil {
+func (_u *MsgTemplateUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mtu *MsgTemplateUpdate) check() error {
-	if v, ok := mtu.mutation.Name(); ok {
+func (_u *MsgTemplateUpdate) check() error {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := msgtemplate.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "MsgTemplate.name": %w`, err)}
 		}
 	}
-	if v, ok := mtu.mutation.Status(); ok {
+	if v, ok := _u.mutation.Status(); ok {
 		if err := msgtemplate.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "MsgTemplate.status": %w`, err)}
 		}
 	}
-	if v, ok := mtu.mutation.ReceiverType(); ok {
+	if v, ok := _u.mutation.ReceiverType(); ok {
 		if err := msgtemplate.ReceiverTypeValidator(v); err != nil {
 			return &ValidationError{Name: "receiver_type", err: fmt.Errorf(`ent: validator failed for field "MsgTemplate.receiver_type": %w`, err)}
 		}
 	}
-	if v, ok := mtu.mutation.Format(); ok {
+	if v, ok := _u.mutation.Format(); ok {
 		if err := msgtemplate.FormatValidator(v); err != nil {
 			return &ValidationError{Name: "format", err: fmt.Errorf(`ent: validator failed for field "MsgTemplate.format": %w`, err)}
 		}
 	}
-	if mtu.mutation.EventCleared() && len(mtu.mutation.EventIDs()) > 0 {
+	if _u.mutation.EventCleared() && len(_u.mutation.EventIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgTemplate.event"`)
 	}
 	return nil
 }
 
-func (mtu *MsgTemplateUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := mtu.check(); err != nil {
-		return n, err
+func (_u *MsgTemplateUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(msgtemplate.Table, msgtemplate.Columns, sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt))
-	if ps := mtu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := mtu.mutation.UpdatedBy(); ok {
+	if value, ok := _u.mutation.UpdatedBy(); ok {
 		_spec.SetField(msgtemplate.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if value, ok := mtu.mutation.AddedUpdatedBy(); ok {
+	if value, ok := _u.mutation.AddedUpdatedBy(); ok {
 		_spec.AddField(msgtemplate.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if mtu.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		_spec.ClearField(msgtemplate.FieldUpdatedBy, field.TypeInt)
 	}
-	if value, ok := mtu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgtemplate.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if mtu.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(msgtemplate.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := mtu.mutation.MsgTypeID(); ok {
+	if value, ok := _u.mutation.MsgTypeID(); ok {
 		_spec.SetField(msgtemplate.FieldMsgTypeID, field.TypeInt, value)
 	}
-	if value, ok := mtu.mutation.AddedMsgTypeID(); ok {
+	if value, ok := _u.mutation.AddedMsgTypeID(); ok {
 		_spec.AddField(msgtemplate.FieldMsgTypeID, field.TypeInt, value)
 	}
-	if value, ok := mtu.mutation.TenantID(); ok {
+	if value, ok := _u.mutation.TenantID(); ok {
 		_spec.SetField(msgtemplate.FieldTenantID, field.TypeInt, value)
 	}
-	if value, ok := mtu.mutation.AddedTenantID(); ok {
+	if value, ok := _u.mutation.AddedTenantID(); ok {
 		_spec.AddField(msgtemplate.FieldTenantID, field.TypeInt, value)
 	}
-	if mtu.mutation.TenantIDCleared() {
+	if _u.mutation.TenantIDCleared() {
 		_spec.ClearField(msgtemplate.FieldTenantID, field.TypeInt)
 	}
-	if value, ok := mtu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(msgtemplate.FieldName, field.TypeString, value)
 	}
-	if value, ok := mtu.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(msgtemplate.FieldStatus, field.TypeEnum, value)
 	}
-	if mtu.mutation.StatusCleared() {
+	if _u.mutation.StatusCleared() {
 		_spec.ClearField(msgtemplate.FieldStatus, field.TypeEnum)
 	}
-	if value, ok := mtu.mutation.ReceiverType(); ok {
+	if value, ok := _u.mutation.ReceiverType(); ok {
 		_spec.SetField(msgtemplate.FieldReceiverType, field.TypeEnum, value)
 	}
-	if value, ok := mtu.mutation.Format(); ok {
+	if value, ok := _u.mutation.Format(); ok {
 		_spec.SetField(msgtemplate.FieldFormat, field.TypeEnum, value)
 	}
-	if value, ok := mtu.mutation.Subject(); ok {
+	if value, ok := _u.mutation.Subject(); ok {
 		_spec.SetField(msgtemplate.FieldSubject, field.TypeString, value)
 	}
-	if mtu.mutation.SubjectCleared() {
+	if _u.mutation.SubjectCleared() {
 		_spec.ClearField(msgtemplate.FieldSubject, field.TypeString)
 	}
-	if value, ok := mtu.mutation.From(); ok {
+	if value, ok := _u.mutation.From(); ok {
 		_spec.SetField(msgtemplate.FieldFrom, field.TypeString, value)
 	}
-	if mtu.mutation.FromCleared() {
+	if _u.mutation.FromCleared() {
 		_spec.ClearField(msgtemplate.FieldFrom, field.TypeString)
 	}
-	if value, ok := mtu.mutation.To(); ok {
+	if value, ok := _u.mutation.To(); ok {
 		_spec.SetField(msgtemplate.FieldTo, field.TypeString, value)
 	}
-	if mtu.mutation.ToCleared() {
+	if _u.mutation.ToCleared() {
 		_spec.ClearField(msgtemplate.FieldTo, field.TypeString)
 	}
-	if value, ok := mtu.mutation.Cc(); ok {
+	if value, ok := _u.mutation.Cc(); ok {
 		_spec.SetField(msgtemplate.FieldCc, field.TypeString, value)
 	}
-	if mtu.mutation.CcCleared() {
+	if _u.mutation.CcCleared() {
 		_spec.ClearField(msgtemplate.FieldCc, field.TypeString)
 	}
-	if value, ok := mtu.mutation.Bcc(); ok {
+	if value, ok := _u.mutation.Bcc(); ok {
 		_spec.SetField(msgtemplate.FieldBcc, field.TypeString, value)
 	}
-	if mtu.mutation.BccCleared() {
+	if _u.mutation.BccCleared() {
 		_spec.ClearField(msgtemplate.FieldBcc, field.TypeString)
 	}
-	if value, ok := mtu.mutation.Body(); ok {
+	if value, ok := _u.mutation.Body(); ok {
 		_spec.SetField(msgtemplate.FieldBody, field.TypeString, value)
 	}
-	if mtu.mutation.BodyCleared() {
+	if _u.mutation.BodyCleared() {
 		_spec.ClearField(msgtemplate.FieldBody, field.TypeString)
 	}
-	if value, ok := mtu.mutation.Tpl(); ok {
+	if value, ok := _u.mutation.Tpl(); ok {
 		_spec.SetField(msgtemplate.FieldTpl, field.TypeString, value)
 	}
-	if mtu.mutation.TplCleared() {
+	if _u.mutation.TplCleared() {
 		_spec.ClearField(msgtemplate.FieldTpl, field.TypeString)
 	}
-	if value, ok := mtu.mutation.Attachments(); ok {
+	if value, ok := _u.mutation.Attachments(); ok {
 		_spec.SetField(msgtemplate.FieldAttachments, field.TypeJSON, value)
 	}
-	if value, ok := mtu.mutation.AppendedAttachments(); ok {
+	if value, ok := _u.mutation.AppendedAttachments(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, msgtemplate.FieldAttachments, value)
 		})
 	}
-	if mtu.mutation.AttachmentsCleared() {
+	if _u.mutation.AttachmentsCleared() {
 		_spec.ClearField(msgtemplate.FieldAttachments, field.TypeJSON)
 	}
-	if value, ok := mtu.mutation.Comments(); ok {
+	if value, ok := _u.mutation.Comments(); ok {
 		_spec.SetField(msgtemplate.FieldComments, field.TypeString, value)
 	}
-	if mtu.mutation.CommentsCleared() {
+	if _u.mutation.CommentsCleared() {
 		_spec.ClearField(msgtemplate.FieldComments, field.TypeString)
 	}
-	if mtu.mutation.EventCleared() {
+	if _u.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -587,10 +587,10 @@ func (mtu *MsgTemplateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mtu.schemaConfig.MsgTemplate
+		edge.Schema = _u.schemaConfig.MsgTemplate
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mtu.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -601,15 +601,15 @@ func (mtu *MsgTemplateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mtu.schemaConfig.MsgTemplate
+		edge.Schema = _u.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Node.Schema = mtu.schemaConfig.MsgTemplate
-	ctx = internal.NewSchemaConfigContext(ctx, mtu.schemaConfig)
-	if n, err = sqlgraph.UpdateNodes(ctx, mtu.driver, _spec); err != nil {
+	_spec.Node.Schema = _u.schemaConfig.MsgTemplate
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgtemplate.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -617,8 +617,8 @@ func (mtu *MsgTemplateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	mtu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // MsgTemplateUpdateOne is the builder for updating a single MsgTemplate entity.
@@ -630,397 +630,397 @@ type MsgTemplateUpdateOne struct {
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (mtuo *MsgTemplateUpdateOne) SetUpdatedBy(i int) *MsgTemplateUpdateOne {
-	mtuo.mutation.ResetUpdatedBy()
-	mtuo.mutation.SetUpdatedBy(i)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetUpdatedBy(v int) *MsgTemplateUpdateOne {
+	_u.mutation.ResetUpdatedBy()
+	_u.mutation.SetUpdatedBy(v)
+	return _u
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableUpdatedBy(i *int) *MsgTemplateUpdateOne {
-	if i != nil {
-		mtuo.SetUpdatedBy(*i)
+func (_u *MsgTemplateUpdateOne) SetNillableUpdatedBy(v *int) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetUpdatedBy(*v)
 	}
-	return mtuo
+	return _u
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (mtuo *MsgTemplateUpdateOne) AddUpdatedBy(i int) *MsgTemplateUpdateOne {
-	mtuo.mutation.AddUpdatedBy(i)
-	return mtuo
+// AddUpdatedBy adds value to the "updated_by" field.
+func (_u *MsgTemplateUpdateOne) AddUpdatedBy(v int) *MsgTemplateUpdateOne {
+	_u.mutation.AddUpdatedBy(v)
+	return _u
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (mtuo *MsgTemplateUpdateOne) ClearUpdatedBy() *MsgTemplateUpdateOne {
-	mtuo.mutation.ClearUpdatedBy()
-	return mtuo
+func (_u *MsgTemplateUpdateOne) ClearUpdatedBy() *MsgTemplateUpdateOne {
+	_u.mutation.ClearUpdatedBy()
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (mtuo *MsgTemplateUpdateOne) SetUpdatedAt(t time.Time) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetUpdatedAt(t)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetUpdatedAt(v time.Time) *MsgTemplateUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableUpdatedAt(t *time.Time) *MsgTemplateUpdateOne {
-	if t != nil {
-		mtuo.SetUpdatedAt(*t)
+func (_u *MsgTemplateUpdateOne) SetNillableUpdatedAt(v *time.Time) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return mtuo
+	return _u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (mtuo *MsgTemplateUpdateOne) ClearUpdatedAt() *MsgTemplateUpdateOne {
-	mtuo.mutation.ClearUpdatedAt()
-	return mtuo
+func (_u *MsgTemplateUpdateOne) ClearUpdatedAt() *MsgTemplateUpdateOne {
+	_u.mutation.ClearUpdatedAt()
+	return _u
 }
 
 // SetMsgTypeID sets the "msg_type_id" field.
-func (mtuo *MsgTemplateUpdateOne) SetMsgTypeID(i int) *MsgTemplateUpdateOne {
-	mtuo.mutation.ResetMsgTypeID()
-	mtuo.mutation.SetMsgTypeID(i)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetMsgTypeID(v int) *MsgTemplateUpdateOne {
+	_u.mutation.ResetMsgTypeID()
+	_u.mutation.SetMsgTypeID(v)
+	return _u
 }
 
 // SetNillableMsgTypeID sets the "msg_type_id" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableMsgTypeID(i *int) *MsgTemplateUpdateOne {
-	if i != nil {
-		mtuo.SetMsgTypeID(*i)
+func (_u *MsgTemplateUpdateOne) SetNillableMsgTypeID(v *int) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetMsgTypeID(*v)
 	}
-	return mtuo
+	return _u
 }
 
-// AddMsgTypeID adds i to the "msg_type_id" field.
-func (mtuo *MsgTemplateUpdateOne) AddMsgTypeID(i int) *MsgTemplateUpdateOne {
-	mtuo.mutation.AddMsgTypeID(i)
-	return mtuo
+// AddMsgTypeID adds value to the "msg_type_id" field.
+func (_u *MsgTemplateUpdateOne) AddMsgTypeID(v int) *MsgTemplateUpdateOne {
+	_u.mutation.AddMsgTypeID(v)
+	return _u
 }
 
 // SetMsgEventID sets the "msg_event_id" field.
-func (mtuo *MsgTemplateUpdateOne) SetMsgEventID(i int) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetMsgEventID(i)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetMsgEventID(v int) *MsgTemplateUpdateOne {
+	_u.mutation.SetMsgEventID(v)
+	return _u
 }
 
 // SetNillableMsgEventID sets the "msg_event_id" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableMsgEventID(i *int) *MsgTemplateUpdateOne {
-	if i != nil {
-		mtuo.SetMsgEventID(*i)
+func (_u *MsgTemplateUpdateOne) SetNillableMsgEventID(v *int) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetMsgEventID(*v)
 	}
-	return mtuo
+	return _u
 }
 
 // SetTenantID sets the "tenant_id" field.
-func (mtuo *MsgTemplateUpdateOne) SetTenantID(i int) *MsgTemplateUpdateOne {
-	mtuo.mutation.ResetTenantID()
-	mtuo.mutation.SetTenantID(i)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetTenantID(v int) *MsgTemplateUpdateOne {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
 }
 
 // SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableTenantID(i *int) *MsgTemplateUpdateOne {
-	if i != nil {
-		mtuo.SetTenantID(*i)
+func (_u *MsgTemplateUpdateOne) SetNillableTenantID(v *int) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
 	}
-	return mtuo
+	return _u
 }
 
-// AddTenantID adds i to the "tenant_id" field.
-func (mtuo *MsgTemplateUpdateOne) AddTenantID(i int) *MsgTemplateUpdateOne {
-	mtuo.mutation.AddTenantID(i)
-	return mtuo
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *MsgTemplateUpdateOne) AddTenantID(v int) *MsgTemplateUpdateOne {
+	_u.mutation.AddTenantID(v)
+	return _u
 }
 
 // ClearTenantID clears the value of the "tenant_id" field.
-func (mtuo *MsgTemplateUpdateOne) ClearTenantID() *MsgTemplateUpdateOne {
-	mtuo.mutation.ClearTenantID()
-	return mtuo
+func (_u *MsgTemplateUpdateOne) ClearTenantID() *MsgTemplateUpdateOne {
+	_u.mutation.ClearTenantID()
+	return _u
 }
 
 // SetName sets the "name" field.
-func (mtuo *MsgTemplateUpdateOne) SetName(s string) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetName(s)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetName(v string) *MsgTemplateUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableName(s *string) *MsgTemplateUpdateOne {
-	if s != nil {
-		mtuo.SetName(*s)
+func (_u *MsgTemplateUpdateOne) SetNillableName(v *string) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return mtuo
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (mtuo *MsgTemplateUpdateOne) SetStatus(ts typex.SimpleStatus) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetStatus(ts)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetStatus(v typex.SimpleStatus) *MsgTemplateUpdateOne {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableStatus(ts *typex.SimpleStatus) *MsgTemplateUpdateOne {
-	if ts != nil {
-		mtuo.SetStatus(*ts)
+func (_u *MsgTemplateUpdateOne) SetNillableStatus(v *typex.SimpleStatus) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return mtuo
+	return _u
 }
 
 // ClearStatus clears the value of the "status" field.
-func (mtuo *MsgTemplateUpdateOne) ClearStatus() *MsgTemplateUpdateOne {
-	mtuo.mutation.ClearStatus()
-	return mtuo
+func (_u *MsgTemplateUpdateOne) ClearStatus() *MsgTemplateUpdateOne {
+	_u.mutation.ClearStatus()
+	return _u
 }
 
 // SetReceiverType sets the "receiver_type" field.
-func (mtuo *MsgTemplateUpdateOne) SetReceiverType(pt profile.ReceiverType) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetReceiverType(pt)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetReceiverType(v profile.ReceiverType) *MsgTemplateUpdateOne {
+	_u.mutation.SetReceiverType(v)
+	return _u
 }
 
 // SetNillableReceiverType sets the "receiver_type" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableReceiverType(pt *profile.ReceiverType) *MsgTemplateUpdateOne {
-	if pt != nil {
-		mtuo.SetReceiverType(*pt)
+func (_u *MsgTemplateUpdateOne) SetNillableReceiverType(v *profile.ReceiverType) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetReceiverType(*v)
 	}
-	return mtuo
+	return _u
 }
 
 // SetFormat sets the "format" field.
-func (mtuo *MsgTemplateUpdateOne) SetFormat(m msgtemplate.Format) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetFormat(m)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetFormat(v msgtemplate.Format) *MsgTemplateUpdateOne {
+	_u.mutation.SetFormat(v)
+	return _u
 }
 
 // SetNillableFormat sets the "format" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableFormat(m *msgtemplate.Format) *MsgTemplateUpdateOne {
-	if m != nil {
-		mtuo.SetFormat(*m)
+func (_u *MsgTemplateUpdateOne) SetNillableFormat(v *msgtemplate.Format) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetFormat(*v)
 	}
-	return mtuo
+	return _u
 }
 
 // SetSubject sets the "subject" field.
-func (mtuo *MsgTemplateUpdateOne) SetSubject(s string) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetSubject(s)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetSubject(v string) *MsgTemplateUpdateOne {
+	_u.mutation.SetSubject(v)
+	return _u
 }
 
 // SetNillableSubject sets the "subject" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableSubject(s *string) *MsgTemplateUpdateOne {
-	if s != nil {
-		mtuo.SetSubject(*s)
+func (_u *MsgTemplateUpdateOne) SetNillableSubject(v *string) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetSubject(*v)
 	}
-	return mtuo
+	return _u
 }
 
 // ClearSubject clears the value of the "subject" field.
-func (mtuo *MsgTemplateUpdateOne) ClearSubject() *MsgTemplateUpdateOne {
-	mtuo.mutation.ClearSubject()
-	return mtuo
+func (_u *MsgTemplateUpdateOne) ClearSubject() *MsgTemplateUpdateOne {
+	_u.mutation.ClearSubject()
+	return _u
 }
 
 // SetFrom sets the "from" field.
-func (mtuo *MsgTemplateUpdateOne) SetFrom(s string) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetFrom(s)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetFrom(v string) *MsgTemplateUpdateOne {
+	_u.mutation.SetFrom(v)
+	return _u
 }
 
 // SetNillableFrom sets the "from" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableFrom(s *string) *MsgTemplateUpdateOne {
-	if s != nil {
-		mtuo.SetFrom(*s)
+func (_u *MsgTemplateUpdateOne) SetNillableFrom(v *string) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetFrom(*v)
 	}
-	return mtuo
+	return _u
 }
 
 // ClearFrom clears the value of the "from" field.
-func (mtuo *MsgTemplateUpdateOne) ClearFrom() *MsgTemplateUpdateOne {
-	mtuo.mutation.ClearFrom()
-	return mtuo
+func (_u *MsgTemplateUpdateOne) ClearFrom() *MsgTemplateUpdateOne {
+	_u.mutation.ClearFrom()
+	return _u
 }
 
 // SetTo sets the "to" field.
-func (mtuo *MsgTemplateUpdateOne) SetTo(s string) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetTo(s)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetTo(v string) *MsgTemplateUpdateOne {
+	_u.mutation.SetTo(v)
+	return _u
 }
 
 // SetNillableTo sets the "to" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableTo(s *string) *MsgTemplateUpdateOne {
-	if s != nil {
-		mtuo.SetTo(*s)
+func (_u *MsgTemplateUpdateOne) SetNillableTo(v *string) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetTo(*v)
 	}
-	return mtuo
+	return _u
 }
 
 // ClearTo clears the value of the "to" field.
-func (mtuo *MsgTemplateUpdateOne) ClearTo() *MsgTemplateUpdateOne {
-	mtuo.mutation.ClearTo()
-	return mtuo
+func (_u *MsgTemplateUpdateOne) ClearTo() *MsgTemplateUpdateOne {
+	_u.mutation.ClearTo()
+	return _u
 }
 
 // SetCc sets the "cc" field.
-func (mtuo *MsgTemplateUpdateOne) SetCc(s string) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetCc(s)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetCc(v string) *MsgTemplateUpdateOne {
+	_u.mutation.SetCc(v)
+	return _u
 }
 
 // SetNillableCc sets the "cc" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableCc(s *string) *MsgTemplateUpdateOne {
-	if s != nil {
-		mtuo.SetCc(*s)
+func (_u *MsgTemplateUpdateOne) SetNillableCc(v *string) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetCc(*v)
 	}
-	return mtuo
+	return _u
 }
 
 // ClearCc clears the value of the "cc" field.
-func (mtuo *MsgTemplateUpdateOne) ClearCc() *MsgTemplateUpdateOne {
-	mtuo.mutation.ClearCc()
-	return mtuo
+func (_u *MsgTemplateUpdateOne) ClearCc() *MsgTemplateUpdateOne {
+	_u.mutation.ClearCc()
+	return _u
 }
 
 // SetBcc sets the "bcc" field.
-func (mtuo *MsgTemplateUpdateOne) SetBcc(s string) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetBcc(s)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetBcc(v string) *MsgTemplateUpdateOne {
+	_u.mutation.SetBcc(v)
+	return _u
 }
 
 // SetNillableBcc sets the "bcc" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableBcc(s *string) *MsgTemplateUpdateOne {
-	if s != nil {
-		mtuo.SetBcc(*s)
+func (_u *MsgTemplateUpdateOne) SetNillableBcc(v *string) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetBcc(*v)
 	}
-	return mtuo
+	return _u
 }
 
 // ClearBcc clears the value of the "bcc" field.
-func (mtuo *MsgTemplateUpdateOne) ClearBcc() *MsgTemplateUpdateOne {
-	mtuo.mutation.ClearBcc()
-	return mtuo
+func (_u *MsgTemplateUpdateOne) ClearBcc() *MsgTemplateUpdateOne {
+	_u.mutation.ClearBcc()
+	return _u
 }
 
 // SetBody sets the "body" field.
-func (mtuo *MsgTemplateUpdateOne) SetBody(s string) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetBody(s)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetBody(v string) *MsgTemplateUpdateOne {
+	_u.mutation.SetBody(v)
+	return _u
 }
 
 // SetNillableBody sets the "body" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableBody(s *string) *MsgTemplateUpdateOne {
-	if s != nil {
-		mtuo.SetBody(*s)
+func (_u *MsgTemplateUpdateOne) SetNillableBody(v *string) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetBody(*v)
 	}
-	return mtuo
+	return _u
 }
 
 // ClearBody clears the value of the "body" field.
-func (mtuo *MsgTemplateUpdateOne) ClearBody() *MsgTemplateUpdateOne {
-	mtuo.mutation.ClearBody()
-	return mtuo
+func (_u *MsgTemplateUpdateOne) ClearBody() *MsgTemplateUpdateOne {
+	_u.mutation.ClearBody()
+	return _u
 }
 
 // SetTpl sets the "tpl" field.
-func (mtuo *MsgTemplateUpdateOne) SetTpl(s string) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetTpl(s)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetTpl(v string) *MsgTemplateUpdateOne {
+	_u.mutation.SetTpl(v)
+	return _u
 }
 
 // SetNillableTpl sets the "tpl" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableTpl(s *string) *MsgTemplateUpdateOne {
-	if s != nil {
-		mtuo.SetTpl(*s)
+func (_u *MsgTemplateUpdateOne) SetNillableTpl(v *string) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetTpl(*v)
 	}
-	return mtuo
+	return _u
 }
 
 // ClearTpl clears the value of the "tpl" field.
-func (mtuo *MsgTemplateUpdateOne) ClearTpl() *MsgTemplateUpdateOne {
-	mtuo.mutation.ClearTpl()
-	return mtuo
+func (_u *MsgTemplateUpdateOne) ClearTpl() *MsgTemplateUpdateOne {
+	_u.mutation.ClearTpl()
+	return _u
 }
 
 // SetAttachments sets the "attachments" field.
-func (mtuo *MsgTemplateUpdateOne) SetAttachments(s []string) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetAttachments(s)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetAttachments(v []string) *MsgTemplateUpdateOne {
+	_u.mutation.SetAttachments(v)
+	return _u
 }
 
-// AppendAttachments appends s to the "attachments" field.
-func (mtuo *MsgTemplateUpdateOne) AppendAttachments(s []string) *MsgTemplateUpdateOne {
-	mtuo.mutation.AppendAttachments(s)
-	return mtuo
+// AppendAttachments appends value to the "attachments" field.
+func (_u *MsgTemplateUpdateOne) AppendAttachments(v []string) *MsgTemplateUpdateOne {
+	_u.mutation.AppendAttachments(v)
+	return _u
 }
 
 // ClearAttachments clears the value of the "attachments" field.
-func (mtuo *MsgTemplateUpdateOne) ClearAttachments() *MsgTemplateUpdateOne {
-	mtuo.mutation.ClearAttachments()
-	return mtuo
+func (_u *MsgTemplateUpdateOne) ClearAttachments() *MsgTemplateUpdateOne {
+	_u.mutation.ClearAttachments()
+	return _u
 }
 
 // SetComments sets the "comments" field.
-func (mtuo *MsgTemplateUpdateOne) SetComments(s string) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetComments(s)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetComments(v string) *MsgTemplateUpdateOne {
+	_u.mutation.SetComments(v)
+	return _u
 }
 
 // SetNillableComments sets the "comments" field if the given value is not nil.
-func (mtuo *MsgTemplateUpdateOne) SetNillableComments(s *string) *MsgTemplateUpdateOne {
-	if s != nil {
-		mtuo.SetComments(*s)
+func (_u *MsgTemplateUpdateOne) SetNillableComments(v *string) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetComments(*v)
 	}
-	return mtuo
+	return _u
 }
 
 // ClearComments clears the value of the "comments" field.
-func (mtuo *MsgTemplateUpdateOne) ClearComments() *MsgTemplateUpdateOne {
-	mtuo.mutation.ClearComments()
-	return mtuo
+func (_u *MsgTemplateUpdateOne) ClearComments() *MsgTemplateUpdateOne {
+	_u.mutation.ClearComments()
+	return _u
 }
 
 // SetEventID sets the "event" edge to the MsgEvent entity by ID.
-func (mtuo *MsgTemplateUpdateOne) SetEventID(id int) *MsgTemplateUpdateOne {
-	mtuo.mutation.SetEventID(id)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) SetEventID(id int) *MsgTemplateUpdateOne {
+	_u.mutation.SetEventID(id)
+	return _u
 }
 
 // SetEvent sets the "event" edge to the MsgEvent entity.
-func (mtuo *MsgTemplateUpdateOne) SetEvent(m *MsgEvent) *MsgTemplateUpdateOne {
-	return mtuo.SetEventID(m.ID)
+func (_u *MsgTemplateUpdateOne) SetEvent(v *MsgEvent) *MsgTemplateUpdateOne {
+	return _u.SetEventID(v.ID)
 }
 
 // Mutation returns the MsgTemplateMutation object of the builder.
-func (mtuo *MsgTemplateUpdateOne) Mutation() *MsgTemplateMutation {
-	return mtuo.mutation
+func (_u *MsgTemplateUpdateOne) Mutation() *MsgTemplateMutation {
+	return _u.mutation
 }
 
 // ClearEvent clears the "event" edge to the MsgEvent entity.
-func (mtuo *MsgTemplateUpdateOne) ClearEvent() *MsgTemplateUpdateOne {
-	mtuo.mutation.ClearEvent()
-	return mtuo
+func (_u *MsgTemplateUpdateOne) ClearEvent() *MsgTemplateUpdateOne {
+	_u.mutation.ClearEvent()
+	return _u
 }
 
 // Where appends a list predicates to the MsgTemplateUpdate builder.
-func (mtuo *MsgTemplateUpdateOne) Where(ps ...predicate.MsgTemplate) *MsgTemplateUpdateOne {
-	mtuo.mutation.Where(ps...)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) Where(ps ...predicate.MsgTemplate) *MsgTemplateUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (mtuo *MsgTemplateUpdateOne) Select(field string, fields ...string) *MsgTemplateUpdateOne {
-	mtuo.fields = append([]string{field}, fields...)
-	return mtuo
+func (_u *MsgTemplateUpdateOne) Select(field string, fields ...string) *MsgTemplateUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated MsgTemplate entity.
-func (mtuo *MsgTemplateUpdateOne) Save(ctx context.Context) (*MsgTemplate, error) {
-	return withHooks(ctx, mtuo.sqlSave, mtuo.mutation, mtuo.hooks)
+func (_u *MsgTemplateUpdateOne) Save(ctx context.Context) (*MsgTemplate, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mtuo *MsgTemplateUpdateOne) SaveX(ctx context.Context) *MsgTemplate {
-	node, err := mtuo.Save(ctx)
+func (_u *MsgTemplateUpdateOne) SaveX(ctx context.Context) *MsgTemplate {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -1028,57 +1028,57 @@ func (mtuo *MsgTemplateUpdateOne) SaveX(ctx context.Context) *MsgTemplate {
 }
 
 // Exec executes the query on the entity.
-func (mtuo *MsgTemplateUpdateOne) Exec(ctx context.Context) error {
-	_, err := mtuo.Save(ctx)
+func (_u *MsgTemplateUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mtuo *MsgTemplateUpdateOne) ExecX(ctx context.Context) {
-	if err := mtuo.Exec(ctx); err != nil {
+func (_u *MsgTemplateUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mtuo *MsgTemplateUpdateOne) check() error {
-	if v, ok := mtuo.mutation.Name(); ok {
+func (_u *MsgTemplateUpdateOne) check() error {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := msgtemplate.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "MsgTemplate.name": %w`, err)}
 		}
 	}
-	if v, ok := mtuo.mutation.Status(); ok {
+	if v, ok := _u.mutation.Status(); ok {
 		if err := msgtemplate.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "MsgTemplate.status": %w`, err)}
 		}
 	}
-	if v, ok := mtuo.mutation.ReceiverType(); ok {
+	if v, ok := _u.mutation.ReceiverType(); ok {
 		if err := msgtemplate.ReceiverTypeValidator(v); err != nil {
 			return &ValidationError{Name: "receiver_type", err: fmt.Errorf(`ent: validator failed for field "MsgTemplate.receiver_type": %w`, err)}
 		}
 	}
-	if v, ok := mtuo.mutation.Format(); ok {
+	if v, ok := _u.mutation.Format(); ok {
 		if err := msgtemplate.FormatValidator(v); err != nil {
 			return &ValidationError{Name: "format", err: fmt.Errorf(`ent: validator failed for field "MsgTemplate.format": %w`, err)}
 		}
 	}
-	if mtuo.mutation.EventCleared() && len(mtuo.mutation.EventIDs()) > 0 {
+	if _u.mutation.EventCleared() && len(_u.mutation.EventIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MsgTemplate.event"`)
 	}
 	return nil
 }
 
-func (mtuo *MsgTemplateUpdateOne) sqlSave(ctx context.Context) (_node *MsgTemplate, err error) {
-	if err := mtuo.check(); err != nil {
+func (_u *MsgTemplateUpdateOne) sqlSave(ctx context.Context) (_node *MsgTemplate, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(msgtemplate.Table, msgtemplate.Columns, sqlgraph.NewFieldSpec(msgtemplate.FieldID, field.TypeInt))
-	id, ok := mtuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "MsgTemplate.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := mtuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, msgtemplate.FieldID)
 		for _, f := range fields {
@@ -1090,118 +1090,118 @@ func (mtuo *MsgTemplateUpdateOne) sqlSave(ctx context.Context) (_node *MsgTempla
 			}
 		}
 	}
-	if ps := mtuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := mtuo.mutation.UpdatedBy(); ok {
+	if value, ok := _u.mutation.UpdatedBy(); ok {
 		_spec.SetField(msgtemplate.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if value, ok := mtuo.mutation.AddedUpdatedBy(); ok {
+	if value, ok := _u.mutation.AddedUpdatedBy(); ok {
 		_spec.AddField(msgtemplate.FieldUpdatedBy, field.TypeInt, value)
 	}
-	if mtuo.mutation.UpdatedByCleared() {
+	if _u.mutation.UpdatedByCleared() {
 		_spec.ClearField(msgtemplate.FieldUpdatedBy, field.TypeInt)
 	}
-	if value, ok := mtuo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(msgtemplate.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if mtuo.mutation.UpdatedAtCleared() {
+	if _u.mutation.UpdatedAtCleared() {
 		_spec.ClearField(msgtemplate.FieldUpdatedAt, field.TypeTime)
 	}
-	if value, ok := mtuo.mutation.MsgTypeID(); ok {
+	if value, ok := _u.mutation.MsgTypeID(); ok {
 		_spec.SetField(msgtemplate.FieldMsgTypeID, field.TypeInt, value)
 	}
-	if value, ok := mtuo.mutation.AddedMsgTypeID(); ok {
+	if value, ok := _u.mutation.AddedMsgTypeID(); ok {
 		_spec.AddField(msgtemplate.FieldMsgTypeID, field.TypeInt, value)
 	}
-	if value, ok := mtuo.mutation.TenantID(); ok {
+	if value, ok := _u.mutation.TenantID(); ok {
 		_spec.SetField(msgtemplate.FieldTenantID, field.TypeInt, value)
 	}
-	if value, ok := mtuo.mutation.AddedTenantID(); ok {
+	if value, ok := _u.mutation.AddedTenantID(); ok {
 		_spec.AddField(msgtemplate.FieldTenantID, field.TypeInt, value)
 	}
-	if mtuo.mutation.TenantIDCleared() {
+	if _u.mutation.TenantIDCleared() {
 		_spec.ClearField(msgtemplate.FieldTenantID, field.TypeInt)
 	}
-	if value, ok := mtuo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(msgtemplate.FieldName, field.TypeString, value)
 	}
-	if value, ok := mtuo.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(msgtemplate.FieldStatus, field.TypeEnum, value)
 	}
-	if mtuo.mutation.StatusCleared() {
+	if _u.mutation.StatusCleared() {
 		_spec.ClearField(msgtemplate.FieldStatus, field.TypeEnum)
 	}
-	if value, ok := mtuo.mutation.ReceiverType(); ok {
+	if value, ok := _u.mutation.ReceiverType(); ok {
 		_spec.SetField(msgtemplate.FieldReceiverType, field.TypeEnum, value)
 	}
-	if value, ok := mtuo.mutation.Format(); ok {
+	if value, ok := _u.mutation.Format(); ok {
 		_spec.SetField(msgtemplate.FieldFormat, field.TypeEnum, value)
 	}
-	if value, ok := mtuo.mutation.Subject(); ok {
+	if value, ok := _u.mutation.Subject(); ok {
 		_spec.SetField(msgtemplate.FieldSubject, field.TypeString, value)
 	}
-	if mtuo.mutation.SubjectCleared() {
+	if _u.mutation.SubjectCleared() {
 		_spec.ClearField(msgtemplate.FieldSubject, field.TypeString)
 	}
-	if value, ok := mtuo.mutation.From(); ok {
+	if value, ok := _u.mutation.From(); ok {
 		_spec.SetField(msgtemplate.FieldFrom, field.TypeString, value)
 	}
-	if mtuo.mutation.FromCleared() {
+	if _u.mutation.FromCleared() {
 		_spec.ClearField(msgtemplate.FieldFrom, field.TypeString)
 	}
-	if value, ok := mtuo.mutation.To(); ok {
+	if value, ok := _u.mutation.To(); ok {
 		_spec.SetField(msgtemplate.FieldTo, field.TypeString, value)
 	}
-	if mtuo.mutation.ToCleared() {
+	if _u.mutation.ToCleared() {
 		_spec.ClearField(msgtemplate.FieldTo, field.TypeString)
 	}
-	if value, ok := mtuo.mutation.Cc(); ok {
+	if value, ok := _u.mutation.Cc(); ok {
 		_spec.SetField(msgtemplate.FieldCc, field.TypeString, value)
 	}
-	if mtuo.mutation.CcCleared() {
+	if _u.mutation.CcCleared() {
 		_spec.ClearField(msgtemplate.FieldCc, field.TypeString)
 	}
-	if value, ok := mtuo.mutation.Bcc(); ok {
+	if value, ok := _u.mutation.Bcc(); ok {
 		_spec.SetField(msgtemplate.FieldBcc, field.TypeString, value)
 	}
-	if mtuo.mutation.BccCleared() {
+	if _u.mutation.BccCleared() {
 		_spec.ClearField(msgtemplate.FieldBcc, field.TypeString)
 	}
-	if value, ok := mtuo.mutation.Body(); ok {
+	if value, ok := _u.mutation.Body(); ok {
 		_spec.SetField(msgtemplate.FieldBody, field.TypeString, value)
 	}
-	if mtuo.mutation.BodyCleared() {
+	if _u.mutation.BodyCleared() {
 		_spec.ClearField(msgtemplate.FieldBody, field.TypeString)
 	}
-	if value, ok := mtuo.mutation.Tpl(); ok {
+	if value, ok := _u.mutation.Tpl(); ok {
 		_spec.SetField(msgtemplate.FieldTpl, field.TypeString, value)
 	}
-	if mtuo.mutation.TplCleared() {
+	if _u.mutation.TplCleared() {
 		_spec.ClearField(msgtemplate.FieldTpl, field.TypeString)
 	}
-	if value, ok := mtuo.mutation.Attachments(); ok {
+	if value, ok := _u.mutation.Attachments(); ok {
 		_spec.SetField(msgtemplate.FieldAttachments, field.TypeJSON, value)
 	}
-	if value, ok := mtuo.mutation.AppendedAttachments(); ok {
+	if value, ok := _u.mutation.AppendedAttachments(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, msgtemplate.FieldAttachments, value)
 		})
 	}
-	if mtuo.mutation.AttachmentsCleared() {
+	if _u.mutation.AttachmentsCleared() {
 		_spec.ClearField(msgtemplate.FieldAttachments, field.TypeJSON)
 	}
-	if value, ok := mtuo.mutation.Comments(); ok {
+	if value, ok := _u.mutation.Comments(); ok {
 		_spec.SetField(msgtemplate.FieldComments, field.TypeString, value)
 	}
-	if mtuo.mutation.CommentsCleared() {
+	if _u.mutation.CommentsCleared() {
 		_spec.ClearField(msgtemplate.FieldComments, field.TypeString)
 	}
-	if mtuo.mutation.EventCleared() {
+	if _u.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1212,10 +1212,10 @@ func (mtuo *MsgTemplateUpdateOne) sqlSave(ctx context.Context) (_node *MsgTempla
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mtuo.schemaConfig.MsgTemplate
+		edge.Schema = _u.schemaConfig.MsgTemplate
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mtuo.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1226,18 +1226,18 @@ func (mtuo *MsgTemplateUpdateOne) sqlSave(ctx context.Context) (_node *MsgTempla
 				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = mtuo.schemaConfig.MsgTemplate
+		edge.Schema = _u.schemaConfig.MsgTemplate
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.Node.Schema = mtuo.schemaConfig.MsgTemplate
-	ctx = internal.NewSchemaConfigContext(ctx, mtuo.schemaConfig)
-	_node = &MsgTemplate{config: mtuo.config}
+	_spec.Node.Schema = _u.schemaConfig.MsgTemplate
+	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
+	_node = &MsgTemplate{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, mtuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{msgtemplate.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -1245,6 +1245,6 @@ func (mtuo *MsgTemplateUpdateOne) sqlSave(ctx context.Context) (_node *MsgTempla
 		}
 		return nil, err
 	}
-	mtuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

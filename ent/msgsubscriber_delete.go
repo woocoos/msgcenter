@@ -22,58 +22,58 @@ type MsgSubscriberDelete struct {
 }
 
 // Where appends a list predicates to the MsgSubscriberDelete builder.
-func (msd *MsgSubscriberDelete) Where(ps ...predicate.MsgSubscriber) *MsgSubscriberDelete {
-	msd.mutation.Where(ps...)
-	return msd
+func (_d *MsgSubscriberDelete) Where(ps ...predicate.MsgSubscriber) *MsgSubscriberDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (msd *MsgSubscriberDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, msd.sqlExec, msd.mutation, msd.hooks)
+func (_d *MsgSubscriberDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (msd *MsgSubscriberDelete) ExecX(ctx context.Context) int {
-	n, err := msd.Exec(ctx)
+func (_d *MsgSubscriberDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (msd *MsgSubscriberDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *MsgSubscriberDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(msgsubscriber.Table, sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt))
-	_spec.Node.Schema = msd.schemaConfig.MsgSubscriber
-	ctx = internal.NewSchemaConfigContext(ctx, msd.schemaConfig)
-	if ps := msd.mutation.predicates; len(ps) > 0 {
+	_spec.Node.Schema = _d.schemaConfig.MsgSubscriber
+	ctx = internal.NewSchemaConfigContext(ctx, _d.schemaConfig)
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, msd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	msd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // MsgSubscriberDeleteOne is the builder for deleting a single MsgSubscriber entity.
 type MsgSubscriberDeleteOne struct {
-	msd *MsgSubscriberDelete
+	_d *MsgSubscriberDelete
 }
 
 // Where appends a list predicates to the MsgSubscriberDelete builder.
-func (msdo *MsgSubscriberDeleteOne) Where(ps ...predicate.MsgSubscriber) *MsgSubscriberDeleteOne {
-	msdo.msd.mutation.Where(ps...)
-	return msdo
+func (_d *MsgSubscriberDeleteOne) Where(ps ...predicate.MsgSubscriber) *MsgSubscriberDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (msdo *MsgSubscriberDeleteOne) Exec(ctx context.Context) error {
-	n, err := msdo.msd.Exec(ctx)
+func (_d *MsgSubscriberDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -85,8 +85,8 @@ func (msdo *MsgSubscriberDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (msdo *MsgSubscriberDeleteOne) ExecX(ctx context.Context) {
-	if err := msdo.Exec(ctx); err != nil {
+func (_d *MsgSubscriberDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

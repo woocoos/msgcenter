@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/woocoos/msgcenter/ent/msgalert"
+	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 )
@@ -54,13 +55,15 @@ type MsgAlert struct {
 type MsgAlertEdges struct {
 	// 消息日志
 	Nlog []*Nlog `json:"nlog,omitempty"`
+	// Org holds the value of the org edge.
+	Org *Org `json:"org,omitempty"`
 	// NlogAlerts holds the value of the nlog_alerts edge.
 	NlogAlerts []*NlogAlert `json:"nlog_alerts,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [3]map[string]int
 
 	namedNlog       map[string][]*Nlog
 	namedNlogAlerts map[string][]*NlogAlert
@@ -75,10 +78,21 @@ func (e MsgAlertEdges) NlogOrErr() ([]*Nlog, error) {
 	return nil, &NotLoadedError{edge: "nlog"}
 }
 
+// OrgOrErr returns the Org value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MsgAlertEdges) OrgOrErr() (*Org, error) {
+	if e.Org != nil {
+		return e.Org, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: org.Label}
+	}
+	return nil, &NotLoadedError{edge: "org"}
+}
+
 // NlogAlertsOrErr returns the NlogAlerts value or an error if the edge
 // was not loaded in eager-loading.
 func (e MsgAlertEdges) NlogAlertsOrErr() ([]*NlogAlert, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.NlogAlerts, nil
 	}
 	return nil, &NotLoadedError{edge: "nlog_alerts"}
@@ -108,7 +122,7 @@ func (*MsgAlert) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the MsgAlert fields.
-func (ma *MsgAlert) assignValues(columns []string, values []any) error {
+func (_m *MsgAlert) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -119,18 +133,18 @@ func (ma *MsgAlert) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			ma.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case msgalert.FieldTenantID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
 			} else if value.Valid {
-				ma.TenantID = int(value.Int64)
+				_m.TenantID = int(value.Int64)
 			}
 		case msgalert.FieldLabels:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field labels", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &ma.Labels); err != nil {
+				if err := json.Unmarshal(*value, &_m.Labels); err != nil {
 					return fmt.Errorf("unmarshal field labels: %w", err)
 				}
 			}
@@ -138,7 +152,7 @@ func (ma *MsgAlert) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field annotations", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &ma.Annotations); err != nil {
+				if err := json.Unmarshal(*value, &_m.Annotations); err != nil {
 					return fmt.Errorf("unmarshal field annotations: %w", err)
 				}
 			}
@@ -146,58 +160,58 @@ func (ma *MsgAlert) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field starts_at", values[i])
 			} else if value.Valid {
-				ma.StartsAt = value.Time
+				_m.StartsAt = value.Time
 			}
 		case msgalert.FieldEndsAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field ends_at", values[i])
 			} else if value.Valid {
-				ma.EndsAt = value.Time
+				_m.EndsAt = value.Time
 			}
 		case msgalert.FieldURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field url", values[i])
 			} else if value.Valid {
-				ma.URL = value.String
+				_m.URL = value.String
 			}
 		case msgalert.FieldTimeout:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field timeout", values[i])
 			} else if value.Valid {
-				ma.Timeout = value.Bool
+				_m.Timeout = value.Bool
 			}
 		case msgalert.FieldFingerprint:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field fingerprint", values[i])
 			} else if value.Valid {
-				ma.Fingerprint = value.String
+				_m.Fingerprint = value.String
 			}
 		case msgalert.FieldState:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field state", values[i])
 			} else if value.Valid {
-				ma.State = alert.AlertStatus(value.String)
+				_m.State = alert.AlertStatus(value.String)
 			}
 		case msgalert.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				ma.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case msgalert.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				ma.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case msgalert.FieldDeleted:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field deleted", values[i])
 			} else if value.Valid {
-				ma.Deleted = value.Bool
+				_m.Deleted = value.Bool
 			}
 		default:
-			ma.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -205,127 +219,132 @@ func (ma *MsgAlert) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the MsgAlert.
 // This includes values selected through modifiers, order, etc.
-func (ma *MsgAlert) Value(name string) (ent.Value, error) {
-	return ma.selectValues.Get(name)
+func (_m *MsgAlert) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryNlog queries the "nlog" edge of the MsgAlert entity.
-func (ma *MsgAlert) QueryNlog() *NlogQuery {
-	return NewMsgAlertClient(ma.config).QueryNlog(ma)
+func (_m *MsgAlert) QueryNlog() *NlogQuery {
+	return NewMsgAlertClient(_m.config).QueryNlog(_m)
+}
+
+// QueryOrg queries the "org" edge of the MsgAlert entity.
+func (_m *MsgAlert) QueryOrg() *OrgQuery {
+	return NewMsgAlertClient(_m.config).QueryOrg(_m)
 }
 
 // QueryNlogAlerts queries the "nlog_alerts" edge of the MsgAlert entity.
-func (ma *MsgAlert) QueryNlogAlerts() *NlogAlertQuery {
-	return NewMsgAlertClient(ma.config).QueryNlogAlerts(ma)
+func (_m *MsgAlert) QueryNlogAlerts() *NlogAlertQuery {
+	return NewMsgAlertClient(_m.config).QueryNlogAlerts(_m)
 }
 
 // Update returns a builder for updating this MsgAlert.
 // Note that you need to call MsgAlert.Unwrap() before calling this method if this MsgAlert
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (ma *MsgAlert) Update() *MsgAlertUpdateOne {
-	return NewMsgAlertClient(ma.config).UpdateOne(ma)
+func (_m *MsgAlert) Update() *MsgAlertUpdateOne {
+	return NewMsgAlertClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the MsgAlert entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (ma *MsgAlert) Unwrap() *MsgAlert {
-	_tx, ok := ma.config.driver.(*txDriver)
+func (_m *MsgAlert) Unwrap() *MsgAlert {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: MsgAlert is not a transactional entity")
 	}
-	ma.config.driver = _tx.drv
-	return ma
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (ma *MsgAlert) String() string {
+func (_m *MsgAlert) String() string {
 	var builder strings.Builder
 	builder.WriteString("MsgAlert(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", ma.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("tenant_id=")
-	builder.WriteString(fmt.Sprintf("%v", ma.TenantID))
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
 	builder.WriteString(", ")
 	builder.WriteString("labels=")
-	builder.WriteString(fmt.Sprintf("%v", ma.Labels))
+	builder.WriteString(fmt.Sprintf("%v", _m.Labels))
 	builder.WriteString(", ")
 	builder.WriteString("annotations=")
-	builder.WriteString(fmt.Sprintf("%v", ma.Annotations))
+	builder.WriteString(fmt.Sprintf("%v", _m.Annotations))
 	builder.WriteString(", ")
 	builder.WriteString("starts_at=")
-	builder.WriteString(ma.StartsAt.Format(time.ANSIC))
+	builder.WriteString(_m.StartsAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("ends_at=")
-	builder.WriteString(ma.EndsAt.Format(time.ANSIC))
+	builder.WriteString(_m.EndsAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("url=")
-	builder.WriteString(ma.URL)
+	builder.WriteString(_m.URL)
 	builder.WriteString(", ")
 	builder.WriteString("timeout=")
-	builder.WriteString(fmt.Sprintf("%v", ma.Timeout))
+	builder.WriteString(fmt.Sprintf("%v", _m.Timeout))
 	builder.WriteString(", ")
 	builder.WriteString("fingerprint=")
-	builder.WriteString(ma.Fingerprint)
+	builder.WriteString(_m.Fingerprint)
 	builder.WriteString(", ")
 	builder.WriteString("state=")
-	builder.WriteString(fmt.Sprintf("%v", ma.State))
+	builder.WriteString(fmt.Sprintf("%v", _m.State))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(ma.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(ma.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("deleted=")
-	builder.WriteString(fmt.Sprintf("%v", ma.Deleted))
+	builder.WriteString(fmt.Sprintf("%v", _m.Deleted))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
 // NamedNlog returns the Nlog named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (ma *MsgAlert) NamedNlog(name string) ([]*Nlog, error) {
-	if ma.Edges.namedNlog == nil {
+func (_m *MsgAlert) NamedNlog(name string) ([]*Nlog, error) {
+	if _m.Edges.namedNlog == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := ma.Edges.namedNlog[name]
+	nodes, ok := _m.Edges.namedNlog[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (ma *MsgAlert) appendNamedNlog(name string, edges ...*Nlog) {
-	if ma.Edges.namedNlog == nil {
-		ma.Edges.namedNlog = make(map[string][]*Nlog)
+func (_m *MsgAlert) appendNamedNlog(name string, edges ...*Nlog) {
+	if _m.Edges.namedNlog == nil {
+		_m.Edges.namedNlog = make(map[string][]*Nlog)
 	}
 	if len(edges) == 0 {
-		ma.Edges.namedNlog[name] = []*Nlog{}
+		_m.Edges.namedNlog[name] = []*Nlog{}
 	} else {
-		ma.Edges.namedNlog[name] = append(ma.Edges.namedNlog[name], edges...)
+		_m.Edges.namedNlog[name] = append(_m.Edges.namedNlog[name], edges...)
 	}
 }
 
 // NamedNlogAlerts returns the NlogAlerts named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (ma *MsgAlert) NamedNlogAlerts(name string) ([]*NlogAlert, error) {
-	if ma.Edges.namedNlogAlerts == nil {
+func (_m *MsgAlert) NamedNlogAlerts(name string) ([]*NlogAlert, error) {
+	if _m.Edges.namedNlogAlerts == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := ma.Edges.namedNlogAlerts[name]
+	nodes, ok := _m.Edges.namedNlogAlerts[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (ma *MsgAlert) appendNamedNlogAlerts(name string, edges ...*NlogAlert) {
-	if ma.Edges.namedNlogAlerts == nil {
-		ma.Edges.namedNlogAlerts = make(map[string][]*NlogAlert)
+func (_m *MsgAlert) appendNamedNlogAlerts(name string, edges ...*NlogAlert) {
+	if _m.Edges.namedNlogAlerts == nil {
+		_m.Edges.namedNlogAlerts = make(map[string][]*NlogAlert)
 	}
 	if len(edges) == 0 {
-		ma.Edges.namedNlogAlerts[name] = []*NlogAlert{}
+		_m.Edges.namedNlogAlerts[name] = []*NlogAlert{}
 	} else {
-		ma.Edges.namedNlogAlerts[name] = append(ma.Edges.namedNlogAlerts[name], edges...)
+		_m.Edges.namedNlogAlerts[name] = append(_m.Edges.namedNlogAlerts[name], edges...)
 	}
 }
 

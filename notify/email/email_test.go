@@ -3,6 +3,7 @@ package email
 import (
 	"context"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
@@ -98,6 +99,77 @@ func TestEmailSuite(t *testing.T) {
 	suite.Run(t, new(EmailSuite))
 }
 
+func TestSplitEmailAddresses(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected []string
+		hasError bool
+	}{
+		{
+			name:     "single email address",
+			input:    "test@example.com",
+			expected: []string{"<test@example.com>"},
+			hasError: false,
+		},
+		{
+			name:     "multiple email addresses",
+			input:    "test1@example.com,test2@example.com,test3@example.com",
+			expected: []string{"<test1@example.com>", "<test2@example.com>", "<test3@example.com>"},
+			hasError: false,
+		},
+		{
+			name:     "email addresses with display names",
+			input:    `"Company, Ltd" <test@example.com>,"Org, Inc" <org@example.com>`,
+			expected: []string{`"Company, Ltd" <test@example.com>`, `"Org, Inc" <org@example.com>`},
+			hasError: false,
+		},
+		{
+			name:     "mixed email addresses",
+			input:    `"Company, Ltd" <test@example.com>,org@example.com,OrgInc <org2@example.com>`,
+			expected: []string{`"Company, Ltd" <test@example.com>`, `<org@example.com>`, `"OrgInc" <org2@example.com>`},
+			hasError: false,
+		},
+		{
+			name:     "email addresses with spaces",
+			input:    "test1@example.com, test2@example.com , test3@example.com",
+			expected: []string{"<test1@example.com>", "<test2@example.com>", "<test3@example.com>"},
+			hasError: false,
+		},
+		{
+			name:     "empty string",
+			input:    "",
+			expected: nil,
+			hasError: true,
+		},
+		{
+			name:     "invalid email address",
+			input:    "invalid-email",
+			expected: nil,
+			hasError: true,
+		},
+		{
+			name:     "mixed valid and invalid email addresses",
+			input:    "test@example.com,invalid-email",
+			expected: nil,
+			hasError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := splitEmailAddresses(tt.input)
+			if tt.hasError {
+				assert.Error(t, err)
+				assert.Nil(t, result)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expected, result)
+			}
+		})
+	}
+}
+
 func (ts *EmailSuite) TestEmailNotifyWithErrors() {
 	for _, tc := range []struct {
 		title     string
@@ -132,7 +204,7 @@ func (ts *EmailSuite) TestEmailNotifyWithErrors() {
 			updateCfg: func(cfg *profile.EmailConfig) {
 				cfg.To = `xxx`
 			},
-			errMsg: "invalid to address:",
+			errMsg: "parse 'to' string:",
 		},
 		{
 			title: "invalid 'subject' template",

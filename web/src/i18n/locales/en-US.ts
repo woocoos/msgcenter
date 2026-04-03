@@ -131,6 +131,8 @@ export default {
     starts_at: 'Start time',
     end_at: 'End time',
     effective_time: 'Effective time',
+    search_msg_event: 'Search msg event',
+    click_search_msg_event: 'Click search msg event',
 
     msg_center: 'Message center',
     msg_type: 'Message type',
@@ -155,7 +157,9 @@ export default {
     attachments_tip: 'Attachments are fixed documents, and variables in attachments are not supported for the time being',
     click_drag_upload: 'Click or drag the file to upload',
     receiving_user: 'Receiving user',
+    receiving_type: 'receiving type',
     receiving_user_group: 'Receiving user group',
+    receive_channel: 'receive channel',
     exclude_user: 'Exclude user',
     receiving_subject: 'Receiving subject',
     match_type: 'Matching type',
@@ -185,6 +189,9 @@ export default {
     station_msg_detail: 'Site message details',
     msg_event_config_example: 'Configuration example',
     page_403: "Sorry, you are not authorized to access this page",
+    view_content: 'view content',
+    more_message: 'more message',
+    query_message: 'query message',
 
     // 创建
     create_msg_type: 'Create message type',

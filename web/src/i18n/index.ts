@@ -15,6 +15,7 @@ i18n
   .init({
     resources,
     lng: LocaleType.zhCN,
+    nsSeparator: '::',
     interpolation: {
       escapeValue: false,
     },

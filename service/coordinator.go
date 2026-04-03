@@ -19,6 +19,7 @@ import (
 	"github.com/woocoos/msgcenter/notify/email"
 	"github.com/woocoos/msgcenter/notify/message"
 	"github.com/woocoos/msgcenter/notify/webhook"
+	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service/kosdk"
@@ -478,4 +479,11 @@ func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *templ
 		return nil, errs
 	}
 	return integrations, nil
+}
+
+func (c *Coordinator) FindTemplate(ctx context.Context, client *ent.Client, rt profile.ReceiverType,
+	labels label.LabelSet) (*ent.MsgTemplate, error) {
+	basedir := c.Template.BaseDir
+	attdir := c.Template.AttachmentDir
+	return findTemplate(ctx, basedir, attdir, client, rt, labels)
 }

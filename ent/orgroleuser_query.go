@@ -32,40 +32,40 @@ type OrgRoleUserQuery struct {
 }
 
 // Where adds a new predicate for the OrgRoleUserQuery builder.
-func (oruq *OrgRoleUserQuery) Where(ps ...predicate.OrgRoleUser) *OrgRoleUserQuery {
-	oruq.predicates = append(oruq.predicates, ps...)
-	return oruq
+func (_q *OrgRoleUserQuery) Where(ps ...predicate.OrgRoleUser) *OrgRoleUserQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (oruq *OrgRoleUserQuery) Limit(limit int) *OrgRoleUserQuery {
-	oruq.ctx.Limit = &limit
-	return oruq
+func (_q *OrgRoleUserQuery) Limit(limit int) *OrgRoleUserQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (oruq *OrgRoleUserQuery) Offset(offset int) *OrgRoleUserQuery {
-	oruq.ctx.Offset = &offset
-	return oruq
+func (_q *OrgRoleUserQuery) Offset(offset int) *OrgRoleUserQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (oruq *OrgRoleUserQuery) Unique(unique bool) *OrgRoleUserQuery {
-	oruq.ctx.Unique = &unique
-	return oruq
+func (_q *OrgRoleUserQuery) Unique(unique bool) *OrgRoleUserQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (oruq *OrgRoleUserQuery) Order(o ...orgroleuser.OrderOption) *OrgRoleUserQuery {
-	oruq.order = append(oruq.order, o...)
-	return oruq
+func (_q *OrgRoleUserQuery) Order(o ...orgroleuser.OrderOption) *OrgRoleUserQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // First returns the first OrgRoleUser entity from the query.
 // Returns a *NotFoundError when no OrgRoleUser was found.
-func (oruq *OrgRoleUserQuery) First(ctx context.Context) (*OrgRoleUser, error) {
-	nodes, err := oruq.Limit(1).All(setContextOp(ctx, oruq.ctx, ent.OpQueryFirst))
+func (_q *OrgRoleUserQuery) First(ctx context.Context) (*OrgRoleUser, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -76,8 +76,8 @@ func (oruq *OrgRoleUserQuery) First(ctx context.Context) (*OrgRoleUser, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (oruq *OrgRoleUserQuery) FirstX(ctx context.Context) *OrgRoleUser {
-	node, err := oruq.First(ctx)
+func (_q *OrgRoleUserQuery) FirstX(ctx context.Context) *OrgRoleUser {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -86,9 +86,9 @@ func (oruq *OrgRoleUserQuery) FirstX(ctx context.Context) *OrgRoleUser {
 
 // FirstID returns the first OrgRoleUser ID from the query.
 // Returns a *NotFoundError when no OrgRoleUser ID was found.
-func (oruq *OrgRoleUserQuery) FirstID(ctx context.Context) (id int, err error) {
+func (_q *OrgRoleUserQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = oruq.Limit(1).IDs(setContextOp(ctx, oruq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -99,8 +99,8 @@ func (oruq *OrgRoleUserQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (oruq *OrgRoleUserQuery) FirstIDX(ctx context.Context) int {
-	id, err := oruq.FirstID(ctx)
+func (_q *OrgRoleUserQuery) FirstIDX(ctx context.Context) int {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -110,8 +110,8 @@ func (oruq *OrgRoleUserQuery) FirstIDX(ctx context.Context) int {
 // Only returns a single OrgRoleUser entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one OrgRoleUser entity is found.
 // Returns a *NotFoundError when no OrgRoleUser entities are found.
-func (oruq *OrgRoleUserQuery) Only(ctx context.Context) (*OrgRoleUser, error) {
-	nodes, err := oruq.Limit(2).All(setContextOp(ctx, oruq.ctx, ent.OpQueryOnly))
+func (_q *OrgRoleUserQuery) Only(ctx context.Context) (*OrgRoleUser, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -126,8 +126,8 @@ func (oruq *OrgRoleUserQuery) Only(ctx context.Context) (*OrgRoleUser, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (oruq *OrgRoleUserQuery) OnlyX(ctx context.Context) *OrgRoleUser {
-	node, err := oruq.Only(ctx)
+func (_q *OrgRoleUserQuery) OnlyX(ctx context.Context) *OrgRoleUser {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -137,9 +137,9 @@ func (oruq *OrgRoleUserQuery) OnlyX(ctx context.Context) *OrgRoleUser {
 // OnlyID is like Only, but returns the only OrgRoleUser ID in the query.
 // Returns a *NotSingularError when more than one OrgRoleUser ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (oruq *OrgRoleUserQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *OrgRoleUserQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = oruq.Limit(2).IDs(setContextOp(ctx, oruq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -154,8 +154,8 @@ func (oruq *OrgRoleUserQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (oruq *OrgRoleUserQuery) OnlyIDX(ctx context.Context) int {
-	id, err := oruq.OnlyID(ctx)
+func (_q *OrgRoleUserQuery) OnlyIDX(ctx context.Context) int {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -163,18 +163,18 @@ func (oruq *OrgRoleUserQuery) OnlyIDX(ctx context.Context) int {
 }
 
 // All executes the query and returns a list of OrgRoleUsers.
-func (oruq *OrgRoleUserQuery) All(ctx context.Context) ([]*OrgRoleUser, error) {
-	ctx = setContextOp(ctx, oruq.ctx, ent.OpQueryAll)
-	if err := oruq.prepareQuery(ctx); err != nil {
+func (_q *OrgRoleUserQuery) All(ctx context.Context) ([]*OrgRoleUser, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*OrgRoleUser, *OrgRoleUserQuery]()
-	return withInterceptors[[]*OrgRoleUser](ctx, oruq, qr, oruq.inters)
+	return withInterceptors[[]*OrgRoleUser](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (oruq *OrgRoleUserQuery) AllX(ctx context.Context) []*OrgRoleUser {
-	nodes, err := oruq.All(ctx)
+func (_q *OrgRoleUserQuery) AllX(ctx context.Context) []*OrgRoleUser {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -182,20 +182,20 @@ func (oruq *OrgRoleUserQuery) AllX(ctx context.Context) []*OrgRoleUser {
 }
 
 // IDs executes the query and returns a list of OrgRoleUser IDs.
-func (oruq *OrgRoleUserQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if oruq.ctx.Unique == nil && oruq.path != nil {
-		oruq.Unique(true)
+func (_q *OrgRoleUserQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, oruq.ctx, ent.OpQueryIDs)
-	if err = oruq.Select(orgroleuser.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(orgroleuser.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (oruq *OrgRoleUserQuery) IDsX(ctx context.Context) []int {
-	ids, err := oruq.IDs(ctx)
+func (_q *OrgRoleUserQuery) IDsX(ctx context.Context) []int {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -203,17 +203,17 @@ func (oruq *OrgRoleUserQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (oruq *OrgRoleUserQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, oruq.ctx, ent.OpQueryCount)
-	if err := oruq.prepareQuery(ctx); err != nil {
+func (_q *OrgRoleUserQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, oruq, querierCount[*OrgRoleUserQuery](), oruq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*OrgRoleUserQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (oruq *OrgRoleUserQuery) CountX(ctx context.Context) int {
-	count, err := oruq.Count(ctx)
+func (_q *OrgRoleUserQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -221,9 +221,9 @@ func (oruq *OrgRoleUserQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (oruq *OrgRoleUserQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, oruq.ctx, ent.OpQueryExist)
-	switch _, err := oruq.FirstID(ctx); {
+func (_q *OrgRoleUserQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -234,8 +234,8 @@ func (oruq *OrgRoleUserQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (oruq *OrgRoleUserQuery) ExistX(ctx context.Context) bool {
-	exist, err := oruq.Exist(ctx)
+func (_q *OrgRoleUserQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -244,19 +244,19 @@ func (oruq *OrgRoleUserQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the OrgRoleUserQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (oruq *OrgRoleUserQuery) Clone() *OrgRoleUserQuery {
-	if oruq == nil {
+func (_q *OrgRoleUserQuery) Clone() *OrgRoleUserQuery {
+	if _q == nil {
 		return nil
 	}
 	return &OrgRoleUserQuery{
-		config:     oruq.config,
-		ctx:        oruq.ctx.Clone(),
-		order:      append([]orgroleuser.OrderOption{}, oruq.order...),
-		inters:     append([]Interceptor{}, oruq.inters...),
-		predicates: append([]predicate.OrgRoleUser{}, oruq.predicates...),
+		config:     _q.config,
+		ctx:        _q.ctx.Clone(),
+		order:      append([]orgroleuser.OrderOption{}, _q.order...),
+		inters:     append([]Interceptor{}, _q.inters...),
+		predicates: append([]predicate.OrgRoleUser{}, _q.predicates...),
 		// clone intermediate query.
-		sql:  oruq.sql.Clone(),
-		path: oruq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
@@ -274,10 +274,10 @@ func (oruq *OrgRoleUserQuery) Clone() *OrgRoleUserQuery {
 //		GroupBy(orgroleuser.FieldOrgRoleID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (oruq *OrgRoleUserQuery) GroupBy(field string, fields ...string) *OrgRoleUserGroupBy {
-	oruq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &OrgRoleUserGroupBy{build: oruq}
-	grbuild.flds = &oruq.ctx.Fields
+func (_q *OrgRoleUserQuery) GroupBy(field string, fields ...string) *OrgRoleUserGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &OrgRoleUserGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = orgroleuser.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -295,103 +295,103 @@ func (oruq *OrgRoleUserQuery) GroupBy(field string, fields ...string) *OrgRoleUs
 //	client.OrgRoleUser.Query().
 //		Select(orgroleuser.FieldOrgRoleID).
 //		Scan(ctx, &v)
-func (oruq *OrgRoleUserQuery) Select(fields ...string) *OrgRoleUserSelect {
-	oruq.ctx.Fields = append(oruq.ctx.Fields, fields...)
-	sbuild := &OrgRoleUserSelect{OrgRoleUserQuery: oruq}
+func (_q *OrgRoleUserQuery) Select(fields ...string) *OrgRoleUserSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &OrgRoleUserSelect{OrgRoleUserQuery: _q}
 	sbuild.label = orgroleuser.Label
-	sbuild.flds, sbuild.scan = &oruq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a OrgRoleUserSelect configured with the given aggregations.
-func (oruq *OrgRoleUserQuery) Aggregate(fns ...AggregateFunc) *OrgRoleUserSelect {
-	return oruq.Select().Aggregate(fns...)
+func (_q *OrgRoleUserQuery) Aggregate(fns ...AggregateFunc) *OrgRoleUserSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (oruq *OrgRoleUserQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range oruq.inters {
+func (_q *OrgRoleUserQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, oruq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range oruq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !orgroleuser.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if oruq.path != nil {
-		prev, err := oruq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		oruq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (oruq *OrgRoleUserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*OrgRoleUser, error) {
+func (_q *OrgRoleUserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*OrgRoleUser, error) {
 	var (
 		nodes = []*OrgRoleUser{}
-		_spec = oruq.querySpec()
+		_spec = _q.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*OrgRoleUser).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &OrgRoleUser{config: oruq.config}
+		node := &OrgRoleUser{config: _q.config}
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
-	_spec.Node.Schema = oruq.schemaConfig.OrgRoleUser
-	ctx = internal.NewSchemaConfigContext(ctx, oruq.schemaConfig)
-	if len(oruq.modifiers) > 0 {
-		_spec.Modifiers = oruq.modifiers
+	_spec.Node.Schema = _q.schemaConfig.OrgRoleUser
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, oruq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	for i := range oruq.loadTotal {
-		if err := oruq.loadTotal[i](ctx, nodes); err != nil {
+	for i := range _q.loadTotal {
+		if err := _q.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
 }
 
-func (oruq *OrgRoleUserQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := oruq.querySpec()
-	_spec.Node.Schema = oruq.schemaConfig.OrgRoleUser
-	ctx = internal.NewSchemaConfigContext(ctx, oruq.schemaConfig)
-	if len(oruq.modifiers) > 0 {
-		_spec.Modifiers = oruq.modifiers
+func (_q *OrgRoleUserQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	_spec.Node.Schema = _q.schemaConfig.OrgRoleUser
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = oruq.ctx.Fields
-	if len(oruq.ctx.Fields) > 0 {
-		_spec.Unique = oruq.ctx.Unique != nil && *oruq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, oruq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (oruq *OrgRoleUserQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *OrgRoleUserQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(orgroleuser.Table, orgroleuser.Columns, sqlgraph.NewFieldSpec(orgroleuser.FieldID, field.TypeInt))
-	_spec.From = oruq.sql
-	if unique := oruq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if oruq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := oruq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, orgroleuser.FieldID)
 		for i := range fields {
@@ -400,20 +400,20 @@ func (oruq *OrgRoleUserQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if ps := oruq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := oruq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := oruq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := oruq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -423,36 +423,36 @@ func (oruq *OrgRoleUserQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (oruq *OrgRoleUserQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(oruq.driver.Dialect())
+func (_q *OrgRoleUserQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(orgroleuser.Table)
-	columns := oruq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = orgroleuser.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if oruq.sql != nil {
-		selector = oruq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if oruq.ctx.Unique != nil && *oruq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	t1.Schema(oruq.schemaConfig.OrgRoleUser)
-	ctx = internal.NewSchemaConfigContext(ctx, oruq.schemaConfig)
+	t1.Schema(_q.schemaConfig.OrgRoleUser)
+	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
 	selector.WithContext(ctx)
-	for _, p := range oruq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range oruq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := oruq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := oruq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -465,41 +465,41 @@ type OrgRoleUserGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (orugb *OrgRoleUserGroupBy) Aggregate(fns ...AggregateFunc) *OrgRoleUserGroupBy {
-	orugb.fns = append(orugb.fns, fns...)
-	return orugb
+func (_g *OrgRoleUserGroupBy) Aggregate(fns ...AggregateFunc) *OrgRoleUserGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (orugb *OrgRoleUserGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, orugb.build.ctx, ent.OpQueryGroupBy)
-	if err := orugb.build.prepareQuery(ctx); err != nil {
+func (_g *OrgRoleUserGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*OrgRoleUserQuery, *OrgRoleUserGroupBy](ctx, orugb.build, orugb, orugb.build.inters, v)
+	return scanWithInterceptors[*OrgRoleUserQuery, *OrgRoleUserGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (orugb *OrgRoleUserGroupBy) sqlScan(ctx context.Context, root *OrgRoleUserQuery, v any) error {
+func (_g *OrgRoleUserGroupBy) sqlScan(ctx context.Context, root *OrgRoleUserQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(orugb.fns))
-	for _, fn := range orugb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*orugb.flds)+len(orugb.fns))
-		for _, f := range *orugb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*orugb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := orugb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -513,27 +513,27 @@ type OrgRoleUserSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (orus *OrgRoleUserSelect) Aggregate(fns ...AggregateFunc) *OrgRoleUserSelect {
-	orus.fns = append(orus.fns, fns...)
-	return orus
+func (_s *OrgRoleUserSelect) Aggregate(fns ...AggregateFunc) *OrgRoleUserSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (orus *OrgRoleUserSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, orus.ctx, ent.OpQuerySelect)
-	if err := orus.prepareQuery(ctx); err != nil {
+func (_s *OrgRoleUserSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*OrgRoleUserQuery, *OrgRoleUserSelect](ctx, orus.OrgRoleUserQuery, orus, orus.inters, v)
+	return scanWithInterceptors[*OrgRoleUserQuery, *OrgRoleUserSelect](ctx, _s.OrgRoleUserQuery, _s, _s.inters, v)
 }
 
-func (orus *OrgRoleUserSelect) sqlScan(ctx context.Context, root *OrgRoleUserQuery, v any) error {
+func (_s *OrgRoleUserSelect) sqlScan(ctx context.Context, root *OrgRoleUserQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(orus.fns))
-	for _, fn := range orus.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*orus.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -541,7 +541,7 @@ func (orus *OrgRoleUserSelect) sqlScan(ctx context.Context, root *OrgRoleUserQue
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := orus.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

@@ -65,7 +65,7 @@ func (*MsgChannel) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the MsgChannel fields.
-func (mc *MsgChannel) assignValues(columns []string, values []any) error {
+func (_m *MsgChannel) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -76,60 +76,60 @@ func (mc *MsgChannel) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			mc.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case msgchannel.FieldCreatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_by", values[i])
 			} else if value.Valid {
-				mc.CreatedBy = int(value.Int64)
+				_m.CreatedBy = int(value.Int64)
 			}
 		case msgchannel.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				mc.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case msgchannel.FieldUpdatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
 			} else if value.Valid {
-				mc.UpdatedBy = int(value.Int64)
+				_m.UpdatedBy = int(value.Int64)
 			}
 		case msgchannel.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				mc.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case msgchannel.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				mc.Name = value.String
+				_m.Name = value.String
 			}
 		case msgchannel.FieldTenantID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
 			} else if value.Valid {
-				mc.TenantID = int(value.Int64)
+				_m.TenantID = int(value.Int64)
 			}
 		case msgchannel.FieldReceiverType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field receiver_type", values[i])
 			} else if value.Valid {
-				mc.ReceiverType = profile.ReceiverType(value.String)
+				_m.ReceiverType = profile.ReceiverType(value.String)
 			}
 		case msgchannel.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				mc.Status = typex.SimpleStatus(value.String)
+				_m.Status = typex.SimpleStatus(value.String)
 			}
 		case msgchannel.FieldReceiver:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field receiver", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &mc.Receiver); err != nil {
+				if err := json.Unmarshal(*value, &_m.Receiver); err != nil {
 					return fmt.Errorf("unmarshal field receiver: %w", err)
 				}
 			}
@@ -137,10 +137,10 @@ func (mc *MsgChannel) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field comments", values[i])
 			} else if value.Valid {
-				mc.Comments = value.String
+				_m.Comments = value.String
 			}
 		default:
-			mc.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -148,62 +148,62 @@ func (mc *MsgChannel) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the MsgChannel.
 // This includes values selected through modifiers, order, etc.
-func (mc *MsgChannel) Value(name string) (ent.Value, error) {
-	return mc.selectValues.Get(name)
+func (_m *MsgChannel) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this MsgChannel.
 // Note that you need to call MsgChannel.Unwrap() before calling this method if this MsgChannel
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (mc *MsgChannel) Update() *MsgChannelUpdateOne {
-	return NewMsgChannelClient(mc.config).UpdateOne(mc)
+func (_m *MsgChannel) Update() *MsgChannelUpdateOne {
+	return NewMsgChannelClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the MsgChannel entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (mc *MsgChannel) Unwrap() *MsgChannel {
-	_tx, ok := mc.config.driver.(*txDriver)
+func (_m *MsgChannel) Unwrap() *MsgChannel {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: MsgChannel is not a transactional entity")
 	}
-	mc.config.driver = _tx.drv
-	return mc
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (mc *MsgChannel) String() string {
+func (_m *MsgChannel) String() string {
 	var builder strings.Builder
 	builder.WriteString("MsgChannel(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", mc.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", mc.CreatedBy))
+	builder.WriteString(fmt.Sprintf("%v", _m.CreatedBy))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(mc.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", mc.UpdatedBy))
+	builder.WriteString(fmt.Sprintf("%v", _m.UpdatedBy))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(mc.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(mc.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("tenant_id=")
-	builder.WriteString(fmt.Sprintf("%v", mc.TenantID))
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
 	builder.WriteString(", ")
 	builder.WriteString("receiver_type=")
-	builder.WriteString(fmt.Sprintf("%v", mc.ReceiverType))
+	builder.WriteString(fmt.Sprintf("%v", _m.ReceiverType))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", mc.Status))
+	builder.WriteString(fmt.Sprintf("%v", _m.Status))
 	builder.WriteString(", ")
 	builder.WriteString("receiver=")
-	builder.WriteString(fmt.Sprintf("%v", mc.Receiver))
+	builder.WriteString(fmt.Sprintf("%v", _m.Receiver))
 	builder.WriteString(", ")
 	builder.WriteString("comments=")
-	builder.WriteString(mc.Comments)
+	builder.WriteString(_m.Comments)
 	builder.WriteByte(')')
 	return builder.String()
 }

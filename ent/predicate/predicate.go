@@ -36,6 +36,9 @@ type Nlog func(*sql.Selector)
 // NlogAlert is the predicate function for nlogalert builders.
 type NlogAlert func(*sql.Selector)
 
+// Org is the predicate function for org builders.
+type Org func(*sql.Selector)
+
 // OrgRoleUser is the predicate function for orgroleuser builders.
 type OrgRoleUser func(*sql.Selector)
 
