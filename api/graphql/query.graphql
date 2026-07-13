@@ -177,9 +177,9 @@ extend type Query {
         first: Int
         before: Cursor
         last: Int
-        orderBy: SilenceOrder
-        where: SilenceWhereInput
-    ):SilenceConnection!
+        orderBy: MsgSilenceOrder
+        where: MsgSilenceWhereInput
+    ):MsgSilenceConnection!
 
     """消息列表"""
     msgAlerts(

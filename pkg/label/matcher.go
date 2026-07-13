@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"io"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 // MatchType is an enum for label matching types.
@@ -35,7 +35,7 @@ func (m MatchType) String() string {
 	panic("unknown match type")
 }
 
-func (m *MatchType) UnmarshalGQL(v interface{}) error {
+func (m *MatchType) UnmarshalGQL(v any) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enum %T must be a string", v)
@@ -70,7 +70,7 @@ func (m MatchType) MarshalGQL(w io.Writer) {
 	w.Write([]byte(strconv.Quote(gqlM)))
 }
 
-func (m MatchType) MarshalYAML() (interface{}, error) {
+func (m MatchType) MarshalYAML() (any, error) {
 	return m.String(), nil
 }
 
@@ -99,6 +99,9 @@ func NewMatcher(t MatchType, n, v string) (*Matcher, error) {
 }
 
 func (m *Matcher) String() string {
+	if strings.ContainsFunc(m.Name, isReserved) {
+		return fmt.Sprintf(`%s%s%s`, strconv.Quote(m.Name), m.Type, strconv.Quote(m.Value))
+	}
 	return fmt.Sprintf(`%s%s"%s"`, m.Name, m.Type, openMetricsEscape(m.Value))
 }
 
@@ -127,8 +130,17 @@ func (m *Matcher) UnmarshalText(in []byte) error {
 }
 
 func (m *Matcher) UnmarshalJSON(data []byte) error {
-	type cm Matcher
-	return json.Unmarshal(data, (*cm)(m))
+	// JSON object format: {"type": ..., "name": ..., "value": ...}
+	if len(data) > 0 && data[0] == '{' {
+		type plain Matcher
+		return json.Unmarshal(data, (*plain)(m))
+	}
+	// Text format: alertname="value"
+	var s string
+	if err := json.Unmarshal(data, &s); err == nil {
+		return m.UnmarshalText([]byte(s))
+	}
+	return m.UnmarshalText(data)
 }
 
 // openMetricsEscape is similar to the usual string escaping, but more
@@ -193,31 +205,28 @@ func (ms Matchers) String() string {
 	return buf.String()
 }
 
-// UnmarshalJSON implements the json.Unmarshaler interface for Matchers.
-func (m *Matchers) UnmarshalJSON(data []byte) error {
-	var lines []string
-	if err := json.Unmarshal(data, &lines); err != nil {
-		return err
-	}
-	for _, line := range lines {
-		pm, err := ParseMatchers(line)
-		if err != nil {
-			return err
+// MatcherSet is a slice of Matchers pointers that implements OR logic across
+// multiple matcher sets. At least one matcher set must match for the MatcherSet
+// to match.
+type MatcherSet []*Matchers
+
+// Matches checks whether at least one matcher set is fulfilled against the given
+// label set (OR logic across matcher sets, AND logic within each set).
+func (ms MatcherSet) Matches(lset LabelSet) bool {
+	for _, matchers := range ms {
+		if (*matchers).Matches(lset) {
+			return true
 		}
-		*m = append(*m, pm...)
 	}
-	sort.Sort(Matchers(*m))
-	return nil
+	return false
 }
 
-// MarshalJSON implements the json.Marshaler interface for Matchers.
-func (m Matchers) MarshalJSON() ([]byte, error) {
-	if len(m) == 0 {
-		return []byte("[]"), nil
-	}
-	result := make([]string, len(m))
-	for i, matcher := range m {
-		result[i] = matcher.String()
-	}
-	return json.Marshal(result)
+// This is copied from matcher/parse/lexer.go. It will be removed when
+// the transition window from classic matchers to UTF-8 matchers is complete,
+// as then we can use double quotes when printing the label name for all
+// matchers. Until then, the classic parser does not understand double quotes
+// around the label name, so we use this function as a heuristic to tell if
+// the matcher was parsed with the UTF-8 parser or the classic parser.
+func isReserved(r rune) bool {
+	return unicode.IsSpace(r) || strings.ContainsRune("{}!=~,\\\"'`", r)
 }

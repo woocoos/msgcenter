@@ -2,6 +2,11 @@ appName: alertmanager
 version: 0.0.1
 development: true
 
+log:
+  cores:
+    - level: info
+      encoding: console
+
 web:
   server:
     addr: 127.0.0.1:10072

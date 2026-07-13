@@ -144,6 +144,34 @@ var (
 			},
 		},
 	}
+	// MsgSilenceColumns holds the columns for the "msg_silence" table.
+	MsgSilenceColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "tenant_id", Type: field.TypeInt},
+		{Name: "matchers", Type: field.TypeJSON, Nullable: true},
+		{Name: "starts_at", Type: field.TypeTime},
+		{Name: "ends_at", Type: field.TypeTime},
+		{Name: "comments", Type: field.TypeString, Nullable: true},
+		{Name: "state", Type: field.TypeEnum, Enums: []string{"expired", "active", "pending"}, Default: "active"},
+		{Name: "created_by", Type: field.TypeInt},
+	}
+	// MsgSilenceTable holds the schema information for the "msg_silence" table.
+	MsgSilenceTable = &schema.Table{
+		Name:       "msg_silence",
+		Columns:    MsgSilenceColumns,
+		PrimaryKey: []*schema.Column{MsgSilenceColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "msg_silence_user_silences",
+				Columns:    []*schema.Column{MsgSilenceColumns[10]},
+				RefColumns: []*schema.Column{UserColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// MsgSubscriberColumns holds the columns for the "msg_subscriber" table.
 	MsgSubscriberColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -317,34 +345,6 @@ var (
 		Columns:    OrgRoleUserColumns,
 		PrimaryKey: []*schema.Column{OrgRoleUserColumns[0]},
 	}
-	// MsgSilenceColumns holds the columns for the "msg_silence" table.
-	MsgSilenceColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, SchemaType: map[string]string{"mysql": "bigint"}},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
-		{Name: "tenant_id", Type: field.TypeInt},
-		{Name: "matchers", Type: field.TypeJSON, Nullable: true},
-		{Name: "starts_at", Type: field.TypeTime},
-		{Name: "ends_at", Type: field.TypeTime},
-		{Name: "comments", Type: field.TypeString, Nullable: true},
-		{Name: "state", Type: field.TypeEnum, Enums: []string{"expired", "active", "pending"}, Default: "active"},
-		{Name: "created_by", Type: field.TypeInt},
-	}
-	// MsgSilenceTable holds the schema information for the "msg_silence" table.
-	MsgSilenceTable = &schema.Table{
-		Name:       "msg_silence",
-		Columns:    MsgSilenceColumns,
-		PrimaryKey: []*schema.Column{MsgSilenceColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "msg_silence_user_silences",
-				Columns:    []*schema.Column{MsgSilenceColumns[10]},
-				RefColumns: []*schema.Column{UserColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-	}
 	// UserColumns holds the columns for the "user" table.
 	UserColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -393,6 +393,7 @@ var (
 		MsgEventTable,
 		MsgInternalTable,
 		MsgInternalToTable,
+		MsgSilenceTable,
 		MsgSubscriberTable,
 		MsgTemplateTable,
 		MsgTypeTable,
@@ -400,7 +401,6 @@ var (
 		MsgNlogAlertTable,
 		OrgTable,
 		OrgRoleUserTable,
-		MsgSilenceTable,
 		UserTable,
 		UserAddrTable,
 	}
@@ -425,6 +425,10 @@ func init() {
 	MsgInternalToTable.ForeignKeys[1].RefTable = UserTable
 	MsgInternalToTable.Annotation = &entsql.Annotation{
 		Table: "msg_internal_to",
+	}
+	MsgSilenceTable.ForeignKeys[0].RefTable = UserTable
+	MsgSilenceTable.Annotation = &entsql.Annotation{
+		Table: "msg_silence",
 	}
 	MsgSubscriberTable.ForeignKeys[0].RefTable = UserTable
 	MsgSubscriberTable.ForeignKeys[1].RefTable = MsgTypeTable
@@ -451,10 +455,6 @@ func init() {
 	}
 	OrgRoleUserTable.Annotation = &entsql.Annotation{
 		Table: "org_role_user",
-	}
-	MsgSilenceTable.ForeignKeys[0].RefTable = UserTable
-	MsgSilenceTable.Annotation = &entsql.Annotation{
-		Table: "msg_silence",
 	}
 	UserTable.Annotation = &entsql.Annotation{
 		Table: "user",

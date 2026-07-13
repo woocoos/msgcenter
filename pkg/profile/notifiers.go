@@ -3,6 +3,8 @@ package profile
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/httpx"
 	"net/textproto"
@@ -70,13 +72,28 @@ type EmailConfig struct {
 	AuthType     string            `yaml:"authType,omitempty" json:"authType,omitempty"`
 	AuthUsername string            `yaml:"authUsername,omitempty" json:"authUsername,omitempty"`
 	AuthPassword string            `yaml:"authPassword,omitempty" json:"authPassword,omitempty"`
-	AuthSecret   string            `yaml:"authSecret,omitempty" json:"authSecret,omitempty"`
-	AuthIdentity string            `yaml:"authIdentity,omitempty" json:"authIdentity,omitempty"`
-	Headers      map[string]string `yaml:"headers,omitempty" json:"headers,omitempty"`
-	HTML         string            `yaml:"html,omitempty" json:"html,omitempty"`
-	Text         string            `yaml:"text,omitempty" json:"text,omitempty"`
-	RequireTLS   bool              `yaml:"requireTls,omitempty" json:"requireTls,omitempty"`
-	TLSConfig    *conf.TLS         `yaml:"tls,omitempty" json:"tls,omitempty"`
+	// AuthPasswordFile is a file containing the auth password.
+	AuthPasswordFile string `yaml:"authPasswordFile,omitempty" json:"authPasswordFile,omitempty"`
+	AuthSecret       string `yaml:"authSecret,omitempty" json:"authSecret,omitempty"`
+	AuthIdentity     string `yaml:"authIdentity,omitempty" json:"authIdentity,omitempty"`
+	Headers          map[string]string `yaml:"headers,omitempty" json:"headers,omitempty"`
+	HTML             string            `yaml:"html,omitempty" json:"html,omitempty"`
+	Text             string            `yaml:"text,omitempty" json:"text,omitempty"`
+	RequireTLS       bool              `yaml:"requireTls,omitempty" json:"requireTls,omitempty"`
+	TLSConfig        *conf.TLS         `yaml:"tls,omitempty" json:"tls,omitempty"`
+	// ForceImplicitTLS forces implicit TLS (direct TLS connection, typically port 465).
+	// When nil, port 465 defaults to implicit TLS.
+	ForceImplicitTLS *bool `yaml:"forceImplicitTls,omitempty" json:"forceImplicitTls,omitempty"`
+	// Threading configures email threading via References/In-Reply-To headers.
+	Threading EmailThreading `yaml:"threading,omitempty" json:"threading,omitempty"`
+}
+
+// EmailThreading configures email threading.
+type EmailThreading struct {
+	// Enabled enables email threading.
+	Enabled bool `yaml:"enabled,omitempty" json:"enabled,omitempty"`
+	// ThreadByDate groups emails by date. "none" or "daily".
+	ThreadByDate string `yaml:"threadByDate,omitempty" json:"threadByDate,omitempty"`
 }
 
 func (c *EmailConfig) Clone() *EmailConfig {
@@ -131,10 +148,14 @@ type WebhookConfig struct {
 	HttpConfigOri *conf.Configuration `yaml:"-" json:"-"`
 	// URL to send POST request to.
 	URL *URL `yaml:"url" json:"url"`
+	// URLFile is a file containing the URL to send POST request to.
+	URLFile string `yaml:"urlFile" json:"urlFile"`
 	// MaxAlerts is the maximum number of alerts to be sent per webhook message.
 	// Alerts exceeding this threshold will be truncated. Setting this to 0
 	// allows an unlimited number of alerts.
 	MaxAlerts uint64 `yaml:"maxAlerts" json:"maxAlerts"`
+	// Timeout for the webhook request.
+	Timeout time.Duration `yaml:"timeout" json:"timeout"`
 	// HTTP Headers.
 	Headers map[string]string `yaml:"headers,omitempty" json:"headers,omitempty"`
 	// Template for POST message body.
@@ -144,8 +165,11 @@ type WebhookConfig struct {
 }
 
 func (c *WebhookConfig) Validate() error {
-	if c.URL == nil {
-		return fmt.Errorf("url must be configured")
+	if c.URL == nil && c.URLFile == "" {
+		return fmt.Errorf("one of url or urlFile must be configured")
+	}
+	if c.URL != nil && c.URLFile != "" {
+		return fmt.Errorf("at most one of url and urlFile must be configured")
 	}
 	if c.URL != nil {
 		if c.URL.Scheme != "https" && c.URL.Scheme != "http" {

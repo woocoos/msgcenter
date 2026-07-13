@@ -12,6 +12,7 @@ type SchemaConfig struct {
 	MsgEvent      string // MsgEvent table.
 	MsgInternal   string // MsgInternal table.
 	MsgInternalTo string // MsgInternalTo table.
+	MsgSilence    string // MsgSilence table.
 	MsgSubscriber string // MsgSubscriber table.
 	MsgTemplate   string // MsgTemplate table.
 	MsgType       string // MsgType table.
@@ -20,7 +21,6 @@ type SchemaConfig struct {
 	NlogAlert     string // NlogAlert table.
 	Org           string // Org table.
 	OrgRoleUser   string // OrgRoleUser table.
-	Silence       string // Silence table.
 	User          string // User table.
 	UserAddr      string // UserAddr table.
 }

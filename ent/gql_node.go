@@ -20,13 +20,13 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
+	"github.com/woocoos/msgcenter/ent/msgsilence"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/org"
-	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 	"golang.org/x/sync/semaphore"
 )
@@ -61,6 +61,11 @@ var msginternaltoImplementors = []string{"MsgInternalTo", "Node"}
 // IsNode implements the Node interface check for GQLGen.
 func (*MsgInternalTo) IsNode() {}
 
+var msgsilenceImplementors = []string{"MsgSilence", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*MsgSilence) IsNode() {}
+
 var msgsubscriberImplementors = []string{"MsgSubscriber", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
@@ -90,11 +95,6 @@ var orgImplementors = []string{"Org", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
 func (*Org) IsNode() {}
-
-var silenceImplementors = []string{"Silence", "Node"}
-
-// IsNode implements the Node interface check for GQLGen.
-func (*Silence) IsNode() {}
 
 var userImplementors = []string{"User", "Node"}
 
@@ -204,6 +204,15 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			}
 		}
 		return query.Only(entcache.WithRefEntryKey(ctx, "MsgInternalTo", id))
+	case "MsgSilence":
+		query := c.MsgSilence.Query().
+			Where(msgsilence.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, msgsilenceImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(entcache.WithRefEntryKey(ctx, "MsgSilence", id))
 	case "MsgSubscriber":
 		query := c.MsgSubscriber.Query().
 			Where(msgsubscriber.ID(id))
@@ -258,15 +267,6 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			}
 		}
 		return query.Only(entcache.WithRefEntryKey(ctx, "Org", id))
-	case "Silence":
-		query := c.Silence.Query().
-			Where(silence.ID(id))
-		if fc := graphql.GetFieldContext(ctx); fc != nil {
-			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, silenceImplementors...); err != nil {
-				return nil, err
-			}
-		}
-		return query.Only(entcache.WithRefEntryKey(ctx, "Silence", id))
 	case "User":
 		query := c.User.Query().
 			Where(user.ID(id))
@@ -429,6 +429,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
+	case "MsgSilence":
+		query := c.MsgSilence.Query().
+			Where(msgsilence.IDIn(ids...))
+		query, err := query.CollectFields(ctx, msgsilenceImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	case "MsgSubscriber":
 		query := c.MsgSubscriber.Query().
 			Where(msgsubscriber.IDIn(ids...))
@@ -513,22 +529,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Org.Query().
 			Where(org.IDIn(ids...))
 		query, err := query.CollectFields(ctx, orgImplementors...)
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case "Silence":
-		query := c.Silence.Query().
-			Where(silence.IDIn(ids...))
-		query, err := query.CollectFields(ctx, silenceImplementors...)
 		if err != nil {
 			return nil, err
 		}

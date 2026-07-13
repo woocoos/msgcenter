@@ -1,3 +1,9 @@
+// Copyright 2023 woocoos
+//
+// Derived from Prometheus Alertmanager (https://github.com/prometheus/alertmanager).
+// Original Copyright 2016-2026 The Prometheus Authors.
+// Licensed under the Apache License 2.0.
+
 package notify
 
 import (
@@ -214,26 +220,29 @@ func (ms MultiStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.
 type FanoutStage []Stage
 
 // Exec attempts to execute all stages concurrently and discards the results.
-// It returns its input alerts and a types.MultiError if one or more stages fail.
+// It returns its input alerts and a combined error if one or more stages fail.
 func (fs FanoutStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.Context, []*alert.Alert, error) {
 	var (
-		wg sync.WaitGroup
-		me error
+		wg  sync.WaitGroup
+		mtx sync.Mutex
+		errs error
 	)
 	wg.Add(len(fs))
 
 	for _, s := range fs {
 		go func(s Stage) {
 			if _, _, err := s.Exec(ctx, alerts...); err != nil {
-				me = errors.Join(me, err)
+				mtx.Lock()
+				errs = errors.Join(errs, err)
+				mtx.Unlock()
 			}
 			wg.Done()
 		}(s)
 	}
 	wg.Wait()
 
-	if me != nil {
-		return ctx, alerts, me
+	if errs != nil {
+		return ctx, alerts, errs
 	}
 	return ctx, alerts, nil
 }
@@ -254,7 +263,7 @@ func (n *MuteStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.C
 	for _, a := range alerts {
 		// TODO(fabxc): increment total alerts counter.
 		// Do not send the alert if muted.
-		if !n.muter.Mutes(a.Labels) {
+		if !n.muter.Mutes(ctx, a.Labels) {
 			filtered = append(filtered, a)
 		}
 		// TODO(fabxc): increment muted alerts counter if muted.

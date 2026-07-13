@@ -40,9 +40,9 @@ type Mutation {
     """ 删除订阅 """
     deleteMsgSubscriber(ids: [ID!]!): Boolean!
     """ 创建静默 """
-    createSilence(input: CreateSilenceInput!): Silence!
+    createSilence(input: CreateMsgSilenceInput!): MsgSilence!
     """ 更新静默 """
-    updateSilence(id: ID!, input: UpdateSilenceInput!): Silence!
+    updateSilence(id: ID!, input: UpdateMsgSilenceInput!): MsgSilence!
     """ 删除静默 """
     deleteSilence(id: ID!): Boolean!
     """ 设置站内信消息已读未读 """

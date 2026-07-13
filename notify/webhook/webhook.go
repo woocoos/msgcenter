@@ -4,13 +4,18 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"os"
+	"strings"
+
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/template"
-	"io"
-	"net/http"
 )
 
 // Message is the data structure of the webhook message. It is passed to the webhook server.
@@ -23,9 +28,7 @@ type Message struct {
 	TruncatedAlerts uint64 `json:"truncatedAlerts"`
 }
 
-// Notifier email notifier
-//
-// tmpl include all of receiver's template.
+// Notifier sends notifications via a generic webhook.
 type Notifier struct {
 	config        *profile.WebhookConfig
 	tmpl          *template.Template
@@ -42,11 +45,9 @@ func New(cfg *profile.WebhookConfig, tmpl *template.Template,
 		config:        cfg,
 		tmpl:          tmpl,
 		customTplFunc: fn,
-		// Webhooks are assumed to respond with 2xx response codes on a successful
-		// request and 5xx response codes are assumed to be recoverable.
 		retrier: &notify.Retrier{
 			CustomDetailsFunc: func(_ int, body io.Reader) string {
-				return errDetails(body, cfg.URL.String())
+				return errDetails(body)
 			},
 		},
 	}
@@ -103,8 +104,9 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (bool, er
 		GroupKey:        groupKey.String(),
 		TruncatedAlerts: numTruncated,
 	}
+
 	var buf bytes.Buffer
-	if config.Body == "" { // if body is empty, just send the data
+	if config.Body == "" {
 		if err := json.NewEncoder(&buf).Encode(msg); err != nil {
 			return false, err
 		}
@@ -116,32 +118,98 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (bool, er
 		buf.WriteString(body)
 	}
 
-	url := n.config.URL.String()
-	resp, err := n.client.Post(url, "application/json", &buf)
+	url, err := n.resolveURL(ctx, config)
+	if err != nil {
+		return false, err
+	}
+
+	// Apply timeout if configured.
+	if config.Timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, config.Timeout)
+		defer cancel()
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, &buf)
 	if err != nil {
 		return true, err
 	}
-	defer resp.Body.Close()
+	req.Header.Set("Content-Type", "application/json")
+
+	// Set custom headers.
+	for k, v := range config.Headers {
+		req.Header.Set(k, v)
+	}
+
+	resp, err := n.client.Do(req)
+	if err != nil {
+		return true, redactURLError(err)
+	}
+	defer drain(resp)
 
 	shouldRetry, err := n.retrier.Check(resp.StatusCode, resp.Body)
 	return shouldRetry, err
+}
+
+// resolveURL determines the webhook URL from config.URL or config.URLFile,
+// with optional template rendering.
+func (n *Notifier) resolveURL(ctx context.Context, config *profile.WebhookConfig) (string, error) {
+	var rawURL string
+	if config.URLFile != "" {
+		content, err := os.ReadFile(config.URLFile)
+		if err != nil {
+			return "", fmt.Errorf("reading url_file %q: %w", config.URLFile, err)
+		}
+		rawURL = strings.TrimSpace(string(content))
+	} else if config.URL != nil {
+		rawURL = config.URL.String()
+	}
+
+	// Template rendering on URL.
+	if strings.Contains(rawURL, "{{") {
+		rendered, err := n.tmpl.ExecuteTextString(rawURL, notify.GetTemplateData(ctx, n.tmpl, nil))
+		if err != nil {
+			return "", fmt.Errorf("rendering webhook url template: %w", err)
+		}
+		rawURL = rendered
+	}
+
+	if rawURL == "" {
+		return "", fmt.Errorf("webhook url is empty")
+	}
+	return rawURL, nil
 }
 
 func truncateAlerts(maxAlerts uint64, alerts []*alert.Alert) ([]*alert.Alert, uint64) {
 	if maxAlerts != 0 && uint64(len(alerts)) > maxAlerts {
 		return alerts[:maxAlerts], uint64(len(alerts)) - maxAlerts
 	}
-
 	return alerts, 0
 }
 
-func errDetails(body io.Reader, url string) string {
+func errDetails(body io.Reader) string {
 	if body == nil {
-		return url
+		return ""
 	}
 	bs, err := io.ReadAll(body)
 	if err != nil {
-		return url
+		return ""
 	}
-	return fmt.Sprintf("%s: %s", url, string(bs))
+	return string(bs)
+}
+
+// drain consumes and closes the response body to enable connection reuse.
+func drain(resp *http.Response) {
+	io.Copy(io.Discard, resp.Body)
+	resp.Body.Close()
+}
+
+// redactURLError replaces the URL in a *url.Error with "<redacted>" to prevent
+// leaking sensitive information in error messages.
+func redactURLError(err error) error {
+	var urlErr *url.Error
+	if errors.As(err, &urlErr) {
+		urlErr.URL = "<redacted>"
+	}
+	return err
 }

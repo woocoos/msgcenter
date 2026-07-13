@@ -30,7 +30,7 @@ type User struct {
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
 	// 静默
-	Silences []*Silence `json:"silences,omitempty"`
+	Silences []*MsgSilence `json:"silences,omitempty"`
 	// 用户联系信息
 	Addresses []*UserAddr `json:"addresses,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -39,13 +39,13 @@ type UserEdges struct {
 	// totalCount holds the count of the edges above.
 	totalCount [1]map[string]int
 
-	namedSilences  map[string][]*Silence
+	namedSilences  map[string][]*MsgSilence
 	namedAddresses map[string][]*UserAddr
 }
 
 // SilencesOrErr returns the Silences value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) SilencesOrErr() ([]*Silence, error) {
+func (e UserEdges) SilencesOrErr() ([]*MsgSilence, error) {
 	if e.loadedTypes[0] {
 		return e.Silences, nil
 	}
@@ -117,7 +117,7 @@ func (_m *User) Value(name string) (ent.Value, error) {
 }
 
 // QuerySilences queries the "silences" edge of the User entity.
-func (_m *User) QuerySilences() *SilenceQuery {
+func (_m *User) QuerySilences() *MsgSilenceQuery {
 	return NewUserClient(_m.config).QuerySilences(_m)
 }
 
@@ -160,7 +160,7 @@ func (_m *User) String() string {
 
 // NamedSilences returns the Silences named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (_m *User) NamedSilences(name string) ([]*Silence, error) {
+func (_m *User) NamedSilences(name string) ([]*MsgSilence, error) {
 	if _m.Edges.namedSilences == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
@@ -171,12 +171,12 @@ func (_m *User) NamedSilences(name string) ([]*Silence, error) {
 	return nodes, nil
 }
 
-func (_m *User) appendNamedSilences(name string, edges ...*Silence) {
+func (_m *User) appendNamedSilences(name string, edges ...*MsgSilence) {
 	if _m.Edges.namedSilences == nil {
-		_m.Edges.namedSilences = make(map[string][]*Silence)
+		_m.Edges.namedSilences = make(map[string][]*MsgSilence)
 	}
 	if len(edges) == 0 {
-		_m.Edges.namedSilences[name] = []*Silence{}
+		_m.Edges.namedSilences[name] = []*MsgSilence{}
 	} else {
 		_m.Edges.namedSilences[name] = append(_m.Edges.namedSilences[name], edges...)
 	}

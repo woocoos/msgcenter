@@ -57,7 +57,7 @@ func (User) Hooks() []ent.Hook {
 
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("silences", Silence.Type).Comment("静默"),
+		edge.To("silences", MsgSilence.Type).Comment("静默"),
 		edge.To("addresses", UserAddr.Type).Comment("用户联系信息"),
 	}
 }

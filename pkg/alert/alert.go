@@ -2,10 +2,11 @@ package alert
 
 import (
 	"fmt"
-	"github.com/woocoos/msgcenter/pkg/label"
 	"io"
 	"strconv"
 	"time"
+
+	"github.com/woocoos/msgcenter/pkg/label"
 )
 
 type AlertStatus string
@@ -16,7 +17,7 @@ const (
 	AlertResolved AlertStatus = "resolved"
 )
 
-func (a *AlertStatus) UnmarshalGQL(v interface{}) error {
+func (a *AlertStatus) UnmarshalGQL(v any) error {
 	if v, ok := v.(string); ok {
 		switch v {
 		case string(AlertNone):

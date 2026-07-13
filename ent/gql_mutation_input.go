@@ -7,9 +7,9 @@ import (
 
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
-	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/service/silence"
 )
 
 // CreateMsgChannelInput represents a mutation input for creating msgchannels.
@@ -160,6 +160,90 @@ func (c *MsgEventUpdate) SetInput(i UpdateMsgEventInput) *MsgEventUpdate {
 
 // SetInput applies the change-set in the UpdateMsgEventInput on the MsgEventUpdateOne builder.
 func (c *MsgEventUpdateOne) SetInput(i UpdateMsgEventInput) *MsgEventUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateMsgSilenceInput represents a mutation input for creating msgsilences.
+type CreateMsgSilenceInput struct {
+	TenantID int
+	Matchers []*label.Matcher
+	StartsAt time.Time
+	EndsAt   time.Time
+	Comments *string
+	State    *silence.SilenceState
+}
+
+// Mutate applies the CreateMsgSilenceInput on the MsgSilenceMutation builder.
+func (i *CreateMsgSilenceInput) Mutate(m *MsgSilenceMutation) {
+	m.SetTenantID(i.TenantID)
+	if v := i.Matchers; v != nil {
+		m.SetMatchers(v)
+	}
+	m.SetStartsAt(i.StartsAt)
+	m.SetEndsAt(i.EndsAt)
+	if v := i.Comments; v != nil {
+		m.SetComments(*v)
+	}
+	if v := i.State; v != nil {
+		m.SetState(*v)
+	}
+}
+
+// SetInput applies the change-set in the CreateMsgSilenceInput on the MsgSilenceCreate builder.
+func (c *MsgSilenceCreate) SetInput(i CreateMsgSilenceInput) *MsgSilenceCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateMsgSilenceInput represents a mutation input for updating msgsilences.
+type UpdateMsgSilenceInput struct {
+	ClearMatchers  bool
+	Matchers       []*label.Matcher
+	AppendMatchers []*label.Matcher
+	StartsAt       *time.Time
+	EndsAt         *time.Time
+	ClearComments  bool
+	Comments       *string
+	State          *silence.SilenceState
+}
+
+// Mutate applies the UpdateMsgSilenceInput on the MsgSilenceMutation builder.
+func (i *UpdateMsgSilenceInput) Mutate(m *MsgSilenceMutation) {
+	if i.ClearMatchers {
+		m.ClearMatchers()
+	}
+	if v := i.Matchers; v != nil {
+		m.SetMatchers(v)
+	}
+	if i.AppendMatchers != nil {
+		m.AppendMatchers(i.Matchers)
+	}
+	if v := i.StartsAt; v != nil {
+		m.SetStartsAt(*v)
+	}
+	if v := i.EndsAt; v != nil {
+		m.SetEndsAt(*v)
+	}
+	if i.ClearComments {
+		m.ClearComments()
+	}
+	if v := i.Comments; v != nil {
+		m.SetComments(*v)
+	}
+	if v := i.State; v != nil {
+		m.SetState(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateMsgSilenceInput on the MsgSilenceUpdate builder.
+func (c *MsgSilenceUpdate) SetInput(i UpdateMsgSilenceInput) *MsgSilenceUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateMsgSilenceInput on the MsgSilenceUpdateOne builder.
+func (c *MsgSilenceUpdateOne) SetInput(i UpdateMsgSilenceInput) *MsgSilenceUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }
@@ -536,90 +620,6 @@ func (c *MsgTypeUpdate) SetInput(i UpdateMsgTypeInput) *MsgTypeUpdate {
 
 // SetInput applies the change-set in the UpdateMsgTypeInput on the MsgTypeUpdateOne builder.
 func (c *MsgTypeUpdateOne) SetInput(i UpdateMsgTypeInput) *MsgTypeUpdateOne {
-	i.Mutate(c.Mutation())
-	return c
-}
-
-// CreateSilenceInput represents a mutation input for creating silences.
-type CreateSilenceInput struct {
-	TenantID int
-	Matchers []*label.Matcher
-	StartsAt time.Time
-	EndsAt   time.Time
-	Comments *string
-	State    *alert.SilenceState
-}
-
-// Mutate applies the CreateSilenceInput on the SilenceMutation builder.
-func (i *CreateSilenceInput) Mutate(m *SilenceMutation) {
-	m.SetTenantID(i.TenantID)
-	if v := i.Matchers; v != nil {
-		m.SetMatchers(v)
-	}
-	m.SetStartsAt(i.StartsAt)
-	m.SetEndsAt(i.EndsAt)
-	if v := i.Comments; v != nil {
-		m.SetComments(*v)
-	}
-	if v := i.State; v != nil {
-		m.SetState(*v)
-	}
-}
-
-// SetInput applies the change-set in the CreateSilenceInput on the SilenceCreate builder.
-func (c *SilenceCreate) SetInput(i CreateSilenceInput) *SilenceCreate {
-	i.Mutate(c.Mutation())
-	return c
-}
-
-// UpdateSilenceInput represents a mutation input for updating silences.
-type UpdateSilenceInput struct {
-	ClearMatchers  bool
-	Matchers       []*label.Matcher
-	AppendMatchers []*label.Matcher
-	StartsAt       *time.Time
-	EndsAt         *time.Time
-	ClearComments  bool
-	Comments       *string
-	State          *alert.SilenceState
-}
-
-// Mutate applies the UpdateSilenceInput on the SilenceMutation builder.
-func (i *UpdateSilenceInput) Mutate(m *SilenceMutation) {
-	if i.ClearMatchers {
-		m.ClearMatchers()
-	}
-	if v := i.Matchers; v != nil {
-		m.SetMatchers(v)
-	}
-	if i.AppendMatchers != nil {
-		m.AppendMatchers(i.Matchers)
-	}
-	if v := i.StartsAt; v != nil {
-		m.SetStartsAt(*v)
-	}
-	if v := i.EndsAt; v != nil {
-		m.SetEndsAt(*v)
-	}
-	if i.ClearComments {
-		m.ClearComments()
-	}
-	if v := i.Comments; v != nil {
-		m.SetComments(*v)
-	}
-	if v := i.State; v != nil {
-		m.SetState(*v)
-	}
-}
-
-// SetInput applies the change-set in the UpdateSilenceInput on the SilenceUpdate builder.
-func (c *SilenceUpdate) SetInput(i UpdateSilenceInput) *SilenceUpdate {
-	i.Mutate(c.Mutation())
-	return c
-}
-
-// SetInput applies the change-set in the UpdateSilenceInput on the SilenceUpdateOne builder.
-func (c *SilenceUpdateOne) SetInput(i UpdateSilenceInput) *SilenceUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }

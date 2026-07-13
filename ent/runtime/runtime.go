@@ -11,6 +11,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
+	"github.com/woocoos/msgcenter/ent/msgsilence"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -18,7 +19,6 @@ import (
 	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
-	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
 )
@@ -135,6 +135,29 @@ func init() {
 	msginternaltoDescCreatedAt := msginternaltoFields[5].Descriptor()
 	// msginternalto.DefaultCreatedAt holds the default value on creation for the created_at field.
 	msginternalto.DefaultCreatedAt = msginternaltoDescCreatedAt.Default.(func() time.Time)
+	msgsilenceMixin := schema.MsgSilence{}.Mixin()
+	msgsilenceMixinHooks1 := msgsilenceMixin[1].Hooks()
+	msgsilenceMixinHooks2 := msgsilenceMixin[2].Hooks()
+	msgsilenceMixinHooks3 := msgsilenceMixin[3].Hooks()
+	msgsilence.Hooks[0] = msgsilenceMixinHooks1[0]
+	msgsilence.Hooks[1] = msgsilenceMixinHooks2[0]
+	msgsilence.Hooks[2] = msgsilenceMixinHooks3[0]
+	msgsilenceMixinInters2 := msgsilenceMixin[2].Interceptors()
+	msgsilence.Interceptors[0] = msgsilenceMixinInters2[0]
+	msgsilenceMixinFields0 := msgsilenceMixin[0].Fields()
+	_ = msgsilenceMixinFields0
+	msgsilenceMixinFields1 := msgsilenceMixin[1].Fields()
+	_ = msgsilenceMixinFields1
+	msgsilenceFields := schema.MsgSilence{}.Fields()
+	_ = msgsilenceFields
+	// msgsilenceDescCreatedAt is the schema descriptor for created_at field.
+	msgsilenceDescCreatedAt := msgsilenceMixinFields1[1].Descriptor()
+	// msgsilence.DefaultCreatedAt holds the default value on creation for the created_at field.
+	msgsilence.DefaultCreatedAt = msgsilenceDescCreatedAt.Default.(func() time.Time)
+	// msgsilenceDescID is the schema descriptor for id field.
+	msgsilenceDescID := msgsilenceMixinFields0[0].Descriptor()
+	// msgsilence.DefaultID holds the default value on creation for the id field.
+	msgsilence.DefaultID = msgsilenceDescID.Default.(func() int)
 	msgsubscriberMixin := schema.MsgSubscriber{}.Mixin()
 	msgsubscriberMixinHooks1 := msgsubscriberMixin[1].Hooks()
 	msgsubscriberMixinHooks2 := msgsubscriberMixin[2].Hooks()
@@ -225,29 +248,6 @@ func init() {
 	org.Hooks[0] = orgHooks[0]
 	orgroleuserHooks := schema.OrgRoleUser{}.Hooks()
 	orgroleuser.Hooks[0] = orgroleuserHooks[0]
-	silenceMixin := schema.Silence{}.Mixin()
-	silenceMixinHooks1 := silenceMixin[1].Hooks()
-	silenceMixinHooks2 := silenceMixin[2].Hooks()
-	silenceMixinHooks3 := silenceMixin[3].Hooks()
-	silence.Hooks[0] = silenceMixinHooks1[0]
-	silence.Hooks[1] = silenceMixinHooks2[0]
-	silence.Hooks[2] = silenceMixinHooks3[0]
-	silenceMixinInters2 := silenceMixin[2].Interceptors()
-	silence.Interceptors[0] = silenceMixinInters2[0]
-	silenceMixinFields0 := silenceMixin[0].Fields()
-	_ = silenceMixinFields0
-	silenceMixinFields1 := silenceMixin[1].Fields()
-	_ = silenceMixinFields1
-	silenceFields := schema.Silence{}.Fields()
-	_ = silenceFields
-	// silenceDescCreatedAt is the schema descriptor for created_at field.
-	silenceDescCreatedAt := silenceMixinFields1[1].Descriptor()
-	// silence.DefaultCreatedAt holds the default value on creation for the created_at field.
-	silence.DefaultCreatedAt = silenceDescCreatedAt.Default.(func() time.Time)
-	// silenceDescID is the schema descriptor for id field.
-	silenceDescID := silenceMixinFields0[0].Descriptor()
-	// silence.DefaultID holds the default value on creation for the id field.
-	silence.DefaultID = silenceDescID.Default.(func() int)
 	userHooks := schema.User{}.Hooks()
 	user.Hooks[0] = userHooks[0]
 	useraddrHooks := schema.UserAddr{}.Hooks()

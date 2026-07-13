@@ -1,8 +1,6 @@
 module github.com/woocoos/msgcenter
 
-go 1.24.2
-
-toolchain go1.24.9
+go 1.25.0
 
 require (
 	entgo.io/contrib v0.7.0
@@ -25,14 +23,14 @@ require (
 	github.com/prometheus/client_golang v1.20.5
 	github.com/redis/go-redis/v9 v9.7.3
 	github.com/stretchr/testify v1.11.1
-	github.com/tsingsun/members v0.0.0-20231020035013-99de08e2d5dd
-	github.com/tsingsun/woocoo v0.7.2
+	github.com/tsingsun/members v0.0.0-20250331021059-2cfe9bb4040c
+	github.com/tsingsun/woocoo v0.7.3
 	github.com/tsingsun/woocoo/contrib/gql v0.1.4
 	github.com/tsingsun/woocoo/contrib/telemetry v0.58.3
 	github.com/vektah/gqlparser/v2 v2.5.23
 	github.com/vmihailenco/msgpack/v5 v5.3.5
-	github.com/woocoos/entcache v0.3.1-0.20260202131644-50a86f0add1c
-	github.com/woocoos/knockout-go v0.6.0
+	github.com/woocoos/entcache v0.3.1
+	github.com/woocoos/knockout-go v0.6.1
 	go.uber.org/zap v1.26.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/sync v0.16.0
@@ -60,7 +58,7 @@ require (
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible // indirect
 	github.com/aliyun/credentials-go v1.3.1 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
-	github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da // indirect
+	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.30.3 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.3 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.27.27 // indirect
@@ -111,12 +109,14 @@ require (
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-envparse v0.1.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.0.0 // indirect
+	github.com/hashicorp/go-metrics v0.5.4 // indirect
 	github.com/hashicorp/go-msgpack v0.5.3 // indirect
+	github.com/hashicorp/go-msgpack/v2 v2.1.1 // indirect
 	github.com/hashicorp/go-sockaddr v1.0.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/hashicorp/hcl/v2 v2.18.1 // indirect
-	github.com/hashicorp/memberlist v0.5.0 // indirect
+	github.com/hashicorp/memberlist v0.5.3 // indirect
 	github.com/jhump/protoreflect v1.15.3 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect

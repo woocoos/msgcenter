@@ -1,8 +1,10 @@
 package service
 
 import (
-	"context"
-	"github.com/prometheus/client_golang/prometheus"
+	"os"
+	"sync/atomic"
+	"time"
+
 	"github.com/tsingsun/members"
 	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/pkg/conf"
@@ -11,15 +13,14 @@ import (
 	"github.com/woocoos/msgcenter/dispatch"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/notify"
-	"github.com/woocoos/msgcenter/pkg/alert"
+	"github.com/woocoos/msgcenter/pkg/marker"
+	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service/inhibit"
 	"github.com/woocoos/msgcenter/service/kosdk"
 	"github.com/woocoos/msgcenter/service/provider"
 	"github.com/woocoos/msgcenter/service/provider/mem"
 	"github.com/woocoos/msgcenter/service/silence"
-	"os"
-	"time"
 )
 
 // NotifyMinTimeout is the minimum timeout that is set for the context of a call
@@ -45,15 +46,15 @@ type AlertManager struct {
 	Coordinator     *Coordinator
 	NotificationLog notify.NotificationLog
 	Silences        *silence.Silences
-	Marker          alert.Marker
 	Alerts          provider.Alerts
-	Dispatcher      *dispatch.Dispatcher
-	Inhibitor       *inhibit.Inhibitor
+	Dispatcher      atomic.Pointer[dispatch.Dispatcher]
+	Inhibitor       atomic.Pointer[inhibit.Inhibitor]
 	Silencer        *silence.Silencer
 	Subscribe       *UserSubscribe
 	DB              *ent.Client
 	Peer            *members.Peer
 	Route           *dispatch.Route
+	groupMarker     marker.GroupMarker
 }
 
 func NewAlertManager(app *woocoo.App, opts ...AmOption) (*AlertManager, error) {
@@ -113,6 +114,7 @@ func (am *AlertManager) Apply(cnf *conf.Configuration) error {
 		nflog.NLogCallback = NlogCallback{db: am.DB}
 		am.NotificationLog = nflog
 	}
+	am.groupMarker = marker.NewGroupMarker()
 
 	am.Silences, err = silence.NewFromConfiguration(cnf, silence.WithDataLoader(SilencesDataLoad(am.DB)))
 	if err != nil {
@@ -124,9 +126,12 @@ func (am *AlertManager) Apply(cnf *conf.Configuration) error {
 		}
 	}
 
-	am.Marker = alert.NewMarker(prometheus.DefaultRegisterer)
-	am.Alerts, err = mem.NewAlerts(context.Background(), am.Marker,
-		am.cnf.Duration("alerts.gcInterval"), &AlertCallback{db: am.DB})
+	am.Silencer = silence.NewSilencer(am.Silences, &AlertCallback{db: am.DB})
+
+	am.Alerts, err = mem.NewAlerts(
+		am.cnf.Duration("alerts.gcInterval"),
+		am.cnf.Int("alerts.perAlertnameLimit"),
+		am.Silencer)
 	if err != nil {
 		return err
 	}
@@ -186,35 +191,63 @@ func (am *AlertManager) Start(co *Coordinator, config *profile.Config) error {
 		timeIntervals[ti.Name] = ti.TimeIntervals
 	}
 
-	am.Inhibitor.Stop(context.Background())
-	am.Dispatcher.Stop()
+	if old := am.Inhibitor.Load(); old != nil {
+		old.Stop()
+	}
+	if old := am.Dispatcher.Load(); old != nil {
+		old.Stop()
+	}
 
-	am.Inhibitor = inhibit.NewInhibitor(am.Alerts, config.InhibitRules, am.Marker)
-	am.Silencer = silence.NewSilencer(am.Silences, am.Marker)
+	newInhibitor := inhibit.NewInhibitor(am.Alerts, config.InhibitRules)
 
 	pipeline := pipelineBuilder.New(
 		receivers,
 		waitFunc,
-		am.Inhibitor,
+		newInhibitor,
 		am.Silencer,
 		timeIntervals,
 		am.NotificationLog,
 		am.Alerts,
 		am.Subscribe,
 	)
-	am.Dispatcher = dispatch.NewDispatcher(am.Alerts, routes, pipeline, am.Marker, timeoutFunc)
+	newDispatcher := dispatch.NewDispatcher(am.Alerts, routes, pipeline, am.groupMarker, timeoutFunc,
+		am.cnf.Duration("dispatch.maintenanceInterval"),
+		nil,
+		metrics.Dispatcher,
+	)
 	routes.Apply(am.cnf)
 	am.Route = routes
 
-	go am.Dispatcher.Run()
-	go am.Inhibitor.Start(context.Background())
+	// First, start the inhibitor so the inhibition cache can populate.
+	// Wait for it to load alerts before starting the dispatcher so we
+	// don't accidentally notify for an alert that will be inhibited.
+	// Publish it only after loading completes: the API mute callback
+	// reads r.inhibitor.Load(), so swapping earlier would expose an
+	// empty inhibition cache to concurrent requests during a reload (the
+	// pipeline already holds newInhibitor directly, and no dispatcher is
+	// running to drive it yet, so the old inhibitor stays authoritative
+	// for the API until the new one is ready).
+	go newInhibitor.Run()
+	newInhibitor.WaitForLoading()
+	am.Inhibitor.Store(newInhibitor)
+
+	// Next, start the dispatcher and wait for it to load before swapping
+	// the dispatcher pointer. This ensures that the API doesn't see the new
+	// dispatcher before it finishes populating the aggrGroups.
+	go newDispatcher.Run(time.Now().Add(am.cnf.Duration("dispatch.startDelay")))
+	newDispatcher.WaitForLoading()
+	am.Dispatcher.Store(newDispatcher)
 
 	return nil
 }
 
 func (am *AlertManager) Stop() {
-	am.Dispatcher.Stop()
-	am.Inhibitor.Stop(context.Background())
+	if i := am.Inhibitor.Load(); i != nil {
+		i.Stop()
+	}
+	if d := am.Dispatcher.Load(); d != nil {
+		d.Stop()
+	}
 	am.DB.Close()
 }
 

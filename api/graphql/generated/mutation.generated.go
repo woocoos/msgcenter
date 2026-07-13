@@ -39,8 +39,8 @@ type MutationResolver interface {
 	DisableMsgTemplate(ctx context.Context, id int) (*ent.MsgTemplate, error)
 	CreateMsgSubscriber(ctx context.Context, inputs []*ent.CreateMsgSubscriberInput) ([]*ent.MsgSubscriber, error)
 	DeleteMsgSubscriber(ctx context.Context, ids []int) (bool, error)
-	CreateSilence(ctx context.Context, input ent.CreateSilenceInput) (*ent.Silence, error)
-	UpdateSilence(ctx context.Context, id int, input ent.UpdateSilenceInput) (*ent.Silence, error)
+	CreateSilence(ctx context.Context, input ent.CreateMsgSilenceInput) (*ent.MsgSilence, error)
+	UpdateSilence(ctx context.Context, id int, input ent.UpdateMsgSilenceInput) (*ent.MsgSilence, error)
 	DeleteSilence(ctx context.Context, id int) (bool, error)
 	MarkMsgInternalToReadOrUnRead(ctx context.Context, ids []int, read bool) (bool, error)
 	MarkMsgInternalToDeleted(ctx context.Context, ids []int) (bool, error)
@@ -210,18 +210,18 @@ func (ec *executionContext) field_Mutation_createSilence_args(ctx context.Contex
 func (ec *executionContext) field_Mutation_createSilence_argsInput(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (ent.CreateSilenceInput, error) {
+) (ent.CreateMsgSilenceInput, error) {
 	if _, ok := rawArgs["input"]; !ok {
-		var zeroVal ent.CreateSilenceInput
+		var zeroVal ent.CreateMsgSilenceInput
 		return zeroVal, nil
 	}
 
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNCreateSilenceInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐCreateSilenceInput(ctx, tmp)
+		return ec.unmarshalNCreateMsgSilenceInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐCreateMsgSilenceInput(ctx, tmp)
 	}
 
-	var zeroVal ent.CreateSilenceInput
+	var zeroVal ent.CreateMsgSilenceInput
 	return zeroVal, nil
 }
 
@@ -1074,18 +1074,18 @@ func (ec *executionContext) field_Mutation_updateSilence_argsID(
 func (ec *executionContext) field_Mutation_updateSilence_argsInput(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (ent.UpdateSilenceInput, error) {
+) (ent.UpdateMsgSilenceInput, error) {
 	if _, ok := rawArgs["input"]; !ok {
-		var zeroVal ent.UpdateSilenceInput
+		var zeroVal ent.UpdateMsgSilenceInput
 		return zeroVal, nil
 	}
 
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNUpdateSilenceInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐUpdateSilenceInput(ctx, tmp)
+		return ec.unmarshalNUpdateMsgSilenceInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐUpdateMsgSilenceInput(ctx, tmp)
 	}
 
-	var zeroVal ent.UpdateSilenceInput
+	var zeroVal ent.UpdateMsgSilenceInput
 	return zeroVal, nil
 }
 
@@ -2709,7 +2709,7 @@ func (ec *executionContext) _Mutation_createSilence(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateSilence(rctx, fc.Args["input"].(ent.CreateSilenceInput))
+		return ec.resolvers.Mutation().CreateSilence(rctx, fc.Args["input"].(ent.CreateMsgSilenceInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2721,9 +2721,9 @@ func (ec *executionContext) _Mutation_createSilence(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ent.Silence)
+	res := resTmp.(*ent.MsgSilence)
 	fc.Result = res
-	return ec.marshalNSilence2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilence(ctx, field.Selections, res)
+	return ec.marshalNMsgSilence2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgSilence(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createSilence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2735,31 +2735,31 @@ func (ec *executionContext) fieldContext_Mutation_createSilence(ctx context.Cont
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Silence_id(ctx, field)
+				return ec.fieldContext_MsgSilence_id(ctx, field)
 			case "createdBy":
-				return ec.fieldContext_Silence_createdBy(ctx, field)
+				return ec.fieldContext_MsgSilence_createdBy(ctx, field)
 			case "createdAt":
-				return ec.fieldContext_Silence_createdAt(ctx, field)
+				return ec.fieldContext_MsgSilence_createdAt(ctx, field)
 			case "updatedBy":
-				return ec.fieldContext_Silence_updatedBy(ctx, field)
+				return ec.fieldContext_MsgSilence_updatedBy(ctx, field)
 			case "updatedAt":
-				return ec.fieldContext_Silence_updatedAt(ctx, field)
+				return ec.fieldContext_MsgSilence_updatedAt(ctx, field)
 			case "tenantID":
-				return ec.fieldContext_Silence_tenantID(ctx, field)
+				return ec.fieldContext_MsgSilence_tenantID(ctx, field)
 			case "matchers":
-				return ec.fieldContext_Silence_matchers(ctx, field)
+				return ec.fieldContext_MsgSilence_matchers(ctx, field)
 			case "startsAt":
-				return ec.fieldContext_Silence_startsAt(ctx, field)
+				return ec.fieldContext_MsgSilence_startsAt(ctx, field)
 			case "endsAt":
-				return ec.fieldContext_Silence_endsAt(ctx, field)
+				return ec.fieldContext_MsgSilence_endsAt(ctx, field)
 			case "comments":
-				return ec.fieldContext_Silence_comments(ctx, field)
+				return ec.fieldContext_MsgSilence_comments(ctx, field)
 			case "state":
-				return ec.fieldContext_Silence_state(ctx, field)
+				return ec.fieldContext_MsgSilence_state(ctx, field)
 			case "user":
-				return ec.fieldContext_Silence_user(ctx, field)
+				return ec.fieldContext_MsgSilence_user(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Silence", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type MsgSilence", field.Name)
 		},
 	}
 	defer func() {
@@ -2790,7 +2790,7 @@ func (ec *executionContext) _Mutation_updateSilence(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateSilence(rctx, fc.Args["id"].(int), fc.Args["input"].(ent.UpdateSilenceInput))
+		return ec.resolvers.Mutation().UpdateSilence(rctx, fc.Args["id"].(int), fc.Args["input"].(ent.UpdateMsgSilenceInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2802,9 +2802,9 @@ func (ec *executionContext) _Mutation_updateSilence(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ent.Silence)
+	res := resTmp.(*ent.MsgSilence)
 	fc.Result = res
-	return ec.marshalNSilence2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilence(ctx, field.Selections, res)
+	return ec.marshalNMsgSilence2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgSilence(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateSilence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2816,31 +2816,31 @@ func (ec *executionContext) fieldContext_Mutation_updateSilence(ctx context.Cont
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Silence_id(ctx, field)
+				return ec.fieldContext_MsgSilence_id(ctx, field)
 			case "createdBy":
-				return ec.fieldContext_Silence_createdBy(ctx, field)
+				return ec.fieldContext_MsgSilence_createdBy(ctx, field)
 			case "createdAt":
-				return ec.fieldContext_Silence_createdAt(ctx, field)
+				return ec.fieldContext_MsgSilence_createdAt(ctx, field)
 			case "updatedBy":
-				return ec.fieldContext_Silence_updatedBy(ctx, field)
+				return ec.fieldContext_MsgSilence_updatedBy(ctx, field)
 			case "updatedAt":
-				return ec.fieldContext_Silence_updatedAt(ctx, field)
+				return ec.fieldContext_MsgSilence_updatedAt(ctx, field)
 			case "tenantID":
-				return ec.fieldContext_Silence_tenantID(ctx, field)
+				return ec.fieldContext_MsgSilence_tenantID(ctx, field)
 			case "matchers":
-				return ec.fieldContext_Silence_matchers(ctx, field)
+				return ec.fieldContext_MsgSilence_matchers(ctx, field)
 			case "startsAt":
-				return ec.fieldContext_Silence_startsAt(ctx, field)
+				return ec.fieldContext_MsgSilence_startsAt(ctx, field)
 			case "endsAt":
-				return ec.fieldContext_Silence_endsAt(ctx, field)
+				return ec.fieldContext_MsgSilence_endsAt(ctx, field)
 			case "comments":
-				return ec.fieldContext_Silence_comments(ctx, field)
+				return ec.fieldContext_MsgSilence_comments(ctx, field)
 			case "state":
-				return ec.fieldContext_Silence_state(ctx, field)
+				return ec.fieldContext_MsgSilence_state(ctx, field)
 			case "user":
-				return ec.fieldContext_Silence_user(ctx, field)
+				return ec.fieldContext_MsgSilence_user(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Silence", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type MsgSilence", field.Name)
 		},
 	}
 	defer func() {

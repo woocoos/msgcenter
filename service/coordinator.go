@@ -5,6 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
+	"sync"
+	"time"
+
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
@@ -25,11 +31,6 @@ import (
 	"github.com/woocoos/msgcenter/service/kosdk"
 	"github.com/woocoos/msgcenter/template"
 	"go.uber.org/zap"
-	"os"
-	"path/filepath"
-	"strconv"
-	"sync"
-	"time"
 )
 
 var logger = log.Component("config")
@@ -219,7 +220,7 @@ func (c *Coordinator) loadTempParams(tempParams map[string]map[string]string) er
 	m := tps.ToStringMap()
 	for oid, vm := range m {
 		out := make(map[string]string)
-		for k, v := range vm.(map[string]interface{}) {
+		for k, v := range vm.(map[string]any) {
 			out[k] = fmt.Sprintf("%v", v)
 		}
 		tempParams[oid] = out

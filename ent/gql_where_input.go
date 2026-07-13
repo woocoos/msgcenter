@@ -13,15 +13,16 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
+	"github.com/woocoos/msgcenter/ent/msgsilence"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/predicate"
-	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/service/silence"
 )
 
 // MsgAlertWhereInput represents a where input for filtering MsgAlert queries.
@@ -2407,6 +2408,386 @@ func (i *MsgInternalToWhereInput) P() (predicate.MsgInternalTo, error) {
 		return predicates[0], nil
 	default:
 		return msginternalto.And(predicates...), nil
+	}
+}
+
+// MsgSilenceWhereInput represents a where input for filtering MsgSilence queries.
+type MsgSilenceWhereInput struct {
+	Predicates []predicate.MsgSilence  `json:"-"`
+	Not        *MsgSilenceWhereInput   `json:"not,omitempty"`
+	Or         []*MsgSilenceWhereInput `json:"or,omitempty"`
+	And        []*MsgSilenceWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "created_by" field predicates.
+	CreatedBy      *int  `json:"createdBy,omitempty"`
+	CreatedByNEQ   *int  `json:"createdByNEQ,omitempty"`
+	CreatedByIn    []int `json:"createdByIn,omitempty"`
+	CreatedByNotIn []int `json:"createdByNotIn,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "updated_by" field predicates.
+	UpdatedBy       *int  `json:"updatedBy,omitempty"`
+	UpdatedByNEQ    *int  `json:"updatedByNEQ,omitempty"`
+	UpdatedByIn     []int `json:"updatedByIn,omitempty"`
+	UpdatedByNotIn  []int `json:"updatedByNotIn,omitempty"`
+	UpdatedByGT     *int  `json:"updatedByGT,omitempty"`
+	UpdatedByGTE    *int  `json:"updatedByGTE,omitempty"`
+	UpdatedByLT     *int  `json:"updatedByLT,omitempty"`
+	UpdatedByLTE    *int  `json:"updatedByLTE,omitempty"`
+	UpdatedByIsNil  bool  `json:"updatedByIsNil,omitempty"`
+	UpdatedByNotNil bool  `json:"updatedByNotNil,omitempty"`
+
+	// "updated_at" field predicates.
+	UpdatedAt       *time.Time  `json:"updatedAt,omitempty"`
+	UpdatedAtNEQ    *time.Time  `json:"updatedAtNEQ,omitempty"`
+	UpdatedAtIn     []time.Time `json:"updatedAtIn,omitempty"`
+	UpdatedAtNotIn  []time.Time `json:"updatedAtNotIn,omitempty"`
+	UpdatedAtGT     *time.Time  `json:"updatedAtGT,omitempty"`
+	UpdatedAtGTE    *time.Time  `json:"updatedAtGTE,omitempty"`
+	UpdatedAtLT     *time.Time  `json:"updatedAtLT,omitempty"`
+	UpdatedAtLTE    *time.Time  `json:"updatedAtLTE,omitempty"`
+	UpdatedAtIsNil  bool        `json:"updatedAtIsNil,omitempty"`
+	UpdatedAtNotNil bool        `json:"updatedAtNotNil,omitempty"`
+
+	// "tenant_id" field predicates.
+	TenantID      *int  `json:"tenantID,omitempty"`
+	TenantIDNEQ   *int  `json:"tenantIDNEQ,omitempty"`
+	TenantIDIn    []int `json:"tenantIDIn,omitempty"`
+	TenantIDNotIn []int `json:"tenantIDNotIn,omitempty"`
+	TenantIDGT    *int  `json:"tenantIDGT,omitempty"`
+	TenantIDGTE   *int  `json:"tenantIDGTE,omitempty"`
+	TenantIDLT    *int  `json:"tenantIDLT,omitempty"`
+	TenantIDLTE   *int  `json:"tenantIDLTE,omitempty"`
+
+	// "starts_at" field predicates.
+	StartsAt      *time.Time  `json:"startsAt,omitempty"`
+	StartsAtNEQ   *time.Time  `json:"startsAtNEQ,omitempty"`
+	StartsAtIn    []time.Time `json:"startsAtIn,omitempty"`
+	StartsAtNotIn []time.Time `json:"startsAtNotIn,omitempty"`
+	StartsAtGT    *time.Time  `json:"startsAtGT,omitempty"`
+	StartsAtGTE   *time.Time  `json:"startsAtGTE,omitempty"`
+	StartsAtLT    *time.Time  `json:"startsAtLT,omitempty"`
+	StartsAtLTE   *time.Time  `json:"startsAtLTE,omitempty"`
+
+	// "ends_at" field predicates.
+	EndsAt      *time.Time  `json:"endsAt,omitempty"`
+	EndsAtNEQ   *time.Time  `json:"endsAtNEQ,omitempty"`
+	EndsAtIn    []time.Time `json:"endsAtIn,omitempty"`
+	EndsAtNotIn []time.Time `json:"endsAtNotIn,omitempty"`
+	EndsAtGT    *time.Time  `json:"endsAtGT,omitempty"`
+	EndsAtGTE   *time.Time  `json:"endsAtGTE,omitempty"`
+	EndsAtLT    *time.Time  `json:"endsAtLT,omitempty"`
+	EndsAtLTE   *time.Time  `json:"endsAtLTE,omitempty"`
+
+	// "state" field predicates.
+	State      *silence.SilenceState  `json:"state,omitempty"`
+	StateNEQ   *silence.SilenceState  `json:"stateNEQ,omitempty"`
+	StateIn    []silence.SilenceState `json:"stateIn,omitempty"`
+	StateNotIn []silence.SilenceState `json:"stateNotIn,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *MsgSilenceWhereInput) AddPredicates(predicates ...predicate.MsgSilence) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the MsgSilenceWhereInput filter on the MsgSilenceQuery builder.
+func (i *MsgSilenceWhereInput) Filter(q *MsgSilenceQuery) (*MsgSilenceQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyMsgSilenceWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyMsgSilenceWhereInput is returned in case the MsgSilenceWhereInput is empty.
+var ErrEmptyMsgSilenceWhereInput = errors.New("ent: empty predicate MsgSilenceWhereInput")
+
+// P returns a predicate for filtering msgsilences.
+// An error is returned if the input is empty or invalid.
+func (i *MsgSilenceWhereInput) P() (predicate.MsgSilence, error) {
+	var predicates []predicate.MsgSilence
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, msgsilence.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.MsgSilence, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, msgsilence.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.MsgSilence, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, msgsilence.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, msgsilence.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, msgsilence.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, msgsilence.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, msgsilence.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, msgsilence.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, msgsilence.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, msgsilence.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, msgsilence.IDLTE(*i.IDLTE))
+	}
+	if i.CreatedBy != nil {
+		predicates = append(predicates, msgsilence.CreatedByEQ(*i.CreatedBy))
+	}
+	if i.CreatedByNEQ != nil {
+		predicates = append(predicates, msgsilence.CreatedByNEQ(*i.CreatedByNEQ))
+	}
+	if len(i.CreatedByIn) > 0 {
+		predicates = append(predicates, msgsilence.CreatedByIn(i.CreatedByIn...))
+	}
+	if len(i.CreatedByNotIn) > 0 {
+		predicates = append(predicates, msgsilence.CreatedByNotIn(i.CreatedByNotIn...))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, msgsilence.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, msgsilence.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, msgsilence.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, msgsilence.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, msgsilence.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, msgsilence.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, msgsilence.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, msgsilence.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.UpdatedBy != nil {
+		predicates = append(predicates, msgsilence.UpdatedByEQ(*i.UpdatedBy))
+	}
+	if i.UpdatedByNEQ != nil {
+		predicates = append(predicates, msgsilence.UpdatedByNEQ(*i.UpdatedByNEQ))
+	}
+	if len(i.UpdatedByIn) > 0 {
+		predicates = append(predicates, msgsilence.UpdatedByIn(i.UpdatedByIn...))
+	}
+	if len(i.UpdatedByNotIn) > 0 {
+		predicates = append(predicates, msgsilence.UpdatedByNotIn(i.UpdatedByNotIn...))
+	}
+	if i.UpdatedByGT != nil {
+		predicates = append(predicates, msgsilence.UpdatedByGT(*i.UpdatedByGT))
+	}
+	if i.UpdatedByGTE != nil {
+		predicates = append(predicates, msgsilence.UpdatedByGTE(*i.UpdatedByGTE))
+	}
+	if i.UpdatedByLT != nil {
+		predicates = append(predicates, msgsilence.UpdatedByLT(*i.UpdatedByLT))
+	}
+	if i.UpdatedByLTE != nil {
+		predicates = append(predicates, msgsilence.UpdatedByLTE(*i.UpdatedByLTE))
+	}
+	if i.UpdatedByIsNil {
+		predicates = append(predicates, msgsilence.UpdatedByIsNil())
+	}
+	if i.UpdatedByNotNil {
+		predicates = append(predicates, msgsilence.UpdatedByNotNil())
+	}
+	if i.UpdatedAt != nil {
+		predicates = append(predicates, msgsilence.UpdatedAtEQ(*i.UpdatedAt))
+	}
+	if i.UpdatedAtNEQ != nil {
+		predicates = append(predicates, msgsilence.UpdatedAtNEQ(*i.UpdatedAtNEQ))
+	}
+	if len(i.UpdatedAtIn) > 0 {
+		predicates = append(predicates, msgsilence.UpdatedAtIn(i.UpdatedAtIn...))
+	}
+	if len(i.UpdatedAtNotIn) > 0 {
+		predicates = append(predicates, msgsilence.UpdatedAtNotIn(i.UpdatedAtNotIn...))
+	}
+	if i.UpdatedAtGT != nil {
+		predicates = append(predicates, msgsilence.UpdatedAtGT(*i.UpdatedAtGT))
+	}
+	if i.UpdatedAtGTE != nil {
+		predicates = append(predicates, msgsilence.UpdatedAtGTE(*i.UpdatedAtGTE))
+	}
+	if i.UpdatedAtLT != nil {
+		predicates = append(predicates, msgsilence.UpdatedAtLT(*i.UpdatedAtLT))
+	}
+	if i.UpdatedAtLTE != nil {
+		predicates = append(predicates, msgsilence.UpdatedAtLTE(*i.UpdatedAtLTE))
+	}
+	if i.UpdatedAtIsNil {
+		predicates = append(predicates, msgsilence.UpdatedAtIsNil())
+	}
+	if i.UpdatedAtNotNil {
+		predicates = append(predicates, msgsilence.UpdatedAtNotNil())
+	}
+	if i.TenantID != nil {
+		predicates = append(predicates, msgsilence.TenantIDEQ(*i.TenantID))
+	}
+	if i.TenantIDNEQ != nil {
+		predicates = append(predicates, msgsilence.TenantIDNEQ(*i.TenantIDNEQ))
+	}
+	if len(i.TenantIDIn) > 0 {
+		predicates = append(predicates, msgsilence.TenantIDIn(i.TenantIDIn...))
+	}
+	if len(i.TenantIDNotIn) > 0 {
+		predicates = append(predicates, msgsilence.TenantIDNotIn(i.TenantIDNotIn...))
+	}
+	if i.TenantIDGT != nil {
+		predicates = append(predicates, msgsilence.TenantIDGT(*i.TenantIDGT))
+	}
+	if i.TenantIDGTE != nil {
+		predicates = append(predicates, msgsilence.TenantIDGTE(*i.TenantIDGTE))
+	}
+	if i.TenantIDLT != nil {
+		predicates = append(predicates, msgsilence.TenantIDLT(*i.TenantIDLT))
+	}
+	if i.TenantIDLTE != nil {
+		predicates = append(predicates, msgsilence.TenantIDLTE(*i.TenantIDLTE))
+	}
+	if i.StartsAt != nil {
+		predicates = append(predicates, msgsilence.StartsAtEQ(*i.StartsAt))
+	}
+	if i.StartsAtNEQ != nil {
+		predicates = append(predicates, msgsilence.StartsAtNEQ(*i.StartsAtNEQ))
+	}
+	if len(i.StartsAtIn) > 0 {
+		predicates = append(predicates, msgsilence.StartsAtIn(i.StartsAtIn...))
+	}
+	if len(i.StartsAtNotIn) > 0 {
+		predicates = append(predicates, msgsilence.StartsAtNotIn(i.StartsAtNotIn...))
+	}
+	if i.StartsAtGT != nil {
+		predicates = append(predicates, msgsilence.StartsAtGT(*i.StartsAtGT))
+	}
+	if i.StartsAtGTE != nil {
+		predicates = append(predicates, msgsilence.StartsAtGTE(*i.StartsAtGTE))
+	}
+	if i.StartsAtLT != nil {
+		predicates = append(predicates, msgsilence.StartsAtLT(*i.StartsAtLT))
+	}
+	if i.StartsAtLTE != nil {
+		predicates = append(predicates, msgsilence.StartsAtLTE(*i.StartsAtLTE))
+	}
+	if i.EndsAt != nil {
+		predicates = append(predicates, msgsilence.EndsAtEQ(*i.EndsAt))
+	}
+	if i.EndsAtNEQ != nil {
+		predicates = append(predicates, msgsilence.EndsAtNEQ(*i.EndsAtNEQ))
+	}
+	if len(i.EndsAtIn) > 0 {
+		predicates = append(predicates, msgsilence.EndsAtIn(i.EndsAtIn...))
+	}
+	if len(i.EndsAtNotIn) > 0 {
+		predicates = append(predicates, msgsilence.EndsAtNotIn(i.EndsAtNotIn...))
+	}
+	if i.EndsAtGT != nil {
+		predicates = append(predicates, msgsilence.EndsAtGT(*i.EndsAtGT))
+	}
+	if i.EndsAtGTE != nil {
+		predicates = append(predicates, msgsilence.EndsAtGTE(*i.EndsAtGTE))
+	}
+	if i.EndsAtLT != nil {
+		predicates = append(predicates, msgsilence.EndsAtLT(*i.EndsAtLT))
+	}
+	if i.EndsAtLTE != nil {
+		predicates = append(predicates, msgsilence.EndsAtLTE(*i.EndsAtLTE))
+	}
+	if i.State != nil {
+		predicates = append(predicates, msgsilence.StateEQ(*i.State))
+	}
+	if i.StateNEQ != nil {
+		predicates = append(predicates, msgsilence.StateNEQ(*i.StateNEQ))
+	}
+	if len(i.StateIn) > 0 {
+		predicates = append(predicates, msgsilence.StateIn(i.StateIn...))
+	}
+	if len(i.StateNotIn) > 0 {
+		predicates = append(predicates, msgsilence.StateNotIn(i.StateNotIn...))
+	}
+
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyMsgSilenceWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return msgsilence.And(predicates...), nil
 	}
 }
 
@@ -4937,385 +5318,5 @@ func (i *NlogAlertWhereInput) P() (predicate.NlogAlert, error) {
 		return predicates[0], nil
 	default:
 		return nlogalert.And(predicates...), nil
-	}
-}
-
-// SilenceWhereInput represents a where input for filtering Silence queries.
-type SilenceWhereInput struct {
-	Predicates []predicate.Silence  `json:"-"`
-	Not        *SilenceWhereInput   `json:"not,omitempty"`
-	Or         []*SilenceWhereInput `json:"or,omitempty"`
-	And        []*SilenceWhereInput `json:"and,omitempty"`
-
-	// "id" field predicates.
-	ID      *int  `json:"id,omitempty"`
-	IDNEQ   *int  `json:"idNEQ,omitempty"`
-	IDIn    []int `json:"idIn,omitempty"`
-	IDNotIn []int `json:"idNotIn,omitempty"`
-	IDGT    *int  `json:"idGT,omitempty"`
-	IDGTE   *int  `json:"idGTE,omitempty"`
-	IDLT    *int  `json:"idLT,omitempty"`
-	IDLTE   *int  `json:"idLTE,omitempty"`
-
-	// "created_by" field predicates.
-	CreatedBy      *int  `json:"createdBy,omitempty"`
-	CreatedByNEQ   *int  `json:"createdByNEQ,omitempty"`
-	CreatedByIn    []int `json:"createdByIn,omitempty"`
-	CreatedByNotIn []int `json:"createdByNotIn,omitempty"`
-
-	// "created_at" field predicates.
-	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
-	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
-	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
-	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
-	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
-	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
-	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
-	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
-
-	// "updated_by" field predicates.
-	UpdatedBy       *int  `json:"updatedBy,omitempty"`
-	UpdatedByNEQ    *int  `json:"updatedByNEQ,omitempty"`
-	UpdatedByIn     []int `json:"updatedByIn,omitempty"`
-	UpdatedByNotIn  []int `json:"updatedByNotIn,omitempty"`
-	UpdatedByGT     *int  `json:"updatedByGT,omitempty"`
-	UpdatedByGTE    *int  `json:"updatedByGTE,omitempty"`
-	UpdatedByLT     *int  `json:"updatedByLT,omitempty"`
-	UpdatedByLTE    *int  `json:"updatedByLTE,omitempty"`
-	UpdatedByIsNil  bool  `json:"updatedByIsNil,omitempty"`
-	UpdatedByNotNil bool  `json:"updatedByNotNil,omitempty"`
-
-	// "updated_at" field predicates.
-	UpdatedAt       *time.Time  `json:"updatedAt,omitempty"`
-	UpdatedAtNEQ    *time.Time  `json:"updatedAtNEQ,omitempty"`
-	UpdatedAtIn     []time.Time `json:"updatedAtIn,omitempty"`
-	UpdatedAtNotIn  []time.Time `json:"updatedAtNotIn,omitempty"`
-	UpdatedAtGT     *time.Time  `json:"updatedAtGT,omitempty"`
-	UpdatedAtGTE    *time.Time  `json:"updatedAtGTE,omitempty"`
-	UpdatedAtLT     *time.Time  `json:"updatedAtLT,omitempty"`
-	UpdatedAtLTE    *time.Time  `json:"updatedAtLTE,omitempty"`
-	UpdatedAtIsNil  bool        `json:"updatedAtIsNil,omitempty"`
-	UpdatedAtNotNil bool        `json:"updatedAtNotNil,omitempty"`
-
-	// "tenant_id" field predicates.
-	TenantID      *int  `json:"tenantID,omitempty"`
-	TenantIDNEQ   *int  `json:"tenantIDNEQ,omitempty"`
-	TenantIDIn    []int `json:"tenantIDIn,omitempty"`
-	TenantIDNotIn []int `json:"tenantIDNotIn,omitempty"`
-	TenantIDGT    *int  `json:"tenantIDGT,omitempty"`
-	TenantIDGTE   *int  `json:"tenantIDGTE,omitempty"`
-	TenantIDLT    *int  `json:"tenantIDLT,omitempty"`
-	TenantIDLTE   *int  `json:"tenantIDLTE,omitempty"`
-
-	// "starts_at" field predicates.
-	StartsAt      *time.Time  `json:"startsAt,omitempty"`
-	StartsAtNEQ   *time.Time  `json:"startsAtNEQ,omitempty"`
-	StartsAtIn    []time.Time `json:"startsAtIn,omitempty"`
-	StartsAtNotIn []time.Time `json:"startsAtNotIn,omitempty"`
-	StartsAtGT    *time.Time  `json:"startsAtGT,omitempty"`
-	StartsAtGTE   *time.Time  `json:"startsAtGTE,omitempty"`
-	StartsAtLT    *time.Time  `json:"startsAtLT,omitempty"`
-	StartsAtLTE   *time.Time  `json:"startsAtLTE,omitempty"`
-
-	// "ends_at" field predicates.
-	EndsAt      *time.Time  `json:"endsAt,omitempty"`
-	EndsAtNEQ   *time.Time  `json:"endsAtNEQ,omitempty"`
-	EndsAtIn    []time.Time `json:"endsAtIn,omitempty"`
-	EndsAtNotIn []time.Time `json:"endsAtNotIn,omitempty"`
-	EndsAtGT    *time.Time  `json:"endsAtGT,omitempty"`
-	EndsAtGTE   *time.Time  `json:"endsAtGTE,omitempty"`
-	EndsAtLT    *time.Time  `json:"endsAtLT,omitempty"`
-	EndsAtLTE   *time.Time  `json:"endsAtLTE,omitempty"`
-
-	// "state" field predicates.
-	State      *alert.SilenceState  `json:"state,omitempty"`
-	StateNEQ   *alert.SilenceState  `json:"stateNEQ,omitempty"`
-	StateIn    []alert.SilenceState `json:"stateIn,omitempty"`
-	StateNotIn []alert.SilenceState `json:"stateNotIn,omitempty"`
-}
-
-// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
-func (i *SilenceWhereInput) AddPredicates(predicates ...predicate.Silence) {
-	i.Predicates = append(i.Predicates, predicates...)
-}
-
-// Filter applies the SilenceWhereInput filter on the SilenceQuery builder.
-func (i *SilenceWhereInput) Filter(q *SilenceQuery) (*SilenceQuery, error) {
-	if i == nil {
-		return q, nil
-	}
-	p, err := i.P()
-	if err != nil {
-		if err == ErrEmptySilenceWhereInput {
-			return q, nil
-		}
-		return nil, err
-	}
-	return q.Where(p), nil
-}
-
-// ErrEmptySilenceWhereInput is returned in case the SilenceWhereInput is empty.
-var ErrEmptySilenceWhereInput = errors.New("ent: empty predicate SilenceWhereInput")
-
-// P returns a predicate for filtering silences.
-// An error is returned if the input is empty or invalid.
-func (i *SilenceWhereInput) P() (predicate.Silence, error) {
-	var predicates []predicate.Silence
-	if i.Not != nil {
-		p, err := i.Not.P()
-		if err != nil {
-			return nil, fmt.Errorf("%w: field 'not'", err)
-		}
-		predicates = append(predicates, silence.Not(p))
-	}
-	switch n := len(i.Or); {
-	case n == 1:
-		p, err := i.Or[0].P()
-		if err != nil {
-			return nil, fmt.Errorf("%w: field 'or'", err)
-		}
-		predicates = append(predicates, p)
-	case n > 1:
-		or := make([]predicate.Silence, 0, n)
-		for _, w := range i.Or {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'or'", err)
-			}
-			or = append(or, p)
-		}
-		predicates = append(predicates, silence.Or(or...))
-	}
-	switch n := len(i.And); {
-	case n == 1:
-		p, err := i.And[0].P()
-		if err != nil {
-			return nil, fmt.Errorf("%w: field 'and'", err)
-		}
-		predicates = append(predicates, p)
-	case n > 1:
-		and := make([]predicate.Silence, 0, n)
-		for _, w := range i.And {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'and'", err)
-			}
-			and = append(and, p)
-		}
-		predicates = append(predicates, silence.And(and...))
-	}
-	predicates = append(predicates, i.Predicates...)
-	if i.ID != nil {
-		predicates = append(predicates, silence.IDEQ(*i.ID))
-	}
-	if i.IDNEQ != nil {
-		predicates = append(predicates, silence.IDNEQ(*i.IDNEQ))
-	}
-	if len(i.IDIn) > 0 {
-		predicates = append(predicates, silence.IDIn(i.IDIn...))
-	}
-	if len(i.IDNotIn) > 0 {
-		predicates = append(predicates, silence.IDNotIn(i.IDNotIn...))
-	}
-	if i.IDGT != nil {
-		predicates = append(predicates, silence.IDGT(*i.IDGT))
-	}
-	if i.IDGTE != nil {
-		predicates = append(predicates, silence.IDGTE(*i.IDGTE))
-	}
-	if i.IDLT != nil {
-		predicates = append(predicates, silence.IDLT(*i.IDLT))
-	}
-	if i.IDLTE != nil {
-		predicates = append(predicates, silence.IDLTE(*i.IDLTE))
-	}
-	if i.CreatedBy != nil {
-		predicates = append(predicates, silence.CreatedByEQ(*i.CreatedBy))
-	}
-	if i.CreatedByNEQ != nil {
-		predicates = append(predicates, silence.CreatedByNEQ(*i.CreatedByNEQ))
-	}
-	if len(i.CreatedByIn) > 0 {
-		predicates = append(predicates, silence.CreatedByIn(i.CreatedByIn...))
-	}
-	if len(i.CreatedByNotIn) > 0 {
-		predicates = append(predicates, silence.CreatedByNotIn(i.CreatedByNotIn...))
-	}
-	if i.CreatedAt != nil {
-		predicates = append(predicates, silence.CreatedAtEQ(*i.CreatedAt))
-	}
-	if i.CreatedAtNEQ != nil {
-		predicates = append(predicates, silence.CreatedAtNEQ(*i.CreatedAtNEQ))
-	}
-	if len(i.CreatedAtIn) > 0 {
-		predicates = append(predicates, silence.CreatedAtIn(i.CreatedAtIn...))
-	}
-	if len(i.CreatedAtNotIn) > 0 {
-		predicates = append(predicates, silence.CreatedAtNotIn(i.CreatedAtNotIn...))
-	}
-	if i.CreatedAtGT != nil {
-		predicates = append(predicates, silence.CreatedAtGT(*i.CreatedAtGT))
-	}
-	if i.CreatedAtGTE != nil {
-		predicates = append(predicates, silence.CreatedAtGTE(*i.CreatedAtGTE))
-	}
-	if i.CreatedAtLT != nil {
-		predicates = append(predicates, silence.CreatedAtLT(*i.CreatedAtLT))
-	}
-	if i.CreatedAtLTE != nil {
-		predicates = append(predicates, silence.CreatedAtLTE(*i.CreatedAtLTE))
-	}
-	if i.UpdatedBy != nil {
-		predicates = append(predicates, silence.UpdatedByEQ(*i.UpdatedBy))
-	}
-	if i.UpdatedByNEQ != nil {
-		predicates = append(predicates, silence.UpdatedByNEQ(*i.UpdatedByNEQ))
-	}
-	if len(i.UpdatedByIn) > 0 {
-		predicates = append(predicates, silence.UpdatedByIn(i.UpdatedByIn...))
-	}
-	if len(i.UpdatedByNotIn) > 0 {
-		predicates = append(predicates, silence.UpdatedByNotIn(i.UpdatedByNotIn...))
-	}
-	if i.UpdatedByGT != nil {
-		predicates = append(predicates, silence.UpdatedByGT(*i.UpdatedByGT))
-	}
-	if i.UpdatedByGTE != nil {
-		predicates = append(predicates, silence.UpdatedByGTE(*i.UpdatedByGTE))
-	}
-	if i.UpdatedByLT != nil {
-		predicates = append(predicates, silence.UpdatedByLT(*i.UpdatedByLT))
-	}
-	if i.UpdatedByLTE != nil {
-		predicates = append(predicates, silence.UpdatedByLTE(*i.UpdatedByLTE))
-	}
-	if i.UpdatedByIsNil {
-		predicates = append(predicates, silence.UpdatedByIsNil())
-	}
-	if i.UpdatedByNotNil {
-		predicates = append(predicates, silence.UpdatedByNotNil())
-	}
-	if i.UpdatedAt != nil {
-		predicates = append(predicates, silence.UpdatedAtEQ(*i.UpdatedAt))
-	}
-	if i.UpdatedAtNEQ != nil {
-		predicates = append(predicates, silence.UpdatedAtNEQ(*i.UpdatedAtNEQ))
-	}
-	if len(i.UpdatedAtIn) > 0 {
-		predicates = append(predicates, silence.UpdatedAtIn(i.UpdatedAtIn...))
-	}
-	if len(i.UpdatedAtNotIn) > 0 {
-		predicates = append(predicates, silence.UpdatedAtNotIn(i.UpdatedAtNotIn...))
-	}
-	if i.UpdatedAtGT != nil {
-		predicates = append(predicates, silence.UpdatedAtGT(*i.UpdatedAtGT))
-	}
-	if i.UpdatedAtGTE != nil {
-		predicates = append(predicates, silence.UpdatedAtGTE(*i.UpdatedAtGTE))
-	}
-	if i.UpdatedAtLT != nil {
-		predicates = append(predicates, silence.UpdatedAtLT(*i.UpdatedAtLT))
-	}
-	if i.UpdatedAtLTE != nil {
-		predicates = append(predicates, silence.UpdatedAtLTE(*i.UpdatedAtLTE))
-	}
-	if i.UpdatedAtIsNil {
-		predicates = append(predicates, silence.UpdatedAtIsNil())
-	}
-	if i.UpdatedAtNotNil {
-		predicates = append(predicates, silence.UpdatedAtNotNil())
-	}
-	if i.TenantID != nil {
-		predicates = append(predicates, silence.TenantIDEQ(*i.TenantID))
-	}
-	if i.TenantIDNEQ != nil {
-		predicates = append(predicates, silence.TenantIDNEQ(*i.TenantIDNEQ))
-	}
-	if len(i.TenantIDIn) > 0 {
-		predicates = append(predicates, silence.TenantIDIn(i.TenantIDIn...))
-	}
-	if len(i.TenantIDNotIn) > 0 {
-		predicates = append(predicates, silence.TenantIDNotIn(i.TenantIDNotIn...))
-	}
-	if i.TenantIDGT != nil {
-		predicates = append(predicates, silence.TenantIDGT(*i.TenantIDGT))
-	}
-	if i.TenantIDGTE != nil {
-		predicates = append(predicates, silence.TenantIDGTE(*i.TenantIDGTE))
-	}
-	if i.TenantIDLT != nil {
-		predicates = append(predicates, silence.TenantIDLT(*i.TenantIDLT))
-	}
-	if i.TenantIDLTE != nil {
-		predicates = append(predicates, silence.TenantIDLTE(*i.TenantIDLTE))
-	}
-	if i.StartsAt != nil {
-		predicates = append(predicates, silence.StartsAtEQ(*i.StartsAt))
-	}
-	if i.StartsAtNEQ != nil {
-		predicates = append(predicates, silence.StartsAtNEQ(*i.StartsAtNEQ))
-	}
-	if len(i.StartsAtIn) > 0 {
-		predicates = append(predicates, silence.StartsAtIn(i.StartsAtIn...))
-	}
-	if len(i.StartsAtNotIn) > 0 {
-		predicates = append(predicates, silence.StartsAtNotIn(i.StartsAtNotIn...))
-	}
-	if i.StartsAtGT != nil {
-		predicates = append(predicates, silence.StartsAtGT(*i.StartsAtGT))
-	}
-	if i.StartsAtGTE != nil {
-		predicates = append(predicates, silence.StartsAtGTE(*i.StartsAtGTE))
-	}
-	if i.StartsAtLT != nil {
-		predicates = append(predicates, silence.StartsAtLT(*i.StartsAtLT))
-	}
-	if i.StartsAtLTE != nil {
-		predicates = append(predicates, silence.StartsAtLTE(*i.StartsAtLTE))
-	}
-	if i.EndsAt != nil {
-		predicates = append(predicates, silence.EndsAtEQ(*i.EndsAt))
-	}
-	if i.EndsAtNEQ != nil {
-		predicates = append(predicates, silence.EndsAtNEQ(*i.EndsAtNEQ))
-	}
-	if len(i.EndsAtIn) > 0 {
-		predicates = append(predicates, silence.EndsAtIn(i.EndsAtIn...))
-	}
-	if len(i.EndsAtNotIn) > 0 {
-		predicates = append(predicates, silence.EndsAtNotIn(i.EndsAtNotIn...))
-	}
-	if i.EndsAtGT != nil {
-		predicates = append(predicates, silence.EndsAtGT(*i.EndsAtGT))
-	}
-	if i.EndsAtGTE != nil {
-		predicates = append(predicates, silence.EndsAtGTE(*i.EndsAtGTE))
-	}
-	if i.EndsAtLT != nil {
-		predicates = append(predicates, silence.EndsAtLT(*i.EndsAtLT))
-	}
-	if i.EndsAtLTE != nil {
-		predicates = append(predicates, silence.EndsAtLTE(*i.EndsAtLTE))
-	}
-	if i.State != nil {
-		predicates = append(predicates, silence.StateEQ(*i.State))
-	}
-	if i.StateNEQ != nil {
-		predicates = append(predicates, silence.StateNEQ(*i.StateNEQ))
-	}
-	if len(i.StateIn) > 0 {
-		predicates = append(predicates, silence.StateIn(i.StateIn...))
-	}
-	if len(i.StateNotIn) > 0 {
-		predicates = append(predicates, silence.StateNotIn(i.StateNotIn...))
-	}
-
-	switch len(predicates) {
-	case 0:
-		return nil, ErrEmptySilenceWhereInput
-	case 1:
-		return predicates[0], nil
-	default:
-		return silence.And(predicates...), nil
 	}
 }

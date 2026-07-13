@@ -372,12 +372,12 @@ func (r *mutationResolver) DeleteMsgSubscriber(ctx context.Context, ids []int) (
 }
 
 // CreateSilence is the resolver for the createSilence field.
-func (r *mutationResolver) CreateSilence(ctx context.Context, input ent.CreateSilenceInput) (*ent.Silence, error) {
-	sil, err := ent.FromContext(ctx).Silence.Create().SetInput(input).Save(ctx)
+func (r *mutationResolver) CreateSilence(ctx context.Context, input ent.CreateMsgSilenceInput) (*ent.MsgSilence, error) {
+	sil, err := ent.FromContext(ctx).MsgSilence.Create().SetInput(input).Save(ctx)
 	if err != nil {
 		return nil, err
 	}
-	_, err = r.Silences.Set(&silence.Entry{
+	_, err = r.Silences.Set(ctx, &silence.Entry{
 		ID:        sil.ID,
 		UpdatedAt: sil.UpdatedAt,
 		Matchers:  sil.Matchers,
@@ -389,13 +389,13 @@ func (r *mutationResolver) CreateSilence(ctx context.Context, input ent.CreateSi
 }
 
 // UpdateSilence is the resolver for the updateSilence field.
-func (r *mutationResolver) UpdateSilence(ctx context.Context, id int, input ent.UpdateSilenceInput) (*ent.Silence, error) {
+func (r *mutationResolver) UpdateSilence(ctx context.Context, id int, input ent.UpdateMsgSilenceInput) (*ent.MsgSilence, error) {
 	client := ent.FromContext(ctx)
-	sil, err := client.Silence.UpdateOneID(id).SetInput(input).Save(ctx)
+	sil, err := client.MsgSilence.UpdateOneID(id).SetInput(input).Save(ctx)
 	if err != nil {
 		return nil, err
 	}
-	id, err = r.Silences.Set(&silence.Entry{
+	id, err = r.Silences.Set(ctx, &silence.Entry{
 		ID:        sil.ID,
 		UpdatedAt: sil.UpdatedAt,
 		Matchers:  sil.Matchers,
@@ -409,15 +409,15 @@ func (r *mutationResolver) UpdateSilence(ctx context.Context, id int, input ent.
 	if sil.ID == id {
 		return sil, nil
 	}
-	mu := client.Silence.UpdateOne(sil).Mutation()
+	mu := client.MsgSilence.UpdateOne(sil).Mutation()
 	mu.SetOp(ent.OpCreate)
 	v, err := client.Mutate(ctx, mu)
-	return v.(*ent.Silence), err
+	return v.(*ent.MsgSilence), err
 }
 
 // DeleteSilence is the resolver for the deleteSilence field.
 func (r *mutationResolver) DeleteSilence(ctx context.Context, id int) (bool, error) {
-	err := ent.FromContext(ctx).Silence.DeleteOneID(id).Exec(ctx)
+	err := ent.FromContext(ctx).MsgSilence.DeleteOneID(id).Exec(ctx)
 	if err != nil {
 		return false, err
 	}

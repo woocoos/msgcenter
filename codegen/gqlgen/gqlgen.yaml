@@ -68,6 +68,9 @@ models:
   MatchType:
     model:
       - github.com/woocoos/msgcenter/pkg/label.MatchType
+  SilenceState:
+    model:
+      - github.com/woocoos/msgcenter/service/silence.SilenceState
   LabelName:
     model:
       - github.com/woocoos/msgcenter/pkg/label.LabelName

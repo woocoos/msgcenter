@@ -21,6 +21,9 @@ type MsgInternal func(*sql.Selector)
 // MsgInternalTo is the predicate function for msginternalto builders.
 type MsgInternalTo func(*sql.Selector)
 
+// MsgSilence is the predicate function for msgsilence builders.
+type MsgSilence func(*sql.Selector)
+
 // MsgSubscriber is the predicate function for msgsubscriber builders.
 type MsgSubscriber func(*sql.Selector)
 
@@ -41,9 +44,6 @@ type Org func(*sql.Selector)
 
 // OrgRoleUser is the predicate function for orgroleuser builders.
 type OrgRoleUser func(*sql.Selector)
-
-// Silence is the predicate function for silence builders.
-type Silence func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

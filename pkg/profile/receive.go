@@ -37,7 +37,7 @@ func (r ReceiverType) MarshalGQL(w io.Writer) {
 }
 
 // UnmarshalGQL implements graphql.Unmarshaler interface.
-func (r *ReceiverType) UnmarshalGQL(val interface{}) error {
+func (r *ReceiverType) UnmarshalGQL(val any) error {
 	str, ok := val.(string)
 	if !ok {
 		return nil

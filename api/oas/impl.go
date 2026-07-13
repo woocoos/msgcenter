@@ -3,6 +3,13 @@ package oas
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"regexp"
+	"runtime"
+	"sort"
+	"sync"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/contrib/telemetry/otelweb"
@@ -19,18 +26,23 @@ import (
 	"github.com/woocoos/msgcenter/service"
 	"github.com/woocoos/msgcenter/service/provider"
 	"github.com/woocoos/msgcenter/service/silence"
-	"net/http"
-	"regexp"
-	"runtime"
-	"sort"
-	"sync"
-	"time"
 )
 
 type (
 	getAlertStatusFn func(label.Fingerprint) alert.MarkerStatus
 	setAlertStatusFn func(label.LabelSet)
 )
+
+// defaultAlertStatus returns an unprocessed status since per-group markers
+// are not accessible from the API layer. The actual silenced/inhibited state
+// is tracked within the notification pipeline via per-group AlertMarker.
+func defaultAlertStatus(_ label.Fingerprint) alert.MarkerStatus {
+	return alert.MarkerStatus{
+		State:       alert.AlertStateUnprocessed,
+		SilencedBy:  []int{},
+		InhibitedBy: []string{},
+	}
+}
 
 type ServerImpl struct {
 	uptime         time.Time
@@ -62,7 +74,7 @@ func NewServer(app *woocoo.App, am *service.AlertManager, web *web.Server) (*Ser
 		coordinator: am.Coordinator,
 		alerts:      am.Alerts,
 		silences:    am.Silences,
-		statusFunc:  am.Marker.Status,
+		statusFunc:  defaultAlertStatus,
 		metric:      metrics.NewAlerts("v2"),
 		webServer:   web,
 	}
@@ -153,10 +165,11 @@ func (s *ServerImpl) GetAlerts(c *gin.Context, request *GetAlertsRequest) (res G
 	now := time.Now()
 
 	s.mu.RLock()
-	for a := range alerts.Next() {
+	for pAlert := range alerts.Next() {
 		if err = alerts.Err(); err != nil {
 			break
 		}
+		a := pAlert.Data
 
 		routes := s.route.Match(a.Labels)
 		receivers := make([]string, 0, len(routes))
@@ -316,7 +329,7 @@ func (s *ServerImpl) PostAlerts(c *gin.Context, req *PostAlertsRequest) error {
 		}
 		validAlerts = append(validAlerts, a)
 	}
-	if err := s.alerts.Put(validAlerts...); err != nil {
+	if err := s.alerts.Put(c, validAlerts...); err != nil {
 		return err
 	}
 
@@ -393,7 +406,7 @@ func (s *ServerImpl) PostSilences(c *gin.Context, req *PostSilencesRequest) (res
 		return nil, err
 	}
 
-	sid, err := s.silences.Set(&silence.Entry{
+	sid, err := s.silences.Set(c, &silence.Entry{
 		ID:        sil.ID,
 		UpdatedAt: sil.UpdatedAt,
 		Matchers:  sil.Matchers,
@@ -480,8 +493,8 @@ func APILabelSetToModelLabelSet(apiLabelSet LabelSet) label.LabelSet {
 }
 
 // PostableSilenceToEnt converts *open_api_models.PostableSilenc to *silencepb.Silence.
-func PostableSilenceToEnt(s *PostableSilence) (*ent.Silence, error) {
-	sil := &ent.Silence{
+func PostableSilenceToEnt(s *PostableSilence) (*ent.MsgSilence, error) {
+	sil := &ent.MsgSilence{
 		ID:        s.ID,
 		StartsAt:  s.StartsAt,
 		EndsAt:    s.EndsAt,
@@ -504,7 +517,7 @@ func GettableSilenceFromProto(s *silence.Entry) (*GettableSilence, error) {
 	start := s.StartsAt
 	end := s.EndsAt
 	updated := s.UpdatedAt
-	state := string(alert.CalcSilenceState(start, end))
+	state := string(silence.CalcSilenceState(start, end))
 	sil := &GettableSilence{
 		Silence: &Silence{
 			StartsAt: start,
@@ -577,10 +590,10 @@ func CheckSilenceMatchesFilterLabels(s *silence.Entry, matchers []*label.Matcher
 	return true
 }
 
-var silenceStateOrder = map[alert.SilenceState]int{
-	alert.SilenceStateActive:  1,
-	alert.SilenceStatePending: 2,
-	alert.SilenceStateExpired: 3,
+var silenceStateOrder = map[silence.SilenceState]int{
+	silence.SilenceStateActive:  1,
+	silence.SilenceStatePending: 2,
+	silence.SilenceStateExpired: 3,
 }
 
 // SortSilences sorts first according to the state "active, pending, expired"
@@ -590,21 +603,21 @@ var silenceStateOrder = map[alert.SilenceState]int{
 // expired are ordered based on which one expired most recently
 func SortSilences(sils GettableSilences) {
 	sort.Slice(sils, func(i, j int) bool {
-		state1 := alert.SilenceState(sils[i].Status.State)
-		state2 := alert.SilenceState(sils[j].Status.State)
+		state1 := silence.SilenceState(sils[i].Status.State)
+		state2 := silence.SilenceState(sils[j].Status.State)
 		if state1 != state2 {
 			return silenceStateOrder[state1] < silenceStateOrder[state2]
 		}
 		switch state1 {
-		case alert.SilenceStateActive:
+		case silence.SilenceStateActive:
 			endsAt1 := sils[i].Silence.EndsAt
 			endsAt2 := sils[j].Silence.EndsAt
 			return endsAt1.Before(endsAt2)
-		case alert.SilenceStatePending:
+		case silence.SilenceStatePending:
 			startsAt1 := sils[i].Silence.StartsAt
 			startsAt2 := sils[j].Silence.StartsAt
 			return startsAt1.Before(startsAt2)
-		case alert.SilenceStateExpired:
+		case silence.SilenceStateExpired:
 			endsAt1 := sils[i].Silence.EndsAt
 			endsAt2 := sils[j].Silence.EndsAt
 			return endsAt1.After(endsAt2)

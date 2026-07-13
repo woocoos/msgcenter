@@ -1,5 +1,7 @@
 # 消息中心
 
+> 本项目基于 [Prometheus Alertmanager](https://github.com/prometheus/alertmanager) 深度定制，核心分发机制（Dispatcher、Route、Silence、Inhibit、Notify Pipeline）源自 Alertmanager。详见 [NOTICE](./NOTICE) 文件。
+
 本项目源于[AlertManager](https://prometheus.io)项目,为了实现监控消息与业务消息的统一处理.整体的消息分发机制类似于`AlertManager`.
 
 消息源主要分为两类:

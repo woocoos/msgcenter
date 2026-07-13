@@ -228,6 +228,16 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 				},
 			},
 		}).SaveX(ctx)
+	client.MsgChannel.Create().SetName("webhook").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
+		SetTenantID(1000).SetReceiverType(profile.ReceiverWebhook).
+		SetReceiver(&profile.Receiver{
+			Name: "webhook",
+			WebhookConfigs: []*profile.WebhookConfig{
+				{
+					URL: &profile.URL{Host: "localhost:5001", Scheme: "http", Path: "/webhook"},
+				},
+			},
+		}).SaveX(ctx)
 	client.MsgEvent.Create().SetID(3).SetMsgTypeID(1).SetName(WebhookEventName).SetStatus(typex.SimpleStatusActive).
 		SetCreatedBy(1).SetModes("webhook").SaveX(ctx)
 	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(3).SetTenantID(1).SetName("WebhookTemplate").SetCreatedBy(1).
@@ -297,6 +307,7 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 	client.UserAddr.Create().SetID(3).SetUserID(3).SetEmail("nobody@localhost").
 		SetMobile("13800138002").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)
 	client.Org.Create().SetID(1).SetOwnerID(1).SetKind("root").SetParentID(0).SaveX(ctx)
+	client.Org.Create().SetID(1000).SetOwnerID(1).SetKind("root").SetParentID(0).SaveX(ctx)
 	client.OrgRoleUser.Create().SetID(1).SetOrgID(1).SetUserID(1).SetOrgRoleID(12).SetOrgUserID(3).
 		SaveX(ctx)
 	client.OrgRoleUser.Create().SetID(2).SetOrgID(1).SetUserID(2).SetOrgRoleID(13).SetOrgUserID(4).

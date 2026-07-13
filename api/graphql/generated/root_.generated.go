@@ -254,6 +254,32 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	MsgSilence struct {
+		Comments  func(childComplexity int) int
+		CreatedAt func(childComplexity int) int
+		CreatedBy func(childComplexity int) int
+		EndsAt    func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Matchers  func(childComplexity int) int
+		StartsAt  func(childComplexity int) int
+		State     func(childComplexity int) int
+		TenantID  func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+		UpdatedBy func(childComplexity int) int
+		User      func(childComplexity int) int
+	}
+
+	MsgSilenceConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgSilenceEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
 	MsgSubscriber struct {
 		CreatedAt func(childComplexity int) int
 		CreatedBy func(childComplexity int) int
@@ -342,7 +368,7 @@ type ComplexityRoot struct {
 		CreateMsgSubscriber           func(childComplexity int, inputs []*ent.CreateMsgSubscriberInput) int
 		CreateMsgTemplate             func(childComplexity int, input ent.CreateMsgTemplateInput) int
 		CreateMsgType                 func(childComplexity int, input ent.CreateMsgTypeInput) int
-		CreateSilence                 func(childComplexity int, input ent.CreateSilenceInput) int
+		CreateSilence                 func(childComplexity int, input ent.CreateMsgSilenceInput) int
 		DeleteMsgChannel              func(childComplexity int, id int) int
 		DeleteMsgEvent                func(childComplexity int, id int) int
 		DeleteMsgSubscriber           func(childComplexity int, ids []int) int
@@ -364,7 +390,7 @@ type ComplexityRoot struct {
 		UpdateMsgEvent                func(childComplexity int, id int, input ent.UpdateMsgEventInput) int
 		UpdateMsgTemplate             func(childComplexity int, id int, input ent.UpdateMsgTemplateInput) int
 		UpdateMsgType                 func(childComplexity int, id int, input ent.UpdateMsgTypeInput) int
-		UpdateSilence                 func(childComplexity int, id int, input ent.UpdateSilenceInput) int
+		UpdateSilence                 func(childComplexity int, id int, input ent.UpdateMsgSilenceInput) int
 	}
 
 	Nlog struct {
@@ -433,7 +459,7 @@ type ComplexityRoot struct {
 		Node                                  func(childComplexity int, id string) int
 		Nodes                                 func(childComplexity int, ids []string) int
 		RenderMsgAlert                        func(childComplexity int, msgAlertID int, receiver string) int
-		Silences                              func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SilenceOrder, where *ent.SilenceWhereInput) int
+		Silences                              func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgSilenceOrder, where *ent.MsgSilenceWhereInput) int
 		UserMsgInternalTos                    func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) int
 		UserSubMsgCategory                    func(childComplexity int) int
 		UserUnreadMsgInternals                func(childComplexity int) int
@@ -457,32 +483,6 @@ type ComplexityRoot struct {
 		Receiver            func(childComplexity int) int
 		RepeatInterval      func(childComplexity int) int
 		Routes              func(childComplexity int) int
-	}
-
-	Silence struct {
-		Comments  func(childComplexity int) int
-		CreatedAt func(childComplexity int) int
-		CreatedBy func(childComplexity int) int
-		EndsAt    func(childComplexity int) int
-		ID        func(childComplexity int) int
-		Matchers  func(childComplexity int) int
-		StartsAt  func(childComplexity int) int
-		State     func(childComplexity int) int
-		TenantID  func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
-		UpdatedBy func(childComplexity int) int
-		User      func(childComplexity int) int
-	}
-
-	SilenceConnection struct {
-		Edges      func(childComplexity int) int
-		PageInfo   func(childComplexity int) int
-		TotalCount func(childComplexity int) int
-	}
-
-	SilenceEdge struct {
-		Cursor func(childComplexity int) int
-		Node   func(childComplexity int) int
 	}
 
 	Subscription struct {
@@ -1464,6 +1464,125 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgInternalToEdge.Node(childComplexity), true
 
+	case "MsgSilence.comments":
+		if e.complexity.MsgSilence.Comments == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.Comments(childComplexity), true
+
+	case "MsgSilence.createdAt":
+		if e.complexity.MsgSilence.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.CreatedAt(childComplexity), true
+
+	case "MsgSilence.createdBy":
+		if e.complexity.MsgSilence.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.CreatedBy(childComplexity), true
+
+	case "MsgSilence.endsAt":
+		if e.complexity.MsgSilence.EndsAt == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.EndsAt(childComplexity), true
+
+	case "MsgSilence.id":
+		if e.complexity.MsgSilence.ID == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.ID(childComplexity), true
+
+	case "MsgSilence.matchers":
+		if e.complexity.MsgSilence.Matchers == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.Matchers(childComplexity), true
+
+	case "MsgSilence.startsAt":
+		if e.complexity.MsgSilence.StartsAt == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.StartsAt(childComplexity), true
+
+	case "MsgSilence.state":
+		if e.complexity.MsgSilence.State == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.State(childComplexity), true
+
+	case "MsgSilence.tenantID":
+		if e.complexity.MsgSilence.TenantID == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.TenantID(childComplexity), true
+
+	case "MsgSilence.updatedAt":
+		if e.complexity.MsgSilence.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.UpdatedAt(childComplexity), true
+
+	case "MsgSilence.updatedBy":
+		if e.complexity.MsgSilence.UpdatedBy == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.UpdatedBy(childComplexity), true
+
+	case "MsgSilence.user":
+		if e.complexity.MsgSilence.User == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.User(childComplexity), true
+
+	case "MsgSilenceConnection.edges":
+		if e.complexity.MsgSilenceConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgSilenceConnection.Edges(childComplexity), true
+
+	case "MsgSilenceConnection.pageInfo":
+		if e.complexity.MsgSilenceConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgSilenceConnection.PageInfo(childComplexity), true
+
+	case "MsgSilenceConnection.totalCount":
+		if e.complexity.MsgSilenceConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgSilenceConnection.TotalCount(childComplexity), true
+
+	case "MsgSilenceEdge.cursor":
+		if e.complexity.MsgSilenceEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgSilenceEdge.Cursor(childComplexity), true
+
+	case "MsgSilenceEdge.node":
+		if e.complexity.MsgSilenceEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgSilenceEdge.Node(childComplexity), true
+
 	case "MsgSubscriber.createdAt":
 		if e.complexity.MsgSubscriber.CreatedAt == nil {
 			break
@@ -1961,7 +2080,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateSilence(childComplexity, args["input"].(ent.CreateSilenceInput)), true
+		return e.complexity.Mutation.CreateSilence(childComplexity, args["input"].(ent.CreateMsgSilenceInput)), true
 
 	case "Mutation.deleteMsgChannel":
 		if e.complexity.Mutation.DeleteMsgChannel == nil {
@@ -2220,7 +2339,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateSilence(childComplexity, args["id"].(int), args["input"].(ent.UpdateSilenceInput)), true
+		return e.complexity.Mutation.UpdateSilence(childComplexity, args["id"].(int), args["input"].(ent.UpdateMsgSilenceInput)), true
 
 	case "Nlog.alerts":
 		if e.complexity.Nlog.Alerts == nil {
@@ -2631,7 +2750,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Silences(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.SilenceOrder), args["where"].(*ent.SilenceWhereInput)), true
+		return e.complexity.Query.Silences(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgSilenceOrder), args["where"].(*ent.MsgSilenceWhereInput)), true
 
 	case "Query.userMsgInternalTos":
 		if e.complexity.Query.UserMsgInternalTos == nil {
@@ -2762,125 +2881,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Route.Routes(childComplexity), true
 
-	case "Silence.comments":
-		if e.complexity.Silence.Comments == nil {
-			break
-		}
-
-		return e.complexity.Silence.Comments(childComplexity), true
-
-	case "Silence.createdAt":
-		if e.complexity.Silence.CreatedAt == nil {
-			break
-		}
-
-		return e.complexity.Silence.CreatedAt(childComplexity), true
-
-	case "Silence.createdBy":
-		if e.complexity.Silence.CreatedBy == nil {
-			break
-		}
-
-		return e.complexity.Silence.CreatedBy(childComplexity), true
-
-	case "Silence.endsAt":
-		if e.complexity.Silence.EndsAt == nil {
-			break
-		}
-
-		return e.complexity.Silence.EndsAt(childComplexity), true
-
-	case "Silence.id":
-		if e.complexity.Silence.ID == nil {
-			break
-		}
-
-		return e.complexity.Silence.ID(childComplexity), true
-
-	case "Silence.matchers":
-		if e.complexity.Silence.Matchers == nil {
-			break
-		}
-
-		return e.complexity.Silence.Matchers(childComplexity), true
-
-	case "Silence.startsAt":
-		if e.complexity.Silence.StartsAt == nil {
-			break
-		}
-
-		return e.complexity.Silence.StartsAt(childComplexity), true
-
-	case "Silence.state":
-		if e.complexity.Silence.State == nil {
-			break
-		}
-
-		return e.complexity.Silence.State(childComplexity), true
-
-	case "Silence.tenantID":
-		if e.complexity.Silence.TenantID == nil {
-			break
-		}
-
-		return e.complexity.Silence.TenantID(childComplexity), true
-
-	case "Silence.updatedAt":
-		if e.complexity.Silence.UpdatedAt == nil {
-			break
-		}
-
-		return e.complexity.Silence.UpdatedAt(childComplexity), true
-
-	case "Silence.updatedBy":
-		if e.complexity.Silence.UpdatedBy == nil {
-			break
-		}
-
-		return e.complexity.Silence.UpdatedBy(childComplexity), true
-
-	case "Silence.user":
-		if e.complexity.Silence.User == nil {
-			break
-		}
-
-		return e.complexity.Silence.User(childComplexity), true
-
-	case "SilenceConnection.edges":
-		if e.complexity.SilenceConnection.Edges == nil {
-			break
-		}
-
-		return e.complexity.SilenceConnection.Edges(childComplexity), true
-
-	case "SilenceConnection.pageInfo":
-		if e.complexity.SilenceConnection.PageInfo == nil {
-			break
-		}
-
-		return e.complexity.SilenceConnection.PageInfo(childComplexity), true
-
-	case "SilenceConnection.totalCount":
-		if e.complexity.SilenceConnection.TotalCount == nil {
-			break
-		}
-
-		return e.complexity.SilenceConnection.TotalCount(childComplexity), true
-
-	case "SilenceEdge.cursor":
-		if e.complexity.SilenceEdge.Cursor == nil {
-			break
-		}
-
-		return e.complexity.SilenceEdge.Cursor(childComplexity), true
-
-	case "SilenceEdge.node":
-		if e.complexity.SilenceEdge.Node == nil {
-			break
-		}
-
-		return e.complexity.SilenceEdge.Node(childComplexity), true
-
 	case "Subscription.message":
 		if e.complexity.Subscription.Message == nil {
 			break
@@ -2954,10 +2954,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateMsgChannelInput,
 		ec.unmarshalInputCreateMsgEventInput,
+		ec.unmarshalInputCreateMsgSilenceInput,
 		ec.unmarshalInputCreateMsgSubscriberInput,
 		ec.unmarshalInputCreateMsgTemplateInput,
 		ec.unmarshalInputCreateMsgTypeInput,
-		ec.unmarshalInputCreateSilenceInput,
 		ec.unmarshalInputEmailConfigInput,
 		ec.unmarshalInputMatcherInput,
 		ec.unmarshalInputMessageConfigInput,
@@ -2971,6 +2971,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputMsgInternalToOrder,
 		ec.unmarshalInputMsgInternalToWhereInput,
 		ec.unmarshalInputMsgInternalWhereInput,
+		ec.unmarshalInputMsgSilenceOrder,
+		ec.unmarshalInputMsgSilenceWhereInput,
 		ec.unmarshalInputMsgSubscriberOrder,
 		ec.unmarshalInputMsgSubscriberWhereInput,
 		ec.unmarshalInputMsgTemplateOrder,
@@ -2983,14 +2985,12 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputNlogWhereInput,
 		ec.unmarshalInputReceiverInput,
 		ec.unmarshalInputRouteInput,
-		ec.unmarshalInputSilenceOrder,
-		ec.unmarshalInputSilenceWhereInput,
 		ec.unmarshalInputUpdateMsgChannelInput,
 		ec.unmarshalInputUpdateMsgEventInput,
+		ec.unmarshalInputUpdateMsgSilenceInput,
 		ec.unmarshalInputUpdateMsgSubscriberInput,
 		ec.unmarshalInputUpdateMsgTemplateInput,
 		ec.unmarshalInputUpdateMsgTypeInput,
-		ec.unmarshalInputUpdateSilenceInput,
 	)
 	first := true
 
@@ -3157,6 +3157,36 @@ input CreateMsgEventInput {
   msgTypeID: ID!
 }
 """
+CreateMsgSilenceInput is used for create MsgSilence object.
+Input was generated by ent.
+"""
+input CreateMsgSilenceInput {
+  """
+  租户ID
+  """
+  tenantID: Int!
+  """
+  应用ID
+  """
+  matchers: [MatcherInput]
+  """
+  开始时间
+  """
+  startsAt: Time!
+  """
+  结束时间
+  """
+  endsAt: Time!
+  """
+  备注
+  """
+  comments: String
+  """
+  状态
+  """
+  state: MsgSilenceSilenceState
+}
+"""
 CreateMsgSubscriberInput is used for create MsgSubscriber object.
 Input was generated by ent.
 """
@@ -3272,36 +3302,6 @@ input CreateMsgTypeInput {
   是否可定制
   """
   canCustom: Boolean
-}
-"""
-CreateSilenceInput is used for create Silence object.
-Input was generated by ent.
-"""
-input CreateSilenceInput {
-  """
-  租户ID
-  """
-  tenantID: Int!
-  """
-  应用ID
-  """
-  matchers: [MatcherInput]
-  """
-  开始时间
-  """
-  startsAt: Time!
-  """
-  结束时间
-  """
-  endsAt: Time!
-  """
-  备注
-  """
-  comments: String
-  """
-  状态
-  """
-  state: SilenceSilenceState
 }
 """
 Define a Relay Cursor type:
@@ -4442,6 +4442,202 @@ input MsgInternalWhereInput {
   """
   hasMsgInternalTo: Boolean
   hasMsgInternalToWith: [MsgInternalToWhereInput!]
+}
+type MsgSilence implements Node {
+  id: ID!
+  createdBy: ID!
+  createdAt: Time!
+  updatedBy: Int
+  updatedAt: Time
+  """
+  租户ID
+  """
+  tenantID: Int!
+  """
+  应用ID
+  """
+  matchers: [Matcher]
+  """
+  开始时间
+  """
+  startsAt: Time!
+  """
+  结束时间
+  """
+  endsAt: Time!
+  """
+  备注
+  """
+  comments: String
+  """
+  状态
+  """
+  state: MsgSilenceSilenceState!
+  """
+  创建人
+  """
+  user: User!
+}
+"""
+A connection to a list of items.
+"""
+type MsgSilenceConnection {
+  """
+  A list of edges.
+  """
+  edges: [MsgSilenceEdge]
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  Identifies the total count of items in the connection.
+  """
+  totalCount: Int!
+}
+"""
+An edge in a connection.
+"""
+type MsgSilenceEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: MsgSilence
+  """
+  A cursor for use in pagination.
+  """
+  cursor: Cursor!
+}
+"""
+Ordering options for MsgSilence connections
+"""
+input MsgSilenceOrder {
+  """
+  The ordering direction.
+  """
+  direction: OrderDirection! = ASC
+  """
+  The field by which to order MsgSilences.
+  """
+  field: MsgSilenceOrderField!
+}
+"""
+Properties by which MsgSilence connections can be ordered.
+"""
+enum MsgSilenceOrderField {
+  createdAt
+}
+"""
+MsgSilenceSilenceState is enum for the field state
+"""
+enum MsgSilenceSilenceState @goModel(model: "github.com/woocoos/msgcenter/service/silence.SilenceState") {
+  expired
+  active
+  pending
+}
+"""
+MsgSilenceWhereInput is used for filtering MsgSilence objects.
+Input was generated by ent.
+"""
+input MsgSilenceWhereInput {
+  not: MsgSilenceWhereInput
+  and: [MsgSilenceWhereInput!]
+  or: [MsgSilenceWhereInput!]
+  """
+  id field predicates
+  """
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  """
+  created_by field predicates
+  """
+  createdBy: ID
+  createdByNEQ: ID
+  createdByIn: [ID!]
+  createdByNotIn: [ID!]
+  """
+  created_at field predicates
+  """
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  """
+  updated_by field predicates
+  """
+  updatedBy: Int
+  updatedByNEQ: Int
+  updatedByIn: [Int!]
+  updatedByNotIn: [Int!]
+  updatedByGT: Int
+  updatedByGTE: Int
+  updatedByLT: Int
+  updatedByLTE: Int
+  updatedByIsNil: Boolean
+  updatedByNotNil: Boolean
+  """
+  updated_at field predicates
+  """
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtIsNil: Boolean
+  updatedAtNotNil: Boolean
+  """
+  tenant_id field predicates
+  """
+  tenantID: Int
+  tenantIDNEQ: Int
+  tenantIDIn: [Int!]
+  tenantIDNotIn: [Int!]
+  tenantIDGT: Int
+  tenantIDGTE: Int
+  tenantIDLT: Int
+  tenantIDLTE: Int
+  """
+  starts_at field predicates
+  """
+  startsAt: Time
+  startsAtNEQ: Time
+  startsAtIn: [Time!]
+  startsAtNotIn: [Time!]
+  startsAtGT: Time
+  startsAtGTE: Time
+  startsAtLT: Time
+  startsAtLTE: Time
+  """
+  ends_at field predicates
+  """
+  endsAt: Time
+  endsAtNEQ: Time
+  endsAtIn: [Time!]
+  endsAtNotIn: [Time!]
+  endsAtGT: Time
+  endsAtGTE: Time
+  endsAtLT: Time
+  endsAtLTE: Time
+  """
+  state field predicates
+  """
+  state: MsgSilenceSilenceState
+  stateNEQ: MsgSilenceSilenceState
+  stateIn: [MsgSilenceSilenceState!]
+  stateNotIn: [MsgSilenceSilenceState!]
 }
 type MsgSubscriber implements Node {
   id: ID!
@@ -5676,202 +5872,6 @@ type Query {
     where: MsgInternalToWhereInput
   ): MsgInternalToConnection!
 }
-type Silence implements Node {
-  id: ID!
-  createdBy: ID!
-  createdAt: Time!
-  updatedBy: Int
-  updatedAt: Time
-  """
-  租户ID
-  """
-  tenantID: Int!
-  """
-  应用ID
-  """
-  matchers: [Matcher]
-  """
-  开始时间
-  """
-  startsAt: Time!
-  """
-  结束时间
-  """
-  endsAt: Time!
-  """
-  备注
-  """
-  comments: String
-  """
-  状态
-  """
-  state: SilenceSilenceState!
-  """
-  创建人
-  """
-  user: User!
-}
-"""
-A connection to a list of items.
-"""
-type SilenceConnection {
-  """
-  A list of edges.
-  """
-  edges: [SilenceEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type SilenceEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Silence
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for Silence connections
-"""
-input SilenceOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order Silences.
-  """
-  field: SilenceOrderField!
-}
-"""
-Properties by which Silence connections can be ordered.
-"""
-enum SilenceOrderField {
-  createdAt
-}
-"""
-SilenceSilenceState is enum for the field state
-"""
-enum SilenceSilenceState @goModel(model: "github.com/woocoos/msgcenter/pkg/alert.SilenceState") {
-  expired
-  active
-  pending
-}
-"""
-SilenceWhereInput is used for filtering Silence objects.
-Input was generated by ent.
-"""
-input SilenceWhereInput {
-  not: SilenceWhereInput
-  and: [SilenceWhereInput!]
-  or: [SilenceWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  created_by field predicates
-  """
-  createdBy: ID
-  createdByNEQ: ID
-  createdByIn: [ID!]
-  createdByNotIn: [ID!]
-  """
-  created_at field predicates
-  """
-  createdAt: Time
-  createdAtNEQ: Time
-  createdAtIn: [Time!]
-  createdAtNotIn: [Time!]
-  createdAtGT: Time
-  createdAtGTE: Time
-  createdAtLT: Time
-  createdAtLTE: Time
-  """
-  updated_by field predicates
-  """
-  updatedBy: Int
-  updatedByNEQ: Int
-  updatedByIn: [Int!]
-  updatedByNotIn: [Int!]
-  updatedByGT: Int
-  updatedByGTE: Int
-  updatedByLT: Int
-  updatedByLTE: Int
-  updatedByIsNil: Boolean
-  updatedByNotNil: Boolean
-  """
-  updated_at field predicates
-  """
-  updatedAt: Time
-  updatedAtNEQ: Time
-  updatedAtIn: [Time!]
-  updatedAtNotIn: [Time!]
-  updatedAtGT: Time
-  updatedAtGTE: Time
-  updatedAtLT: Time
-  updatedAtLTE: Time
-  updatedAtIsNil: Boolean
-  updatedAtNotNil: Boolean
-  """
-  tenant_id field predicates
-  """
-  tenantID: Int
-  tenantIDNEQ: Int
-  tenantIDIn: [Int!]
-  tenantIDNotIn: [Int!]
-  tenantIDGT: Int
-  tenantIDGTE: Int
-  tenantIDLT: Int
-  tenantIDLTE: Int
-  """
-  starts_at field predicates
-  """
-  startsAt: Time
-  startsAtNEQ: Time
-  startsAtIn: [Time!]
-  startsAtNotIn: [Time!]
-  startsAtGT: Time
-  startsAtGTE: Time
-  startsAtLT: Time
-  startsAtLTE: Time
-  """
-  ends_at field predicates
-  """
-  endsAt: Time
-  endsAtNEQ: Time
-  endsAtIn: [Time!]
-  endsAtNotIn: [Time!]
-  endsAtGT: Time
-  endsAtGTE: Time
-  endsAtLT: Time
-  endsAtLTE: Time
-  """
-  state field predicates
-  """
-  state: SilenceSilenceState
-  stateNEQ: SilenceSilenceState
-  stateIn: [SilenceSilenceState!]
-  stateNotIn: [SilenceSilenceState!]
-}
 """
 The builtin Time type
 """
@@ -5928,6 +5928,35 @@ input UpdateMsgEventInput {
   """
   modes: String
   msgTypeID: ID
+}
+"""
+UpdateMsgSilenceInput is used for update MsgSilence object.
+Input was generated by ent.
+"""
+input UpdateMsgSilenceInput {
+  """
+  应用ID
+  """
+  matchers: [MatcherInput]
+  appendMatchers: [MatcherInput]
+  clearMatchers: Boolean
+  """
+  开始时间
+  """
+  startsAt: Time
+  """
+  结束时间
+  """
+  endsAt: Time
+  """
+  备注
+  """
+  comments: String
+  clearComments: Boolean
+  """
+  状态
+  """
+  state: MsgSilenceSilenceState
 }
 """
 UpdateMsgSubscriberInput is used for update MsgSubscriber object.
@@ -6065,35 +6094,6 @@ input UpdateMsgTypeInput {
   canCustom: Boolean
   clearCanCustom: Boolean
 }
-"""
-UpdateSilenceInput is used for update Silence object.
-Input was generated by ent.
-"""
-input UpdateSilenceInput {
-  """
-  应用ID
-  """
-  matchers: [MatcherInput]
-  appendMatchers: [MatcherInput]
-  clearMatchers: Boolean
-  """
-  开始时间
-  """
-  startsAt: Time
-  """
-  结束时间
-  """
-  endsAt: Time
-  """
-  备注
-  """
-  comments: String
-  clearComments: Boolean
-  """
-  状态
-  """
-  state: SilenceSilenceState
-}
 type User implements Node {
   """
   ID
@@ -6110,7 +6110,7 @@ type User implements Node {
   """
   静默
   """
-  silences: [Silence!]
+  silences: [MsgSilence!]
 }
 `, BuiltIn: false},
 	{Name: "../query.graphql", Input: `""" time duration: RFCXXX duration string, e.g. 1h30m """
@@ -6292,9 +6292,9 @@ extend type Query {
         first: Int
         before: Cursor
         last: Int
-        orderBy: SilenceOrder
-        where: SilenceWhereInput
-    ):SilenceConnection!
+        orderBy: MsgSilenceOrder
+        where: MsgSilenceWhereInput
+    ):MsgSilenceConnection!
 
     """消息列表"""
     msgAlerts(
@@ -6392,9 +6392,9 @@ extend type Query {
     """ 删除订阅 """
     deleteMsgSubscriber(ids: [ID!]!): Boolean!
     """ 创建静默 """
-    createSilence(input: CreateSilenceInput!): Silence!
+    createSilence(input: CreateMsgSilenceInput!): MsgSilence!
     """ 更新静默 """
-    updateSilence(id: ID!, input: UpdateSilenceInput!): Silence!
+    updateSilence(id: ID!, input: UpdateMsgSilenceInput!): MsgSilence!
     """ 删除静默 """
     deleteSilence(id: ID!): Boolean!
     """ 设置站内信消息已读未读 """

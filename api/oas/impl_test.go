@@ -3,9 +3,19 @@ package oas
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
+	"math/rand"
+	"net"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"strconv"
+	"testing"
+	"time"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqljson"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -19,15 +29,6 @@ import (
 	"github.com/woocoos/msgcenter/service/provider/mem"
 	"github.com/woocoos/msgcenter/test/maildev"
 	"github.com/woocoos/msgcenter/test/testsuite"
-	"io"
-	"math/rand"
-	"net"
-	"net/http"
-	"net/http/httptest"
-	"net/url"
-	"strconv"
-	"testing"
-	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	_ "github.com/woocoos/msgcenter/ent/runtime"
@@ -115,8 +116,9 @@ func (s *serviceSuite) SetupSuite() {
 		s.Require().NoError(s.AlertManager.Start(s.AlertManager.Coordinator, c))
 
 		s.server.Update(c, func(labels label.LabelSet) {
-			s.AlertManager.Inhibitor.Mutes(labels)
-			s.AlertManager.Silencer.Mutes(labels)
+			ctx := context.Background()
+			s.AlertManager.Inhibitor.Load().Mutes(ctx, labels)
+			s.AlertManager.Silencer.Mutes(ctx, labels)
 		})
 
 		return nil
@@ -125,7 +127,7 @@ func (s *serviceSuite) SetupSuite() {
 	err = s.AlertManager.Coordinator.Reload()
 	s.Require().NoError(err)
 	alerts := s.AlertManager.Alerts.(*mem.Alerts)
-	go alerts.Start(nil)
+	go alerts.Start(context.Background())
 	s.shutdowns = append(s.shutdowns, func() {
 		s.AlertManager.Stop()
 		alerts.Stop(context.Background())
@@ -179,7 +181,7 @@ func (s *serviceSuite) TestPostAlertsWithParams() {
 			Alert: &Alert{
 				Labels: map[string]string{
 					"alertname":       "AlterPassword",
-					label.TenantLabel: "3",
+					label.TenantLabel: "1",
 				},
 			},
 			Annotations: map[string]string{

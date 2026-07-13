@@ -143,10 +143,10 @@ func (r *queryResolver) MsgTemplates(ctx context.Context, after *entgql.Cursor[i
 }
 
 // Silences is the resolver for the silences field.
-func (r *queryResolver) Silences(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SilenceOrder, where *ent.SilenceWhereInput) (*ent.SilenceConnection, error) {
-	return r.client.Silence.Query().Paginate(ctx, after, first, before, last,
-		ent.WithSilenceOrder(orderBy),
-		ent.WithSilenceFilter(where.Filter))
+func (r *queryResolver) Silences(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgSilenceOrder, where *ent.MsgSilenceWhereInput) (*ent.MsgSilenceConnection, error) {
+	return r.client.MsgSilence.Query().Paginate(ctx, after, first, before, last,
+		ent.WithMsgSilenceOrder(orderBy),
+		ent.WithMsgSilenceFilter(where.Filter))
 }
 
 // MsgAlerts is the resolver for the msgAlerts field.

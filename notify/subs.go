@@ -64,7 +64,7 @@ func (u EventSubscribeStage) exec(ctx context.Context, alerts ...*alert.Alert) (
 			ac.Labels[label.SkipSubscribeLabel] = "Y"
 			uls[i] = ac
 		}
-		if err := u.alerts.Put(uls...); err != nil {
+		if err := u.alerts.Put(ctx, uls...); err != nil {
 			return ctx, nil, err
 		}
 	}

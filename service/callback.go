@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"strconv"
+	"time"
+
 	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgalert"
@@ -12,8 +15,6 @@ import (
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service/provider/mem"
 	"go.uber.org/zap"
-	"strconv"
-	"time"
 )
 
 var (
@@ -72,6 +73,10 @@ func (a *AlertCallback) PostDelete(alert *alert.Alert) {
 	if err != nil {
 		logger.Error("delete alert error", zap.Error(err))
 	}
+}
+
+// PostGC is N/A for Db
+func (a *AlertCallback) PostGC(fps []label.Fingerprint) {
 }
 
 type NlogCallback struct {

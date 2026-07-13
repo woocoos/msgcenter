@@ -25,8 +25,8 @@ const (
 	Table = "user"
 	// SilencesTable is the table that holds the silences relation/edge.
 	SilencesTable = "msg_silence"
-	// SilencesInverseTable is the table name for the Silence entity.
-	// It exists in this package in order to avoid circular dependency with the "silence" package.
+	// SilencesInverseTable is the table name for the MsgSilence entity.
+	// It exists in this package in order to avoid circular dependency with the "msgsilence" package.
 	SilencesInverseTable = "msg_silence"
 	// SilencesColumn is the table column denoting the silences relation/edge.
 	SilencesColumn = "created_by"

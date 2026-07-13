@@ -89,13 +89,21 @@ alertManager:
     retention: 120h
     maintenanceInterval: 15m
   alerts:
+    # Interval between alert GC. Default 30m
     gcInterval: 30m
+    # Maximum number of alerts per alertname. If negative or zero, no limit is set.
+    # Default 0
+    perAlertnameLimit: 0
   template:
     baseDir: "files" # 相对于程序运行目录
     dataDir: "tpl" # 模板正式路径
     attachmentDir: "att" # 附件存储路径
     tempParamsFile: etc/tempparams.yaml # 全局模板参数文件
-
+  dispatch:
+    # Interval between maintenance of aggregation groups in the dispatcher. default 30s
+    maintenanceInterval: 30s
+    # Minimum amount of time to wait before dispatching alerts. This option should be synced with value of --rules.alert.resend-delay on Prometheus. default 0.
+    startDelay: 0s
 prometheus:
   server:
     addr: 127.0.0.1:9093

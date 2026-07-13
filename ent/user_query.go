@@ -12,8 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/woocoos/msgcenter/ent/msgsilence"
 	"github.com/woocoos/msgcenter/ent/predicate"
-	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
 
@@ -27,11 +27,11 @@ type UserQuery struct {
 	order              []user.OrderOption
 	inters             []Interceptor
 	predicates         []predicate.User
-	withSilences       *SilenceQuery
+	withSilences       *MsgSilenceQuery
 	withAddresses      *UserAddrQuery
 	modifiers          []func(*sql.Selector)
 	loadTotal          []func(context.Context, []*User) error
-	withNamedSilences  map[string]*SilenceQuery
+	withNamedSilences  map[string]*MsgSilenceQuery
 	withNamedAddresses map[string]*UserAddrQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -70,8 +70,8 @@ func (_q *UserQuery) Order(o ...user.OrderOption) *UserQuery {
 }
 
 // QuerySilences chains the current query on the "silences" edge.
-func (_q *UserQuery) QuerySilences() *SilenceQuery {
-	query := (&SilenceClient{config: _q.config}).Query()
+func (_q *UserQuery) QuerySilences() *MsgSilenceQuery {
+	query := (&MsgSilenceClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -82,12 +82,12 @@ func (_q *UserQuery) QuerySilences() *SilenceQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(silence.Table, silence.FieldID),
+			sqlgraph.To(msgsilence.Table, msgsilence.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.SilencesTable, user.SilencesColumn),
 		)
 		schemaConfig := _q.schemaConfig
-		step.To.Schema = schemaConfig.Silence
-		step.Edge.Schema = schemaConfig.Silence
+		step.To.Schema = schemaConfig.MsgSilence
+		step.Edge.Schema = schemaConfig.MsgSilence
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
@@ -321,8 +321,8 @@ func (_q *UserQuery) Clone() *UserQuery {
 
 // WithSilences tells the query-builder to eager-load the nodes that are connected to
 // the "silences" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *UserQuery) WithSilences(opts ...func(*SilenceQuery)) *UserQuery {
-	query := (&SilenceClient{config: _q.config}).Query()
+func (_q *UserQuery) WithSilences(opts ...func(*MsgSilenceQuery)) *UserQuery {
+	query := (&MsgSilenceClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -449,8 +449,8 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	}
 	if query := _q.withSilences; query != nil {
 		if err := _q.loadSilences(ctx, query, nodes,
-			func(n *User) { n.Edges.Silences = []*Silence{} },
-			func(n *User, e *Silence) { n.Edges.Silences = append(n.Edges.Silences, e) }); err != nil {
+			func(n *User) { n.Edges.Silences = []*MsgSilence{} },
+			func(n *User, e *MsgSilence) { n.Edges.Silences = append(n.Edges.Silences, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -464,7 +464,7 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	for name, query := range _q.withNamedSilences {
 		if err := _q.loadSilences(ctx, query, nodes,
 			func(n *User) { n.appendNamedSilences(name) },
-			func(n *User, e *Silence) { n.appendNamedSilences(name, e) }); err != nil {
+			func(n *User, e *MsgSilence) { n.appendNamedSilences(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -483,7 +483,7 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	return nodes, nil
 }
 
-func (_q *UserQuery) loadSilences(ctx context.Context, query *SilenceQuery, nodes []*User, init func(*User), assign func(*User, *Silence)) error {
+func (_q *UserQuery) loadSilences(ctx context.Context, query *MsgSilenceQuery, nodes []*User, init func(*User), assign func(*User, *MsgSilence)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
 	for i := range nodes {
@@ -494,9 +494,9 @@ func (_q *UserQuery) loadSilences(ctx context.Context, query *SilenceQuery, node
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(silence.FieldCreatedBy)
+		query.ctx.AppendFieldOnce(msgsilence.FieldCreatedBy)
 	}
-	query.Where(predicate.Silence(func(s *sql.Selector) {
+	query.Where(predicate.MsgSilence(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.SilencesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
@@ -635,13 +635,13 @@ func (_q *UserQuery) sqlQuery(ctx context.Context) *sql.Selector {
 
 // WithNamedSilences tells the query-builder to eager-load the nodes that are connected to the "silences"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (_q *UserQuery) WithNamedSilences(name string, opts ...func(*SilenceQuery)) *UserQuery {
-	query := (&SilenceClient{config: _q.config}).Query()
+func (_q *UserQuery) WithNamedSilences(name string, opts ...func(*MsgSilenceQuery)) *UserQuery {
+	query := (&MsgSilenceClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
 	if _q.withNamedSilences == nil {
-		_q.withNamedSilences = make(map[string]*SilenceQuery)
+		_q.withNamedSilences = make(map[string]*MsgSilenceQuery)
 	}
 	_q.withNamedSilences[name] = query
 	return _q

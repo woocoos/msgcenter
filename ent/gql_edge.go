@@ -106,6 +106,14 @@ func (_m *MsgInternalTo) User(ctx context.Context) (*User, error) {
 	return result, err
 }
 
+func (_m *MsgSilence) User(ctx context.Context) (*User, error) {
+	result, err := _m.Edges.UserOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryUser().Only(ctx)
+	}
+	return result, err
+}
+
 func (_m *MsgSubscriber) MsgType(ctx context.Context) (*MsgType, error) {
 	result, err := _m.Edges.MsgTypeOrErr()
 	if IsNotLoaded(err) {
@@ -206,15 +214,7 @@ func (_m *Org) MsgAlerts(ctx context.Context) (result []*MsgAlert, err error) {
 	return result, err
 }
 
-func (_m *Silence) User(ctx context.Context) (*User, error) {
-	result, err := _m.Edges.UserOrErr()
-	if IsNotLoaded(err) {
-		result, err = _m.QueryUser().Only(ctx)
-	}
-	return result, err
-}
-
-func (_m *User) Silences(ctx context.Context) (result []*Silence, err error) {
+func (_m *User) Silences(ctx context.Context) (result []*MsgSilence, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = _m.NamedSilences(graphql.GetFieldContext(ctx).Field.Alias)
 	} else {

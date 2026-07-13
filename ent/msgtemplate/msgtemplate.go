@@ -304,7 +304,7 @@ func (e Format) MarshalGQL(w io.Writer) {
 }
 
 // UnmarshalGQL implements graphql.Unmarshaler interface.
-func (e *Format) UnmarshalGQL(val interface{}) error {
+func (e *Format) UnmarshalGQL(val any) error {
 	str, ok := val.(string)
 	if !ok {
 		return fmt.Errorf("enum %T must be a string", val)
