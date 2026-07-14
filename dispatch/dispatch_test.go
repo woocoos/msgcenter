@@ -17,124 +17,19 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
+	"github.com/woocoos/msgcenter/pkg/marker"
 	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service/provider"
 )
 
 const testMaintenanceInterval = 30 * time.Second
-
-// --- Helper types ---
-
-// recordStage implements notify.Stage for testing. It records all alerts
-// dispatched by the Dispatcher, keyed by group key.
-type recordStage struct {
-	mtx    sync.RWMutex
-	alerts map[string]map[label.Fingerprint]*alert.Alert
-}
-
-func newRecordStage() *recordStage {
-	return &recordStage{alerts: make(map[string]map[label.Fingerprint]*alert.Alert)}
-}
-
-func (r *recordStage) Alerts() []*alert.Alert {
-	r.mtx.RLock()
-	defer r.mtx.RUnlock()
-	var result []*alert.Alert
-	for _, m := range r.alerts {
-		for _, a := range m {
-			result = append(result, a)
-		}
-	}
-	return result
-}
-
-func (r *recordStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.Context, []*alert.Alert, error) {
-	r.mtx.Lock()
-	defer r.mtx.Unlock()
-	gk, ok := notify.GroupKey(ctx)
-	if !ok {
-		panic("GroupKey not present in context")
-	}
-	if _, ok := r.alerts[gk]; !ok {
-		r.alerts[gk] = make(map[label.Fingerprint]*alert.Alert)
-	}
-	for _, a := range alerts {
-		r.alerts[gk][a.Fingerprint()] = a
-	}
-	return ctx, alerts, nil
-}
-
-type testLimits struct {
-	groups int
-}
-
-func (l testLimits) MaxNumberOfAggregationGroups() int { return l.groups }
-
-// mockAlerts implements provider.Alerts for testing.
-type mockAlerts struct {
-	ch   chan *provider.Alert
-	done chan struct{}
-}
-
-func newMockAlerts() *mockAlerts {
-	return &mockAlerts{
-		ch:   make(chan *provider.Alert, 1000),
-		done: make(chan struct{}),
-	}
-}
-
-func (m *mockAlerts) Subscribe(name string) provider.AlertIterator {
-	return provider.NewAlertIterator(m.ch, m.done, nil)
-}
-
-func (m *mockAlerts) SlurpAndSubscribe(name string) ([]*alert.Alert, provider.AlertIterator) {
-	return nil, provider.NewAlertIterator(m.ch, m.done, nil)
-}
-
-func (m *mockAlerts) GetPending() provider.AlertIterator {
-	return provider.NewAlertIterator(make(chan *provider.Alert), make(chan struct{}), nil)
-}
-
-func (m *mockAlerts) Get(fp label.Fingerprint) (*alert.Alert, error) { return nil, nil }
-func (m *mockAlerts) Put(ctx context.Context, alerts ...*alert.Alert) error {
-	for _, a := range alerts {
-		m.ch <- &provider.Alert{Data: a, Header: map[string]string{}}
-	}
-	return nil
-}
-
-func (m *mockAlerts) Start(ctx context.Context) error { return nil }
-func (m *mockAlerts) Stop(ctx context.Context) error  { return nil }
-func (m *mockAlerts) Name() string                    { return "mock" }
-func (m *mockAlerts) Merge(b []byte) error            { return nil }
-
-var (
-	// Set the start time in the past to trigger a flush immediately.
-	t0 = time.Now().Add(-time.Minute)
-	// Set the end time in the future to avoid deleting the alert.
-	t1 = t0.Add(2 * time.Minute)
-)
-
-func newTestAlert(labels label.LabelSet) *alert.Alert {
-	return &alert.Alert{
-		Labels:       labels,
-		Annotations:  label.LabelSet{"foo": "bar"},
-		StartsAt:     t0,
-		EndsAt:       t1,
-		GeneratorURL: "http://example.com/prometheus",
-		UpdatedAt:    t0,
-	}
-}
-
-// --- TestAggrGroup ---
-// Tests the aggregation group lifecycle: group_wait, group_interval,
-// resolved alerts cleanup, and context propagation.
 
 func TestAggrGroup(t *testing.T) {
 	lset := label.LabelSet{"a": "v1", "b": "v2"}
@@ -279,8 +174,6 @@ func TestAggrGroup(t *testing.T) {
 	ag.stop()
 }
 
-// --- TestGroupLabels ---
-
 func TestGroupLabels(t *testing.T) {
 	t.Parallel()
 	a := &alert.Alert{
@@ -311,7 +204,277 @@ func TestGroupByAllLabels(t *testing.T) {
 	assert.Equal(t, a.Labels, ls)
 }
 
-// --- TestDispatcherRace ---
+func TestGroups(t *testing.T) {
+	confData := `
+route:
+  receiver: 'prod'
+  groupBy: ['alertname']
+  groupWait: 10ms
+  groupInterval: 10ms
+  routes:
+    - matchers: ['env="testing"']
+      receiver: 'testing'
+      groupBy: ['alertname', 'service']
+    - matchers: ['env="prod"']
+      receiver: 'prod'
+      groupBy: ['alertname', 'service', 'cluster']
+      continue: true
+    - matchers: ['kafka="yes"']
+      receiver: 'kafka'
+      groupBy: ['alertname', 'service', 'cluster']
+receivers:
+  - name: 'prod'
+  - name: 'testing'
+  - name: 'kafka'
+`
+	cfg, err := profile.Load([]byte(confData))
+	require.NoError(t, err)
+
+	route := NewRoute(cfg.Route, nil)
+	mk := marker.NewGroupMarker()
+	alerts := newMockAlerts()
+
+	timeout := func(d time.Duration) time.Duration { return 0 }
+	recorder := newRecordStage()
+	dispatcher := NewDispatcher(alerts, route, recorder, mk, timeout, testMaintenanceInterval, nil, nil)
+	go dispatcher.Run(time.Now())
+	defer dispatcher.Stop()
+
+	inputAlerts := []*alert.Alert{
+		// Matches the parent route.
+		newTestAlert(label.LabelSet{"alertname": "OtherAlert", "cluster": "cc", "service": "dd"}),
+		// Matches the first sub-route.
+		newTestAlert(label.LabelSet{"env": "testing", "alertname": "TestingAlert", "service": "api", "instance": "inst1"}),
+		// Matches the second sub-route.
+		newTestAlert(label.LabelSet{"env": "prod", "alertname": "HighErrorRate", "cluster": "aa", "service": "api", "instance": "inst1"}),
+		newTestAlert(label.LabelSet{"env": "prod", "alertname": "HighErrorRate", "cluster": "aa", "service": "api", "instance": "inst2"}),
+		// Matches the second sub-route.
+		newTestAlert(label.LabelSet{"env": "prod", "alertname": "HighErrorRate", "cluster": "bb", "service": "api", "instance": "inst1"}),
+		// Matches the second and third sub-route.
+		newTestAlert(label.LabelSet{"env": "prod", "alertname": "HighLatency", "cluster": "bb", "service": "db", "kafka": "yes", "instance": "inst3"}),
+	}
+	for _, a := range inputAlerts {
+		require.NoError(t, alerts.Put(context.Background(), a))
+	}
+
+	// Let alerts get processed.
+	require.Eventually(t, func() bool {
+		return len(recorder.Alerts()) == 7
+	}, 5*time.Second, 200*time.Millisecond, "not all alerts were notified")
+
+	alertGroups, receivers := dispatcher.Groups(func(*Route) bool { return true }, func(*alert.Alert, time.Time) bool { return true })
+
+	require.Len(t, alertGroups, 6)
+	require.Equal(t, map[label.Fingerprint][]string{
+		inputAlerts[0].Fingerprint(): {"prod"},
+		inputAlerts[1].Fingerprint(): {"testing"},
+		inputAlerts[2].Fingerprint(): {"prod"},
+		inputAlerts[3].Fingerprint(): {"prod"},
+		inputAlerts[4].Fingerprint(): {"prod"},
+		inputAlerts[5].Fingerprint(): {"kafka", "prod"},
+	}, receivers)
+
+	// Verify group labels and receivers.
+	for _, ag := range alertGroups {
+		switch {
+		case ag.Labels.Equal(label.LabelSet{"alertname": "OtherAlert"}):
+			require.Equal(t, "prod", ag.Receiver)
+			require.Len(t, ag.Alerts, 1)
+		case ag.Labels.Equal(label.LabelSet{"alertname": "TestingAlert", "service": "api"}):
+			require.Equal(t, "testing", ag.Receiver)
+			require.Len(t, ag.Alerts, 1)
+		case ag.Labels.Equal(label.LabelSet{"alertname": "HighErrorRate", "service": "api", "cluster": "aa"}):
+			require.Equal(t, "prod", ag.Receiver)
+			require.Len(t, ag.Alerts, 2)
+		case ag.Labels.Equal(label.LabelSet{"alertname": "HighErrorRate", "service": "api", "cluster": "bb"}):
+			require.Equal(t, "prod", ag.Receiver)
+			require.Len(t, ag.Alerts, 1)
+		case ag.Labels.Equal(label.LabelSet{"alertname": "HighLatency", "service": "db", "cluster": "bb"}):
+			// Two groups with same labels: one for kafka, one for prod.
+			require.Contains(t, []string{"kafka", "prod"}, ag.Receiver)
+			require.Len(t, ag.Alerts, 1)
+		default:
+			t.Fatalf("unexpected group: labels=%v receiver=%s", ag.Labels, ag.Receiver)
+		}
+	}
+}
+
+func TestGroupsWithLimits(t *testing.T) {
+	confData := `
+route:
+  receiver: 'prod'
+  groupBy: ['alertname']
+  groupWait: 10ms
+  groupInterval: 10ms
+  routes:
+    - matchers: ['env="testing"']
+      receiver: 'testing'
+      groupBy: ['alertname', 'service']
+    - matchers: ['env="prod"']
+      receiver: 'prod'
+      groupBy: ['alertname', 'service', 'cluster']
+      continue: true
+    - matchers: ['kafka="yes"']
+      receiver: 'kafka'
+      groupBy: ['alertname', 'service', 'cluster']
+receivers:
+  - name: 'prod'
+  - name: 'testing'
+  - name: 'kafka'
+`
+	cfg, err := profile.Load([]byte(confData))
+	require.NoError(t, err)
+
+	route := NewRoute(cfg.Route, nil)
+	reg := prometheus.NewRegistry()
+	mk := marker.NewGroupMarker()
+	alerts := newMockAlerts()
+
+	timeout := func(d time.Duration) time.Duration { return 0 }
+	recorder := newRecordStage()
+	lim := testLimits{groups: 6}
+	m := metrics.NewDispatcherMetrics(true, reg)
+	dispatcher := NewDispatcher(alerts, route, recorder, mk, timeout, testMaintenanceInterval, lim, m)
+	go dispatcher.Run(time.Now())
+	defer dispatcher.Stop()
+
+	inputAlerts := []*alert.Alert{
+		newTestAlert(label.LabelSet{"alertname": "OtherAlert", "cluster": "cc", "service": "dd"}),
+		newTestAlert(label.LabelSet{"env": "testing", "alertname": "TestingAlert", "service": "api", "instance": "inst1"}),
+		newTestAlert(label.LabelSet{"env": "prod", "alertname": "HighErrorRate", "cluster": "aa", "service": "api", "instance": "inst1"}),
+		newTestAlert(label.LabelSet{"env": "prod", "alertname": "HighErrorRate", "cluster": "aa", "service": "api", "instance": "inst2"}),
+		newTestAlert(label.LabelSet{"env": "prod", "alertname": "HighErrorRate", "cluster": "bb", "service": "api", "instance": "inst1"}),
+		newTestAlert(label.LabelSet{"env": "prod", "alertname": "HighLatency", "cluster": "bb", "service": "db", "kafka": "yes", "instance": "inst3"}),
+	}
+	for _, a := range inputAlerts {
+		require.NoError(t, alerts.Put(context.Background(), a))
+	}
+
+	require.Eventually(t, func() bool {
+		return len(recorder.Alerts()) == 7
+	}, 5*time.Second, 200*time.Millisecond)
+
+	routeFilter := func(*Route) bool { return true }
+	alertFilter := func(*alert.Alert, time.Time) bool { return true }
+
+	alertGroups, _ := dispatcher.Groups(routeFilter, alertFilter)
+	require.Len(t, alertGroups, 6)
+
+	require.Equal(t, 0.0, testutil.ToFloat64(m.AggrGroupLimitReached))
+
+	// Try to store a new alert that would create a 7th group, hitting the limit.
+	require.NoError(t, alerts.Put(context.Background(),
+		newTestAlert(label.LabelSet{"env": "prod", "alertname": "NewAlert", "cluster": "new-cluster", "service": "db"})))
+
+	require.Eventually(t, func() bool {
+		return testutil.ToFloat64(m.AggrGroupLimitReached) > 0
+	}, 5*time.Second, 200*time.Millisecond)
+
+	// Verify there are still only 6 groups.
+	alertGroups, _ = dispatcher.Groups(routeFilter, alertFilter)
+	require.Len(t, alertGroups, 6)
+}
+
+// recordStage implements notify.Stage for testing. It records all alerts
+// dispatched by the Dispatcher, keyed by group key.
+type recordStage struct {
+	mtx    sync.RWMutex
+	alerts map[string]map[label.Fingerprint]*alert.Alert
+}
+
+func newRecordStage() *recordStage {
+	return &recordStage{alerts: make(map[string]map[label.Fingerprint]*alert.Alert)}
+}
+
+func (r *recordStage) Alerts() []*alert.Alert {
+	r.mtx.RLock()
+	defer r.mtx.RUnlock()
+	var result []*alert.Alert
+	for _, m := range r.alerts {
+		for _, a := range m {
+			result = append(result, a)
+		}
+	}
+	return result
+}
+
+func (r *recordStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.Context, []*alert.Alert, error) {
+	r.mtx.Lock()
+	defer r.mtx.Unlock()
+	gk, ok := notify.GroupKey(ctx)
+	if !ok {
+		panic("GroupKey not present in context")
+	}
+	if _, ok := r.alerts[gk]; !ok {
+		r.alerts[gk] = make(map[label.Fingerprint]*alert.Alert)
+	}
+	for _, a := range alerts {
+		r.alerts[gk][a.Fingerprint()] = a
+	}
+	return ctx, alerts, nil
+}
+
+type testLimits struct {
+	groups int
+}
+
+func (l testLimits) MaxNumberOfAggregationGroups() int { return l.groups }
+
+// mockAlerts implements provider.Alerts for testing.
+type mockAlerts struct {
+	ch   chan *provider.Alert
+	done chan struct{}
+}
+
+func newMockAlerts() *mockAlerts {
+	return &mockAlerts{
+		ch:   make(chan *provider.Alert, 1000),
+		done: make(chan struct{}),
+	}
+}
+
+func (m *mockAlerts) Subscribe(name string) provider.AlertIterator {
+	return provider.NewAlertIterator(m.ch, m.done, nil)
+}
+
+func (m *mockAlerts) SlurpAndSubscribe(name string) ([]*alert.Alert, provider.AlertIterator) {
+	return nil, provider.NewAlertIterator(m.ch, m.done, nil)
+}
+
+func (m *mockAlerts) GetPending() provider.AlertIterator {
+	return provider.NewAlertIterator(make(chan *provider.Alert), make(chan struct{}), nil)
+}
+func (m *mockAlerts) Get(fp label.Fingerprint) (*alert.Alert, error) { return nil, nil }
+
+func (m *mockAlerts) Put(ctx context.Context, alerts ...*alert.Alert) error {
+	for _, a := range alerts {
+		m.ch <- &provider.Alert{Data: a, Header: map[string]string{}}
+	}
+	return nil
+}
+func (m *mockAlerts) Start(ctx context.Context) error { return nil }
+func (m *mockAlerts) Stop(ctx context.Context) error  { return nil }
+func (m *mockAlerts) Name() string                    { return "mock" }
+
+func (m *mockAlerts) Merge(b []byte) error { return nil }
+
+var (
+	// Set the start time in the past to trigger a flush immediately.
+	t0 = time.Now().Add(-time.Minute)
+	// Set the end time in the future to avoid deleting the alert.
+	t1 = t0.Add(2 * time.Minute)
+)
+
+func newTestAlert(labels label.LabelSet) *alert.Alert {
+	return &alert.Alert{
+		Labels:       labels,
+		Annotations:  label.LabelSet{"foo": "bar"},
+		StartsAt:     t0,
+		EndsAt:       t1,
+		GeneratorURL: "http://example.com/prometheus",
+		UpdatedAt:    t0,
+	}
+}
 
 func TestDispatcherRace(t *testing.T) {
 	t.Parallel()
@@ -365,8 +528,6 @@ func TestDispatcherRaceOnFirstAlertNotDeliveredWhenGroupWaitIsZero(t *testing.T)
 	require.Len(t, recorder.Alerts(), numAlerts)
 }
 
-// --- TestDispatcher_DoMaintenance ---
-
 func TestDispatcher_DoMaintenance(t *testing.T) {
 	t.Parallel()
 	alerts := newMockAlerts()
@@ -380,8 +541,9 @@ func TestDispatcher_DoMaintenance(t *testing.T) {
 	}
 	timeout := func(d time.Duration) time.Duration { return d }
 	recorder := newRecordStage()
+	mk := marker.NewGroupMarker()
 
-	d := NewDispatcher(alerts, route, recorder, nil, timeout, testMaintenanceInterval, nil, nil)
+	d := NewDispatcher(alerts, route, recorder, mk, timeout, testMaintenanceInterval, nil, nil)
 	// Manually create routeGroupsSlice since we are not calling Run().
 	d.routeGroupsSlice = make([]routeAggrGroups, route.Idx+1)
 	d.routeGroupsSlice[route.Idx] = routeAggrGroups{route: route}
@@ -410,6 +572,12 @@ func TestDispatcher_DoMaintenance(t *testing.T) {
 	})
 	require.True(t, notified, "flush should have called notify function")
 
+	// Insert a marker for the aggregation group's group key.
+	mk.SetMuted(route.ID(), ag.GroupKey(), []string{"weekends"})
+	mutedBy, isMuted := mk.Muted(route.ID(), ag.GroupKey())
+	require.True(t, isMuted)
+	require.Equal(t, []string{"weekends"}, mutedBy)
+
 	// Must run otherwise doMaintenance blocks on ag.stop().
 	go ag.run(func(context.Context, ...*alert.Alert) bool { return true })
 
@@ -419,12 +587,12 @@ func TestDispatcher_DoMaintenance(t *testing.T) {
 	// The group should have been removed from the map.
 	_, ok := d.routeGroupsSlice[route.Idx].groups.Load(ag.fingerprint())
 	assert.False(t, ok, "destroyed group should have been removed by maintenance")
-}
 
-// --- TestGroupAlert_RecoversWhenCASFails ---
-// Regression test: when CAS fails during group creation, the code should
-// fall back to LoadOrStore and insert into whichever live group now
-// occupies the slot.
+	// The marker should have been cleaned up.
+	mutedBy, isMuted = mk.Muted(route.ID(), ag.GroupKey())
+	assert.False(t, isMuted, "marker should have been cleaned up by maintenance")
+	assert.Empty(t, mutedBy)
+}
 
 func TestGroupAlert_RecoversWhenCASFails(t *testing.T) {
 	const (
@@ -503,10 +671,6 @@ func TestGroupAlert_RecoversWhenCASFails(t *testing.T) {
 	}
 }
 
-// --- TestGroupAlert_DisplacedAggrGroupGoroutineExits ---
-// Regression test: when groupAlert CAS-replaces a destroyed aggrGroup,
-// the displaced group's run goroutine must exit.
-
 func TestGroupAlert_DisplacedAggrGroupGoroutineExits(t *testing.T) {
 	t.Parallel()
 	alerts := newMockAlerts()
@@ -552,9 +716,127 @@ func TestGroupAlert_DisplacedAggrGroupGoroutineExits(t *testing.T) {
 	}
 }
 
-// --- TestDispatchOnStartup ---
-// Tests delayed start: alerts received before the start time are collected
-// into groups but not flushed until the timer fires.
+func TestDispatcher_DeleteResolvedAlertsFromMarker(t *testing.T) {
+	t.Run("successful flush deletes markers for resolved alerts", func(t *testing.T) {
+		labels := label.LabelSet{"alertname": "TestAlert"}
+		route := &Route{
+			RouteOpts: RouteOpts{
+				Receiver:       "test",
+				GroupBy:        map[label.LabelName]struct{}{"alertname": {}},
+				GroupWait:      0,
+				GroupInterval:  time.Minute,
+				RepeatInterval: time.Hour,
+			},
+		}
+		timeout := func(d time.Duration) time.Duration { return d }
+
+		ag := newAggrGroup(context.Background(), labels, route, timeout)
+
+		now := time.Now()
+		activeAlert := &alert.Alert{
+			Labels:   label.LabelSet{"alertname": "TestAlert", "instance": "1"},
+			StartsAt: now.Add(-time.Hour),
+			EndsAt:   now.Add(time.Hour),
+		}
+		resolvedAlert := &alert.Alert{
+			Labels:   label.LabelSet{"alertname": "TestAlert", "instance": "2"},
+			StartsAt: now.Add(-time.Hour),
+			EndsAt:   now.Add(-time.Minute),
+		}
+
+		ag.insert(context.Background(), activeAlert)
+		ag.insert(context.Background(), resolvedAlert)
+
+		ag.marker.SetSilenced(activeAlert.Fingerprint(), nil)
+		ag.marker.SetSilenced(resolvedAlert.Fingerprint(), nil)
+
+		require.Equal(t, alert.AlertStateActive, ag.marker.Status(activeAlert.Fingerprint()).State)
+		require.Equal(t, alert.AlertStateActive, ag.marker.Status(resolvedAlert.Fingerprint()).State)
+
+		ag.flush(func(alerts ...*alert.Alert) bool { return true })
+
+		require.Equal(t, alert.AlertStateActive, ag.marker.Status(activeAlert.Fingerprint()).State,
+			"active alert marker should still exist")
+		require.Equal(t, alert.AlertStateUnprocessed, ag.marker.Status(resolvedAlert.Fingerprint()).State,
+			"resolved alert marker should be deleted")
+	})
+
+	t.Run("failed flush does not delete markers", func(t *testing.T) {
+		labels := label.LabelSet{"alertname": "TestAlert"}
+		route := &Route{
+			RouteOpts: RouteOpts{
+				Receiver:       "test",
+				GroupBy:        map[label.LabelName]struct{}{"alertname": {}},
+				GroupWait:      0,
+				GroupInterval:  time.Minute,
+				RepeatInterval: time.Hour,
+			},
+		}
+		timeout := func(d time.Duration) time.Duration { return d }
+
+		ag := newAggrGroup(context.Background(), labels, route, timeout)
+
+		now := time.Now()
+		resolvedAlert := &alert.Alert{
+			Labels:   label.LabelSet{"alertname": "TestAlert", "instance": "1"},
+			StartsAt: now.Add(-time.Hour),
+			EndsAt:   now.Add(-time.Minute),
+		}
+
+		ag.insert(context.Background(), resolvedAlert)
+		ag.marker.SetSilenced(resolvedAlert.Fingerprint(), nil)
+
+		require.Equal(t, alert.AlertStateActive, ag.marker.Status(resolvedAlert.Fingerprint()).State)
+
+		ag.flush(func(alerts ...*alert.Alert) bool { return false })
+
+		require.Equal(t, alert.AlertStateActive, ag.marker.Status(resolvedAlert.Fingerprint()).State,
+			"marker should not be deleted when notify fails")
+	})
+
+	t.Run("markers not deleted when alert is modified during flush", func(t *testing.T) {
+		labels := label.LabelSet{"alertname": "TestAlert"}
+		route := &Route{
+			RouteOpts: RouteOpts{
+				Receiver:       "test",
+				GroupBy:        map[label.LabelName]struct{}{"alertname": {}},
+				GroupWait:      0,
+				GroupInterval:  time.Minute,
+				RepeatInterval: time.Hour,
+			},
+		}
+		timeout := func(d time.Duration) time.Duration { return d }
+
+		ag := newAggrGroup(context.Background(), labels, route, timeout)
+
+		now := time.Now()
+		resolvedAlert := &alert.Alert{
+			Labels:    label.LabelSet{"alertname": "TestAlert", "instance": "1"},
+			StartsAt:  now.Add(-time.Hour),
+			EndsAt:    now.Add(-time.Minute),
+			UpdatedAt: now,
+		}
+
+		ag.insert(context.Background(), resolvedAlert)
+		ag.marker.SetSilenced(resolvedAlert.Fingerprint(), nil)
+
+		require.Equal(t, alert.AlertStateActive, ag.marker.Status(resolvedAlert.Fingerprint()).State)
+
+		ag.flush(func(alerts ...*alert.Alert) bool {
+			modifiedAlert := &alert.Alert{
+				Labels:    label.LabelSet{"alertname": "TestAlert", "instance": "1"},
+				StartsAt:  now.Add(-time.Hour),
+				EndsAt:    now.Add(time.Hour),
+				UpdatedAt: now.Add(time.Second),
+			}
+			ag.alerts.Set(modifiedAlert)
+			return true
+		})
+
+		require.Equal(t, alert.AlertStateActive, ag.marker.Status(resolvedAlert.Fingerprint()).State,
+			"marker should not be deleted when alert is modified during flush")
+	})
+}
 
 func TestDispatchOnStartup(t *testing.T) {
 	alerts := newMockAlerts()
@@ -598,8 +880,6 @@ func TestDispatchOnStartup(t *testing.T) {
 	require.Equal(t, alert1.Fingerprint(), recorder.Alerts()[0].Fingerprint())
 }
 
-// --- TestGetGroupLabels ---
-
 func TestGetGroupLabels(t *testing.T) {
 	t.Parallel()
 	a := &alert.Alert{
@@ -635,8 +915,6 @@ func TestGetGroupLabels(t *testing.T) {
 		assert.Equal(t, a.Labels, labels)
 	})
 }
-
-// --- BenchmarkGetGroupLabels ---
 
 func BenchmarkGetGroupLabels(b *testing.B) {
 	now := time.Now()

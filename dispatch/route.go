@@ -13,12 +13,13 @@ import (
 	"strings"
 	"time"
 
+	"sort"
+
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"go.uber.org/zap"
-	"sort"
 )
 
 // DefaultRouteOpts are the defaulting routing options which apply
@@ -71,16 +72,14 @@ func newRoute(cr *profile.Route, parent *Route, counter *int) *Route {
 		opts.Receiver = cr.Receiver
 	}
 
-	if cr.GroupBy != nil {
+	if len(cr.GroupBy) > 0 {
 		opts.GroupBy = map[label.LabelName]struct{}{}
 		for _, ln := range cr.GroupBy {
 			opts.GroupBy[ln] = struct{}{}
 		}
 		opts.GroupByAll = false
-	} else {
-		if cr.GroupByAll {
-			opts.GroupByAll = cr.GroupByAll
-		}
+	} else if cr.GroupByAll {
+		opts.GroupByAll = cr.GroupByAll
 	}
 
 	if cr.GroupWait != nil {
@@ -142,26 +141,6 @@ func (r *Route) Apply(cfg *conf.Configuration) {
 	})
 }
 
-// ID returns a unique identifier for the route within the routing tree.
-func (r *Route) ID() string {
-	b := strings.Builder{}
-	if r.parent != nil {
-		b.WriteString(r.parent.ID())
-		b.WriteRune('/')
-	}
-	b.WriteString(r.Matchers.String())
-	if r.parent != nil {
-		for i := range r.parent.Routes {
-			if r == r.parent.Routes[i] {
-				b.WriteRune('/')
-				b.WriteString(strconv.Itoa(i))
-				break
-			}
-		}
-	}
-	return b.String()
-}
-
 // Match does a depth-first left-to-right search through the route tree
 // and returns the matching routing nodes.
 func (r *Route) Match(lset label.LabelSet) []*Route {
@@ -198,6 +177,26 @@ func (r *Route) Key() string {
 		b.WriteRune('/')
 	}
 	b.WriteString(r.Matchers.String())
+	return b.String()
+}
+
+// ID returns a unique identifier for the route within the routing tree.
+func (r *Route) ID() string {
+	b := strings.Builder{}
+	if r.parent != nil {
+		b.WriteString(r.parent.ID())
+		b.WriteRune('/')
+	}
+	b.WriteString(r.Matchers.String())
+	if r.parent != nil {
+		for i := range r.parent.Routes {
+			if r == r.parent.Routes[i] {
+				b.WriteRune('/')
+				b.WriteString(strconv.Itoa(i))
+				break
+			}
+		}
+	}
 	return b.String()
 }
 

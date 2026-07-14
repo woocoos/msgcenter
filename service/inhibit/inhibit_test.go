@@ -1,7 +1,9 @@
 package inhibit
 
 import (
+	"context"
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -9,6 +11,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
+	"github.com/woocoos/msgcenter/pkg/marker"
+	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/service/provider"
 	"github.com/woocoos/msgcenter/service/store"
 )
 
@@ -40,15 +45,6 @@ func firingAlert(labels label.LabelSet) *alert.Alert {
 		Labels:    labels,
 		StartsAt:  time.Now(),
 		EndsAt:    time.Now().Add(time.Hour),
-		UpdatedAt: time.Now(),
-	}
-}
-
-func resolvedAlert(labels label.LabelSet) *alert.Alert {
-	return &alert.Alert{
-		Labels:    labels,
-		StartsAt:  time.Now().Add(-2 * time.Hour),
-		EndsAt:    time.Now().Add(-time.Hour),
 		UpdatedAt: time.Now(),
 	}
 }
@@ -109,88 +105,80 @@ func TestInhibitRule_updateIndex_ResolvedOverride(t *testing.T) {
 	assert.Equal(t, src2.Fingerprint(), found.Fingerprint())
 }
 
-func TestInhibitRule_hasEqual(t *testing.T) {
-	tests := []struct {
-		name                 string
-		rule                 *InhibitRule
-		setupAlerts          []*alert.Alert
-		target               label.LabelSet
-		excludeTwoSidedMatch bool
-		expectFound          bool
+func TestInhibitRuleHasEqual(t *testing.T) {
+	t.Parallel()
+
+	now := time.Now()
+	cases := []struct {
+		name    string
+		initial []*alert.Alert
+		equal   []label.LabelName
+		input   label.LabelSet
+		result  bool
 	}{
 		{
-			name:        "no source alerts",
-			rule:        newTestRule("severity"),
-			target:      label.LabelSet{"alertname": "target", "severity": "critical"},
-			expectFound: false,
+			name:    "no source alerts",
+			initial: nil,
+			input:   label.LabelSet{"a": "b"},
+			result:  false,
 		},
 		{
-			name: "matching source alert",
-			rule: newTestRule("severity"),
-			setupAlerts: []*alert.Alert{
-				firingAlert(label.LabelSet{"alertname": "source", "severity": "critical"}),
+			name: "no equal labels, any source alert satisfies the requirement",
+			initial: []*alert.Alert{
+				{Labels: label.LabelSet{"a": "b"}, StartsAt: now.Add(-time.Minute), EndsAt: now.Add(time.Hour), UpdatedAt: now},
 			},
-			target:      label.LabelSet{"alertname": "target", "severity": "critical"},
-			expectFound: true,
+			input:  label.LabelSet{"a": "b"},
+			result: true,
 		},
 		{
-			name: "resolved source alert not found",
-			rule: newTestRule("severity"),
-			setupAlerts: []*alert.Alert{
-				resolvedAlert(label.LabelSet{"alertname": "source", "severity": "critical"}),
+			name: "matching but already resolved",
+			initial: []*alert.Alert{
+				{Labels: label.LabelSet{"a": "b", "b": "f"}, StartsAt: now.Add(-time.Minute), EndsAt: now.Add(-time.Second), UpdatedAt: now},
+				{Labels: label.LabelSet{"a": "b", "b": "c"}, StartsAt: now.Add(-time.Minute), EndsAt: now.Add(-time.Second), UpdatedAt: now},
 			},
-			target:      label.LabelSet{"alertname": "target", "severity": "critical"},
-			expectFound: false,
+			equal:  []label.LabelName{"a", "b"},
+			input:  label.LabelSet{"a": "b", "b": "c"},
+			result: false,
 		},
 		{
-			name: "non-matching equal labels",
-			rule: newTestRule("severity"),
-			setupAlerts: []*alert.Alert{
-				firingAlert(label.LabelSet{"alertname": "source", "severity": "warning"}),
+			name: "matching and unresolved",
+			initial: []*alert.Alert{
+				{Labels: label.LabelSet{"a": "b", "c": "d"}, StartsAt: now.Add(-time.Minute), EndsAt: now.Add(-time.Second), UpdatedAt: now},
+				{Labels: label.LabelSet{"a": "b", "c": "f"}, StartsAt: now.Add(-time.Minute), EndsAt: now.Add(time.Hour), UpdatedAt: now},
 			},
-			target:      label.LabelSet{"alertname": "target", "severity": "critical"},
-			expectFound: false,
+			equal:  []label.LabelName{"a"},
+			input:  label.LabelSet{"a": "b"},
+			result: true,
 		},
 		{
-			name: "exclude two-sided match",
-			rule: func() *InhibitRule {
-				// Both source and target matchers match severity=critical,
-				// so the source alert also matches target matchers.
-				r := &InhibitRule{
-					SourceMatchers: label.Matchers{
-						&label.Matcher{Type: label.MatchEqual, Name: "severity", Value: "critical"},
-					},
-					TargetMatchers: label.Matchers{
-						&label.Matcher{Type: label.MatchEqual, Name: "severity", Value: "critical"},
-					},
-					Equal:  map[label.LabelName]struct{}{"severity": {}},
-					scache: newTestStore(),
-					sindex: newIndex(),
-				}
-				r.scache.SetGCCallback(r.gcCallback)
-				return r
-			}(),
-			setupAlerts: []*alert.Alert{
-				firingAlert(label.LabelSet{"alertname": "source", "severity": "critical"}),
+			name: "equal label does not match",
+			initial: []*alert.Alert{
+				{Labels: label.LabelSet{"a": "c", "c": "d"}, StartsAt: now.Add(-time.Minute), EndsAt: now.Add(-time.Second), UpdatedAt: now},
+				{Labels: label.LabelSet{"a": "c", "c": "f"}, StartsAt: now.Add(-time.Minute), EndsAt: now.Add(-time.Second), UpdatedAt: now},
 			},
-			target:               label.LabelSet{"alertname": "source", "severity": "critical"},
-			excludeTwoSidedMatch: true,
-			expectFound:          false,
+			equal:  []label.LabelName{"a"},
+			input:  label.LabelSet{"a": "b"},
+			result: false,
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			for _, a := range tt.setupAlerts {
-				require.NoError(t, tt.rule.scache.Set(a))
-				tt.rule.updateIndex(a)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			r := &InhibitRule{
+				Equal:  map[label.LabelName]struct{}{},
+				scache: newTestStore(),
+				sindex: newIndex(),
+			}
+			for _, ln := range c.equal {
+				r.Equal[ln] = struct{}{}
+			}
+			for _, a := range c.initial {
+				require.NoError(t, r.scache.Set(a))
+				r.updateIndex(a)
 			}
 
-			fp, found := tt.rule.hasEqual(tt.target, tt.excludeTwoSidedMatch)
-			assert.Equal(t, tt.expectFound, found)
-			if found {
-				assert.NotZero(t, fp)
-			}
+			_, have := r.hasEqual(c.input, false)
+			require.Equal(t, c.result, have)
 		})
 	}
 }
@@ -228,6 +216,288 @@ func TestIndex_ConcurrentAccess(t *testing.T) {
 
 	<-done
 	assert.Equal(t, 1000, idx.Len())
+}
+
+// checkMutes calls ih.Mutes with a fresh AlertMarker in the context
+// and asserts the mute result matches wantMuted.
+func checkMutes(t *testing.T, ih *Inhibitor, target label.LabelSet, wantMuted bool, msgAndArgs ...any) {
+	t.Helper()
+	m := marker.NewAlertMarker()
+	ctx := marker.WithContext(context.Background(), m)
+	got := ih.Mutes(ctx, target)
+	require.Equal(t, wantMuted, got, msgAndArgs...)
+}
+
+// TestInhibitRuleMatches verifies inhibition through the full Mutes path,
+// adapted from upstream TestInhibitRuleMatches.
+func TestInhibitRuleMatches(t *testing.T) {
+	t.Parallel()
+
+	rule1 := profile.InhibitRule{
+		SourceMatchers: label.Matchers{&label.Matcher{Type: label.MatchEqual, Name: "s1", Value: "1"}},
+		TargetMatchers: label.Matchers{&label.Matcher{Type: label.MatchEqual, Name: "t1", Value: "1"}},
+		Equal:          []label.LabelName{"e"},
+	}
+	rule2 := profile.InhibitRule{
+		SourceMatchers: label.Matchers{&label.Matcher{Type: label.MatchEqual, Name: "s2", Value: "1"}},
+		TargetMatchers: label.Matchers{&label.Matcher{Type: label.MatchEqual, Name: "t2", Value: "1"}},
+		Equal:          []label.LabelName{"e"},
+	}
+
+	ih := NewInhibitor(nil, []profile.InhibitRule{rule1, rule2})
+	now := time.Now()
+	sourceAlert1 := &alert.Alert{
+		Labels:   label.LabelSet{"s1": "1", "t1": "2", "e": "1"},
+		StartsAt: now.Add(-time.Minute),
+		EndsAt:   now.Add(time.Hour),
+	}
+	sourceAlert2 := &alert.Alert{
+		Labels:   label.LabelSet{"s2": "1", "t2": "1", "e": "1"},
+		StartsAt: now.Add(-time.Minute),
+		EndsAt:   now.Add(time.Hour),
+	}
+
+	ih.rules[0].scache = store.NewAlerts()
+	ih.rules[0].scache.Set(sourceAlert1)
+	ih.rules[0].sindex = newIndex()
+	ih.rules[0].updateIndex(sourceAlert1)
+
+	ih.rules[1].scache = store.NewAlerts()
+	ih.rules[1].scache.Set(sourceAlert2)
+	ih.rules[1].sindex = newIndex()
+	ih.rules[1].updateIndex(sourceAlert2)
+
+	cases := []struct {
+		target   label.LabelSet
+		expected bool
+	}{
+		{target: label.LabelSet{"t1": "1", "e": "1"}, expected: true},
+		{target: label.LabelSet{"t2": "1", "e": "1"}, expected: true},
+		{target: label.LabelSet{"t1": "1", "t3": "1", "e": "1"}, expected: true},
+		{target: label.LabelSet{"t1": "1", "t2": "1", "e": "1"}, expected: true},
+		{target: label.LabelSet{"t1": "0", "e": "1"}, expected: false},
+		{target: label.LabelSet{"s1": "1", "t1": "1", "e": "1"}, expected: true},
+		{target: label.LabelSet{"s2": "1", "t2": "1", "e": "1"}, expected: false},
+		{target: label.LabelSet{"t1": "1", "e": "0"}, expected: false},
+	}
+
+	for _, c := range cases {
+		checkMutes(t, ih, c.target, c.expected, "target %v", c.target)
+	}
+}
+
+// TestInhibitRuleMatchers verifies inhibition with mixed matcher types,
+// adapted from upstream TestInhibitRuleMatchers.
+func TestInhibitRuleMatchers(t *testing.T) {
+	t.Parallel()
+
+	rule1 := profile.InhibitRule{
+		SourceMatchers: label.Matchers{&label.Matcher{Type: label.MatchEqual, Name: "s1", Value: "1"}},
+		TargetMatchers: label.Matchers{&label.Matcher{Type: label.MatchNotEqual, Name: "t1", Value: "1"}},
+		Equal:          []label.LabelName{"e"},
+	}
+	rule2 := profile.InhibitRule{
+		SourceMatchers: label.Matchers{&label.Matcher{Type: label.MatchEqual, Name: "s2", Value: "1"}},
+		TargetMatchers: label.Matchers{&label.Matcher{Type: label.MatchEqual, Name: "t2", Value: "1"}},
+		Equal:          []label.LabelName{"e"},
+	}
+
+	ih := NewInhibitor(nil, []profile.InhibitRule{rule1, rule2})
+	now := time.Now()
+	sourceAlert1 := &alert.Alert{
+		Labels:   label.LabelSet{"s1": "1", "t1": "2", "e": "1"},
+		StartsAt: now.Add(-time.Minute),
+		EndsAt:   now.Add(time.Hour),
+	}
+	sourceAlert2 := &alert.Alert{
+		Labels:   label.LabelSet{"s2": "1", "t2": "1", "e": "1"},
+		StartsAt: now.Add(-time.Minute),
+		EndsAt:   now.Add(time.Hour),
+	}
+
+	ih.rules[0].scache = store.NewAlerts()
+	ih.rules[0].scache.Set(sourceAlert1)
+	ih.rules[0].sindex = newIndex()
+	ih.rules[0].updateIndex(sourceAlert1)
+
+	ih.rules[1].scache = store.NewAlerts()
+	ih.rules[1].scache.Set(sourceAlert2)
+	ih.rules[1].sindex = newIndex()
+	ih.rules[1].updateIndex(sourceAlert2)
+
+	cases := []struct {
+		target   label.LabelSet
+		expected bool
+	}{
+		{target: label.LabelSet{"t1": "1", "e": "1"}, expected: false},
+		{target: label.LabelSet{"t2": "1", "e": "1"}, expected: true},
+		{target: label.LabelSet{"t1": "1", "t3": "1", "e": "1"}, expected: false},
+		{target: label.LabelSet{"t1": "1", "t2": "1", "e": "1"}, expected: true},
+		{target: label.LabelSet{"t1": "0", "e": "1"}, expected: true},
+		{target: label.LabelSet{"s1": "1", "t1": "1", "e": "1"}, expected: false},
+		{target: label.LabelSet{"s2": "1", "t2": "1", "e": "1"}, expected: true},
+		{target: label.LabelSet{"t1": "1", "e": "0"}, expected: false},
+	}
+
+	for _, c := range cases {
+		checkMutes(t, ih, c.target, c.expected, "target %v", c.target)
+	}
+}
+
+// TestInhibitRuleName verifies that named and unnamed rules are handled correctly,
+// adapted from upstream TestInhibitRuleName.
+func TestInhibitRuleName(t *testing.T) {
+	t.Parallel()
+
+	config1 := profile.InhibitRule{
+		Name: "test-rule",
+		SourceMatchers: label.Matchers{
+			&label.Matcher{Type: label.MatchEqual, Name: "severity", Value: "critical"},
+		},
+		TargetMatchers: label.Matchers{
+			&label.Matcher{Type: label.MatchEqual, Name: "severity", Value: "warning"},
+		},
+		Equal: []label.LabelName{"instance"},
+	}
+	config2 := profile.InhibitRule{
+		SourceMatchers: label.Matchers{
+			&label.Matcher{Type: label.MatchEqual, Name: "severity", Value: "critical"},
+		},
+		TargetMatchers: label.Matchers{
+			&label.Matcher{Type: label.MatchEqual, Name: "severity", Value: "warning"},
+		},
+		Equal: []label.LabelName{"instance"},
+	}
+
+	rule1 := NewInhibitRule(config1)
+	rule2 := NewInhibitRule(config2)
+
+	require.Equal(t, "test-rule", rule1.Name, "Expected named rule to adopt name from config")
+	require.Empty(t, rule2.Name, "Expected unnamed rule to have empty name")
+}
+
+// fakeAlerts implements provider.Alerts for integration testing.
+type fakeAlerts struct {
+	alerts   []*alert.Alert
+	finished chan struct{}
+}
+
+func newFakeAlerts(alerts []*alert.Alert) *fakeAlerts {
+	return &fakeAlerts{
+		alerts:   alerts,
+		finished: make(chan struct{}),
+	}
+}
+
+func (f *fakeAlerts) Start(context.Context) error                          { return nil }
+func (f *fakeAlerts) Stop(context.Context) error                           { return nil }
+func (f *fakeAlerts) GetPending() provider.AlertIterator                   { return nil }
+func (f *fakeAlerts) Get(label.Fingerprint) (*alert.Alert, error)          { return nil, nil }
+func (f *fakeAlerts) Put(context.Context, ...*alert.Alert) error           { return nil }
+func (f *fakeAlerts) Subscribe(name string) provider.AlertIterator         { return nil }
+func (f *fakeAlerts) SlurpAndSubscribe(name string) ([]*alert.Alert, provider.AlertIterator) {
+	ch := make(chan *provider.Alert)
+	done := make(chan struct{})
+	go func() {
+		for _, a := range f.alerts {
+			ch <- &provider.Alert{Data: a, Header: map[string]string{}}
+		}
+		ch <- &provider.Alert{
+			Data:   &alert.Alert{Labels: label.LabelSet{}, StartsAt: time.Now()},
+			Header: map[string]string{},
+		}
+		close(f.finished)
+		<-done
+	}()
+	return nil, provider.NewAlertIterator(ch, done, nil)
+}
+
+// TestInhibit is a full integration test that exercises the Inhibitor lifecycle,
+// adapted from upstream TestInhibit.
+func TestInhibit(t *testing.T) {
+	t.Parallel()
+
+	now := time.Now()
+	inhibitRule := func() profile.InhibitRule {
+		return profile.InhibitRule{
+			SourceMatchers: label.Matchers{&label.Matcher{Type: label.MatchEqual, Name: "s", Value: "1"}},
+			TargetMatchers: label.Matchers{&label.Matcher{Type: label.MatchEqual, Name: "t", Value: "1"}},
+			Equal:          []label.LabelName{"e"},
+		}
+	}
+	alertOne := func() *alert.Alert {
+		return &alert.Alert{
+			Labels:   label.LabelSet{"t": "1", "e": "f"},
+			StartsAt: now.Add(-time.Minute),
+			EndsAt:   now.Add(time.Hour),
+		}
+	}
+	alertTwo := func(resolved bool) *alert.Alert {
+		var end time.Time
+		if resolved {
+			end = now.Add(-time.Second)
+		} else {
+			end = now.Add(time.Hour)
+		}
+		return &alert.Alert{
+			Labels:   label.LabelSet{"s": "1", "e": "f"},
+			StartsAt: now.Add(-time.Minute),
+			EndsAt:   end,
+		}
+	}
+
+	type exp struct {
+		lbls  label.LabelSet
+		muted bool
+	}
+	for i, tc := range []struct {
+		alerts   []*alert.Alert
+		expected []exp
+	}{
+		{
+			alerts: []*alert.Alert{alertOne()},
+			expected: []exp{
+				{lbls: label.LabelSet{"t": "1", "e": "f"}, muted: false},
+			},
+		},
+		{
+			alerts: []*alert.Alert{alertOne(), alertTwo(false)},
+			expected: []exp{
+				{lbls: label.LabelSet{"t": "1", "e": "f"}, muted: true},
+				{lbls: label.LabelSet{"s": "1", "e": "f"}, muted: false},
+			},
+		},
+		{
+			alerts: []*alert.Alert{alertOne(), alertTwo(false), alertTwo(true)},
+			expected: []exp{
+				{lbls: label.LabelSet{"t": "1", "e": "f"}, muted: false},
+				{lbls: label.LabelSet{"s": "1", "e": "f"}, muted: false},
+			},
+		},
+	} {
+		ap := newFakeAlerts(tc.alerts)
+		inhibitor := NewInhibitor(ap, []profile.InhibitRule{inhibitRule()})
+
+		var wg sync.WaitGroup
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for ap.finished != nil {
+				select {
+				case <-ap.finished:
+					ap.finished = nil
+				default:
+				}
+			}
+			inhibitor.Stop()
+		}()
+		inhibitor.Run()
+		wg.Wait()
+
+		for _, expected := range tc.expected {
+			checkMutes(t, inhibitor, expected.lbls, expected.muted, "tc: %d, labels %q", i, expected.lbls)
+		}
+	}
 }
 
 // BenchmarkMutes compares hasEqual performance with many source alerts cached.

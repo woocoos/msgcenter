@@ -201,7 +201,10 @@ type InhibitRule struct {
 	// Cache of alerts matching source labels.
 	scache *store.Alerts
 
-	// sindex maps Equal-label fingerprint → source alert fingerprint for O(1) lookups.
+	// Index of fingerprints of source alert equal labels to fingerprint of source alert.
+	// The index helps speed up source alert lookups from scache significantely in scenarios with 100s of source alerts cached.
+	// The index items might overwrite eachother if multiple source alerts have exact equal labels.
+	// Overwrites only happen if the new source alert has bigger EndsAt value.
 	sindex *index
 }
 
@@ -223,6 +226,7 @@ func NewInhibitRule(cr profile.InhibitRule) *InhibitRule {
 	}
 
 	rule := &InhibitRule{
+		Name:           cr.Name,
 		SourceMatchers: sourcem,
 		TargetMatchers: targetm,
 		Equal:          equal,
