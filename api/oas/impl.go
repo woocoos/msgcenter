@@ -472,7 +472,7 @@ func OpenAPIAlertsToAlerts(apiAlerts PostableAlerts) []*alert.Alert {
 	return alerts
 }
 
-// ModelLabelSetToAPILabelSet converts prometheus_model.LabelSet to open_api_models.LabelSet.
+// ModelLabelSetToAPILabelSet converts label.LabelSet to open_api_models.LabelSet.
 func ModelLabelSetToAPILabelSet(modelLabelSet label.LabelSet) LabelSet {
 	apiLabelSet := LabelSet{}
 	for key, value := range modelLabelSet {
@@ -482,7 +482,7 @@ func ModelLabelSetToAPILabelSet(modelLabelSet label.LabelSet) LabelSet {
 	return apiLabelSet
 }
 
-// APILabelSetToModelLabelSet converts open_api_models.LabelSet to prometheus_model.LabelSet.
+// APILabelSetToModelLabelSet converts open_api_models.LabelSet to label.LabelSet.
 func APILabelSetToModelLabelSet(apiLabelSet LabelSet) label.LabelSet {
 	modelLabelSet := label.LabelSet{}
 	for key, value := range apiLabelSet {

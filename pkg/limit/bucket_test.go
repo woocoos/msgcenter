@@ -5,15 +5,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
+	"github.com/woocoos/msgcenter/pkg/alert"
+	"github.com/woocoos/msgcenter/pkg/label"
 )
 
 func TestBucketUpsert(t *testing.T) {
 	testCases := []struct {
 		name           string
 		bucketCapacity int
-		alerts         []model.Alert
+		alerts         []alert.Alert
 		alertTimings   []time.Time // When each alert is added relative to now
 		expectedResult []bool      // Expected return value for each Add() call
 		description    string
@@ -21,10 +22,10 @@ func TestBucketUpsert(t *testing.T) {
 		{
 			name:           "Bucket with zero capacity should reject all alerts",
 			bucketCapacity: 0,
-			alerts: []model.Alert{
-				{Labels: model.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(1 * time.Hour)},
-				{Labels: model.LabelSet{"alertname": "Alert2", "instance": "server2"}, EndsAt: time.Now().Add(1 * time.Hour)},
-				{Labels: model.LabelSet{"alertname": "Alert3", "instance": "server3"}, EndsAt: time.Now().Add(1 * time.Hour)},
+			alerts: []alert.Alert{
+				{Labels: label.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(1 * time.Hour)},
+				{Labels: label.LabelSet{"alertname": "Alert2", "instance": "server2"}, EndsAt: time.Now().Add(1 * time.Hour)},
+				{Labels: label.LabelSet{"alertname": "Alert3", "instance": "server3"}, EndsAt: time.Now().Add(1 * time.Hour)},
 			},
 			alertTimings:   []time.Time{time.Now(), time.Now(), time.Now()},
 			expectedResult: []bool{false, false, false}, // All should be rejected
@@ -33,10 +34,10 @@ func TestBucketUpsert(t *testing.T) {
 		{
 			name:           "Empty bucket should add items while not full",
 			bucketCapacity: 3,
-			alerts: []model.Alert{
-				{Labels: model.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(1 * time.Hour)},
-				{Labels: model.LabelSet{"alertname": "Alert2", "instance": "server2"}, EndsAt: time.Now().Add(1 * time.Hour)},
-				{Labels: model.LabelSet{"alertname": "Alert3", "instance": "server3"}, EndsAt: time.Now().Add(1 * time.Hour)},
+			alerts: []alert.Alert{
+				{Labels: label.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(1 * time.Hour)},
+				{Labels: label.LabelSet{"alertname": "Alert2", "instance": "server2"}, EndsAt: time.Now().Add(1 * time.Hour)},
+				{Labels: label.LabelSet{"alertname": "Alert3", "instance": "server3"}, EndsAt: time.Now().Add(1 * time.Hour)},
 			},
 			alertTimings:   []time.Time{time.Now(), time.Now(), time.Now()},
 			expectedResult: []bool{true, true, true}, // All should be added successfully
@@ -45,10 +46,10 @@ func TestBucketUpsert(t *testing.T) {
 		{
 			name:           "Full bucket must not add items if old items are not expired yet",
 			bucketCapacity: 2,
-			alerts: []model.Alert{
-				{Labels: model.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(1 * time.Hour)},
-				{Labels: model.LabelSet{"alertname": "Alert2", "instance": "server2"}, EndsAt: time.Now().Add(1 * time.Hour)},
-				{Labels: model.LabelSet{"alertname": "Alert3", "instance": "server3"}, EndsAt: time.Now().Add(1 * time.Hour)},
+			alerts: []alert.Alert{
+				{Labels: label.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(1 * time.Hour)},
+				{Labels: label.LabelSet{"alertname": "Alert2", "instance": "server2"}, EndsAt: time.Now().Add(1 * time.Hour)},
+				{Labels: label.LabelSet{"alertname": "Alert3", "instance": "server3"}, EndsAt: time.Now().Add(1 * time.Hour)},
 			},
 			alertTimings:   []time.Time{time.Now(), time.Now(), time.Now()},
 			expectedResult: []bool{true, true, false}, // First two succeed, third fails
@@ -57,10 +58,10 @@ func TestBucketUpsert(t *testing.T) {
 		{
 			name:           "Full bucket must add items if old items are expired",
 			bucketCapacity: 2,
-			alerts: []model.Alert{
-				{Labels: model.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(-1 * time.Hour)},    // Expired 1 hour ago
-				{Labels: model.LabelSet{"alertname": "Alert2", "instance": "server2"}, EndsAt: time.Now().Add(-30 * time.Minute)}, // Expired 30 minutes ago
-				{Labels: model.LabelSet{"alertname": "Alert3", "instance": "server3"}, EndsAt: time.Now().Add(1 * time.Hour)},     // Will expire in 1 hour
+			alerts: []alert.Alert{
+				{Labels: label.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(-1 * time.Hour)},    // Expired 1 hour ago
+				{Labels: label.LabelSet{"alertname": "Alert2", "instance": "server2"}, EndsAt: time.Now().Add(-30 * time.Minute)}, // Expired 30 minutes ago
+				{Labels: label.LabelSet{"alertname": "Alert3", "instance": "server3"}, EndsAt: time.Now().Add(1 * time.Hour)},     // Will expire in 1 hour
 			},
 			alertTimings:   []time.Time{time.Now(), time.Now(), time.Now()},
 			expectedResult: []bool{true, true, true}, // All should succeed because older items get evicted
@@ -69,10 +70,10 @@ func TestBucketUpsert(t *testing.T) {
 		{
 			name:           "Update existing alert in bucket should not increase size",
 			bucketCapacity: 2,
-			alerts: []model.Alert{
-				{Labels: model.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(1 * time.Hour)},
-				{Labels: model.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(2 * time.Hour)}, // Same fingerprint, different EndsAt
-				{Labels: model.LabelSet{"alertname": "Alert2", "instance": "server2"}, EndsAt: time.Now().Add(1 * time.Hour)},
+			alerts: []alert.Alert{
+				{Labels: label.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(1 * time.Hour)},
+				{Labels: label.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(2 * time.Hour)}, // Same fingerprint, different EndsAt
+				{Labels: label.LabelSet{"alertname": "Alert2", "instance": "server2"}, EndsAt: time.Now().Add(1 * time.Hour)},
 			},
 			alertTimings:   []time.Time{time.Now(), time.Now(), time.Now()},
 			expectedResult: []bool{true, true, true}, // All should succeed - second is an update, not a new entry
@@ -81,11 +82,11 @@ func TestBucketUpsert(t *testing.T) {
 		{
 			name:           "Mixed scenario with expiration and updates",
 			bucketCapacity: 2,
-			alerts: []model.Alert{
-				{Labels: model.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(-1 * time.Hour)}, // Expired
-				{Labels: model.LabelSet{"alertname": "Alert2", "instance": "server2"}, EndsAt: time.Now().Add(1 * time.Hour)},  // Active
-				{Labels: model.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(2 * time.Hour)},  // Update of first alert
-				{Labels: model.LabelSet{"alertname": "Alert3", "instance": "server3"}, EndsAt: time.Now().Add(1 * time.Hour)},  // New alert, bucket full but Alert2 not expired
+			alerts: []alert.Alert{
+				{Labels: label.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(-1 * time.Hour)}, // Expired
+				{Labels: label.LabelSet{"alertname": "Alert2", "instance": "server2"}, EndsAt: time.Now().Add(1 * time.Hour)},  // Active
+				{Labels: label.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(2 * time.Hour)},  // Update of first alert
+				{Labels: label.LabelSet{"alertname": "Alert3", "instance": "server3"}, EndsAt: time.Now().Add(1 * time.Hour)},  // New alert, bucket full but Alert2 not expired
 			},
 			alertTimings:   []time.Time{time.Now(), time.Now(), time.Now(), time.Now()},
 			expectedResult: []bool{true, true, true, false}, // Last one should fail because bucket is full with non-expired items
@@ -95,7 +96,7 @@ func TestBucketUpsert(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			bucket := NewBucket[model.Fingerprint](tc.bucketCapacity)
+			bucket := NewBucket[label.Fingerprint](tc.bucketCapacity)
 
 			for i, alert := range tc.alerts {
 				result := bucket.Upsert(alert.Fingerprint(), alert.EndsAt)
@@ -107,11 +108,11 @@ func TestBucketUpsert(t *testing.T) {
 }
 
 func TestBucketAddConcurrency(t *testing.T) {
-	bucket := NewBucket[model.Fingerprint](2)
+	bucket := NewBucket[label.Fingerprint](2)
 
 	// Test that concurrent access to bucket is safe
-	alert1 := model.Alert{Labels: model.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(1 * time.Hour)}
-	alert2 := model.Alert{Labels: model.LabelSet{"alertname": "Alert2", "instance": "server2"}, EndsAt: time.Now().Add(1 * time.Hour)}
+	alert1 := alert.Alert{Labels: label.LabelSet{"alertname": "Alert1", "instance": "server1"}, EndsAt: time.Now().Add(1 * time.Hour)}
+	alert2 := alert.Alert{Labels: label.LabelSet{"alertname": "Alert2", "instance": "server2"}, EndsAt: time.Now().Add(1 * time.Hour)}
 
 	done := make(chan bool, 2)
 
@@ -136,16 +137,16 @@ func TestBucketAddConcurrency(t *testing.T) {
 }
 
 func TestBucketAddExpiredEviction(t *testing.T) {
-	bucket := NewBucket[model.Fingerprint](2)
+	bucket := NewBucket[label.Fingerprint](2)
 
 	// Add two alerts that are already expired
-	expiredAlert1 := model.Alert{
-		Labels: model.LabelSet{"alertname": "ExpiredAlert1", "instance": "server1"},
+	expiredAlert1 := alert.Alert{
+		Labels: label.LabelSet{"alertname": "ExpiredAlert1", "instance": "server1"},
 		EndsAt: time.Now().Add(-1 * time.Hour),
 	}
 	expiredFingerprint1 := expiredAlert1.Fingerprint()
-	expiredAlert2 := model.Alert{
-		Labels: model.LabelSet{"alertname": "ExpiredAlert2", "instance": "server2"},
+	expiredAlert2 := alert.Alert{
+		Labels: label.LabelSet{"alertname": "ExpiredAlert2", "instance": "server2"},
 		EndsAt: time.Now().Add(-30 * time.Minute),
 	}
 	expiredFingerprint2 := expiredAlert2.Fingerprint()
@@ -158,8 +159,8 @@ func TestBucketAddExpiredEviction(t *testing.T) {
 	require.True(t, result2, "Second expired alert should be added successfully")
 
 	// Now add a fresh alert - it should evict the first expired alert
-	freshAlert := model.Alert{
-		Labels: model.LabelSet{"alertname": "FreshAlert", "instance": "server3"},
+	freshAlert := alert.Alert{
+		Labels: label.LabelSet{"alertname": "FreshAlert", "instance": "server3"},
 		EndsAt: time.Now().Add(1 * time.Hour),
 	}
 	freshFingerprint := freshAlert.Fingerprint()
@@ -182,15 +183,15 @@ func TestBucketAddExpiredEviction(t *testing.T) {
 
 func TestBucketAddEdgeCases(t *testing.T) {
 	t.Run("Single capacity bucket with replacement", func(t *testing.T) {
-		bucket := NewBucket[model.Fingerprint](1)
+		bucket := NewBucket[label.Fingerprint](1)
 
 		// Add expired alert
-		expiredAlert := model.Alert{Labels: model.LabelSet{"alertname": "Expired"}, EndsAt: time.Now().Add(-1 * time.Hour)}
+		expiredAlert := alert.Alert{Labels: label.LabelSet{"alertname": "Expired"}, EndsAt: time.Now().Add(-1 * time.Hour)}
 		result1 := bucket.Upsert(expiredAlert.Fingerprint(), expiredAlert.EndsAt)
 		require.True(t, result1, "Adding expired alert to single-capacity bucket should succeed")
 
 		// Add fresh alert (should replace expired one)
-		freshAlert := model.Alert{Labels: model.LabelSet{"alertname": "Fresh"}, EndsAt: time.Now().Add(1 * time.Hour)}
+		freshAlert := alert.Alert{Labels: label.LabelSet{"alertname": "Fresh"}, EndsAt: time.Now().Add(1 * time.Hour)}
 		result2 := bucket.Upsert(freshAlert.Fingerprint(), freshAlert.EndsAt)
 		require.True(t, result2, "Adding fresh alert should succeed by replacing expired one")
 
@@ -202,17 +203,17 @@ func TestBucketAddEdgeCases(t *testing.T) {
 	})
 
 	t.Run("Alert with same fingerprint but different EndsAt", func(t *testing.T) {
-		bucket := NewBucket[model.Fingerprint](2)
+		bucket := NewBucket[label.Fingerprint](2)
 
 		// Add initial alert
 		originalTime := time.Now().Add(1 * time.Hour)
-		alert1 := model.Alert{Labels: model.LabelSet{"alertname": "Test"}, EndsAt: originalTime}
+		alert1 := alert.Alert{Labels: label.LabelSet{"alertname": "Test"}, EndsAt: originalTime}
 		result1 := bucket.Upsert(alert1.Fingerprint(), alert1.EndsAt)
 		require.True(t, result1, "Initial alert should be added successfully")
 
 		// Add same alert with different EndsAt (should update, not add new)
 		updatedTime := time.Now().Add(2 * time.Hour)
-		alert2 := model.Alert{Labels: model.LabelSet{"alertname": "Test"}, EndsAt: updatedTime}
+		alert2 := alert.Alert{Labels: label.LabelSet{"alertname": "Test"}, EndsAt: updatedTime}
 		result2 := bucket.Upsert(alert2.Fingerprint(), alert2.EndsAt)
 		require.True(t, result2, "Updated alert should not fill bucket")
 
@@ -228,9 +229,9 @@ func TestBucketAddEdgeCases(t *testing.T) {
 // Benchmark tests for Bucket.Upsert() performance.
 func BenchmarkBucketUpsert(b *testing.B) {
 	b.Run("EmptyBucket", func(b *testing.B) {
-		bucket := NewBucket[model.Fingerprint](1000)
-		alert := model.Alert{
-			Labels: model.LabelSet{"alertname": "TestAlert", "instance": "server1"},
+		bucket := NewBucket[label.Fingerprint](1000)
+		alert := alert.Alert{
+			Labels: label.LabelSet{"alertname": "TestAlert", "instance": "server1"},
 			EndsAt: time.Now().Add(1 * time.Hour),
 		}
 
@@ -242,19 +243,19 @@ func BenchmarkBucketUpsert(b *testing.B) {
 
 	b.Run("AddToFullBucketWithExpiredItems", func(b *testing.B) {
 		bucketSize := 100
-		bucket := NewBucket[model.Fingerprint](bucketSize)
+		bucket := NewBucket[label.Fingerprint](bucketSize)
 
 		// Fill bucket with expired alerts
 		for i := range bucketSize {
-			expiredAlert := model.Alert{
-				Labels: model.LabelSet{"alertname": model.LabelValue("ExpiredAlert" + string(rune(i))), "instance": "server1"},
+			expiredAlert := alert.Alert{
+				Labels: label.LabelSet{"alertname": "ExpiredAlert" + string(rune(i)), "instance": "server1"},
 				EndsAt: time.Now().Add(-1 * time.Hour), // Expired 1 hour ago
 			}
 			bucket.Upsert(expiredAlert.Fingerprint(), expiredAlert.EndsAt)
 		}
 
-		newAlert := model.Alert{
-			Labels: model.LabelSet{"alertname": "NewAlert", "instance": "server2"},
+		newAlert := alert.Alert{
+			Labels: label.LabelSet{"alertname": "NewAlert", "instance": "server2"},
 			EndsAt: time.Now().Add(1 * time.Hour),
 		}
 
@@ -266,19 +267,19 @@ func BenchmarkBucketUpsert(b *testing.B) {
 
 	b.Run("AddToFullBucketWithActiveItems", func(b *testing.B) {
 		bucketSize := 100
-		bucket := NewBucket[model.Fingerprint](bucketSize)
+		bucket := NewBucket[label.Fingerprint](bucketSize)
 
 		// Fill bucket with active alerts
 		for i := range bucketSize {
-			activeAlert := model.Alert{
-				Labels: model.LabelSet{"alertname": model.LabelValue("ActiveAlert" + string(rune(i))), "instance": "server1"},
+			activeAlert := alert.Alert{
+				Labels: label.LabelSet{"alertname": "ActiveAlert" + string(rune(i)), "instance": "server1"},
 				EndsAt: time.Now().Add(1 * time.Hour), // Active for 1 hour
 			}
 			bucket.Upsert(activeAlert.Fingerprint(), activeAlert.EndsAt)
 		}
 
-		newAlert := model.Alert{
-			Labels: model.LabelSet{"alertname": "NewAlert", "instance": "server2"},
+		newAlert := alert.Alert{
+			Labels: label.LabelSet{"alertname": "NewAlert", "instance": "server2"},
 			EndsAt: time.Now().Add(1 * time.Hour),
 		}
 
@@ -289,18 +290,18 @@ func BenchmarkBucketUpsert(b *testing.B) {
 	})
 
 	b.Run("UpdateExistingItem", func(b *testing.B) {
-		bucket := NewBucket[model.Fingerprint](100)
+		bucket := NewBucket[label.Fingerprint](100)
 
 		// Add initial alert
-		alert := model.Alert{
-			Labels: model.LabelSet{"alertname": "TestAlert", "instance": "server1"},
+		a := alert.Alert{
+			Labels: label.LabelSet{"alertname": "TestAlert", "instance": "server1"},
 			EndsAt: time.Now().Add(1 * time.Hour),
 		}
-		bucket.Upsert(alert.Fingerprint(), alert.EndsAt)
+		bucket.Upsert(a.Fingerprint(), a.EndsAt)
 
 		// Create update with same fingerprint but different EndsAt
-		updatedAlert := model.Alert{
-			Labels: model.LabelSet{"alertname": "TestAlert", "instance": "server1"},
+		updatedAlert := alert.Alert{
+			Labels: label.LabelSet{"alertname": "TestAlert", "instance": "server1"},
 			EndsAt: time.Now().Add(2 * time.Hour),
 		}
 
@@ -312,29 +313,29 @@ func BenchmarkBucketUpsert(b *testing.B) {
 
 	b.Run("MixedWorkload", func(b *testing.B) {
 		bucketSize := 50
-		bucket := NewBucket[model.Fingerprint](bucketSize)
+		bucket := NewBucket[label.Fingerprint](bucketSize)
 
 		// Pre-populate with mix of expired and active alerts
 		for i := 0; i < bucketSize/2; i++ {
-			expiredAlert := model.Alert{
-				Labels: model.LabelSet{"alertname": model.LabelValue("ExpiredAlert" + string(rune(i))), "instance": "server1"},
+			expiredAlert := alert.Alert{
+				Labels: label.LabelSet{"alertname": "ExpiredAlert" + string(rune(i)), "instance": "server1"},
 				EndsAt: time.Now().Add(-1 * time.Hour),
 			}
 			bucket.Upsert(expiredAlert.Fingerprint(), expiredAlert.EndsAt)
 		}
 		for i := 0; i < bucketSize/2; i++ {
-			activeAlert := model.Alert{
-				Labels: model.LabelSet{"alertname": model.LabelValue("ActiveAlert" + string(rune(i))), "instance": "server1"},
+			activeAlert := alert.Alert{
+				Labels: label.LabelSet{"alertname": "ActiveAlert" + string(rune(i)), "instance": "server1"},
 				EndsAt: time.Now().Add(1 * time.Hour),
 			}
 			bucket.Upsert(activeAlert.Fingerprint(), activeAlert.EndsAt)
 		}
 
 		// Create different types of alerts for the benchmark
-		alerts := []*model.Alert{
-			{Labels: model.LabelSet{"alertname": "NewAlert1", "instance": "server2"}, EndsAt: time.Now().Add(1 * time.Hour)},
-			{Labels: model.LabelSet{"alertname": "ExpiredAlert0", "instance": "server1"}, EndsAt: time.Now().Add(2 * time.Hour)}, // Update existing
-			{Labels: model.LabelSet{"alertname": "NewAlert2", "instance": "server3"}, EndsAt: time.Now().Add(1 * time.Hour)},
+		alerts := []*alert.Alert{
+			{Labels: label.LabelSet{"alertname": "NewAlert1", "instance": "server2"}, EndsAt: time.Now().Add(1 * time.Hour)},
+			{Labels: label.LabelSet{"alertname": "ExpiredAlert0", "instance": "server1"}, EndsAt: time.Now().Add(2 * time.Hour)}, // Update existing
+			{Labels: label.LabelSet{"alertname": "NewAlert2", "instance": "server3"}, EndsAt: time.Now().Add(1 * time.Hour)},
 		}
 
 		b.ResetTimer()
@@ -351,19 +352,19 @@ func BenchmarkBucketUpsertScaling(b *testing.B) {
 
 	for _, size := range sizes {
 		b.Run(fmt.Sprintf("BucketSize_%d", size), func(b *testing.B) {
-			bucket := NewBucket[model.Fingerprint](size)
+			bucket := NewBucket[label.Fingerprint](size)
 
 			// Fill bucket to capacity with expired items
 			for i := range size {
-				alert := model.Alert{
-					Labels: model.LabelSet{"alertname": model.LabelValue(fmt.Sprintf("Alert%d", i)), "instance": "server1"},
+				alert := alert.Alert{
+					Labels: label.LabelSet{"alertname": fmt.Sprintf("Alert%d", i), "instance": "server1"},
 					EndsAt: time.Now().Add(-1 * time.Hour),
 				}
 				bucket.Upsert(alert.Fingerprint(), alert.EndsAt)
 			}
 
-			newAlert := model.Alert{
-				Labels: model.LabelSet{"alertname": "NewAlert", "instance": "server2"},
+			newAlert := alert.Alert{
+				Labels: label.LabelSet{"alertname": "NewAlert", "instance": "server2"},
 				EndsAt: time.Now().Add(1 * time.Hour),
 			}
 
@@ -377,7 +378,7 @@ func BenchmarkBucketUpsertScaling(b *testing.B) {
 
 func TestBucketIsStale(t *testing.T) {
 	t.Run("IsStale on empty bucket should return true", func(t *testing.T) {
-		bucket := NewBucket[model.Fingerprint](5)
+		bucket := NewBucket[label.Fingerprint](5)
 
 		// Should not panic when bucket is empty and return true
 		require.NotPanics(t, func() {
@@ -387,13 +388,13 @@ func TestBucketIsStale(t *testing.T) {
 	})
 
 	t.Run("IsStale returns true when latest item is expired", func(t *testing.T) {
-		bucket := NewBucket[model.Fingerprint](3)
+		bucket := NewBucket[label.Fingerprint](3)
 
 		// Add three alerts that are all expired
 		expiredTime := time.Now().Add(-1 * time.Hour)
-		alert1 := model.Alert{Labels: model.LabelSet{"alertname": "Alert1"}, EndsAt: expiredTime}
-		alert2 := model.Alert{Labels: model.LabelSet{"alertname": "Alert2"}, EndsAt: expiredTime.Add(-10 * time.Minute)}
-		alert3 := model.Alert{Labels: model.LabelSet{"alertname": "Alert3"}, EndsAt: expiredTime.Add(-20 * time.Minute)}
+		alert1 := alert.Alert{Labels: label.LabelSet{"alertname": "Alert1"}, EndsAt: expiredTime}
+		alert2 := alert.Alert{Labels: label.LabelSet{"alertname": "Alert2"}, EndsAt: expiredTime.Add(-10 * time.Minute)}
+		alert3 := alert.Alert{Labels: label.LabelSet{"alertname": "Alert3"}, EndsAt: expiredTime.Add(-20 * time.Minute)}
 
 		bucket.Upsert(alert1.Fingerprint(), alert1.EndsAt)
 		bucket.Upsert(alert2.Fingerprint(), alert2.EndsAt)
@@ -412,15 +413,15 @@ func TestBucketIsStale(t *testing.T) {
 	})
 
 	t.Run("IsStale returns false when latest item is not expired", func(t *testing.T) {
-		bucket := NewBucket[model.Fingerprint](3)
+		bucket := NewBucket[label.Fingerprint](3)
 
 		// Add mix of expired and non-expired alerts
 		expiredTime := time.Now().Add(-1 * time.Hour)
 		futureTime := time.Now().Add(1 * time.Hour)
 
-		alert1 := model.Alert{Labels: model.LabelSet{"alertname": "Expired1"}, EndsAt: expiredTime}
-		alert2 := model.Alert{Labels: model.LabelSet{"alertname": "Expired2"}, EndsAt: expiredTime.Add(-10 * time.Minute)}
-		alert3 := model.Alert{Labels: model.LabelSet{"alertname": "Active"}, EndsAt: futureTime}
+		alert1 := alert.Alert{Labels: label.LabelSet{"alertname": "Expired1"}, EndsAt: expiredTime}
+		alert2 := alert.Alert{Labels: label.LabelSet{"alertname": "Expired2"}, EndsAt: expiredTime.Add(-10 * time.Minute)}
+		alert3 := alert.Alert{Labels: label.LabelSet{"alertname": "Active"}, EndsAt: futureTime}
 
 		bucket.Upsert(alert1.Fingerprint(), alert1.EndsAt)
 		bucket.Upsert(alert2.Fingerprint(), alert2.EndsAt)
@@ -439,13 +440,13 @@ func TestBucketIsStale(t *testing.T) {
 
 // Benchmark concurrent access to Bucket.Upsert().
 func BenchmarkBucketUpsertConcurrent(b *testing.B) {
-	bucket := NewBucket[model.Fingerprint](100)
+	bucket := NewBucket[label.Fingerprint](100)
 
 	b.RunParallel(func(pb *testing.PB) {
 		alertCounter := 0
 		for pb.Next() {
-			alert := model.Alert{
-				Labels: model.LabelSet{"alertname": model.LabelValue("Alert" + string(rune(alertCounter))), "instance": "server1"},
+			alert := alert.Alert{
+				Labels: label.LabelSet{"alertname": "Alert" + string(rune(alertCounter)), "instance": "server1"},
 				EndsAt: time.Now().Add(1 * time.Hour),
 			}
 			bucket.Upsert(alert.Fingerprint(), alert.EndsAt)
