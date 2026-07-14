@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -171,6 +172,65 @@ func (s *serviceSuite) TestPostAlerts() {
 	s.Require().NoError(err)
 	s.Require().NotNil(mail)
 	s.Require().Equal("alerts@example.com", mail.To[0]["Address"])
+}
+
+// TestPostAlertsWithDynamicAttachments tests email notification with dynamic attachments
+// from alert annotations, including both HTTP URL and local file path.
+func (s *serviceSuite) TestPostAlertsWithDynamicAttachments() {
+	// Record message count before sending to locate our email precisely.
+	countBefore, err := s.maildev.MessageCount()
+	s.Require().NoError(err)
+
+	// Create a test file to serve as HTTP attachment
+	tmpFile, err := os.CreateTemp("", "dynamic-attachment-*.txt")
+	s.Require().NoError(err)
+	defer os.Remove(tmpFile.Name())
+	_, err = tmpFile.WriteString("dynamic attachment content")
+	s.Require().NoError(err)
+	tmpFile.Close()
+
+	// Start HTTP test server to serve the attachment file
+	attServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Disposition", `attachment; filename="dynamic.txt"`)
+		w.Header().Set("Content-Type", "text/plain")
+		http.ServeFile(w, r, tmpFile.Name())
+	}))
+	defer attServer.Close()
+
+	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	req := PostableAlerts{
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					"alertname":         "AlterPassword",
+					label.TenantLabel:   "1",
+					label.ToUserIDLabel: "1",
+				},
+			},
+			Annotations: map[string]string{
+				"summary":        "dynamic attachment test",
+				"__attachments__": attServer.URL + "/dynamic.txt",
+			},
+			EndsAt:   time.Now().Add(time.Hour),
+			StartsAt: time.Now(),
+		},
+	}
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
+	time.Sleep(time.Second * 3)
+
+	// Our email is at offset countBefore (newest-first order).
+	mail, err := s.maildev.GetEmailAt(countBefore)
+	s.Require().NoError(err)
+	s.Require().NotNil(mail)
+	s.Require().Equal("alerts@example.com", mail.To[0]["Address"])
+	s.Require().Greater(mail.Attachments, 0, "email should have at least 1 attachment")
+
+	// Verify attachment details via full message.
+	msg, err := s.maildev.GetMessage(mail.ID)
+	s.Require().NoError(err)
+	s.Require().Len(msg.Attachments, 1)
+	s.Require().Equal("dynamic.txt", msg.Attachments[0].FileName)
+	s.Require().Equal("text/plain", msg.Attachments[0].ContentType)
 }
 
 // TestPostAlertsWithParams

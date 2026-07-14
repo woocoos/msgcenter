@@ -6,8 +6,13 @@ import (
 	"crypto/sha256"
 	"crypto/tls"
 	"fmt"
+	"io"
+	"mime"
+	"net/http"
 	"net/mail"
+	neturl "net/url"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -17,6 +22,17 @@ import (
 	pkgmail "github.com/woocoos/msgcenter/pkg/mail"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/template"
+)
+
+const (
+	// maxAttachmentSize limits the maximum size of a single attachment downloaded from URL.
+	maxAttachmentSize = 50 << 20 // 50 MB
+	// attachmentDownloadTimeout is the timeout for downloading a single attachment from URL.
+	attachmentDownloadTimeout = 30 * time.Second
+	// dynamicAttachmentAnnotation is the annotation key for dynamic attachment paths.
+	// Value is a semicolon-separated list of file paths or HTTP(S) URLs.
+	// Semicolon is used instead of comma to avoid conflicts with commas in URLs or file paths.
+	dynamicAttachmentAnnotation = "__attachments__"
 )
 
 // Notifier email notifier
@@ -138,10 +154,8 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 	for header, t := range config.Headers {
 		switch strings.ToLower(header) {
 		case "attachments":
-			for _, a := range strings.Split(t, ",") {
-				if _, err = email.AttachFile(a); err != nil {
-					return false, err
-				}
+			if err := n.attachFiles(email, strings.Split(t, ",")); err != nil {
+				return false, err
 			}
 		case "cc":
 			value, err := n.tmpl.ExecuteTextString(t, data)
@@ -173,6 +187,13 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 				return false, fmt.Errorf("execute %q header template: %w", header, err)
 			}
 			email.SetHeader(header, value)
+		}
+	}
+
+	// Attach dynamic attachments from alert annotations.
+	if dynPaths := dynamicAttachmentPaths(alerts); len(dynPaths) > 0 {
+		if err := n.attachFiles(email, dynPaths); err != nil {
+			return false, fmt.Errorf("attach dynamic attachments: %w", err)
 		}
 	}
 
@@ -248,4 +269,98 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 		return false, err
 	}
 	return true, nil
+}
+
+// attachFiles attaches files to the email, supporting both local file paths and HTTP(S) URLs.
+func (n *Notifier) attachFiles(email *pkgmail.Email, paths []string) error {
+	for _, p := range paths {
+		p = strings.TrimSpace(p)
+		if p == "" {
+			continue
+		}
+		if strings.HasPrefix(p, "http://") || strings.HasPrefix(p, "https://") {
+			if err := n.attachFromURL(email, p); err != nil {
+				return fmt.Errorf("attach from URL %q: %w", p, err)
+			}
+		} else {
+			if _, err := email.AttachFile(p); err != nil {
+				return fmt.Errorf("attach file %q: %w", p, err)
+			}
+		}
+	}
+	return nil
+}
+
+// attachFromURL downloads a file from the given URL and attaches it to the email.
+func (n *Notifier) attachFromURL(email *pkgmail.Email, rawURL string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), attachmentDownloadTimeout)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
+	if err != nil {
+		return err
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status: %s", resp.Status)
+	}
+
+	reader := io.LimitReader(resp.Body, maxAttachmentSize)
+	filename := filenameFromResponse(resp, rawURL)
+	contentType := resp.Header.Get("Content-Type")
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+
+	_, err = email.Attach(reader, filename, contentType)
+	return err
+}
+
+// filenameFromResponse extracts the attachment filename from the HTTP response.
+// It prefers Content-Disposition header, falling back to the URL path base.
+func filenameFromResponse(resp *http.Response, rawURL string) string {
+	if cd := resp.Header.Get("Content-Disposition"); cd != "" {
+		if _, params, err := mime.ParseMediaType(cd); err == nil {
+			if name, ok := params["filename"]; ok && name != "" {
+				return name
+			}
+		}
+	}
+	if u, err := neturl.Parse(rawURL); err == nil && u.Path != "" {
+		if base := path.Base(u.Path); base != "." && base != "/" {
+			return base
+		}
+	}
+	return "attachment"
+}
+
+// dynamicAttachmentPaths extracts attachment paths from alert annotations.
+// Multiple alerts may carry different attachments; duplicates are preserved
+// and the caller is responsible for deduplication if needed.
+func dynamicAttachmentPaths(alerts []*alert.Alert) []string {
+	var paths []string
+	seen := make(map[string]struct{})
+	for _, a := range alerts {
+		v, ok := a.Annotations[dynamicAttachmentAnnotation]
+		if !ok || v == "" {
+			continue
+		}
+		for _, p := range strings.Split(v, ";") {
+			p = strings.TrimSpace(p)
+			if p == "" {
+				continue
+			}
+			if _, dup := seen[p]; dup {
+				continue
+			}
+			seen[p] = struct{}{}
+			paths = append(paths, p)
+		}
+	}
+	return paths
 }

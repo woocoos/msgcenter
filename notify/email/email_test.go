@@ -2,12 +2,17 @@ package email
 
 import (
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/woocoos/msgcenter/pkg/alert"
+	pkgmail "github.com/woocoos/msgcenter/pkg/mail"
+	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/template"
 )
@@ -120,4 +125,189 @@ func TestImplicitTLS_Detection(t *testing.T) {
 
 func boolPtr(b bool) *bool {
 	return &b
+}
+
+func TestFilenameFromResponse(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name         string
+		cdHeader     string
+		rawURL       string
+		wantFilename string
+	}{
+		{
+			name:         "Content-Disposition with filename",
+			cdHeader:     `attachment; filename="report.pdf"`,
+			rawURL:       "https://example.com/data.csv",
+			wantFilename: "report.pdf",
+		},
+		{
+			name:         "fallback to URL path",
+			cdHeader:     "",
+			rawURL:       "https://example.com/files/report.pdf",
+			wantFilename: "report.pdf",
+		},
+		{
+			name:         "URL with query string",
+			cdHeader:     "",
+			rawURL:       "https://example.com/download?file=report.pdf&token=abc",
+			wantFilename: "download",
+		},
+		{
+			name:         "URL root path",
+			cdHeader:     "",
+			rawURL:       "https://example.com/",
+			wantFilename: "attachment",
+		},
+		{
+			name:         "Content-Disposition without filename param",
+			cdHeader:     "inline",
+			rawURL:       "https://example.com/data.csv",
+			wantFilename: "data.csv",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			resp := &http.Response{Header: http.Header{}}
+			if tt.cdHeader != "" {
+				resp.Header.Set("Content-Disposition", tt.cdHeader)
+			}
+			got := filenameFromResponse(resp, tt.rawURL)
+			assert.Equal(t, tt.wantFilename, got)
+		})
+	}
+}
+
+func TestDynamicAttachmentPaths(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name    string
+		alerts  []*alert.Alert
+		want    []string
+	}{
+		{
+			name:   "no alerts",
+			alerts: nil,
+			want:   nil,
+		},
+		{
+			name: "single alert with attachments",
+			alerts: []*alert.Alert{
+				{Annotations: label.LabelSet{dynamicAttachmentAnnotation: "/tmp/a.pdf;/tmp/b.csv"}},
+			},
+			want: []string{"/tmp/a.pdf", "/tmp/b.csv"},
+		},
+		{
+			name: "multiple alerts merged and deduped",
+			alerts: []*alert.Alert{
+				{Annotations: label.LabelSet{dynamicAttachmentAnnotation: "/tmp/a.pdf"}},
+				{Annotations: label.LabelSet{dynamicAttachmentAnnotation: "/tmp/a.pdf;https://example.com/c.pdf"}},
+			},
+			want: []string{"/tmp/a.pdf", "https://example.com/c.pdf"},
+		},
+		{
+			name: "alert without annotation skipped",
+			alerts: []*alert.Alert{
+				{Annotations: label.LabelSet{"other": "value"}},
+				{Annotations: label.LabelSet{dynamicAttachmentAnnotation: "/tmp/x.pdf"}},
+			},
+			want: []string{"/tmp/x.pdf"},
+		},
+		{
+			name: "empty annotation value skipped",
+			alerts: []*alert.Alert{
+				{Annotations: label.LabelSet{dynamicAttachmentAnnotation: ""}},
+				{Annotations: label.LabelSet{dynamicAttachmentAnnotation: "  ;  ;/tmp/y.pdf"}},
+			},
+			want: []string{"/tmp/y.pdf"},
+		},
+		{
+			name: "URL with comma preserved",
+			alerts: []*alert.Alert{
+				{Annotations: label.LabelSet{dynamicAttachmentAnnotation: "https://example.com/download?a=1,b=2;/tmp/local.pdf"}},
+			},
+			want: []string{"https://example.com/download?a=1,b=2", "/tmp/local.pdf"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			got := dynamicAttachmentPaths(tt.alerts)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestAttachFiles_LocalFile(t *testing.T) {
+	t.Parallel()
+	dir := t.TempDir()
+	f := filepath.Join(dir, "test.txt")
+	require.NoError(t, os.WriteFile(f, []byte("hello"), 0644))
+
+	n := &Notifier{}
+	email := pkgmail.NewEmailMsg()
+	err := n.attachFiles(email, []string{f})
+	require.NoError(t, err)
+	assert.Len(t, email.Attachments(), 1)
+	assert.Equal(t, "test.txt", email.Attachments()[0].Filename)
+}
+
+func TestAttachFiles_HTTPURL(t *testing.T) {
+	t.Parallel()
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Disposition", `attachment; filename="remote.csv"`)
+		w.Header().Set("Content-Type", "text/csv")
+		w.Write([]byte("a,b,c\n1,2,3"))
+	}))
+	defer ts.Close()
+
+	n := &Notifier{}
+	email := pkgmail.NewEmailMsg()
+	err := n.attachFiles(email, []string{ts.URL + "/remote.csv"})
+	require.NoError(t, err)
+	require.Len(t, email.Attachments(), 1)
+	assert.Equal(t, "remote.csv", email.Attachments()[0].Filename)
+	assert.Equal(t, "text/csv", email.Attachments()[0].ContentType)
+}
+
+func TestAttachFiles_HTTPError(t *testing.T) {
+	t.Parallel()
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer ts.Close()
+
+	n := &Notifier{}
+	email := pkgmail.NewEmailMsg()
+	err := n.attachFiles(email, []string{ts.URL + "/missing"})
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "unexpected status")
+}
+
+func TestAttachFiles_MixedLocalAndHTTP(t *testing.T) {
+	t.Parallel()
+	dir := t.TempDir()
+	f := filepath.Join(dir, "local.txt")
+	require.NoError(t, os.WriteFile(f, []byte("local"), 0644))
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("remote"))
+	}))
+	defer ts.Close()
+
+	n := &Notifier{}
+	email := pkgmail.NewEmailMsg()
+	err := n.attachFiles(email, []string{f, ts.URL + "/remote.bin", ""})
+	require.NoError(t, err)
+	assert.Len(t, email.Attachments(), 2)
+}
+
+func TestAttachFiles_SkipsEmptyPaths(t *testing.T) {
+	t.Parallel()
+	n := &Notifier{}
+	email := pkgmail.NewEmailMsg()
+	err := n.attachFiles(email, []string{"", "  "})
+	require.NoError(t, err)
+	assert.Empty(t, email.Attachments())
 }
