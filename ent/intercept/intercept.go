@@ -24,6 +24,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
+	"github.com/woocoos/msgcenter/ent/userdevice"
 )
 
 // The Query interface represents an operation that queries a graph.
@@ -487,6 +488,33 @@ func (f TraverseUserAddr) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.UserAddrQuery", q)
 }
 
+// The UserDeviceFunc type is an adapter to allow the use of ordinary function as a Querier.
+type UserDeviceFunc func(context.Context, *ent.UserDeviceQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f UserDeviceFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.UserDeviceQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.UserDeviceQuery", q)
+}
+
+// The TraverseUserDevice type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseUserDevice func(context.Context, *ent.UserDeviceQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseUserDevice) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseUserDevice) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.UserDeviceQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.UserDeviceQuery", q)
+}
+
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
@@ -520,6 +548,8 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.UserQuery, predicate.User, user.OrderOption]{typ: ent.TypeUser, tq: q}, nil
 	case *ent.UserAddrQuery:
 		return &query[*ent.UserAddrQuery, predicate.UserAddr, useraddr.OrderOption]{typ: ent.TypeUserAddr, tq: q}, nil
+	case *ent.UserDeviceQuery:
+		return &query[*ent.UserDeviceQuery, predicate.UserDevice, userdevice.OrderOption]{typ: ent.TypeUserDevice, tq: q}, nil
 	default:
 		return nil, fmt.Errorf("unknown query type %T", q)
 	}

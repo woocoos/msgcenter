@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+	"errors"
 	"sync/atomic"
 	"time"
 
@@ -152,6 +154,19 @@ func (am *AlertManager) buildDBClient(cnf *conf.AppConfiguration) {
 	} else {
 		am.DB = ent.NewClient(ent.Driver(drv), scfg)
 	}
+	am.DB.User.Use(ReadOnlyHook)
+	am.DB.UserAddr.Use(ReadOnlyHook)
+	am.DB.UserDevice.Use(ReadOnlyHook)
+	am.DB.Org.Use(ReadOnlyHook)
+	am.DB.OrgRoleUser.Use(ReadOnlyHook)
+
+}
+
+// ReadOnlyHook keep schema data readonly.
+func ReadOnlyHook(next ent.Mutator) ent.Mutator {
+	return ent.MutateFunc(func(ctx context.Context, mutation ent.Mutation) (ent.Value, error) {
+		return nil, errors.New("not implemented")
+	})
 }
 
 func (am *AlertManager) Start(co *Coordinator, config *profile.Config) error {

@@ -229,6 +229,15 @@ func overrideWebHookConfig(basedir, attdir string, client *ent.Client) notify.Cu
 	}
 }
 
+func overrideUmengConfig(basedir, attdir string, client *ent.Client) notify.CustomerConfigFunc[profile.UmengConfig] {
+	return func(ctx context.Context, cfg *profile.UmengConfig, set label.LabelSet,
+	) error {
+		// Umeng config does not support template overrides from database.
+		// Template rendering is handled in the notifier using default templates.
+		return nil
+	}
+}
+
 func overrideMessageConfig(basedir, attdir string, client *ent.Client) notify.CustomerConfigFunc[profile.MessageConfig] {
 	return func(ctx context.Context, cfg *profile.MessageConfig, set label.LabelSet,
 	) error {

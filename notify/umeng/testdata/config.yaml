@@ -1,0 +1,32 @@
+# Umeng Push Configuration for Testing
+# 敏感信息通过环境变量引用，实际值在 .env.local 中定义
+
+# HTTP 客户端配置（可选）
+httpConfig:
+  timeout: 10s
+
+# API 端点（可选，默认 https://msgapi.umeng.com/api/send）
+apiURL: ""
+
+# 是否使用生产模式
+productionMode: false
+
+# 应用配置
+apps:
+  # Android 应用配置
+  qeelyn-dev-android:
+    appKey: "${UMENG_ANDROID_APP_KEY}"
+    appMasterSecret: "${UMENG_ANDROID_APP_MASTER_SECRET}"
+    platform: "android"
+    appSet: "${UMENG_ANDROID_APP_SET}"
+    aliasType: "${UMENG_ANDROID_ALIAS_TYPE}"
+    afterOpen: "${UMENG_ANDROID_AFTER_OPEN}"
+    activity: "${UMENG_ANDROID_ACTIVITY}"
+
+  # iOS 应用配置
+  qeelyn-dev-ios:
+    appKey: "${UMENG_IOS_APP_KEY}"
+    appMasterSecret: "${UMENG_IOS_APP_MASTER_SECRET}"
+    platform: "ios"
+    appSet: "${UMENG_IOS_APP_SET}"
+    aliasType: "${UMENG_IOS_ALIAS_TYPE}"

@@ -28,6 +28,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
+	"github.com/woocoos/msgcenter/ent/userdevice"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -58,6 +59,7 @@ const (
 	TypeOrgRoleUser   = "OrgRoleUser"
 	TypeUser          = "User"
 	TypeUserAddr      = "UserAddr"
+	TypeUserDevice    = "UserDevice"
 )
 
 // MsgAlertMutation represents an operation that mutates the MsgAlert nodes in the graph.
@@ -15343,4 +15345,887 @@ func (m *UserAddrMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown UserAddr edge %s", name)
+}
+
+// UserDeviceMutation represents an operation that mutates the UserDevice nodes in the graph.
+type UserDeviceMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *int
+	user_id        *int
+	adduser_id     *int
+	device_uid     *string
+	device_name    *string
+	system_name    *string
+	system_version *string
+	app_version    *string
+	device_model   *string
+	status         *typex.SimpleStatus
+	clearedFields  map[string]struct{}
+	done           bool
+	oldValue       func(context.Context) (*UserDevice, error)
+	predicates     []predicate.UserDevice
+}
+
+var _ ent.Mutation = (*UserDeviceMutation)(nil)
+
+// userdeviceOption allows management of the mutation configuration using functional options.
+type userdeviceOption func(*UserDeviceMutation)
+
+// newUserDeviceMutation creates new mutation for the UserDevice entity.
+func newUserDeviceMutation(c config, op Op, opts ...userdeviceOption) *UserDeviceMutation {
+	m := &UserDeviceMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeUserDevice,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withUserDeviceID sets the ID field of the mutation.
+func withUserDeviceID(id int) userdeviceOption {
+	return func(m *UserDeviceMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *UserDevice
+		)
+		m.oldValue = func(ctx context.Context) (*UserDevice, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().UserDevice.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withUserDevice sets the old UserDevice of the mutation.
+func withUserDevice(node *UserDevice) userdeviceOption {
+	return func(m *UserDeviceMutation) {
+		m.oldValue = func(context.Context) (*UserDevice, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m UserDeviceMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m UserDeviceMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of UserDevice entities.
+func (m *UserDeviceMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *UserDeviceMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *UserDeviceMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().UserDevice.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetUserID sets the "user_id" field.
+func (m *UserDeviceMutation) SetUserID(i int) {
+	m.user_id = &i
+	m.adduser_id = nil
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *UserDeviceMutation) UserID() (r int, exists bool) {
+	v := m.user_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the UserDevice entity.
+// If the UserDevice object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserDeviceMutation) OldUserID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// AddUserID adds i to the "user_id" field.
+func (m *UserDeviceMutation) AddUserID(i int) {
+	if m.adduser_id != nil {
+		*m.adduser_id += i
+	} else {
+		m.adduser_id = &i
+	}
+}
+
+// AddedUserID returns the value that was added to the "user_id" field in this mutation.
+func (m *UserDeviceMutation) AddedUserID() (r int, exists bool) {
+	v := m.adduser_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (m *UserDeviceMutation) ClearUserID() {
+	m.user_id = nil
+	m.adduser_id = nil
+	m.clearedFields[userdevice.FieldUserID] = struct{}{}
+}
+
+// UserIDCleared returns if the "user_id" field was cleared in this mutation.
+func (m *UserDeviceMutation) UserIDCleared() bool {
+	_, ok := m.clearedFields[userdevice.FieldUserID]
+	return ok
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *UserDeviceMutation) ResetUserID() {
+	m.user_id = nil
+	m.adduser_id = nil
+	delete(m.clearedFields, userdevice.FieldUserID)
+}
+
+// SetDeviceUID sets the "device_uid" field.
+func (m *UserDeviceMutation) SetDeviceUID(s string) {
+	m.device_uid = &s
+}
+
+// DeviceUID returns the value of the "device_uid" field in the mutation.
+func (m *UserDeviceMutation) DeviceUID() (r string, exists bool) {
+	v := m.device_uid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeviceUID returns the old "device_uid" field's value of the UserDevice entity.
+// If the UserDevice object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserDeviceMutation) OldDeviceUID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeviceUID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeviceUID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeviceUID: %w", err)
+	}
+	return oldValue.DeviceUID, nil
+}
+
+// ResetDeviceUID resets all changes to the "device_uid" field.
+func (m *UserDeviceMutation) ResetDeviceUID() {
+	m.device_uid = nil
+}
+
+// SetDeviceName sets the "device_name" field.
+func (m *UserDeviceMutation) SetDeviceName(s string) {
+	m.device_name = &s
+}
+
+// DeviceName returns the value of the "device_name" field in the mutation.
+func (m *UserDeviceMutation) DeviceName() (r string, exists bool) {
+	v := m.device_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeviceName returns the old "device_name" field's value of the UserDevice entity.
+// If the UserDevice object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserDeviceMutation) OldDeviceName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeviceName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeviceName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeviceName: %w", err)
+	}
+	return oldValue.DeviceName, nil
+}
+
+// ClearDeviceName clears the value of the "device_name" field.
+func (m *UserDeviceMutation) ClearDeviceName() {
+	m.device_name = nil
+	m.clearedFields[userdevice.FieldDeviceName] = struct{}{}
+}
+
+// DeviceNameCleared returns if the "device_name" field was cleared in this mutation.
+func (m *UserDeviceMutation) DeviceNameCleared() bool {
+	_, ok := m.clearedFields[userdevice.FieldDeviceName]
+	return ok
+}
+
+// ResetDeviceName resets all changes to the "device_name" field.
+func (m *UserDeviceMutation) ResetDeviceName() {
+	m.device_name = nil
+	delete(m.clearedFields, userdevice.FieldDeviceName)
+}
+
+// SetSystemName sets the "system_name" field.
+func (m *UserDeviceMutation) SetSystemName(s string) {
+	m.system_name = &s
+}
+
+// SystemName returns the value of the "system_name" field in the mutation.
+func (m *UserDeviceMutation) SystemName() (r string, exists bool) {
+	v := m.system_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSystemName returns the old "system_name" field's value of the UserDevice entity.
+// If the UserDevice object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserDeviceMutation) OldSystemName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSystemName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSystemName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSystemName: %w", err)
+	}
+	return oldValue.SystemName, nil
+}
+
+// ClearSystemName clears the value of the "system_name" field.
+func (m *UserDeviceMutation) ClearSystemName() {
+	m.system_name = nil
+	m.clearedFields[userdevice.FieldSystemName] = struct{}{}
+}
+
+// SystemNameCleared returns if the "system_name" field was cleared in this mutation.
+func (m *UserDeviceMutation) SystemNameCleared() bool {
+	_, ok := m.clearedFields[userdevice.FieldSystemName]
+	return ok
+}
+
+// ResetSystemName resets all changes to the "system_name" field.
+func (m *UserDeviceMutation) ResetSystemName() {
+	m.system_name = nil
+	delete(m.clearedFields, userdevice.FieldSystemName)
+}
+
+// SetSystemVersion sets the "system_version" field.
+func (m *UserDeviceMutation) SetSystemVersion(s string) {
+	m.system_version = &s
+}
+
+// SystemVersion returns the value of the "system_version" field in the mutation.
+func (m *UserDeviceMutation) SystemVersion() (r string, exists bool) {
+	v := m.system_version
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSystemVersion returns the old "system_version" field's value of the UserDevice entity.
+// If the UserDevice object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserDeviceMutation) OldSystemVersion(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSystemVersion is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSystemVersion requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSystemVersion: %w", err)
+	}
+	return oldValue.SystemVersion, nil
+}
+
+// ClearSystemVersion clears the value of the "system_version" field.
+func (m *UserDeviceMutation) ClearSystemVersion() {
+	m.system_version = nil
+	m.clearedFields[userdevice.FieldSystemVersion] = struct{}{}
+}
+
+// SystemVersionCleared returns if the "system_version" field was cleared in this mutation.
+func (m *UserDeviceMutation) SystemVersionCleared() bool {
+	_, ok := m.clearedFields[userdevice.FieldSystemVersion]
+	return ok
+}
+
+// ResetSystemVersion resets all changes to the "system_version" field.
+func (m *UserDeviceMutation) ResetSystemVersion() {
+	m.system_version = nil
+	delete(m.clearedFields, userdevice.FieldSystemVersion)
+}
+
+// SetAppVersion sets the "app_version" field.
+func (m *UserDeviceMutation) SetAppVersion(s string) {
+	m.app_version = &s
+}
+
+// AppVersion returns the value of the "app_version" field in the mutation.
+func (m *UserDeviceMutation) AppVersion() (r string, exists bool) {
+	v := m.app_version
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAppVersion returns the old "app_version" field's value of the UserDevice entity.
+// If the UserDevice object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserDeviceMutation) OldAppVersion(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAppVersion is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAppVersion requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAppVersion: %w", err)
+	}
+	return oldValue.AppVersion, nil
+}
+
+// ClearAppVersion clears the value of the "app_version" field.
+func (m *UserDeviceMutation) ClearAppVersion() {
+	m.app_version = nil
+	m.clearedFields[userdevice.FieldAppVersion] = struct{}{}
+}
+
+// AppVersionCleared returns if the "app_version" field was cleared in this mutation.
+func (m *UserDeviceMutation) AppVersionCleared() bool {
+	_, ok := m.clearedFields[userdevice.FieldAppVersion]
+	return ok
+}
+
+// ResetAppVersion resets all changes to the "app_version" field.
+func (m *UserDeviceMutation) ResetAppVersion() {
+	m.app_version = nil
+	delete(m.clearedFields, userdevice.FieldAppVersion)
+}
+
+// SetDeviceModel sets the "device_model" field.
+func (m *UserDeviceMutation) SetDeviceModel(s string) {
+	m.device_model = &s
+}
+
+// DeviceModel returns the value of the "device_model" field in the mutation.
+func (m *UserDeviceMutation) DeviceModel() (r string, exists bool) {
+	v := m.device_model
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeviceModel returns the old "device_model" field's value of the UserDevice entity.
+// If the UserDevice object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserDeviceMutation) OldDeviceModel(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeviceModel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeviceModel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeviceModel: %w", err)
+	}
+	return oldValue.DeviceModel, nil
+}
+
+// ClearDeviceModel clears the value of the "device_model" field.
+func (m *UserDeviceMutation) ClearDeviceModel() {
+	m.device_model = nil
+	m.clearedFields[userdevice.FieldDeviceModel] = struct{}{}
+}
+
+// DeviceModelCleared returns if the "device_model" field was cleared in this mutation.
+func (m *UserDeviceMutation) DeviceModelCleared() bool {
+	_, ok := m.clearedFields[userdevice.FieldDeviceModel]
+	return ok
+}
+
+// ResetDeviceModel resets all changes to the "device_model" field.
+func (m *UserDeviceMutation) ResetDeviceModel() {
+	m.device_model = nil
+	delete(m.clearedFields, userdevice.FieldDeviceModel)
+}
+
+// SetStatus sets the "status" field.
+func (m *UserDeviceMutation) SetStatus(ts typex.SimpleStatus) {
+	m.status = &ts
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *UserDeviceMutation) Status() (r typex.SimpleStatus, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the UserDevice entity.
+// If the UserDevice object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserDeviceMutation) OldStatus(ctx context.Context) (v typex.SimpleStatus, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ClearStatus clears the value of the "status" field.
+func (m *UserDeviceMutation) ClearStatus() {
+	m.status = nil
+	m.clearedFields[userdevice.FieldStatus] = struct{}{}
+}
+
+// StatusCleared returns if the "status" field was cleared in this mutation.
+func (m *UserDeviceMutation) StatusCleared() bool {
+	_, ok := m.clearedFields[userdevice.FieldStatus]
+	return ok
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *UserDeviceMutation) ResetStatus() {
+	m.status = nil
+	delete(m.clearedFields, userdevice.FieldStatus)
+}
+
+// Where appends a list predicates to the UserDeviceMutation builder.
+func (m *UserDeviceMutation) Where(ps ...predicate.UserDevice) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the UserDeviceMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *UserDeviceMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.UserDevice, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *UserDeviceMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *UserDeviceMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (UserDevice).
+func (m *UserDeviceMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *UserDeviceMutation) Fields() []string {
+	fields := make([]string, 0, 8)
+	if m.user_id != nil {
+		fields = append(fields, userdevice.FieldUserID)
+	}
+	if m.device_uid != nil {
+		fields = append(fields, userdevice.FieldDeviceUID)
+	}
+	if m.device_name != nil {
+		fields = append(fields, userdevice.FieldDeviceName)
+	}
+	if m.system_name != nil {
+		fields = append(fields, userdevice.FieldSystemName)
+	}
+	if m.system_version != nil {
+		fields = append(fields, userdevice.FieldSystemVersion)
+	}
+	if m.app_version != nil {
+		fields = append(fields, userdevice.FieldAppVersion)
+	}
+	if m.device_model != nil {
+		fields = append(fields, userdevice.FieldDeviceModel)
+	}
+	if m.status != nil {
+		fields = append(fields, userdevice.FieldStatus)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *UserDeviceMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case userdevice.FieldUserID:
+		return m.UserID()
+	case userdevice.FieldDeviceUID:
+		return m.DeviceUID()
+	case userdevice.FieldDeviceName:
+		return m.DeviceName()
+	case userdevice.FieldSystemName:
+		return m.SystemName()
+	case userdevice.FieldSystemVersion:
+		return m.SystemVersion()
+	case userdevice.FieldAppVersion:
+		return m.AppVersion()
+	case userdevice.FieldDeviceModel:
+		return m.DeviceModel()
+	case userdevice.FieldStatus:
+		return m.Status()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *UserDeviceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case userdevice.FieldUserID:
+		return m.OldUserID(ctx)
+	case userdevice.FieldDeviceUID:
+		return m.OldDeviceUID(ctx)
+	case userdevice.FieldDeviceName:
+		return m.OldDeviceName(ctx)
+	case userdevice.FieldSystemName:
+		return m.OldSystemName(ctx)
+	case userdevice.FieldSystemVersion:
+		return m.OldSystemVersion(ctx)
+	case userdevice.FieldAppVersion:
+		return m.OldAppVersion(ctx)
+	case userdevice.FieldDeviceModel:
+		return m.OldDeviceModel(ctx)
+	case userdevice.FieldStatus:
+		return m.OldStatus(ctx)
+	}
+	return nil, fmt.Errorf("unknown UserDevice field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *UserDeviceMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case userdevice.FieldUserID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case userdevice.FieldDeviceUID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeviceUID(v)
+		return nil
+	case userdevice.FieldDeviceName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeviceName(v)
+		return nil
+	case userdevice.FieldSystemName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSystemName(v)
+		return nil
+	case userdevice.FieldSystemVersion:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSystemVersion(v)
+		return nil
+	case userdevice.FieldAppVersion:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAppVersion(v)
+		return nil
+	case userdevice.FieldDeviceModel:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeviceModel(v)
+		return nil
+	case userdevice.FieldStatus:
+		v, ok := value.(typex.SimpleStatus)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	}
+	return fmt.Errorf("unknown UserDevice field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *UserDeviceMutation) AddedFields() []string {
+	var fields []string
+	if m.adduser_id != nil {
+		fields = append(fields, userdevice.FieldUserID)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *UserDeviceMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case userdevice.FieldUserID:
+		return m.AddedUserID()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *UserDeviceMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case userdevice.FieldUserID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUserID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown UserDevice numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *UserDeviceMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(userdevice.FieldUserID) {
+		fields = append(fields, userdevice.FieldUserID)
+	}
+	if m.FieldCleared(userdevice.FieldDeviceName) {
+		fields = append(fields, userdevice.FieldDeviceName)
+	}
+	if m.FieldCleared(userdevice.FieldSystemName) {
+		fields = append(fields, userdevice.FieldSystemName)
+	}
+	if m.FieldCleared(userdevice.FieldSystemVersion) {
+		fields = append(fields, userdevice.FieldSystemVersion)
+	}
+	if m.FieldCleared(userdevice.FieldAppVersion) {
+		fields = append(fields, userdevice.FieldAppVersion)
+	}
+	if m.FieldCleared(userdevice.FieldDeviceModel) {
+		fields = append(fields, userdevice.FieldDeviceModel)
+	}
+	if m.FieldCleared(userdevice.FieldStatus) {
+		fields = append(fields, userdevice.FieldStatus)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *UserDeviceMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *UserDeviceMutation) ClearField(name string) error {
+	switch name {
+	case userdevice.FieldUserID:
+		m.ClearUserID()
+		return nil
+	case userdevice.FieldDeviceName:
+		m.ClearDeviceName()
+		return nil
+	case userdevice.FieldSystemName:
+		m.ClearSystemName()
+		return nil
+	case userdevice.FieldSystemVersion:
+		m.ClearSystemVersion()
+		return nil
+	case userdevice.FieldAppVersion:
+		m.ClearAppVersion()
+		return nil
+	case userdevice.FieldDeviceModel:
+		m.ClearDeviceModel()
+		return nil
+	case userdevice.FieldStatus:
+		m.ClearStatus()
+		return nil
+	}
+	return fmt.Errorf("unknown UserDevice nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *UserDeviceMutation) ResetField(name string) error {
+	switch name {
+	case userdevice.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case userdevice.FieldDeviceUID:
+		m.ResetDeviceUID()
+		return nil
+	case userdevice.FieldDeviceName:
+		m.ResetDeviceName()
+		return nil
+	case userdevice.FieldSystemName:
+		m.ResetSystemName()
+		return nil
+	case userdevice.FieldSystemVersion:
+		m.ResetSystemVersion()
+		return nil
+	case userdevice.FieldAppVersion:
+		m.ResetAppVersion()
+		return nil
+	case userdevice.FieldDeviceModel:
+		m.ResetDeviceModel()
+		return nil
+	case userdevice.FieldStatus:
+		m.ResetStatus()
+		return nil
+	}
+	return fmt.Errorf("unknown UserDevice field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *UserDeviceMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *UserDeviceMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *UserDeviceMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *UserDeviceMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *UserDeviceMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *UserDeviceMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *UserDeviceMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown UserDevice unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *UserDeviceMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown UserDevice edge %s", name)
 }

@@ -55,7 +55,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "name", Type: field.TypeString, Size: 45},
 		{Name: "tenant_id", Type: field.TypeInt},
-		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "message", "webhook"}},
+		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "message", "webhook", "umeng"}},
 		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"active", "inactive", "processing", "disabled"}, Default: "inactive"},
 		{Name: "receiver", Type: field.TypeJSON, Nullable: true},
 		{Name: "comments", Type: field.TypeString, Nullable: true},
@@ -217,7 +217,7 @@ var (
 		{Name: "user_id", Type: field.TypeInt, Nullable: true},
 		{Name: "name", Type: field.TypeString, Size: 45},
 		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"active", "inactive", "processing", "disabled"}, Default: "inactive"},
-		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "message", "webhook"}},
+		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "message", "webhook", "umeng"}},
 		{Name: "format", Type: field.TypeEnum, Enums: []string{"txt", "html"}},
 		{Name: "subject", Type: field.TypeString, Nullable: true},
 		{Name: "from", Type: field.TypeString, Nullable: true},
@@ -271,7 +271,7 @@ var (
 		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "group_key", Type: field.TypeString},
 		{Name: "receiver", Type: field.TypeString},
-		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "message", "webhook"}},
+		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "message", "webhook", "umeng"}},
 		{Name: "idx", Type: field.TypeInt},
 		{Name: "send_at", Type: field.TypeTime},
 		{Name: "created_at", Type: field.TypeTime},
@@ -387,6 +387,24 @@ var (
 			},
 		},
 	}
+	// UserDeviceColumns holds the columns for the "user_device" table.
+	UserDeviceColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "user_id", Type: field.TypeInt, Nullable: true},
+		{Name: "device_uid", Type: field.TypeString, Size: 64},
+		{Name: "device_name", Type: field.TypeString, Nullable: true, Size: 45},
+		{Name: "system_name", Type: field.TypeString, Nullable: true, Size: 45},
+		{Name: "system_version", Type: field.TypeString, Nullable: true, Size: 45},
+		{Name: "app_version", Type: field.TypeString, Nullable: true, Size: 45},
+		{Name: "device_model", Type: field.TypeString, Nullable: true, Size: 45},
+		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"active", "inactive", "processing", "disabled"}},
+	}
+	// UserDeviceTable holds the schema information for the "user_device" table.
+	UserDeviceTable = &schema.Table{
+		Name:       "user_device",
+		Columns:    UserDeviceColumns,
+		PrimaryKey: []*schema.Column{UserDeviceColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		MsgAlertTable,
@@ -404,6 +422,7 @@ var (
 		OrgRoleUserTable,
 		UserTable,
 		UserAddrTable,
+		UserDeviceTable,
 	}
 )
 
@@ -463,5 +482,8 @@ func init() {
 	UserAddrTable.ForeignKeys[0].RefTable = UserTable
 	UserAddrTable.Annotation = &entsql.Annotation{
 		Table: "user_addr",
+	}
+	UserDeviceTable.Annotation = &entsql.Annotation{
+		Table: "user_device",
 	}
 }

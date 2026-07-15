@@ -33,7 +33,7 @@ type MsgTemplate struct {
 	MsgTypeID int `json:"msg_type_id,omitempty"`
 	// 消息事件ID
 	MsgEventID int `json:"msg_event_id,omitempty"`
-	// 组织ID
+	// 租户ID
 	TenantID int `json:"tenant_id,omitempty"`
 	// 用户ID，为空表示租户级或全局模板
 	UserID int `json:"user_id,omitempty"`

@@ -8,7 +8,7 @@ import (
 
 // ReceiverConfigs is a union type for all receiver configs.
 type ReceiverConfigs interface {
-	EmailConfig | WebhookConfig | MessageConfig
+	EmailConfig | WebhookConfig | MessageConfig | UmengConfig
 }
 
 type ReceiverType string
@@ -17,6 +17,7 @@ const (
 	ReceiverEmail   ReceiverType = "email"
 	ReceiverMessage ReceiverType = "message"
 	ReceiverWebhook ReceiverType = "webhook"
+	ReceiverUmeng   ReceiverType = "umeng"
 )
 
 func (r ReceiverType) String() string {
@@ -28,6 +29,7 @@ func (r ReceiverType) Values() []string {
 		ReceiverEmail.String(),
 		ReceiverMessage.String(),
 		ReceiverWebhook.String(),
+		ReceiverUmeng.String(),
 	}
 }
 
@@ -51,7 +53,7 @@ func (r *ReceiverType) UnmarshalGQL(val any) error {
 
 func ReceiverTypeValidator(input ReceiverType) error {
 	switch input {
-	case ReceiverEmail, ReceiverMessage, ReceiverWebhook:
+	case ReceiverEmail, ReceiverMessage, ReceiverWebhook, ReceiverUmeng:
 		return nil
 	default:
 		return fmt.Errorf("invalid enum value for receiver field: %q", input)
@@ -67,6 +69,7 @@ type Receiver struct {
 	MessageConfig  *MessageConfig   `yaml:"messageConfig,omitempty" json:"messageConfig,omitempty"`
 	EmailConfigs   []*EmailConfig   `yaml:"emailConfigs,omitempty" json:"emailConfigs,omitempty"`
 	WebhookConfigs []*WebhookConfig `yaml:"webhookConfigs,omitempty" json:"webhookConfigs,omitempty"`
+	UmengConfigs   []*UmengConfig   `yaml:"umengConfigs,omitempty" json:"umengConfigs,omitempty"`
 }
 
 // TenantReceiverName extends the receiver name with the tenant ID.

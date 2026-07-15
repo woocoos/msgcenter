@@ -5,10 +5,11 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"github.com/tsingsun/woocoo/pkg/gds"
 	"sort"
 	"strconv"
 	"unicode/utf8"
+
+	"github.com/tsingsun/woocoo/pkg/gds"
 )
 
 const (
@@ -22,6 +23,8 @@ const (
 	SkipSubscribeLabel = "skipSub"
 	// SkipTempParamsLabel is the label name for the skip template params. Y/N
 	SkipTempParamsLabel = "skipTempParams"
+	// AppSetLabel is the label name for the target application set (business application name).
+	AppSetLabel = "appSet"
 )
 
 type LabelName string

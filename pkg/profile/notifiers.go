@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	"net/textproto"
+
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/httpx"
-	"net/textproto"
 )
 
 var (
@@ -29,6 +30,11 @@ var (
 		HTML:         `{{ template "email.default.html" . }}`,
 		Text:         ``,
 		Subject:      `{{ template "email.default.subject" . }}`,
+	}
+	// DefaultUmengConfig defines default values for Umeng Push configurations.
+	DefaultUmengConfig = UmengConfig{
+		SendResolved: false,
+		APIURL:       "https://msgapi.umeng.com/api/send",
 	}
 )
 
@@ -65,17 +71,17 @@ type EmailConfig struct {
 	SendResolved bool `yaml:"sendResolved" json:"sendResolved"`
 	// Email address to notify.
 	// To 一般采用模板的方式接收动态参数
-	To           string            `yaml:"to,omitempty" json:"to,omitempty"`
-	From         string            `yaml:"from,omitempty" json:"from,omitempty"`
-	Subject      string            `yaml:"subject,omitempty" json:"subject,omitempty"`
-	SmartHost    HostPort          `yaml:"smartHost,omitempty" json:"smartHost,omitempty"`
-	AuthType     string            `yaml:"authType,omitempty" json:"authType,omitempty"`
-	AuthUsername string            `yaml:"authUsername,omitempty" json:"authUsername,omitempty"`
-	AuthPassword string            `yaml:"authPassword,omitempty" json:"authPassword,omitempty"`
+	To           string   `yaml:"to,omitempty" json:"to,omitempty"`
+	From         string   `yaml:"from,omitempty" json:"from,omitempty"`
+	Subject      string   `yaml:"subject,omitempty" json:"subject,omitempty"`
+	SmartHost    HostPort `yaml:"smartHost,omitempty" json:"smartHost,omitempty"`
+	AuthType     string   `yaml:"authType,omitempty" json:"authType,omitempty"`
+	AuthUsername string   `yaml:"authUsername,omitempty" json:"authUsername,omitempty"`
+	AuthPassword string   `yaml:"authPassword,omitempty" json:"authPassword,omitempty"`
 	// AuthPasswordFile is a file containing the auth password.
-	AuthPasswordFile string `yaml:"authPasswordFile,omitempty" json:"authPasswordFile,omitempty"`
-	AuthSecret       string `yaml:"authSecret,omitempty" json:"authSecret,omitempty"`
-	AuthIdentity     string `yaml:"authIdentity,omitempty" json:"authIdentity,omitempty"`
+	AuthPasswordFile string            `yaml:"authPasswordFile,omitempty" json:"authPasswordFile,omitempty"`
+	AuthSecret       string            `yaml:"authSecret,omitempty" json:"authSecret,omitempty"`
+	AuthIdentity     string            `yaml:"authIdentity,omitempty" json:"authIdentity,omitempty"`
 	Headers          map[string]string `yaml:"headers,omitempty" json:"headers,omitempty"`
 	HTML             string            `yaml:"html,omitempty" json:"html,omitempty"`
 	Text             string            `yaml:"text,omitempty" json:"text,omitempty"`
@@ -211,5 +217,107 @@ func (c *WebhookConfig) UnmarshalJSON(data []byte) error {
 func (c *WebhookConfig) Clone() *WebhookConfig {
 	clone := *c
 	clone.Headers = CopyMap(c.Headers)
+	return &clone
+}
+
+// UmengAppConfig holds credentials for a specific Umeng application.
+type UmengAppConfig struct {
+	AppKey          string `yaml:"appKey" json:"appKey"`
+	AppMasterSecret string `yaml:"appMasterSecret" json:"appMasterSecret"`
+	// Platform is the target platform: android, ios, or harmonyos.
+	Platform string `yaml:"platform" json:"platform"`
+	// AppSet is the business application set name (e.g., "xiaohongshu").
+	// Multiple Umeng apps (iOS/Android) can belong to the same AppSet.
+	AppSet string `yaml:"appSet" json:"appSet"`
+	// AliasType is the alias type for customizedcast push.
+	// This should match the alias_type set in the client SDK.
+	AliasType string `yaml:"aliasType,omitempty" json:"aliasType,omitempty"`
+	// Android-specific: after_open behavior (go_app, go_url, go_activity, go_custom).
+	AfterOpen string `yaml:"afterOpen,omitempty" json:"afterOpen,omitempty"`
+	// Android-specific: activity to open when after_open=go_activity.
+	Activity string `yaml:"activity,omitempty" json:"activity,omitempty"`
+}
+
+// UmengConfig configures notifications via Umeng Push API.
+type UmengConfig struct {
+	SendResolved bool `yaml:"sendResolved" json:"sendResolved"`
+	// HTTPConfig configures the HTTP client used to send the request.
+	HTTPConfig    *httpx.ClientConfig `yaml:"httpConfig" json:"httpConfig"`
+	HttpConfigOri *conf.Configuration `yaml:"-" json:"-"`
+	// APIURL is the Umeng Push API endpoint. Defaults to https://msgapi.umeng.com/api/send.
+	APIURL string `yaml:"apiURL" json:"apiURL"`
+	// Apps maps application name to application-specific credentials.
+	// When set, the notifier selects credentials based on the alert's "app" label.
+	Apps map[string]*UmengAppConfig `yaml:"apps,omitempty" json:"apps,omitempty"`
+	// ProductionMode indicates whether to use production environment.
+	ProductionMode *bool `yaml:"productionMode,omitempty" json:"productionMode,omitempty"`
+}
+
+func (c *UmengConfig) Validate() error {
+	if len(c.Apps) == 0 {
+		return fmt.Errorf("missing apps in umeng config")
+	}
+	// Validate each app config.
+	for name, ac := range c.Apps {
+		if ac.AppKey == "" {
+			return fmt.Errorf("missing appKey for app %q in umeng config", name)
+		}
+		if ac.AppMasterSecret == "" {
+			return fmt.Errorf("missing appMasterSecret for app %q in umeng config", name)
+		}
+		if ac.Platform == "" {
+			return fmt.Errorf("missing platform for app %q in umeng config", name)
+		}
+		switch ac.Platform {
+		case "android", "ios", "harmonyos":
+			// valid
+		default:
+			return fmt.Errorf("invalid platform %q for app %q in umeng config", ac.Platform, name)
+		}
+	}
+	if c.HTTPConfig != nil {
+		if err := c.HTTPConfig.Validate(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *UmengConfig) UnmarshalJSON(data []byte) error {
+	*c = DefaultUmengConfig
+	p, err := NewJsonParse(data)
+	if err != nil {
+		return err
+	}
+	if err := p.Unmarshal("", c); err != nil {
+		return err
+	}
+	if p.IsSet("httpConfig") {
+		hp, err := p.Sub("httpConfig")
+		if err != nil {
+			return err
+		}
+		c.HttpConfigOri = conf.NewFromParse(hp)
+		c.HTTPConfig, err = httpx.NewClientConfig(c.HttpConfigOri)
+		if err != nil {
+			return err
+		}
+	}
+	if err := c.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Clone returns a deep clone of the UmengConfig.
+func (c *UmengConfig) Clone() *UmengConfig {
+	clone := *c
+	if c.Apps != nil {
+		clone.Apps = make(map[string]*UmengAppConfig, len(c.Apps))
+		for k, v := range c.Apps {
+			pv := *v
+			clone.Apps[k] = &pv
+		}
+	}
 	return &clone
 }

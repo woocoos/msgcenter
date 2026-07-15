@@ -109,7 +109,7 @@ input CreateMsgTemplateInput {
   """
   msgTypeID: Int!
   """
-  组织ID
+  租户ID
   """
   tenantID: ID
   """
@@ -567,6 +567,7 @@ enum MsgChannelReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/pr
   email
   message
   webhook
+  umeng
 }
 """
 MsgChannelSimpleStatus is enum for the field status
@@ -1719,7 +1720,7 @@ type MsgTemplate implements Node {
   """
   msgEventID: ID!
   """
-  组织ID
+  租户ID
   """
   tenantID: ID
   """
@@ -1843,6 +1844,7 @@ enum MsgTemplateReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/p
   email
   message
   webhook
+  umeng
 }
 """
 MsgTemplateSimpleStatus is enum for the field status
@@ -2501,6 +2503,7 @@ enum NlogReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.
   email
   message
   webhook
+  umeng
 }
 """
 NlogWhereInput is used for filtering Nlog objects.
@@ -2905,7 +2908,7 @@ input UpdateMsgTemplateInput {
   """
   msgTypeID: Int
   """
-  组织ID
+  租户ID
   """
   tenantID: ID
   clearTenantID: Boolean

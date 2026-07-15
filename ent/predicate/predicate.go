@@ -50,3 +50,6 @@ type User func(*sql.Selector)
 
 // UserAddr is the predicate function for useraddr builders.
 type UserAddr func(*sql.Selector)
+
+// UserDevice is the predicate function for userdevice builders.
+type UserDevice func(*sql.Selector)

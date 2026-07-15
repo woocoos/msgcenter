@@ -24,6 +24,7 @@ import (
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/notify/email"
 	"github.com/woocoos/msgcenter/notify/message"
+	"github.com/woocoos/msgcenter/notify/umeng"
 	"github.com/woocoos/msgcenter/notify/webhook"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/metrics"
@@ -466,6 +467,11 @@ func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *templ
 	for i, cfg := range nc.WebhookConfigs {
 		add("webhook", i, func() (notify.Notifier, error) {
 			return webhook.New(cfg, tmpl, overrideWebHookConfig(basedir, attdir, c.db))
+		})
+	}
+	for i, cfg := range nc.UmengConfigs {
+		add("umeng", i, func() (notify.Notifier, error) {
+			return umeng.New(cfg, tmpl, overrideUmengConfig(basedir, attdir, c.db), c.db)
 		})
 	}
 	if nc.MessageConfig != nil {

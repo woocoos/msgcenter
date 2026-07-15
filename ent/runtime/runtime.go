@@ -17,10 +17,8 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
-	"github.com/woocoos/msgcenter/ent/org"
-	"github.com/woocoos/msgcenter/ent/orgroleuser"
-	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
+	"github.com/woocoos/msgcenter/ent/userdevice"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -244,14 +242,6 @@ func init() {
 	nlogalertDescCreatedAt := nlogalertFields[2].Descriptor()
 	// nlogalert.DefaultCreatedAt holds the default value on creation for the created_at field.
 	nlogalert.DefaultCreatedAt = nlogalertDescCreatedAt.Default.(func() time.Time)
-	orgHooks := schema.Org{}.Hooks()
-	org.Hooks[0] = orgHooks[0]
-	orgroleuserHooks := schema.OrgRoleUser{}.Hooks()
-	orgroleuser.Hooks[0] = orgroleuserHooks[0]
-	userHooks := schema.User{}.Hooks()
-	user.Hooks[0] = userHooks[0]
-	useraddrHooks := schema.UserAddr{}.Hooks()
-	useraddr.Hooks[0] = useraddrHooks[0]
 	useraddrFields := schema.UserAddr{}.Fields()
 	_ = useraddrFields
 	// useraddrDescEmail is the schema descriptor for email field.
@@ -282,6 +272,32 @@ func init() {
 	useraddrDescIsDefault := useraddrFields[11].Descriptor()
 	// useraddr.DefaultIsDefault holds the default value on creation for the is_default field.
 	useraddr.DefaultIsDefault = useraddrDescIsDefault.Default.(bool)
+	userdeviceFields := schema.UserDevice{}.Fields()
+	_ = userdeviceFields
+	// userdeviceDescDeviceUID is the schema descriptor for device_uid field.
+	userdeviceDescDeviceUID := userdeviceFields[2].Descriptor()
+	// userdevice.DeviceUIDValidator is a validator for the "device_uid" field. It is called by the builders before save.
+	userdevice.DeviceUIDValidator = userdeviceDescDeviceUID.Validators[0].(func(string) error)
+	// userdeviceDescDeviceName is the schema descriptor for device_name field.
+	userdeviceDescDeviceName := userdeviceFields[3].Descriptor()
+	// userdevice.DeviceNameValidator is a validator for the "device_name" field. It is called by the builders before save.
+	userdevice.DeviceNameValidator = userdeviceDescDeviceName.Validators[0].(func(string) error)
+	// userdeviceDescSystemName is the schema descriptor for system_name field.
+	userdeviceDescSystemName := userdeviceFields[4].Descriptor()
+	// userdevice.SystemNameValidator is a validator for the "system_name" field. It is called by the builders before save.
+	userdevice.SystemNameValidator = userdeviceDescSystemName.Validators[0].(func(string) error)
+	// userdeviceDescSystemVersion is the schema descriptor for system_version field.
+	userdeviceDescSystemVersion := userdeviceFields[5].Descriptor()
+	// userdevice.SystemVersionValidator is a validator for the "system_version" field. It is called by the builders before save.
+	userdevice.SystemVersionValidator = userdeviceDescSystemVersion.Validators[0].(func(string) error)
+	// userdeviceDescAppVersion is the schema descriptor for app_version field.
+	userdeviceDescAppVersion := userdeviceFields[6].Descriptor()
+	// userdevice.AppVersionValidator is a validator for the "app_version" field. It is called by the builders before save.
+	userdevice.AppVersionValidator = userdeviceDescAppVersion.Validators[0].(func(string) error)
+	// userdeviceDescDeviceModel is the schema descriptor for device_model field.
+	userdeviceDescDeviceModel := userdeviceFields[7].Descriptor()
+	// userdevice.DeviceModelValidator is a validator for the "device_model" field. It is called by the builders before save.
+	userdevice.DeviceModelValidator = userdeviceDescDeviceModel.Validators[0].(func(string) error)
 }
 
 const (
