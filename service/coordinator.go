@@ -49,6 +49,8 @@ type Coordinator struct {
 	db *ent.Client
 	// knockout sdk
 	KOSdk *api.SDK
+	// MountPaths maps bucket name to local mount path.
+	MountPaths map[string]string
 }
 
 // NewCoordinator returns a new coordinator with the given configuration for alert manager.

@@ -15,6 +15,12 @@ const (
 	AlertNone     AlertStatus = "none"
 	AlertFiring   AlertStatus = "firing"
 	AlertResolved AlertStatus = "resolved"
+
+	// DynamicAttachmentAnnotation is the annotation key for dynamic attachment paths.
+	// Value is a semicolon-separated list of file paths or HTTP(S) URLs.
+	DynamicAttachmentAnnotation = "__attachments__"
+	// DynamicAttachmentSeparator is the separator for multiple attachment paths.
+	DynamicAttachmentSeparator = ";"
 )
 
 func (a *AlertStatus) UnmarshalGQL(v any) error {

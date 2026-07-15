@@ -45,6 +45,31 @@ POST /api/v2/alerts
 
 两者互不覆盖，按顺序依次附加到邮件。
 
+## OSS 对象存储挂载
+
+当附件 URL 为阿里云 OSS 等对象存储地址时，系统可在 API 接收阶段自动将其解析为本地挂载路径，避免运行时 HTTP 下载。
+
+### 配置
+
+在 `app.yaml` 的 `alertManager` 段配置 `mountPaths`，以 bucket 名称为 key、容器内挂载路径为 value：
+
+```yaml
+alertManager:
+  mountPaths:
+    reports-bucket: "/mnt/oss/reports-bucket"
+    data-bucket: "/mnt/oss/data-bucket"
+```
+
+### 解析流程
+
+1. API 接收 Alert 时，提取 `__attachments__` 中的路径
+2. 通过 KOSdk 匹配 URL 对应的 provider（按 `scheme://host` 匹配 `BucketUrl`）
+3. 从 `mountPaths` 中查找该 bucket 的本地挂载路径
+4. 拼接 `{mountPath}/{objectKey}` 得到本地文件路径
+5. 替换 annotation 中的 URL 为本地路径
+
+后续邮件发送时直接读取本地文件，无网络开销。未匹配到 `mountPaths` 的 URL 保持原样，走 HTTP 下载流程。
+
 ## HTTP 附件处理机制
 
 对于 HTTP(S) URL 类型的附件：

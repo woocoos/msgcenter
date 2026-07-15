@@ -29,10 +29,6 @@ const (
 	maxAttachmentSize = 50 << 20 // 50 MB
 	// attachmentDownloadTimeout is the timeout for downloading a single attachment from URL.
 	attachmentDownloadTimeout = 30 * time.Second
-	// dynamicAttachmentAnnotation is the annotation key for dynamic attachment paths.
-	// Value is a semicolon-separated list of file paths or HTTP(S) URLs.
-	// Semicolon is used instead of comma to avoid conflicts with commas in URLs or file paths.
-	dynamicAttachmentAnnotation = "__attachments__"
 )
 
 // Notifier email notifier
@@ -346,11 +342,11 @@ func dynamicAttachmentPaths(alerts []*alert.Alert) []string {
 	var paths []string
 	seen := make(map[string]struct{})
 	for _, a := range alerts {
-		v, ok := a.Annotations[dynamicAttachmentAnnotation]
+		v, ok := a.Annotations[alert.DynamicAttachmentAnnotation]
 		if !ok || v == "" {
 			continue
 		}
-		for _, p := range strings.Split(v, ";") {
+		for _, p := range strings.Split(v, alert.DynamicAttachmentSeparator) {
 			p = strings.TrimSpace(p)
 			if p == "" {
 				continue

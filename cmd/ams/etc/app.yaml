@@ -83,8 +83,9 @@ alertManager:
     # 如果指定租户，则只能访问指定租户的配置
     tenants: [ 1,2,3 ]
     file: etc/alertmanager.yaml
-  storage:
-    path: data
+  # bucket 挂载路径映射：key 为 bucket 名称，value 为容器内挂载路径
+  mountPaths:
+    mybucket: "/mnt/oss/mybucket"
   data:
     retention: 120h
     maintenanceInterval: 15m

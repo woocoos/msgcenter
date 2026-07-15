@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"runtime"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -24,6 +25,7 @@ import (
 	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service"
+	"github.com/woocoos/msgcenter/service/kosdk"
 	"github.com/woocoos/msgcenter/service/provider"
 	"github.com/woocoos/msgcenter/service/silence"
 )
@@ -329,6 +331,10 @@ func (s *ServerImpl) PostAlerts(c *gin.Context, req *PostAlertsRequest) error {
 		}
 		validAlerts = append(validAlerts, a)
 	}
+
+	// Resolve OSS storage URLs in dynamic attachments to local mount paths.
+	s.resolveAttachmentPaths(validAlerts)
+
 	if err := s.alerts.Put(c, validAlerts...); err != nil {
 		return err
 	}
@@ -340,6 +346,42 @@ func removeEmptyLabels(ls label.LabelSet) {
 	for k, v := range ls {
 		if string(v) == "" {
 			delete(ls, k)
+		}
+	}
+}
+
+// resolveAttachmentPaths resolves OSS storage URLs in alert annotations to local mount paths.
+// This allows the email notifier to attach files directly from the mounted filesystem
+// instead of downloading them via HTTP.
+func (s *ServerImpl) resolveAttachmentPaths(alerts []*alert.Alert) {
+	if s.coordinator.KOSdk == nil || len(s.coordinator.MountPaths) == 0 {
+		return
+	}
+	for _, a := range alerts {
+		v, ok := a.Annotations[alert.DynamicAttachmentAnnotation]
+		if !ok || v == "" {
+			continue
+		}
+		tenantID := string(a.Labels[label.TenantLabel])
+		if tenantID == "" {
+			continue
+		}
+		var resolved []string
+		changed := false
+		for _, p := range strings.Split(v, alert.DynamicAttachmentSeparator) {
+			p = strings.TrimSpace(p)
+			if p == "" {
+				continue
+			}
+			if localPath, ok := kosdk.ResolveMountPath(s.coordinator.KOSdk, s.coordinator.MountPaths, tenantID, p); ok {
+				resolved = append(resolved, localPath)
+				changed = true
+			} else {
+				resolved = append(resolved, p)
+			}
+		}
+		if changed {
+			a.Annotations[alert.DynamicAttachmentAnnotation] = strings.Join(resolved, alert.DynamicAttachmentSeparator)
 		}
 	}
 }

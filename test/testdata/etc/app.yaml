@@ -27,8 +27,8 @@ store:
 alertManager:
   config:
     file: testdata/etc/alertmanager.yaml
-  storage:
-    path: tmp
+  mountPaths:
+    test-bucket: "/tmp/oss-mount/test-bucket"
   data:
     retention: 120h
     maintenanceInterval: 15m

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"os"
 	"sync/atomic"
 	"time"
 
@@ -83,6 +82,11 @@ func NewAlertManager(app *woocoo.App, opts ...AmOption) (*AlertManager, error) {
 	am.Coordinator.db = am.DB
 	am.Subscribe.DB = am.DB
 
+	// Load bucket mount paths mapping.
+	if am.cnf.IsSet("mountPaths") {
+		am.Coordinator.MountPaths = am.cnf.StringMap("mountPaths")
+	}
+
 	if app.AppConfiguration().IsSet("kosdk") {
 		koSdk, err := kosdk.NewSDK(app.AppConfiguration().Sub("kosdk"), am.DB)
 		if err != nil {
@@ -97,12 +101,7 @@ func NewAlertManager(app *woocoo.App, opts ...AmOption) (*AlertManager, error) {
 }
 
 func (am *AlertManager) Apply(cnf *conf.Configuration) error {
-	dataDir := cnf.String("storage.path")
-	err := os.MkdirAll(dataDir, os.ModePerm)
-	if err != nil {
-		return err
-	}
-
+	var err error
 	if nflog, err := notify.NewLog(cnf); err != nil {
 		return err
 	} else {

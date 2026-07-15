@@ -194,15 +194,15 @@ func TestDynamicAttachmentPaths(t *testing.T) {
 		{
 			name: "single alert with attachments",
 			alerts: []*alert.Alert{
-				{Annotations: label.LabelSet{dynamicAttachmentAnnotation: "/tmp/a.pdf;/tmp/b.csv"}},
+				{Annotations: label.LabelSet{alert.DynamicAttachmentAnnotation: "/tmp/a.pdf;/tmp/b.csv"}},
 			},
 			want: []string{"/tmp/a.pdf", "/tmp/b.csv"},
 		},
 		{
 			name: "multiple alerts merged and deduped",
 			alerts: []*alert.Alert{
-				{Annotations: label.LabelSet{dynamicAttachmentAnnotation: "/tmp/a.pdf"}},
-				{Annotations: label.LabelSet{dynamicAttachmentAnnotation: "/tmp/a.pdf;https://example.com/c.pdf"}},
+				{Annotations: label.LabelSet{alert.DynamicAttachmentAnnotation: "/tmp/a.pdf"}},
+				{Annotations: label.LabelSet{alert.DynamicAttachmentAnnotation: "/tmp/a.pdf;https://example.com/c.pdf"}},
 			},
 			want: []string{"/tmp/a.pdf", "https://example.com/c.pdf"},
 		},
@@ -210,22 +210,22 @@ func TestDynamicAttachmentPaths(t *testing.T) {
 			name: "alert without annotation skipped",
 			alerts: []*alert.Alert{
 				{Annotations: label.LabelSet{"other": "value"}},
-				{Annotations: label.LabelSet{dynamicAttachmentAnnotation: "/tmp/x.pdf"}},
+				{Annotations: label.LabelSet{alert.DynamicAttachmentAnnotation: "/tmp/x.pdf"}},
 			},
 			want: []string{"/tmp/x.pdf"},
 		},
 		{
 			name: "empty annotation value skipped",
 			alerts: []*alert.Alert{
-				{Annotations: label.LabelSet{dynamicAttachmentAnnotation: ""}},
-				{Annotations: label.LabelSet{dynamicAttachmentAnnotation: "  ;  ;/tmp/y.pdf"}},
+				{Annotations: label.LabelSet{alert.DynamicAttachmentAnnotation: ""}},
+				{Annotations: label.LabelSet{alert.DynamicAttachmentAnnotation: "  ;  ;/tmp/y.pdf"}},
 			},
 			want: []string{"/tmp/y.pdf"},
 		},
 		{
 			name: "URL with comma preserved",
 			alerts: []*alert.Alert{
-				{Annotations: label.LabelSet{dynamicAttachmentAnnotation: "https://example.com/download?a=1,b=2;/tmp/local.pdf"}},
+				{Annotations: label.LabelSet{alert.DynamicAttachmentAnnotation: "https://example.com/download?a=1,b=2;/tmp/local.pdf"}},
 			},
 			want: []string{"https://example.com/download?a=1,b=2", "/tmp/local.pdf"},
 		},

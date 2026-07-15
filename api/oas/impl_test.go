@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -21,9 +22,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"github.com/woocoos/knockout-go/ent/schemax"
+	"github.com/woocoos/knockout-go/api/fs"
+	"github.com/woocoos/knockout-go/api/fs/alioss"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/notify/webhook"
+	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service"
@@ -34,6 +38,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	_ "github.com/woocoos/msgcenter/ent/runtime"
 )
+
+func init() {
+	fs.RegisterS3Provider(fs.KindAliOSS, alioss.BuildProvider)
+}
 
 // ServiceSuite is the service test suite
 type serviceSuite struct {
@@ -73,6 +81,33 @@ func TestServiceSuite(t *testing.T) {
 				}
 			} else if r.URL.Path == "/graphql/query" {
 				w.Header().Set("Content-Type", "application/json")
+				body, _ := io.ReadAll(r.Body)
+				if strings.Contains(string(body), "fileIdentities") {
+					d, err := json.Marshal(map[string]any{
+						"data": map[string]any{
+							"fileIdentitiesForApp": []map[string]any{
+								{
+									"id": 1, "tenantID": 1,
+									"accessKeyID": "test-ak", "accessKeySecret": "test-sk",
+									"roleArn": "", "policy": "", "durationSeconds": 3600,
+									"isDefault": true,
+									"source": map[string]any{
+										"id": 1, "kind": "aliOSS",
+										"endpoint":          "https://oss-cn-hangzhou.aliyuncs.com",
+										"endpointImmutable": false,
+										"stsEndpoint":       "https://sts.cn-hangzhou.aliyuncs.com",
+										"region":            "cn-hangzhou",
+										"bucket":            "test-bucket",
+										"bucketURL":         "https://test-bucket.oss-cn-hangzhou.aliyuncs.com",
+									},
+								},
+							},
+						},
+					})
+					require.NoError(t, err)
+					w.Write(d)
+					return
+				}
 				d, err := json.Marshal(map[string]string{})
 				require.NoError(t, err)
 				w.Write(d)
@@ -202,26 +237,37 @@ func (s *serviceSuite) TestPostAlertsWithDynamicAttachments() {
 		{
 			Alert: &Alert{
 				Labels: map[string]string{
-					"alertname":         "AlterPassword",
-					label.TenantLabel:   "1",
-					label.ToUserIDLabel: "1",
+					"alertname":       "AlterPassword",
+					label.TenantLabel: "1",
+					// Use unique user to create a distinct group, avoiding group_interval delay.
+					label.ToUserIDLabel: "dynatt",
 				},
 			},
 			Annotations: map[string]string{
-				"summary":        "dynamic attachment test",
-				"__attachments__": attServer.URL + "/dynamic.txt",
+				"summary":                           "dynamic attachment test",
+				"to":                                "alerts@example.com",
+				alert.DynamicAttachmentAnnotation: attServer.URL + "/dynamic.txt",
 			},
 			EndsAt:   time.Now().Add(time.Hour),
 			StartsAt: time.Now(),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
-	time.Sleep(time.Second * 3)
 
-	// Our email is at offset countBefore (newest-first order).
-	mail, err := s.maildev.GetEmailAt(countBefore)
-	s.Require().NoError(err)
-	s.Require().NotNil(mail)
+	// Poll for the email to arrive: wait for message count to increase.
+	var mail *maildev.MailDevEmail
+	for i := 0; i < 20; i++ {
+		time.Sleep(500 * time.Millisecond)
+		count, err := s.maildev.MessageCount()
+		s.Require().NoError(err)
+		if count > countBefore {
+			// New email arrived, it's at index 0 (newest-first order).
+			mail, err = s.maildev.GetEmailAt(0)
+			s.Require().NoError(err)
+			break
+		}
+	}
+	s.Require().NotNil(mail, "email should arrive within 10 seconds")
 	s.Require().Equal("alerts@example.com", mail.To[0]["Address"])
 	s.Require().Greater(mail.Attachments, 0, "email should have at least 1 attachment")
 
@@ -231,6 +277,75 @@ func (s *serviceSuite) TestPostAlertsWithDynamicAttachments() {
 	s.Require().Len(msg.Attachments, 1)
 	s.Require().Equal("dynamic.txt", msg.Attachments[0].FileName)
 	s.Require().Equal("text/plain", msg.Attachments[0].ContentType)
+}
+
+// TestPostAlertsWithDynamicAttachments_OSSMount tests that OSS URLs in annotations
+// are resolved to local mount paths at the API stage, so the email notifier
+// attaches the file directly from the mounted filesystem.
+func (s *serviceSuite) TestPostAlertsWithDynamicAttachments_OSSMount() {
+	// Record message count before sending to locate our email precisely.
+	countBefore, err := s.maildev.MessageCount()
+	s.Require().NoError(err)
+
+	// Verify KOSdk was initialized with the mock provider.
+	s.Require().NotNil(s.server.coordinator.KOSdk, "KOSdk must be initialized")
+	s.Require().NotEmpty(s.server.coordinator.MountPaths, "mountPaths must be configured")
+
+	// Create a local file at the expected mount path.
+	mountDir := "/tmp/oss-mount/test-bucket"
+	s.Require().NoError(os.MkdirAll(mountDir, 0o755))
+	localFile := mountDir + "/test-attachment.txt"
+	s.Require().NoError(os.WriteFile(localFile, []byte("oss mount test content"), 0o644))
+	defer os.Remove(localFile)
+
+	// The OSS URL should match the mock provider's BucketUrl.
+	ossURL := "https://test-bucket.oss-cn-hangzhou.aliyuncs.com/test-attachment.txt"
+
+	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	req := PostableAlerts{
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					"alertname":       "AlterPassword",
+					label.TenantLabel: "1",
+					// Use unique user to create a distinct group, avoiding group_interval delay.
+					label.ToUserIDLabel: "ossmount",
+				},
+			},
+			Annotations: map[string]string{
+				"to":                                "alerts@example.com",
+				"summary":                           "oss mount attachment test",
+				alert.DynamicAttachmentAnnotation: ossURL,
+			},
+			EndsAt:   time.Now().Add(time.Hour),
+			StartsAt: time.Now(),
+		},
+	}
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
+
+	// Poll for the email to arrive: wait for message count to increase.
+	var mail *maildev.MailDevEmail
+	for i := 0; i < 20; i++ {
+		time.Sleep(500 * time.Millisecond)
+		count, err := s.maildev.MessageCount()
+		s.Require().NoError(err)
+		if count > countBefore {
+			// New email arrived, it's at index 0 (newest-first order).
+			mail, err = s.maildev.GetEmailAt(0)
+			s.Require().NoError(err)
+			break
+		}
+	}
+	s.Require().NotNil(mail, "email should arrive within 10 seconds")
+
+	// Verify the email was sent with the local file as attachment.
+	s.Require().Equal("alerts@example.com", mail.To[0]["Address"])
+	s.Require().Greater(mail.Attachments, 0, "email should have at least 1 attachment")
+
+	msg, err := s.maildev.GetMessage(mail.ID)
+	s.Require().NoError(err)
+	s.Require().Len(msg.Attachments, 1)
+	s.Require().Equal("test-attachment.txt", msg.Attachments[0].FileName)
 }
 
 // TestPostAlertsWithParams
