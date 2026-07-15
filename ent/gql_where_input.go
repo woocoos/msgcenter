@@ -3316,6 +3316,18 @@ type MsgTemplateWhereInput struct {
 	TenantIDIsNil  bool  `json:"tenantIDIsNil,omitempty"`
 	TenantIDNotNil bool  `json:"tenantIDNotNil,omitempty"`
 
+	// "user_id" field predicates.
+	UserID       *int  `json:"userID,omitempty"`
+	UserIDNEQ    *int  `json:"userIDNEQ,omitempty"`
+	UserIDIn     []int `json:"userIDIn,omitempty"`
+	UserIDNotIn  []int `json:"userIDNotIn,omitempty"`
+	UserIDGT     *int  `json:"userIDGT,omitempty"`
+	UserIDGTE    *int  `json:"userIDGTE,omitempty"`
+	UserIDLT     *int  `json:"userIDLT,omitempty"`
+	UserIDLTE    *int  `json:"userIDLTE,omitempty"`
+	UserIDIsNil  bool  `json:"userIDIsNil,omitempty"`
+	UserIDNotNil bool  `json:"userIDNotNil,omitempty"`
+
 	// "name" field predicates.
 	Name             *string  `json:"name,omitempty"`
 	NameNEQ          *string  `json:"nameNEQ,omitempty"`
@@ -3709,6 +3721,36 @@ func (i *MsgTemplateWhereInput) P() (predicate.MsgTemplate, error) {
 	}
 	if i.TenantIDNotNil {
 		predicates = append(predicates, msgtemplate.TenantIDNotNil())
+	}
+	if i.UserID != nil {
+		predicates = append(predicates, msgtemplate.UserIDEQ(*i.UserID))
+	}
+	if i.UserIDNEQ != nil {
+		predicates = append(predicates, msgtemplate.UserIDNEQ(*i.UserIDNEQ))
+	}
+	if len(i.UserIDIn) > 0 {
+		predicates = append(predicates, msgtemplate.UserIDIn(i.UserIDIn...))
+	}
+	if len(i.UserIDNotIn) > 0 {
+		predicates = append(predicates, msgtemplate.UserIDNotIn(i.UserIDNotIn...))
+	}
+	if i.UserIDGT != nil {
+		predicates = append(predicates, msgtemplate.UserIDGT(*i.UserIDGT))
+	}
+	if i.UserIDGTE != nil {
+		predicates = append(predicates, msgtemplate.UserIDGTE(*i.UserIDGTE))
+	}
+	if i.UserIDLT != nil {
+		predicates = append(predicates, msgtemplate.UserIDLT(*i.UserIDLT))
+	}
+	if i.UserIDLTE != nil {
+		predicates = append(predicates, msgtemplate.UserIDLTE(*i.UserIDLTE))
+	}
+	if i.UserIDIsNil {
+		predicates = append(predicates, msgtemplate.UserIDIsNil())
+	}
+	if i.UserIDNotNil {
+		predicates = append(predicates, msgtemplate.UserIDNotNil())
 	}
 	if i.Name != nil {
 		predicates = append(predicates, msgtemplate.NameEQ(*i.Name))

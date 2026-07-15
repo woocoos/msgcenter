@@ -191,7 +191,7 @@ func init() {
 	// msgtemplate.DefaultCreatedAt holds the default value on creation for the created_at field.
 	msgtemplate.DefaultCreatedAt = msgtemplateDescCreatedAt.Default.(func() time.Time)
 	// msgtemplateDescName is the schema descriptor for name field.
-	msgtemplateDescName := msgtemplateFields[3].Descriptor()
+	msgtemplateDescName := msgtemplateFields[4].Descriptor()
 	// msgtemplate.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	msgtemplate.NameValidator = msgtemplateDescName.Validators[0].(func(string) error)
 	msgtypeMixin := schema.MsgType{}.Mixin()

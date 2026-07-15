@@ -35,6 +35,8 @@ const (
 	FieldMsgEventID = "msg_event_id"
 	// FieldTenantID holds the string denoting the tenant_id field in the database.
 	FieldTenantID = "tenant_id"
+	// FieldUserID holds the string denoting the user_id field in the database.
+	FieldUserID = "user_id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldStatus holds the string denoting the status field in the database.
@@ -84,6 +86,7 @@ var Columns = []string{
 	FieldMsgTypeID,
 	FieldMsgEventID,
 	FieldTenantID,
+	FieldUserID,
 	FieldName,
 	FieldStatus,
 	FieldReceiverType,
@@ -210,6 +213,11 @@ func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
+// ByUserID orders the results by the user_id field.
+func ByUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserID, opts...).ToFunc()
+}
+
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
@@ -304,7 +312,7 @@ func (e Format) MarshalGQL(w io.Writer) {
 }
 
 // UnmarshalGQL implements graphql.Unmarshaler interface.
-func (e *Format) UnmarshalGQL(val any) error {
+func (e *Format) UnmarshalGQL(val interface{}) error {
 	str, ok := val.(string)
 	if !ok {
 		return fmt.Errorf("enum %T must be a string", val)

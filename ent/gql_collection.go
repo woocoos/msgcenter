@@ -1331,6 +1331,11 @@ func (_m *MsgTemplateQuery) collectField(ctx context.Context, oneNode bool, opCt
 				selectedFields = append(selectedFields, msgtemplate.FieldTenantID)
 				fieldSeen[msgtemplate.FieldTenantID] = struct{}{}
 			}
+		case "userID":
+			if _, ok := fieldSeen[msgtemplate.FieldUserID]; !ok {
+				selectedFields = append(selectedFields, msgtemplate.FieldUserID)
+				fieldSeen[msgtemplate.FieldUserID] = struct{}{}
+			}
 		case "name":
 			if _, ok := fieldSeen[msgtemplate.FieldName]; !ok {
 				selectedFields = append(selectedFields, msgtemplate.FieldName)

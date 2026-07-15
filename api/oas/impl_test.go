@@ -22,10 +22,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"github.com/woocoos/knockout-go/ent/schemax"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/knockout-go/api/fs"
 	"github.com/woocoos/knockout-go/api/fs/alioss"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msginternal"
+	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/notify/webhook"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
@@ -172,6 +174,21 @@ func (s *serviceSuite) SetupSuite() {
 
 // 在此添加特殊的用例数据
 func (s *serviceSuite) initData() error {
+	ctx := s.NewTestCtx()
+
+	// Create a user-level template for user 1 on AlterPassword event.
+	// This template has a distinct subject to verify user-level template priority.
+	s.Client.MsgTemplate.Create().
+		SetMsgTypeID(1).SetEventID(1).SetTenantID(1).SetUserID(1).
+		SetName("UserCustomAlterPassword").SetCreatedBy(1).
+		SetStatus(typex.SimpleStatusActive).
+		SetFormat(msgtemplate.FormatTxt).
+		SetReceiverType(profile.ReceiverEmail).
+		SetTo(`{{ template "email.to" . }}`).
+		SetSubject(`用户定制模板测试`).
+		SetBody(`用户定制模板内容`).
+		SaveX(ctx)
+
 	return nil
 }
 
@@ -671,6 +688,93 @@ func (s *serviceSuite) TestMessage() {
 	mist, err := mis[0].MsgInternalTo(schemax.SkipTenantPrivacy(context.Background()))
 	s.Require().NoError(err)
 	s.Len(mist, 2)
+}
+
+// TestUserLevelTemplate verifies that user-level templates take priority over tenant-level templates.
+func (s *serviceSuite) TestUserLevelTemplate() {
+	countBefore, err := s.maildev.MessageCount()
+	s.Require().NoError(err)
+
+	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	req := PostableAlerts{
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					"alertname":       "AlterPassword",
+					label.TenantLabel: "1",
+					// User 1 has a custom user-level template.
+					label.ToUserIDLabel: "1",
+				},
+			},
+			Annotations: map[string]string{
+				"summary": "user template test",
+			},
+			EndsAt:   time.Now().Add(time.Hour),
+			StartsAt: time.Now(),
+		},
+	}
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
+
+	// Poll for the email to arrive.
+	var mail *maildev.MailDevEmail
+	for i := 0; i < 20; i++ {
+		time.Sleep(500 * time.Millisecond)
+		count, err := s.maildev.MessageCount()
+		s.Require().NoError(err)
+		if count > countBefore {
+			mail, err = s.maildev.GetEmailAt(0)
+			s.Require().NoError(err)
+			break
+		}
+	}
+	s.Require().NotNil(mail, "email should arrive within 10 seconds")
+	// User-level template subject should be used.
+	s.Require().Equal("用户定制模板测试", mail.Subject)
+}
+
+// TestTenantLevelTemplateFallback verifies that when no user-level template exists,
+// the system falls back to the tenant-level template.
+func (s *serviceSuite) TestTenantLevelTemplateFallback() {
+	countBefore, err := s.maildev.MessageCount()
+	s.Require().NoError(err)
+
+	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	req := PostableAlerts{
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					"alertname":       "AlterPassword",
+					label.TenantLabel: "1",
+					// User 2 has NO user-level template, should fall back to tenant-level.
+					label.ToUserIDLabel: "2",
+				},
+			},
+			Annotations: map[string]string{
+				"summary": "tenant fallback test",
+			},
+			EndsAt:   time.Now().Add(time.Hour),
+			StartsAt: time.Now(),
+		},
+	}
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
+
+	// Poll for the email to arrive.
+	var mail *maildev.MailDevEmail
+	for i := 0; i < 20; i++ {
+		time.Sleep(500 * time.Millisecond)
+		count, err := s.maildev.MessageCount()
+		s.Require().NoError(err)
+		if count > countBefore {
+			mail, err = s.maildev.GetEmailAt(0)
+			s.Require().NoError(err)
+			break
+		}
+	}
+	s.Require().NotNil(mail, "email should arrive within 10 seconds")
+	// Tenant-level template subject contains "密码到期提醒".
+	s.Require().Contains(mail.Subject, "密码到期提醒")
+	// Should NOT be the user-level template subject.
+	s.Require().NotEqual("用户定制模板测试", mail.Subject)
 }
 
 func (s *serviceSuite) TestPostSilence() {

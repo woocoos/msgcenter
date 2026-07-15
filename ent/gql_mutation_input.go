@@ -334,6 +334,7 @@ func (c *MsgSubscriberUpdateOne) SetInput(i UpdateMsgSubscriberInput) *MsgSubscr
 type CreateMsgTemplateInput struct {
 	MsgTypeID    int
 	TenantID     *int
+	UserID       *int
 	Name         string
 	ReceiverType profile.ReceiverType
 	Format       msgtemplate.Format
@@ -354,6 +355,9 @@ func (i *CreateMsgTemplateInput) Mutate(m *MsgTemplateMutation) {
 	m.SetMsgTypeID(i.MsgTypeID)
 	if v := i.TenantID; v != nil {
 		m.SetTenantID(*v)
+	}
+	if v := i.UserID; v != nil {
+		m.SetUserID(*v)
 	}
 	m.SetName(i.Name)
 	m.SetReceiverType(i.ReceiverType)
@@ -399,6 +403,8 @@ type UpdateMsgTemplateInput struct {
 	MsgTypeID         *int
 	ClearTenantID     bool
 	TenantID          *int
+	ClearUserID       bool
+	UserID            *int
 	Name              *string
 	ReceiverType      *profile.ReceiverType
 	Format            *msgtemplate.Format
@@ -434,6 +440,12 @@ func (i *UpdateMsgTemplateInput) Mutate(m *MsgTemplateMutation) {
 	}
 	if v := i.TenantID; v != nil {
 		m.SetTenantID(*v)
+	}
+	if i.ClearUserID {
+		m.ClearUserID()
+	}
+	if v := i.UserID; v != nil {
+		m.SetUserID(*v)
 	}
 	if v := i.Name; v != nil {
 		m.SetName(*v)

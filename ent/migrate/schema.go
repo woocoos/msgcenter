@@ -214,6 +214,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "msg_type_id", Type: field.TypeInt},
 		{Name: "tenant_id", Type: field.TypeInt, Nullable: true},
+		{Name: "user_id", Type: field.TypeInt, Nullable: true},
 		{Name: "name", Type: field.TypeString, Size: 45},
 		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"active", "inactive", "processing", "disabled"}, Default: "inactive"},
 		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "message", "webhook"}},
@@ -237,7 +238,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "msg_template_msg_event_customer_template",
-				Columns:    []*schema.Column{MsgTemplateColumns[20]},
+				Columns:    []*schema.Column{MsgTemplateColumns[21]},
 				RefColumns: []*schema.Column{MsgEventColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

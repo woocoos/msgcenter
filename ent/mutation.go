@@ -7504,6 +7504,8 @@ type MsgTemplateMutation struct {
 	addmsg_type_id    *int
 	tenant_id         *int
 	addtenant_id      *int
+	user_id           *int
+	adduser_id        *int
 	name              *string
 	status            *typex.SimpleStatus
 	receiver_type     *profile.ReceiverType
@@ -8001,6 +8003,76 @@ func (m *MsgTemplateMutation) ResetTenantID() {
 	m.tenant_id = nil
 	m.addtenant_id = nil
 	delete(m.clearedFields, msgtemplate.FieldTenantID)
+}
+
+// SetUserID sets the "user_id" field.
+func (m *MsgTemplateMutation) SetUserID(i int) {
+	m.user_id = &i
+	m.adduser_id = nil
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *MsgTemplateMutation) UserID() (r int, exists bool) {
+	v := m.user_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the MsgTemplate entity.
+// If the MsgTemplate object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgTemplateMutation) OldUserID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// AddUserID adds i to the "user_id" field.
+func (m *MsgTemplateMutation) AddUserID(i int) {
+	if m.adduser_id != nil {
+		*m.adduser_id += i
+	} else {
+		m.adduser_id = &i
+	}
+}
+
+// AddedUserID returns the value that was added to the "user_id" field in this mutation.
+func (m *MsgTemplateMutation) AddedUserID() (r int, exists bool) {
+	v := m.adduser_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (m *MsgTemplateMutation) ClearUserID() {
+	m.user_id = nil
+	m.adduser_id = nil
+	m.clearedFields[msgtemplate.FieldUserID] = struct{}{}
+}
+
+// UserIDCleared returns if the "user_id" field was cleared in this mutation.
+func (m *MsgTemplateMutation) UserIDCleared() bool {
+	_, ok := m.clearedFields[msgtemplate.FieldUserID]
+	return ok
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *MsgTemplateMutation) ResetUserID() {
+	m.user_id = nil
+	m.adduser_id = nil
+	delete(m.clearedFields, msgtemplate.FieldUserID)
 }
 
 // SetName sets the "name" field.
@@ -8691,7 +8763,7 @@ func (m *MsgTemplateMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MsgTemplateMutation) Fields() []string {
-	fields := make([]string, 0, 20)
+	fields := make([]string, 0, 21)
 	if m.created_by != nil {
 		fields = append(fields, msgtemplate.FieldCreatedBy)
 	}
@@ -8712,6 +8784,9 @@ func (m *MsgTemplateMutation) Fields() []string {
 	}
 	if m.tenant_id != nil {
 		fields = append(fields, msgtemplate.FieldTenantID)
+	}
+	if m.user_id != nil {
+		fields = append(fields, msgtemplate.FieldUserID)
 	}
 	if m.name != nil {
 		fields = append(fields, msgtemplate.FieldName)
@@ -8774,6 +8849,8 @@ func (m *MsgTemplateMutation) Field(name string) (ent.Value, bool) {
 		return m.MsgEventID()
 	case msgtemplate.FieldTenantID:
 		return m.TenantID()
+	case msgtemplate.FieldUserID:
+		return m.UserID()
 	case msgtemplate.FieldName:
 		return m.Name()
 	case msgtemplate.FieldStatus:
@@ -8823,6 +8900,8 @@ func (m *MsgTemplateMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldMsgEventID(ctx)
 	case msgtemplate.FieldTenantID:
 		return m.OldTenantID(ctx)
+	case msgtemplate.FieldUserID:
+		return m.OldUserID(ctx)
 	case msgtemplate.FieldName:
 		return m.OldName(ctx)
 	case msgtemplate.FieldStatus:
@@ -8906,6 +8985,13 @@ func (m *MsgTemplateMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTenantID(v)
+		return nil
+	case msgtemplate.FieldUserID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
 		return nil
 	case msgtemplate.FieldName:
 		v, ok := value.(string)
@@ -9018,6 +9104,9 @@ func (m *MsgTemplateMutation) AddedFields() []string {
 	if m.addtenant_id != nil {
 		fields = append(fields, msgtemplate.FieldTenantID)
 	}
+	if m.adduser_id != nil {
+		fields = append(fields, msgtemplate.FieldUserID)
+	}
 	return fields
 }
 
@@ -9034,6 +9123,8 @@ func (m *MsgTemplateMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedMsgTypeID()
 	case msgtemplate.FieldTenantID:
 		return m.AddedTenantID()
+	case msgtemplate.FieldUserID:
+		return m.AddedUserID()
 	}
 	return nil, false
 }
@@ -9071,6 +9162,13 @@ func (m *MsgTemplateMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddTenantID(v)
 		return nil
+	case msgtemplate.FieldUserID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUserID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown MsgTemplate numeric field %s", name)
 }
@@ -9087,6 +9185,9 @@ func (m *MsgTemplateMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(msgtemplate.FieldTenantID) {
 		fields = append(fields, msgtemplate.FieldTenantID)
+	}
+	if m.FieldCleared(msgtemplate.FieldUserID) {
+		fields = append(fields, msgtemplate.FieldUserID)
 	}
 	if m.FieldCleared(msgtemplate.FieldStatus) {
 		fields = append(fields, msgtemplate.FieldStatus)
@@ -9140,6 +9241,9 @@ func (m *MsgTemplateMutation) ClearField(name string) error {
 		return nil
 	case msgtemplate.FieldTenantID:
 		m.ClearTenantID()
+		return nil
+	case msgtemplate.FieldUserID:
+		m.ClearUserID()
 		return nil
 	case msgtemplate.FieldStatus:
 		m.ClearStatus()
@@ -9199,6 +9303,9 @@ func (m *MsgTemplateMutation) ResetField(name string) error {
 		return nil
 	case msgtemplate.FieldTenantID:
 		m.ResetTenantID()
+		return nil
+	case msgtemplate.FieldUserID:
+		m.ResetUserID()
 		return nil
 	case msgtemplate.FieldName:
 		m.ResetName()
