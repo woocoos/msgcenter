@@ -78,6 +78,27 @@ const schemaWithMocks = addMocksToSchema({
       }
     },
     Mutation: {
+      createMsgSilence(_, { input }) {
+        input.id = `${Date.now()}`;
+        store.set('Silence', input.id, input)
+        return addListTemp(
+          store,
+          store.get('Query', 'ROOT', 'silences') as Ref,
+          store.get('Silence', input.id) as Ref
+        );
+      },
+      updateMsgSilence(_, { id, input }) {
+        store.set('Silence', id, input)
+        return store.get('Silence', id)
+      },
+      deleteMsgSilence(_, { id }) {
+        delListTemp(
+          store,
+          store.get('Query', 'ROOT', 'silences') as Ref,
+          id,
+        )
+        return true;
+      },
       createMsgSubscriber(_, { inputs }) {
         const ids: string[] = [];
         inputs.forEach((input, index) => {
