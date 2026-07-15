@@ -2,8 +2,11 @@ import { getItem, setItem } from '@/pkg/localStore';
 import { User } from '@knockout-js/api/ucenter';
 import { request } from 'ice';
 import { LoginRes } from '.';
+import { getI18n } from 'react-i18next';
+import { randomId } from '@/util';
 
 const ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '/api-auth'
+const ICE_API_I18N_PREFIX = process.env.ICE_API_I18N_PREFIX ?? ''
 
 /**
  * 解析spm信息
@@ -51,5 +54,22 @@ export async function parseSpm() {
     u.searchParams.delete('spm')
     u.searchParams.delete('tid')
     location.replace(u)
+  }
+}
+
+/**
+ * 多语言文件获取
+ */
+export const initFillI18n = async () => {
+  if (ICE_API_I18N_PREFIX) {
+    const i18n = getI18n()
+    try {
+      const file = await request.get(`${ICE_API_I18N_PREFIX}/${i18n.language}.json?t=${randomId(5)}`)
+      if (typeof file === 'object') {
+        i18n.addResources(i18n.language, 'translation', file)
+      }
+    } catch (error) {
+      console.error(`${i18n?.language ?? 'i18n'}读取失败！`)
+    }
   }
 }

@@ -12,10 +12,10 @@ import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/type
 import { Result, message } from 'antd';
 import { defineAppConfig, defineDataLoader } from 'ice';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
-import { useTranslation } from 'react-i18next';
+import { getI18n, useTranslation } from 'react-i18next';
 import { Message } from './generated/msgsrv/graphql';
 import { logout } from './services/auth';
-import { parseSpm } from './services/auth/noStore';
+import { initFillI18n, parseSpm } from './services/auth/noStore';
 import { browserLanguage, getMenuAppActions } from './util';
 import { setLibraryName } from '@ice/stark-app';
 import { isInIcestark } from '@ice/stark-app';
@@ -126,6 +126,7 @@ export const urqlConfig = defineUrqlConfig([
     exchangeOpt: {
       authOpts: {
         store: {
+          getI18n: () => getI18n(),
           getState: () => {
             const userState = store.getModelState('user')
             let token = userState.token ? userState.token : getItem<string>('token') as string,
@@ -152,7 +153,9 @@ export const urqlConfig = defineUrqlConfig([
           }
         },
         error: (err, errstr) => {
-          if (errstr) {
+          if (err.response.status === 403) {
+            message.error(getI18n().t("403"))
+          } else if (errstr) {
             message.error(errstr)
           }
           return false;
@@ -196,6 +199,7 @@ export const authConfig = defineAuthConfig(async (appData) => {
     token = starkStore.get('token') ?? iceStore?.user?.token
     tenantId = iceStore?.user?.tenantId
   }
+  await initFillI18n()
   // 判断路由权限
   if (token && tenantId) {
     const result = await userPermissions(ICE_APP_CODE, {
@@ -242,6 +246,7 @@ export const storeConfig = defineStoreConfig(async (appData) => {
 export const requestConfig = defineRequestConfig({
   interceptors: requestInterceptor({
     store: {
+      getI18n: () => getI18n(),
       getState: () => {
         let token = getItem<string>('token') as string,
           tenantId = getItem<string>('tenantId') as string;
@@ -258,9 +263,11 @@ export const requestConfig = defineRequestConfig({
     },
     headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
     login: ICE_LOGIN_URL,
-    error: (err, str) => {
-      if (str) {
-        message.error(str)
+    error: (err, errstr) => {
+      if (err?.['response']?.['status'] === 403) {
+        message.error(getI18n().t("403"))
+      } else if (errstr) {
+        message.error(errstr)
       }
     }
   })
