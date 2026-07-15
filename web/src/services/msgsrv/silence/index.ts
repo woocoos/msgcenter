@@ -1,5 +1,5 @@
 import { gql } from "@/generated/msgsrv";
-import { CreateSilenceInput, OrderDirection, SilenceOrder, SilenceOrderField, SilenceWhereInput, UpdateSilenceInput } from "@/generated/msgsrv/graphql";
+import { CreateMsgSilenceInput, OrderDirection, MsgSilenceOrder, MsgSilenceOrderField, MsgSilenceWhereInput, UpdateMsgSilenceInput } from "@/generated/msgsrv/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
@@ -16,7 +16,7 @@ export const EnumSilenceMatchType = {
   MatchNotRegexp: { text: '!~', },
 };
 
-const querySilenceList = gql(/* GraphQL */`query silenceList($first: Int,$orderBy:SilenceOrder,$where:SilenceWhereInput){
+const querySilenceList = gql(/* GraphQL */`query silenceList($first: Int,$orderBy:MsgSilenceOrder,$where:MsgSilenceWhereInput){
   silences(first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
@@ -34,7 +34,7 @@ const querySilenceList = gql(/* GraphQL */`query silenceList($first: Int,$orderB
 const querySilenceInfo = gql(/* GraphQL */`query SilenceInfo($gid:GID!){
   node(id: $gid){
     id
-    ... on Silence{
+    ... on MsgSilence{
       id,tenantID,startsAt,endsAt,comments,state
       matchers{
         type,name,value
@@ -44,8 +44,8 @@ const querySilenceInfo = gql(/* GraphQL */`query SilenceInfo($gid:GID!){
 }`);
 
 
-const mutationCreateSilence = gql(/* GraphQL */`mutation createSilence($input: CreateSilenceInput!){
-  createSilence(input: $input){
+const mutationCreateSilence = gql(/* GraphQL */`mutation createMsgSilence($input: CreateMsgSilenceInput!){
+  createMsgSilence(input: $input){
     id,tenantID,comments,createdAt,startsAt,endsAt,state,
     matchers{
       type,name,value
@@ -53,8 +53,8 @@ const mutationCreateSilence = gql(/* GraphQL */`mutation createSilence($input: C
   }
 }`);
 
-const mutationUpdateSilence = gql(/* GraphQL */`mutation updateSilence($id:ID!,$input: UpdateSilenceInput!){
-  updateSilence(id:$id,input: $input){
+const mutationUpdateSilence = gql(/* GraphQL */`mutation updateMsgSilence($id:ID!,$input: UpdateMsgSilenceInput!){
+  updateMsgSilence(id:$id,input: $input){
     id,tenantID,comments,createdAt,startsAt,endsAt,state,
     matchers{
       type,name,value
@@ -62,8 +62,8 @@ const mutationUpdateSilence = gql(/* GraphQL */`mutation updateSilence($id:ID!,$
   }
 }`);
 
-const mutationDelSilence = gql(/* GraphQL */`mutation delSilence($id:ID!){
-  deleteSilence(id:$id)
+const mutationDelSilence = gql(/* GraphQL */`mutation delMsgSilence($id:ID!){
+  deleteMsgSilence(id:$id)
 }`);
 
 
@@ -77,8 +77,8 @@ export async function getSilenceList(
   gather: {
     current?: number;
     pageSize?: number;
-    where?: SilenceWhereInput;
-    orderBy?: SilenceOrder;
+    where?: MsgSilenceWhereInput;
+    orderBy?: MsgSilenceOrder;
   }) {
   const result = await paging(
     querySilenceList, {
@@ -86,7 +86,7 @@ export async function getSilenceList(
     where: gather.where,
     orderBy: gather.orderBy ?? {
       direction: OrderDirection.Desc,
-      field: SilenceOrderField.CreatedAt
+      field: MsgSilenceOrderField.CreatedAt
     },
   }, gather.current || 1);
 
@@ -104,9 +104,9 @@ export async function getSilenceList(
  */
 export async function getSilenceInfo(silenceId: string) {
   const result = await query(querySilenceInfo, {
-    gid: gid('Silence', silenceId)
+    gid: gid('MsgSilence', silenceId)
   })
-  if (result.data?.node?.__typename === "Silence") {
+  if (result.data?.node?.__typename === "MsgSilence") {
     return result.data.node
   }
   return null
@@ -118,7 +118,7 @@ export async function getSilenceInfo(silenceId: string) {
  * @param input
  * @returns
  */
-export async function createSilence(input: CreateSilenceInput) {
+export async function createSilence(input: CreateMsgSilenceInput) {
   const result = await mutation(mutationCreateSilence, {
     input
   })
@@ -134,7 +134,7 @@ export async function createSilence(input: CreateSilenceInput) {
  * @param input
  * @returns
  */
-export async function updateSilence(silenceId: string, input: UpdateSilenceInput) {
+export async function updateSilence(silenceId: string, input: UpdateMsgSilenceInput) {
   const result = await mutation(mutationUpdateSilence, {
     id: silenceId,
     input,

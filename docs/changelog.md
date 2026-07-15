@@ -1,5 +1,31 @@
 # Changelog
 
+## v0.3.0 (2026-07-15)
+
+### 用户级模板定制
+
+- `MsgTemplate` schema 新增 `user_id` 可选字段，支持用户级模板定制
+- 模板选择实现三级回退策略：用户级 > 租户级 > 全局默认
+- 前端模板管理页面新增"模板范围"列，显示模板级别（用户/租户/全局）
+- 前端模板创建/编辑表单新增用户选择器，支持指定模板适用用户
+
+### 动态附件
+
+- 邮件通知支持通过 Alert annotations 传递动态附件路径（`__attachments__`）
+- 支持本地文件路径和 HTTP(S) URL 两种附件来源
+- API 阶段自动识别 OSS URL 并解析为本地挂载路径，避免运行时下载
+- 配置 `alertManager.mountPaths` 支持按 bucket 映射本地挂载路径
+
+### GraphQL 规范化
+
+- Silence 相关 mutation 重命名：`createSilence` → `createMsgSilence`，`updateSilence` → `updateMsgSilence`，`deleteSilence` → `deleteMsgSilence`
+- 统一实体命名规范，所有 mutation 使用 `Msg` 前缀
+
+### 配置变更
+
+- 新增 `alertManager.mountPaths`：bucket 到本地挂载路径的映射（用于动态附件）
+- 移除废弃的 `alertManager.storage.path` 配置
+
 ## v0.2.0 (2026-07-14)
 
 ### 核心重构

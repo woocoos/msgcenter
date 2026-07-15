@@ -6,7 +6,7 @@ import { CreateMsgTemplateInput, MsgEvent, MsgTemplate, MsgTemplateFormat, MsgTe
 import { EnumMsgTemplateFormat, createMsgTemplate, getMsgTemplateInfo, updateMsgTemplate,getMsgTemplateDefine } from '@/services/msgsrv/template';
 import InputMultiple from '@/components/input/multiple';
 import { UploadMultiple, UploadTemp, useLeavePrompt } from '@knockout-js/layout';
-import { OrgSelect } from '@knockout-js/org';
+import { OrgSelect, UserSelect } from '@knockout-js/org';
 import { getOrg } from '@knockout-js/api';
 import { Org, OrgKind } from '@knockout-js/api/ucenter';
 import store from '@/store';
@@ -25,6 +25,7 @@ type ProFormData = {
   body?: string;
   tpl?: string;
   attachments?: string[];
+  userID?: string;
 };
 
 export default (props: {
@@ -90,6 +91,7 @@ export default (props: {
           initData.body = result.body || undefined;
           initData.tpl = result.tpl || undefined;
           initData.attachments = result.attachments || undefined;
+          initData.userID = result.userID || undefined;
         }
       }
       setShowCc(!!initData.cc)
@@ -115,6 +117,9 @@ export default (props: {
       }
       if (props.type === TemplateType.customer){
         input.tenantID = userState.tenantId;
+        if (values.userID) {
+          input.userID = values.userID;
+        }
       }
 
       if (props.receiverType === MsgTemplateReceiverType.Email) {
@@ -174,6 +179,15 @@ export default (props: {
         label={t('description')}
         placeholder={`${t('please_enter_description')}`}
       />
+      {props.type === TemplateType.customer ? (
+        <ProFormText
+          name="userID"
+          label="用户ID"
+          tooltip="指定用户ID后，该模板仅对该用户生效，为空则为租户级模板"
+        >
+          <UserSelect changeValue="id" />
+        </ProFormText>
+      ) : null}
       <ProFormText
         name="subject"
         label={t('subject')}

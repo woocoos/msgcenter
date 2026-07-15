@@ -186,7 +186,7 @@ func (s *serviceSuite) initData() error {
 		SetReceiverType(profile.ReceiverEmail).
 		SetTo(`{{ template "email.to" . }}`).
 		SetSubject(`用户定制模板测试`).
-		SetBody(`用户定制模板内容`).
+		SetBody(`{{ template "1.alterpwd.txt" . }}`).
 		SaveX(ctx)
 
 	return nil
@@ -208,7 +208,7 @@ func (s *serviceSuite) TestPostAlerts() {
 				Labels: map[string]string{
 					"alertname":         "AlterPassword",
 					label.TenantLabel:   "1",
-					label.ToUserIDLabel: "1",
+					label.ToUserIDLabel: "3",
 				},
 			},
 			Annotations: map[string]string{
@@ -223,7 +223,7 @@ func (s *serviceSuite) TestPostAlerts() {
 	mail, err := s.maildev.GetLastEmail()
 	s.Require().NoError(err)
 	s.Require().NotNil(mail)
-	s.Require().Equal("alerts@example.com", mail.To[0]["Address"])
+	s.Require().Equal("nobody@localhost", mail.To[0]["Address"])
 }
 
 // TestPostAlertsWithDynamicAttachments tests email notification with dynamic attachments

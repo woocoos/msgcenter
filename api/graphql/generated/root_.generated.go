@@ -318,6 +318,7 @@ type ComplexityRoot struct {
 		Tpl          func(childComplexity int) int
 		UpdatedAt    func(childComplexity int) int
 		UpdatedBy    func(childComplexity int) int
+		UserID       func(childComplexity int) int
 	}
 
 	MsgTemplateConnection struct {
@@ -365,16 +366,16 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateMsgChannel              func(childComplexity int, input ent.CreateMsgChannelInput) int
 		CreateMsgEvent                func(childComplexity int, input ent.CreateMsgEventInput) int
+		CreateMsgSilence              func(childComplexity int, input ent.CreateMsgSilenceInput) int
 		CreateMsgSubscriber           func(childComplexity int, inputs []*ent.CreateMsgSubscriberInput) int
 		CreateMsgTemplate             func(childComplexity int, input ent.CreateMsgTemplateInput) int
 		CreateMsgType                 func(childComplexity int, input ent.CreateMsgTypeInput) int
-		CreateSilence                 func(childComplexity int, input ent.CreateMsgSilenceInput) int
 		DeleteMsgChannel              func(childComplexity int, id int) int
 		DeleteMsgEvent                func(childComplexity int, id int) int
+		DeleteMsgSilence              func(childComplexity int, id int) int
 		DeleteMsgSubscriber           func(childComplexity int, ids []int) int
 		DeleteMsgTemplate             func(childComplexity int, id int) int
 		DeleteMsgType                 func(childComplexity int, id int) int
-		DeleteSilence                 func(childComplexity int, id int) int
 		DisableMsgChannel             func(childComplexity int, id int) int
 		DisableMsgEvent               func(childComplexity int, id int) int
 		DisableMsgTemplate            func(childComplexity int, id int) int
@@ -388,9 +389,9 @@ type ComplexityRoot struct {
 		TestSendMessageTpl            func(childComplexity int, tplID int, userID int, labels map[string]string, annotations map[string]string) int
 		UpdateMsgChannel              func(childComplexity int, id int, input ent.UpdateMsgChannelInput) int
 		UpdateMsgEvent                func(childComplexity int, id int, input ent.UpdateMsgEventInput) int
+		UpdateMsgSilence              func(childComplexity int, id int, input ent.UpdateMsgSilenceInput) int
 		UpdateMsgTemplate             func(childComplexity int, id int, input ent.UpdateMsgTemplateInput) int
 		UpdateMsgType                 func(childComplexity int, id int, input ent.UpdateMsgTypeInput) int
-		UpdateSilence                 func(childComplexity int, id int, input ent.UpdateMsgSilenceInput) int
 	}
 
 	Nlog struct {
@@ -1821,6 +1822,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgTemplate.UpdatedBy(childComplexity), true
 
+	case "MsgTemplate.userID":
+		if e.complexity.MsgTemplate.UserID == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplate.UserID(childComplexity), true
+
 	case "MsgTemplateConnection.edges":
 		if e.complexity.MsgTemplateConnection.Edges == nil {
 			break
@@ -2034,6 +2042,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateMsgEvent(childComplexity, args["input"].(ent.CreateMsgEventInput)), true
 
+	case "Mutation.createMsgSilence":
+		if e.complexity.Mutation.CreateMsgSilence == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createMsgSilence_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateMsgSilence(childComplexity, args["input"].(ent.CreateMsgSilenceInput)), true
+
 	case "Mutation.createMsgSubscriber":
 		if e.complexity.Mutation.CreateMsgSubscriber == nil {
 			break
@@ -2070,18 +2090,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateMsgType(childComplexity, args["input"].(ent.CreateMsgTypeInput)), true
 
-	case "Mutation.createSilence":
-		if e.complexity.Mutation.CreateSilence == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createSilence_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateSilence(childComplexity, args["input"].(ent.CreateMsgSilenceInput)), true
-
 	case "Mutation.deleteMsgChannel":
 		if e.complexity.Mutation.DeleteMsgChannel == nil {
 			break
@@ -2105,6 +2113,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteMsgEvent(childComplexity, args["id"].(int)), true
+
+	case "Mutation.deleteMsgSilence":
+		if e.complexity.Mutation.DeleteMsgSilence == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteMsgSilence_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteMsgSilence(childComplexity, args["id"].(int)), true
 
 	case "Mutation.deleteMsgSubscriber":
 		if e.complexity.Mutation.DeleteMsgSubscriber == nil {
@@ -2141,18 +2161,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteMsgType(childComplexity, args["id"].(int)), true
-
-	case "Mutation.deleteSilence":
-		if e.complexity.Mutation.DeleteSilence == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteSilence_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteSilence(childComplexity, args["id"].(int)), true
 
 	case "Mutation.disableMsgChannel":
 		if e.complexity.Mutation.DisableMsgChannel == nil {
@@ -2305,6 +2313,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateMsgEvent(childComplexity, args["id"].(int), args["input"].(ent.UpdateMsgEventInput)), true
 
+	case "Mutation.updateMsgSilence":
+		if e.complexity.Mutation.UpdateMsgSilence == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateMsgSilence_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateMsgSilence(childComplexity, args["id"].(int), args["input"].(ent.UpdateMsgSilenceInput)), true
+
 	case "Mutation.updateMsgTemplate":
 		if e.complexity.Mutation.UpdateMsgTemplate == nil {
 			break
@@ -2328,18 +2348,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateMsgType(childComplexity, args["id"].(int), args["input"].(ent.UpdateMsgTypeInput)), true
-
-	case "Mutation.updateSilence":
-		if e.complexity.Mutation.UpdateSilence == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_updateSilence_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.UpdateSilence(childComplexity, args["id"].(int), args["input"].(ent.UpdateMsgSilenceInput)), true
 
 	case "Nlog.alerts":
 		if e.complexity.Nlog.Alerts == nil {
@@ -3219,6 +3227,10 @@ input CreateMsgTemplateInput {
   组织ID
   """
   tenantID: ID
+  """
+  用户ID，为空表示租户级或全局模板
+  """
+  userID: ID
   """
   消息模板名称
   """
@@ -4826,6 +4838,10 @@ type MsgTemplate implements Node {
   """
   tenantID: ID
   """
+  用户ID，为空表示租户级或全局模板
+  """
+  userID: ID
+  """
   消息模板名称
   """
   name: String!
@@ -5050,6 +5066,19 @@ input MsgTemplateWhereInput {
   tenantIDLTE: ID
   tenantIDIsNil: Boolean
   tenantIDNotNil: Boolean
+  """
+  user_id field predicates
+  """
+  userID: ID
+  userIDNEQ: ID
+  userIDIn: [ID!]
+  userIDNotIn: [ID!]
+  userIDGT: ID
+  userIDGTE: ID
+  userIDLT: ID
+  userIDLTE: ID
+  userIDIsNil: Boolean
+  userIDNotNil: Boolean
   """
   name field predicates
   """
@@ -5996,6 +6025,11 @@ input UpdateMsgTemplateInput {
   tenantID: ID
   clearTenantID: Boolean
   """
+  用户ID，为空表示租户级或全局模板
+  """
+  userID: ID
+  clearUserID: Boolean
+  """
   消息模板名称
   """
   name: String
@@ -6392,11 +6426,11 @@ extend type Query {
     """ 删除订阅 """
     deleteMsgSubscriber(ids: [ID!]!): Boolean!
     """ 创建静默 """
-    createSilence(input: CreateMsgSilenceInput!): MsgSilence!
+    createMsgSilence(input: CreateMsgSilenceInput!): MsgSilence!
     """ 更新静默 """
-    updateSilence(id: ID!, input: UpdateMsgSilenceInput!): MsgSilence!
+    updateMsgSilence(id: ID!, input: UpdateMsgSilenceInput!): MsgSilence!
     """ 删除静默 """
-    deleteSilence(id: ID!): Boolean!
+    deleteMsgSilence(id: ID!): Boolean!
     """ 设置站内信消息已读未读 """
     markMsgInternalToReadOrUnRead(ids: [ID!]!, read: Boolean!): Boolean!
     """ 删除站内信消息 """

@@ -371,8 +371,8 @@ func (r *mutationResolver) DeleteMsgSubscriber(ctx context.Context, ids []int) (
 	return err == nil, err
 }
 
-// CreateSilence is the resolver for the createSilence field.
-func (r *mutationResolver) CreateSilence(ctx context.Context, input ent.CreateMsgSilenceInput) (*ent.MsgSilence, error) {
+// CreateMsgSilence is the resolver for the createMsgSilence field.
+func (r *mutationResolver) CreateMsgSilence(ctx context.Context, input ent.CreateMsgSilenceInput) (*ent.MsgSilence, error) {
 	sil, err := ent.FromContext(ctx).MsgSilence.Create().SetInput(input).Save(ctx)
 	if err != nil {
 		return nil, err
@@ -388,8 +388,8 @@ func (r *mutationResolver) CreateSilence(ctx context.Context, input ent.CreateMs
 	return sil, err
 }
 
-// UpdateSilence is the resolver for the updateSilence field.
-func (r *mutationResolver) UpdateSilence(ctx context.Context, id int, input ent.UpdateMsgSilenceInput) (*ent.MsgSilence, error) {
+// UpdateMsgSilence is the resolver for the updateMsgSilence field.
+func (r *mutationResolver) UpdateMsgSilence(ctx context.Context, id int, input ent.UpdateMsgSilenceInput) (*ent.MsgSilence, error) {
 	client := ent.FromContext(ctx)
 	sil, err := client.MsgSilence.UpdateOneID(id).SetInput(input).Save(ctx)
 	if err != nil {
@@ -415,8 +415,8 @@ func (r *mutationResolver) UpdateSilence(ctx context.Context, id int, input ent.
 	return v.(*ent.MsgSilence), err
 }
 
-// DeleteSilence is the resolver for the deleteSilence field.
-func (r *mutationResolver) DeleteSilence(ctx context.Context, id int) (bool, error) {
+// DeleteMsgSilence is the resolver for the deleteMsgSilence field.
+func (r *mutationResolver) DeleteMsgSilence(ctx context.Context, id int) (bool, error) {
 	err := ent.FromContext(ctx).MsgSilence.DeleteOneID(id).Exec(ctx)
 	if err != nil {
 		return false, err

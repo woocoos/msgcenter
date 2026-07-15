@@ -38,6 +38,18 @@ export default () => {
       },
       { title: t('subject'), dataIndex: 'subject', width: 120 },
       {
+        title: '模板范围', dataIndex: 'userID', width: 100, search: false,
+        render(text, record) {
+          if (record.userID) {
+            return `用户(${record.userID})`;
+          }
+          if (record.tenantID) {
+            return '租户';
+          }
+          return '全局';
+        },
+      },
+      {
         title: t('way_receiving'), dataIndex: 'receiverType', width: 120, search: false,
         filters: true,
         valueEnum: EnumMsgTemplateFormat,

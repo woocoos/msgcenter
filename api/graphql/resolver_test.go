@@ -79,9 +79,9 @@ func (s *resolverSuite) TearDownSuite() {
 	}
 }
 
-func (s *resolverSuite) TestCreateSilence() {
+func (s *resolverSuite) TestCreateMsgSilence() {
 	ctx := s.NewTestCtx()
-	silence, err := s.mr.CreateSilence(ctx, ent.CreateMsgSilenceInput{
+	silence, err := s.mr.CreateMsgSilence(ctx, ent.CreateMsgSilenceInput{
 		Comments: gds.Ptr("test"),
 		EndsAt:   time.Now().Add(time.Second * 10),
 		StartsAt: time.Now().Add(time.Second * -5),

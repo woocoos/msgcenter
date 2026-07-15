@@ -4393,6 +4393,8 @@ func (ec *executionContext) fieldContext_MsgEvent_customerTemplate(_ context.Con
 				return ec.fieldContext_MsgTemplate_msgEventID(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_MsgTemplate_tenantID(ctx, field)
+			case "userID":
+				return ec.fieldContext_MsgTemplate_userID(ctx, field)
 			case "name":
 				return ec.fieldContext_MsgTemplate_name(ctx, field)
 			case "status":
@@ -7993,6 +7995,47 @@ func (ec *executionContext) fieldContext_MsgTemplate_tenantID(_ context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _MsgTemplate_userID(ctx context.Context, field graphql.CollectedField, obj *ent.MsgTemplate) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgTemplate_userID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgTemplate_userID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgTemplate",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MsgTemplate_name(ctx context.Context, field graphql.CollectedField, obj *ent.MsgTemplate) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MsgTemplate_name(ctx, field)
 	if err != nil {
@@ -8806,6 +8849,8 @@ func (ec *executionContext) fieldContext_MsgTemplateEdge_node(_ context.Context,
 				return ec.fieldContext_MsgTemplate_msgEventID(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_MsgTemplate_tenantID(ctx, field)
+			case "userID":
+				return ec.fieldContext_MsgTemplate_userID(ctx, field)
 			case "name":
 				return ec.fieldContext_MsgTemplate_name(ctx, field)
 			case "status":
@@ -13296,7 +13341,7 @@ func (ec *executionContext) unmarshalInputCreateMsgTemplateInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"msgTypeID", "tenantID", "name", "receiverType", "format", "subject", "from", "to", "cc", "bcc", "body", "tpl", "attachments", "comments", "eventID"}
+	fieldsInOrder := [...]string{"msgTypeID", "tenantID", "userID", "name", "receiverType", "format", "subject", "from", "to", "cc", "bcc", "body", "tpl", "attachments", "comments", "eventID"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13317,6 +13362,13 @@ func (ec *executionContext) unmarshalInputCreateMsgTemplateInput(ctx context.Con
 				return it, err
 			}
 			it.TenantID = data
+		case "userID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserID = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -18176,7 +18228,7 @@ func (ec *executionContext) unmarshalInputMsgTemplateWhereInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "msgTypeID", "msgTypeIDNEQ", "msgTypeIDIn", "msgTypeIDNotIn", "msgTypeIDGT", "msgTypeIDGTE", "msgTypeIDLT", "msgTypeIDLTE", "msgEventID", "msgEventIDNEQ", "msgEventIDIn", "msgEventIDNotIn", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "tenantIDIsNil", "tenantIDNotNil", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "status", "statusNEQ", "statusIn", "statusNotIn", "statusIsNil", "statusNotNil", "receiverType", "receiverTypeNEQ", "receiverTypeIn", "receiverTypeNotIn", "format", "formatNEQ", "formatIn", "formatNotIn", "subject", "subjectNEQ", "subjectIn", "subjectNotIn", "subjectGT", "subjectGTE", "subjectLT", "subjectLTE", "subjectContains", "subjectHasPrefix", "subjectHasSuffix", "subjectIsNil", "subjectNotNil", "subjectEqualFold", "subjectContainsFold", "from", "fromNEQ", "fromIn", "fromNotIn", "fromGT", "fromGTE", "fromLT", "fromLTE", "fromContains", "fromHasPrefix", "fromHasSuffix", "fromIsNil", "fromNotNil", "fromEqualFold", "fromContainsFold", "to", "toNEQ", "toIn", "toNotIn", "toGT", "toGTE", "toLT", "toLTE", "toContains", "toHasPrefix", "toHasSuffix", "toIsNil", "toNotNil", "toEqualFold", "toContainsFold", "cc", "ccNEQ", "ccIn", "ccNotIn", "ccGT", "ccGTE", "ccLT", "ccLTE", "ccContains", "ccHasPrefix", "ccHasSuffix", "ccIsNil", "ccNotNil", "ccEqualFold", "ccContainsFold", "bcc", "bccNEQ", "bccIn", "bccNotIn", "bccGT", "bccGTE", "bccLT", "bccLTE", "bccContains", "bccHasPrefix", "bccHasSuffix", "bccIsNil", "bccNotNil", "bccEqualFold", "bccContainsFold", "hasEvent", "hasEventWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "msgTypeID", "msgTypeIDNEQ", "msgTypeIDIn", "msgTypeIDNotIn", "msgTypeIDGT", "msgTypeIDGTE", "msgTypeIDLT", "msgTypeIDLTE", "msgEventID", "msgEventIDNEQ", "msgEventIDIn", "msgEventIDNotIn", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "tenantIDIsNil", "tenantIDNotNil", "userID", "userIDNEQ", "userIDIn", "userIDNotIn", "userIDGT", "userIDGTE", "userIDLT", "userIDLTE", "userIDIsNil", "userIDNotNil", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "status", "statusNEQ", "statusIn", "statusNotIn", "statusIsNil", "statusNotNil", "receiverType", "receiverTypeNEQ", "receiverTypeIn", "receiverTypeNotIn", "format", "formatNEQ", "formatIn", "formatNotIn", "subject", "subjectNEQ", "subjectIn", "subjectNotIn", "subjectGT", "subjectGTE", "subjectLT", "subjectLTE", "subjectContains", "subjectHasPrefix", "subjectHasSuffix", "subjectIsNil", "subjectNotNil", "subjectEqualFold", "subjectContainsFold", "from", "fromNEQ", "fromIn", "fromNotIn", "fromGT", "fromGTE", "fromLT", "fromLTE", "fromContains", "fromHasPrefix", "fromHasSuffix", "fromIsNil", "fromNotNil", "fromEqualFold", "fromContainsFold", "to", "toNEQ", "toIn", "toNotIn", "toGT", "toGTE", "toLT", "toLTE", "toContains", "toHasPrefix", "toHasSuffix", "toIsNil", "toNotNil", "toEqualFold", "toContainsFold", "cc", "ccNEQ", "ccIn", "ccNotIn", "ccGT", "ccGTE", "ccLT", "ccLTE", "ccContains", "ccHasPrefix", "ccHasSuffix", "ccIsNil", "ccNotNil", "ccEqualFold", "ccContainsFold", "bcc", "bccNEQ", "bccIn", "bccNotIn", "bccGT", "bccGTE", "bccLT", "bccLTE", "bccContains", "bccHasPrefix", "bccHasSuffix", "bccIsNil", "bccNotNil", "bccEqualFold", "bccContainsFold", "hasEvent", "hasEventWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -18666,6 +18718,76 @@ func (ec *executionContext) unmarshalInputMsgTemplateWhereInput(ctx context.Cont
 				return it, err
 			}
 			it.TenantIDNotNil = data
+		case "userID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserID = data
+		case "userIDNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userIDNEQ"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserIDNEQ = data
+		case "userIDIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userIDIn"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserIDIn = data
+		case "userIDNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userIDNotIn"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserIDNotIn = data
+		case "userIDGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userIDGT"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserIDGT = data
+		case "userIDGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userIDGTE"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserIDGTE = data
+		case "userIDLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userIDLT"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserIDLT = data
+		case "userIDLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userIDLTE"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserIDLTE = data
+		case "userIDIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userIDIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserIDIsNil = data
+		case "userIDNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userIDNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserIDNotNil = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -21376,7 +21498,7 @@ func (ec *executionContext) unmarshalInputUpdateMsgTemplateInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"msgTypeID", "tenantID", "clearTenantID", "name", "receiverType", "format", "subject", "clearSubject", "from", "clearFrom", "to", "clearTo", "cc", "clearCc", "bcc", "clearBcc", "body", "clearBody", "tpl", "clearTpl", "attachments", "appendAttachments", "clearAttachments", "comments", "clearComments", "eventID"}
+	fieldsInOrder := [...]string{"msgTypeID", "tenantID", "clearTenantID", "userID", "clearUserID", "name", "receiverType", "format", "subject", "clearSubject", "from", "clearFrom", "to", "clearTo", "cc", "clearCc", "bcc", "clearBcc", "body", "clearBody", "tpl", "clearTpl", "attachments", "appendAttachments", "clearAttachments", "comments", "clearComments", "eventID"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -21404,6 +21526,20 @@ func (ec *executionContext) unmarshalInputUpdateMsgTemplateInput(ctx context.Con
 				return it, err
 			}
 			it.ClearTenantID = data
+		case "userID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserID = data
+		case "clearUserID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearUserID"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearUserID = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -23393,6 +23529,8 @@ func (ec *executionContext) _MsgTemplate(ctx context.Context, sel ast.SelectionS
 			}
 		case "tenantID":
 			out.Values[i] = ec._MsgTemplate_tenantID(ctx, field, obj)
+		case "userID":
+			out.Values[i] = ec._MsgTemplate_userID(ctx, field, obj)
 		case "name":
 			out.Values[i] = ec._MsgTemplate_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
