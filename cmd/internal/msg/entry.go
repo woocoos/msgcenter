@@ -2,20 +2,22 @@ package msg
 
 import (
 	"context"
-	"entgo.io/contrib/entgql"
 	"errors"
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/handler/extension"
-	"github.com/99designs/gqlgen/graphql/handler/lru"
+	"net/http"
+	"strconv"
+	"time"
+
+	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/tsingsun/woocoo/contrib/gql"
+	"github.com/tsingsun/woocoo/contrib/telemetry/otelweb"
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/tsingsun/woocoo/web"
-	"github.com/vektah/gqlparser/v2/ast"
+	"github.com/tsingsun/woocoo/web/handler/authz"
 	"github.com/woocoos/knockout-go/pkg/fmterr"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/knockout-go/pkg/koapp"
@@ -23,22 +25,23 @@ import (
 	"github.com/woocoos/msgcenter/api/graphql"
 	"github.com/woocoos/msgcenter/ent"
 	"go.uber.org/zap"
-	"net/http"
-	"strconv"
 )
 
 // Server alert server, includes: API提醒服务,包括API及消息分发功能,可选服务包括: UI
 type Server struct {
-	appCnf    *conf.AppConfiguration
-	dbClient  *ent.Client
-	msgClient *redisx.Client
-	webSrv    *web.Server
-	subs      *PubSub
+	appCnf                *conf.AppConfiguration
+	dbClient              *ent.Client
+	msgClient             *redisx.Client
+	webSrv                *web.Server
+	subs                  *PubSub
+	serverID              string
+	keepAlivePingInterval time.Duration
 }
 
 func NewServer(cnf *conf.AppConfiguration) *Server {
 	s := &Server{
-		appCnf: cnf,
+		appCnf:                cnf,
+		keepAlivePingInterval: 30 * time.Second,
 	}
 	// 初始化错误处理
 	if err := fmterr.InitErrorHandler(cnf.Sub("errors")); err != nil {
@@ -59,6 +62,7 @@ func (s *Server) buildEntClient() {
 		Org:         "portal",
 		OrgRoleUser: "portal",
 		UserAddr:    "portal",
+		UserDevice:  "portal",
 	})
 	if s.appCnf.Development {
 		s.dbClient = ent.NewClient(ent.Driver(drv), ent.Debug(), scfg)
@@ -73,7 +77,8 @@ func (s *Server) buildPubSub() {
 		panic(err)
 	}
 	s.msgClient = cli
-	s.subs = NewPubSub(cli)
+	s.serverID = uuid.New().String()
+	s.subs = NewPubSub(cli, s.serverID)
 }
 
 func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
@@ -82,17 +87,22 @@ func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
 		gql.RegisterMiddleware(),
 		middleware.RegisterTenantID(),
 		middleware.RegisterTokenSigner(),
-		//web.RegisterMiddleware(otelweb.NewMiddleware()),
+		otelweb.RegisterMiddleware(),
+		web.WithMiddlewareNewFunc("authz", authz.Middleware),
 	)
-	//gql use msg resolver
-	gqlsrv := handler.New(NewSchema(
+	ss, err := gql.RegisterSchema(s.webSrv, NewSchema(
 		graphql.WithClient(s.dbClient),
 		graphql.WithMsgClient(s.msgClient.UniversalClient),
 		graphql.WithPubSub(s.subs),
 	))
-
+	if err != nil {
+		panic(err)
+	}
+	//gql use msg resolver
+	gqlsrv := ss[0]
+	gqlsrv.AroundResponses(middleware.SimplePagination())
 	gqlsrv.AddTransport(transport.Websocket{
-		KeepAlivePingInterval: 10,
+		KeepAlivePingInterval: s.keepAlivePingInterval,
 		Upgrader: websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
 				return true
@@ -103,19 +113,6 @@ func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
 		ErrorFunc: s.wsError,
 	})
 
-	gqlsrv.AddTransport(transport.Options{})
-	gqlsrv.AddTransport(transport.GET{})
-	gqlsrv.AddTransport(transport.POST{})
-	gqlsrv.AddTransport(transport.MultipartForm{})
-
-	gqlsrv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
-
-	gqlsrv.Use(extension.Introspection{})
-	gqlsrv.Use(extension.AutomaticPersistedQuery{
-		Cache: lru.New[string](100),
-	})
-
-	gqlsrv.AroundResponses(middleware.SimplePagination())
 	// mutation事务
 	gqlsrv.Use(entgql.Transactioner{TxOpener: s.dbClient})
 	if err := gql.RegisterGraphqlServer(s.webSrv, gqlsrv); err != nil {

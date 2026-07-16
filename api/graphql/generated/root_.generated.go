@@ -446,6 +446,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		DeviceConnected                       func(childComplexity int, deviceID string) int
 		FormatMsgAlertMore                    func(childComplexity int, msgAlertID int) int
 		FormatMsgAlerts                       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, alertName *string, userID *string, receiverType *profile.ReceiverType, where *ent.MsgAlertWhereInput, orderBy *ent.MsgAlertOrder) int
 		MsgAlerts                             func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) int
@@ -2580,6 +2581,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PageInfo.StartCursor(childComplexity), true
 
+	case "Query.deviceConnected":
+		if e.complexity.Query.DeviceConnected == nil {
+			break
+		}
+
+		args, err := ec.field_Query_deviceConnected_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.DeviceConnected(childComplexity, args["deviceId"].(string)), true
+
 	case "Query.formatMsgAlertMore":
 		if e.complexity.Query.FormatMsgAlertMore == nil {
 			break
@@ -3224,7 +3237,7 @@ input CreateMsgTemplateInput {
   """
   msgTypeID: Int!
   """
-  组织ID
+  租户ID
   """
   tenantID: ID
   """
@@ -3682,6 +3695,7 @@ enum MsgChannelReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/pr
   email
   message
   webhook
+  umeng
 }
 """
 MsgChannelSimpleStatus is enum for the field status
@@ -4834,7 +4848,7 @@ type MsgTemplate implements Node {
   """
   msgEventID: ID!
   """
-  组织ID
+  租户ID
   """
   tenantID: ID
   """
@@ -4958,6 +4972,7 @@ enum MsgTemplateReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/p
   email
   message
   webhook
+  umeng
 }
 """
 MsgTemplateSimpleStatus is enum for the field status
@@ -5616,6 +5631,7 @@ enum NlogReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.
   email
   message
   webhook
+  umeng
 }
 """
 NlogWhereInput is used for filtering Nlog objects.
@@ -6020,7 +6036,7 @@ input UpdateMsgTemplateInput {
   """
   msgTypeID: Int
   """
-  组织ID
+  租户ID
   """
   tenantID: ID
   clearTenantID: Boolean
@@ -6511,6 +6527,11 @@ type MessageFilter {
     appCode: String!
     userId: ID!
     deviceId:String!
+}
+
+extend type Query {
+    """查询设备是否已有活跃的WebSocket连接"""
+    deviceConnected(deviceId: String!): Boolean!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)

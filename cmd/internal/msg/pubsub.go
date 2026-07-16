@@ -19,7 +19,11 @@ import (
 
 var logger = log.Component("push")
 
-const connectionIDKey = "woocoos/msg/conn_id"
+const (
+	connectionIDKey = "woocoos/msg/conn_id"
+	deviceConnKey   = "mc:ws:dev:"
+	deviceConnTTL   = 90 * time.Second
+)
 
 // Connection 对应客户端连接,共享队列机制.连接在用户真正订阅时才会创建连接.
 type Connection struct {
@@ -30,15 +34,19 @@ type Connection struct {
 
 // PubSub 订阅管理器
 type PubSub struct {
-	conns  []*Connection
-	client redis.UniversalClient
-	mu     sync.RWMutex
+	conns    []*Connection
+	client   redis.UniversalClient
+	mu       sync.RWMutex
+	serverID string
+	active   map[string]bool // deviceId -> active
 }
 
-func NewPubSub(client redis.UniversalClient) *PubSub {
+func NewPubSub(client redis.UniversalClient, serverID string) *PubSub {
 	return &PubSub{
-		client: client,
-		conns:  make([]*Connection, 0, 100),
+		client:   client,
+		conns:    make([]*Connection, 0, 100),
+		serverID: serverID,
+		active:   make(map[string]bool),
 	}
 }
 
@@ -87,9 +95,27 @@ func (pb *PubSub) RemoveConn(ctx context.Context) error {
 	if !ok {
 		return nil
 	}
+	pb.mu.Lock()
+	var deviceID string
 	for i, conn := range pb.conns {
-		conn.ID = connID
-		pb.conns = append(pb.conns[:i], pb.conns[i+1:]...)
+		if conn.ID == connID {
+			deviceID = conn.Filter.DeviceID
+			delete(pb.active, deviceID)
+			pb.conns = append(pb.conns[:i], pb.conns[i+1:]...)
+			break
+		}
+	}
+	pb.mu.Unlock()
+
+	if deviceID != "" && pb.client != nil {
+		script := redis.NewScript(`
+			if redis.call("GET", KEYS[1]) == ARGV[1] then
+				return redis.call("DEL", KEYS[1])
+			else
+				return 0
+			end
+		`)
+		script.Run(context.Background(), pb.client, []string{deviceConnKey + deviceID}, pb.serverID)
 	}
 	return nil
 }
@@ -115,6 +141,9 @@ func (pb *PubSub) subscribe(ctx context.Context, filter *model.MessageFilter, to
 	}
 	if conn == nil {
 		conn = pb.AddConnBy(connID, filter)
+		if filter.DeviceID != "" {
+			pb.registerDevice(filter.DeviceID)
+		}
 	}
 	pb.mu.Lock()
 	defer pb.mu.Unlock()
@@ -123,17 +152,97 @@ func (pb *PubSub) subscribe(ctx context.Context, filter *model.MessageFilter, to
 	return ch, nil
 }
 
+// HasDeviceConnection 检查指定设备是否已有活跃的WebSocket连接
+func (pb *PubSub) HasDeviceConnection(deviceID string) bool {
+	if pb.client == nil {
+		pb.mu.RLock()
+		defer pb.mu.RUnlock()
+		_, ok := pb.active[deviceID]
+		return ok
+	}
+	val, err := pb.client.Get(context.Background(), deviceConnKey+deviceID).Result()
+	if err != nil {
+		return false
+	}
+	return val == pb.serverID
+}
+
+func (pb *PubSub) registerDevice(deviceID string) {
+	pb.mu.Lock()
+	pb.active[deviceID] = true
+	pb.mu.Unlock()
+
+	if pb.client != nil {
+		pb.client.Set(context.Background(), deviceConnKey+deviceID, pb.serverID, deviceConnTTL)
+	}
+}
+
+func (pb *PubSub) unregisterDevice(deviceID string) {
+	pb.mu.Lock()
+	delete(pb.active, deviceID)
+	pb.mu.Unlock()
+
+	if pb.client != nil {
+		script := redis.NewScript(`
+			if redis.call("GET", KEYS[1]) == ARGV[1] then
+				return redis.call("DEL", KEYS[1])
+			else
+				return 0
+			end
+		`)
+		script.Run(context.Background(), pb.client, []string{deviceConnKey + deviceID}, pb.serverID)
+	}
+}
+
 func (pb *PubSub) Start(ctx context.Context) error {
 	if pb.client != nil {
-		go func() {
-			pb.subRedis(ctx)
-		}()
+		go pb.subRedis(ctx)
+		go pb.refreshLoop(ctx)
 	}
 	return nil
 }
 
 func (pb *PubSub) Stop(ctx context.Context) error {
+	pb.mu.RLock()
+	ids := make([]string, 0, len(pb.active))
+	for id := range pb.active {
+		ids = append(ids, id)
+	}
+	pb.mu.RUnlock()
+	for _, id := range ids {
+		pb.unregisterDevice(id)
+	}
 	return pb.client.Close()
+}
+
+func (pb *PubSub) refreshLoop(ctx context.Context) {
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			pb.RefreshAll()
+		case <-ctx.Done():
+			return
+		}
+	}
+}
+
+// RefreshAll 刷新所有活跃连接的 TTL
+func (pb *PubSub) RefreshAll() {
+	if pb.client == nil {
+		return
+	}
+	pb.mu.RLock()
+	ids := make([]string, 0, len(pb.active))
+	for id := range pb.active {
+		ids = append(ids, id)
+	}
+	pb.mu.RUnlock()
+
+	for _, id := range ids {
+		pb.client.Expire(context.Background(), deviceConnKey+id, deviceConnTTL)
+	}
 }
 
 // 连接redis订阅

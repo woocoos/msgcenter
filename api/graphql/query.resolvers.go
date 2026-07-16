@@ -285,6 +285,14 @@ func (r *queryResolver) MsgTemplateDefineByName(ctx context.Context, format msgt
 	return tmpl, nil
 }
 
+// DeviceConnected is the resolver for the deviceConnected field.
+func (r *queryResolver) DeviceConnected(ctx context.Context, deviceID string) (bool, error) {
+	if r.PubSub == nil {
+		return false, nil
+	}
+	return r.PubSub.HasDeviceConnection(deviceID), nil
+}
+
 // Matchers is the resolver for the matchers field.
 func (r *routeResolver) Matchers(ctx context.Context, obj *profile.Route) ([]*label.Matcher, error) {
 	return obj.Matchers, nil

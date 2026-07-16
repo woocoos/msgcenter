@@ -64,6 +64,7 @@ func WithPubSub(pubSub PubSub) Option {
 
 type PubSub interface {
 	Subscribe(ctx context.Context, topic string) (chan *model.Message, error)
+	HasDeviceConnection(deviceID string) bool
 }
 
 // Resolver is the root resolver.
