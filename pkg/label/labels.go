@@ -25,6 +25,9 @@ const (
 	SkipTempParamsLabel = "skipTempParams"
 	// AppSetLabel is the label name for the target application set (business application name).
 	AppSetLabel = "appSet"
+	// AlertIDAnnotation is the annotation key for storing alert database ID.
+	// This is set by AlertCallback.PreStore after saving to database.
+	AlertIDAnnotation = "__alert_id__"
 )
 
 type LabelName string

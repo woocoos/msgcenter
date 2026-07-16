@@ -11,18 +11,23 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/tsingsun/woocoo/pkg/conf"
+	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/template"
-	yaml "gopkg.in/yaml.v3"
+
+	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/woocoos/msgcenter/ent/runtime"
 )
 
 func newTestNotifier(t *testing.T, cfg *profile.UmengConfig) *Notifier {
@@ -32,6 +37,40 @@ func newTestNotifier(t *testing.T, cfg *profile.UmengConfig) *Notifier {
 	n, err := New(cfg, tmpl, nil, nil)
 	require.NoError(t, err)
 	return n
+}
+
+func newTestNotifierWithDB(t *testing.T, cfg *profile.UmengConfig, db *ent.Client) *Notifier {
+	t.Helper()
+	tmpl, err := template.New()
+	require.NoError(t, err)
+	n, err := New(cfg, tmpl, nil, db)
+	require.NoError(t, err)
+	return n
+}
+
+// initTestDB creates an in-memory SQLite database and initializes it with a test user device.
+func initTestDB(t *testing.T, userID, systemName string) *ent.Client {
+	t.Helper()
+	client, err := ent.Open("sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
+	require.NoError(t, err)
+
+	// Run schema migration
+	require.NoError(t, client.Schema.Create(context.Background()))
+
+	// Parse user ID
+	uid, err := strconv.Atoi(userID)
+	require.NoError(t, err)
+
+	// Create test user device
+	_, err = client.UserDevice.Create().
+		SetUserID(uid).
+		SetDeviceUID("test-device-" + userID).
+		SetSystemName(systemName).
+		SetStatus("active").
+		Save(context.Background())
+	require.NoError(t, err)
+
+	return client
 }
 
 func testAlert() *alert.Alert {
@@ -219,9 +258,9 @@ func TestBuildRequest_Sign(t *testing.T) {
 	req, err := n.buildRequestForApp(cfg, msg, "")
 	require.NoError(t, err)
 
-	// Verify sign = md5(appKey + timestamp + appMasterSecret)
-	expectedSign := md5Hex("my_app_key" + req.Timestamp + "my_secret")
-	assert.Equal(t, expectedSign, req.Sign)
+	// Sign is now calculated in notifySingleApp and passed as URL parameter
+	// Verify that timestamp is set
+	assert.NotEmpty(t, req.Timestamp)
 }
 
 func TestBuildRequest_WithPolicy(t *testing.T) {
@@ -282,7 +321,7 @@ func TestBuildRequest_Alias(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, "user_123", req.Alias)
-	assert.Equal(t, "uid", req.AliasType)
+	assert.Equal(t, "", req.AliasType) // No default value, should be empty
 }
 
 func TestNotify_Success(t *testing.T) {
@@ -295,7 +334,7 @@ func TestNotify_Success(t *testing.T) {
 		require.NoError(t, json.Unmarshal(body, &req))
 		assert.Equal(t, "test_key", req.AppKey)
 		assert.NotEmpty(t, req.Timestamp)
-		assert.NotEmpty(t, req.Sign)
+		// Sign is now passed as URL parameter, not in request body
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(Response{Ret: "SUCCESS", Data: struct {
@@ -651,7 +690,7 @@ func TestBuildRequest_PushTypeFromUserIDs(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "customizedcast", req.Type)
 		assert.Equal(t, "100", req.Alias)
-		assert.Equal(t, "uid", req.AliasType)
+		assert.Equal(t, "", req.AliasType) // No default value, should be empty
 	})
 
 	t.Run("multiple users become customizedcast", func(t *testing.T) {
@@ -668,7 +707,7 @@ func TestBuildRequest_PushTypeFromUserIDs(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "customizedcast", req.Type)
 		assert.Equal(t, "100,200,300", req.Alias)
-		assert.Equal(t, "uid", req.AliasType)
+		assert.Equal(t, "", req.AliasType) // No default value, should be empty
 	})
 
 	t.Run("no users stays broadcast", func(t *testing.T) {
@@ -701,8 +740,8 @@ func TestBuildRequest_PushTypeFromUserIDs(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "customizedcast", req.Type)
 		assert.Equal(t, "100", req.Alias)
-		// AliasType is now hardcoded to "uid" in simplified config
-		assert.Equal(t, "uid", req.AliasType)
+		// AliasType is not set by default, should be empty
+		assert.Equal(t, "", req.AliasType)
 	})
 
 	t.Run("users across alerts deduped", func(t *testing.T) {
@@ -779,7 +818,7 @@ func loadTestConfig() *profile.UmengConfig {
 
 	// Parse YAML into UmengConfig
 	var cfg profile.UmengConfig
-	if err := yaml.Unmarshal([]byte(content), &cfg); err != nil {
+	if err := conf.NewFromBytes([]byte(content)).Unmarshal(&cfg); err != nil {
 		return nil
 	}
 
@@ -817,7 +856,10 @@ func TestIntegration_RealAPI_Android(t *testing.T) {
 		t.Skip("UMENG_ANDROID_TEST_USER not set, skipping")
 	}
 
-	n := newTestNotifier(t, cfg)
+	// Initialize in-memory database with test user device
+	db := initTestDB(t, testUser, "Android")
+
+	n := newTestNotifierWithDB(t, cfg, db)
 
 	ctx := testContext()
 	alert := &alert.Alert{
@@ -830,7 +872,9 @@ func TestIntegration_RealAPI_Android(t *testing.T) {
 		EndsAt:    time.Now().Add(time.Hour),
 		UpdatedAt: time.Now(),
 		Annotations: label.LabelSet{
-			"summary": "msgcenter Android integration test",
+			"summary":               "msgcenter Android integration test",
+			MsgType:                 "msg_detail",
+			label.AlertIDAnnotation: "1",
 		},
 	}
 
@@ -855,25 +899,37 @@ func TestIntegration_RealAPI_IOS(t *testing.T) {
 		t.Skip("iOS app not configured in config.yaml, skipping")
 	}
 
-	n := newTestNotifier(t, cfg)
+	// Load test user from environment
+	env := loadTestEnv()
+	testUser := env["UMENG_IOS_TEST_USER"]
+	if testUser == "" {
+		t.Skip("UMENG_IOS_TEST_USER not set, skipping")
+	}
+
+	// Initialize in-memory database with test user device
+	db := initTestDB(t, testUser, "iOS")
+
+	n := newTestNotifierWithDB(t, cfg, db)
 
 	ctx := testContext()
 	alert := &alert.Alert{
 		Labels: label.LabelSet{
 			"alertname": "IntegrationTestIOS",
 			"severity":  "info",
-			"user":      "test-user-456", // 测试用户ID
+			"user":      testUser,
 		},
 		StartsAt:  time.Now(),
 		EndsAt:    time.Now().Add(time.Hour),
 		UpdatedAt: time.Now(),
 		Annotations: label.LabelSet{
-			"summary": "msgcenter iOS integration test",
+			"summary":               "msgcenter iOS integration test",
+			MsgType:                 "msg_detail",
+			label.AlertIDAnnotation: "1",
 		},
 	}
 
 	retry, err := n.Notify(ctx, alert)
 	require.NoError(t, err, "Umeng API call should succeed")
 	assert.False(t, retry, "should not retry on success")
-	t.Logf("iOS push sent successfully, retry=%v", retry)
+	t.Logf("iOS push sent successfully to user %s, retry=%v", testUser, retry)
 }

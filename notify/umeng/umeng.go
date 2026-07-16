@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/tsingsun/woocoo/pkg/log"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/userdevice"
 	"github.com/woocoos/msgcenter/notify"
@@ -44,11 +45,15 @@ const (
 	AppHarmonyOS = "harmonyos"
 )
 
+const (
+	// 推送的消息类型,用于App端识别业务实例
+	MsgType = "msg_detail"
+)
+
 // Request is the Umeng Push API request body.
 type Request struct {
 	AppKey       string         `json:"app_key"`
 	Timestamp    string         `json:"timestamp"`
-	Sign         string         `json:"sign"`
 	Type         string         `json:"type"`
 	DeviceTokens string         `json:"device_tokens,omitempty"`
 	Alias        string         `json:"alias,omitempty"`
@@ -200,7 +205,8 @@ func (n *Notifier) notifyMultiApp(ctx context.Context, config *profile.UmengConf
 	// Query user devices to determine which apps to push to.
 	appUsers, err := n.queryUserApps(ctx, userIDs)
 	if err != nil {
-		return true, fmt.Errorf("querying user devices: %w", err)
+		// No devices found, don't retry and don't send to Umeng.
+		return false, fmt.Errorf("querying user devices: %w", err)
 	}
 
 	// Log users without devices.
@@ -289,7 +295,26 @@ func (n *Notifier) notifySingleApp(ctx context.Context, config *profile.UmengCon
 		return false, fmt.Errorf("encoding umeng request: %w", err)
 	}
 
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, apiURL, bytes.NewReader(body))
+	// Calculate signature: MD5(method + url + post-body + app_master_secret)
+	// Parse URL to get full URL without query string
+	parsedURL, err := url.Parse(apiURL)
+	if err != nil {
+		return false, fmt.Errorf("parsing api url: %w", err)
+	}
+	// URL should include scheme, host, and path (without query string)
+	urlWithoutQuery := parsedURL.Scheme + "://" + parsedURL.Host + parsedURL.Path
+
+	// Get app master secret
+	_, appSecret := n.resolveCredentialsForApp(config, app)
+
+	// Calculate signature
+	signString := "POST" + urlWithoutQuery + string(body) + appSecret
+	sign := md5Hex(signString)
+
+	// Build final URL with signature parameter
+	finalURL := apiURL + "?sign=" + sign
+
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, finalURL, bytes.NewReader(body))
 	if err != nil {
 		return true, err
 	}
@@ -300,6 +325,15 @@ func (n *Notifier) notifySingleApp(ctx context.Context, config *profile.UmengCon
 		return true, redactURLError(err)
 	}
 	defer drain(resp)
+
+	// Check HTTP status code.
+	if resp.StatusCode != http.StatusOK {
+		// Read response body for error details.
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		// Retry on server errors (5xx), don't retry on client errors (4xx)
+		shouldRetry := resp.StatusCode >= 500
+		return shouldRetry, fmt.Errorf("umeng API returned HTTP %d: %s", resp.StatusCode, string(bodyBytes))
+	}
 
 	// Parse Umeng response.
 	var umengResp Response
@@ -337,11 +371,10 @@ func (n *Notifier) buildRequestForApp(config *profile.UmengConfig, msg *Message,
 }
 
 // buildRequestCommon builds common request fields shared across all platforms.
-func (n *Notifier) buildRequestCommon(config *profile.UmengConfig, msg *Message, app string) (*Request, string, error) {
+func (n *Notifier) buildRequestCommon(config *profile.UmengConfig, msg *Message, app string) (*Request, error) {
 	// Resolve app credentials.
-	appKey, appSecret := n.resolveCredentialsForApp(config, app)
+	appKey, _ := n.resolveCredentialsForApp(config, app)
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	sign := md5Hex(appKey + timestamp + appSecret)
 
 	// Determine push type based on user IDs.
 	// Prefer msg.UserIDs (from multi-app mode) over extracted userIDs.
@@ -364,7 +397,6 @@ func (n *Notifier) buildRequestCommon(config *profile.UmengConfig, msg *Message,
 	req := &Request{
 		AppKey:     appKey,
 		Timestamp:  timestamp,
-		Sign:       sign,
 		Type:       pushType,
 		Production: config.ProductionMode,
 	}
@@ -388,17 +420,42 @@ func (n *Notifier) buildRequestCommon(config *profile.UmengConfig, msg *Message,
 			}
 		}
 		if req.AliasType == "" {
-			req.AliasType = "uid"
+			logger.Warn("alias_type is empty when using customizedcast, push may fail",
+				zap.String("app", app),
+				zap.Strings("user_ids", targetUserIDs),
+			)
 		}
 	}
 
-	return req, appKey + timestamp + appSecret, nil
+	return req, nil
+}
+
+// extractExtraFields extracts extra fields from alert annotations.
+// Returns a map of extra fields to be included in the payload.
+func extractExtraFields(msg *Message) map[string]any {
+	if msg == nil || msg.Data == nil {
+		return nil
+	}
+	extra := make(map[string]any)
+	for _, a := range msg.Data.Alerts {
+		if v, ok := a.Annotations[MsgType]; ok && v != "" {
+			extra["type"] = v
+		}
+		// Extract alert database ID from annotation, use as "id" in extra
+		if v, ok := a.Annotations[label.AlertIDAnnotation]; ok && v != "" {
+			extra["id"] = v
+		}
+	}
+	if len(extra) == 0 {
+		return nil
+	}
+	return extra
 }
 
 // buildRequestForAndroid builds Android-specific request.
 // Android has additional fields: category, channel_properties, local_properties.
 func (n *Notifier) buildRequestForAndroid(config *profile.UmengConfig, msg *Message, app string) (*Request, error) {
-	req, _, err := n.buildRequestCommon(config, msg, app)
+	req, err := n.buildRequestCommon(config, msg, app)
 	if err != nil {
 		return nil, err
 	}
@@ -407,6 +464,15 @@ func (n *Notifier) buildRequestForAndroid(config *profile.UmengConfig, msg *Mess
 	// Android uses a flat body structure with title, text, ticker, etc.
 	title := n.renderString(`{{ template "umeng.default.title" . }}`, msg)
 	text := n.renderString(`{{ template "umeng.default.text" . }}`, msg)
+
+	// If templates are not rendered, use fallback values.
+	if strings.Contains(title, "{{ template") {
+		title = "消息通知"
+	}
+	if strings.Contains(text, "{{ template") {
+		text = "您有一条新消息"
+	}
+
 	body := map[string]any{
 		"title":  title,
 		"ticker": title,
@@ -425,10 +491,17 @@ func (n *Notifier) buildRequestForAndroid(config *profile.UmengConfig, msg *Mess
 		}
 	}
 
-	req.Payload = map[string]any{
+	payload := map[string]any{
 		"display_type": "notification",
 		"body":         body,
 	}
+
+	// Add extra fields from annotations.
+	if extra := extractExtraFields(msg); extra != nil {
+		payload["extra"] = extra
+	}
+
+	req.Payload = payload
 
 	// Android-specific: category for message classification.
 	// 0: 资讯营销类消息, 1: 服务与通讯类消息
@@ -440,7 +513,7 @@ func (n *Notifier) buildRequestForAndroid(config *profile.UmengConfig, msg *Mess
 // buildRequestForIOS builds iOS-specific request.
 // iOS follows APNs standard and has different policy fields.
 func (n *Notifier) buildRequestForIOS(config *profile.UmengConfig, msg *Message, app string) (*Request, error) {
-	req, _, err := n.buildRequestCommon(config, msg, app)
+	req, err := n.buildRequestCommon(config, msg, app)
 	if err != nil {
 		return nil, err
 	}
@@ -449,7 +522,7 @@ func (n *Notifier) buildRequestForIOS(config *profile.UmengConfig, msg *Message,
 	// iOS follows APNs standard with aps dictionary structure.
 	title := n.renderString(`{{ template "umeng.default.title" . }}`, msg)
 	text := n.renderString(`{{ template "umeng.default.text" . }}`, msg)
-	req.Payload = map[string]any{
+	payload := map[string]any{
 		"display_type": "notification",
 		"aps": map[string]any{
 			"alert": map[string]any{
@@ -460,6 +533,16 @@ func (n *Notifier) buildRequestForIOS(config *profile.UmengConfig, msg *Message,
 		},
 	}
 
+	// iOS does not have "extra" field like Android.
+	// Custom fields are added directly to payload root level (alongside "aps").
+	if extra := extractExtraFields(msg); extra != nil {
+		for k, v := range extra {
+			payload[k] = v
+		}
+	}
+
+	req.Payload = payload
+
 	// iOS does not have category, channel_properties, or local_properties.
 	// iOS policy can have apns_collapse_id for message collapsing.
 
@@ -469,7 +552,7 @@ func (n *Notifier) buildRequestForIOS(config *profile.UmengConfig, msg *Message,
 // buildRequestForHarmonyOS builds HarmonyOS-specific request.
 // HarmonyOS has channel_properties but different from Android.
 func (n *Notifier) buildRequestForHarmonyOS(config *profile.UmengConfig, msg *Message, app string) (*Request, error) {
-	req, _, err := n.buildRequestCommon(config, msg, app)
+	req, err := n.buildRequestCommon(config, msg, app)
 	if err != nil {
 		return nil, err
 	}
@@ -478,13 +561,20 @@ func (n *Notifier) buildRequestForHarmonyOS(config *profile.UmengConfig, msg *Me
 	// HarmonyOS uses a structure similar to Android but with some differences.
 	title := n.renderString(`{{ template "umeng.default.title" . }}`, msg)
 	text := n.renderString(`{{ template "umeng.default.text" . }}`, msg)
-	req.Payload = map[string]any{
+	payload := map[string]any{
 		"display_type": "notification",
 		"body": map[string]any{
 			"title": title,
 			"body":  text,
 		},
 	}
+
+	// Add extra fields from annotations.
+	if extra := extractExtraFields(msg); extra != nil {
+		payload["extra"] = extra
+	}
+
+	req.Payload = payload
 
 	// HarmonyOS-specific: channel_properties with harmony_channel_category.
 	req.ChannelProperties = map[string]any{
@@ -589,9 +679,10 @@ func (n *Notifier) resolveCredentialsForApp(config *profile.UmengConfig, app str
 }
 
 // queryUserApps queries user devices from the database and groups by user ID.
+// Returns an error if no devices are found for any of the users.
 func (n *Notifier) queryUserApps(ctx context.Context, userIDs []string) (map[string][]*ent.UserDevice, error) {
 	if n.db == nil {
-		return nil, nil
+		return nil, fmt.Errorf("database connection is nil")
 	}
 	// Convert user IDs to integers.
 	uids := make([]int, 0, len(userIDs))
@@ -601,14 +692,18 @@ func (n *Notifier) queryUserApps(ctx context.Context, userIDs []string) (map[str
 		}
 	}
 	if len(uids) == 0 {
-		return nil, nil
+		return nil, fmt.Errorf("no valid user IDs provided")
 	}
 
 	devices, err := n.db.UserDevice.Query().
-		Where(userdevice.UserIDIn(uids...)).
+		Where(userdevice.UserIDIn(uids...), userdevice.StatusEQ(typex.SimpleStatusActive)).
 		All(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(devices) == 0 {
+		return nil, fmt.Errorf("no active devices found for users: %v", userIDs)
 	}
 
 	result := make(map[string][]*ent.UserDevice)

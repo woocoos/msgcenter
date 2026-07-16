@@ -49,8 +49,17 @@ func (a *AlertCallback) PreStore(alert *alert.Alert, existing bool) error {
 	} else {
 		c.SetTenantID(0)
 	}
-	//id := alert.Fingerprint()
-	return c.Exec(schemax.SkipTenantPrivacy(context.Background()))
+	// Save and get the database ID
+	saved, err := c.Save(schemax.SkipTenantPrivacy(context.Background()))
+	if err != nil {
+		return err
+	}
+	// Store the ID in annotation for downstream consumers
+	if alert.Annotations == nil {
+		alert.Annotations = make(label.LabelSet)
+	}
+	alert.Annotations[label.AlertIDAnnotation] = strconv.Itoa(saved.ID)
+	return nil
 }
 
 func (a *AlertCallback) PostStore(alert *alert.Alert, existing bool) {

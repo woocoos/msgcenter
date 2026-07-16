@@ -13,6 +13,19 @@ Content-Type: application/json
 请求样例: https://msgapi.umeng.com/api/send?sign=$mysign
 签名(sign=$mysign)的计算方式参见[附录I](https://developer.umeng.com/docs/67966/detail/149296#h2--h-8)。
 
+附录I 关于签名
+为了确保用户发送的请求不被更改，我们设计了签名算法。该算法基本可以保证请求是合法者发送且参数没有被修改，但无法保证不被偷窥。 签名生成规则：
+
+提取请求方法method（POST，全大写）；
+
+提取请求url信息，包括Host字段的域名(或ip:端口)和URI的path部分。注意不包括path的querystring。比如http://msg.umeng.com/api/send 或者 http://msg.umeng.com/api/status;
+
+提取请求的post-body；
+
+拼接请求方法、url、post-body及应用的app_master_secret；
+
+将上一步形成的字符串计算MD5值，形成一个32位的十六进制（字母小写）字符串，即为本次请求sign（签名）的值；Sign=MD5(${http_method}${url}${post-body}${app_master_secret})
+
 ## 调用参数-Android
 ```json
 {
