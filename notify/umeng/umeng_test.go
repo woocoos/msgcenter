@@ -22,6 +22,7 @@ import (
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/template"
+	yaml "gopkg.in/yaml.v3"
 )
 
 func newTestNotifier(t *testing.T, cfg *profile.UmengConfig) *Notifier {
@@ -756,6 +757,35 @@ func loadTestEnv() map[string]string {
 	return env
 }
 
+// loadTestConfig reads config.yaml and expands environment variables from .env.local.
+// Returns nil if the config file does not exist or environment variables are not set.
+func loadTestConfig() *profile.UmengConfig {
+	env := loadTestEnv()
+	if env == nil {
+		return nil
+	}
+
+	configFile := filepath.Join("testdata", "config.yaml")
+	data, err := os.ReadFile(configFile)
+	if err != nil {
+		return nil
+	}
+
+	// Expand environment variables in the YAML content
+	content := string(data)
+	for key, val := range env {
+		content = strings.ReplaceAll(content, "${"+key+"}", val)
+	}
+
+	// Parse YAML into UmengConfig
+	var cfg profile.UmengConfig
+	if err := yaml.Unmarshal([]byte(content), &cfg); err != nil {
+		return nil
+	}
+
+	return &cfg
+}
+
 // expandEnvVars replaces ${VAR_NAME} patterns in a string with environment variable values.
 func expandEnvVars(s string, env map[string]string) string {
 	result := s
@@ -767,36 +797,24 @@ func expandEnvVars(s string, env map[string]string) string {
 
 // TestIntegration_RealAPI_Android sends a real push to Umeng API for Android.
 // Run with: go test -v -run TestIntegration_RealAPI_Android ./notify/umeng/...
-// Requires: notify/umeng/testdata/.env.local with valid Android credentials.
+// Requires: notify/umeng/testdata/config.yaml and .env.local with valid Android credentials.
 func TestIntegration_RealAPI_Android(t *testing.T) {
+	cfg := loadTestConfig()
+	if cfg == nil {
+		t.Skip("testdata/config.yaml or .env.local not found, skipping integration test")
+	}
+
+	// Verify Android app is configured
+	androidApp, ok := cfg.Apps["qeelyn-dev-android"]
+	if !ok || androidApp.AppKey == "" {
+		t.Skip("Android app not configured in config.yaml, skipping")
+	}
+
+	// Load test user from environment
 	env := loadTestEnv()
-	if env == nil {
-		t.Skip("testdata/.env.local not found or empty, skipping integration test")
-	}
-
-	appKey := env["UMENG_ANDROID_APP_KEY"]
-	appSecret := env["UMENG_ANDROID_APP_MASTER_SECRET"]
-	if appKey == "" || appSecret == "" {
-		t.Skip("UMENG_ANDROID_APP_KEY or UMENG_ANDROID_APP_MASTER_SECRET not set, skipping")
-	}
-
-	cfg := &profile.UmengConfig{
-		Apps: map[string]*profile.UmengAppConfig{
-			"test-android": {
-				AppKey:          appKey,
-				AppMasterSecret: appSecret,
-				Platform:        "android",
-				AppSet:          env["UMENG_ANDROID_APP_SET"],
-				AliasType:       env["UMENG_ANDROID_ALIAS_TYPE"],
-				AfterOpen:       env["UMENG_ANDROID_AFTER_OPEN"],
-				Activity:        env["UMENG_ANDROID_ACTIVITY"],
-			},
-		},
-		ProductionMode: boolPtr(false),
-	}
-
-	if cfg.Apps["test-android"].AliasType == "" {
-		cfg.Apps["test-android"].AliasType = "uid"
+	testUser := env["UMENG_ANDROID_TEST_USER"]
+	if testUser == "" {
+		t.Skip("UMENG_ANDROID_TEST_USER not set, skipping")
 	}
 
 	n := newTestNotifier(t, cfg)
@@ -806,7 +824,7 @@ func TestIntegration_RealAPI_Android(t *testing.T) {
 		Labels: label.LabelSet{
 			"alertname": "IntegrationTestAndroid",
 			"severity":  "info",
-			"user":      "test-user-123", // 测试用户ID
+			"user":      testUser,
 		},
 		StartsAt:  time.Now(),
 		EndsAt:    time.Now().Add(time.Hour),
@@ -819,39 +837,22 @@ func TestIntegration_RealAPI_Android(t *testing.T) {
 	retry, err := n.Notify(ctx, alert)
 	require.NoError(t, err, "Umeng API call should succeed")
 	assert.False(t, retry, "should not retry on success")
-	t.Logf("Android push sent successfully, retry=%v", retry)
+	t.Logf("Android push sent successfully to user %s, retry=%v", testUser, retry)
 }
 
 // TestIntegration_RealAPI_IOS sends a real push to Umeng API for iOS.
 // Run with: go test -v -run TestIntegration_RealAPI_IOS ./notify/umeng/...
-// Requires: notify/umeng/testdata/.env.local with valid iOS credentials.
+// Requires: notify/umeng/testdata/config.yaml and .env.local with valid iOS credentials.
 func TestIntegration_RealAPI_IOS(t *testing.T) {
-	env := loadTestEnv()
-	if env == nil {
-		t.Skip("testdata/.env.local not found or empty, skipping integration test")
+	cfg := loadTestConfig()
+	if cfg == nil {
+		t.Skip("testdata/config.yaml or .env.local not found, skipping integration test")
 	}
 
-	appKey := env["UMENG_IOS_APP_KEY"]
-	appSecret := env["UMENG_IOS_APP_MASTER_SECRET"]
-	if appKey == "" || appSecret == "" {
-		t.Skip("UMENG_IOS_APP_KEY or UMENG_IOS_APP_MASTER_SECRET not set, skipping")
-	}
-
-	cfg := &profile.UmengConfig{
-		Apps: map[string]*profile.UmengAppConfig{
-			"test-ios": {
-				AppKey:          appKey,
-				AppMasterSecret: appSecret,
-				Platform:        "ios",
-				AppSet:          env["UMENG_IOS_APP_SET"],
-				AliasType:       env["UMENG_IOS_ALIAS_TYPE"],
-			},
-		},
-		ProductionMode: boolPtr(false),
-	}
-
-	if cfg.Apps["test-ios"].AliasType == "" {
-		cfg.Apps["test-ios"].AliasType = "uid"
+	// Verify iOS app is configured
+	iosApp, ok := cfg.Apps["qeelyn-dev-ios"]
+	if !ok || iosApp.AppKey == "" {
+		t.Skip("iOS app not configured in config.yaml, skipping")
 	}
 
 	n := newTestNotifier(t, cfg)
