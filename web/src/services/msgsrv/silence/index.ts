@@ -122,8 +122,8 @@ export async function createSilence(input: CreateMsgSilenceInput) {
   const result = await mutation(mutationCreateSilence, {
     input
   })
-  if (result.data?.createSilence.id) {
-    return result.data.createSilence
+  if (result.data?.createMsgSilence.id) {
+    return result.data.createMsgSilence
   }
   return null
 }
@@ -139,8 +139,8 @@ export async function updateSilence(silenceId: string, input: UpdateMsgSilenceIn
     id: silenceId,
     input,
   })
-  if (result.data?.updateSilence.id) {
-    return result.data.updateSilence
+  if (result.data?.updateMsgSilence.id) {
+    return result.data.updateMsgSilence
   }
   return null
 }
@@ -154,8 +154,8 @@ export async function delSilence(silenceId: string) {
   const result = await mutation(mutationDelSilence, {
     id: silenceId,
   })
-  if (result.data?.deleteSilence) {
-    return result.data.deleteSilence
+  if (result.data?.deleteMsgSilence) {
+    return result.data.deleteMsgSilence
   }
   return null
 }
