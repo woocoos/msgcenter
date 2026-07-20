@@ -111,22 +111,25 @@ func TestHasDeviceConnectionCrossServer(t *testing.T) {
 func TestRemoveConn(t *testing.T) {
 	pb, _ := newTestPubSub(t)
 
-	connID := uuid.New()
 	filter := &model.MessageFilter{
 		TenantID: 1,
 		UserID:   100,
 		DeviceID: "device-1",
 	}
-	conn := pb.AddConnBy(connID, filter)
+	conn := &Connection{
+		ID:          uuid.New(),
+		Filter:      *filter,
+		Subscribers: make(map[string]chan *model.Message),
+	}
+	pb.mu.Lock()
+	pb.conns = append(pb.conns, conn)
+	pb.mu.Unlock()
 	pb.registerDevice("device-1")
 
 	assert.True(t, pb.HasDeviceConnection("device-1"))
 	assert.Len(t, pb.conns, 1)
-	_ = conn
 
-	ctx := context.WithValue(context.Background(), connectionIDKey, connID)
-	err := pb.RemoveConn(ctx)
-	require.NoError(t, err)
+	pb.RemoveConn(conn)
 
 	// 连接已移除
 	assert.Empty(t, pb.conns)
@@ -134,36 +137,48 @@ func TestRemoveConn(t *testing.T) {
 	assert.False(t, pb.HasDeviceConnection("device-1"))
 }
 
-func TestRemoveConnWrongID(t *testing.T) {
-	// 验证修复后的 bug：不匹配的 connID 不应移除任何连接
+func TestRemoveConnMultiple(t *testing.T) {
+	// 验证只移除指定连接,不影响其他连接
 	pb, _ := newTestPubSub(t)
 
-	connID := uuid.New()
-	filter := &model.MessageFilter{DeviceID: "device-1"}
-	pb.AddConnBy(connID, filter)
+	conn1 := &Connection{
+		ID:          uuid.New(),
+		Filter:      model.MessageFilter{DeviceID: "device-1"},
+		Subscribers: make(map[string]chan *model.Message),
+	}
+	conn2 := &Connection{
+		ID:          uuid.New(),
+		Filter:      model.MessageFilter{DeviceID: "device-2"},
+		Subscribers: make(map[string]chan *model.Message),
+	}
+	pb.mu.Lock()
+	pb.conns = append(pb.conns, conn1, conn2)
+	pb.mu.Unlock()
 	pb.registerDevice("device-1")
+	pb.registerDevice("device-2")
 
-	// 用错误的 connID 调用 RemoveConn
-	wrongID := uuid.New()
-	ctx := context.WithValue(context.Background(), connectionIDKey, wrongID)
-	err := pb.RemoveConn(ctx)
-	require.NoError(t, err)
+	pb.RemoveConn(conn1)
 
-	// 连接不应被移除
+	// conn1 已移除,conn2 保留
 	assert.Len(t, pb.conns, 1)
-	assert.True(t, pb.HasDeviceConnection("device-1"))
+	assert.Equal(t, conn2.ID, pb.conns[0].ID)
+	assert.False(t, pb.HasDeviceConnection("device-1"))
+	assert.True(t, pb.HasDeviceConnection("device-2"))
 }
 
 func TestRemoveConnNoDeviceID(t *testing.T) {
 	pb, _ := newTestPubSub(t)
 
-	connID := uuid.New()
-	filter := &model.MessageFilter{} // 无 DeviceID
-	pb.AddConnBy(connID, filter)
+	conn := &Connection{
+		ID:          uuid.New(),
+		Filter:      model.MessageFilter{},
+		Subscribers: make(map[string]chan *model.Message),
+	}
+	pb.mu.Lock()
+	pb.conns = append(pb.conns, conn)
+	pb.mu.Unlock()
 
-	ctx := context.WithValue(context.Background(), connectionIDKey, connID)
-	err := pb.RemoveConn(ctx)
-	require.NoError(t, err)
+	pb.RemoveConn(conn)
 
 	assert.Empty(t, pb.conns)
 }
