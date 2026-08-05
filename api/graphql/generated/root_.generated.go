@@ -45,7 +45,11 @@ type ResolverRoot interface {
 	Query() QueryResolver
 	Route() RouteResolver
 	Subscription() SubscriptionResolver
+	UmengConfig() UmengConfigResolver
+	WebhookConfig() WebhookConfigResolver
 	RouteInput() RouteInputResolver
+	UmengConfigInput() UmengConfigInputResolver
+	WebhookConfigInput() WebhookConfigInputResolver
 }
 
 type DirectiveRoot struct {
@@ -469,9 +473,11 @@ type ComplexityRoot struct {
 	}
 
 	Receiver struct {
-		EmailConfigs  func(childComplexity int) int
-		MessageConfig func(childComplexity int) int
-		Name          func(childComplexity int) int
+		EmailConfigs   func(childComplexity int) int
+		MessageConfig  func(childComplexity int) int
+		Name           func(childComplexity int) int
+		UmengConfigs   func(childComplexity int) int
+		WebhookConfigs func(childComplexity int) int
 	}
 
 	Route struct {
@@ -491,6 +497,13 @@ type ComplexityRoot struct {
 		Message func(childComplexity int) int
 	}
 
+	UmengConfig struct {
+		APIURL         func(childComplexity int) int
+		Apps           func(childComplexity int) int
+		ProductionMode func(childComplexity int) int
+		SendResolved   func(childComplexity int) int
+	}
+
 	User struct {
 		DisplayName   func(childComplexity int) int
 		ID            func(childComplexity int) int
@@ -503,6 +516,17 @@ type ComplexityRoot struct {
 		Mobile func(childComplexity int) int
 		Name   func(childComplexity int) int
 		UserID func(childComplexity int) int
+	}
+
+	WebhookConfig struct {
+		Body         func(childComplexity int) int
+		Headers      func(childComplexity int) int
+		MaxAlerts    func(childComplexity int) int
+		SendResolved func(childComplexity int) int
+		Subject      func(childComplexity int) int
+		Timeout      func(childComplexity int) int
+		URL          func(childComplexity int) int
+		URLFile      func(childComplexity int) int
 	}
 }
 
@@ -2832,6 +2856,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Receiver.Name(childComplexity), true
 
+	case "Receiver.umengConfigs":
+		if e.complexity.Receiver.UmengConfigs == nil {
+			break
+		}
+
+		return e.complexity.Receiver.UmengConfigs(childComplexity), true
+
+	case "Receiver.webhookConfigs":
+		if e.complexity.Receiver.WebhookConfigs == nil {
+			break
+		}
+
+		return e.complexity.Receiver.WebhookConfigs(childComplexity), true
+
 	case "Route.activeTimeIntervals":
 		if e.complexity.Route.ActiveTimeIntervals == nil {
 			break
@@ -2909,6 +2947,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Subscription.Message(childComplexity), true
 
+	case "UmengConfig.apiURL":
+		if e.complexity.UmengConfig.APIURL == nil {
+			break
+		}
+
+		return e.complexity.UmengConfig.APIURL(childComplexity), true
+
+	case "UmengConfig.apps":
+		if e.complexity.UmengConfig.Apps == nil {
+			break
+		}
+
+		return e.complexity.UmengConfig.Apps(childComplexity), true
+
+	case "UmengConfig.productionMode":
+		if e.complexity.UmengConfig.ProductionMode == nil {
+			break
+		}
+
+		return e.complexity.UmengConfig.ProductionMode(childComplexity), true
+
+	case "UmengConfig.sendResolved":
+		if e.complexity.UmengConfig.SendResolved == nil {
+			break
+		}
+
+		return e.complexity.UmengConfig.SendResolved(childComplexity), true
+
 	case "User.displayName":
 		if e.complexity.User.DisplayName == nil {
 			break
@@ -2965,6 +3031,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserInfo.UserID(childComplexity), true
 
+	case "WebhookConfig.body":
+		if e.complexity.WebhookConfig.Body == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.Body(childComplexity), true
+
+	case "WebhookConfig.headers":
+		if e.complexity.WebhookConfig.Headers == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.Headers(childComplexity), true
+
+	case "WebhookConfig.maxAlerts":
+		if e.complexity.WebhookConfig.MaxAlerts == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.MaxAlerts(childComplexity), true
+
+	case "WebhookConfig.sendResolved":
+		if e.complexity.WebhookConfig.SendResolved == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.SendResolved(childComplexity), true
+
+	case "WebhookConfig.subject":
+		if e.complexity.WebhookConfig.Subject == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.Subject(childComplexity), true
+
+	case "WebhookConfig.timeout":
+		if e.complexity.WebhookConfig.Timeout == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.Timeout(childComplexity), true
+
+	case "WebhookConfig.url":
+		if e.complexity.WebhookConfig.URL == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.URL(childComplexity), true
+
+	case "WebhookConfig.urlFile":
+		if e.complexity.WebhookConfig.URLFile == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.URLFile(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -3006,12 +3128,14 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputNlogWhereInput,
 		ec.unmarshalInputReceiverInput,
 		ec.unmarshalInputRouteInput,
+		ec.unmarshalInputUmengConfigInput,
 		ec.unmarshalInputUpdateMsgChannelInput,
 		ec.unmarshalInputUpdateMsgEventInput,
 		ec.unmarshalInputUpdateMsgSilenceInput,
 		ec.unmarshalInputUpdateMsgSubscriberInput,
 		ec.unmarshalInputUpdateMsgTemplateInput,
 		ec.unmarshalInputUpdateMsgTypeInput,
+		ec.unmarshalInputWebhookConfigInput,
 	)
 	first := true
 
@@ -6169,6 +6293,8 @@ scalar Duration
 scalar LabelName
 """ map[string]string JSON Raw """
 scalar MapString
+""" map[string]*UmengAppConfig JSON Raw """
+scalar UmengApps
 """ host:port """
 scalar HostPort
 
@@ -6206,6 +6332,8 @@ type Receiver {
     name: String!
     emailConfigs: [EmailConfig]
     messageConfig: MessageConfig
+    webhookConfigs: [WebhookConfig]
+    umengConfigs: [UmengConfig]
 }
 
 type EmailConfig {
@@ -6224,6 +6352,24 @@ type MessageConfig {
     to: String
     subject: String
     redirect: String
+}
+
+type WebhookConfig {
+    sendResolved: Boolean
+    url: String
+    urlFile: String
+    maxAlerts: Int
+    timeout: Duration
+    headers: MapString
+    subject: String
+    body: String
+}
+
+type UmengConfig {
+    sendResolved: Boolean
+    apiURL: String
+    apps: UmengApps!
+    productionMode: Boolean
 }
 
 enum RouteStrType {
@@ -6482,6 +6628,8 @@ input ReceiverInput {
     name: String!
     emailConfigs: [EmailConfigInput]
     messageConfig: MessageConfigInput
+    webhookConfigs: [WebhookConfigInput]
+    umengConfigs: [UmengConfigInput]
 }
 
 input EmailConfigInput {
@@ -6500,6 +6648,24 @@ input MessageConfigInput {
     to: String
     subject: String
     redirect: String
+}
+
+input WebhookConfigInput {
+    sendResolved: Boolean
+    url: String
+    urlFile: String
+    maxAlerts: Int
+    timeout: Duration
+    headers: MapString
+    subject: String
+    body: String
+}
+
+input UmengConfigInput {
+    sendResolved: Boolean
+    apiURL: String
+    apps: UmengApps!
+    productionMode: Boolean
 }`, BuiltIn: false},
 	{Name: "../subscription.graphql", Input: `type Subscription {
     # internal message

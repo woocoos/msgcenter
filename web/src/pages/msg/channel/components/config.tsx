@@ -49,7 +49,9 @@ export default (props: {
             redirect: '',
             subject: '',
             to: ''
-          }
+          },
+          webhookConfigs: [],
+          umengConfigs: []
         })
       }
       const result = await getMsgChannelReceiverInfo(props.id);
@@ -59,6 +61,16 @@ export default (props: {
           if (receiver?.__typename) {
             delete receiver.__typename
             receiver?.emailConfigs?.forEach(item => {
+              if (item?.__typename) {
+                delete item.__typename
+              }
+            })
+            receiver?.webhookConfigs?.forEach(item => {
+              if (item?.__typename) {
+                delete item.__typename
+              }
+            })
+            receiver?.umengConfigs?.forEach(item => {
               if (item?.__typename) {
                 delete item.__typename
               }

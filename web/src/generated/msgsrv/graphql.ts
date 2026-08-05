@@ -31,6 +31,8 @@ export type Scalars = {
   MapString: { input: any; output: any; }
   /** The builtin Time type */
   Time: { input: any; output: any; }
+  /**  map[string]*UmengAppConfig JSON Raw  */
+  UmengApps: { input: any; output: any; }
 };
 
 /**
@@ -128,7 +130,7 @@ export type CreateMsgTemplateInput = {
   receiverType: MsgTemplateReceiverType;
   /** 标题 */
   subject?: InputMaybe<Scalars['String']['input']>;
-  /** 组织ID */
+  /** 租户ID */
   tenantID?: InputMaybe<Scalars['ID']['input']>;
   /** 收件人 */
   to?: InputMaybe<Scalars['String']['input']>;
@@ -531,6 +533,7 @@ export enum MsgChannelOrderField {
 export enum MsgChannelReceiverType {
   Email = 'email',
   Message = 'message',
+  Umeng = 'umeng',
   Webhook = 'webhook'
 }
 
@@ -1471,7 +1474,7 @@ export type MsgTemplate = Node & {
   status?: Maybe<MsgTemplateSimpleStatus>;
   /** 标题 */
   subject?: Maybe<Scalars['String']['output']>;
-  /** 组织ID */
+  /** 租户ID */
   tenantID?: Maybe<Scalars['ID']['output']>;
   /** 收件人 */
   to?: Maybe<Scalars['String']['output']>;
@@ -1526,6 +1529,7 @@ export enum MsgTemplateOrderField {
 export enum MsgTemplateReceiverType {
   Email = 'email',
   Message = 'message',
+  Umeng = 'umeng',
   Webhook = 'webhook'
 }
 
@@ -2261,6 +2265,7 @@ export enum NlogOrderField {
 export enum NlogReceiverType {
   Email = 'email',
   Message = 'message',
+  Umeng = 'umeng',
   Webhook = 'webhook'
 }
 
@@ -2425,6 +2430,8 @@ export type PageInfo = {
 
 export type Query = {
   __typename?: 'Query';
+  /** 查询设备是否已有活跃的WebSocket连接 */
+  deviceConnected: Scalars['Boolean']['output'];
   /** 查询消息体发送的所有消息 */
   formatMsgAlertMore?: Maybe<Array<Maybe<FormatMsgAlert>>>;
   /** 解析过的消息列表 */
@@ -2463,6 +2470,11 @@ export type Query = {
   userUnreadMsgInternals: Scalars['Int']['output'];
   /** 消息分类站内信未读数 */
   userUnreadMsgInternalsFromMsgCategory: Array<Scalars['Int']['output']>;
+};
+
+
+export type QueryDeviceConnectedArgs = {
+  deviceId: Scalars['String']['input'];
 };
 
 
@@ -2611,12 +2623,16 @@ export type Receiver = {
   emailConfigs?: Maybe<Array<Maybe<EmailConfig>>>;
   messageConfig?: Maybe<MessageConfig>;
   name: Scalars['String']['output'];
+  umengConfigs?: Maybe<Array<Maybe<UmengConfig>>>;
+  webhookConfigs?: Maybe<Array<Maybe<WebhookConfig>>>;
 };
 
 export type ReceiverInput = {
   emailConfigs?: InputMaybe<Array<InputMaybe<EmailConfigInput>>>;
   messageConfig?: InputMaybe<MessageConfigInput>;
   name: Scalars['String']['input'];
+  umengConfigs?: InputMaybe<Array<InputMaybe<UmengConfigInput>>>;
+  webhookConfigs?: InputMaybe<Array<InputMaybe<WebhookConfigInput>>>;
 };
 
 export type Route = {
@@ -2654,6 +2670,21 @@ export enum RouteStrType {
 export type Subscription = {
   __typename?: 'Subscription';
   message?: Maybe<Message>;
+};
+
+export type UmengConfig = {
+  __typename?: 'UmengConfig';
+  apiURL?: Maybe<Scalars['String']['output']>;
+  apps: Scalars['UmengApps']['output'];
+  productionMode?: Maybe<Scalars['Boolean']['output']>;
+  sendResolved?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type UmengConfigInput = {
+  apiURL?: InputMaybe<Scalars['String']['input']>;
+  apps: Scalars['UmengApps']['input'];
+  productionMode?: InputMaybe<Scalars['Boolean']['input']>;
+  sendResolved?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 /**
@@ -2771,7 +2802,7 @@ export type UpdateMsgTemplateInput = {
   receiverType?: InputMaybe<MsgTemplateReceiverType>;
   /** 标题 */
   subject?: InputMaybe<Scalars['String']['input']>;
-  /** 组织ID */
+  /** 租户ID */
   tenantID?: InputMaybe<Scalars['ID']['input']>;
   /** 收件人 */
   to?: InputMaybe<Scalars['String']['input']>;
@@ -2827,6 +2858,29 @@ export type UserInfo = {
   userID?: Maybe<Scalars['String']['output']>;
 };
 
+export type WebhookConfig = {
+  __typename?: 'WebhookConfig';
+  body?: Maybe<Scalars['String']['output']>;
+  headers?: Maybe<Scalars['MapString']['output']>;
+  maxAlerts?: Maybe<Scalars['Int']['output']>;
+  sendResolved?: Maybe<Scalars['Boolean']['output']>;
+  subject?: Maybe<Scalars['String']['output']>;
+  timeout?: Maybe<Scalars['Duration']['output']>;
+  url?: Maybe<Scalars['String']['output']>;
+  urlFile?: Maybe<Scalars['String']['output']>;
+};
+
+export type WebhookConfigInput = {
+  body?: InputMaybe<Scalars['String']['input']>;
+  headers?: InputMaybe<Scalars['MapString']['input']>;
+  maxAlerts?: InputMaybe<Scalars['Int']['input']>;
+  sendResolved?: InputMaybe<Scalars['Boolean']['input']>;
+  subject?: InputMaybe<Scalars['String']['input']>;
+  timeout?: InputMaybe<Scalars['Duration']['input']>;
+  url?: InputMaybe<Scalars['String']['input']>;
+  urlFile?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type MsgChannelListQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<MsgChannelOrder>;
@@ -2848,7 +2902,7 @@ export type MsgChannelReceiverInfoQueryVariables = Exact<{
 }>;
 
 
-export type MsgChannelReceiverInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string, name: string, receiverType: MsgChannelReceiverType, tenantID: string, comments?: string | null, status?: MsgChannelSimpleStatus | null, createdAt: any, receiver?: { __typename?: 'Receiver', name: string, emailConfigs?: Array<{ __typename?: 'EmailConfig', authIdentity: string, authPassword: string, authSecret: string, authType: string, authUsername: string, from?: string | null, headers?: any | null, smartHost: any, to: string } | null> | null, messageConfig?: { __typename?: 'MessageConfig', redirect?: string | null, subject?: string | null, to?: string | null } | null } | null } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'User', id: string } | null };
+export type MsgChannelReceiverInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string, name: string, receiverType: MsgChannelReceiverType, tenantID: string, comments?: string | null, status?: MsgChannelSimpleStatus | null, createdAt: any, receiver?: { __typename?: 'Receiver', name: string, emailConfigs?: Array<{ __typename?: 'EmailConfig', authIdentity: string, authPassword: string, authSecret: string, authType: string, authUsername: string, from?: string | null, headers?: any | null, smartHost: any, to: string } | null> | null, messageConfig?: { __typename?: 'MessageConfig', redirect?: string | null, subject?: string | null, to?: string | null } | null, webhookConfigs?: Array<{ __typename?: 'WebhookConfig', sendResolved?: boolean | null, url?: string | null, urlFile?: string | null, maxAlerts?: number | null, timeout?: any | null, headers?: any | null, subject?: string | null, body?: string | null } | null> | null, umengConfigs?: Array<{ __typename?: 'UmengConfig', sendResolved?: boolean | null, apiURL?: string | null, apps: any, productionMode?: boolean | null } | null> | null } | null } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'User', id: string } | null };
 
 export type CreateMsgChannelMutationVariables = Exact<{
   input: CreateMsgChannelInput;
@@ -3258,7 +3312,7 @@ export type DeleteMsgSubscriberMutation = { __typename?: 'Mutation', deleteMsgSu
 
 export const MsgChannelListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"msgChannelList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MsgChannelOrder"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"MsgChannelWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"msgChannels"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"receiverType"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]}}]} as unknown as DocumentNode<MsgChannelListQuery, MsgChannelListQueryVariables>;
 export const MsgChannelInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"msgChannelInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"MsgChannel"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"receiverType"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]} as unknown as DocumentNode<MsgChannelInfoQuery, MsgChannelInfoQueryVariables>;
-export const MsgChannelReceiverInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"msgChannelReceiverInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"MsgChannel"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"receiverType"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"receiver"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"emailConfigs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authIdentity"}},{"kind":"Field","name":{"kind":"Name","value":"authPassword"}},{"kind":"Field","name":{"kind":"Name","value":"authSecret"}},{"kind":"Field","name":{"kind":"Name","value":"authType"}},{"kind":"Field","name":{"kind":"Name","value":"authUsername"}},{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"headers"}},{"kind":"Field","name":{"kind":"Name","value":"smartHost"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}},{"kind":"Field","name":{"kind":"Name","value":"messageConfig"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"redirect"}},{"kind":"Field","name":{"kind":"Name","value":"subject"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<MsgChannelReceiverInfoQuery, MsgChannelReceiverInfoQueryVariables>;
+export const MsgChannelReceiverInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"msgChannelReceiverInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"MsgChannel"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"receiverType"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"receiver"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"emailConfigs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authIdentity"}},{"kind":"Field","name":{"kind":"Name","value":"authPassword"}},{"kind":"Field","name":{"kind":"Name","value":"authSecret"}},{"kind":"Field","name":{"kind":"Name","value":"authType"}},{"kind":"Field","name":{"kind":"Name","value":"authUsername"}},{"kind":"Field","name":{"kind":"Name","value":"from"}},{"kind":"Field","name":{"kind":"Name","value":"headers"}},{"kind":"Field","name":{"kind":"Name","value":"smartHost"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}},{"kind":"Field","name":{"kind":"Name","value":"messageConfig"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"redirect"}},{"kind":"Field","name":{"kind":"Name","value":"subject"}},{"kind":"Field","name":{"kind":"Name","value":"to"}}]}},{"kind":"Field","name":{"kind":"Name","value":"webhookConfigs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sendResolved"}},{"kind":"Field","name":{"kind":"Name","value":"url"}},{"kind":"Field","name":{"kind":"Name","value":"urlFile"}},{"kind":"Field","name":{"kind":"Name","value":"maxAlerts"}},{"kind":"Field","name":{"kind":"Name","value":"timeout"}},{"kind":"Field","name":{"kind":"Name","value":"headers"}},{"kind":"Field","name":{"kind":"Name","value":"subject"}},{"kind":"Field","name":{"kind":"Name","value":"body"}}]}},{"kind":"Field","name":{"kind":"Name","value":"umengConfigs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sendResolved"}},{"kind":"Field","name":{"kind":"Name","value":"apiURL"}},{"kind":"Field","name":{"kind":"Name","value":"apps"}},{"kind":"Field","name":{"kind":"Name","value":"productionMode"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<MsgChannelReceiverInfoQuery, MsgChannelReceiverInfoQueryVariables>;
 export const CreateMsgChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createMsgChannel"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateMsgChannelInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createMsgChannel"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"receiverType"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<CreateMsgChannelMutation, CreateMsgChannelMutationVariables>;
 export const UpdateMsgChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateMsgChannel"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateMsgChannelInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMsgChannel"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"receiverType"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<UpdateMsgChannelMutation, UpdateMsgChannelMutationVariables>;
 export const DelMsgChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"delMsgChannel"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMsgChannel"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DelMsgChannelMutation, DelMsgChannelMutationVariables>;

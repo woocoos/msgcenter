@@ -11,6 +11,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/vektah/gqlparser/v2/ast"
+	"github.com/woocoos/msgcenter/api/graphql/scalars"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -51,6 +52,14 @@ type MutationResolver interface {
 
 type RouteInputResolver interface {
 	Matchers(ctx context.Context, obj *profile.Route, data []*label.Matcher) error
+}
+type UmengConfigInputResolver interface {
+	Apps(ctx context.Context, obj *profile.UmengConfig, data scalars.UmengApps) error
+}
+type WebhookConfigInputResolver interface {
+	URL(ctx context.Context, obj *profile.WebhookConfig, data *string) error
+
+	MaxAlerts(ctx context.Context, obj *profile.WebhookConfig, data *int) error
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -3360,7 +3369,7 @@ func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "emailConfigs", "messageConfig"}
+	fieldsInOrder := [...]string{"name", "emailConfigs", "messageConfig", "webhookConfigs", "umengConfigs"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3388,6 +3397,20 @@ func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj
 				return it, err
 			}
 			it.MessageConfig = data
+		case "webhookConfigs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("webhookConfigs"))
+			data, err := ec.unmarshalOWebhookConfigInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐWebhookConfig(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.WebhookConfigs = data
+		case "umengConfigs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("umengConfigs"))
+			data, err := ec.unmarshalOUmengConfigInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐUmengConfig(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UmengConfigs = data
 		}
 	}
 
@@ -3480,6 +3503,136 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj an
 				return it, err
 			}
 			it.RepeatInterval = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUmengConfigInput(ctx context.Context, obj any) (profile.UmengConfig, error) {
+	var it profile.UmengConfig
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"sendResolved", "apiURL", "apps", "productionMode"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "sendResolved":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sendResolved"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SendResolved = data
+		case "apiURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("apiURL"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.APIURL = data
+		case "apps":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("apps"))
+			data, err := ec.unmarshalNUmengApps2githubᚗcomᚋwoocoosᚋmsgcenterᚋapiᚋgraphqlᚋscalarsᚐUmengApps(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.UmengConfigInput().Apps(ctx, &it, data); err != nil {
+				return it, err
+			}
+		case "productionMode":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("productionMode"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProductionMode = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputWebhookConfigInput(ctx context.Context, obj any) (profile.WebhookConfig, error) {
+	var it profile.WebhookConfig
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"sendResolved", "url", "urlFile", "maxAlerts", "timeout", "headers", "subject", "body"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "sendResolved":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sendResolved"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SendResolved = data
+		case "url":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.WebhookConfigInput().URL(ctx, &it, data); err != nil {
+				return it, err
+			}
+		case "urlFile":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlFile"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.URLFile = data
+		case "maxAlerts":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxAlerts"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.WebhookConfigInput().MaxAlerts(ctx, &it, data); err != nil {
+				return it, err
+			}
+		case "timeout":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("timeout"))
+			data, err := ec.unmarshalODuration2timeᚐDuration(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Timeout = data
+		case "headers":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("headers"))
+			data, err := ec.unmarshalOMapString2map(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Headers = data
+		case "subject":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subject"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Subject = data
+		case "body":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("body"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Body = data
 		}
 	}
 
@@ -3827,6 +3980,58 @@ func (ec *executionContext) unmarshalORouteInput2ᚖgithubᚗcomᚋwoocoosᚋmsg
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputRouteInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOUmengConfigInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐUmengConfig(ctx context.Context, v any) ([]*profile.UmengConfig, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*profile.UmengConfig, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOUmengConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐUmengConfig(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOUmengConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐUmengConfig(ctx context.Context, v any) (*profile.UmengConfig, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUmengConfigInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOWebhookConfigInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐWebhookConfig(ctx context.Context, v any) ([]*profile.WebhookConfig, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*profile.WebhookConfig, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOWebhookConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐWebhookConfig(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOWebhookConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐWebhookConfig(ctx context.Context, v any) (*profile.WebhookConfig, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputWebhookConfigInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

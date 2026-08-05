@@ -3497,6 +3497,10 @@ func (ec *executionContext) fieldContext_MsgChannel_receiver(_ context.Context, 
 				return ec.fieldContext_Receiver_emailConfigs(ctx, field)
 			case "messageConfig":
 				return ec.fieldContext_Receiver_messageConfig(ctx, field)
+			case "webhookConfigs":
+				return ec.fieldContext_Receiver_webhookConfigs(ctx, field)
+			case "umengConfigs":
+				return ec.fieldContext_Receiver_umengConfigs(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Receiver", field.Name)
 		},

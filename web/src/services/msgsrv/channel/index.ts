@@ -49,6 +49,12 @@ const queryMsgChannelReceiverInfo = gql(/* GraphQL */`query msgChannelReceiverIn
         },
         messageConfig{
           redirect,subject,to
+        },
+        webhookConfigs{
+          sendResolved,url,urlFile,maxAlerts,timeout,headers,subject,body
+        },
+        umengConfigs{
+          sendResolved,apiURL,apps,productionMode
         }
       }
     }

@@ -103,7 +103,7 @@ input CreateMsgTemplateInput {
   receiverType: MsgTemplateReceiverType!
   """标题"""
   subject: String
-  """组织ID"""
+  """租户ID"""
   tenantID: ID
   """收件人"""
   to: String
@@ -518,6 +518,7 @@ enum MsgChannelOrderField {
 enum MsgChannelReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
   email
   message
+  umeng
   webhook
 }
 
@@ -1439,7 +1440,7 @@ type MsgTemplate implements Node {
   status: MsgTemplateSimpleStatus
   """标题"""
   subject: String
-  """组织ID"""
+  """租户ID"""
   tenantID: ID
   """收件人"""
   to: String
@@ -1492,6 +1493,7 @@ enum MsgTemplateOrderField {
 enum MsgTemplateReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
   email
   message
+  umeng
   webhook
 }
 
@@ -2072,6 +2074,7 @@ enum NlogOrderField {
 enum NlogReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
   email
   message
+  umeng
   webhook
 }
 
@@ -2235,6 +2238,8 @@ type PageInfo {
 }
 
 type Query {
+  """查询设备是否已有活跃的WebSocket连接"""
+  deviceConnected(deviceId: String!): Boolean!
   """查询消息体发送的所有消息"""
   formatMsgAlertMore(msgAlertID: ID!): [FormatMsgAlert]
   """解析过的消息列表"""
@@ -2320,12 +2325,16 @@ type Receiver {
   emailConfigs: [EmailConfig]
   messageConfig: MessageConfig
   name: String!
+  umengConfigs: [UmengConfig]
+  webhookConfigs: [WebhookConfig]
 }
 
 input ReceiverInput {
   emailConfigs: [EmailConfigInput]
   messageConfig: MessageConfigInput
   name: String!
+  umengConfigs: [UmengConfigInput]
+  webhookConfigs: [WebhookConfigInput]
 }
 
 type Route {
@@ -2365,6 +2374,23 @@ type Subscription {
 
 """The builtin Time type"""
 scalar Time
+
+""" map[string]*UmengAppConfig JSON Raw """
+scalar UmengApps
+
+type UmengConfig {
+  apiURL: String
+  apps: UmengApps!
+  productionMode: Boolean
+  sendResolved: Boolean
+}
+
+input UmengConfigInput {
+  apiURL: String
+  apps: UmengApps!
+  productionMode: Boolean
+  sendResolved: Boolean
+}
 
 """
 UpdateMsgChannelInput is used for update MsgChannel object.
@@ -2481,7 +2507,7 @@ input UpdateMsgTemplateInput {
   receiverType: MsgTemplateReceiverType
   """标题"""
   subject: String
-  """组织ID"""
+  """租户ID"""
   tenantID: ID
   """收件人"""
   to: String
@@ -2533,4 +2559,26 @@ type UserInfo {
   mobile: String
   name: String
   userID: String
+}
+
+type WebhookConfig {
+  body: String
+  headers: MapString
+  maxAlerts: Int
+  sendResolved: Boolean
+  subject: String
+  timeout: Duration
+  url: String
+  urlFile: String
+}
+
+input WebhookConfigInput {
+  body: String
+  headers: MapString
+  maxAlerts: Int
+  sendResolved: Boolean
+  subject: String
+  timeout: Duration
+  url: String
+  urlFile: String
 }

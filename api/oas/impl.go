@@ -489,7 +489,7 @@ func AlertToOpenAPIAlert(alert *alert.Alert, status alert.MarkerStatus, receiver
 		Fingerprint: alert.Fingerprint().String(),
 		Receivers:   apiReceivers,
 		Status: AlertStatus{
-			State:       string(status.State),
+			State:       AlertStatusState(status.State),
 			SilencedBy:  status.SilencedBy,
 			InhibitedBy: status.InhibitedBy,
 		},
@@ -504,9 +504,13 @@ func OpenAPIAlertsToAlerts(apiAlerts PostableAlerts) []*alert.Alert {
 		a := alert.Alert{
 			Labels:       APILabelSetToModelLabelSet(apiAlert.Labels),
 			Annotations:  APILabelSetToModelLabelSet(apiAlert.Annotations),
-			StartsAt:     apiAlert.StartsAt,
-			EndsAt:       apiAlert.EndsAt,
 			GeneratorURL: apiAlert.GeneratorURL,
+		}
+		if apiAlert.StartsAt != nil {
+			a.StartsAt = *apiAlert.StartsAt
+		}
+		if apiAlert.EndsAt != nil {
+			a.EndsAt = *apiAlert.EndsAt
 		}
 		alerts = append(alerts, &a)
 	}
@@ -570,7 +574,7 @@ func GettableSilenceFromProto(s *silence.Entry) (*GettableSilence, error) {
 		ID:        s.ID,
 		UpdatedAt: updated,
 		Status: SilenceStatus{
-			State: state,
+			State: SilenceStatusState(state),
 		},
 	}
 

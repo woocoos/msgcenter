@@ -14,6 +14,7 @@ import (
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/api/graphql/model"
+	"github.com/woocoos/msgcenter/api/graphql/scalars"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msginternal"
@@ -285,20 +286,40 @@ func (r *queryResolver) MsgTemplateDefineByName(ctx context.Context, format msgt
 	return tmpl, nil
 }
 
-// DeviceConnected is the resolver for the deviceConnected field.
-func (r *queryResolver) DeviceConnected(ctx context.Context, deviceID string) (bool, error) {
-	if r.PubSub == nil {
-		return false, nil
-	}
-	return r.PubSub.HasDeviceConnection(deviceID), nil
-}
-
 // Matchers is the resolver for the matchers field.
 func (r *routeResolver) Matchers(ctx context.Context, obj *profile.Route) ([]*label.Matcher, error) {
 	return obj.Matchers, nil
 }
 
+// Apps is the resolver for the apps field.
+func (r *umengConfigResolver) Apps(ctx context.Context, obj *profile.UmengConfig) (scalars.UmengApps, error) {
+	panic(fmt.Errorf("not implemented: Apps - apps"))
+}
+
+// URL is the resolver for the url field.
+func (r *webhookConfigResolver) URL(ctx context.Context, obj *profile.WebhookConfig) (*string, error) {
+	if obj.URL == nil {
+		return nil, nil
+	}
+	s := obj.URL.String()
+	return &s, nil
+}
+
+// MaxAlerts is the resolver for the maxAlerts field.
+func (r *webhookConfigResolver) MaxAlerts(ctx context.Context, obj *profile.WebhookConfig) (*int, error) {
+	v := int(obj.MaxAlerts)
+	return &v, nil
+}
+
 // Route returns generated.RouteResolver implementation.
 func (r *Resolver) Route() generated.RouteResolver { return &routeResolver{r} }
 
+// UmengConfig returns generated.UmengConfigResolver implementation.
+func (r *Resolver) UmengConfig() generated.UmengConfigResolver { return &umengConfigResolver{r} }
+
+// WebhookConfig returns generated.WebhookConfigResolver implementation.
+func (r *Resolver) WebhookConfig() generated.WebhookConfigResolver { return &webhookConfigResolver{r} }
+
 type routeResolver struct{ *Resolver }
+type umengConfigResolver struct{ *Resolver }
+type webhookConfigResolver struct{ *Resolver }

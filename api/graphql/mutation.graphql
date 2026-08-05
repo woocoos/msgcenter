@@ -80,6 +80,8 @@ input ReceiverInput {
     name: String!
     emailConfigs: [EmailConfigInput]
     messageConfig: MessageConfigInput
+    webhookConfigs: [WebhookConfigInput]
+    umengConfigs: [UmengConfigInput]
 }
 
 input EmailConfigInput {
@@ -98,4 +100,22 @@ input MessageConfigInput {
     to: String
     subject: String
     redirect: String
+}
+
+input WebhookConfigInput {
+    sendResolved: Boolean
+    url: String
+    urlFile: String
+    maxAlerts: Int
+    timeout: Duration
+    headers: MapString
+    subject: String
+    body: String
+}
+
+input UmengConfigInput {
+    sendResolved: Boolean
+    apiURL: String
+    apps: UmengApps!
+    productionMode: Boolean
 }

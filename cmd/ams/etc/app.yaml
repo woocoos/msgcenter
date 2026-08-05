@@ -11,8 +11,8 @@ includeFiles:
   - "etc/local.yaml"
 
 jwt: &jwt
-  signingMethod: "RS256"
-  signingKey: "file:///Volumes/QEELYN/GIT/woocoo/msgcenter/cmd/ams/etc/rsa_pub.pem"
+  signingMethod: "HS256"
+  signingKey: "secret"
 
 web:
   server:

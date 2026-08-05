@@ -14,6 +14,7 @@ import (
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
+	"github.com/woocoos/msgcenter/api/graphql/scalars"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -568,11 +569,51 @@ func (r *routeInputResolver) Matchers(ctx context.Context, obj *profile.Route, d
 	return nil
 }
 
+// Apps is the resolver for the apps field.
+func (r *umengConfigInputResolver) Apps(ctx context.Context, obj *profile.UmengConfig, data scalars.UmengApps) error {
+	obj.Apps = map[string]*profile.UmengAppConfig(data)
+	return nil
+}
+
+// URL is the resolver for the url field.
+func (r *webhookConfigInputResolver) URL(ctx context.Context, obj *profile.WebhookConfig, data *string) error {
+	if data == nil {
+		return nil
+	}
+	u := &profile.URL{}
+	if err := u.UnmarshalText([]byte(*data)); err != nil {
+		return err
+	}
+	obj.URL = u
+	return nil
+}
+
+// MaxAlerts is the resolver for the maxAlerts field.
+func (r *webhookConfigInputResolver) MaxAlerts(ctx context.Context, obj *profile.WebhookConfig, data *int) error {
+	if data == nil {
+		return nil
+	}
+	obj.MaxAlerts = uint64(*data)
+	return nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
 // RouteInput returns generated.RouteInputResolver implementation.
 func (r *Resolver) RouteInput() generated.RouteInputResolver { return &routeInputResolver{r} }
 
+// UmengConfigInput returns generated.UmengConfigInputResolver implementation.
+func (r *Resolver) UmengConfigInput() generated.UmengConfigInputResolver {
+	return &umengConfigInputResolver{r}
+}
+
+// WebhookConfigInput returns generated.WebhookConfigInputResolver implementation.
+func (r *Resolver) WebhookConfigInput() generated.WebhookConfigInputResolver {
+	return &webhookConfigInputResolver{r}
+}
+
 type mutationResolver struct{ *Resolver }
 type routeInputResolver struct{ *Resolver }
+type umengConfigInputResolver struct{ *Resolver }
+type webhookConfigInputResolver struct{ *Resolver }

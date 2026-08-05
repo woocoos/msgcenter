@@ -4,6 +4,8 @@ scalar Duration
 scalar LabelName
 """ map[string]string JSON Raw """
 scalar MapString
+""" map[string]*UmengAppConfig JSON Raw """
+scalar UmengApps
 """ host:port """
 scalar HostPort
 
@@ -41,6 +43,8 @@ type Receiver {
     name: String!
     emailConfigs: [EmailConfig]
     messageConfig: MessageConfig
+    webhookConfigs: [WebhookConfig]
+    umengConfigs: [UmengConfig]
 }
 
 type EmailConfig {
@@ -59,6 +63,24 @@ type MessageConfig {
     to: String
     subject: String
     redirect: String
+}
+
+type WebhookConfig {
+    sendResolved: Boolean
+    url: String
+    urlFile: String
+    maxAlerts: Int
+    timeout: Duration
+    headers: MapString
+    subject: String
+    body: String
+}
+
+type UmengConfig {
+    sendResolved: Boolean
+    apiURL: String
+    apps: UmengApps!
+    productionMode: Boolean
 }
 
 enum RouteStrType {

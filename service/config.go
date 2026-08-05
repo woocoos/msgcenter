@@ -3,6 +3,10 @@ package service
 import (
 	"context"
 	"errors"
+	"net/mail"
+	"strconv"
+	"strings"
+
 	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent"
@@ -15,9 +19,6 @@ import (
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service/kosdk"
-	"net/mail"
-	"strconv"
-	"strings"
 )
 
 var (
