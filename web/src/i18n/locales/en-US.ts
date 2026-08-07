@@ -213,6 +213,8 @@ export default {
     msg_template_list: 'Message event template list',
     msg_subscription_list: 'Message subscription list',
     silence_msg_list: 'Silent message list',
+    event_subscription_list: 'Message event subscription list',
+    event_subscription: 'Event subscription',
     // 详情
 
     // 必填提示

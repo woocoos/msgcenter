@@ -1404,12 +1404,22 @@ func (ec *executionContext) fieldContext_Mutation_createMsgEvent(ctx context.Con
 				return ec.fieldContext_MsgEvent_route(ctx, field)
 			case "modes":
 				return ec.fieldContext_MsgEvent_modes(ctx, field)
+			case "canSubs":
+				return ec.fieldContext_MsgEvent_canSubs(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_MsgEvent_subscribers(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
 			case "routeStr":
 				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
+			case "subscriberUsers":
+				return ec.fieldContext_MsgEvent_subscriberUsers(ctx, field)
+			case "subscriberRoles":
+				return ec.fieldContext_MsgEvent_subscriberRoles(ctx, field)
+			case "excludeSubscriberUsers":
+				return ec.fieldContext_MsgEvent_excludeSubscriberUsers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -1489,12 +1499,22 @@ func (ec *executionContext) fieldContext_Mutation_updateMsgEvent(ctx context.Con
 				return ec.fieldContext_MsgEvent_route(ctx, field)
 			case "modes":
 				return ec.fieldContext_MsgEvent_modes(ctx, field)
+			case "canSubs":
+				return ec.fieldContext_MsgEvent_canSubs(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_MsgEvent_subscribers(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
 			case "routeStr":
 				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
+			case "subscriberUsers":
+				return ec.fieldContext_MsgEvent_subscriberUsers(ctx, field)
+			case "subscriberRoles":
+				return ec.fieldContext_MsgEvent_subscriberRoles(ctx, field)
+			case "excludeSubscriberUsers":
+				return ec.fieldContext_MsgEvent_excludeSubscriberUsers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -1629,12 +1649,22 @@ func (ec *executionContext) fieldContext_Mutation_enableMsgEvent(ctx context.Con
 				return ec.fieldContext_MsgEvent_route(ctx, field)
 			case "modes":
 				return ec.fieldContext_MsgEvent_modes(ctx, field)
+			case "canSubs":
+				return ec.fieldContext_MsgEvent_canSubs(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_MsgEvent_subscribers(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
 			case "routeStr":
 				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
+			case "subscriberUsers":
+				return ec.fieldContext_MsgEvent_subscriberUsers(ctx, field)
+			case "subscriberRoles":
+				return ec.fieldContext_MsgEvent_subscriberRoles(ctx, field)
+			case "excludeSubscriberUsers":
+				return ec.fieldContext_MsgEvent_excludeSubscriberUsers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -1714,12 +1744,22 @@ func (ec *executionContext) fieldContext_Mutation_disableMsgEvent(ctx context.Co
 				return ec.fieldContext_MsgEvent_route(ctx, field)
 			case "modes":
 				return ec.fieldContext_MsgEvent_modes(ctx, field)
+			case "canSubs":
+				return ec.fieldContext_MsgEvent_canSubs(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_MsgEvent_subscribers(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
 			case "routeStr":
 				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
+			case "subscriberUsers":
+				return ec.fieldContext_MsgEvent_subscriberUsers(ctx, field)
+			case "subscriberRoles":
+				return ec.fieldContext_MsgEvent_subscriberRoles(ctx, field)
+			case "excludeSubscriberUsers":
+				return ec.fieldContext_MsgEvent_excludeSubscriberUsers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -2627,6 +2667,8 @@ func (ec *executionContext) fieldContext_Mutation_createMsgSubscriber(ctx contex
 				return ec.fieldContext_MsgSubscriber_updatedAt(ctx, field)
 			case "msgTypeID":
 				return ec.fieldContext_MsgSubscriber_msgTypeID(ctx, field)
+			case "msgEventID":
+				return ec.fieldContext_MsgSubscriber_msgEventID(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_MsgSubscriber_tenantID(ctx, field)
 			case "userID":
@@ -2637,6 +2679,8 @@ func (ec *executionContext) fieldContext_Mutation_createMsgSubscriber(ctx contex
 				return ec.fieldContext_MsgSubscriber_exclude(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgSubscriber_msgType(ctx, field)
+			case "msgEvent":
+				return ec.fieldContext_MsgSubscriber_msgEvent(ctx, field)
 			case "user":
 				return ec.fieldContext_MsgSubscriber_user(ctx, field)
 			}

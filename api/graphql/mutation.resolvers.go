@@ -22,6 +22,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service/silence"
@@ -99,10 +100,15 @@ func (r *mutationResolver) DeleteMsgEvent(ctx context.Context, id int) (bool, er
 	} else if has {
 		return false, fmt.Errorf("the active status cannot be deleted")
 	}
-	if has, err := client.MsgEvent.Query().Where(msgevent.HasCustomerTemplate()).Exist(ctx); err != nil {
+	if has, err := client.MsgEvent.Query().Where(msgevent.ID(id), msgevent.HasCustomerTemplate()).Exist(ctx); err != nil {
 		return false, err
 	} else if has {
 		return false, fmt.Errorf("cannot be deleted. msgevent is associated with msgtemplate")
+	}
+	if has, err := client.MsgEvent.Query().Where(msgevent.ID(id), msgevent.HasSubscribers()).Exist(ctx); err != nil {
+		return false, err
+	} else if has {
+		return false, fmt.Errorf("cannot be deleted. msgevent has subscribers")
 	}
 	err := ent.FromContext(ctx).MsgEvent.DeleteOneID(id).Exec(ctx)
 	return err == nil, err
@@ -333,6 +339,21 @@ func (r *mutationResolver) CreateMsgSubscriber(ctx context.Context, inputs []*en
 		if (v.UserID == nil && v.OrgRoleID == nil) || (v.UserID != nil && v.OrgRoleID != nil) {
 			return nil, fmt.Errorf("only one of userID and orgRoleID")
 		}
+		// 验证 msg_type_id 和 msg_event_id 互斥且必选其一
+		typeID := 0
+		if v.MsgTypeID != nil {
+			typeID = *v.MsgTypeID
+		}
+		eventID := 0
+		if v.MsgEventID != nil {
+			eventID = *v.MsgEventID
+		}
+		if typeID != 0 && eventID != 0 {
+			return nil, fmt.Errorf("msg_type_id and msg_event_id are mutually exclusive")
+		}
+		if typeID == 0 && eventID == 0 {
+			return nil, fmt.Errorf("either msg_type_id or msg_event_id must be set")
+		}
 		// 检查是否已订阅
 		exclude := false
 		if v.Exclude != nil {
@@ -346,11 +367,18 @@ func (r *mutationResolver) CreateMsgSubscriber(ctx context.Context, inputs []*en
 		if v.OrgRoleID != nil {
 			orid = *v.OrgRoleID
 		}
-		has, err := client.MsgSubscriber.Query().Where(
+		// 构建查询条件
+		predicates := []predicate.MsgSubscriber{
 			msgsubscriber.TenantID(v.TenantID),
-			msgsubscriber.MsgTypeID(v.MsgTypeID),
 			msgsubscriber.ExcludeEQ(exclude),
-			msgsubscriber.Or(msgsubscriber.UserIDEQ(uid), msgsubscriber.OrgRoleIDEQ(orid))).Exist(ctx)
+			msgsubscriber.Or(msgsubscriber.UserIDEQ(uid), msgsubscriber.OrgRoleIDEQ(orid)),
+		}
+		if typeID != 0 {
+			predicates = append(predicates, msgsubscriber.MsgTypeID(typeID))
+		} else {
+			predicates = append(predicates, msgsubscriber.MsgEventID(eventID))
+		}
+		has, err := client.MsgSubscriber.Query().Where(predicates...).Exist(ctx)
 		if err != nil {
 			return nil, err
 		}

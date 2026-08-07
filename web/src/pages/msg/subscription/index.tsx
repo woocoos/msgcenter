@@ -9,7 +9,7 @@ import Settings from './components/settings';
 import { getOrgRoles, getUsers } from '@knockout-js/api';
 import { KeepAlive } from '@knockout-js/layout';
 import { DictSelect, DictText } from '@knockout-js/org';
-import { definePageConfig } from 'ice';
+import { definePageConfig, history } from 'ice';
 
 type ProTableColumnsData = {
   id: string;
@@ -49,7 +49,7 @@ export default () => {
         fixed: 'right',
         align: 'center',
         search: false,
-        width: 60,
+        width: 120,
         render: (text, record) => {
           return record.msgType ? <Space>
             <Auth authKey={['createMsgSubscriber', 'deleteMsgSubscriber']}>
@@ -64,6 +64,14 @@ export default () => {
                 {t('settings')}
               </a>
             </Auth>
+            <a
+              key="event_subscription"
+              onClick={() => {
+                history?.push(`/msg/subscription/events?msgTypeId=${record.msgType?.id}&msgTypeName=${encodeURIComponent(record.name)}`);
+              }}
+            >
+              {t('event_subscription')}
+            </a>
           </Space> : <></>;
         },
       },

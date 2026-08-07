@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
@@ -28,9 +29,11 @@ type MsgEventQuery struct {
 	inters                    []Interceptor
 	predicates                []predicate.MsgEvent
 	withMsgType               *MsgTypeQuery
+	withSubscribers           *MsgSubscriberQuery
 	withCustomerTemplate      *MsgTemplateQuery
 	modifiers                 []func(*sql.Selector)
 	loadTotal                 []func(context.Context, []*MsgEvent) error
+	withNamedSubscribers      map[string]*MsgSubscriberQuery
 	withNamedCustomerTemplate map[string]*MsgTemplateQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -87,6 +90,31 @@ func (_q *MsgEventQuery) QueryMsgType() *MsgTypeQuery {
 		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.MsgType
 		step.Edge.Schema = schemaConfig.MsgEvent
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySubscribers chains the current query on the "subscribers" edge.
+func (_q *MsgEventQuery) QuerySubscribers() *MsgSubscriberQuery {
+	query := (&MsgSubscriberClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msgevent.Table, msgevent.FieldID, selector),
+			sqlgraph.To(msgsubscriber.Table, msgsubscriber.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, msgevent.SubscribersTable, msgevent.SubscribersColumn),
+		)
+		schemaConfig := _q.schemaConfig
+		step.To.Schema = schemaConfig.MsgSubscriber
+		step.Edge.Schema = schemaConfig.MsgSubscriber
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
@@ -311,6 +339,7 @@ func (_q *MsgEventQuery) Clone() *MsgEventQuery {
 		inters:               append([]Interceptor{}, _q.inters...),
 		predicates:           append([]predicate.MsgEvent{}, _q.predicates...),
 		withMsgType:          _q.withMsgType.Clone(),
+		withSubscribers:      _q.withSubscribers.Clone(),
 		withCustomerTemplate: _q.withCustomerTemplate.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
@@ -326,6 +355,17 @@ func (_q *MsgEventQuery) WithMsgType(opts ...func(*MsgTypeQuery)) *MsgEventQuery
 		opt(query)
 	}
 	_q.withMsgType = query
+	return _q
+}
+
+// WithSubscribers tells the query-builder to eager-load the nodes that are connected to
+// the "subscribers" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *MsgEventQuery) WithSubscribers(opts ...func(*MsgSubscriberQuery)) *MsgEventQuery {
+	query := (&MsgSubscriberClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withSubscribers = query
 	return _q
 }
 
@@ -418,8 +458,9 @@ func (_q *MsgEventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Msg
 	var (
 		nodes       = []*MsgEvent{}
 		_spec       = _q.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			_q.withMsgType != nil,
+			_q.withSubscribers != nil,
 			_q.withCustomerTemplate != nil,
 		}
 	)
@@ -452,10 +493,24 @@ func (_q *MsgEventQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Msg
 			return nil, err
 		}
 	}
+	if query := _q.withSubscribers; query != nil {
+		if err := _q.loadSubscribers(ctx, query, nodes,
+			func(n *MsgEvent) { n.Edges.Subscribers = []*MsgSubscriber{} },
+			func(n *MsgEvent, e *MsgSubscriber) { n.Edges.Subscribers = append(n.Edges.Subscribers, e) }); err != nil {
+			return nil, err
+		}
+	}
 	if query := _q.withCustomerTemplate; query != nil {
 		if err := _q.loadCustomerTemplate(ctx, query, nodes,
 			func(n *MsgEvent) { n.Edges.CustomerTemplate = []*MsgTemplate{} },
 			func(n *MsgEvent, e *MsgTemplate) { n.Edges.CustomerTemplate = append(n.Edges.CustomerTemplate, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range _q.withNamedSubscribers {
+		if err := _q.loadSubscribers(ctx, query, nodes,
+			func(n *MsgEvent) { n.appendNamedSubscribers(name) },
+			func(n *MsgEvent, e *MsgSubscriber) { n.appendNamedSubscribers(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -500,6 +555,36 @@ func (_q *MsgEventQuery) loadMsgType(ctx context.Context, query *MsgTypeQuery, n
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (_q *MsgEventQuery) loadSubscribers(ctx context.Context, query *MsgSubscriberQuery, nodes []*MsgEvent, init func(*MsgEvent), assign func(*MsgEvent, *MsgSubscriber)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*MsgEvent)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(msgsubscriber.FieldMsgEventID)
+	}
+	query.Where(predicate.MsgSubscriber(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(msgevent.SubscribersColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.MsgEventID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "msg_event_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }
@@ -624,6 +709,20 @@ func (_q *MsgEventQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedSubscribers tells the query-builder to eager-load the nodes that are connected to the "subscribers"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (_q *MsgEventQuery) WithNamedSubscribers(name string, opts ...func(*MsgSubscriberQuery)) *MsgEventQuery {
+	query := (&MsgSubscriberClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if _q.withNamedSubscribers == nil {
+		_q.withNamedSubscribers = make(map[string]*MsgSubscriberQuery)
+	}
+	_q.withNamedSubscribers[name] = query
+	return _q
 }
 
 // WithNamedCustomerTemplate tells the query-builder to eager-load the nodes that are connected to the "customer_template"

@@ -151,30 +151,6 @@ type PostableSilence struct {
 	*Silence `json:",inline"`
 }
 
-// SilenceStatusState defines the type for the state.state enum field.
-type SilenceStatusState string
-
-// SilenceStatusState values.
-const (
-	SilenceStatusStateExpired SilenceStatusState = "expired"
-	SilenceStatusStateActive  SilenceStatusState = "active"
-	SilenceStatusStatePending SilenceStatusState = "pending"
-)
-
-func (s SilenceStatusState) String() string {
-	return string(s)
-}
-
-// SilenceStatusStateValidator is a validator for the SilenceStatusState field enum values.
-func SilenceStatusStateValidator(s SilenceStatusState) error {
-	switch s {
-	case SilenceStatusStateExpired, SilenceStatusStateActive, SilenceStatusStatePending:
-		return nil
-	default:
-		return fmt.Errorf("SilenceStatusState does not allow the value '%s'", s)
-	}
-}
-
 // AlertStatusState defines the type for the state.state enum field.
 type AlertStatusState string
 
@@ -196,6 +172,30 @@ func AlertStatusStateValidator(s AlertStatusState) error {
 		return nil
 	default:
 		return fmt.Errorf("AlertStatusState does not allow the value '%s'", s)
+	}
+}
+
+// SilenceStatusState defines the type for the state.state enum field.
+type SilenceStatusState string
+
+// SilenceStatusState values.
+const (
+	SilenceStatusStateExpired SilenceStatusState = "expired"
+	SilenceStatusStateActive  SilenceStatusState = "active"
+	SilenceStatusStatePending SilenceStatusState = "pending"
+)
+
+func (s SilenceStatusState) String() string {
+	return string(s)
+}
+
+// SilenceStatusStateValidator is a validator for the SilenceStatusState field enum values.
+func SilenceStatusStateValidator(s SilenceStatusState) error {
+	switch s {
+	case SilenceStatusStateExpired, SilenceStatusStateActive, SilenceStatusStatePending:
+		return nil
+	default:
+		return fmt.Errorf("SilenceStatusState does not allow the value '%s'", s)
 	}
 }
 

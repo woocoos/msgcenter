@@ -789,6 +789,25 @@ func (c *MsgEventClient) QueryMsgType(_m *MsgEvent) *MsgTypeQuery {
 	return query
 }
 
+// QuerySubscribers queries the subscribers edge of a MsgEvent.
+func (c *MsgEventClient) QuerySubscribers(_m *MsgEvent) *MsgSubscriberQuery {
+	query := (&MsgSubscriberClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msgevent.Table, msgevent.FieldID, id),
+			sqlgraph.To(msgsubscriber.Table, msgsubscriber.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, msgevent.SubscribersTable, msgevent.SubscribersColumn),
+		)
+		schemaConfig := _m.schemaConfig
+		step.To.Schema = schemaConfig.MsgSubscriber
+		step.Edge.Schema = schemaConfig.MsgSubscriber
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryCustomerTemplate queries the customer_template edge of a MsgEvent.
 func (c *MsgEventClient) QueryCustomerTemplate(_m *MsgEvent) *MsgTemplateQuery {
 	query := (&MsgTemplateClient{config: c.config}).Query()
@@ -1435,6 +1454,25 @@ func (c *MsgSubscriberClient) QueryMsgType(_m *MsgSubscriber) *MsgTypeQuery {
 		)
 		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgSubscriber
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryMsgEvent queries the msg_event edge of a MsgSubscriber.
+func (c *MsgSubscriberClient) QueryMsgEvent(_m *MsgSubscriber) *MsgEventQuery {
+	query := (&MsgEventClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msgsubscriber.Table, msgsubscriber.FieldID, id),
+			sqlgraph.To(msgevent.Table, msgevent.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, msgsubscriber.MsgEventTable, msgsubscriber.MsgEventColumn),
+		)
+		schemaConfig := _m.schemaConfig
+		step.To.Schema = schemaConfig.MsgEvent
 		step.Edge.Schema = schemaConfig.MsgSubscriber
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil

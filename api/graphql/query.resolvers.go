@@ -56,6 +56,51 @@ func (r *msgEventResolver) RouteStr(ctx context.Context, obj *ent.MsgEvent, type
 	return string(rs), nil
 }
 
+// SubscriberUsers is the resolver for the subscriberUsers field.
+func (r *msgEventResolver) SubscriberUsers(ctx context.Context, obj *ent.MsgEvent) ([]*ent.MsgSubscriber, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.client.MsgSubscriber.Query().Where(
+		msgsubscriber.MsgEventID(obj.ID),
+		msgsubscriber.TenantID(tid),
+		msgsubscriber.Exclude(false),
+		msgsubscriber.UserIDNotNil(),
+		msgsubscriber.OrgRoleIDIsNil(),
+	).All(ctx)
+}
+
+// SubscriberRoles is the resolver for the subscriberRoles field.
+func (r *msgEventResolver) SubscriberRoles(ctx context.Context, obj *ent.MsgEvent) ([]*ent.MsgSubscriber, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.client.MsgSubscriber.Query().Where(
+		msgsubscriber.MsgEventID(obj.ID),
+		msgsubscriber.TenantID(tid),
+		msgsubscriber.Exclude(false),
+		msgsubscriber.UserIDIsNil(),
+		msgsubscriber.OrgRoleIDNotNil(),
+	).All(ctx)
+}
+
+// ExcludeSubscriberUsers is the resolver for the excludeSubscriberUsers field.
+func (r *msgEventResolver) ExcludeSubscriberUsers(ctx context.Context, obj *ent.MsgEvent) ([]*ent.MsgSubscriber, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.client.MsgSubscriber.Query().Where(
+		msgsubscriber.MsgEventID(obj.ID),
+		msgsubscriber.TenantID(tid),
+		msgsubscriber.Exclude(true),
+		msgsubscriber.UserIDNotNil(),
+		msgsubscriber.OrgRoleIDIsNil(),
+	).All(ctx)
+}
+
 // ToSendCounts is the resolver for the toSendCounts field.
 func (r *msgInternalResolver) ToSendCounts(ctx context.Context, obj *ent.MsgInternal) (int, error) {
 	return r.client.MsgInternalTo.Query().Where(msginternalto.MsgInternalID(obj.ID)).Count(ctx)

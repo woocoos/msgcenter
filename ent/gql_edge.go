@@ -66,6 +66,18 @@ func (_m *MsgEvent) MsgType(ctx context.Context) (*MsgType, error) {
 	return result, err
 }
 
+func (_m *MsgEvent) Subscribers(ctx context.Context) (result []*MsgSubscriber, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = _m.NamedSubscribers(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = _m.Edges.SubscribersOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = _m.QuerySubscribers().All(ctx)
+	}
+	return result, err
+}
+
 func (_m *MsgEvent) CustomerTemplate(ctx context.Context) (result []*MsgTemplate, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = _m.NamedCustomerTemplate(graphql.GetFieldContext(ctx).Field.Alias)
@@ -119,7 +131,15 @@ func (_m *MsgSubscriber) MsgType(ctx context.Context) (*MsgType, error) {
 	if IsNotLoaded(err) {
 		result, err = _m.QueryMsgType().Only(ctx)
 	}
-	return result, err
+	return result, MaskNotFound(err)
+}
+
+func (_m *MsgSubscriber) MsgEvent(ctx context.Context) (*MsgEvent, error) {
+	result, err := _m.Edges.MsgEventOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryMsgEvent().Only(ctx)
+	}
+	return result, MaskNotFound(err)
 }
 
 func (_m *MsgSubscriber) User(ctx context.Context) (*User, error) {

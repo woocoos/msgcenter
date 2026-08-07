@@ -94,6 +94,7 @@ type CreateMsgEventInput struct {
 	Comments  *string
 	Route     *profile.Route
 	Modes     string
+	CanSubs   *bool
 	MsgTypeID int
 }
 
@@ -107,6 +108,9 @@ func (i *CreateMsgEventInput) Mutate(m *MsgEventMutation) {
 		m.SetRoute(v)
 	}
 	m.SetModes(i.Modes)
+	if v := i.CanSubs; v != nil {
+		m.SetCanSubs(*v)
+	}
 	m.SetMsgTypeID(i.MsgTypeID)
 }
 
@@ -124,6 +128,8 @@ type UpdateMsgEventInput struct {
 	ClearRoute    bool
 	Route         *profile.Route
 	Modes         *string
+	ClearCanSubs  bool
+	CanSubs       *bool
 	MsgTypeID     *int
 }
 
@@ -146,6 +152,12 @@ func (i *UpdateMsgEventInput) Mutate(m *MsgEventMutation) {
 	}
 	if v := i.Modes; v != nil {
 		m.SetModes(*v)
+	}
+	if i.ClearCanSubs {
+		m.ClearCanSubs()
+	}
+	if v := i.CanSubs; v != nil {
+		m.SetCanSubs(*v)
 	}
 	if v := i.MsgTypeID; v != nil {
 		m.SetMsgTypeID(*v)
@@ -250,11 +262,12 @@ func (c *MsgSilenceUpdateOne) SetInput(i UpdateMsgSilenceInput) *MsgSilenceUpdat
 
 // CreateMsgSubscriberInput represents a mutation input for creating msgsubscribers.
 type CreateMsgSubscriberInput struct {
-	TenantID  int
-	OrgRoleID *int
-	Exclude   *bool
-	MsgTypeID int
-	UserID    *int
+	TenantID   int
+	OrgRoleID  *int
+	Exclude    *bool
+	MsgTypeID  *int
+	MsgEventID *int
+	UserID     *int
 }
 
 // Mutate applies the CreateMsgSubscriberInput on the MsgSubscriberMutation builder.
@@ -266,7 +279,12 @@ func (i *CreateMsgSubscriberInput) Mutate(m *MsgSubscriberMutation) {
 	if v := i.Exclude; v != nil {
 		m.SetExclude(*v)
 	}
-	m.SetMsgTypeID(i.MsgTypeID)
+	if v := i.MsgTypeID; v != nil {
+		m.SetMsgTypeID(*v)
+	}
+	if v := i.MsgEventID; v != nil {
+		m.SetMsgEventID(*v)
+	}
 	if v := i.UserID; v != nil {
 		m.SetUserID(*v)
 	}
@@ -285,7 +303,10 @@ type UpdateMsgSubscriberInput struct {
 	OrgRoleID      *int
 	ClearExclude   bool
 	Exclude        *bool
+	ClearMsgType   bool
 	MsgTypeID      *int
+	ClearMsgEvent  bool
+	MsgEventID     *int
 	ClearUser      bool
 	UserID         *int
 }
@@ -307,8 +328,17 @@ func (i *UpdateMsgSubscriberInput) Mutate(m *MsgSubscriberMutation) {
 	if v := i.Exclude; v != nil {
 		m.SetExclude(*v)
 	}
+	if i.ClearMsgType {
+		m.ClearMsgType()
+	}
 	if v := i.MsgTypeID; v != nil {
 		m.SetMsgTypeID(*v)
+	}
+	if i.ClearMsgEvent {
+		m.ClearMsgEvent()
+	}
+	if v := i.MsgEventID; v != nil {
+		m.SetMsgEventID(*v)
 	}
 	if i.ClearUser {
 		m.ClearUser()

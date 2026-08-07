@@ -47,6 +47,10 @@ input CreateMsgEventInput {
   根据route配置对应的以,分隔的mode列表
   """
   modes: String!
+  """
+  是否可订阅
+  """
+  canSubs: Boolean
   msgTypeID: ID!
 }
 """
@@ -96,7 +100,8 @@ input CreateMsgSubscriberInput {
   是否排除
   """
   exclude: Boolean
-  msgTypeID: ID!
+  msgTypeID: ID
+  msgEventID: ID
   userID: ID
 }
 """
@@ -738,9 +743,17 @@ type MsgEvent implements Node {
   """
   modes: String!
   """
+  是否可订阅
+  """
+  canSubs: Boolean
+  """
   消息类型
   """
   msgType: MsgType!
+  """
+  订阅者
+  """
+  subscribers: [MsgSubscriber!]
   """
   自定义的消息模板
   """
@@ -938,10 +951,22 @@ input MsgEventWhereInput {
   modesEqualFold: String
   modesContainsFold: String
   """
+  can_subs field predicates
+  """
+  canSubs: Boolean
+  canSubsNEQ: Boolean
+  canSubsIsNil: Boolean
+  canSubsNotNil: Boolean
+  """
   msg_type edge predicates
   """
   hasMsgType: Boolean
   hasMsgTypeWith: [MsgTypeWhereInput!]
+  """
+  subscribers edge predicates
+  """
+  hasSubscribers: Boolean
+  hasSubscribersWith: [MsgSubscriberWhereInput!]
   """
   customer_template edge predicates
   """
@@ -1546,7 +1571,11 @@ type MsgSubscriber implements Node {
   """
   应用消息类型ID
   """
-  msgTypeID: ID!
+  msgTypeID: ID
+  """
+  应用消息事件ID
+  """
+  msgEventID: ID
   """
   组织ID
   """
@@ -1563,7 +1592,8 @@ type MsgSubscriber implements Node {
   是否排除
   """
   exclude: Boolean
-  msgType: MsgType!
+  msgType: MsgType
+  msgEvent: MsgEvent
   user: User
 }
 """
@@ -1659,6 +1689,17 @@ input MsgSubscriberWhereInput {
   msgTypeIDNEQ: ID
   msgTypeIDIn: [ID!]
   msgTypeIDNotIn: [ID!]
+  msgTypeIDIsNil: Boolean
+  msgTypeIDNotNil: Boolean
+  """
+  msg_event_id field predicates
+  """
+  msgEventID: ID
+  msgEventIDNEQ: ID
+  msgEventIDIn: [ID!]
+  msgEventIDNotIn: [ID!]
+  msgEventIDIsNil: Boolean
+  msgEventIDNotNil: Boolean
   """
   tenant_id field predicates
   """
@@ -1704,6 +1745,11 @@ input MsgSubscriberWhereInput {
   """
   hasMsgType: Boolean
   hasMsgTypeWith: [MsgTypeWhereInput!]
+  """
+  msg_event edge predicates
+  """
+  hasMsgEvent: Boolean
+  hasMsgEventWith: [MsgEventWhereInput!]
 }
 type MsgTemplate implements Node {
   id: ID!
@@ -2844,6 +2890,11 @@ input UpdateMsgEventInput {
   根据route配置对应的以,分隔的mode列表
   """
   modes: String
+  """
+  是否可订阅
+  """
+  canSubs: Boolean
+  clearCanSubs: Boolean
   msgTypeID: ID
 }
 """
@@ -2895,6 +2946,9 @@ input UpdateMsgSubscriberInput {
   exclude: Boolean
   clearExclude: Boolean
   msgTypeID: ID
+  clearMsgType: Boolean
+  msgEventID: ID
+  clearMsgEvent: Boolean
   userID: ID
   clearUser: Boolean
 }

@@ -2,13 +2,16 @@ package schema
 
 import (
 	"context"
+	"fmt"
+	"regexp"
+	"strings"
+
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"fmt"
 	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	gen "github.com/woocoos/msgcenter/ent"
@@ -17,8 +20,6 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/profile"
-	"regexp"
-	"strings"
 )
 
 // MsgEvent 消息事件,消息事件相当于消息路由的入口配置.
@@ -53,6 +54,7 @@ func (MsgEvent) Fields() []ent.Field {
 		field.String("comments").Optional().Comment("备注"),
 		field.JSON("route", &profile.Route{}).Optional().Comment("消息路由配置"),
 		field.String("modes").Comment("根据route配置对应的以,分隔的mode列表"),
+		field.Bool("can_subs").Optional().Default(false).Comment("是否可订阅"),
 	}
 }
 
@@ -61,6 +63,8 @@ func (MsgEvent) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("msg_type", MsgType.Type).Ref("events").Required().Unique().Field("msg_type_id").
 			Comment("消息类型"),
+		edge.To("subscribers", MsgSubscriber.Type).Comment("订阅者").
+			Annotations(entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput)),
 		edge.To("customer_template", MsgTemplate.Type).Comment("自定义的消息模板").Annotations(
 			entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
 		),

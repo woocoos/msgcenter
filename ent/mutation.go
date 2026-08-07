@@ -2360,9 +2360,13 @@ type MsgEventMutation struct {
 	comments                 *string
 	route                    **profile.Route
 	modes                    *string
+	can_subs                 *bool
 	clearedFields            map[string]struct{}
 	msg_type                 *int
 	clearedmsg_type          bool
+	subscribers              map[int]struct{}
+	removedsubscribers       map[int]struct{}
+	clearedsubscribers       bool
 	customer_template        map[int]struct{}
 	removedcustomer_template map[int]struct{}
 	clearedcustomer_template bool
@@ -2941,6 +2945,55 @@ func (m *MsgEventMutation) ResetModes() {
 	m.modes = nil
 }
 
+// SetCanSubs sets the "can_subs" field.
+func (m *MsgEventMutation) SetCanSubs(b bool) {
+	m.can_subs = &b
+}
+
+// CanSubs returns the value of the "can_subs" field in the mutation.
+func (m *MsgEventMutation) CanSubs() (r bool, exists bool) {
+	v := m.can_subs
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCanSubs returns the old "can_subs" field's value of the MsgEvent entity.
+// If the MsgEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgEventMutation) OldCanSubs(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCanSubs is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCanSubs requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCanSubs: %w", err)
+	}
+	return oldValue.CanSubs, nil
+}
+
+// ClearCanSubs clears the value of the "can_subs" field.
+func (m *MsgEventMutation) ClearCanSubs() {
+	m.can_subs = nil
+	m.clearedFields[msgevent.FieldCanSubs] = struct{}{}
+}
+
+// CanSubsCleared returns if the "can_subs" field was cleared in this mutation.
+func (m *MsgEventMutation) CanSubsCleared() bool {
+	_, ok := m.clearedFields[msgevent.FieldCanSubs]
+	return ok
+}
+
+// ResetCanSubs resets all changes to the "can_subs" field.
+func (m *MsgEventMutation) ResetCanSubs() {
+	m.can_subs = nil
+	delete(m.clearedFields, msgevent.FieldCanSubs)
+}
+
 // ClearMsgType clears the "msg_type" edge to the MsgType entity.
 func (m *MsgEventMutation) ClearMsgType() {
 	m.clearedmsg_type = true
@@ -2966,6 +3019,60 @@ func (m *MsgEventMutation) MsgTypeIDs() (ids []int) {
 func (m *MsgEventMutation) ResetMsgType() {
 	m.msg_type = nil
 	m.clearedmsg_type = false
+}
+
+// AddSubscriberIDs adds the "subscribers" edge to the MsgSubscriber entity by ids.
+func (m *MsgEventMutation) AddSubscriberIDs(ids ...int) {
+	if m.subscribers == nil {
+		m.subscribers = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.subscribers[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSubscribers clears the "subscribers" edge to the MsgSubscriber entity.
+func (m *MsgEventMutation) ClearSubscribers() {
+	m.clearedsubscribers = true
+}
+
+// SubscribersCleared reports if the "subscribers" edge to the MsgSubscriber entity was cleared.
+func (m *MsgEventMutation) SubscribersCleared() bool {
+	return m.clearedsubscribers
+}
+
+// RemoveSubscriberIDs removes the "subscribers" edge to the MsgSubscriber entity by IDs.
+func (m *MsgEventMutation) RemoveSubscriberIDs(ids ...int) {
+	if m.removedsubscribers == nil {
+		m.removedsubscribers = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.subscribers, ids[i])
+		m.removedsubscribers[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSubscribers returns the removed IDs of the "subscribers" edge to the MsgSubscriber entity.
+func (m *MsgEventMutation) RemovedSubscribersIDs() (ids []int) {
+	for id := range m.removedsubscribers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SubscribersIDs returns the "subscribers" edge IDs in the mutation.
+func (m *MsgEventMutation) SubscribersIDs() (ids []int) {
+	for id := range m.subscribers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSubscribers resets all changes to the "subscribers" edge.
+func (m *MsgEventMutation) ResetSubscribers() {
+	m.subscribers = nil
+	m.clearedsubscribers = false
+	m.removedsubscribers = nil
 }
 
 // AddCustomerTemplateIDs adds the "customer_template" edge to the MsgTemplate entity by ids.
@@ -3056,7 +3163,7 @@ func (m *MsgEventMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MsgEventMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.created_by != nil {
 		fields = append(fields, msgevent.FieldCreatedBy)
 	}
@@ -3087,6 +3194,9 @@ func (m *MsgEventMutation) Fields() []string {
 	if m.modes != nil {
 		fields = append(fields, msgevent.FieldModes)
 	}
+	if m.can_subs != nil {
+		fields = append(fields, msgevent.FieldCanSubs)
+	}
 	return fields
 }
 
@@ -3115,6 +3225,8 @@ func (m *MsgEventMutation) Field(name string) (ent.Value, bool) {
 		return m.Route()
 	case msgevent.FieldModes:
 		return m.Modes()
+	case msgevent.FieldCanSubs:
+		return m.CanSubs()
 	}
 	return nil, false
 }
@@ -3144,6 +3256,8 @@ func (m *MsgEventMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldRoute(ctx)
 	case msgevent.FieldModes:
 		return m.OldModes(ctx)
+	case msgevent.FieldCanSubs:
+		return m.OldCanSubs(ctx)
 	}
 	return nil, fmt.Errorf("unknown MsgEvent field %s", name)
 }
@@ -3223,6 +3337,13 @@ func (m *MsgEventMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetModes(v)
 		return nil
+	case msgevent.FieldCanSubs:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCanSubs(v)
+		return nil
 	}
 	return fmt.Errorf("unknown MsgEvent field %s", name)
 }
@@ -3295,6 +3416,9 @@ func (m *MsgEventMutation) ClearedFields() []string {
 	if m.FieldCleared(msgevent.FieldRoute) {
 		fields = append(fields, msgevent.FieldRoute)
 	}
+	if m.FieldCleared(msgevent.FieldCanSubs) {
+		fields = append(fields, msgevent.FieldCanSubs)
+	}
 	return fields
 }
 
@@ -3323,6 +3447,9 @@ func (m *MsgEventMutation) ClearField(name string) error {
 		return nil
 	case msgevent.FieldRoute:
 		m.ClearRoute()
+		return nil
+	case msgevent.FieldCanSubs:
+		m.ClearCanSubs()
 		return nil
 	}
 	return fmt.Errorf("unknown MsgEvent nullable field %s", name)
@@ -3362,15 +3489,21 @@ func (m *MsgEventMutation) ResetField(name string) error {
 	case msgevent.FieldModes:
 		m.ResetModes()
 		return nil
+	case msgevent.FieldCanSubs:
+		m.ResetCanSubs()
+		return nil
 	}
 	return fmt.Errorf("unknown MsgEvent field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MsgEventMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.msg_type != nil {
 		edges = append(edges, msgevent.EdgeMsgType)
+	}
+	if m.subscribers != nil {
+		edges = append(edges, msgevent.EdgeSubscribers)
 	}
 	if m.customer_template != nil {
 		edges = append(edges, msgevent.EdgeCustomerTemplate)
@@ -3386,6 +3519,12 @@ func (m *MsgEventMutation) AddedIDs(name string) []ent.Value {
 		if id := m.msg_type; id != nil {
 			return []ent.Value{*id}
 		}
+	case msgevent.EdgeSubscribers:
+		ids := make([]ent.Value, 0, len(m.subscribers))
+		for id := range m.subscribers {
+			ids = append(ids, id)
+		}
+		return ids
 	case msgevent.EdgeCustomerTemplate:
 		ids := make([]ent.Value, 0, len(m.customer_template))
 		for id := range m.customer_template {
@@ -3398,7 +3537,10 @@ func (m *MsgEventMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MsgEventMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
+	if m.removedsubscribers != nil {
+		edges = append(edges, msgevent.EdgeSubscribers)
+	}
 	if m.removedcustomer_template != nil {
 		edges = append(edges, msgevent.EdgeCustomerTemplate)
 	}
@@ -3409,6 +3551,12 @@ func (m *MsgEventMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *MsgEventMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case msgevent.EdgeSubscribers:
+		ids := make([]ent.Value, 0, len(m.removedsubscribers))
+		for id := range m.removedsubscribers {
+			ids = append(ids, id)
+		}
+		return ids
 	case msgevent.EdgeCustomerTemplate:
 		ids := make([]ent.Value, 0, len(m.removedcustomer_template))
 		for id := range m.removedcustomer_template {
@@ -3421,9 +3569,12 @@ func (m *MsgEventMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MsgEventMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedmsg_type {
 		edges = append(edges, msgevent.EdgeMsgType)
+	}
+	if m.clearedsubscribers {
+		edges = append(edges, msgevent.EdgeSubscribers)
 	}
 	if m.clearedcustomer_template {
 		edges = append(edges, msgevent.EdgeCustomerTemplate)
@@ -3437,6 +3588,8 @@ func (m *MsgEventMutation) EdgeCleared(name string) bool {
 	switch name {
 	case msgevent.EdgeMsgType:
 		return m.clearedmsg_type
+	case msgevent.EdgeSubscribers:
+		return m.clearedsubscribers
 	case msgevent.EdgeCustomerTemplate:
 		return m.clearedcustomer_template
 	}
@@ -3460,6 +3613,9 @@ func (m *MsgEventMutation) ResetEdge(name string) error {
 	switch name {
 	case msgevent.EdgeMsgType:
 		m.ResetMsgType()
+		return nil
+	case msgevent.EdgeSubscribers:
+		m.ResetSubscribers()
 		return nil
 	case msgevent.EdgeCustomerTemplate:
 		m.ResetCustomerTemplate()
@@ -6394,28 +6550,30 @@ func (m *MsgSilenceMutation) ResetEdge(name string) error {
 // MsgSubscriberMutation represents an operation that mutates the MsgSubscriber nodes in the graph.
 type MsgSubscriberMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *int
-	created_by      *int
-	addcreated_by   *int
-	created_at      *time.Time
-	updated_by      *int
-	addupdated_by   *int
-	updated_at      *time.Time
-	tenant_id       *int
-	addtenant_id    *int
-	org_role_id     *int
-	addorg_role_id  *int
-	exclude         *bool
-	clearedFields   map[string]struct{}
-	msg_type        *int
-	clearedmsg_type bool
-	user            *int
-	cleareduser     bool
-	done            bool
-	oldValue        func(context.Context) (*MsgSubscriber, error)
-	predicates      []predicate.MsgSubscriber
+	op               Op
+	typ              string
+	id               *int
+	created_by       *int
+	addcreated_by    *int
+	created_at       *time.Time
+	updated_by       *int
+	addupdated_by    *int
+	updated_at       *time.Time
+	tenant_id        *int
+	addtenant_id     *int
+	org_role_id      *int
+	addorg_role_id   *int
+	exclude          *bool
+	clearedFields    map[string]struct{}
+	msg_type         *int
+	clearedmsg_type  bool
+	msg_event        *int
+	clearedmsg_event bool
+	user             *int
+	cleareduser      bool
+	done             bool
+	oldValue         func(context.Context) (*MsgSubscriber, error)
+	predicates       []predicate.MsgSubscriber
 }
 
 var _ ent.Mutation = (*MsgSubscriberMutation)(nil)
@@ -6764,9 +6922,71 @@ func (m *MsgSubscriberMutation) OldMsgTypeID(ctx context.Context) (v int, err er
 	return oldValue.MsgTypeID, nil
 }
 
+// ClearMsgTypeID clears the value of the "msg_type_id" field.
+func (m *MsgSubscriberMutation) ClearMsgTypeID() {
+	m.msg_type = nil
+	m.clearedFields[msgsubscriber.FieldMsgTypeID] = struct{}{}
+}
+
+// MsgTypeIDCleared returns if the "msg_type_id" field was cleared in this mutation.
+func (m *MsgSubscriberMutation) MsgTypeIDCleared() bool {
+	_, ok := m.clearedFields[msgsubscriber.FieldMsgTypeID]
+	return ok
+}
+
 // ResetMsgTypeID resets all changes to the "msg_type_id" field.
 func (m *MsgSubscriberMutation) ResetMsgTypeID() {
 	m.msg_type = nil
+	delete(m.clearedFields, msgsubscriber.FieldMsgTypeID)
+}
+
+// SetMsgEventID sets the "msg_event_id" field.
+func (m *MsgSubscriberMutation) SetMsgEventID(i int) {
+	m.msg_event = &i
+}
+
+// MsgEventID returns the value of the "msg_event_id" field in the mutation.
+func (m *MsgSubscriberMutation) MsgEventID() (r int, exists bool) {
+	v := m.msg_event
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMsgEventID returns the old "msg_event_id" field's value of the MsgSubscriber entity.
+// If the MsgSubscriber object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgSubscriberMutation) OldMsgEventID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMsgEventID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMsgEventID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMsgEventID: %w", err)
+	}
+	return oldValue.MsgEventID, nil
+}
+
+// ClearMsgEventID clears the value of the "msg_event_id" field.
+func (m *MsgSubscriberMutation) ClearMsgEventID() {
+	m.msg_event = nil
+	m.clearedFields[msgsubscriber.FieldMsgEventID] = struct{}{}
+}
+
+// MsgEventIDCleared returns if the "msg_event_id" field was cleared in this mutation.
+func (m *MsgSubscriberMutation) MsgEventIDCleared() bool {
+	_, ok := m.clearedFields[msgsubscriber.FieldMsgEventID]
+	return ok
+}
+
+// ResetMsgEventID resets all changes to the "msg_event_id" field.
+func (m *MsgSubscriberMutation) ResetMsgEventID() {
+	m.msg_event = nil
+	delete(m.clearedFields, msgsubscriber.FieldMsgEventID)
 }
 
 // SetTenantID sets the "tenant_id" field.
@@ -7001,7 +7221,7 @@ func (m *MsgSubscriberMutation) ClearMsgType() {
 
 // MsgTypeCleared reports if the "msg_type" edge to the MsgType entity was cleared.
 func (m *MsgSubscriberMutation) MsgTypeCleared() bool {
-	return m.clearedmsg_type
+	return m.MsgTypeIDCleared() || m.clearedmsg_type
 }
 
 // MsgTypeIDs returns the "msg_type" edge IDs in the mutation.
@@ -7018,6 +7238,33 @@ func (m *MsgSubscriberMutation) MsgTypeIDs() (ids []int) {
 func (m *MsgSubscriberMutation) ResetMsgType() {
 	m.msg_type = nil
 	m.clearedmsg_type = false
+}
+
+// ClearMsgEvent clears the "msg_event" edge to the MsgEvent entity.
+func (m *MsgSubscriberMutation) ClearMsgEvent() {
+	m.clearedmsg_event = true
+	m.clearedFields[msgsubscriber.FieldMsgEventID] = struct{}{}
+}
+
+// MsgEventCleared reports if the "msg_event" edge to the MsgEvent entity was cleared.
+func (m *MsgSubscriberMutation) MsgEventCleared() bool {
+	return m.MsgEventIDCleared() || m.clearedmsg_event
+}
+
+// MsgEventIDs returns the "msg_event" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// MsgEventID instead. It exists only for internal usage by the builders.
+func (m *MsgSubscriberMutation) MsgEventIDs() (ids []int) {
+	if id := m.msg_event; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetMsgEvent resets all changes to the "msg_event" edge.
+func (m *MsgSubscriberMutation) ResetMsgEvent() {
+	m.msg_event = nil
+	m.clearedmsg_event = false
 }
 
 // ClearUser clears the "user" edge to the User entity.
@@ -7081,7 +7328,7 @@ func (m *MsgSubscriberMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MsgSubscriberMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.created_by != nil {
 		fields = append(fields, msgsubscriber.FieldCreatedBy)
 	}
@@ -7096,6 +7343,9 @@ func (m *MsgSubscriberMutation) Fields() []string {
 	}
 	if m.msg_type != nil {
 		fields = append(fields, msgsubscriber.FieldMsgTypeID)
+	}
+	if m.msg_event != nil {
+		fields = append(fields, msgsubscriber.FieldMsgEventID)
 	}
 	if m.tenant_id != nil {
 		fields = append(fields, msgsubscriber.FieldTenantID)
@@ -7127,6 +7377,8 @@ func (m *MsgSubscriberMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case msgsubscriber.FieldMsgTypeID:
 		return m.MsgTypeID()
+	case msgsubscriber.FieldMsgEventID:
+		return m.MsgEventID()
 	case msgsubscriber.FieldTenantID:
 		return m.TenantID()
 	case msgsubscriber.FieldUserID:
@@ -7154,6 +7406,8 @@ func (m *MsgSubscriberMutation) OldField(ctx context.Context, name string) (ent.
 		return m.OldUpdatedAt(ctx)
 	case msgsubscriber.FieldMsgTypeID:
 		return m.OldMsgTypeID(ctx)
+	case msgsubscriber.FieldMsgEventID:
+		return m.OldMsgEventID(ctx)
 	case msgsubscriber.FieldTenantID:
 		return m.OldTenantID(ctx)
 	case msgsubscriber.FieldUserID:
@@ -7205,6 +7459,13 @@ func (m *MsgSubscriberMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetMsgTypeID(v)
+		return nil
+	case msgsubscriber.FieldMsgEventID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMsgEventID(v)
 		return nil
 	case msgsubscriber.FieldTenantID:
 		v, ok := value.(int)
@@ -7321,6 +7582,12 @@ func (m *MsgSubscriberMutation) ClearedFields() []string {
 	if m.FieldCleared(msgsubscriber.FieldUpdatedAt) {
 		fields = append(fields, msgsubscriber.FieldUpdatedAt)
 	}
+	if m.FieldCleared(msgsubscriber.FieldMsgTypeID) {
+		fields = append(fields, msgsubscriber.FieldMsgTypeID)
+	}
+	if m.FieldCleared(msgsubscriber.FieldMsgEventID) {
+		fields = append(fields, msgsubscriber.FieldMsgEventID)
+	}
 	if m.FieldCleared(msgsubscriber.FieldUserID) {
 		fields = append(fields, msgsubscriber.FieldUserID)
 	}
@@ -7349,6 +7616,12 @@ func (m *MsgSubscriberMutation) ClearField(name string) error {
 		return nil
 	case msgsubscriber.FieldUpdatedAt:
 		m.ClearUpdatedAt()
+		return nil
+	case msgsubscriber.FieldMsgTypeID:
+		m.ClearMsgTypeID()
+		return nil
+	case msgsubscriber.FieldMsgEventID:
+		m.ClearMsgEventID()
 		return nil
 	case msgsubscriber.FieldUserID:
 		m.ClearUserID()
@@ -7382,6 +7655,9 @@ func (m *MsgSubscriberMutation) ResetField(name string) error {
 	case msgsubscriber.FieldMsgTypeID:
 		m.ResetMsgTypeID()
 		return nil
+	case msgsubscriber.FieldMsgEventID:
+		m.ResetMsgEventID()
+		return nil
 	case msgsubscriber.FieldTenantID:
 		m.ResetTenantID()
 		return nil
@@ -7400,9 +7676,12 @@ func (m *MsgSubscriberMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MsgSubscriberMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.msg_type != nil {
 		edges = append(edges, msgsubscriber.EdgeMsgType)
+	}
+	if m.msg_event != nil {
+		edges = append(edges, msgsubscriber.EdgeMsgEvent)
 	}
 	if m.user != nil {
 		edges = append(edges, msgsubscriber.EdgeUser)
@@ -7418,6 +7697,10 @@ func (m *MsgSubscriberMutation) AddedIDs(name string) []ent.Value {
 		if id := m.msg_type; id != nil {
 			return []ent.Value{*id}
 		}
+	case msgsubscriber.EdgeMsgEvent:
+		if id := m.msg_event; id != nil {
+			return []ent.Value{*id}
+		}
 	case msgsubscriber.EdgeUser:
 		if id := m.user; id != nil {
 			return []ent.Value{*id}
@@ -7428,7 +7711,7 @@ func (m *MsgSubscriberMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MsgSubscriberMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	return edges
 }
 
@@ -7440,9 +7723,12 @@ func (m *MsgSubscriberMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MsgSubscriberMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedmsg_type {
 		edges = append(edges, msgsubscriber.EdgeMsgType)
+	}
+	if m.clearedmsg_event {
+		edges = append(edges, msgsubscriber.EdgeMsgEvent)
 	}
 	if m.cleareduser {
 		edges = append(edges, msgsubscriber.EdgeUser)
@@ -7456,6 +7742,8 @@ func (m *MsgSubscriberMutation) EdgeCleared(name string) bool {
 	switch name {
 	case msgsubscriber.EdgeMsgType:
 		return m.clearedmsg_type
+	case msgsubscriber.EdgeMsgEvent:
+		return m.clearedmsg_event
 	case msgsubscriber.EdgeUser:
 		return m.cleareduser
 	}
@@ -7468,6 +7756,9 @@ func (m *MsgSubscriberMutation) ClearEdge(name string) error {
 	switch name {
 	case msgsubscriber.EdgeMsgType:
 		m.ClearMsgType()
+		return nil
+	case msgsubscriber.EdgeMsgEvent:
+		m.ClearMsgEvent()
 		return nil
 	case msgsubscriber.EdgeUser:
 		m.ClearUser()
@@ -7482,6 +7773,9 @@ func (m *MsgSubscriberMutation) ResetEdge(name string) error {
 	switch name {
 	case msgsubscriber.EdgeMsgType:
 		m.ResetMsgType()
+		return nil
+	case msgsubscriber.EdgeMsgEvent:
+		m.ResetMsgEvent()
 		return nil
 	case msgsubscriber.EdgeUser:
 		m.ResetUser()

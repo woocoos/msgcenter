@@ -1109,9 +1109,19 @@ type MsgEventWhereInput struct {
 	ModesEqualFold    *string  `json:"modesEqualFold,omitempty"`
 	ModesContainsFold *string  `json:"modesContainsFold,omitempty"`
 
+	// "can_subs" field predicates.
+	CanSubs       *bool `json:"canSubs,omitempty"`
+	CanSubsNEQ    *bool `json:"canSubsNEQ,omitempty"`
+	CanSubsIsNil  bool  `json:"canSubsIsNil,omitempty"`
+	CanSubsNotNil bool  `json:"canSubsNotNil,omitempty"`
+
 	// "msg_type" edge predicates.
 	HasMsgType     *bool                `json:"hasMsgType,omitempty"`
 	HasMsgTypeWith []*MsgTypeWhereInput `json:"hasMsgTypeWith,omitempty"`
+
+	// "subscribers" edge predicates.
+	HasSubscribers     *bool                      `json:"hasSubscribers,omitempty"`
+	HasSubscribersWith []*MsgSubscriberWhereInput `json:"hasSubscribersWith,omitempty"`
 
 	// "customer_template" edge predicates.
 	HasCustomerTemplate     *bool                    `json:"hasCustomerTemplate,omitempty"`
@@ -1474,6 +1484,18 @@ func (i *MsgEventWhereInput) P() (predicate.MsgEvent, error) {
 	if i.ModesContainsFold != nil {
 		predicates = append(predicates, msgevent.ModesContainsFold(*i.ModesContainsFold))
 	}
+	if i.CanSubs != nil {
+		predicates = append(predicates, msgevent.CanSubsEQ(*i.CanSubs))
+	}
+	if i.CanSubsNEQ != nil {
+		predicates = append(predicates, msgevent.CanSubsNEQ(*i.CanSubsNEQ))
+	}
+	if i.CanSubsIsNil {
+		predicates = append(predicates, msgevent.CanSubsIsNil())
+	}
+	if i.CanSubsNotNil {
+		predicates = append(predicates, msgevent.CanSubsNotNil())
+	}
 
 	if i.HasMsgType != nil {
 		p := msgevent.HasMsgType()
@@ -1492,6 +1514,24 @@ func (i *MsgEventWhereInput) P() (predicate.MsgEvent, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, msgevent.HasMsgTypeWith(with...))
+	}
+	if i.HasSubscribers != nil {
+		p := msgevent.HasSubscribers()
+		if !*i.HasSubscribers {
+			p = msgevent.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasSubscribersWith) > 0 {
+		with := make([]predicate.MsgSubscriber, 0, len(i.HasSubscribersWith))
+		for _, w := range i.HasSubscribersWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasSubscribersWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, msgevent.HasSubscribersWith(with...))
 	}
 	if i.HasCustomerTemplate != nil {
 		p := msgevent.HasCustomerTemplate()
@@ -2853,10 +2893,20 @@ type MsgSubscriberWhereInput struct {
 	UpdatedAtNotNil bool        `json:"updatedAtNotNil,omitempty"`
 
 	// "msg_type_id" field predicates.
-	MsgTypeID      *int  `json:"msgTypeID,omitempty"`
-	MsgTypeIDNEQ   *int  `json:"msgTypeIDNEQ,omitempty"`
-	MsgTypeIDIn    []int `json:"msgTypeIDIn,omitempty"`
-	MsgTypeIDNotIn []int `json:"msgTypeIDNotIn,omitempty"`
+	MsgTypeID       *int  `json:"msgTypeID,omitempty"`
+	MsgTypeIDNEQ    *int  `json:"msgTypeIDNEQ,omitempty"`
+	MsgTypeIDIn     []int `json:"msgTypeIDIn,omitempty"`
+	MsgTypeIDNotIn  []int `json:"msgTypeIDNotIn,omitempty"`
+	MsgTypeIDIsNil  bool  `json:"msgTypeIDIsNil,omitempty"`
+	MsgTypeIDNotNil bool  `json:"msgTypeIDNotNil,omitempty"`
+
+	// "msg_event_id" field predicates.
+	MsgEventID       *int  `json:"msgEventID,omitempty"`
+	MsgEventIDNEQ    *int  `json:"msgEventIDNEQ,omitempty"`
+	MsgEventIDIn     []int `json:"msgEventIDIn,omitempty"`
+	MsgEventIDNotIn  []int `json:"msgEventIDNotIn,omitempty"`
+	MsgEventIDIsNil  bool  `json:"msgEventIDIsNil,omitempty"`
+	MsgEventIDNotNil bool  `json:"msgEventIDNotNil,omitempty"`
 
 	// "tenant_id" field predicates.
 	TenantID      *int  `json:"tenantID,omitempty"`
@@ -2897,6 +2947,10 @@ type MsgSubscriberWhereInput struct {
 	// "msg_type" edge predicates.
 	HasMsgType     *bool                `json:"hasMsgType,omitempty"`
 	HasMsgTypeWith []*MsgTypeWhereInput `json:"hasMsgTypeWith,omitempty"`
+
+	// "msg_event" edge predicates.
+	HasMsgEvent     *bool                 `json:"hasMsgEvent,omitempty"`
+	HasMsgEventWith []*MsgEventWhereInput `json:"hasMsgEventWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -3114,6 +3168,30 @@ func (i *MsgSubscriberWhereInput) P() (predicate.MsgSubscriber, error) {
 	if len(i.MsgTypeIDNotIn) > 0 {
 		predicates = append(predicates, msgsubscriber.MsgTypeIDNotIn(i.MsgTypeIDNotIn...))
 	}
+	if i.MsgTypeIDIsNil {
+		predicates = append(predicates, msgsubscriber.MsgTypeIDIsNil())
+	}
+	if i.MsgTypeIDNotNil {
+		predicates = append(predicates, msgsubscriber.MsgTypeIDNotNil())
+	}
+	if i.MsgEventID != nil {
+		predicates = append(predicates, msgsubscriber.MsgEventIDEQ(*i.MsgEventID))
+	}
+	if i.MsgEventIDNEQ != nil {
+		predicates = append(predicates, msgsubscriber.MsgEventIDNEQ(*i.MsgEventIDNEQ))
+	}
+	if len(i.MsgEventIDIn) > 0 {
+		predicates = append(predicates, msgsubscriber.MsgEventIDIn(i.MsgEventIDIn...))
+	}
+	if len(i.MsgEventIDNotIn) > 0 {
+		predicates = append(predicates, msgsubscriber.MsgEventIDNotIn(i.MsgEventIDNotIn...))
+	}
+	if i.MsgEventIDIsNil {
+		predicates = append(predicates, msgsubscriber.MsgEventIDIsNil())
+	}
+	if i.MsgEventIDNotNil {
+		predicates = append(predicates, msgsubscriber.MsgEventIDNotNil())
+	}
 	if i.TenantID != nil {
 		predicates = append(predicates, msgsubscriber.TenantIDEQ(*i.TenantID))
 	}
@@ -3216,6 +3294,24 @@ func (i *MsgSubscriberWhereInput) P() (predicate.MsgSubscriber, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, msgsubscriber.HasMsgTypeWith(with...))
+	}
+	if i.HasMsgEvent != nil {
+		p := msgsubscriber.HasMsgEvent()
+		if !*i.HasMsgEvent {
+			p = msgsubscriber.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasMsgEventWith) > 0 {
+		with := make([]predicate.MsgEvent, 0, len(i.HasMsgEventWith))
+		for _, w := range i.HasMsgEventWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasMsgEventWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, msgsubscriber.HasMsgEventWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

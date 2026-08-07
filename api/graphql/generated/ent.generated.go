@@ -35,6 +35,9 @@ type MsgAlertResolver interface {
 }
 type MsgEventResolver interface {
 	RouteStr(ctx context.Context, obj *ent.MsgEvent, typeArg model.RouteStrType) (string, error)
+	SubscriberUsers(ctx context.Context, obj *ent.MsgEvent) ([]*ent.MsgSubscriber, error)
+	SubscriberRoles(ctx context.Context, obj *ent.MsgEvent) ([]*ent.MsgSubscriber, error)
+	ExcludeSubscriberUsers(ctx context.Context, obj *ent.MsgEvent) ([]*ent.MsgSubscriber, error)
 }
 type MsgInternalResolver interface {
 	ToSendCounts(ctx context.Context, obj *ent.MsgInternal) (int, error)
@@ -4294,6 +4297,47 @@ func (ec *executionContext) fieldContext_MsgEvent_modes(_ context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _MsgEvent_canSubs(ctx context.Context, field graphql.CollectedField, obj *ent.MsgEvent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgEvent_canSubs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CanSubs, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgEvent_canSubs(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgEvent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MsgEvent_msgType(ctx context.Context, field graphql.CollectedField, obj *ent.MsgEvent) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MsgEvent_msgType(ctx, field)
 	if err != nil {
@@ -4369,6 +4413,77 @@ func (ec *executionContext) fieldContext_MsgEvent_msgType(_ context.Context, fie
 				return ec.fieldContext_MsgType_excludeSubscriberUsers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgType", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgEvent_subscribers(ctx context.Context, field graphql.CollectedField, obj *ent.MsgEvent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgEvent_subscribers(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subscribers(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.MsgSubscriber)
+	fc.Result = res
+	return ec.marshalOMsgSubscriber2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgSubscriberᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgEvent_subscribers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgEvent",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgSubscriber_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgSubscriber_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgSubscriber_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgSubscriber_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgSubscriber_updatedAt(ctx, field)
+			case "msgTypeID":
+				return ec.fieldContext_MsgSubscriber_msgTypeID(ctx, field)
+			case "msgEventID":
+				return ec.fieldContext_MsgSubscriber_msgEventID(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgSubscriber_tenantID(ctx, field)
+			case "userID":
+				return ec.fieldContext_MsgSubscriber_userID(ctx, field)
+			case "orgRoleID":
+				return ec.fieldContext_MsgSubscriber_orgRoleID(ctx, field)
+			case "exclude":
+				return ec.fieldContext_MsgSubscriber_exclude(ctx, field)
+			case "msgType":
+				return ec.fieldContext_MsgSubscriber_msgType(ctx, field)
+			case "msgEvent":
+				return ec.fieldContext_MsgSubscriber_msgEvent(ctx, field)
+			case "user":
+				return ec.fieldContext_MsgSubscriber_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgSubscriber", field.Name)
 		},
 	}
 	return fc, nil
@@ -4514,6 +4629,228 @@ func (ec *executionContext) fieldContext_MsgEvent_routeStr(ctx context.Context, 
 	if fc.Args, err = ec.field_MsgEvent_routeStr_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgEvent_subscriberUsers(ctx context.Context, field graphql.CollectedField, obj *ent.MsgEvent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgEvent_subscriberUsers(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.MsgEvent().SubscriberUsers(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.MsgSubscriber)
+	fc.Result = res
+	return ec.marshalNMsgSubscriber2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgSubscriberᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgEvent_subscriberUsers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgEvent",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgSubscriber_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgSubscriber_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgSubscriber_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgSubscriber_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgSubscriber_updatedAt(ctx, field)
+			case "msgTypeID":
+				return ec.fieldContext_MsgSubscriber_msgTypeID(ctx, field)
+			case "msgEventID":
+				return ec.fieldContext_MsgSubscriber_msgEventID(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgSubscriber_tenantID(ctx, field)
+			case "userID":
+				return ec.fieldContext_MsgSubscriber_userID(ctx, field)
+			case "orgRoleID":
+				return ec.fieldContext_MsgSubscriber_orgRoleID(ctx, field)
+			case "exclude":
+				return ec.fieldContext_MsgSubscriber_exclude(ctx, field)
+			case "msgType":
+				return ec.fieldContext_MsgSubscriber_msgType(ctx, field)
+			case "msgEvent":
+				return ec.fieldContext_MsgSubscriber_msgEvent(ctx, field)
+			case "user":
+				return ec.fieldContext_MsgSubscriber_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgSubscriber", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgEvent_subscriberRoles(ctx context.Context, field graphql.CollectedField, obj *ent.MsgEvent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgEvent_subscriberRoles(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.MsgEvent().SubscriberRoles(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.MsgSubscriber)
+	fc.Result = res
+	return ec.marshalNMsgSubscriber2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgSubscriberᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgEvent_subscriberRoles(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgEvent",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgSubscriber_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgSubscriber_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgSubscriber_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgSubscriber_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgSubscriber_updatedAt(ctx, field)
+			case "msgTypeID":
+				return ec.fieldContext_MsgSubscriber_msgTypeID(ctx, field)
+			case "msgEventID":
+				return ec.fieldContext_MsgSubscriber_msgEventID(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgSubscriber_tenantID(ctx, field)
+			case "userID":
+				return ec.fieldContext_MsgSubscriber_userID(ctx, field)
+			case "orgRoleID":
+				return ec.fieldContext_MsgSubscriber_orgRoleID(ctx, field)
+			case "exclude":
+				return ec.fieldContext_MsgSubscriber_exclude(ctx, field)
+			case "msgType":
+				return ec.fieldContext_MsgSubscriber_msgType(ctx, field)
+			case "msgEvent":
+				return ec.fieldContext_MsgSubscriber_msgEvent(ctx, field)
+			case "user":
+				return ec.fieldContext_MsgSubscriber_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgSubscriber", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgEvent_excludeSubscriberUsers(ctx context.Context, field graphql.CollectedField, obj *ent.MsgEvent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgEvent_excludeSubscriberUsers(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.MsgEvent().ExcludeSubscriberUsers(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.MsgSubscriber)
+	fc.Result = res
+	return ec.marshalNMsgSubscriber2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgSubscriberᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgEvent_excludeSubscriberUsers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgEvent",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgSubscriber_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgSubscriber_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgSubscriber_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgSubscriber_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgSubscriber_updatedAt(ctx, field)
+			case "msgTypeID":
+				return ec.fieldContext_MsgSubscriber_msgTypeID(ctx, field)
+			case "msgEventID":
+				return ec.fieldContext_MsgSubscriber_msgEventID(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgSubscriber_tenantID(ctx, field)
+			case "userID":
+				return ec.fieldContext_MsgSubscriber_userID(ctx, field)
+			case "orgRoleID":
+				return ec.fieldContext_MsgSubscriber_orgRoleID(ctx, field)
+			case "exclude":
+				return ec.fieldContext_MsgSubscriber_exclude(ctx, field)
+			case "msgType":
+				return ec.fieldContext_MsgSubscriber_msgType(ctx, field)
+			case "msgEvent":
+				return ec.fieldContext_MsgSubscriber_msgEvent(ctx, field)
+			case "user":
+				return ec.fieldContext_MsgSubscriber_user(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgSubscriber", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -4721,12 +5058,22 @@ func (ec *executionContext) fieldContext_MsgEventEdge_node(_ context.Context, fi
 				return ec.fieldContext_MsgEvent_route(ctx, field)
 			case "modes":
 				return ec.fieldContext_MsgEvent_modes(ctx, field)
+			case "canSubs":
+				return ec.fieldContext_MsgEvent_canSubs(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_MsgEvent_subscribers(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
 			case "routeStr":
 				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
+			case "subscriberUsers":
+				return ec.fieldContext_MsgEvent_subscriberUsers(ctx, field)
+			case "subscriberRoles":
+				return ec.fieldContext_MsgEvent_subscriberRoles(ctx, field)
+			case "excludeSubscriberUsers":
+				return ec.fieldContext_MsgEvent_excludeSubscriberUsers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -7364,17 +7711,55 @@ func (ec *executionContext) _MsgSubscriber_msgTypeID(ctx context.Context, field 
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNID2int(ctx, field.Selections, res)
+	return ec.marshalOID2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MsgSubscriber_msgTypeID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgSubscriber",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgSubscriber_msgEventID(ctx context.Context, field graphql.CollectedField, obj *ent.MsgSubscriber) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgSubscriber_msgEventID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MsgEventID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgSubscriber_msgEventID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "MsgSubscriber",
 		Field:      field,
@@ -7575,14 +7960,11 @@ func (ec *executionContext) _MsgSubscriber_msgType(ctx context.Context, field gr
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*ent.MsgType)
 	fc.Result = res
-	return ec.marshalNMsgType2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgType(ctx, field.Selections, res)
+	return ec.marshalOMsgType2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgType(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MsgSubscriber_msgType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7629,6 +8011,87 @@ func (ec *executionContext) fieldContext_MsgSubscriber_msgType(_ context.Context
 				return ec.fieldContext_MsgType_excludeSubscriberUsers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgType", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgSubscriber_msgEvent(ctx context.Context, field graphql.CollectedField, obj *ent.MsgSubscriber) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgSubscriber_msgEvent(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MsgEvent(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgEvent)
+	fc.Result = res
+	return ec.marshalOMsgEvent2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEvent(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgSubscriber_msgEvent(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgSubscriber",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgEvent_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgEvent_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgEvent_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgEvent_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgEvent_updatedAt(ctx, field)
+			case "msgTypeID":
+				return ec.fieldContext_MsgEvent_msgTypeID(ctx, field)
+			case "name":
+				return ec.fieldContext_MsgEvent_name(ctx, field)
+			case "status":
+				return ec.fieldContext_MsgEvent_status(ctx, field)
+			case "comments":
+				return ec.fieldContext_MsgEvent_comments(ctx, field)
+			case "route":
+				return ec.fieldContext_MsgEvent_route(ctx, field)
+			case "modes":
+				return ec.fieldContext_MsgEvent_modes(ctx, field)
+			case "canSubs":
+				return ec.fieldContext_MsgEvent_canSubs(ctx, field)
+			case "msgType":
+				return ec.fieldContext_MsgEvent_msgType(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_MsgEvent_subscribers(ctx, field)
+			case "customerTemplate":
+				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
+			case "routeStr":
+				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
+			case "subscriberUsers":
+				return ec.fieldContext_MsgEvent_subscriberUsers(ctx, field)
+			case "subscriberRoles":
+				return ec.fieldContext_MsgEvent_subscriberRoles(ctx, field)
+			case "excludeSubscriberUsers":
+				return ec.fieldContext_MsgEvent_excludeSubscriberUsers(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
 	}
 	return fc, nil
@@ -8672,12 +9135,22 @@ func (ec *executionContext) fieldContext_MsgTemplate_event(_ context.Context, fi
 				return ec.fieldContext_MsgEvent_route(ctx, field)
 			case "modes":
 				return ec.fieldContext_MsgEvent_modes(ctx, field)
+			case "canSubs":
+				return ec.fieldContext_MsgEvent_canSubs(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_MsgEvent_subscribers(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
 			case "routeStr":
 				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
+			case "subscriberUsers":
+				return ec.fieldContext_MsgEvent_subscriberUsers(ctx, field)
+			case "subscriberRoles":
+				return ec.fieldContext_MsgEvent_subscriberRoles(ctx, field)
+			case "excludeSubscriberUsers":
+				return ec.fieldContext_MsgEvent_excludeSubscriberUsers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -9528,12 +10001,22 @@ func (ec *executionContext) fieldContext_MsgType_events(_ context.Context, field
 				return ec.fieldContext_MsgEvent_route(ctx, field)
 			case "modes":
 				return ec.fieldContext_MsgEvent_modes(ctx, field)
+			case "canSubs":
+				return ec.fieldContext_MsgEvent_canSubs(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_MsgEvent_subscribers(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
 			case "routeStr":
 				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
+			case "subscriberUsers":
+				return ec.fieldContext_MsgEvent_subscriberUsers(ctx, field)
+			case "subscriberRoles":
+				return ec.fieldContext_MsgEvent_subscriberRoles(ctx, field)
+			case "excludeSubscriberUsers":
+				return ec.fieldContext_MsgEvent_excludeSubscriberUsers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -9589,6 +10072,8 @@ func (ec *executionContext) fieldContext_MsgType_subscribers(_ context.Context, 
 				return ec.fieldContext_MsgSubscriber_updatedAt(ctx, field)
 			case "msgTypeID":
 				return ec.fieldContext_MsgSubscriber_msgTypeID(ctx, field)
+			case "msgEventID":
+				return ec.fieldContext_MsgSubscriber_msgEventID(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_MsgSubscriber_tenantID(ctx, field)
 			case "userID":
@@ -9599,6 +10084,8 @@ func (ec *executionContext) fieldContext_MsgType_subscribers(_ context.Context, 
 				return ec.fieldContext_MsgSubscriber_exclude(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgSubscriber_msgType(ctx, field)
+			case "msgEvent":
+				return ec.fieldContext_MsgSubscriber_msgEvent(ctx, field)
 			case "user":
 				return ec.fieldContext_MsgSubscriber_user(ctx, field)
 			}
@@ -9659,6 +10146,8 @@ func (ec *executionContext) fieldContext_MsgType_subscriberUsers(_ context.Conte
 				return ec.fieldContext_MsgSubscriber_updatedAt(ctx, field)
 			case "msgTypeID":
 				return ec.fieldContext_MsgSubscriber_msgTypeID(ctx, field)
+			case "msgEventID":
+				return ec.fieldContext_MsgSubscriber_msgEventID(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_MsgSubscriber_tenantID(ctx, field)
 			case "userID":
@@ -9669,6 +10158,8 @@ func (ec *executionContext) fieldContext_MsgType_subscriberUsers(_ context.Conte
 				return ec.fieldContext_MsgSubscriber_exclude(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgSubscriber_msgType(ctx, field)
+			case "msgEvent":
+				return ec.fieldContext_MsgSubscriber_msgEvent(ctx, field)
 			case "user":
 				return ec.fieldContext_MsgSubscriber_user(ctx, field)
 			}
@@ -9729,6 +10220,8 @@ func (ec *executionContext) fieldContext_MsgType_subscriberRoles(_ context.Conte
 				return ec.fieldContext_MsgSubscriber_updatedAt(ctx, field)
 			case "msgTypeID":
 				return ec.fieldContext_MsgSubscriber_msgTypeID(ctx, field)
+			case "msgEventID":
+				return ec.fieldContext_MsgSubscriber_msgEventID(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_MsgSubscriber_tenantID(ctx, field)
 			case "userID":
@@ -9739,6 +10232,8 @@ func (ec *executionContext) fieldContext_MsgType_subscriberRoles(_ context.Conte
 				return ec.fieldContext_MsgSubscriber_exclude(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgSubscriber_msgType(ctx, field)
+			case "msgEvent":
+				return ec.fieldContext_MsgSubscriber_msgEvent(ctx, field)
 			case "user":
 				return ec.fieldContext_MsgSubscriber_user(ctx, field)
 			}
@@ -9799,6 +10294,8 @@ func (ec *executionContext) fieldContext_MsgType_excludeSubscriberUsers(_ contex
 				return ec.fieldContext_MsgSubscriber_updatedAt(ctx, field)
 			case "msgTypeID":
 				return ec.fieldContext_MsgSubscriber_msgTypeID(ctx, field)
+			case "msgEventID":
+				return ec.fieldContext_MsgSubscriber_msgEventID(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_MsgSubscriber_tenantID(ctx, field)
 			case "userID":
@@ -9809,6 +10306,8 @@ func (ec *executionContext) fieldContext_MsgType_excludeSubscriberUsers(_ contex
 				return ec.fieldContext_MsgSubscriber_exclude(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgSubscriber_msgType(ctx, field)
+			case "msgEvent":
+				return ec.fieldContext_MsgSubscriber_msgEvent(ctx, field)
 			case "user":
 				return ec.fieldContext_MsgSubscriber_user(ctx, field)
 			}
@@ -13257,7 +13756,7 @@ func (ec *executionContext) unmarshalInputCreateMsgEventInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "comments", "route", "modes", "msgTypeID"}
+	fieldsInOrder := [...]string{"name", "comments", "route", "modes", "canSubs", "msgTypeID"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13292,6 +13791,13 @@ func (ec *executionContext) unmarshalInputCreateMsgEventInput(ctx context.Contex
 				return it, err
 			}
 			it.Modes = data
+		case "canSubs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("canSubs"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CanSubs = data
 		case "msgTypeID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeID"))
 			data, err := ec.unmarshalNID2int(ctx, v)
@@ -13374,7 +13880,7 @@ func (ec *executionContext) unmarshalInputCreateMsgSubscriberInput(ctx context.C
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"tenantID", "orgRoleID", "exclude", "msgTypeID", "userID"}
+	fieldsInOrder := [...]string{"tenantID", "orgRoleID", "exclude", "msgTypeID", "msgEventID", "userID"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13404,11 +13910,18 @@ func (ec *executionContext) unmarshalInputCreateMsgSubscriberInput(ctx context.C
 			it.Exclude = data
 		case "msgTypeID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeID"))
-			data, err := ec.unmarshalNID2int(ctx, v)
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.MsgTypeID = data
+		case "msgEventID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgEventID"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgEventID = data
 		case "userID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
 			data, err := ec.unmarshalOID2ᚖint(ctx, v)
@@ -15072,7 +15585,7 @@ func (ec *executionContext) unmarshalInputMsgEventWhereInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "msgTypeID", "msgTypeIDNEQ", "msgTypeIDIn", "msgTypeIDNotIn", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "status", "statusNEQ", "statusIn", "statusNotIn", "statusIsNil", "statusNotNil", "comments", "commentsNEQ", "commentsIn", "commentsNotIn", "commentsGT", "commentsGTE", "commentsLT", "commentsLTE", "commentsContains", "commentsHasPrefix", "commentsHasSuffix", "commentsIsNil", "commentsNotNil", "commentsEqualFold", "commentsContainsFold", "modes", "modesNEQ", "modesIn", "modesNotIn", "modesGT", "modesGTE", "modesLT", "modesLTE", "modesContains", "modesHasPrefix", "modesHasSuffix", "modesEqualFold", "modesContainsFold", "hasMsgType", "hasMsgTypeWith", "hasCustomerTemplate", "hasCustomerTemplateWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "msgTypeID", "msgTypeIDNEQ", "msgTypeIDIn", "msgTypeIDNotIn", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "status", "statusNEQ", "statusIn", "statusNotIn", "statusIsNil", "statusNotNil", "comments", "commentsNEQ", "commentsIn", "commentsNotIn", "commentsGT", "commentsGTE", "commentsLT", "commentsLTE", "commentsContains", "commentsHasPrefix", "commentsHasSuffix", "commentsIsNil", "commentsNotNil", "commentsEqualFold", "commentsContainsFold", "modes", "modesNEQ", "modesIn", "modesNotIn", "modesGT", "modesGTE", "modesLT", "modesLTE", "modesContains", "modesHasPrefix", "modesHasSuffix", "modesEqualFold", "modesContainsFold", "canSubs", "canSubsNEQ", "canSubsIsNil", "canSubsNotNil", "hasMsgType", "hasMsgTypeWith", "hasSubscribers", "hasSubscribersWith", "hasCustomerTemplate", "hasCustomerTemplateWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -15765,6 +16278,34 @@ func (ec *executionContext) unmarshalInputMsgEventWhereInput(ctx context.Context
 				return it, err
 			}
 			it.ModesContainsFold = data
+		case "canSubs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("canSubs"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CanSubs = data
+		case "canSubsNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("canSubsNEQ"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CanSubsNEQ = data
+		case "canSubsIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("canSubsIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CanSubsIsNil = data
+		case "canSubsNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("canSubsNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CanSubsNotNil = data
 		case "hasMsgType":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasMsgType"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -15779,6 +16320,20 @@ func (ec *executionContext) unmarshalInputMsgEventWhereInput(ctx context.Context
 				return it, err
 			}
 			it.HasMsgTypeWith = data
+		case "hasSubscribers":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasSubscribers"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasSubscribers = data
+		case "hasSubscribersWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasSubscribersWith"))
+			data, err := ec.unmarshalOMsgSubscriberWhereInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgSubscriberWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasSubscribersWith = data
 		case "hasCustomerTemplate":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCustomerTemplate"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -17691,7 +18246,7 @@ func (ec *executionContext) unmarshalInputMsgSubscriberWhereInput(ctx context.Co
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "msgTypeID", "msgTypeIDNEQ", "msgTypeIDIn", "msgTypeIDNotIn", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "userID", "userIDNEQ", "userIDIn", "userIDNotIn", "userIDIsNil", "userIDNotNil", "orgRoleID", "orgRoleIDNEQ", "orgRoleIDIn", "orgRoleIDNotIn", "orgRoleIDGT", "orgRoleIDGTE", "orgRoleIDLT", "orgRoleIDLTE", "orgRoleIDIsNil", "orgRoleIDNotNil", "exclude", "excludeNEQ", "excludeIsNil", "excludeNotNil", "hasMsgType", "hasMsgTypeWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "msgTypeID", "msgTypeIDNEQ", "msgTypeIDIn", "msgTypeIDNotIn", "msgTypeIDIsNil", "msgTypeIDNotNil", "msgEventID", "msgEventIDNEQ", "msgEventIDIn", "msgEventIDNotIn", "msgEventIDIsNil", "msgEventIDNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "userID", "userIDNEQ", "userIDIn", "userIDNotIn", "userIDIsNil", "userIDNotNil", "orgRoleID", "orgRoleIDNEQ", "orgRoleIDIn", "orgRoleIDNotIn", "orgRoleIDGT", "orgRoleIDGTE", "orgRoleIDLT", "orgRoleIDLTE", "orgRoleIDIsNil", "orgRoleIDNotNil", "exclude", "excludeNEQ", "excludeIsNil", "excludeNotNil", "hasMsgType", "hasMsgTypeWith", "hasMsgEvent", "hasMsgEventWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -18055,6 +18610,62 @@ func (ec *executionContext) unmarshalInputMsgSubscriberWhereInput(ctx context.Co
 				return it, err
 			}
 			it.MsgTypeIDNotIn = data
+		case "msgTypeIDIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeIDIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeIDIsNil = data
+		case "msgTypeIDNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeIDNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeIDNotNil = data
+		case "msgEventID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgEventID"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgEventID = data
+		case "msgEventIDNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgEventIDNEQ"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgEventIDNEQ = data
+		case "msgEventIDIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgEventIDIn"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgEventIDIn = data
+		case "msgEventIDNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgEventIDNotIn"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgEventIDNotIn = data
+		case "msgEventIDIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgEventIDIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgEventIDIsNil = data
+		case "msgEventIDNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgEventIDNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgEventIDNotNil = data
 		case "tenantID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantID"))
 			data, err := ec.unmarshalOID2ᚖint(ctx, v)
@@ -18265,6 +18876,20 @@ func (ec *executionContext) unmarshalInputMsgSubscriberWhereInput(ctx context.Co
 				return it, err
 			}
 			it.HasMsgTypeWith = data
+		case "hasMsgEvent":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasMsgEvent"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasMsgEvent = data
+		case "hasMsgEventWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasMsgEventWith"))
+			data, err := ec.unmarshalOMsgEventWhereInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgEventWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasMsgEventWith = data
 		}
 	}
 
@@ -21365,7 +21990,7 @@ func (ec *executionContext) unmarshalInputUpdateMsgEventInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "comments", "clearComments", "route", "clearRoute", "modes", "msgTypeID"}
+	fieldsInOrder := [...]string{"name", "comments", "clearComments", "route", "clearRoute", "modes", "canSubs", "clearCanSubs", "msgTypeID"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -21414,6 +22039,20 @@ func (ec *executionContext) unmarshalInputUpdateMsgEventInput(ctx context.Contex
 				return it, err
 			}
 			it.Modes = data
+		case "canSubs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("canSubs"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CanSubs = data
+		case "clearCanSubs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCanSubs"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearCanSubs = data
 		case "msgTypeID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeID"))
 			data, err := ec.unmarshalOID2ᚖint(ctx, v)
@@ -21510,7 +22149,7 @@ func (ec *executionContext) unmarshalInputUpdateMsgSubscriberInput(ctx context.C
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"tenantID", "orgRoleID", "clearOrgRoleID", "exclude", "clearExclude", "msgTypeID", "userID", "clearUser"}
+	fieldsInOrder := [...]string{"tenantID", "orgRoleID", "clearOrgRoleID", "exclude", "clearExclude", "msgTypeID", "clearMsgType", "msgEventID", "clearMsgEvent", "userID", "clearUser"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -21559,6 +22198,27 @@ func (ec *executionContext) unmarshalInputUpdateMsgSubscriberInput(ctx context.C
 				return it, err
 			}
 			it.MsgTypeID = data
+		case "clearMsgType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearMsgType"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearMsgType = data
+		case "msgEventID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgEventID"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgEventID = data
+		case "clearMsgEvent":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearMsgEvent"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearMsgEvent = data
 		case "userID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
 			data, err := ec.unmarshalOID2ᚖint(ctx, v)
@@ -22531,6 +23191,8 @@ func (ec *executionContext) _MsgEvent(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "canSubs":
+			out.Values[i] = ec._MsgEvent_canSubs(ctx, field, obj)
 		case "msgType":
 			field := field
 
@@ -22544,6 +23206,39 @@ func (ec *executionContext) _MsgEvent(ctx context.Context, sel ast.SelectionSet,
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "subscribers":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MsgEvent_subscribers(ctx, field, obj)
 				return res
 			}
 
@@ -22610,6 +23305,114 @@ func (ec *executionContext) _MsgEvent(ctx context.Context, sel ast.SelectionSet,
 					}
 				}()
 				res = ec._MsgEvent_routeStr(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "subscriberUsers":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MsgEvent_subscriberUsers(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "subscriberRoles":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MsgEvent_subscriberRoles(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "excludeSubscriberUsers":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MsgEvent_excludeSubscriberUsers(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -23469,9 +24272,8 @@ func (ec *executionContext) _MsgSubscriber(ctx context.Context, sel ast.Selectio
 			out.Values[i] = ec._MsgSubscriber_updatedAt(ctx, field, obj)
 		case "msgTypeID":
 			out.Values[i] = ec._MsgSubscriber_msgTypeID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
-			}
+		case "msgEventID":
+			out.Values[i] = ec._MsgSubscriber_msgEventID(ctx, field, obj)
 		case "tenantID":
 			out.Values[i] = ec._MsgSubscriber_tenantID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -23486,16 +24288,46 @@ func (ec *executionContext) _MsgSubscriber(ctx context.Context, sel ast.Selectio
 		case "msgType":
 			field := field
 
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
 				res = ec._MsgSubscriber_msgType(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
 				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "msgEvent":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MsgSubscriber_msgEvent(ctx, field, obj)
 				return res
 			}
 

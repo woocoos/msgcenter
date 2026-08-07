@@ -216,6 +216,8 @@ export default {
     msg_template_list: '消息模板列表',
     msg_subscription_list: '消息订阅列表',
     silence_msg_list: '静默消息列表',
+    event_subscription_list: '事件订阅列表',
+    event_subscription: '事件订阅',
     // 详情
 
     // 必填

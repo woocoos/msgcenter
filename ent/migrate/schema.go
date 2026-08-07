@@ -78,6 +78,7 @@ var (
 		{Name: "comments", Type: field.TypeString, Nullable: true},
 		{Name: "route", Type: field.TypeJSON, Nullable: true},
 		{Name: "modes", Type: field.TypeString},
+		{Name: "can_subs", Type: field.TypeBool, Nullable: true, Default: false},
 		{Name: "msg_type_id", Type: field.TypeInt},
 	}
 	// MsgEventTable holds the schema information for the "msg_event" table.
@@ -88,7 +89,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "msg_event_msg_type_events",
-				Columns:    []*schema.Column{MsgEventColumns[10]},
+				Columns:    []*schema.Column{MsgEventColumns[11]},
 				RefColumns: []*schema.Column{MsgTypeColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -182,8 +183,9 @@ var (
 		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "org_role_id", Type: field.TypeInt, Nullable: true},
 		{Name: "exclude", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "msg_event_id", Type: field.TypeInt, Nullable: true},
 		{Name: "user_id", Type: field.TypeInt, Nullable: true},
-		{Name: "msg_type_id", Type: field.TypeInt},
+		{Name: "msg_type_id", Type: field.TypeInt, Nullable: true},
 	}
 	// MsgSubscriberTable holds the schema information for the "msg_subscriber" table.
 	MsgSubscriberTable = &schema.Table{
@@ -192,14 +194,20 @@ var (
 		PrimaryKey: []*schema.Column{MsgSubscriberColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "msg_subscriber_user_user",
+				Symbol:     "msg_subscriber_msg_event_subscribers",
 				Columns:    []*schema.Column{MsgSubscriberColumns[8]},
+				RefColumns: []*schema.Column{MsgEventColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "msg_subscriber_user_user",
+				Columns:    []*schema.Column{MsgSubscriberColumns[9]},
 				RefColumns: []*schema.Column{UserColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "msg_subscriber_msg_type_subscribers",
-				Columns:    []*schema.Column{MsgSubscriberColumns[9]},
+				Columns:    []*schema.Column{MsgSubscriberColumns[10]},
 				RefColumns: []*schema.Column{MsgTypeColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -450,8 +458,9 @@ func init() {
 	MsgSilenceTable.Annotation = &entsql.Annotation{
 		Table: "msg_silence",
 	}
-	MsgSubscriberTable.ForeignKeys[0].RefTable = UserTable
-	MsgSubscriberTable.ForeignKeys[1].RefTable = MsgTypeTable
+	MsgSubscriberTable.ForeignKeys[0].RefTable = MsgEventTable
+	MsgSubscriberTable.ForeignKeys[1].RefTable = UserTable
+	MsgSubscriberTable.ForeignKeys[2].RefTable = MsgTypeTable
 	MsgSubscriberTable.Annotation = &entsql.Annotation{
 		Table: "msg_subscriber",
 	}

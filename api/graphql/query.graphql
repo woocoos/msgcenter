@@ -99,6 +99,12 @@ extend type MsgType {
 
 extend type MsgEvent {
     routeStr(type: RouteStrType!): String!
+    """ 订阅的用户 """
+    subscriberUsers:[MsgSubscriber!]!
+    """ 订阅的用户组 """
+    subscriberRoles:[MsgSubscriber!]!
+    """ 排除的用户 """
+    excludeSubscriberUsers:[MsgSubscriber!]!
 }
 
 extend type MsgInternal {

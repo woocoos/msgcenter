@@ -543,6 +543,18 @@ func (_m *MsgEventQuery) collectField(ctx context.Context, oneNode bool, opCtx *
 				selectedFields = append(selectedFields, msgevent.FieldMsgTypeID)
 				fieldSeen[msgevent.FieldMsgTypeID] = struct{}{}
 			}
+		case "subscribers":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&MsgSubscriberClient{config: _m.config}).Query()
+			)
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, msgsubscriberImplementors)...); err != nil {
+				return err
+			}
+			_m.WithNamedSubscribers(alias, func(wq *MsgSubscriberQuery) {
+				*wq = *query
+			})
 		case "customerTemplate":
 			var (
 				alias = field.Alias
@@ -604,6 +616,11 @@ func (_m *MsgEventQuery) collectField(ctx context.Context, oneNode bool, opCtx *
 			if _, ok := fieldSeen[msgevent.FieldModes]; !ok {
 				selectedFields = append(selectedFields, msgevent.FieldModes)
 				fieldSeen[msgevent.FieldModes] = struct{}{}
+			}
+		case "canSubs":
+			if _, ok := fieldSeen[msgevent.FieldCanSubs]; !ok {
+				selectedFields = append(selectedFields, msgevent.FieldCanSubs)
+				fieldSeen[msgevent.FieldCanSubs] = struct{}{}
 			}
 		case "id":
 		case "__typename":
@@ -1139,6 +1156,20 @@ func (_m *MsgSubscriberQuery) collectField(ctx context.Context, oneNode bool, op
 				selectedFields = append(selectedFields, msgsubscriber.FieldMsgTypeID)
 				fieldSeen[msgsubscriber.FieldMsgTypeID] = struct{}{}
 			}
+		case "msgEvent":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&MsgEventClient{config: _m.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, msgeventImplementors)...); err != nil {
+				return err
+			}
+			_m.withMsgEvent = query
+			if _, ok := fieldSeen[msgsubscriber.FieldMsgEventID]; !ok {
+				selectedFields = append(selectedFields, msgsubscriber.FieldMsgEventID)
+				fieldSeen[msgsubscriber.FieldMsgEventID] = struct{}{}
+			}
 		case "user":
 			var (
 				alias = field.Alias
@@ -1177,6 +1208,11 @@ func (_m *MsgSubscriberQuery) collectField(ctx context.Context, oneNode bool, op
 			if _, ok := fieldSeen[msgsubscriber.FieldMsgTypeID]; !ok {
 				selectedFields = append(selectedFields, msgsubscriber.FieldMsgTypeID)
 				fieldSeen[msgsubscriber.FieldMsgTypeID] = struct{}{}
+			}
+		case "msgEventID":
+			if _, ok := fieldSeen[msgsubscriber.FieldMsgEventID]; !ok {
+				selectedFields = append(selectedFields, msgsubscriber.FieldMsgEventID)
+				fieldSeen[msgsubscriber.FieldMsgEventID] = struct{}{}
 			}
 		case "tenantID":
 			if _, ok := fieldSeen[msgsubscriber.FieldTenantID]; !ok {

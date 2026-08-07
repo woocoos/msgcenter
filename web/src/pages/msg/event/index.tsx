@@ -50,6 +50,13 @@ export default () => {
         },
       },
       {
+        title: t('open_subscription'), dataIndex: 'canSubs', width: 100, search: false,
+        valueEnum: {
+          true: { text: t('yes'), status: 'Success' },
+          false: { text: t('no'), status: 'Default' },
+        },
+      },
+      {
         title: t('status'), dataIndex: 'status', width: 120, search: false,
         filters: true,
         valueEnum: EnumMsgEventStatus,
@@ -77,13 +84,13 @@ export default () => {
               </a>
             </Auth>
             <Link
-              key="template"
+              key="template_customer"
               to={`/msg/template?id=${record.id}&type=${TemplateType.customer}`}
             >
               {t('temp_customer')}
             </Link>
             <Link
-              key="template"
+              key="template_default"
               to={`/msg/template?id=${record.id}&type=${TemplateType.default}`}
             >
               {t('temp_default')}

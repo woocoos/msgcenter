@@ -180,20 +180,25 @@ type ComplexityRoot struct {
 	}
 
 	MsgEvent struct {
-		Comments         func(childComplexity int) int
-		CreatedAt        func(childComplexity int) int
-		CreatedBy        func(childComplexity int) int
-		CustomerTemplate func(childComplexity int) int
-		ID               func(childComplexity int) int
-		Modes            func(childComplexity int) int
-		MsgType          func(childComplexity int) int
-		MsgTypeID        func(childComplexity int) int
-		Name             func(childComplexity int) int
-		Route            func(childComplexity int) int
-		RouteStr         func(childComplexity int, typeArg model.RouteStrType) int
-		Status           func(childComplexity int) int
-		UpdatedAt        func(childComplexity int) int
-		UpdatedBy        func(childComplexity int) int
+		CanSubs                func(childComplexity int) int
+		Comments               func(childComplexity int) int
+		CreatedAt              func(childComplexity int) int
+		CreatedBy              func(childComplexity int) int
+		CustomerTemplate       func(childComplexity int) int
+		ExcludeSubscriberUsers func(childComplexity int) int
+		ID                     func(childComplexity int) int
+		Modes                  func(childComplexity int) int
+		MsgType                func(childComplexity int) int
+		MsgTypeID              func(childComplexity int) int
+		Name                   func(childComplexity int) int
+		Route                  func(childComplexity int) int
+		RouteStr               func(childComplexity int, typeArg model.RouteStrType) int
+		Status                 func(childComplexity int) int
+		SubscriberRoles        func(childComplexity int) int
+		SubscriberUsers        func(childComplexity int) int
+		Subscribers            func(childComplexity int) int
+		UpdatedAt              func(childComplexity int) int
+		UpdatedBy              func(childComplexity int) int
 	}
 
 	MsgEventConnection struct {
@@ -285,18 +290,20 @@ type ComplexityRoot struct {
 	}
 
 	MsgSubscriber struct {
-		CreatedAt func(childComplexity int) int
-		CreatedBy func(childComplexity int) int
-		Exclude   func(childComplexity int) int
-		ID        func(childComplexity int) int
-		MsgType   func(childComplexity int) int
-		MsgTypeID func(childComplexity int) int
-		OrgRoleID func(childComplexity int) int
-		TenantID  func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
-		UpdatedBy func(childComplexity int) int
-		User      func(childComplexity int) int
-		UserID    func(childComplexity int) int
+		CreatedAt  func(childComplexity int) int
+		CreatedBy  func(childComplexity int) int
+		Exclude    func(childComplexity int) int
+		ID         func(childComplexity int) int
+		MsgEvent   func(childComplexity int) int
+		MsgEventID func(childComplexity int) int
+		MsgType    func(childComplexity int) int
+		MsgTypeID  func(childComplexity int) int
+		OrgRoleID  func(childComplexity int) int
+		TenantID   func(childComplexity int) int
+		UpdatedAt  func(childComplexity int) int
+		UpdatedBy  func(childComplexity int) int
+		User       func(childComplexity int) int
+		UserID     func(childComplexity int) int
 	}
 
 	MsgTemplate struct {
@@ -1121,6 +1128,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgChannelEdge.Node(childComplexity), true
 
+	case "MsgEvent.canSubs":
+		if e.complexity.MsgEvent.CanSubs == nil {
+			break
+		}
+
+		return e.complexity.MsgEvent.CanSubs(childComplexity), true
+
 	case "MsgEvent.comments":
 		if e.complexity.MsgEvent.Comments == nil {
 			break
@@ -1148,6 +1162,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgEvent.CustomerTemplate(childComplexity), true
+
+	case "MsgEvent.excludeSubscriberUsers":
+		if e.complexity.MsgEvent.ExcludeSubscriberUsers == nil {
+			break
+		}
+
+		return e.complexity.MsgEvent.ExcludeSubscriberUsers(childComplexity), true
 
 	case "MsgEvent.id":
 		if e.complexity.MsgEvent.ID == nil {
@@ -1209,6 +1230,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgEvent.Status(childComplexity), true
+
+	case "MsgEvent.subscriberRoles":
+		if e.complexity.MsgEvent.SubscriberRoles == nil {
+			break
+		}
+
+		return e.complexity.MsgEvent.SubscriberRoles(childComplexity), true
+
+	case "MsgEvent.subscriberUsers":
+		if e.complexity.MsgEvent.SubscriberUsers == nil {
+			break
+		}
+
+		return e.complexity.MsgEvent.SubscriberUsers(childComplexity), true
+
+	case "MsgEvent.subscribers":
+		if e.complexity.MsgEvent.Subscribers == nil {
+			break
+		}
+
+		return e.complexity.MsgEvent.Subscribers(childComplexity), true
 
 	case "MsgEvent.updatedAt":
 		if e.complexity.MsgEvent.UpdatedAt == nil {
@@ -1636,6 +1678,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgSubscriber.ID(childComplexity), true
+
+	case "MsgSubscriber.msgEvent":
+		if e.complexity.MsgSubscriber.MsgEvent == nil {
+			break
+		}
+
+		return e.complexity.MsgSubscriber.MsgEvent(childComplexity), true
+
+	case "MsgSubscriber.msgEventID":
+		if e.complexity.MsgSubscriber.MsgEventID == nil {
+			break
+		}
+
+		return e.complexity.MsgSubscriber.MsgEventID(childComplexity), true
 
 	case "MsgSubscriber.msgType":
 		if e.complexity.MsgSubscriber.MsgType == nil {
@@ -3299,6 +3355,10 @@ input CreateMsgEventInput {
   根据route配置对应的以,分隔的mode列表
   """
   modes: String!
+  """
+  是否可订阅
+  """
+  canSubs: Boolean
   msgTypeID: ID!
 }
 """
@@ -3348,7 +3408,8 @@ input CreateMsgSubscriberInput {
   是否排除
   """
   exclude: Boolean
-  msgTypeID: ID!
+  msgTypeID: ID
+  msgEventID: ID
   userID: ID
 }
 """
@@ -3990,9 +4051,17 @@ type MsgEvent implements Node {
   """
   modes: String!
   """
+  是否可订阅
+  """
+  canSubs: Boolean
+  """
   消息类型
   """
   msgType: MsgType!
+  """
+  订阅者
+  """
+  subscribers: [MsgSubscriber!]
   """
   自定义的消息模板
   """
@@ -4190,10 +4259,22 @@ input MsgEventWhereInput {
   modesEqualFold: String
   modesContainsFold: String
   """
+  can_subs field predicates
+  """
+  canSubs: Boolean
+  canSubsNEQ: Boolean
+  canSubsIsNil: Boolean
+  canSubsNotNil: Boolean
+  """
   msg_type edge predicates
   """
   hasMsgType: Boolean
   hasMsgTypeWith: [MsgTypeWhereInput!]
+  """
+  subscribers edge predicates
+  """
+  hasSubscribers: Boolean
+  hasSubscribersWith: [MsgSubscriberWhereInput!]
   """
   customer_template edge predicates
   """
@@ -4798,7 +4879,11 @@ type MsgSubscriber implements Node {
   """
   应用消息类型ID
   """
-  msgTypeID: ID!
+  msgTypeID: ID
+  """
+  应用消息事件ID
+  """
+  msgEventID: ID
   """
   组织ID
   """
@@ -4815,7 +4900,8 @@ type MsgSubscriber implements Node {
   是否排除
   """
   exclude: Boolean
-  msgType: MsgType!
+  msgType: MsgType
+  msgEvent: MsgEvent
   user: User
 }
 """
@@ -4911,6 +4997,17 @@ input MsgSubscriberWhereInput {
   msgTypeIDNEQ: ID
   msgTypeIDIn: [ID!]
   msgTypeIDNotIn: [ID!]
+  msgTypeIDIsNil: Boolean
+  msgTypeIDNotNil: Boolean
+  """
+  msg_event_id field predicates
+  """
+  msgEventID: ID
+  msgEventIDNEQ: ID
+  msgEventIDIn: [ID!]
+  msgEventIDNotIn: [ID!]
+  msgEventIDIsNil: Boolean
+  msgEventIDNotNil: Boolean
   """
   tenant_id field predicates
   """
@@ -4956,6 +5053,11 @@ input MsgSubscriberWhereInput {
   """
   hasMsgType: Boolean
   hasMsgTypeWith: [MsgTypeWhereInput!]
+  """
+  msg_event edge predicates
+  """
+  hasMsgEvent: Boolean
+  hasMsgEventWith: [MsgEventWhereInput!]
 }
 type MsgTemplate implements Node {
   id: ID!
@@ -6096,6 +6198,11 @@ input UpdateMsgEventInput {
   根据route配置对应的以,分隔的mode列表
   """
   modes: String
+  """
+  是否可订阅
+  """
+  canSubs: Boolean
+  clearCanSubs: Boolean
   msgTypeID: ID
 }
 """
@@ -6147,6 +6254,9 @@ input UpdateMsgSubscriberInput {
   exclude: Boolean
   clearExclude: Boolean
   msgTypeID: ID
+  clearMsgType: Boolean
+  msgEventID: ID
+  clearMsgEvent: Boolean
   userID: ID
   clearUser: Boolean
 }
@@ -6388,6 +6498,12 @@ extend type MsgType {
 
 extend type MsgEvent {
     routeStr(type: RouteStrType!): String!
+    """ 订阅的用户 """
+    subscriberUsers:[MsgSubscriber!]!
+    """ 订阅的用户组 """
+    subscriberRoles:[MsgSubscriber!]!
+    """ 排除的用户 """
+    excludeSubscriberUsers:[MsgSubscriber!]!
 }
 
 extend type MsgInternal {

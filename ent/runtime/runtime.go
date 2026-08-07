@@ -99,6 +99,10 @@ func init() {
 			return nil
 		}
 	}()
+	// msgeventDescCanSubs is the schema descriptor for can_subs field.
+	msgeventDescCanSubs := msgeventFields[6].Descriptor()
+	// msgevent.DefaultCanSubs holds the default value on creation for the can_subs field.
+	msgevent.DefaultCanSubs = msgeventDescCanSubs.Default.(bool)
 	msginternalMixin := schema.MsgInternal{}.Mixin()
 	msginternalMixinHooks1 := msginternalMixin[1].Hooks()
 	msginternalMixinHooks2 := msginternalMixin[2].Hooks()
@@ -172,7 +176,7 @@ func init() {
 	// msgsubscriber.DefaultCreatedAt holds the default value on creation for the created_at field.
 	msgsubscriber.DefaultCreatedAt = msgsubscriberDescCreatedAt.Default.(func() time.Time)
 	// msgsubscriberDescExclude is the schema descriptor for exclude field.
-	msgsubscriberDescExclude := msgsubscriberFields[4].Descriptor()
+	msgsubscriberDescExclude := msgsubscriberFields[5].Descriptor()
 	// msgsubscriber.DefaultExclude holds the default value on creation for the exclude field.
 	msgsubscriber.DefaultExclude = msgsubscriberDescExclude.Default.(bool)
 	msgtemplateMixin := schema.MsgTemplate{}.Mixin()
