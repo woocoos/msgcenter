@@ -10,7 +10,6 @@ import (
 	"github.com/tsingsun/woocoo/contrib/gql"
 	"github.com/tsingsun/woocoo/contrib/telemetry/otelweb"
 	"github.com/tsingsun/woocoo/pkg/conf"
-	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/tsingsun/woocoo/web"
 	"github.com/tsingsun/woocoo/web/handler/authz"
@@ -104,9 +103,6 @@ func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
 
 	// mutation事务
 	gqlsrv.Use(entgql.Transactioner{TxOpener: s.dbClient})
-	if err := gql.RegisterGraphqlServer(s.webSrv, gqlsrv); err != nil {
-		log.Fatal(err)
-	}
 }
 
 func (s *Server) Start(ctx context.Context) error {
