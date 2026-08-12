@@ -67,6 +67,7 @@ type MessageConfig {
 
 type WebhookConfig {
     sendResolved: Boolean
+    receiveType: String
     url: String
     urlFile: String
     maxAlerts: Int

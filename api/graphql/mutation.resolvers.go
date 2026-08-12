@@ -603,6 +603,19 @@ func (r *umengConfigInputResolver) Apps(ctx context.Context, obj *profile.UmengC
 	return nil
 }
 
+// ReceiveType is the resolver for the receiveType field.
+func (r *webhookConfigInputResolver) ReceiveType(ctx context.Context, obj *profile.WebhookConfig, data *string) error {
+	if data == nil {
+		return nil
+	}
+	rt := profile.WebhookReceiveType(*data)
+	if err := profile.WebhookReceiveTypeValidator(rt); err != nil {
+		return err
+	}
+	obj.ReceiveType = rt
+	return nil
+}
+
 // URL is the resolver for the url field.
 func (r *webhookConfigInputResolver) URL(ctx context.Context, obj *profile.WebhookConfig, data *string) error {
 	if data == nil {

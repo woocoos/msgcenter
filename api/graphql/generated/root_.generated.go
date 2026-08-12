@@ -529,6 +529,7 @@ type ComplexityRoot struct {
 		Body         func(childComplexity int) int
 		Headers      func(childComplexity int) int
 		MaxAlerts    func(childComplexity int) int
+		ReceiveType  func(childComplexity int) int
 		SendResolved func(childComplexity int) int
 		Subject      func(childComplexity int) int
 		Timeout      func(childComplexity int) int
@@ -3107,6 +3108,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.WebhookConfig.MaxAlerts(childComplexity), true
+
+	case "WebhookConfig.receiveType":
+		if e.complexity.WebhookConfig.ReceiveType == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.ReceiveType(childComplexity), true
 
 	case "WebhookConfig.sendResolved":
 		if e.complexity.WebhookConfig.SendResolved == nil {
@@ -6466,6 +6474,7 @@ type MessageConfig {
 
 type WebhookConfig {
     sendResolved: Boolean
+    receiveType: String
     url: String
     urlFile: String
     maxAlerts: Int
@@ -6768,6 +6777,7 @@ input MessageConfigInput {
 
 input WebhookConfigInput {
     sendResolved: Boolean
+    receiveType: String
     url: String
     urlFile: String
     maxAlerts: Int

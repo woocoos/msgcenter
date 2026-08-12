@@ -338,7 +338,19 @@ func (r *routeResolver) Matchers(ctx context.Context, obj *profile.Route) ([]*la
 
 // Apps is the resolver for the apps field.
 func (r *umengConfigResolver) Apps(ctx context.Context, obj *profile.UmengConfig) (scalars.UmengApps, error) {
-	panic(fmt.Errorf("not implemented: Apps - apps"))
+	if obj.Apps == nil {
+		return nil, nil
+	}
+	return scalars.UmengApps(obj.Apps), nil
+}
+
+// ReceiveType is the resolver for the receiveType field.
+func (r *webhookConfigResolver) ReceiveType(ctx context.Context, obj *profile.WebhookConfig) (*string, error) {
+	if obj.ReceiveType == "" {
+		return nil, nil
+	}
+	s := string(obj.ReceiveType)
+	return &s, nil
 }
 
 // URL is the resolver for the url field.

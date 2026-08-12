@@ -2607,6 +2607,7 @@ type WebhookConfig {
   body: String
   headers: MapString
   maxAlerts: Int
+  receiveType: String
   sendResolved: Boolean
   subject: String
   timeout: Duration
@@ -2618,6 +2619,7 @@ input WebhookConfigInput {
   body: String
   headers: MapString
   maxAlerts: Int
+  receiveType: String
   sendResolved: Boolean
   subject: String
   timeout: Duration

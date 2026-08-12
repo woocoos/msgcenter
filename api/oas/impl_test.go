@@ -21,10 +21,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"github.com/woocoos/knockout-go/ent/schemax"
-	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/knockout-go/api/fs"
 	"github.com/woocoos/knockout-go/api/fs/alioss"
+	"github.com/woocoos/knockout-go/ent/schemax"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
@@ -212,10 +212,11 @@ func (s *serviceSuite) TestPostAlerts() {
 				},
 			},
 			Annotations: map[string]string{
-				"summary": "test",
+				"summary": "summary",
+				"text":    "text",
 			},
-			EndsAt:   time.Now().Add(time.Hour),
-			StartsAt: time.Now(),
+			EndsAt:   timePtr(time.Now().Add(time.Hour)),
+			StartsAt: timePtr(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -261,12 +262,12 @@ func (s *serviceSuite) TestPostAlertsWithDynamicAttachments() {
 				},
 			},
 			Annotations: map[string]string{
-				"summary":                           "dynamic attachment test",
-				"to":                                "alerts@example.com",
+				"summary":                         "dynamic attachment test",
+				"to":                              "alerts@example.com",
 				alert.DynamicAttachmentAnnotation: attServer.URL + "/dynamic.txt",
 			},
-			EndsAt:   time.Now().Add(time.Hour),
-			StartsAt: time.Now(),
+			EndsAt:   timePtr(time.Now().Add(time.Hour)),
+			StartsAt: timePtr(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -330,12 +331,12 @@ func (s *serviceSuite) TestPostAlertsWithDynamicAttachments_OSSMount() {
 				},
 			},
 			Annotations: map[string]string{
-				"to":                                "alerts@example.com",
-				"summary":                           "oss mount attachment test",
+				"to":                              "alerts@example.com",
+				"summary":                         "oss mount attachment test",
 				alert.DynamicAttachmentAnnotation: ossURL,
 			},
-			EndsAt:   time.Now().Add(time.Hour),
-			StartsAt: time.Now(),
+			EndsAt:   timePtr(time.Now().Add(time.Hour)),
+			StartsAt: timePtr(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -380,8 +381,8 @@ func (s *serviceSuite) TestPostAlertsWithParams() {
 				"to":       "alerts@example.com",
 				"nickname": "test",
 			},
-			EndsAt:   time.Now().Add(time.Hour),
-			StartsAt: time.Now(),
+			EndsAt:   timePtr(time.Now().Add(time.Hour)),
+			StartsAt: timePtr(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -412,8 +413,8 @@ func (s *serviceSuite) TestPostAlertsWithTenant() {
 				"summary":  "test",
 				"nickname": "woocoos",
 			},
-			EndsAt:   time.Now().Add(time.Second * 2),
-			StartsAt: time.Now(),
+			EndsAt:   timePtr(time.Now().Add(time.Second * 2)),
+			StartsAt: timePtr(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -444,8 +445,8 @@ func (s *serviceSuite) TestPostAlertsWithDefaultTpl() {
 				"nickname":  "test",
 				"timestamp": strconv.Itoa(int(time.Now().Unix())),
 			},
-			EndsAt:   time.Now().Add(time.Hour),
-			StartsAt: time.Now(),
+			EndsAt:   timePtr(time.Now().Add(time.Hour)),
+			StartsAt: timePtr(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -566,8 +567,8 @@ func (s *serviceSuite) TestUserSubscribe() {
 				"summary":  "test",
 				"nickname": "woocoos",
 			},
-			EndsAt:   time.Now().Add(time.Second * 5),
-			StartsAt: time.Now(),
+			EndsAt:   timePtr(time.Now().Add(time.Second * 5)),
+			StartsAt: timePtr(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -614,8 +615,8 @@ func (s *serviceSuite) TestWebhook() {
 				"summary": "webhook test",
 				"mobile":  "8618359260323",
 			},
-			StartsAt: time.Now(),
-			EndsAt:   time.Now().Add(time.Hour),
+			StartsAt: timePtr(time.Now()),
+			EndsAt:   timePtr(time.Now().Add(time.Hour)),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -650,13 +651,45 @@ func (s *serviceSuite) TestWebhook_CustomTpl_DingTalk() {
 			Annotations: map[string]string{
 				"summary": "webhook template test",
 			},
-			EndsAt:   time.Now().Add(time.Hour),
-			StartsAt: time.Now().Add(time.Second * 5),
+			EndsAt:   timePtr(time.Now().Add(time.Hour)),
+			StartsAt: timePtr(time.Now().Add(time.Second * 5)),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
 	time.Sleep(time.Second * 2)
 	s.Require().Contains(got, "webhook template test")
+}
+
+// TestWebhook_Dingtalk sends a real DingTalk webhook notification to verify
+// the DingTalk markdown message format.
+func (s *serviceSuite) TestWebhook_Dingtalk() {
+	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	startsAt := time.Now()
+	endsAt := time.Now().Add(time.Hour)
+	req := PostableAlerts{
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					label.AlertNameLabel: testsuite.DingtalkEventName,
+					"event":              "app:approve",
+					"receiver":           "dingtalk",
+					"tenant":             "1",
+					"skipSub":            "Y",
+					"severity":           "critical",
+				},
+			},
+			Annotations: map[string]string{
+				"to":          "tst@qq.com",
+				"summary":     "钉钉webhook测试",
+				"description": "这是一条测试告警消息",
+			},
+			StartsAt: &startsAt,
+			EndsAt:   &endsAt,
+		},
+	}
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
+	// Wait for notification pipeline to process.
+	time.Sleep(time.Second * 10)
 }
 
 func (s *serviceSuite) TestMessage() {
@@ -674,8 +707,8 @@ func (s *serviceSuite) TestMessage() {
 			Annotations: map[string]string{
 				"summary": "internal message test",
 			},
-			StartsAt: time.Now(),
-			EndsAt:   time.Now().Add(time.Hour),
+			StartsAt: timePtr(time.Now()),
+			EndsAt:   timePtr(time.Now().Add(time.Hour)),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -709,8 +742,8 @@ func (s *serviceSuite) TestUserLevelTemplate() {
 			Annotations: map[string]string{
 				"summary": "user template test",
 			},
-			EndsAt:   time.Now().Add(time.Hour),
-			StartsAt: time.Now(),
+			EndsAt:   timePtr(time.Now().Add(time.Hour)),
+			StartsAt: timePtr(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -752,8 +785,8 @@ func (s *serviceSuite) TestTenantLevelTemplateFallback() {
 			Annotations: map[string]string{
 				"summary": "tenant fallback test",
 			},
-			EndsAt:   time.Now().Add(time.Hour),
-			StartsAt: time.Now(),
+			EndsAt:   timePtr(time.Now().Add(time.Hour)),
+			StartsAt: timePtr(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -797,4 +830,8 @@ func (s *serviceSuite) TestPostSilence() {
 	res, err := s.server.PostSilences(ctx, &PostSilencesRequest{PostableSilence: req})
 	s.Require().NoError(err)
 	s.NotZero(res.SilenceID)
+}
+
+func timePtr(t time.Time) *time.Time {
+	return &t
 }

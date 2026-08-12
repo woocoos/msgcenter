@@ -2905,6 +2905,7 @@ export type WebhookConfig = {
   body?: Maybe<Scalars['String']['output']>;
   headers?: Maybe<Scalars['MapString']['output']>;
   maxAlerts?: Maybe<Scalars['Int']['output']>;
+  receiveType?: Maybe<Scalars['String']['output']>;
   sendResolved?: Maybe<Scalars['Boolean']['output']>;
   subject?: Maybe<Scalars['String']['output']>;
   timeout?: Maybe<Scalars['Duration']['output']>;
@@ -2916,6 +2917,7 @@ export type WebhookConfigInput = {
   body?: InputMaybe<Scalars['String']['input']>;
   headers?: InputMaybe<Scalars['MapString']['input']>;
   maxAlerts?: InputMaybe<Scalars['Int']['input']>;
+  receiveType?: InputMaybe<Scalars['String']['input']>;
   sendResolved?: InputMaybe<Scalars['Boolean']['input']>;
   subject?: InputMaybe<Scalars['String']['input']>;
   timeout?: InputMaybe<Scalars['Duration']['input']>;

@@ -31,6 +31,7 @@ type UmengConfigResolver interface {
 	Apps(ctx context.Context, obj *profile.UmengConfig) (scalars.UmengApps, error)
 }
 type WebhookConfigResolver interface {
+	ReceiveType(ctx context.Context, obj *profile.WebhookConfig) (*string, error)
 	URL(ctx context.Context, obj *profile.WebhookConfig) (*string, error)
 
 	MaxAlerts(ctx context.Context, obj *profile.WebhookConfig) (*int, error)
@@ -1710,6 +1711,8 @@ func (ec *executionContext) fieldContext_Receiver_webhookConfigs(_ context.Conte
 			switch field.Name {
 			case "sendResolved":
 				return ec.fieldContext_WebhookConfig_sendResolved(ctx, field)
+			case "receiveType":
+				return ec.fieldContext_WebhookConfig_receiveType(ctx, field)
 			case "url":
 				return ec.fieldContext_WebhookConfig_url(ctx, field)
 			case "urlFile":
@@ -2589,6 +2592,47 @@ func (ec *executionContext) fieldContext_WebhookConfig_sendResolved(_ context.Co
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WebhookConfig_receiveType(ctx context.Context, field graphql.CollectedField, obj *profile.WebhookConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_WebhookConfig_receiveType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.WebhookConfig().ReceiveType(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_WebhookConfig_receiveType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WebhookConfig",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3489,6 +3533,39 @@ func (ec *executionContext) _WebhookConfig(ctx context.Context, sel ast.Selectio
 			out.Values[i] = graphql.MarshalString("WebhookConfig")
 		case "sendResolved":
 			out.Values[i] = ec._WebhookConfig_sendResolved(ctx, field, obj)
+		case "receiveType":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._WebhookConfig_receiveType(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "url":
 			field := field
 

@@ -3,6 +3,8 @@ package profile
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"strconv"
 	"time"
 
 	"net/textproto"
@@ -141,6 +143,54 @@ func (c *EmailConfig) Validate() error {
 	return nil
 }
 
+// WebhookReceiveType defines the type of webhook receiver.
+type WebhookReceiveType string
+
+const (
+	// WebhookReceiveTypeGeneric is a generic webhook receiver.
+	WebhookReceiveTypeGeneric WebhookReceiveType = ""
+	// WebhookReceiveTypeDingtalk is a DingTalk webhook receiver.
+	WebhookReceiveTypeDingtalk WebhookReceiveType = "dingtalk"
+)
+
+func (r WebhookReceiveType) String() string {
+	return string(r)
+}
+
+func (r WebhookReceiveType) Values() []string {
+	return []string{
+		WebhookReceiveTypeGeneric.String(),
+		WebhookReceiveTypeDingtalk.String(),
+	}
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (r WebhookReceiveType) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(r.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (r *WebhookReceiveType) UnmarshalGQL(val any) error {
+	str, ok := val.(string)
+	if !ok {
+		return nil
+	}
+	*r = WebhookReceiveType(str)
+	if err := WebhookReceiveTypeValidator(*r); err != nil {
+		return fmt.Errorf("%s is not a valid WebhookReceiveType", str)
+	}
+	return nil
+}
+
+func WebhookReceiveTypeValidator(input WebhookReceiveType) error {
+	switch input {
+	case WebhookReceiveTypeGeneric, WebhookReceiveTypeDingtalk:
+		return nil
+	default:
+		return fmt.Errorf("invalid enum value for webhook receive type field: %q", input)
+	}
+}
+
 // WebhookConfig configures notifications via a generic webhook.
 //
 // Because the configuration of httpconfig is dynamic and requires initialization,
@@ -149,6 +199,12 @@ func (c *EmailConfig) Validate() error {
 // The kind of storage depends on Run Mod: cluster or not.
 type WebhookConfig struct {
 	SendResolved bool `yaml:"sendResolved" json:"sendResolved"`
+	// ReceiveType is the type of webhook receiver (e.g., "dingtalk", "" for generic).
+	ReceiveType WebhookReceiveType `yaml:"receiveType,omitempty" json:"receiveType,omitempty"`
+	// Secret is the signing secret for webhook receivers that require HMAC-SHA256 signing
+	// (e.g., DingTalk custom robots). When set, timestamp and sign query parameters are
+	// appended to the webhook URL.
+	Secret string `yaml:"secret,omitempty" json:"secret,omitempty"`
 	// HTTPConfig configures the HTTP client used to send the webhook. Unmarshalled by custom logic.
 	HTTPConfig    *httpx.ClientConfig `yaml:"httpConfig" json:"httpConfig"`
 	HttpConfigOri *conf.Configuration `yaml:"-" json:"-"`

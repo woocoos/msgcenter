@@ -2,6 +2,9 @@ package webhook
 
 import (
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -9,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -221,6 +225,129 @@ func TestTruncateAlerts(t *testing.T) {
 	truncated, num = truncateAlerts(10, alerts)
 	assert.Len(t, truncated, 3)
 	assert.Equal(t, uint64(0), num)
+}
+
+func TestNotify_Dingtalk(t *testing.T) {
+	t.Parallel()
+	var receivedBody []byte
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		receivedBody, _ = io.ReadAll(r.Body)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	u, _ := url.Parse(srv.URL)
+	cfg := &profile.WebhookConfig{
+		URL:         (*profile.URL)(u),
+		ReceiveType: profile.WebhookReceiveTypeDingtalk,
+		Body:        `## Alert\n{{ .CommonLabels.alertname }}`,
+	}
+	n := newTestNotifier(t, cfg)
+
+	retry, err := n.Notify(testContext(), testAlert())
+	require.NoError(t, err)
+	assert.False(t, retry)
+
+	// Body is rendered and sent directly; dingtalk JSON formatting
+	// is handled entirely by the template.
+	assert.Contains(t, string(receivedBody), "## Alert")
+	assert.Contains(t, string(receivedBody), "test")
+}
+
+func TestNotify_Dingtalk_NoBody(t *testing.T) {
+	t.Parallel()
+	var receivedBody []byte
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		receivedBody, _ = io.ReadAll(r.Body)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	u, _ := url.Parse(srv.URL)
+	cfg := &profile.WebhookConfig{
+		URL:         (*profile.URL)(u),
+		ReceiveType: profile.WebhookReceiveTypeDingtalk,
+	}
+	n := newTestNotifier(t, cfg)
+
+	retry, err := n.Notify(testContext(), testAlert())
+	require.NoError(t, err)
+	assert.False(t, retry)
+
+	// Body为空时走默认逻辑，序列化Message而非钉钉格式。
+	var msg Message
+	require.NoError(t, json.Unmarshal(receivedBody, &msg))
+	assert.Equal(t, "4", msg.Version)
+}
+
+func TestSignDingTalkURL(t *testing.T) {
+	t.Parallel()
+
+	secret := "SECtest123"
+	rawURL := "https://oapi.dingtalk.com/robot/send?access_token=abc"
+
+	signed := signDingTalkURL(rawURL, secret)
+
+	// Should contain timestamp and sign parameters.
+	assert.Contains(t, signed, "timestamp=")
+	assert.Contains(t, signed, "sign=")
+	// URL already has ?, should use & separator.
+	assert.True(t, strings.HasPrefix(signed, rawURL+"&"))
+
+	// Verify sign is valid HMAC-SHA256 by parsing the raw query string.
+	idx := strings.Index(signed, "timestamp=")
+	queryPart := signed[idx:]
+	params := strings.Split(queryPart, "&")
+	var ts, signRaw string
+	for _, p := range params {
+		kv := strings.SplitN(p, "=", 2)
+		if kv[0] == "timestamp" {
+			ts = kv[1]
+		} else if kv[0] == "sign" {
+			signRaw = kv[1]
+		}
+	}
+	assert.NotEmpty(t, ts)
+	assert.NotEmpty(t, signRaw)
+
+	// Verify timestamp is a valid millisecond timestamp.
+	tsInt, err := strconv.ParseInt(ts, 10, 64)
+	require.NoError(t, err)
+	assert.Greater(t, tsInt, int64(0))
+
+	// Verify sign matches HMAC-SHA256 computation (signRaw is URL-encoded).
+	stringToSign := ts + "\n" + secret
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write([]byte(stringToSign))
+	expectedSign := url.QueryEscape(base64.StdEncoding.EncodeToString(mac.Sum(nil)))
+	assert.Equal(t, expectedSign, signRaw)
+}
+
+func TestNotify_WithSecret(t *testing.T) {
+	t.Parallel()
+	var receivedURL string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		receivedURL = r.URL.RequestURI()
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+
+	u, _ := url.Parse(srv.URL)
+	cfg := &profile.WebhookConfig{
+		URL:         (*profile.URL)(u),
+		Secret:      "SECtest123",
+		Body:        `{"text":"hello"}`,
+		ReceiveType: profile.WebhookReceiveTypeDingtalk,
+	}
+	n := newTestNotifier(t, cfg)
+
+	retry, err := n.Notify(testContext(), testAlert())
+	require.NoError(t, err)
+	assert.False(t, retry)
+
+	// Verify timestamp and sign are in the request URL.
+	assert.Contains(t, receivedURL, "timestamp=")
+	assert.Contains(t, receivedURL, "sign=")
 }
 
 func TestWebhookConfig_Validate(t *testing.T) {

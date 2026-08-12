@@ -3,6 +3,9 @@ package webhook
 import (
 	"bytes"
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,7 +13,9 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
@@ -88,6 +93,11 @@ func (n *Notifier) CustomConfig(ctx context.Context) (*profile.WebhookConfig, er
 func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (bool, error) {
 	alerts, numTruncated := truncateAlerts(n.config.MaxAlerts, alerts)
 	data := notify.GetTemplateData(ctx, n.tmpl, alerts)
+	var err error
+	tmpl := notify.TmplText(n.tmpl, data, &err)
+	if err != nil {
+		return false, err
+	}
 
 	config, err := n.CustomConfig(ctx)
 	if err != nil {
@@ -96,6 +106,14 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (bool, er
 	groupKey, err := notify.ExtractGroupKey(ctx)
 	if err != nil {
 		return false, err
+	}
+	url, err := n.resolveURL(ctx, config)
+	if err != nil {
+		return false, err
+	}
+	sub := tmpl(config.Subject)
+	if err != nil {
+		return false, fmt.Errorf("execute 'subject' template: %w", err)
 	}
 
 	msg := &Message{
@@ -115,12 +133,25 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (bool, er
 		if err != nil {
 			return false, err
 		}
-		buf.WriteString(body)
-	}
+		if config.ReceiveType == profile.WebhookReceiveTypeDingtalk {
+			mdMsg := map[string]any{
+				"msgtype": "markdown",
+				"markdown": map[string]string{
+					"title": sub,
+					"text":  body,
+				},
+			}
+			if err := json.NewEncoder(&buf).Encode(mdMsg); err != nil {
+				return false, err
+			}
 
-	url, err := n.resolveURL(ctx, config)
-	if err != nil {
-		return false, err
+			// Append timestamp and sign query parameters when secret is configured.
+			if config.Secret != "" {
+				url = signDingTalkURL(url, config.Secret)
+			}
+		} else {
+			buf.WriteString(body)
+		}
 	}
 
 	// Apply timeout if configured.
@@ -212,4 +243,24 @@ func redactURLError(err error) error {
 		urlErr.URL = "<redacted>"
 	}
 	return err
+}
+
+// signDingTalkURL appends timestamp and sign query parameters to the URL using
+// HMAC-SHA256 signing (compatible with DingTalk custom robot security settings).
+func signDingTalkURL(rawURL, secret string) string {
+	timestamp := strconv.FormatInt(time.Now().UnixMilli(), 10)
+	stringToSign := timestamp + "\n" + secret
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write([]byte(stringToSign))
+	sign := url.QueryEscape(base64.StdEncoding.EncodeToString(mac.Sum(nil)))
+
+	sep := "&"
+	if strings.Contains(rawURL, "?") {
+		if !strings.HasSuffix(rawURL, "&") {
+			sep = "&"
+		}
+	} else {
+		sep = "?"
+	}
+	return rawURL + sep + "timestamp=" + timestamp + "&sign=" + sign
 }
