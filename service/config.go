@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/mail"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -128,11 +129,16 @@ func processTemplateAttachments(event *ent.MsgTemplate, basedir, attdir string) 
 	if event.Attachments != nil && len(event.Attachments) > 0 {
 		as := make([]string, len(event.Attachments))
 		for i, attacher := range event.Attachments {
-			path, err := kosdk.DefaultFilePath(event.TenantID, attacher, basedir, attdir)
-			if err != nil {
-				return nil, err
+			if strings.Contains(attacher, "://") {
+				path, err := kosdk.DefaultFilePath(event.TenantID, attacher, basedir, attdir)
+				if err != nil {
+					return nil, err
+				}
+				as[i] = path
+			} else {
+				// 按约定，默认模版附件只存储附件名称+后缀
+				as[i] = filepath.Join(basedir, strconv.Itoa(event.TenantID), attdir, attacher)
 			}
-			as[i] = path
 		}
 		event.Attachments = as
 	}

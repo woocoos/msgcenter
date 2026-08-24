@@ -2,10 +2,13 @@ package ams
 
 import (
 	"context"
+	"fmt"
+	"strconv"
+	"strings"
+
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqljson"
-	"fmt"
 	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/model"
@@ -25,8 +28,6 @@ import (
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service"
-	"strconv"
-	"strings"
 )
 
 type Option func(*Service)

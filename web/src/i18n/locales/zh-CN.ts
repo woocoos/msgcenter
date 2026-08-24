@@ -158,6 +158,7 @@ export default {
     msg_temp_format: '正文',
     msg_temp_format_tip: '正文可包含go template的模板语法',
     attachments_tip: '附件为固定文档，暂时不支持附件中的变量',
+    please_enter_attachment_names: '请输入附件名称，回车添加',
     click_drag_upload: '点击或拖拽文件上传',
     receiving_user: '接收用户',
     receiving_type: '接收方式',

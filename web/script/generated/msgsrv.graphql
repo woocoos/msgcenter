@@ -2620,6 +2620,7 @@ input WebhookConfigInput {
   headers: MapString
   maxAlerts: Int
   receiveType: String
+  secret: String
   sendResolved: Boolean
   subject: String
   timeout: Duration

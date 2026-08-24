@@ -58,6 +58,7 @@ type UmengConfigInputResolver interface {
 }
 type WebhookConfigInputResolver interface {
 	ReceiveType(ctx context.Context, obj *profile.WebhookConfig, data *string) error
+
 	URL(ctx context.Context, obj *profile.WebhookConfig, data *string) error
 
 	MaxAlerts(ctx context.Context, obj *profile.WebhookConfig, data *int) error
@@ -3611,7 +3612,7 @@ func (ec *executionContext) unmarshalInputWebhookConfigInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"sendResolved", "receiveType", "url", "urlFile", "maxAlerts", "timeout", "headers", "subject", "body"}
+	fieldsInOrder := [...]string{"sendResolved", "receiveType", "secret", "url", "urlFile", "maxAlerts", "timeout", "headers", "subject", "body"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3634,6 +3635,13 @@ func (ec *executionContext) unmarshalInputWebhookConfigInput(ctx context.Context
 			if err = ec.resolvers.WebhookConfigInput().ReceiveType(ctx, &it, data); err != nil {
 				return it, err
 			}
+		case "secret":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("secret"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Secret = data
 		case "url":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)

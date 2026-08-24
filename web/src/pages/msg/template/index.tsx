@@ -40,10 +40,10 @@ export default () => {
       {
         title: '模板范围', dataIndex: 'userID', width: 100, search: false,
         render(text, record) {
-          if (record.userID) {
+          if (record.userID && record.userID != "0") {
             return `用户(${record.userID})`;
           }
-          if (record.tenantID) {
+          if (record.tenantID && record.tenantID != "0") {
             return '租户';
           }
           return '全局';
@@ -70,7 +70,20 @@ export default () => {
         render: (text, record) => {
           return (<Space>
             {
-              record.status === MsgTemplateSimpleStatus.Active ? <></> : <Auth authKey="updateMsgTemplate">
+              record.status === MsgTemplateSimpleStatus.Active ? <a
+                key="view"
+                onClick={() => {
+                  setModal({
+                    open: true,
+                    title: `${t('view')}:${record.name}`,
+                    id: record.id,
+                    receiverType: record.receiverType,
+                    readonly: true,
+                  });
+                }}
+              >
+                {t('view')}
+              </a> : <Auth authKey="updateMsgTemplate">
                 <a
                   key="editor"
                   onClick={() => {
@@ -132,7 +145,8 @@ export default () => {
       title: string;
       id: string;
       receiverType?: MsgTemplateReceiverType;
-      type?: 'test'
+      type?: 'test';
+      readonly?: boolean;
     }>({
       open: false,
       title: '',
@@ -277,11 +291,12 @@ export default () => {
           title={modal.title}
           type={searchParams.get('type')}
           id={modal.id}
+          readonly={modal.readonly}
           onClose={(isSuccess, newInfo) => {
             if (isSuccess && newInfo) {
               setDataSource(saveDataSource(dataSource, newInfo))
             }
-            setModal({ open: false, title: modal.title, id: '', receiverType: modal.receiverType });
+            setModal({ open: false, title: modal.title, id: '', receiverType: modal.receiverType, readonly: false });
           }}
           msgEvent={msgEventInfo}
           receiverType={modal.receiverType || MsgTemplateReceiverType.Email}

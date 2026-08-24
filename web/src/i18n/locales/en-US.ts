@@ -155,6 +155,7 @@ export default {
     msg_temp_format: 'Main body',
     msg_temp_format_tip: 'The body can contain the template syntax for go template',
     attachments_tip: 'Attachments are fixed documents, and variables in attachments are not supported for the time being',
+    please_enter_attachment_names: 'Enter attachment names, press Enter to add',
     click_drag_upload: 'Click or drag the file to upload',
     receiving_user: 'Receiving user',
     receiving_type: 'receiving type',

@@ -6778,6 +6778,7 @@ input MessageConfigInput {
 input WebhookConfigInput {
     sendResolved: Boolean
     receiveType: String
+    secret: String
     url: String
     urlFile: String
     maxAlerts: Int

@@ -2918,6 +2918,7 @@ export type WebhookConfigInput = {
   headers?: InputMaybe<Scalars['MapString']['input']>;
   maxAlerts?: InputMaybe<Scalars['Int']['input']>;
   receiveType?: InputMaybe<Scalars['String']['input']>;
+  secret?: InputMaybe<Scalars['String']['input']>;
   sendResolved?: InputMaybe<Scalars['Boolean']['input']>;
   subject?: InputMaybe<Scalars['String']['input']>;
   timeout?: InputMaybe<Scalars['Duration']['input']>;

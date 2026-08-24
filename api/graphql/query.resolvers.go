@@ -8,6 +8,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
+	"regexp"
 
 	"entgo.io/contrib/entgql"
 	"github.com/woocoos/knockout-go/ent/schemax"
@@ -309,6 +312,18 @@ func (r *queryResolver) UserUnreadMsgInternals(ctx context.Context) (int, error)
 
 // MsgTemplateDefineByName is the resolver for the msgTemplateDefineByName field.
 func (r *queryResolver) MsgTemplateDefineByName(ctx context.Context, format msgtemplate.Format, body string) (string, error) {
+	tplRefRe := regexp.MustCompile(`\{\{-?\s*template\s+"(\w+)\.(\w+)\.(\w+)"\s+\.\s*-?\}\}`)
+	baseDir := r.coordinator.Template.BaseDir
+	tplDir := r.coordinator.Template.DataDir
+	if matches := tplRefRe.FindStringSubmatch(body); len(matches) == 4 {
+		tenantID := matches[1]
+		tplName := matches[2]
+		filePath := filepath.Join(baseDir, tenantID, tplDir, tplName+".tmpl")
+		if content, err := os.ReadFile(filePath); err == nil {
+			return string(content), nil
+		}
+	}
+
 	data := template.Data{
 		CommonLabels: template.KV{
 			label.TenantLabel: "0",
