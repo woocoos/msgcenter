@@ -244,19 +244,24 @@ func (s *Service) convertMsgAlert(msgAlert *ent.MsgAlert) alert.Alert {
 func (s *Service) findMsgTemplate(ctx context.Context, receiver string, a alert.Alert) (*ent.MsgTemplate, error) {
 	var msgTemp *ent.MsgTemplate
 	var err error
+	var rt profile.ReceiverType
 	if strings.HasPrefix(receiver, profile.ReceiverWebhook.String()) {
 		// webhook
-		msgTemp, err = s.am.Coordinator.FindTemplate(ctx, s.client, profile.ReceiverWebhook, a.Labels)
+		rt = profile.ReceiverWebhook
 	} else if strings.HasPrefix(receiver, profile.ReceiverEmail.String()) {
 		// email
-		msgTemp, err = s.am.Coordinator.FindTemplate(ctx, s.client, profile.ReceiverEmail, a.Labels)
+		rt = profile.ReceiverEmail
 	} else if strings.HasPrefix(receiver, profile.ReceiverMessage.String()) {
 		// message
-		msgTemp, err = s.am.Coordinator.FindTemplate(ctx, s.client, profile.ReceiverMessage, a.Labels)
+		rt = profile.ReceiverMessage
+	} else if strings.HasPrefix(receiver, profile.ReceiverUmeng.String()) {
+		// umeng
+		rt = profile.ReceiverUmeng
 	} else {
 		// unknown
 		return nil, fmt.Errorf("unknown receiver")
 	}
+	msgTemp, err = s.am.Coordinator.FindTemplate(ctx, s.client, rt, a.Labels)
 	if err != nil {
 		return nil, err
 	}

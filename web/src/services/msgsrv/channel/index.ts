@@ -8,6 +8,7 @@ export const EnumMsgChannelReceiverType = {
   email: { text: 'email' },
   message: { text: 'message' },
   webhook: { text: 'webhook' },
+  umeng: { text: 'umeng' },
 };
 
 export const EnumMsgChannelStatus = {

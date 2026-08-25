@@ -312,7 +312,7 @@ func (r *queryResolver) UserUnreadMsgInternals(ctx context.Context) (int, error)
 
 // MsgTemplateDefineByName is the resolver for the msgTemplateDefineByName field.
 func (r *queryResolver) MsgTemplateDefineByName(ctx context.Context, format msgtemplate.Format, body string) (string, error) {
-	tplRefRe := regexp.MustCompile(`\{\{-?\s*template\s+"(\w+)\.(\w+)\.(\w+)"\s+\.\s*-?\}\}`)
+	tplRefRe := regexp.MustCompile(`\{\{-?\s*template\s+"([\w-]+)\.([\w-]+)\.(\w+)"\s+\.\s*-?\}\}`)
 	baseDir := r.coordinator.Template.BaseDir
 	tplDir := r.coordinator.Template.DataDir
 	if matches := tplRefRe.FindStringSubmatch(body); len(matches) == 4 {

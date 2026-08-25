@@ -26,6 +26,9 @@ receivers:
   - name: message
     messageConfig:
       sendResolved: false
+  - name: umeng
+    umengConfig:
+      sendResolved: false
 inhibit_rules:
   - source_match:
       severity: "critical"
