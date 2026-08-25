@@ -215,8 +215,8 @@ func (s *serviceSuite) TestPostAlerts() {
 				"summary": "summary",
 				"text":    "text",
 			},
-			EndsAt:   timePtr(time.Now().Add(time.Hour)),
-			StartsAt: timePtr(time.Now()),
+			EndsAt:   new(time.Now().Add(time.Hour)),
+			StartsAt: new(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -266,8 +266,8 @@ func (s *serviceSuite) TestPostAlertsWithDynamicAttachments() {
 				"to":                              "alerts@example.com",
 				alert.DynamicAttachmentAnnotation: attServer.URL + "/dynamic.txt",
 			},
-			EndsAt:   timePtr(time.Now().Add(time.Hour)),
-			StartsAt: timePtr(time.Now()),
+			EndsAt:   new(time.Now().Add(time.Hour)),
+			StartsAt: new(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -335,8 +335,8 @@ func (s *serviceSuite) TestPostAlertsWithDynamicAttachments_OSSMount() {
 				"summary":                         "oss mount attachment test",
 				alert.DynamicAttachmentAnnotation: ossURL,
 			},
-			EndsAt:   timePtr(time.Now().Add(time.Hour)),
-			StartsAt: timePtr(time.Now()),
+			EndsAt:   new(time.Now().Add(time.Hour)),
+			StartsAt: new(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -381,8 +381,8 @@ func (s *serviceSuite) TestPostAlertsWithParams() {
 				"to":       "alerts@example.com",
 				"nickname": "test",
 			},
-			EndsAt:   timePtr(time.Now().Add(time.Hour)),
-			StartsAt: timePtr(time.Now()),
+			EndsAt:   new(time.Now().Add(time.Hour)),
+			StartsAt: new(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -413,8 +413,8 @@ func (s *serviceSuite) TestPostAlertsWithTenant() {
 				"summary":  "test",
 				"nickname": "woocoos",
 			},
-			EndsAt:   timePtr(time.Now().Add(time.Second * 2)),
-			StartsAt: timePtr(time.Now()),
+			EndsAt:   new(time.Now().Add(time.Second * 2)),
+			StartsAt: new(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -445,8 +445,8 @@ func (s *serviceSuite) TestPostAlertsWithDefaultTpl() {
 				"nickname":  "test",
 				"timestamp": strconv.Itoa(int(time.Now().Unix())),
 			},
-			EndsAt:   timePtr(time.Now().Add(time.Hour)),
-			StartsAt: timePtr(time.Now()),
+			EndsAt:   new(time.Now().Add(time.Hour)),
+			StartsAt: new(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -567,8 +567,8 @@ func (s *serviceSuite) TestUserSubscribe() {
 				"summary":  "test",
 				"nickname": "woocoos",
 			},
-			EndsAt:   timePtr(time.Now().Add(time.Second * 5)),
-			StartsAt: timePtr(time.Now()),
+			EndsAt:   new(time.Now().Add(time.Second * 5)),
+			StartsAt: new(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -615,8 +615,8 @@ func (s *serviceSuite) TestWebhook() {
 				"summary": "webhook test",
 				"mobile":  "8618359260323",
 			},
-			StartsAt: timePtr(time.Now()),
-			EndsAt:   timePtr(time.Now().Add(time.Hour)),
+			StartsAt: new(time.Now()),
+			EndsAt:   new(time.Now().Add(time.Hour)),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -651,8 +651,8 @@ func (s *serviceSuite) TestWebhook_CustomTpl_DingTalk() {
 			Annotations: map[string]string{
 				"summary": "webhook template test",
 			},
-			EndsAt:   timePtr(time.Now().Add(time.Hour)),
-			StartsAt: timePtr(time.Now().Add(time.Second * 5)),
+			EndsAt:   new(time.Now().Add(time.Hour)),
+			StartsAt: new(time.Now().Add(time.Second * 5)),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -707,8 +707,8 @@ func (s *serviceSuite) TestMessage() {
 			Annotations: map[string]string{
 				"summary": "internal message test",
 			},
-			StartsAt: timePtr(time.Now()),
-			EndsAt:   timePtr(time.Now().Add(time.Hour)),
+			StartsAt: new(time.Now()),
+			EndsAt:   new(time.Now().Add(time.Hour)),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -742,8 +742,8 @@ func (s *serviceSuite) TestUserLevelTemplate() {
 			Annotations: map[string]string{
 				"summary": "user template test",
 			},
-			EndsAt:   timePtr(time.Now().Add(time.Hour)),
-			StartsAt: timePtr(time.Now()),
+			EndsAt:   new(time.Now().Add(time.Hour)),
+			StartsAt: new(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -785,8 +785,8 @@ func (s *serviceSuite) TestTenantLevelTemplateFallback() {
 			Annotations: map[string]string{
 				"summary": "tenant fallback test",
 			},
-			EndsAt:   timePtr(time.Now().Add(time.Hour)),
-			StartsAt: timePtr(time.Now()),
+			EndsAt:   new(time.Now().Add(time.Hour)),
+			StartsAt: new(time.Now()),
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
@@ -832,6 +832,3 @@ func (s *serviceSuite) TestPostSilence() {
 	s.NotZero(res.SilenceID)
 }
 
-func timePtr(t time.Time) *time.Time {
-	return &t
-}
