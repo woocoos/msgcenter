@@ -2,9 +2,18 @@ name: CI
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - "LICENSE"
+      - "NOTICE"
   pull_request:
-    branches: [main, dev]
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - "LICENSE"
+      - "NOTICE"
   workflow_dispatch:
 
 jobs:
