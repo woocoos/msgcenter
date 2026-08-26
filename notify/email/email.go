@@ -13,6 +13,7 @@ import (
 	neturl "net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -338,6 +339,7 @@ func filenameFromResponse(resp *http.Response, rawURL string) string {
 // dynamicAttachmentPaths extracts attachment paths from alert annotations.
 // Multiple alerts may carry different attachments; duplicates are preserved
 // and the caller is responsible for deduplication if needed.
+// Relative paths (not starting with http:// or https://) are converted to absolute paths.
 func dynamicAttachmentPaths(alerts []*alert.Alert) []string {
 	var paths []string
 	seen := make(map[string]struct{})
@@ -355,6 +357,14 @@ func dynamicAttachmentPaths(alerts []*alert.Alert) []string {
 				continue
 			}
 			seen[p] = struct{}{}
+			// Convert relative paths to absolute paths.
+			// The attachment directory is mounted at the same level as the application runtime directory.
+			if !strings.HasPrefix(p, "http://") && !strings.HasPrefix(p, "https://") {
+				p = strings.TrimPrefix(p, "/")
+				if abs, err := filepath.Abs(p); err == nil {
+					p = abs
+				}
+			}
 			paths = append(paths, p)
 		}
 	}

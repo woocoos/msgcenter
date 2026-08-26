@@ -2,18 +2,24 @@ package graphql
 
 import (
 	"context"
+	"encoding/json"
+	"net"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"github.com/tsingsun/woocoo/pkg/gds"
-	"github.com/tsingsun/woocoo/web"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/service"
 	"github.com/woocoos/msgcenter/service/provider/mem"
 	"github.com/woocoos/msgcenter/test/testsuite"
-	"net/url"
-	"testing"
-	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	_ "github.com/woocoos/msgcenter/ent/runtime"
@@ -21,10 +27,11 @@ import (
 
 type resolverSuite struct {
 	testsuite.BaseSuite
-	resolver  *Resolver
-	mr        *mutationResolver
-	qr        *queryResolver
-	server    *web.Server
+	resolver *Resolver
+	mr       *mutationResolver
+	qr       *queryResolver
+	webhook  *httptest.Server
+	//server    *web.Server
 	shutdowns []func()
 }
 
@@ -35,6 +42,37 @@ func TestRolverSuite(t *testing.T) {
 			DriverName: "sqlite3",
 		},
 	}
+	s.webhook = httptest.NewUnstartedServer(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			if r.URL.Path == "/token" {
+				d, _ := json.Marshal(map[string]string{
+					"access_token": "90d64460d14870c08c81352a05dedd3465940a7c",
+					"expires_in":   "7200",
+					"scope":        "user",
+					"token_type":   "bearer",
+				})
+				w.Write(d)
+				return
+			} else if r.URL.Path == "/graphql/query" {
+				w.Write([]byte(`{"data":{}}`))
+				return
+			} else if r.URL.Path == "/org/domain" {
+				d, _ := json.Marshal(map[string]any{
+					"id":        1,
+					"name":      "test",
+					"parent_id": 0,
+				})
+				w.Write(d)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+		}))
+	var err error
+	s.webhook.Listener, err = net.Listen("tcp", "127.0.0.1:5001")
+	require.NoError(t, err)
+	s.webhook.Start()
+	defer s.webhook.Close()
 	suite.Run(t, s)
 }
 
@@ -42,7 +80,9 @@ func TestRolverSuite(t *testing.T) {
 func (s *resolverSuite) SetupSuite() {
 	err := s.BaseSuite.Setup()
 	s.Require().NoError(err)
-	s.server = web.New(web.WithConfiguration(s.Cnf.Sub("web")))
+	s.AlertManager, err = service.NewAlertManager(s.App, service.WithClient(s.Client))
+	s.Require().NoError(err)
+	//s.server = web.New(web.WithConfiguration(s.Cnf.Sub("web")))
 	s.resolver = &Resolver{
 		coordinator: s.AlertManager.Coordinator,
 		client:      s.Client,
@@ -65,7 +105,7 @@ func (s *resolverSuite) SetupSuite() {
 	err = s.AlertManager.Coordinator.Reload()
 	s.Require().NoError(err)
 	alerts := s.AlertManager.Alerts.(*mem.Alerts)
-	go alerts.Start(nil)
+	go alerts.Start(context.Background())
 	s.shutdowns = append(s.shutdowns, func() {
 		s.AlertManager.Stop()
 		alerts.Stop(context.Background())
@@ -140,7 +180,7 @@ func (s *resolverSuite) TestMessageHandler() {
 
 func (s *resolverSuite) TestMsgTemplateDefineByName() {
 	ctx := s.NewTestCtx()
-	txt, err := s.qr.MsgTemplateDefineByName(ctx, "html", "{{ template \"0.ChangeUserPassword.txt\" . }}")
+	txt, err := s.qr.MsgTemplateDefineByName(ctx, "html", `{{ template "1.dingtalk.txt" . }}`)
 	s.Require().NoError(err)
 	s.Require().NotEmpty(txt)
 }

@@ -21,6 +21,7 @@ export const EnumMsgTemplateReceiverType = {
   email: { text: 'email' },
   message: { text: 'message' },
   webhook: { text: 'webhook' },
+  umeng: { text: 'umeng' },
 };
 
 export const EnumMsgTemplateFormat = {

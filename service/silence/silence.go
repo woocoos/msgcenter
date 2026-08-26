@@ -620,9 +620,6 @@ func (s *Silences) Set(ctx context.Context, sil *Entry) (int, error) {
 
 	now := time.Now()
 	prev, ok := s.getSilence(sil.ID)
-	if sil.ID != 0 && !ok {
-		return 0, ErrNotFound
-	}
 
 	if ok && canUpdate(prev, sil, now) {
 		_, _, err := s.setSilence(sil, now)
@@ -632,8 +629,11 @@ func (s *Silences) Set(ctx context.Context, sil *Entry) (int, error) {
 		return sil.ID, nil
 	}
 
-	// Generate new ID for new or replacing silence.
-	sil.ID = int(snowflake.New().Int64())
+	// Generate new ID only for silences without one (ID==0).
+	// If sil.ID is already set (e.g. from DB sync), keep it.
+	if sil.ID == 0 {
+		sil.ID = int(snowflake.New().Int64())
+	}
 
 	// Set default StartsAt if before now.
 	if sil.StartsAt.Before(now) {
