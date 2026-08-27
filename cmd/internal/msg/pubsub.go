@@ -241,9 +241,11 @@ func (pb *PubSub) subRedis(ctx context.Context) {
 	for {
 		select {
 		case msg := <-ch.Channel():
-			switch msg.Channel {
-			case string(graphql.SubTopicMessage):
-				pb.handlerMessage(msg.Payload)
+			if msg != nil {
+				switch msg.Channel {
+				case string(graphql.SubTopicMessage):
+					pb.handlerMessage(msg.Payload)
+				}
 			}
 		case <-ctx.Done():
 			ch.Close()

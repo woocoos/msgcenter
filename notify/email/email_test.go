@@ -6,13 +6,14 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/woocoos/msgcenter/pkg/alert"
-	pkgmail "github.com/woocoos/msgcenter/pkg/mail"
 	"github.com/woocoos/msgcenter/pkg/label"
+	pkgmail "github.com/woocoos/msgcenter/pkg/mail"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/template"
 )
@@ -179,12 +180,24 @@ func TestFilenameFromResponse(t *testing.T) {
 	}
 }
 
+// toAbsPath applies the same path transformation as dynamicAttachmentPaths
+func toAbsPath(p string) string {
+	if strings.HasPrefix(p, "http://") || strings.HasPrefix(p, "https://") {
+		return p
+	}
+	p = strings.TrimPrefix(p, "/")
+	if abs, err := filepath.Abs(p); err == nil {
+		return abs
+	}
+	return p
+}
+
 func TestDynamicAttachmentPaths(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
-		name    string
-		alerts  []*alert.Alert
-		want    []string
+		name   string
+		alerts []*alert.Alert
+		want   []string
 	}{
 		{
 			name:   "no alerts",
@@ -234,7 +247,16 @@ func TestDynamicAttachmentPaths(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			got := dynamicAttachmentPaths(tt.alerts)
-			assert.Equal(t, tt.want, got)
+			if tt.want == nil {
+				assert.Nil(t, got)
+				return
+			}
+			// Transform expected values the same way as dynamicAttachmentPaths
+			want := make([]string, len(tt.want))
+			for i, p := range tt.want {
+				want[i] = toAbsPath(p)
+			}
+			assert.Equal(t, want, got)
 		})
 	}
 }

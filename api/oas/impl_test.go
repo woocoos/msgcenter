@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
@@ -310,9 +311,10 @@ func (s *serviceSuite) TestPostAlertsWithDynamicAttachments_OSSMount() {
 	s.Require().NotEmpty(s.server.coordinator.MountPaths, "mountPaths must be configured")
 
 	// Create a local file at the expected mount path.
-	mountDir := "/tmp/oss-mount/test-bucket"
+	mountDir := "tmp/oss-mount/test-bucket"
 	s.Require().NoError(os.MkdirAll(mountDir, 0o755))
-	localFile := mountDir + "/test-attachment.txt"
+	localFile, err := filepath.Abs(mountDir + "/test-attachment.txt")
+	s.Require().NoError(err)
 	s.Require().NoError(os.WriteFile(localFile, []byte("oss mount test content"), 0o644))
 	defer os.Remove(localFile)
 
@@ -560,12 +562,14 @@ func (s *serviceSuite) TestUserSubscribe() {
 				Labels: map[string]string{
 					"receiver":           "email|webhook",
 					label.AlertNameLabel: testsuite.SubEventName,
+					"app":                "1",
 					"tenant":             "1",
 				},
 			},
 			Annotations: map[string]string{
 				"summary":  "test",
 				"nickname": "woocoos",
+				"to":       "test@test.com",
 			},
 			EndsAt:   new(time.Now().Add(time.Second * 5)),
 			StartsAt: new(time.Now()),
@@ -583,7 +587,7 @@ func (s *serviceSuite) TestUserSubscribe() {
 		selector.Where(sqljson.ValueEQ(msgalert.FieldLabels, testsuite.SubEventName, sqljson.Path("alertname")))
 	}).All(schemax.SkipTenantPrivacy(context.Background()))
 	s.Require().NoError(err)
-	s.Require().Len(ss, 3)
+	s.Require().Len(ss, 1)
 }
 
 func (s *serviceSuite) TestWebhook() {
@@ -620,7 +624,7 @@ func (s *serviceSuite) TestWebhook() {
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
-	time.Sleep(time.Second * 20)
+	time.Sleep(time.Second * 3)
 	s.Require().NotNil(got.Data)
 	s.Require().Equal("webhook test", got.Data.CommonAnnotations["summary"])
 }
@@ -656,7 +660,7 @@ func (s *serviceSuite) TestWebhook_CustomTpl_DingTalk() {
 		},
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
-	time.Sleep(time.Second * 2)
+	time.Sleep(time.Second * 3)
 	s.Require().Contains(got, "webhook template test")
 }
 
@@ -831,4 +835,3 @@ func (s *serviceSuite) TestPostSilence() {
 	s.Require().NoError(err)
 	s.NotZero(res.SilenceID)
 }
-

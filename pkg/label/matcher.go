@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"unicode"
@@ -209,6 +210,35 @@ func (ms Matchers) String() string {
 // multiple matcher sets. At least one matcher set must match for the MatcherSet
 // to match.
 type MatcherSet []*Matchers
+
+// UnmarshalJSON implements the json.Unmarshaler interface for Matchers.
+func (ms *Matchers) UnmarshalJSON(data []byte) error {
+	var lines []string
+	if err := json.Unmarshal(data, &lines); err != nil {
+		return err
+	}
+	for _, line := range lines {
+		pm, err := ParseMatchers(line)
+		if err != nil {
+			return err
+		}
+		*ms = append(*ms, pm...)
+	}
+	sort.Sort(Matchers(*ms))
+	return nil
+}
+
+// MarshalJSON implements the json.Marshaler interface for Matchers.
+func (ms Matchers) MarshalJSON() ([]byte, error) {
+	if len(ms) == 0 {
+		return []byte("[]"), nil
+	}
+	result := make([]string, len(ms))
+	for i, matcher := range ms {
+		result[i] = matcher.String()
+	}
+	return json.Marshal(result)
+}
 
 // Matches checks whether at least one matcher set is fulfilled against the given
 // label set (OR logic across matcher sets, AND logic within each set).
