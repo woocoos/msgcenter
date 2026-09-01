@@ -94,14 +94,16 @@ func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
 		graphql.WithMsgClient(s.msgClient.UniversalClient),
 		graphql.WithPubSub(s.subs),
 	))
+	// SSE 必须在 POST 之前，否则 POST transport 会匹配所有 POST 请求（它不检查 Accept 头），
+	// SSE transport 永远不会被选中
+	gqlsrv.AddTransport(transport.SSE{
+		KeepAlivePingInterval: s.keepAlivePingInterval,
+	})
 	gqlsrv.AddTransport(transport.Options{})
 	gqlsrv.AddTransport(transport.GET{})
 	gqlsrv.AddTransport(transport.POST{})
 	gqlsrv.AddTransport(transport.MultipartForm{})
 	gqlsrv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
-	gqlsrv.AddTransport(transport.SSE{
-		KeepAlivePingInterval: s.keepAlivePingInterval,
-	})
 
 	// RegisterGraphqlServer 内部调用 SupportStream 发送测试请求，
 	// AroundResponses/Use 必须在其之后注册，避免测试请求触发中间件 panic

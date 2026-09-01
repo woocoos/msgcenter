@@ -135,6 +135,7 @@ func TestServiceSuite(t *testing.T) {
 	s.webhook.Listener, err = net.Listen("tcp", "127.0.0.1:5001")
 	require.NoError(t, err)
 	s.webhook.Start()
+	defer s.webhook.Close()
 	suite.Run(t, s)
 }
 
