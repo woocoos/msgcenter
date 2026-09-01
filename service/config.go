@@ -41,24 +41,6 @@ func tenantIDFromLabels(set label.LabelSet) (int, error) {
 	return tid, nil
 }
 
-// UserIDsFromLabels returns the user IDs from the labels.
-func UserIDsFromLabels(set label.LabelSet) ([]int, error) {
-	ul, ok := set[label.ToUserIDLabel]
-	if !ok {
-		return nil, nil
-	}
-	ids := strings.Split(ul, ",")
-	uis := make([]int, 0, len(ids))
-	for _, id := range ids {
-		uid, _ := strconv.Atoi(id)
-		if uid == 0 {
-			continue
-		}
-		uis = append(uis, uid)
-	}
-	return uis, nil
-}
-
 // findTemplate find template from database
 // Priority: user-level template > tenant-level template > global default template
 func findTemplate(ctx context.Context, basedir, attdir string, client *ent.Client, rt profile.ReceiverType,
@@ -73,7 +55,7 @@ func findTemplate(ctx context.Context, basedir, attdir string, client *ent.Clien
 	en := labels[label.AlertNameLabel]
 
 	// Try user-level template first (only if single user ID in labels)
-	userIDs, _ := UserIDsFromLabels(labels)
+	userIDs, _ := label.UserIDsFromLabels(labels)
 	if len(userIDs) == 1 {
 		uid := userIDs[0]
 		event, err := client.MsgTemplate.Query().Where(

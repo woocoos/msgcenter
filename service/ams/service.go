@@ -9,6 +9,7 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqljson"
+	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/model"
@@ -28,7 +29,10 @@ import (
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service"
+	"go.uber.org/zap"
 )
+
+var logger = log.Component("ams")
 
 type Option func(*Service)
 
@@ -114,6 +118,9 @@ func (s *Service) FormatMsgAlerts(ctx context.Context, after *entgql.Cursor[int]
 		if err != nil {
 			return nil, err
 		}
+		if formatMsgAlert == nil {
+			continue
+		}
 		if formatMsgAlert != nil {
 			formatMsgAlert.HasMultiMsg = hasMultiMsg
 		}
@@ -145,7 +152,8 @@ func (s *Service) formatMsgAlert(ctx context.Context, msgAlert *ent.MsgAlert, ro
 	routeOpt := route.RouteOpts
 	msgTemp, err := s.findMsgTemplate(ctx, routeOpt.Receiver, a)
 	if err != nil {
-		return nil, err
+		logger.Error("find msg template", zap.Error(err), zap.Int("alertID", msgAlert.ID))
+		return nil, nil
 	}
 	// 模板标题
 	if msgTemp != nil {
@@ -182,7 +190,7 @@ func (s *Service) formatMsgAlert(ctx context.Context, msgAlert *ent.MsgAlert, ro
 	// 判断消息是否订阅
 	users := make([]*model.UserInfo, 0)
 	// 取消息体的user
-	uids, err := service.UserIDsFromLabels(labels)
+	uids, err := label.UserIDsFromLabels(labels)
 	if err != nil {
 		return nil, err
 	}
@@ -284,6 +292,9 @@ func (s *Service) FormatMsgAlertMore(ctx context.Context, msgAlertID int) ([]*mo
 		formatMsgAlert, err := s.formatMsgAlert(ctx, ma, route)
 		if err != nil {
 			return nil, err
+		}
+		if formatMsgAlert == nil {
+			continue
 		}
 		msgAlerts = append(msgAlerts, formatMsgAlert)
 	}

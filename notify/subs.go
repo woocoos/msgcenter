@@ -2,6 +2,8 @@ package notify
 
 import (
 	"context"
+	"strconv"
+
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/service/provider"
@@ -52,15 +54,40 @@ func (u EventSubscribeStage) exec(ctx context.Context, alerts ...*alert.Alert) (
 	if err != nil {
 		return ctx, alerts, err
 	}
-	if len(uis) == 0 {
+
+	// Collect user IDs from subscribers.
+	seen := make(map[string]struct{})
+	var userIDs []string
+	for _, ui := range uis {
+		if ui.UserID == "" {
+			continue
+		}
+		if _, ok := seen[ui.UserID]; !ok {
+			seen[ui.UserID] = struct{}{}
+			userIDs = append(userIDs, ui.UserID)
+		}
+	}
+
+	// 没有订阅用户，走正常流程
+	if len(userIDs) == 0 {
 		return ctx, alerts, nil
 	}
-	for _, ui := range uis {
-		// copy alerts
+
+	// Also extract user IDs from alert labels and merge (deduplicated).
+	labelUIDs, _ := label.UserIDsFromLabels(ga.Labels)
+	for _, id := range labelUIDs {
+		uid := strconv.Itoa(id)
+		if _, ok := seen[uid]; !ok {
+			seen[uid] = struct{}{}
+			userIDs = append(userIDs, uid)
+		}
+	}
+
+	for _, uid := range userIDs {
 		uls := make([]*alert.Alert, len(alerts))
 		for i, a := range alerts {
 			ac := a.Clone()
-			ac.Labels[label.ToUserIDLabel] = ui.UserID
+			ac.Labels[label.ToUserIDLabel] = uid
 			ac.Labels[label.SkipSubscribeLabel] = "Y"
 			uls[i] = ac
 		}

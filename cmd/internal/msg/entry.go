@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"entgo.io/contrib/entgql"
+	gqlgen "github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/google/uuid"
 	"github.com/tsingsun/woocoo/contrib/gql"
@@ -13,6 +15,7 @@ import (
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/tsingsun/woocoo/web"
 	"github.com/tsingsun/woocoo/web/handler/authz"
+	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/woocoos/knockout-go/pkg/fmterr"
 	"github.com/woocoos/knockout-go/pkg/koapp"
 	"github.com/woocoos/knockout-go/pkg/middleware"
@@ -83,24 +86,30 @@ func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
 		otelweb.RegisterMiddleware(),
 		web.WithMiddlewareNewFunc("authz", authz.Middleware),
 	)
-	ss, err := gql.RegisterSchema(s.webSrv, NewSchema(
+
+	// 手动创建 gqlgen server，确保 SSE transport 在注册前已添加，
+	// 使 buildGraphqlServer 中 SupportStream() 能正确检测并设置 isSupportStream=true
+	gqlsrv := gqlgen.New(NewSchema(
 		graphql.WithClient(s.dbClient),
 		graphql.WithMsgClient(s.msgClient.UniversalClient),
 		graphql.WithPubSub(s.subs),
 	))
-	if err != nil {
-		panic(err)
-	}
-	//gql use msg resolver
-	gqlsrv := ss[0]
-	gqlsrv.AroundResponses(middleware.SimplePagination())
-	gqlsrv.AddTransport(transport.SSE{
-		KeepAlivePingInterval: s.keepAlivePingInterval,
-	})
 	gqlsrv.AddTransport(transport.Options{})
 	gqlsrv.AddTransport(transport.GET{})
 	gqlsrv.AddTransport(transport.POST{})
+	gqlsrv.AddTransport(transport.MultipartForm{})
+	gqlsrv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
+	gqlsrv.AddTransport(transport.SSE{
+		KeepAlivePingInterval: s.keepAlivePingInterval,
+	})
 
+	// RegisterGraphqlServer 内部调用 SupportStream 发送测试请求，
+	// AroundResponses/Use 必须在其之后注册，避免测试请求触发中间件 panic
+	if err := gql.RegisterGraphqlServer(s.webSrv, gqlsrv); err != nil {
+		panic(err)
+	}
+
+	gqlsrv.AroundResponses(middleware.SimplePagination())
 	// mutation事务
 	gqlsrv.Use(entgql.Transactioner{TxOpener: s.dbClient})
 }
