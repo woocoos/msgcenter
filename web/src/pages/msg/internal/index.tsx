@@ -223,6 +223,7 @@ export default () => {
             })
             table.total = result.totalCount;
           }
+          setDataSource(table.data)
           setSelectedRowKeys([]);
           return table;
         }}
