@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-onlyBuiltDependencies:
-  - electron
-
 overrides:
   '@graphql-tools/schema': 10.0.33
 
@@ -24,20 +21,17 @@ dependencies:
     specifier: 0.1.17
     version: 0.1.17(react@18.3.1)
   '@knockout-js/ice-urql':
-    specifier: 0.1.18
-    version: 0.1.18(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1)
+    specifier: 0.1.21
+    version: 0.1.21(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1)
   '@knockout-js/layout':
-    specifier: 0.1.24
-    version: 0.1.24(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
+    specifier: 0.1.26
+    version: 0.1.26(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
   '@knockout-js/org':
-    specifier: 0.1.15
-    version: 0.1.15(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
+    specifier: 0.1.17
+    version: 0.1.17(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
   '@monaco-editor/react':
     specifier: ^4.5.1
     version: 4.7.0(monaco-editor@0.52.2)(react-dom@18.3.1)(react@18.3.1)
-  '@qeelyn-pb/ims-js':
-    specifier: ^1.0.32
-    version: 1.0.38(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
   '@urql/core':
     specifier: '5'
     version: 5.2.0(graphql@16.14.2)
@@ -1666,6 +1660,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [arm64]
     os: [android]
+    requiresBuild: true
     optional: true
 
   /@esbuild/android-arm@0.17.19:
@@ -1673,6 +1668,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [arm]
     os: [android]
+    requiresBuild: true
     optional: true
 
   /@esbuild/android-x64@0.17.19:
@@ -1680,6 +1676,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [x64]
     os: [android]
+    requiresBuild: true
     optional: true
 
   /@esbuild/darwin-arm64@0.17.19:
@@ -1687,6 +1684,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [arm64]
     os: [darwin]
+    requiresBuild: true
     optional: true
 
   /@esbuild/darwin-x64@0.17.19:
@@ -1694,6 +1692,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [x64]
     os: [darwin]
+    requiresBuild: true
     optional: true
 
   /@esbuild/freebsd-arm64@0.17.19:
@@ -1701,6 +1700,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [arm64]
     os: [freebsd]
+    requiresBuild: true
     optional: true
 
   /@esbuild/freebsd-x64@0.17.19:
@@ -1708,6 +1708,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [x64]
     os: [freebsd]
+    requiresBuild: true
     optional: true
 
   /@esbuild/linux-arm64@0.17.19:
@@ -1715,6 +1716,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [arm64]
     os: [linux]
+    requiresBuild: true
     optional: true
 
   /@esbuild/linux-arm@0.17.19:
@@ -1722,6 +1724,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [arm]
     os: [linux]
+    requiresBuild: true
     optional: true
 
   /@esbuild/linux-ia32@0.17.19:
@@ -1729,6 +1732,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [ia32]
     os: [linux]
+    requiresBuild: true
     optional: true
 
   /@esbuild/linux-loong64@0.17.19:
@@ -1736,6 +1740,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [loong64]
     os: [linux]
+    requiresBuild: true
     optional: true
 
   /@esbuild/linux-mips64el@0.17.19:
@@ -1743,6 +1748,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [mips64el]
     os: [linux]
+    requiresBuild: true
     optional: true
 
   /@esbuild/linux-ppc64@0.17.19:
@@ -1750,6 +1756,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [ppc64]
     os: [linux]
+    requiresBuild: true
     optional: true
 
   /@esbuild/linux-riscv64@0.17.19:
@@ -1757,6 +1764,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [riscv64]
     os: [linux]
+    requiresBuild: true
     optional: true
 
   /@esbuild/linux-s390x@0.17.19:
@@ -1764,6 +1772,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [s390x]
     os: [linux]
+    requiresBuild: true
     optional: true
 
   /@esbuild/linux-x64@0.17.19:
@@ -1771,6 +1780,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [x64]
     os: [linux]
+    requiresBuild: true
     optional: true
 
   /@esbuild/netbsd-x64@0.17.19:
@@ -1778,6 +1788,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [x64]
     os: [netbsd]
+    requiresBuild: true
     optional: true
 
   /@esbuild/openbsd-x64@0.17.19:
@@ -1785,6 +1796,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [x64]
     os: [openbsd]
+    requiresBuild: true
     optional: true
 
   /@esbuild/sunos-x64@0.17.19:
@@ -1792,6 +1804,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [x64]
     os: [sunos]
+    requiresBuild: true
     optional: true
 
   /@esbuild/win32-arm64@0.17.19:
@@ -1799,6 +1812,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [arm64]
     os: [win32]
+    requiresBuild: true
     optional: true
 
   /@esbuild/win32-ia32@0.17.19:
@@ -1806,6 +1820,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [ia32]
     os: [win32]
+    requiresBuild: true
     optional: true
 
   /@esbuild/win32-x64@0.17.19:
@@ -1813,6 +1828,7 @@ packages:
     engines: {node: '>=12'}
     cpu: [x64]
     os: [win32]
+    requiresBuild: true
     optional: true
 
   /@eslint-community/eslint-utils@4.9.1(eslint@8.57.1):
@@ -2458,7 +2474,7 @@ packages:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
       graphql: 16.14.2
-      tslib: 2.6.3
+      tslib: 2.8.1
     dev: true
 
   /@graphql-tools/prisma-loader@8.0.17(@types/node@18.19.130)(graphql@16.14.2):
@@ -2504,7 +2520,7 @@ packages:
       '@ardatan/relay-compiler': 13.0.1(graphql@16.14.2)
       '@graphql-tools/utils': 11.2.0(graphql@16.14.2)
       graphql: 16.14.2
-      tslib: 2.6.3
+      tslib: 2.8.1
     dev: true
 
   /@graphql-tools/schema@10.0.33(graphql@16.14.2):
@@ -2671,6 +2687,7 @@ packages:
     resolution: {integrity: sha512-XWD54zBBOduTwUCa0XMJ6CU7SVksa1HKf1FR9qISEoyzQt6Br4SgVGMieFT+/IhC+JQZs8atPDEsM6bzrpCBlQ==}
     engines: {node: '>=14.19.0', npm: '>=3.0.0'}
     hasBin: true
+    requiresBuild: true
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
@@ -2757,12 +2774,14 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
+    requiresBuild: true
     optional: true
 
   /@ice/css-modules-hash-darwin-universal@0.0.10:
     resolution: {integrity: sha512-pdh0wK8jBD+saBk9T9f/dNjTH5L/sTv9EMgz2FqYk9rKc3CXQWX/PxRctp+VkXANAnqm7s4vo+Pz25hXlm+l6g==}
     engines: {node: '>= 10'}
     os: [darwin]
+    requiresBuild: true
     optional: true
 
   /@ice/css-modules-hash-darwin-x64@0.0.10:
@@ -2770,6 +2789,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
+    requiresBuild: true
     optional: true
 
   /@ice/css-modules-hash-linux-arm64-gnu@0.0.10:
@@ -2778,6 +2798,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
+    requiresBuild: true
     optional: true
 
   /@ice/css-modules-hash-linux-arm64-musl@0.0.10:
@@ -2786,6 +2807,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     libc: [musl]
+    requiresBuild: true
     optional: true
 
   /@ice/css-modules-hash-linux-x64-gnu@0.0.10:
@@ -2794,6 +2816,7 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [glibc]
+    requiresBuild: true
     optional: true
 
   /@ice/css-modules-hash-linux-x64-musl@0.0.10:
@@ -2802,6 +2825,7 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [musl]
+    requiresBuild: true
     optional: true
 
   /@ice/css-modules-hash-win32-arm64-msvc@0.0.10:
@@ -2809,6 +2833,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
+    requiresBuild: true
     optional: true
 
   /@ice/css-modules-hash-win32-ia32-msvc@0.0.10:
@@ -2816,6 +2841,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [i686]
     os: [win32]
+    requiresBuild: true
     optional: true
 
   /@ice/css-modules-hash-win32-x64-msvc@0.0.10:
@@ -2823,6 +2849,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
+    requiresBuild: true
     optional: true
 
   /@ice/css-modules-hash@0.0.10:
@@ -2863,12 +2890,14 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
+    requiresBuild: true
     optional: true
 
   /@ice/pack-binding-darwin-universal@0.0.13:
     resolution: {integrity: sha512-BFIZfUA7wPchm0vRTUB4sMvczfqwvjOm4ri3szwXq/l7aooqiFFTzrYKZimqfWSf23s5veiq7OzUyuo0YqKO5g==}
     engines: {node: '>= 10'}
     os: [darwin]
+    requiresBuild: true
     optional: true
 
   /@ice/pack-binding-darwin-x64@0.0.13:
@@ -2876,6 +2905,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
+    requiresBuild: true
     optional: true
 
   /@ice/pack-binding-linux-arm64-gnu@0.0.13:
@@ -2884,6 +2914,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
+    requiresBuild: true
     optional: true
 
   /@ice/pack-binding-linux-arm64-musl@0.0.13:
@@ -2892,6 +2923,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     libc: [musl]
+    requiresBuild: true
     optional: true
 
   /@ice/pack-binding-linux-x64-gnu@0.0.13:
@@ -2900,6 +2932,7 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [glibc]
+    requiresBuild: true
     optional: true
 
   /@ice/pack-binding-linux-x64-musl@0.0.13:
@@ -2908,6 +2941,7 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [musl]
+    requiresBuild: true
     optional: true
 
   /@ice/pack-binding-win32-arm64-msvc@0.0.13:
@@ -2915,6 +2949,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
+    requiresBuild: true
     optional: true
 
   /@ice/pack-binding-win32-ia32-msvc@0.0.13:
@@ -2922,6 +2957,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [i686]
     os: [win32]
+    requiresBuild: true
     optional: true
 
   /@ice/pack-binding-win32-x64-msvc@0.0.13:
@@ -2929,6 +2965,7 @@ packages:
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
+    requiresBuild: true
     optional: true
 
   /@ice/pack-binding@0.0.13:
@@ -3030,6 +3067,7 @@ packages:
 
   /@ice/runtime@1.5.6(react-dom@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-t2kbwk30X5Cz31Gifghh+A+10JnYWgf7nX/PrHCvZ99K5+XdZ+dFnKd91b89Tnl0+uuWg8ANjM3gicrbTjlrMA==}
+    requiresBuild: true
     peerDependencies:
       react: ^18.1.0
       react-dom: ^18.1.0
@@ -3190,8 +3228,8 @@ packages:
       - supports-color
     dev: false
 
-  /@knockout-js/ice-urql@0.1.18(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-MGZTLsPh4zv8cEuFN/MtdjmtnCjyt1jN72AvE3SNRWd/0am7YEmlp2lpikN3lzFaN9UVK2vxgVPs3qAHUebZ3Q==}
+  /@knockout-js/ice-urql@0.1.21(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-qscAmr3FaFbWnym9h6evcowzHYKn9f7qJI6feSg7wf397bj28FxRxjI/gRJYPRWkXCvdnDiG/eLrtHbeGOLSyg==}
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
@@ -3216,8 +3254,8 @@ packages:
       - supports-color
     dev: false
 
-  /@knockout-js/layout@0.1.24(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-l8h9AwKzXCcnlD5H6rr21u5Rf+mBmLToCumnxykBabMhvnd01Gttyi0OSCW6PxCcXAyKfiOIHyPeZdCaxJkZYw==}
+  /@knockout-js/layout@0.1.26(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-Q6yPYajbSfLGpPIu3o5WZJD3aVT/686QuS9Qo6/U0IqvZndXikYRdInE/OKhn7g2j7kjge8tLOZQsJN3AZIJwQ==}
     peerDependencies:
       react: ^17 || ^18
     dependencies:
@@ -3229,7 +3267,7 @@ packages:
       '@ice/jsx-runtime': 0.2.2(react@18.3.1)
       '@ice/runtime': 1.5.6(react-dom@18.3.1)(react@18.3.1)
       '@knockout-js/api': 0.1.17(react@18.3.1)
-      '@knockout-js/ice-urql': 0.1.18(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1)
+      '@knockout-js/ice-urql': 0.1.21(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1)
       '@swc/helpers': 0.5.23
       antd: 5.29.3(react-dom@18.3.1)(react@18.3.1)
       dayjs: 1.11.21
@@ -3251,43 +3289,8 @@ packages:
       - supports-color
     dev: false
 
-  /@knockout-js/layout@0.1.25(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-KWbYBEUD/CV0arhr28uKp+4qyiLRci+Z/wXAzZalzCuOaMc7e1o99CjqGQE2avuoBwtuw+U4Aem9o4Vv6kvZkQ==}
-    peerDependencies:
-      react: ^17 || ^18
-    dependencies:
-      '@ant-design/icons': 5.6.1(react-dom@18.3.1)(react@18.3.1)
-      '@ant-design/pro-components': 2.8.10(antd@5.29.3)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
-      '@dnd-kit/core': 6.3.1(react-dom@18.3.1)(react@18.3.1)
-      '@dnd-kit/sortable': 7.0.2(@dnd-kit/core@6.3.1)(react@18.3.1)
-      '@dnd-kit/utilities': 3.2.2(react@18.3.1)
-      '@ice/jsx-runtime': 0.2.2(react@18.3.1)
-      '@ice/runtime': 1.5.6(react-dom@18.3.1)(react@18.3.1)
-      '@knockout-js/api': 0.1.17(react@18.3.1)
-      '@knockout-js/ice-urql': 0.1.18(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1)
-      '@swc/helpers': 0.5.23
-      antd: 5.29.3(react-dom@18.3.1)(react@18.3.1)
-      dayjs: 1.11.21
-      react: 18.3.1
-      react-activation: 0.12.4(prop-types@15.8.1)(react@18.3.1)
-      react-draggable: 4.7.0(react-dom@18.3.1)(react@18.3.1)
-    transitivePeerDependencies:
-      - '@urql/core'
-      - aws-crt
-      - date-fns
-      - debug
-      - graphql
-      - luxon
-      - moment
-      - prop-types
-      - proxy-agent
-      - rc-field-form
-      - react-dom
-      - supports-color
-    dev: false
-
-  /@knockout-js/org@0.1.15(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-gJRRA8FTxGYGZ4nblZNV5yzsgPnh4fAMxI/gXB7CRIthsLeyxLVDy2A8kiVvrbUjlbiVycNX0+nj2luA9qFJDw==}
+  /@knockout-js/org@0.1.17(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-JSVNIXhCX3IzyQ80VkXxqXex07Ncx202p8lt7EqHVsTahQ+83L5jNnF1/Yt7Kufkfm6lfCNUQPGkGREMjmvE2A==}
     peerDependencies:
       react: ^17 || ^18
     dependencies:
@@ -3295,8 +3298,8 @@ packages:
       '@ant-design/pro-components': 2.8.10(antd@5.29.3)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
       '@ice/jsx-runtime': 0.2.2(react@18.3.1)
       '@knockout-js/api': 0.1.17(react@18.3.1)
-      '@knockout-js/ice-urql': 0.1.18(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1)
-      '@knockout-js/layout': 0.1.25(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
+      '@knockout-js/ice-urql': 0.1.21(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1)
+      '@knockout-js/layout': 0.1.26(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
       '@swc/helpers': 0.5.23
       antd: 5.29.3(react-dom@18.3.1)(react@18.3.1)
       react: 18.3.1
@@ -3363,6 +3366,7 @@ packages:
     engines: {node: '>= 10.0.0'}
     cpu: [arm64]
     os: [android]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -3371,6 +3375,7 @@ packages:
     engines: {node: '>= 10.0.0'}
     cpu: [arm64]
     os: [darwin]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -3379,6 +3384,7 @@ packages:
     engines: {node: '>= 10.0.0'}
     cpu: [x64]
     os: [darwin]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -3387,6 +3393,7 @@ packages:
     engines: {node: '>= 10.0.0'}
     cpu: [x64]
     os: [freebsd]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -3396,6 +3403,7 @@ packages:
     cpu: [arm]
     os: [linux]
     libc: [glibc]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -3405,6 +3413,7 @@ packages:
     cpu: [arm]
     os: [linux]
     libc: [musl]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -3414,6 +3423,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -3423,6 +3433,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     libc: [musl]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -3432,6 +3443,7 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [glibc]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -3441,6 +3453,7 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [musl]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -3449,6 +3462,7 @@ packages:
     engines: {node: '>= 10.0.0'}
     cpu: [arm64]
     os: [win32]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -3457,6 +3471,7 @@ packages:
     engines: {node: '>= 10.0.0'}
     cpu: [ia32]
     os: [win32]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -3465,12 +3480,14 @@ packages:
     engines: {node: '>= 10.0.0'}
     cpu: [x64]
     os: [win32]
+    requiresBuild: true
     dev: true
     optional: true
 
   /@parcel/watcher@2.5.6:
     resolution: {integrity: sha512-tmmZ3lQxAe/k/+rNnXQRawJ4NjxO2hqiOLTHvWchtGZULp4RyFeh6aU4XdOYBFe2KE1oShQTv4AblOs2iOrNnQ==}
     engines: {node: '>= 10.0.0'}
+    requiresBuild: true
     dependencies:
       detect-libc: 2.1.2
       is-glob: 4.0.3
@@ -3523,37 +3540,6 @@ packages:
       tslib: 2.8.1
       webcrypto-core: 1.9.2
     dev: true
-
-  /@qeelyn-pb/ims-js@1.0.38(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-UB1NEq2ha0jOFTO7Ae0o/yldJep5uEWiUqWu6i1EpqQ2LtugTDEhlunJgIF+Qn+kNmG7b+VKVqfQ+vmML7FpNg==}
-    peerDependencies:
-      react: ^17 || ^18
-    dependencies:
-      '@ant-design/icons': 5.6.1(react-dom@18.3.1)(react@18.3.1)
-      '@ant-design/pro-components': 2.8.10(antd@5.29.3)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
-      '@ice/jsx-runtime': 0.2.2(react@18.3.1)
-      '@knockout-js/ice-urql': 0.1.18(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1)
-      '@knockout-js/layout': 0.1.24(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
-      '@knockout-js/org': 0.1.15(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
-      '@swc/helpers': 0.5.23
-      antd: 5.29.3(react-dom@18.3.1)(react@18.3.1)
-      dayjs: 1.11.21
-      react: 18.3.1
-      react-draggable: 4.7.0(react-dom@18.3.1)(react@18.3.1)
-    transitivePeerDependencies:
-      - '@urql/core'
-      - aws-crt
-      - date-fns
-      - debug
-      - graphql
-      - luxon
-      - moment
-      - prop-types
-      - proxy-agent
-      - rc-field-form
-      - react-dom
-      - supports-color
-    dev: false
 
   /@rc-component/async-validator@5.1.2:
     resolution: {integrity: sha512-WYbrZSjzznU1ekD0qFq2qRxt309VoS61MTG5npnFQlKYcoy9IzU8T+ZCIhq5bGAXRbXysABFWTspicMfmWFwow==}
@@ -4173,6 +4159,7 @@ packages:
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [darwin]
+    requiresBuild: true
     optional: true
 
   /@swc/core-darwin-x64@1.3.80:
@@ -4180,6 +4167,7 @@ packages:
     engines: {node: '>=10'}
     cpu: [x64]
     os: [darwin]
+    requiresBuild: true
     optional: true
 
   /@swc/core-linux-arm-gnueabihf@1.3.80:
@@ -4187,6 +4175,7 @@ packages:
     engines: {node: '>=10'}
     cpu: [arm]
     os: [linux]
+    requiresBuild: true
     optional: true
 
   /@swc/core-linux-arm64-gnu@1.3.80:
@@ -4195,6 +4184,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
+    requiresBuild: true
     optional: true
 
   /@swc/core-linux-arm64-musl@1.3.80:
@@ -4203,6 +4193,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     libc: [musl]
+    requiresBuild: true
     optional: true
 
   /@swc/core-linux-x64-gnu@1.3.80:
@@ -4211,6 +4202,7 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [glibc]
+    requiresBuild: true
     optional: true
 
   /@swc/core-linux-x64-musl@1.3.80:
@@ -4219,6 +4211,7 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [musl]
+    requiresBuild: true
     optional: true
 
   /@swc/core-win32-arm64-msvc@1.3.80:
@@ -4226,6 +4219,7 @@ packages:
     engines: {node: '>=10'}
     cpu: [arm64]
     os: [win32]
+    requiresBuild: true
     optional: true
 
   /@swc/core-win32-ia32-msvc@1.3.80:
@@ -4233,6 +4227,7 @@ packages:
     engines: {node: '>=10'}
     cpu: [ia32]
     os: [win32]
+    requiresBuild: true
     optional: true
 
   /@swc/core-win32-x64-msvc@1.3.80:
@@ -4240,11 +4235,13 @@ packages:
     engines: {node: '>=10'}
     cpu: [x64]
     os: [win32]
+    requiresBuild: true
     optional: true
 
   /@swc/core@1.3.80(@swc/helpers@0.5.17):
     resolution: {integrity: sha512-yX2xV5I/lYswHHR+44TPvzBgq3/Y8N1YWpTQADYuvSiX3Jxyvemk5Jpx3rRtigYb8WBkWAAf2i5d5ZJ2M7hhgw==}
     engines: {node: '>=10'}
+    requiresBuild: true
     peerDependencies:
       '@swc/helpers': ^0.5.0
     peerDependenciesMeta:
@@ -4644,6 +4641,7 @@ packages:
     engines: {node: '>=14'}
     cpu: [arm64]
     os: [darwin]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4652,6 +4650,7 @@ packages:
     engines: {node: '>=14'}
     cpu: [x64]
     os: [darwin]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4660,6 +4659,7 @@ packages:
     engines: {node: '>=14'}
     cpu: [arm]
     os: [linux]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4668,6 +4668,7 @@ packages:
     engines: {node: '>=14'}
     cpu: [arm64]
     os: [linux]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4676,6 +4677,7 @@ packages:
     engines: {node: '>=14'}
     cpu: [arm64]
     os: [linux]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4684,6 +4686,7 @@ packages:
     engines: {node: '>=14'}
     cpu: [x64]
     os: [linux]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4692,6 +4695,7 @@ packages:
     engines: {node: '>=14'}
     cpu: [x64]
     os: [linux]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4700,6 +4704,7 @@ packages:
     engines: {node: '>=14'}
     cpu: [arm64]
     os: [win32]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -4708,6 +4713,7 @@ packages:
     engines: {node: '>=14'}
     cpu: [x64]
     os: [win32]
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -5580,9 +5586,11 @@ packages:
 
   /core-js-pure@3.49.0:
     resolution: {integrity: sha512-XM4RFka59xATyJv/cS3O3Kml72hQXUeGRuuTmMYFxwzc9/7C8OYTaIR/Ji+Yt8DXzsFLNhat15cE/JP15HrCgw==}
+    requiresBuild: true
 
   /core-js@3.32.0:
     resolution: {integrity: sha512-rd4rYZNlF3WuoYuRIDEmbR/ga9CeuWX9U05umAvgrrZoHY4Z++cp/xwPQMvUpBB4Ag6J8KfD80G0zwCyaSxDww==}
+    requiresBuild: true
 
   /core-util-is@1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
@@ -5640,6 +5648,7 @@ packages:
 
   /crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
+    deprecated: Active development of CryptoJS has been discontinued. This library is no longer maintained.
     dev: false
 
   /css-functions-list@3.3.3:
@@ -5952,6 +5961,7 @@ packages:
   /errno@0.1.8:
     resolution: {integrity: sha512-dJ6oBr5SQ1VSd9qkk7ByRgb/1SH4JZjCHSW/mr63/QcXO9zLVxvJ6Oy13nio03rxpSnVDDjFor75SjVeZWPW/A==}
     hasBin: true
+    requiresBuild: true
     dependencies:
       prr: 1.0.1
     optional: true
@@ -6102,6 +6112,7 @@ packages:
     resolution: {integrity: sha512-XQ0jAPFkK/u3LcVRcvVHQcTIqD6E2H1fvZMA5dQPSOWb3suUbWbfbRf94pjc0bNzRYLfIrDRQXr7X+LHIm5oHw==}
     engines: {node: '>=12'}
     hasBin: true
+    requiresBuild: true
     optionalDependencies:
       '@esbuild/android-arm': 0.17.19
       '@esbuild/android-arm64': 0.17.19
@@ -6637,6 +6648,7 @@ packages:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
+    requiresBuild: true
     optional: true
 
   /function-bind@1.1.2:
@@ -6851,7 +6863,7 @@ packages:
       graphql: ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
       graphql: 16.14.2
-      tslib: 2.6.3
+      tslib: 2.8.1
     dev: true
 
   /graphql-ws@5.16.2(graphql@16.14.2):
@@ -7059,6 +7071,7 @@ packages:
     resolution: {integrity: sha512-6TDAlDPZxUFCv+fuOkIoXT/V/f3Qbq8e37p+YOiYrUv3v9cc3/6x78VdfPgFVaB9dZYeLUfKgHRebpkm/oP2VQ==}
     engines: {node: '>=0.10.0'}
     hasBin: true
+    requiresBuild: true
     optional: true
 
   /immer@9.0.21:
@@ -7808,6 +7821,7 @@ packages:
   /make-dir@2.1.0:
     resolution: {integrity: sha512-LS9X+dc8KLxXCb8dni79fLIIUA5VyZoyjSMCwTluaXA0o27cCK0bhXkpgw+sTXVpPy/lSO57ilRixqk0vDmtRA==}
     engines: {node: '>=6'}
+    requiresBuild: true
     dependencies:
       pify: 4.0.1
       semver: 5.7.2
@@ -7911,6 +7925,7 @@ packages:
     resolution: {integrity: sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg==}
     engines: {node: '>=4'}
     hasBin: true
+    requiresBuild: true
     optional: true
 
   /mime@2.6.0:
@@ -8025,6 +8040,7 @@ packages:
     resolution: {integrity: sha512-6R9fqJ5Zcmf+uYaFgdIHmLwNldn5HbK8L5ybn7Uz+ylX/rnOsSp1AHcvQSrCaFN+qNM1wpymHqD7mVasEOlHGQ==}
     engines: {node: '>= 4.4.x'}
     hasBin: true
+    requiresBuild: true
     dependencies:
       debug: 3.2.7
       iconv-lite: 0.4.24
@@ -8422,6 +8438,7 @@ packages:
   /pify@4.0.1:
     resolution: {integrity: sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g==}
     engines: {node: '>=6'}
+    requiresBuild: true
     optional: true
 
   /pkg-types@1.3.1:
@@ -8524,6 +8541,7 @@ packages:
 
   /prr@1.0.1:
     resolution: {integrity: sha512-yPw4Sng1gWghHQWj0B3ZggWUm4qVbPwPFcRG8KyxiU7J2OHFSoEHKS+EZ3fv5l1t9CyCiop6l/ZYeWbrgoQejw==}
+    requiresBuild: true
     optional: true
 
   /pump@3.0.4:
@@ -9476,6 +9494,7 @@ packages:
   /rs-module-lexer@2.8.0:
     resolution: {integrity: sha512-/KvawAdE1TpykHA2mJwKcqqcgPj0Rqn0Dj7qqClHOTat17yZSmWFtE0eLmpzMnHQrQbPk0hY1e9ppK+3o3M0Uw==}
     engines: {node: '>=14'}
+    requiresBuild: true
     optionalDependencies:
       '@xn-sakina/rml-darwin-arm64': 2.8.0
       '@xn-sakina/rml-darwin-x64': 2.8.0

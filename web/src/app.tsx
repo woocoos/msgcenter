@@ -160,6 +160,9 @@ export const urqlConfig = defineUrqlConfig([
           }
           return false;
         },
+        errTraceId: {
+          isShow: true
+        },
         beforeRefreshTime: 5 * 60 * 1000,
         headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
         login: ICE_LOGIN_URL,

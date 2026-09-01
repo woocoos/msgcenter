@@ -9,13 +9,13 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { OrgKind } from '@knockout-js/api/ucenter';
 import { KeepAlive } from '@knockout-js/layout';
 import { UserSelect } from '@knockout-js/org';
-import { getDate } from '@qeelyn-pb/ims-js/esm/utils';
 import { Modal, Space, Typography } from 'antd';
 import { definePageConfig, useNavigate } from 'ice';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TemplateType } from '@/pages/msg/event';
 import InputMsgEvent from '@/pages/msg/query/components/inputMsgEvent';
+import { getDate } from '@/util';
 
 export default () => {
   const { token } = useToken(),
@@ -83,8 +83,8 @@ export default () => {
           return <UserSelect />;
         },
         render: (text, record) => {
-          return record.users?.map((item: UserInfo) => {
-            return item.name ? item.name : item.email;
+          return record.users?.map((item) => {
+            return item?.name ? item.name : item?.email;
           }).join(',') || '-';
         },
       },

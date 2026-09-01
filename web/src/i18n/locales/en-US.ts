@@ -153,6 +153,7 @@ export default {
     msg_temp_to: 'addressee',
     msg_temp_from: 'addresser',
     msg_temp_format: 'Main body',
+    msg_temp_user_tip: 'After specifying the user ID, this template will only be effective for that user. If the ID is left blank, it will be a tenant-level template.',
     msg_temp_format_tip: 'The body can contain the template syntax for go template',
     attachments_tip: 'Attachments are fixed documents, and variables in attachments are not supported for the time being',
     please_enter_attachment_names: 'Enter attachment names, press Enter to add',

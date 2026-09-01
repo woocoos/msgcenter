@@ -156,6 +156,7 @@ export default {
     msg_temp_to: '收件人',
     msg_temp_from: '发件人',
     msg_temp_format: '正文',
+    msg_temp_user_tip: '指定用户ID后，该模板仅对该用户生效，为空则为租户级模板',
     msg_temp_format_tip: '正文可包含go template的模板语法',
     attachments_tip: '附件为固定文档，暂时不支持附件中的变量',
     please_enter_attachment_names: '请输入附件名称，回车添加',
