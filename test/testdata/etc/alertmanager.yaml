@@ -49,6 +49,10 @@ route:
         - matchers:
             - receiver =~"webhook"
           receiver: webhook
+          continue: true
+        - matchers:
+            - receiver =~"dingtalk"
+          receiver: webhook-dingtalk
     - matchers:
         - event="app:message"
       receiver: internal
@@ -123,6 +127,9 @@ receivers:
   - name: 'internal'
     messageConfig:
       sendResolved: false
+  - name: 'webhook-dingtalk'
+    webhookConfigs:
+      - url: "http://127.0.0.1:10080/webhook"
   - name: 'team-X-pager'
     emailConfigs:
       - to: 'team-X+alerts-critical@example.org'

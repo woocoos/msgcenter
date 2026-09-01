@@ -58,8 +58,11 @@ func main() {
 			return err
 		}
 		api.Update(cfg, func(labels label.LabelSet) {
-			am.Inhibitor.Mutes(labels)
-			am.Silencer.Mutes(labels)
+			ctx := context.Background()
+			if ih := am.Inhibitor.Load(); ih != nil {
+				ih.Mutes(ctx, labels)
+			}
+			am.Silencer.Mutes(ctx, labels)
 		})
 		return nil
 	})

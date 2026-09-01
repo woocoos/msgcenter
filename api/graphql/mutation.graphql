@@ -40,11 +40,11 @@ type Mutation {
     """ 删除订阅 """
     deleteMsgSubscriber(ids: [ID!]!): Boolean!
     """ 创建静默 """
-    createSilence(input: CreateSilenceInput!): Silence!
+    createMsgSilence(input: CreateMsgSilenceInput!): MsgSilence!
     """ 更新静默 """
-    updateSilence(id: ID!, input: UpdateSilenceInput!): Silence!
+    updateMsgSilence(id: ID!, input: UpdateMsgSilenceInput!): MsgSilence!
     """ 删除静默 """
-    deleteSilence(id: ID!): Boolean!
+    deleteMsgSilence(id: ID!): Boolean!
     """ 设置站内信消息已读未读 """
     markMsgInternalToReadOrUnRead(ids: [ID!]!, read: Boolean!): Boolean!
     """ 删除站内信消息 """
@@ -80,6 +80,8 @@ input ReceiverInput {
     name: String!
     emailConfigs: [EmailConfigInput]
     messageConfig: MessageConfigInput
+    webhookConfigs: [WebhookConfigInput]
+    umengConfigs: [UmengConfigInput]
 }
 
 input EmailConfigInput {
@@ -98,4 +100,24 @@ input MessageConfigInput {
     to: String
     subject: String
     redirect: String
+}
+
+input WebhookConfigInput {
+    sendResolved: Boolean
+    receiveType: String
+    secret: String
+    url: String
+    urlFile: String
+    maxAlerts: Int
+    timeout: Duration
+    headers: MapString
+    subject: String
+    body: String
+}
+
+input UmengConfigInput {
+    sendResolved: Boolean
+    apiURL: String
+    apps: UmengApps!
+    productionMode: Boolean
 }

@@ -3,7 +3,6 @@
 package user
 
 import (
-	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -25,8 +24,8 @@ const (
 	Table = "user"
 	// SilencesTable is the table that holds the silences relation/edge.
 	SilencesTable = "msg_silence"
-	// SilencesInverseTable is the table name for the Silence entity.
-	// It exists in this package in order to avoid circular dependency with the "silence" package.
+	// SilencesInverseTable is the table name for the MsgSilence entity.
+	// It exists in this package in order to avoid circular dependency with the "msgsilence" package.
 	SilencesInverseTable = "msg_silence"
 	// SilencesColumn is the table column denoting the silences relation/edge.
 	SilencesColumn = "created_by"
@@ -55,15 +54,6 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
-
-// Note that the variables below are initialized by the runtime
-// package on the initialization of the application. Therefore,
-// it should be imported in the main as follows:
-//
-//	import _ "github.com/woocoos/msgcenter/ent/runtime"
-var (
-	Hooks [1]ent.Hook
-)
 
 // OrderOption defines the ordering options for the User queries.
 type OrderOption func(*sql.Selector)

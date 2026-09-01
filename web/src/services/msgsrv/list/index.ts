@@ -22,6 +22,7 @@ export const EnumNlogReceiverType = {
   email: { text: 'email' },
   message: { text: 'message' },
   webhook: { text: 'webhook' },
+  umeng: { text: 'umeng' },
 };
 
 const queryMsgAlertList = gql(/* GraphQL */`query msgAlertList($first: Int,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){

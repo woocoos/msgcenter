@@ -2,16 +2,34 @@ package email
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/sha256"
 	"crypto/tls"
 	"fmt"
-	"github.com/woocoos/msgcenter/notify"
-	"github.com/woocoos/msgcenter/pkg/alert"
-	"github.com/woocoos/msgcenter/pkg/mail"
-	"github.com/woocoos/msgcenter/pkg/profile"
-	"github.com/woocoos/msgcenter/template"
-	netMail "net/mail"
+	"io"
+	"mime"
+	"net/http"
+	"net/mail"
+	neturl "net/url"
+	"os"
+	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/woocoos/msgcenter/notify"
+	"github.com/woocoos/msgcenter/pkg/alert"
+	pkgmail "github.com/woocoos/msgcenter/pkg/mail"
+	"github.com/woocoos/msgcenter/pkg/profile"
+	"github.com/woocoos/msgcenter/template"
+)
+
+const (
+	// maxAttachmentSize limits the maximum size of a single attachment downloaded from URL.
+	maxAttachmentSize = 50 << 20 // 50 MB
+	// attachmentDownloadTimeout is the timeout for downloading a single attachment from URL.
+	attachmentDownloadTimeout = 30 * time.Second
 )
 
 // Notifier email notifier
@@ -30,9 +48,14 @@ func (n *Notifier) SendResolved() bool {
 
 func New(cfg *profile.EmailConfig, tmpl *template.Template, fn notify.CustomerConfigFunc[profile.EmailConfig],
 ) (*Notifier, error) {
+	hostname, err := os.Hostname()
+	if err != nil {
+		hostname = "localhost.localdomain"
+	}
 	return &Notifier{
 		config:        cfg,
 		tmpl:          tmpl,
+		hostname:      hostname,
 		customTplFunc: fn,
 	}, nil
 }
@@ -40,7 +63,7 @@ func New(cfg *profile.EmailConfig, tmpl *template.Template, fn notify.CustomerCo
 // splitEmailAddresses splits a comma-separated list of email addresses,
 func splitEmailAddresses(s string) ([]string, error) {
 	var addresses []string
-	addrs, err := netMail.ParseAddressList(s)
+	addrs, err := mail.ParseAddressList(s)
 	if err != nil {
 		return nil, err
 	}
@@ -51,6 +74,13 @@ func splitEmailAddresses(s string) ([]string, error) {
 }
 
 func (n *Notifier) getPassword() (string, error) {
+	if n.config.AuthPasswordFile != "" {
+		content, err := os.ReadFile(n.config.AuthPasswordFile)
+		if err != nil {
+			return "", fmt.Errorf("reading auth password file %q: %w", n.config.AuthPasswordFile, err)
+		}
+		return strings.TrimSpace(string(content)), nil
+	}
 	return n.config.AuthPassword, nil
 }
 
@@ -72,18 +102,16 @@ func (n *Notifier) CustomConfig(ctx context.Context) (*profile.EmailConfig, erro
 }
 
 // Notify implements the Notifier interface.
-//
-// It should load customer config from DB and render the template every called.
-// See service.overrideEmailConfig for more details
 func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bool, err error) {
-	email := mail.NewEmailMsg()
+	email := pkgmail.NewEmailMsg()
 	data := notify.GetTemplateData(ctx, n.tmpl, alerts)
 	tmpl := notify.TmplText(n.tmpl, data, &err)
-	// use custom template setting to render the email
+
 	config, err := n.CustomConfig(ctx)
 	if err != nil {
 		return false, err
 	}
+
 	from := tmpl(config.From)
 	if err != nil {
 		return false, fmt.Errorf("execute 'from' template: %w", err)
@@ -106,7 +134,6 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 	}
 	email.SetSubject(sub)
 
-	// choose text format as default
 	if len(config.Text) > 0 {
 		body, err := n.tmpl.ExecuteTextString(config.Text, data)
 		if err != nil {
@@ -124,10 +151,8 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 	for header, t := range config.Headers {
 		switch strings.ToLower(header) {
 		case "attachments":
-			for _, a := range strings.Split(t, ",") {
-				if _, err = email.AttachFile(a); err != nil {
-					return false, err
-				}
+			if err := n.attachFiles(email, strings.Split(t, ",")); err != nil {
+				return false, err
 			}
 		case "cc":
 			value, err := n.tmpl.ExecuteTextString(t, data)
@@ -162,35 +187,186 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 		}
 	}
 
-	// connection level use original config
+	// Attach dynamic attachments from alert annotations.
+	if dynPaths := dynamicAttachmentPaths(alerts); len(dynPaths) > 0 {
+		if err := n.attachFiles(email, dynPaths); err != nil {
+			return false, fmt.Errorf("attach dynamic attachments: %w", err)
+		}
+	}
+
+	// Generate Message-Id if not set by user.
+	if _, ok := config.Headers["Message-Id"]; !ok {
+		var rnd [8]byte
+		rand.Read(rnd[:])
+		msgID := fmt.Sprintf("<%d.%x@%s>", time.Now().UnixNano(), rnd, n.hostname)
+		email.SetHeader("Message-Id", msgID)
+	}
+
+	// Email threading: add References and In-Reply-To headers.
+	if config.Threading.Enabled {
+		key, keyErr := notify.ExtractGroupKey(ctx)
+		if keyErr == nil {
+			h := sha256.Sum256([]byte(key))
+			keyHash := fmt.Sprintf("%x", h[:8])
+			threadBy := ""
+			if config.Threading.ThreadByDate == "daily" {
+				threadBy = time.Now().Format("2006-01-02")
+			}
+			threadRootID := fmt.Sprintf("<alert-%s-%s@msgcenter>", keyHash, threadBy)
+			email.SetHeader("References", threadRootID)
+			email.SetHeader("In-Reply-To", threadRootID)
+		}
+	}
+
+	// Determine TLS mode.
+	useImplicitTLS := false
+	if config.ForceImplicitTLS != nil {
+		useImplicitTLS = *config.ForceImplicitTLS
+	} else {
+		port, _ := strconv.Atoi(config.SmartHost.Port)
+		useImplicitTLS = port == 465
+	}
+
 	var (
 		tlsConfig *tls.Config
-		ect       mail.SMTPEncryptionType
+		ect       pkgmail.SMTPEncryptionType
 	)
-	if n.config.RequireTLS {
-		// new a tls.config
-		tlsConfig, err = n.config.TLSConfig.BuildTlsConfig()
+	if useImplicitTLS {
+		ect = pkgmail.SMTPEncryptionTypeSSLTLS
+		tlsConfig, err = config.TLSConfig.BuildTlsConfig()
 		if err != nil {
 			return false, fmt.Errorf("parse TLS config: %w", err)
 		}
 		if tlsConfig.ServerName == "" {
-			tlsConfig.ServerName = n.config.SmartHost.Host
+			tlsConfig.ServerName = config.SmartHost.Host
 		}
-		ect = mail.SMTPEncryptionTypeSTARTTLS
+	} else if config.RequireTLS {
+		ect = pkgmail.SMTPEncryptionTypeSTARTTLS
+		tlsConfig, err = config.TLSConfig.BuildTlsConfig()
+		if err != nil {
+			return false, fmt.Errorf("parse TLS config: %w", err)
+		}
+		if tlsConfig.ServerName == "" {
+			tlsConfig.ServerName = config.SmartHost.Host
+		}
 	}
-	port, _ := strconv.Atoi(n.config.SmartHost.Port)
+
+	port, _ := strconv.Atoi(config.SmartHost.Port)
 	pwd, err := n.getPassword()
 	if err != nil {
 		return false, fmt.Errorf("get password: %w", err)
 	}
 
-	client := mail.NewSMTPClient(n.config.SmartHost.Host, port)
-	client.SetAuthType(mail.SMTPAuthType(n.config.AuthType)).
-		SetAuthCredentials(n.config.AuthIdentity, n.config.AuthUsername, pwd).
+	client := pkgmail.NewSMTPClient(config.SmartHost.Host, port)
+	client.SetAuthType(pkgmail.SMTPAuthType(config.AuthType)).
+		SetAuthCredentials(config.AuthIdentity, config.AuthUsername, pwd).
 		SetEncryptionType(ect)
 
 	if err := client.SendMail(email, tlsConfig); err != nil {
 		return false, err
 	}
 	return true, nil
+}
+
+// attachFiles attaches files to the email, supporting both local file paths and HTTP(S) URLs.
+func (n *Notifier) attachFiles(email *pkgmail.Email, paths []string) error {
+	for _, p := range paths {
+		p = strings.TrimSpace(p)
+		if p == "" {
+			continue
+		}
+		if strings.HasPrefix(p, "http://") || strings.HasPrefix(p, "https://") {
+			if err := n.attachFromURL(email, p); err != nil {
+				return fmt.Errorf("attach from URL %q: %w", p, err)
+			}
+		} else {
+			if _, err := email.AttachFile(p); err != nil {
+				return fmt.Errorf("attach file %q: %w", p, err)
+			}
+		}
+	}
+	return nil
+}
+
+// attachFromURL downloads a file from the given URL and attaches it to the email.
+func (n *Notifier) attachFromURL(email *pkgmail.Email, rawURL string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), attachmentDownloadTimeout)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
+	if err != nil {
+		return err
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status: %s", resp.Status)
+	}
+
+	reader := io.LimitReader(resp.Body, maxAttachmentSize)
+	filename := filenameFromResponse(resp, rawURL)
+	contentType := resp.Header.Get("Content-Type")
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+
+	_, err = email.Attach(reader, filename, contentType)
+	return err
+}
+
+// filenameFromResponse extracts the attachment filename from the HTTP response.
+// It prefers Content-Disposition header, falling back to the URL path base.
+func filenameFromResponse(resp *http.Response, rawURL string) string {
+	if cd := resp.Header.Get("Content-Disposition"); cd != "" {
+		if _, params, err := mime.ParseMediaType(cd); err == nil {
+			if name, ok := params["filename"]; ok && name != "" {
+				return name
+			}
+		}
+	}
+	if u, err := neturl.Parse(rawURL); err == nil && u.Path != "" {
+		if base := path.Base(u.Path); base != "." && base != "/" {
+			return base
+		}
+	}
+	return "attachment"
+}
+
+// dynamicAttachmentPaths extracts attachment paths from alert annotations.
+// Multiple alerts may carry different attachments; duplicates are preserved
+// and the caller is responsible for deduplication if needed.
+// Relative paths (not starting with http:// or https://) are converted to absolute paths.
+func dynamicAttachmentPaths(alerts []*alert.Alert) []string {
+	var paths []string
+	seen := make(map[string]struct{})
+	for _, a := range alerts {
+		v, ok := a.Annotations[alert.DynamicAttachmentAnnotation]
+		if !ok || v == "" {
+			continue
+		}
+		for _, p := range strings.Split(v, alert.DynamicAttachmentSeparator) {
+			p = strings.TrimSpace(p)
+			if p == "" {
+				continue
+			}
+			if _, dup := seen[p]; dup {
+				continue
+			}
+			seen[p] = struct{}{}
+			// Convert relative paths to absolute paths.
+			// The attachment directory is mounted at the same level as the application runtime directory.
+			if !strings.HasPrefix(p, "http://") && !strings.HasPrefix(p, "https://") {
+				p = strings.TrimPrefix(p, "/")
+				if abs, err := filepath.Abs(p); err == nil {
+					p = abs
+				}
+			}
+			paths = append(paths, p)
+		}
+	}
+	return paths
 }

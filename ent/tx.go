@@ -22,6 +22,8 @@ type Tx struct {
 	MsgInternal *MsgInternalClient
 	// MsgInternalTo is the client for interacting with the MsgInternalTo builders.
 	MsgInternalTo *MsgInternalToClient
+	// MsgSilence is the client for interacting with the MsgSilence builders.
+	MsgSilence *MsgSilenceClient
 	// MsgSubscriber is the client for interacting with the MsgSubscriber builders.
 	MsgSubscriber *MsgSubscriberClient
 	// MsgTemplate is the client for interacting with the MsgTemplate builders.
@@ -36,12 +38,12 @@ type Tx struct {
 	Org *OrgClient
 	// OrgRoleUser is the client for interacting with the OrgRoleUser builders.
 	OrgRoleUser *OrgRoleUserClient
-	// Silence is the client for interacting with the Silence builders.
-	Silence *SilenceClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// UserAddr is the client for interacting with the UserAddr builders.
 	UserAddr *UserAddrClient
+	// UserDevice is the client for interacting with the UserDevice builders.
+	UserDevice *UserDeviceClient
 
 	// lazily loaded.
 	client     *Client
@@ -178,6 +180,7 @@ func (tx *Tx) init() {
 	tx.MsgEvent = NewMsgEventClient(tx.config)
 	tx.MsgInternal = NewMsgInternalClient(tx.config)
 	tx.MsgInternalTo = NewMsgInternalToClient(tx.config)
+	tx.MsgSilence = NewMsgSilenceClient(tx.config)
 	tx.MsgSubscriber = NewMsgSubscriberClient(tx.config)
 	tx.MsgTemplate = NewMsgTemplateClient(tx.config)
 	tx.MsgType = NewMsgTypeClient(tx.config)
@@ -185,9 +188,9 @@ func (tx *Tx) init() {
 	tx.NlogAlert = NewNlogAlertClient(tx.config)
 	tx.Org = NewOrgClient(tx.config)
 	tx.OrgRoleUser = NewOrgRoleUserClient(tx.config)
-	tx.Silence = NewSilenceClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 	tx.UserAddr = NewUserAddrClient(tx.config)
+	tx.UserDevice = NewUserDeviceClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

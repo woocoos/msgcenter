@@ -2,10 +2,14 @@ package ams
 
 import (
 	"context"
+	"fmt"
+	"strconv"
+	"strings"
+
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqljson"
-	"fmt"
+	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/model"
@@ -25,9 +29,10 @@ import (
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service"
-	"strconv"
-	"strings"
+	"go.uber.org/zap"
 )
+
+var logger = log.Component("ams")
 
 type Option func(*Service)
 
@@ -113,6 +118,9 @@ func (s *Service) FormatMsgAlerts(ctx context.Context, after *entgql.Cursor[int]
 		if err != nil {
 			return nil, err
 		}
+		if formatMsgAlert == nil {
+			continue
+		}
 		if formatMsgAlert != nil {
 			formatMsgAlert.HasMultiMsg = hasMultiMsg
 		}
@@ -144,7 +152,8 @@ func (s *Service) formatMsgAlert(ctx context.Context, msgAlert *ent.MsgAlert, ro
 	routeOpt := route.RouteOpts
 	msgTemp, err := s.findMsgTemplate(ctx, routeOpt.Receiver, a)
 	if err != nil {
-		return nil, err
+		logger.Error("find msg template", zap.Error(err), zap.Int("alertID", msgAlert.ID))
+		return nil, nil
 	}
 	// 模板标题
 	if msgTemp != nil {
@@ -181,7 +190,7 @@ func (s *Service) formatMsgAlert(ctx context.Context, msgAlert *ent.MsgAlert, ro
 	// 判断消息是否订阅
 	users := make([]*model.UserInfo, 0)
 	// 取消息体的user
-	uids, err := service.UserIDsFromLabels(labels)
+	uids, err := label.UserIDsFromLabels(labels)
 	if err != nil {
 		return nil, err
 	}
@@ -243,19 +252,24 @@ func (s *Service) convertMsgAlert(msgAlert *ent.MsgAlert) alert.Alert {
 func (s *Service) findMsgTemplate(ctx context.Context, receiver string, a alert.Alert) (*ent.MsgTemplate, error) {
 	var msgTemp *ent.MsgTemplate
 	var err error
+	var rt profile.ReceiverType
 	if strings.HasPrefix(receiver, profile.ReceiverWebhook.String()) {
 		// webhook
-		msgTemp, err = s.am.Coordinator.FindTemplate(ctx, s.client, profile.ReceiverWebhook, a.Labels)
+		rt = profile.ReceiverWebhook
 	} else if strings.HasPrefix(receiver, profile.ReceiverEmail.String()) {
 		// email
-		msgTemp, err = s.am.Coordinator.FindTemplate(ctx, s.client, profile.ReceiverEmail, a.Labels)
+		rt = profile.ReceiverEmail
 	} else if strings.HasPrefix(receiver, profile.ReceiverMessage.String()) {
 		// message
-		msgTemp, err = s.am.Coordinator.FindTemplate(ctx, s.client, profile.ReceiverMessage, a.Labels)
+		rt = profile.ReceiverMessage
+	} else if strings.HasPrefix(receiver, profile.ReceiverUmeng.String()) {
+		// umeng
+		rt = profile.ReceiverUmeng
 	} else {
 		// unknown
 		return nil, fmt.Errorf("unknown receiver")
 	}
+	msgTemp, err = s.am.Coordinator.FindTemplate(ctx, s.client, rt, a.Labels)
 	if err != nil {
 		return nil, err
 	}
@@ -278,6 +292,9 @@ func (s *Service) FormatMsgAlertMore(ctx context.Context, msgAlertID int) ([]*mo
 		formatMsgAlert, err := s.formatMsgAlert(ctx, ma, route)
 		if err != nil {
 			return nil, err
+		}
+		if formatMsgAlert == nil {
+			continue
 		}
 		msgAlerts = append(msgAlerts, formatMsgAlert)
 	}

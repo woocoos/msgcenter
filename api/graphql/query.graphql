@@ -4,6 +4,8 @@ scalar Duration
 scalar LabelName
 """ map[string]string JSON Raw """
 scalar MapString
+""" map[string]*UmengAppConfig JSON Raw """
+scalar UmengApps
 """ host:port """
 scalar HostPort
 
@@ -41,6 +43,8 @@ type Receiver {
     name: String!
     emailConfigs: [EmailConfig]
     messageConfig: MessageConfig
+    webhookConfigs: [WebhookConfig]
+    umengConfigs: [UmengConfig]
 }
 
 type EmailConfig {
@@ -61,6 +65,25 @@ type MessageConfig {
     redirect: String
 }
 
+type WebhookConfig {
+    sendResolved: Boolean
+    receiveType: String
+    url: String
+    urlFile: String
+    maxAlerts: Int
+    timeout: Duration
+    headers: MapString
+    subject: String
+    body: String
+}
+
+type UmengConfig {
+    sendResolved: Boolean
+    apiURL: String
+    apps: UmengApps!
+    productionMode: Boolean
+}
+
 enum RouteStrType {
     Json
     Yaml
@@ -77,6 +100,12 @@ extend type MsgType {
 
 extend type MsgEvent {
     routeStr(type: RouteStrType!): String!
+    """ 订阅的用户 """
+    subscriberUsers:[MsgSubscriber!]!
+    """ 订阅的用户组 """
+    subscriberRoles:[MsgSubscriber!]!
+    """ 排除的用户 """
+    excludeSubscriberUsers:[MsgSubscriber!]!
 }
 
 extend type MsgInternal {
@@ -177,9 +206,9 @@ extend type Query {
         first: Int
         before: Cursor
         last: Int
-        orderBy: SilenceOrder
-        where: SilenceWhereInput
-    ):SilenceConnection!
+        orderBy: MsgSilenceOrder
+        where: MsgSilenceWhereInput
+    ):MsgSilenceConnection!
 
     """消息列表"""
     msgAlerts(

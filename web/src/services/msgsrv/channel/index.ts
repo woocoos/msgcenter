@@ -8,6 +8,7 @@ export const EnumMsgChannelReceiverType = {
   email: { text: 'email' },
   message: { text: 'message' },
   webhook: { text: 'webhook' },
+  umeng: { text: 'umeng' },
 };
 
 export const EnumMsgChannelStatus = {
@@ -49,6 +50,12 @@ const queryMsgChannelReceiverInfo = gql(/* GraphQL */`query msgChannelReceiverIn
         },
         messageConfig{
           redirect,subject,to
+        },
+        webhookConfigs{
+          sendResolved,url,urlFile,maxAlerts,timeout,headers,subject,body
+        },
+        umengConfigs{
+          sendResolved,apiURL,apps,productionMode
         }
       }
     }

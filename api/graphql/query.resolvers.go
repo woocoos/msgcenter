@@ -8,12 +8,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
+	"regexp"
 
 	"entgo.io/contrib/entgql"
 	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/api/graphql/model"
+	"github.com/woocoos/msgcenter/api/graphql/scalars"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msginternal"
@@ -53,6 +57,51 @@ func (r *msgEventResolver) RouteStr(ctx context.Context, obj *ent.MsgEvent, type
 		return "", err
 	}
 	return string(rs), nil
+}
+
+// SubscriberUsers is the resolver for the subscriberUsers field.
+func (r *msgEventResolver) SubscriberUsers(ctx context.Context, obj *ent.MsgEvent) ([]*ent.MsgSubscriber, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.client.MsgSubscriber.Query().Where(
+		msgsubscriber.MsgEventID(obj.ID),
+		msgsubscriber.TenantID(tid),
+		msgsubscriber.Exclude(false),
+		msgsubscriber.UserIDNotNil(),
+		msgsubscriber.OrgRoleIDIsNil(),
+	).All(ctx)
+}
+
+// SubscriberRoles is the resolver for the subscriberRoles field.
+func (r *msgEventResolver) SubscriberRoles(ctx context.Context, obj *ent.MsgEvent) ([]*ent.MsgSubscriber, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.client.MsgSubscriber.Query().Where(
+		msgsubscriber.MsgEventID(obj.ID),
+		msgsubscriber.TenantID(tid),
+		msgsubscriber.Exclude(false),
+		msgsubscriber.UserIDIsNil(),
+		msgsubscriber.OrgRoleIDNotNil(),
+	).All(ctx)
+}
+
+// ExcludeSubscriberUsers is the resolver for the excludeSubscriberUsers field.
+func (r *msgEventResolver) ExcludeSubscriberUsers(ctx context.Context, obj *ent.MsgEvent) ([]*ent.MsgSubscriber, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.client.MsgSubscriber.Query().Where(
+		msgsubscriber.MsgEventID(obj.ID),
+		msgsubscriber.TenantID(tid),
+		msgsubscriber.Exclude(true),
+		msgsubscriber.UserIDNotNil(),
+		msgsubscriber.OrgRoleIDIsNil(),
+	).All(ctx)
 }
 
 // ToSendCounts is the resolver for the toSendCounts field.
@@ -143,10 +192,10 @@ func (r *queryResolver) MsgTemplates(ctx context.Context, after *entgql.Cursor[i
 }
 
 // Silences is the resolver for the silences field.
-func (r *queryResolver) Silences(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SilenceOrder, where *ent.SilenceWhereInput) (*ent.SilenceConnection, error) {
-	return r.client.Silence.Query().Paginate(ctx, after, first, before, last,
-		ent.WithSilenceOrder(orderBy),
-		ent.WithSilenceFilter(where.Filter))
+func (r *queryResolver) Silences(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgSilenceOrder, where *ent.MsgSilenceWhereInput) (*ent.MsgSilenceConnection, error) {
+	return r.client.MsgSilence.Query().Paginate(ctx, after, first, before, last,
+		ent.WithMsgSilenceOrder(orderBy),
+		ent.WithMsgSilenceFilter(where.Filter))
 }
 
 // MsgAlerts is the resolver for the msgAlerts field.
@@ -263,6 +312,18 @@ func (r *queryResolver) UserUnreadMsgInternals(ctx context.Context) (int, error)
 
 // MsgTemplateDefineByName is the resolver for the msgTemplateDefineByName field.
 func (r *queryResolver) MsgTemplateDefineByName(ctx context.Context, format msgtemplate.Format, body string) (string, error) {
+	tplRefRe := regexp.MustCompile(`\{\{-?\s*template\s+"([\w-]+)\.([\w-]+)\.(\w+)"\s+\.\s*-?\}\}`)
+	baseDir := r.coordinator.Template.BaseDir
+	tplDir := r.coordinator.Template.DataDir
+	if matches := tplRefRe.FindStringSubmatch(body); len(matches) == 4 {
+		tenantID := matches[1]
+		tplName := matches[2]
+		filePath := filepath.Join(baseDir, tenantID, tplDir, tplName+".tmpl")
+		if content, err := os.ReadFile(filePath); err == nil {
+			return string(content), nil
+		}
+	}
+
 	data := template.Data{
 		CommonLabels: template.KV{
 			label.TenantLabel: "0",
@@ -290,7 +351,47 @@ func (r *routeResolver) Matchers(ctx context.Context, obj *profile.Route) ([]*la
 	return obj.Matchers, nil
 }
 
+// Apps is the resolver for the apps field.
+func (r *umengConfigResolver) Apps(ctx context.Context, obj *profile.UmengConfig) (scalars.UmengApps, error) {
+	if obj.Apps == nil {
+		return nil, nil
+	}
+	return scalars.UmengApps(obj.Apps), nil
+}
+
+// ReceiveType is the resolver for the receiveType field.
+func (r *webhookConfigResolver) ReceiveType(ctx context.Context, obj *profile.WebhookConfig) (*string, error) {
+	if obj.ReceiveType == "" {
+		return nil, nil
+	}
+	s := string(obj.ReceiveType)
+	return &s, nil
+}
+
+// URL is the resolver for the url field.
+func (r *webhookConfigResolver) URL(ctx context.Context, obj *profile.WebhookConfig) (*string, error) {
+	if obj.URL == nil {
+		return nil, nil
+	}
+	s := obj.URL.String()
+	return &s, nil
+}
+
+// MaxAlerts is the resolver for the maxAlerts field.
+func (r *webhookConfigResolver) MaxAlerts(ctx context.Context, obj *profile.WebhookConfig) (*int, error) {
+	v := int(obj.MaxAlerts)
+	return &v, nil
+}
+
 // Route returns generated.RouteResolver implementation.
 func (r *Resolver) Route() generated.RouteResolver { return &routeResolver{r} }
 
+// UmengConfig returns generated.UmengConfigResolver implementation.
+func (r *Resolver) UmengConfig() generated.UmengConfigResolver { return &umengConfigResolver{r} }
+
+// WebhookConfig returns generated.WebhookConfigResolver implementation.
+func (r *Resolver) WebhookConfig() generated.WebhookConfigResolver { return &webhookConfigResolver{r} }
+
 type routeResolver struct{ *Resolver }
+type umengConfigResolver struct{ *Resolver }
+type webhookConfigResolver struct{ *Resolver }

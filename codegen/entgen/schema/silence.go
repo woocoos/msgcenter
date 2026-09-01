@@ -10,17 +10,17 @@ import (
 	"github.com/woocoos/knockout-go/ent/schemax"
 	gen "github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/intercept"
-	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
+	"github.com/woocoos/msgcenter/service/silence"
 	"github.com/woocoos/msgcenter/version"
 )
 
-// Silence holds the schema definition for the Silence entity.
-type Silence struct {
+// MsgSilence holds the schema definition for the Silence entity.
+type MsgSilence struct {
 	ent.Schema
 }
 
-func (Silence) Annotations() []schema.Annotation {
+func (MsgSilence) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entsql.Annotation{Table: "msg_silence"},
 		entgql.RelayConnection(),
@@ -29,7 +29,7 @@ func (Silence) Annotations() []schema.Annotation {
 	}
 }
 
-func (Silence) Mixin() []ent.Mixin {
+func (MsgSilence) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		schemax.SnowFlakeID{},
 		schemax.AuditMixin{},
@@ -38,8 +38,8 @@ func (Silence) Mixin() []ent.Mixin {
 	}
 }
 
-// Fields of the Silence.
-func (Silence) Fields() []ent.Field {
+// Fields of the MsgSilence.
+func (MsgSilence) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int(schemax.FieldTenantID).Immutable().Comment("租户ID"),
 		field.JSON("matchers", []*label.Matcher{}).Optional().Comment("应用ID").
@@ -48,13 +48,13 @@ func (Silence) Fields() []ent.Field {
 		field.Time("ends_at").Comment("结束时间"),
 		field.String("comments").Optional().Comment("备注").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
-		field.Enum("state").GoType(alert.SilenceState("")).
-			Default(alert.SilenceStateActive.String()).Comment("状态"),
+		field.Enum("state").GoType(silence.SilenceState("")).
+			Default(silence.SilenceStateActive.String()).Comment("状态"),
 	}
 }
 
-// Edges of the Silence.
-func (Silence) Edges() []ent.Edge {
+// Edges of the MsgSilence.
+func (MsgSilence) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("user", User.Type).Ref("silences").Comment("创建人").Unique().
 			Required().Immutable().Field("created_by").

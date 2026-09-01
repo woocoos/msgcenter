@@ -3,6 +3,11 @@ package service
 import (
 	"context"
 	"errors"
+	"net/mail"
+	"path/filepath"
+	"strconv"
+	"strings"
+
 	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent"
@@ -15,9 +20,6 @@ import (
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service/kosdk"
-	"net/mail"
-	"strconv"
-	"strings"
 )
 
 var (
@@ -39,25 +41,8 @@ func tenantIDFromLabels(set label.LabelSet) (int, error) {
 	return tid, nil
 }
 
-// UserIDsFromLabels returns the user IDs from the labels.
-func UserIDsFromLabels(set label.LabelSet) ([]int, error) {
-	ul, ok := set[label.ToUserIDLabel]
-	if !ok {
-		return nil, nil
-	}
-	ids := strings.Split(ul, ",")
-	uis := make([]int, 0, len(ids))
-	for _, id := range ids {
-		uid, _ := strconv.Atoi(id)
-		if uid == 0 {
-			continue
-		}
-		uis = append(uis, uid)
-	}
-	return uis, nil
-}
-
 // findTemplate find template from database
+// Priority: user-level template > tenant-level template > global default template
 func findTemplate(ctx context.Context, basedir, attdir string, client *ent.Client, rt profile.ReceiverType,
 	labels label.LabelSet) (*ent.MsgTemplate, error) {
 	tid, err := tenantIDFromLabels(labels)
@@ -68,33 +53,74 @@ func findTemplate(ctx context.Context, basedir, attdir string, client *ent.Clien
 		return nil, err
 	}
 	en := labels[label.AlertNameLabel]
-	event, err := client.MsgTemplate.Query().Where(msgtemplate.TenantID(tid), msgtemplate.StatusEQ(typex.SimpleStatusActive),
-		msgtemplate.HasEventWith(msgevent.Name(en), msgevent.StatusEQ(typex.SimpleStatusActive)), msgtemplate.ReceiverTypeEQ(rt),
-	).Only(ctx)
-	if err != nil && !ent.IsNotFound(err) {
-		return nil, err
-	}
-	if ent.IsNotFound(err) {
-		// 通过租户找不到模板则取默认模板
-		event, err = client.MsgTemplate.Query().Where(msgtemplate.TenantIDIsNil(), msgtemplate.StatusEQ(typex.SimpleStatusActive),
-			msgtemplate.HasEventWith(msgevent.Name(en), msgevent.StatusEQ(typex.SimpleStatusActive)), msgtemplate.ReceiverTypeEQ(rt),
+
+	// Try user-level template first (only if single user ID in labels)
+	userIDs, _ := label.UserIDsFromLabels(labels)
+	if len(userIDs) == 1 {
+		uid := userIDs[0]
+		event, err := client.MsgTemplate.Query().Where(
+			msgtemplate.TenantID(tid),
+			msgtemplate.UserID(uid),
+			msgtemplate.StatusEQ(typex.SimpleStatusActive),
+			msgtemplate.HasEventWith(msgevent.Name(en), msgevent.StatusEQ(typex.SimpleStatusActive)),
+			msgtemplate.ReceiverTypeEQ(rt),
 		).Only(ctx)
-		if err != nil {
+		if err == nil {
+			return processTemplateAttachments(event, basedir, attdir)
+		}
+		if !ent.IsNotFound(err) {
 			return nil, err
 		}
+		// User-level template not found, fall through to tenant-level
 	}
+
+	// Try tenant-level template
+	event, err := client.MsgTemplate.Query().Where(
+		msgtemplate.TenantID(tid),
+		msgtemplate.UserIDIsNil(),
+		msgtemplate.StatusEQ(typex.SimpleStatusActive),
+		msgtemplate.HasEventWith(msgevent.Name(en), msgevent.StatusEQ(typex.SimpleStatusActive)),
+		msgtemplate.ReceiverTypeEQ(rt),
+	).Only(ctx)
+	if err == nil {
+		return processTemplateAttachments(event, basedir, attdir)
+	}
+	if !ent.IsNotFound(err) {
+		return nil, err
+	}
+
+	// Fall back to global default template (tenant_id IS NULL)
+	event, err = client.MsgTemplate.Query().Where(
+		msgtemplate.TenantIDIsNil(),
+		msgtemplate.UserIDIsNil(),
+		msgtemplate.StatusEQ(typex.SimpleStatusActive),
+		msgtemplate.HasEventWith(msgevent.Name(en), msgevent.StatusEQ(typex.SimpleStatusActive)),
+		msgtemplate.ReceiverTypeEQ(rt),
+	).Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return processTemplateAttachments(event, basedir, attdir)
+}
+
+// processTemplateAttachments replaces remote attachment paths with local paths
+func processTemplateAttachments(event *ent.MsgTemplate, basedir, attdir string) (*ent.MsgTemplate, error) {
 	if event == nil {
 		return nil, nil
 	}
-	// if template has attachments, replace the attachment path
 	if event.Attachments != nil && len(event.Attachments) > 0 {
 		as := make([]string, len(event.Attachments))
 		for i, attacher := range event.Attachments {
-			path, err := kosdk.DefaultFilePath(event.TenantID, attacher, basedir, attdir)
-			if err != nil {
-				return nil, err
+			if strings.Contains(attacher, "://") {
+				path, err := kosdk.DefaultFilePath(event.TenantID, attacher, basedir, attdir)
+				if err != nil {
+					return nil, err
+				}
+				as[i] = path
+			} else {
+				// 按约定，默认模版附件只存储附件名称+后缀
+				as[i] = filepath.Join(basedir, strconv.Itoa(event.TenantID), attdir, attacher)
 			}
-			as[i] = path
 		}
 		event.Attachments = as
 	}
@@ -188,6 +214,15 @@ func overrideWebHookConfig(basedir, attdir string, client *ent.Client) notify.Cu
 		}
 		cfg.Subject = data.Subject
 		cfg.Body = data.Body
+		return nil
+	}
+}
+
+func overrideUmengConfig(basedir, attdir string, client *ent.Client) notify.CustomerConfigFunc[profile.UmengConfig] {
+	return func(ctx context.Context, cfg *profile.UmengConfig, set label.LabelSet,
+	) error {
+		// Umeng config does not support template overrides from database.
+		// Template rendering is handled in the notifier using default templates.
 		return nil
 	}
 }

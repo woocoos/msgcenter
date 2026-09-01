@@ -35,6 +35,8 @@ const (
 	FieldMsgEventID = "msg_event_id"
 	// FieldTenantID holds the string denoting the tenant_id field in the database.
 	FieldTenantID = "tenant_id"
+	// FieldUserID holds the string denoting the user_id field in the database.
+	FieldUserID = "user_id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldStatus holds the string denoting the status field in the database.
@@ -84,6 +86,7 @@ var Columns = []string{
 	FieldMsgTypeID,
 	FieldMsgEventID,
 	FieldTenantID,
+	FieldUserID,
 	FieldName,
 	FieldStatus,
 	FieldReceiverType,
@@ -137,7 +140,7 @@ func StatusValidator(s typex.SimpleStatus) error {
 // ReceiverTypeValidator is a validator for the "receiver_type" field enum values. It is called by the builders before save.
 func ReceiverTypeValidator(rt profile.ReceiverType) error {
 	switch rt.String() {
-	case "email", "message", "webhook":
+	case "email", "message", "webhook", "umeng":
 		return nil
 	default:
 		return fmt.Errorf("msgtemplate: invalid enum value for receiver_type field: %q", rt)
@@ -208,6 +211,11 @@ func ByMsgEventID(opts ...sql.OrderTermOption) OrderOption {
 // ByTenantID orders the results by the tenant_id field.
 func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
+}
+
+// ByUserID orders the results by the user_id field.
+func ByUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserID, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.

@@ -15,8 +15,6 @@
 test/tmp
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
-cmd/msgsrv/data/
-cmd/ams/files
 
 *.idea/
 .run
@@ -27,4 +25,10 @@ cmd/ams/files
 # Go workspace file
 go.work*
 
+# AI
+.qwen
+.claude
+
 # misc
+cmd/msgsrv/data/
+cmd/ams/files

@@ -5,10 +5,11 @@ package main
 import (
 	"context"
 	"flag"
+	"log"
+
 	"github.com/woocoos/knockout-go/codegen/entx"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/migrate"
-	"log"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -32,7 +33,7 @@ func main() {
 		migrate.WithDropIndex(true),
 		migrate.WithDropColumn(true),
 		migrate.WithForeignKeys(false),
-		entx.SkipTablesDiffHook("user", "org", "org_role_user", "user_addr"),
+		entx.SkipTablesDiffHook("user", "org", "org_role_user", "user_addr", "user_device"),
 	)
 	if err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)

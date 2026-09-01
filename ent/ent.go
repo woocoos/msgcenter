@@ -17,6 +17,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
+	"github.com/woocoos/msgcenter/ent/msgsilence"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -24,9 +25,9 @@ import (
 	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
-	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
+	"github.com/woocoos/msgcenter/ent/userdevice"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -92,6 +93,7 @@ func checkColumn(t, c string) error {
 			msgevent.Table:      msgevent.ValidColumn,
 			msginternal.Table:   msginternal.ValidColumn,
 			msginternalto.Table: msginternalto.ValidColumn,
+			msgsilence.Table:    msgsilence.ValidColumn,
 			msgsubscriber.Table: msgsubscriber.ValidColumn,
 			msgtemplate.Table:   msgtemplate.ValidColumn,
 			msgtype.Table:       msgtype.ValidColumn,
@@ -99,9 +101,9 @@ func checkColumn(t, c string) error {
 			nlogalert.Table:     nlogalert.ValidColumn,
 			org.Table:           org.ValidColumn,
 			orgroleuser.Table:   orgroleuser.ValidColumn,
-			silence.Table:       silence.ValidColumn,
 			user.Table:          user.ValidColumn,
 			useraddr.Table:      useraddr.ValidColumn,
+			userdevice.Table:    userdevice.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

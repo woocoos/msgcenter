@@ -11,34 +11,34 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/msgcenter/ent/silence"
+	"github.com/woocoos/msgcenter/ent/msgsilence"
 	"github.com/woocoos/msgcenter/ent/user"
-	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
+	"github.com/woocoos/msgcenter/service/silence"
 )
 
-// SilenceCreate is the builder for creating a Silence entity.
-type SilenceCreate struct {
+// MsgSilenceCreate is the builder for creating a MsgSilence entity.
+type MsgSilenceCreate struct {
 	config
-	mutation *SilenceMutation
+	mutation *MsgSilenceMutation
 	hooks    []Hook
 	conflict []sql.ConflictOption
 }
 
 // SetCreatedBy sets the "created_by" field.
-func (_c *SilenceCreate) SetCreatedBy(v int) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetCreatedBy(v int) *MsgSilenceCreate {
 	_c.mutation.SetCreatedBy(v)
 	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (_c *SilenceCreate) SetCreatedAt(v time.Time) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetCreatedAt(v time.Time) *MsgSilenceCreate {
 	_c.mutation.SetCreatedAt(v)
 	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (_c *SilenceCreate) SetNillableCreatedAt(v *time.Time) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetNillableCreatedAt(v *time.Time) *MsgSilenceCreate {
 	if v != nil {
 		_c.SetCreatedAt(*v)
 	}
@@ -46,13 +46,13 @@ func (_c *SilenceCreate) SetNillableCreatedAt(v *time.Time) *SilenceCreate {
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (_c *SilenceCreate) SetUpdatedBy(v int) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetUpdatedBy(v int) *MsgSilenceCreate {
 	_c.mutation.SetUpdatedBy(v)
 	return _c
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (_c *SilenceCreate) SetNillableUpdatedBy(v *int) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetNillableUpdatedBy(v *int) *MsgSilenceCreate {
 	if v != nil {
 		_c.SetUpdatedBy(*v)
 	}
@@ -60,13 +60,13 @@ func (_c *SilenceCreate) SetNillableUpdatedBy(v *int) *SilenceCreate {
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (_c *SilenceCreate) SetUpdatedAt(v time.Time) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetUpdatedAt(v time.Time) *MsgSilenceCreate {
 	_c.mutation.SetUpdatedAt(v)
 	return _c
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (_c *SilenceCreate) SetNillableUpdatedAt(v *time.Time) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetNillableUpdatedAt(v *time.Time) *MsgSilenceCreate {
 	if v != nil {
 		_c.SetUpdatedAt(*v)
 	}
@@ -74,37 +74,37 @@ func (_c *SilenceCreate) SetNillableUpdatedAt(v *time.Time) *SilenceCreate {
 }
 
 // SetTenantID sets the "tenant_id" field.
-func (_c *SilenceCreate) SetTenantID(v int) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetTenantID(v int) *MsgSilenceCreate {
 	_c.mutation.SetTenantID(v)
 	return _c
 }
 
 // SetMatchers sets the "matchers" field.
-func (_c *SilenceCreate) SetMatchers(v []*label.Matcher) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetMatchers(v []*label.Matcher) *MsgSilenceCreate {
 	_c.mutation.SetMatchers(v)
 	return _c
 }
 
 // SetStartsAt sets the "starts_at" field.
-func (_c *SilenceCreate) SetStartsAt(v time.Time) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetStartsAt(v time.Time) *MsgSilenceCreate {
 	_c.mutation.SetStartsAt(v)
 	return _c
 }
 
 // SetEndsAt sets the "ends_at" field.
-func (_c *SilenceCreate) SetEndsAt(v time.Time) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetEndsAt(v time.Time) *MsgSilenceCreate {
 	_c.mutation.SetEndsAt(v)
 	return _c
 }
 
 // SetComments sets the "comments" field.
-func (_c *SilenceCreate) SetComments(v string) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetComments(v string) *MsgSilenceCreate {
 	_c.mutation.SetComments(v)
 	return _c
 }
 
 // SetNillableComments sets the "comments" field if the given value is not nil.
-func (_c *SilenceCreate) SetNillableComments(v *string) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetNillableComments(v *string) *MsgSilenceCreate {
 	if v != nil {
 		_c.SetComments(*v)
 	}
@@ -112,13 +112,13 @@ func (_c *SilenceCreate) SetNillableComments(v *string) *SilenceCreate {
 }
 
 // SetState sets the "state" field.
-func (_c *SilenceCreate) SetState(v alert.SilenceState) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetState(v silence.SilenceState) *MsgSilenceCreate {
 	_c.mutation.SetState(v)
 	return _c
 }
 
 // SetNillableState sets the "state" field if the given value is not nil.
-func (_c *SilenceCreate) SetNillableState(v *alert.SilenceState) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetNillableState(v *silence.SilenceState) *MsgSilenceCreate {
 	if v != nil {
 		_c.SetState(*v)
 	}
@@ -126,13 +126,13 @@ func (_c *SilenceCreate) SetNillableState(v *alert.SilenceState) *SilenceCreate 
 }
 
 // SetID sets the "id" field.
-func (_c *SilenceCreate) SetID(v int) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetID(v int) *MsgSilenceCreate {
 	_c.mutation.SetID(v)
 	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (_c *SilenceCreate) SetNillableID(v *int) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetNillableID(v *int) *MsgSilenceCreate {
 	if v != nil {
 		_c.SetID(*v)
 	}
@@ -140,23 +140,23 @@ func (_c *SilenceCreate) SetNillableID(v *int) *SilenceCreate {
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (_c *SilenceCreate) SetUserID(id int) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetUserID(id int) *MsgSilenceCreate {
 	_c.mutation.SetUserID(id)
 	return _c
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (_c *SilenceCreate) SetUser(v *User) *SilenceCreate {
+func (_c *MsgSilenceCreate) SetUser(v *User) *MsgSilenceCreate {
 	return _c.SetUserID(v.ID)
 }
 
-// Mutation returns the SilenceMutation object of the builder.
-func (_c *SilenceCreate) Mutation() *SilenceMutation {
+// Mutation returns the MsgSilenceMutation object of the builder.
+func (_c *MsgSilenceCreate) Mutation() *MsgSilenceMutation {
 	return _c.mutation
 }
 
-// Save creates the Silence in the database.
-func (_c *SilenceCreate) Save(ctx context.Context) (*Silence, error) {
+// Save creates the MsgSilence in the database.
+func (_c *MsgSilenceCreate) Save(ctx context.Context) (*MsgSilence, error) {
 	if err := _c.defaults(); err != nil {
 		return nil, err
 	}
@@ -164,7 +164,7 @@ func (_c *SilenceCreate) Save(ctx context.Context) (*Silence, error) {
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (_c *SilenceCreate) SaveX(ctx context.Context) *Silence {
+func (_c *MsgSilenceCreate) SaveX(ctx context.Context) *MsgSilence {
 	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -173,73 +173,73 @@ func (_c *SilenceCreate) SaveX(ctx context.Context) *Silence {
 }
 
 // Exec executes the query.
-func (_c *SilenceCreate) Exec(ctx context.Context) error {
+func (_c *MsgSilenceCreate) Exec(ctx context.Context) error {
 	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_c *SilenceCreate) ExecX(ctx context.Context) {
+func (_c *MsgSilenceCreate) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (_c *SilenceCreate) defaults() error {
+func (_c *MsgSilenceCreate) defaults() error {
 	if _, ok := _c.mutation.CreatedAt(); !ok {
-		if silence.DefaultCreatedAt == nil {
-			return fmt.Errorf("ent: uninitialized silence.DefaultCreatedAt (forgotten import ent/runtime?)")
+		if msgsilence.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized msgsilence.DefaultCreatedAt (forgotten import ent/runtime?)")
 		}
-		v := silence.DefaultCreatedAt()
+		v := msgsilence.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
 	}
 	if _, ok := _c.mutation.State(); !ok {
-		v := silence.DefaultState
+		v := msgsilence.DefaultState
 		_c.mutation.SetState(v)
 	}
 	if _, ok := _c.mutation.ID(); !ok {
-		if silence.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized silence.DefaultID (forgotten import ent/runtime?)")
+		if msgsilence.DefaultID == nil {
+			return fmt.Errorf("ent: uninitialized msgsilence.DefaultID (forgotten import ent/runtime?)")
 		}
-		v := silence.DefaultID()
+		v := msgsilence.DefaultID()
 		_c.mutation.SetID(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (_c *SilenceCreate) check() error {
+func (_c *MsgSilenceCreate) check() error {
 	if _, ok := _c.mutation.CreatedBy(); !ok {
-		return &ValidationError{Name: "created_by", err: errors.New(`ent: missing required field "Silence.created_by"`)}
+		return &ValidationError{Name: "created_by", err: errors.New(`ent: missing required field "MsgSilence.created_by"`)}
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Silence.created_at"`)}
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "MsgSilence.created_at"`)}
 	}
 	if _, ok := _c.mutation.TenantID(); !ok {
-		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "Silence.tenant_id"`)}
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "MsgSilence.tenant_id"`)}
 	}
 	if _, ok := _c.mutation.StartsAt(); !ok {
-		return &ValidationError{Name: "starts_at", err: errors.New(`ent: missing required field "Silence.starts_at"`)}
+		return &ValidationError{Name: "starts_at", err: errors.New(`ent: missing required field "MsgSilence.starts_at"`)}
 	}
 	if _, ok := _c.mutation.EndsAt(); !ok {
-		return &ValidationError{Name: "ends_at", err: errors.New(`ent: missing required field "Silence.ends_at"`)}
+		return &ValidationError{Name: "ends_at", err: errors.New(`ent: missing required field "MsgSilence.ends_at"`)}
 	}
 	if _, ok := _c.mutation.State(); !ok {
-		return &ValidationError{Name: "state", err: errors.New(`ent: missing required field "Silence.state"`)}
+		return &ValidationError{Name: "state", err: errors.New(`ent: missing required field "MsgSilence.state"`)}
 	}
 	if v, ok := _c.mutation.State(); ok {
-		if err := silence.StateValidator(v); err != nil {
-			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "Silence.state": %w`, err)}
+		if err := msgsilence.StateValidator(v); err != nil {
+			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "MsgSilence.state": %w`, err)}
 		}
 	}
 	if len(_c.mutation.UserIDs()) == 0 {
-		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Silence.user"`)}
+		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "MsgSilence.user"`)}
 	}
 	return nil
 }
 
-func (_c *SilenceCreate) sqlSave(ctx context.Context) (*Silence, error) {
+func (_c *MsgSilenceCreate) sqlSave(ctx context.Context) (*MsgSilence, error) {
 	if err := _c.check(); err != nil {
 		return nil, err
 	}
@@ -259,65 +259,65 @@ func (_c *SilenceCreate) sqlSave(ctx context.Context) (*Silence, error) {
 	return _node, nil
 }
 
-func (_c *SilenceCreate) createSpec() (*Silence, *sqlgraph.CreateSpec) {
+func (_c *MsgSilenceCreate) createSpec() (*MsgSilence, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Silence{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(silence.Table, sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt))
+		_node = &MsgSilence{config: _c.config}
+		_spec = sqlgraph.NewCreateSpec(msgsilence.Table, sqlgraph.NewFieldSpec(msgsilence.FieldID, field.TypeInt))
 	)
-	_spec.Schema = _c.schemaConfig.Silence
+	_spec.Schema = _c.schemaConfig.MsgSilence
 	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
-		_spec.SetField(silence.FieldCreatedAt, field.TypeTime, value)
+		_spec.SetField(msgsilence.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := _c.mutation.UpdatedBy(); ok {
-		_spec.SetField(silence.FieldUpdatedBy, field.TypeInt, value)
+		_spec.SetField(msgsilence.FieldUpdatedBy, field.TypeInt, value)
 		_node.UpdatedBy = value
 	}
 	if value, ok := _c.mutation.UpdatedAt(); ok {
-		_spec.SetField(silence.FieldUpdatedAt, field.TypeTime, value)
+		_spec.SetField(msgsilence.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
 	if value, ok := _c.mutation.TenantID(); ok {
-		_spec.SetField(silence.FieldTenantID, field.TypeInt, value)
+		_spec.SetField(msgsilence.FieldTenantID, field.TypeInt, value)
 		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.Matchers(); ok {
-		_spec.SetField(silence.FieldMatchers, field.TypeJSON, value)
+		_spec.SetField(msgsilence.FieldMatchers, field.TypeJSON, value)
 		_node.Matchers = value
 	}
 	if value, ok := _c.mutation.StartsAt(); ok {
-		_spec.SetField(silence.FieldStartsAt, field.TypeTime, value)
+		_spec.SetField(msgsilence.FieldStartsAt, field.TypeTime, value)
 		_node.StartsAt = value
 	}
 	if value, ok := _c.mutation.EndsAt(); ok {
-		_spec.SetField(silence.FieldEndsAt, field.TypeTime, value)
+		_spec.SetField(msgsilence.FieldEndsAt, field.TypeTime, value)
 		_node.EndsAt = value
 	}
 	if value, ok := _c.mutation.Comments(); ok {
-		_spec.SetField(silence.FieldComments, field.TypeString, value)
+		_spec.SetField(msgsilence.FieldComments, field.TypeString, value)
 		_node.Comments = value
 	}
 	if value, ok := _c.mutation.State(); ok {
-		_spec.SetField(silence.FieldState, field.TypeEnum, value)
+		_spec.SetField(msgsilence.FieldState, field.TypeEnum, value)
 		_node.State = value
 	}
 	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   silence.UserTable,
-			Columns: []string{silence.UserColumn},
+			Table:   msgsilence.UserTable,
+			Columns: []string{msgsilence.UserColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = _c.schemaConfig.Silence
+		edge.Schema = _c.schemaConfig.MsgSilence
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -330,7 +330,7 @@ func (_c *SilenceCreate) createSpec() (*Silence, *sqlgraph.CreateSpec) {
 // OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
 // of the `INSERT` statement. For example:
 //
-//	client.Silence.Create().
+//	client.MsgSilence.Create().
 //		SetCreatedBy(v).
 //		OnConflict(
 //			// Update the row with the new values
@@ -339,13 +339,13 @@ func (_c *SilenceCreate) createSpec() (*Silence, *sqlgraph.CreateSpec) {
 //		).
 //		// Override some of the fields with custom
 //		// update values.
-//		Update(func(u *ent.SilenceUpsert) {
+//		Update(func(u *ent.MsgSilenceUpsert) {
 //			SetCreatedBy(v+v).
 //		}).
 //		Exec(ctx)
-func (_c *SilenceCreate) OnConflict(opts ...sql.ConflictOption) *SilenceUpsertOne {
+func (_c *MsgSilenceCreate) OnConflict(opts ...sql.ConflictOption) *MsgSilenceUpsertOne {
 	_c.conflict = opts
-	return &SilenceUpsertOne{
+	return &MsgSilenceUpsertOne{
 		create: _c,
 	}
 }
@@ -353,168 +353,168 @@ func (_c *SilenceCreate) OnConflict(opts ...sql.ConflictOption) *SilenceUpsertOn
 // OnConflictColumns calls `OnConflict` and configures the columns
 // as conflict target. Using this option is equivalent to using:
 //
-//	client.Silence.Create().
+//	client.MsgSilence.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (_c *SilenceCreate) OnConflictColumns(columns ...string) *SilenceUpsertOne {
+func (_c *MsgSilenceCreate) OnConflictColumns(columns ...string) *MsgSilenceUpsertOne {
 	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
-	return &SilenceUpsertOne{
+	return &MsgSilenceUpsertOne{
 		create: _c,
 	}
 }
 
 type (
-	// SilenceUpsertOne is the builder for "upsert"-ing
-	//  one Silence node.
-	SilenceUpsertOne struct {
-		create *SilenceCreate
+	// MsgSilenceUpsertOne is the builder for "upsert"-ing
+	//  one MsgSilence node.
+	MsgSilenceUpsertOne struct {
+		create *MsgSilenceCreate
 	}
 
-	// SilenceUpsert is the "OnConflict" setter.
-	SilenceUpsert struct {
+	// MsgSilenceUpsert is the "OnConflict" setter.
+	MsgSilenceUpsert struct {
 		*sql.UpdateSet
 	}
 )
 
 // SetUpdatedBy sets the "updated_by" field.
-func (u *SilenceUpsert) SetUpdatedBy(v int) *SilenceUpsert {
-	u.Set(silence.FieldUpdatedBy, v)
+func (u *MsgSilenceUpsert) SetUpdatedBy(v int) *MsgSilenceUpsert {
+	u.Set(msgsilence.FieldUpdatedBy, v)
 	return u
 }
 
 // UpdateUpdatedBy sets the "updated_by" field to the value that was provided on create.
-func (u *SilenceUpsert) UpdateUpdatedBy() *SilenceUpsert {
-	u.SetExcluded(silence.FieldUpdatedBy)
+func (u *MsgSilenceUpsert) UpdateUpdatedBy() *MsgSilenceUpsert {
+	u.SetExcluded(msgsilence.FieldUpdatedBy)
 	return u
 }
 
 // AddUpdatedBy adds v to the "updated_by" field.
-func (u *SilenceUpsert) AddUpdatedBy(v int) *SilenceUpsert {
-	u.Add(silence.FieldUpdatedBy, v)
+func (u *MsgSilenceUpsert) AddUpdatedBy(v int) *MsgSilenceUpsert {
+	u.Add(msgsilence.FieldUpdatedBy, v)
 	return u
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (u *SilenceUpsert) ClearUpdatedBy() *SilenceUpsert {
-	u.SetNull(silence.FieldUpdatedBy)
+func (u *MsgSilenceUpsert) ClearUpdatedBy() *MsgSilenceUpsert {
+	u.SetNull(msgsilence.FieldUpdatedBy)
 	return u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (u *SilenceUpsert) SetUpdatedAt(v time.Time) *SilenceUpsert {
-	u.Set(silence.FieldUpdatedAt, v)
+func (u *MsgSilenceUpsert) SetUpdatedAt(v time.Time) *MsgSilenceUpsert {
+	u.Set(msgsilence.FieldUpdatedAt, v)
 	return u
 }
 
 // UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
-func (u *SilenceUpsert) UpdateUpdatedAt() *SilenceUpsert {
-	u.SetExcluded(silence.FieldUpdatedAt)
+func (u *MsgSilenceUpsert) UpdateUpdatedAt() *MsgSilenceUpsert {
+	u.SetExcluded(msgsilence.FieldUpdatedAt)
 	return u
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (u *SilenceUpsert) ClearUpdatedAt() *SilenceUpsert {
-	u.SetNull(silence.FieldUpdatedAt)
+func (u *MsgSilenceUpsert) ClearUpdatedAt() *MsgSilenceUpsert {
+	u.SetNull(msgsilence.FieldUpdatedAt)
 	return u
 }
 
 // SetMatchers sets the "matchers" field.
-func (u *SilenceUpsert) SetMatchers(v []*label.Matcher) *SilenceUpsert {
-	u.Set(silence.FieldMatchers, v)
+func (u *MsgSilenceUpsert) SetMatchers(v []*label.Matcher) *MsgSilenceUpsert {
+	u.Set(msgsilence.FieldMatchers, v)
 	return u
 }
 
 // UpdateMatchers sets the "matchers" field to the value that was provided on create.
-func (u *SilenceUpsert) UpdateMatchers() *SilenceUpsert {
-	u.SetExcluded(silence.FieldMatchers)
+func (u *MsgSilenceUpsert) UpdateMatchers() *MsgSilenceUpsert {
+	u.SetExcluded(msgsilence.FieldMatchers)
 	return u
 }
 
 // ClearMatchers clears the value of the "matchers" field.
-func (u *SilenceUpsert) ClearMatchers() *SilenceUpsert {
-	u.SetNull(silence.FieldMatchers)
+func (u *MsgSilenceUpsert) ClearMatchers() *MsgSilenceUpsert {
+	u.SetNull(msgsilence.FieldMatchers)
 	return u
 }
 
 // SetStartsAt sets the "starts_at" field.
-func (u *SilenceUpsert) SetStartsAt(v time.Time) *SilenceUpsert {
-	u.Set(silence.FieldStartsAt, v)
+func (u *MsgSilenceUpsert) SetStartsAt(v time.Time) *MsgSilenceUpsert {
+	u.Set(msgsilence.FieldStartsAt, v)
 	return u
 }
 
 // UpdateStartsAt sets the "starts_at" field to the value that was provided on create.
-func (u *SilenceUpsert) UpdateStartsAt() *SilenceUpsert {
-	u.SetExcluded(silence.FieldStartsAt)
+func (u *MsgSilenceUpsert) UpdateStartsAt() *MsgSilenceUpsert {
+	u.SetExcluded(msgsilence.FieldStartsAt)
 	return u
 }
 
 // SetEndsAt sets the "ends_at" field.
-func (u *SilenceUpsert) SetEndsAt(v time.Time) *SilenceUpsert {
-	u.Set(silence.FieldEndsAt, v)
+func (u *MsgSilenceUpsert) SetEndsAt(v time.Time) *MsgSilenceUpsert {
+	u.Set(msgsilence.FieldEndsAt, v)
 	return u
 }
 
 // UpdateEndsAt sets the "ends_at" field to the value that was provided on create.
-func (u *SilenceUpsert) UpdateEndsAt() *SilenceUpsert {
-	u.SetExcluded(silence.FieldEndsAt)
+func (u *MsgSilenceUpsert) UpdateEndsAt() *MsgSilenceUpsert {
+	u.SetExcluded(msgsilence.FieldEndsAt)
 	return u
 }
 
 // SetComments sets the "comments" field.
-func (u *SilenceUpsert) SetComments(v string) *SilenceUpsert {
-	u.Set(silence.FieldComments, v)
+func (u *MsgSilenceUpsert) SetComments(v string) *MsgSilenceUpsert {
+	u.Set(msgsilence.FieldComments, v)
 	return u
 }
 
 // UpdateComments sets the "comments" field to the value that was provided on create.
-func (u *SilenceUpsert) UpdateComments() *SilenceUpsert {
-	u.SetExcluded(silence.FieldComments)
+func (u *MsgSilenceUpsert) UpdateComments() *MsgSilenceUpsert {
+	u.SetExcluded(msgsilence.FieldComments)
 	return u
 }
 
 // ClearComments clears the value of the "comments" field.
-func (u *SilenceUpsert) ClearComments() *SilenceUpsert {
-	u.SetNull(silence.FieldComments)
+func (u *MsgSilenceUpsert) ClearComments() *MsgSilenceUpsert {
+	u.SetNull(msgsilence.FieldComments)
 	return u
 }
 
 // SetState sets the "state" field.
-func (u *SilenceUpsert) SetState(v alert.SilenceState) *SilenceUpsert {
-	u.Set(silence.FieldState, v)
+func (u *MsgSilenceUpsert) SetState(v silence.SilenceState) *MsgSilenceUpsert {
+	u.Set(msgsilence.FieldState, v)
 	return u
 }
 
 // UpdateState sets the "state" field to the value that was provided on create.
-func (u *SilenceUpsert) UpdateState() *SilenceUpsert {
-	u.SetExcluded(silence.FieldState)
+func (u *MsgSilenceUpsert) UpdateState() *MsgSilenceUpsert {
+	u.SetExcluded(msgsilence.FieldState)
 	return u
 }
 
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
-//	client.Silence.Create().
+//	client.MsgSilence.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
 //			sql.ResolveWith(func(u *sql.UpdateSet) {
-//				u.SetIgnore(silence.FieldID)
+//				u.SetIgnore(msgsilence.FieldID)
 //			}),
 //		).
 //		Exec(ctx)
-func (u *SilenceUpsertOne) UpdateNewValues() *SilenceUpsertOne {
+func (u *MsgSilenceUpsertOne) UpdateNewValues() *MsgSilenceUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		if _, exists := u.create.mutation.ID(); exists {
-			s.SetIgnore(silence.FieldID)
+			s.SetIgnore(msgsilence.FieldID)
 		}
 		if _, exists := u.create.mutation.CreatedBy(); exists {
-			s.SetIgnore(silence.FieldCreatedBy)
+			s.SetIgnore(msgsilence.FieldCreatedBy)
 		}
 		if _, exists := u.create.mutation.CreatedAt(); exists {
-			s.SetIgnore(silence.FieldCreatedAt)
+			s.SetIgnore(msgsilence.FieldCreatedAt)
 		}
 		if _, exists := u.create.mutation.TenantID(); exists {
-			s.SetIgnore(silence.FieldTenantID)
+			s.SetIgnore(msgsilence.FieldTenantID)
 		}
 	}))
 	return u
@@ -523,180 +523,180 @@ func (u *SilenceUpsertOne) UpdateNewValues() *SilenceUpsertOne {
 // Ignore sets each column to itself in case of conflict.
 // Using this option is equivalent to using:
 //
-//	client.Silence.Create().
+//	client.MsgSilence.Create().
 //	    OnConflict(sql.ResolveWithIgnore()).
 //	    Exec(ctx)
-func (u *SilenceUpsertOne) Ignore() *SilenceUpsertOne {
+func (u *MsgSilenceUpsertOne) Ignore() *MsgSilenceUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
 	return u
 }
 
 // DoNothing configures the conflict_action to `DO NOTHING`.
 // Supported only by SQLite and PostgreSQL.
-func (u *SilenceUpsertOne) DoNothing() *SilenceUpsertOne {
+func (u *MsgSilenceUpsertOne) DoNothing() *MsgSilenceUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.DoNothing())
 	return u
 }
 
-// Update allows overriding fields `UPDATE` values. See the SilenceCreate.OnConflict
+// Update allows overriding fields `UPDATE` values. See the MsgSilenceCreate.OnConflict
 // documentation for more info.
-func (u *SilenceUpsertOne) Update(set func(*SilenceUpsert)) *SilenceUpsertOne {
+func (u *MsgSilenceUpsertOne) Update(set func(*MsgSilenceUpsert)) *MsgSilenceUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
-		set(&SilenceUpsert{UpdateSet: update})
+		set(&MsgSilenceUpsert{UpdateSet: update})
 	}))
 	return u
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (u *SilenceUpsertOne) SetUpdatedBy(v int) *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) SetUpdatedBy(v int) *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.SetUpdatedBy(v)
 	})
 }
 
 // AddUpdatedBy adds v to the "updated_by" field.
-func (u *SilenceUpsertOne) AddUpdatedBy(v int) *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) AddUpdatedBy(v int) *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.AddUpdatedBy(v)
 	})
 }
 
 // UpdateUpdatedBy sets the "updated_by" field to the value that was provided on create.
-func (u *SilenceUpsertOne) UpdateUpdatedBy() *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) UpdateUpdatedBy() *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.UpdateUpdatedBy()
 	})
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (u *SilenceUpsertOne) ClearUpdatedBy() *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) ClearUpdatedBy() *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.ClearUpdatedBy()
 	})
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (u *SilenceUpsertOne) SetUpdatedAt(v time.Time) *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) SetUpdatedAt(v time.Time) *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.SetUpdatedAt(v)
 	})
 }
 
 // UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
-func (u *SilenceUpsertOne) UpdateUpdatedAt() *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) UpdateUpdatedAt() *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.UpdateUpdatedAt()
 	})
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (u *SilenceUpsertOne) ClearUpdatedAt() *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) ClearUpdatedAt() *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.ClearUpdatedAt()
 	})
 }
 
 // SetMatchers sets the "matchers" field.
-func (u *SilenceUpsertOne) SetMatchers(v []*label.Matcher) *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) SetMatchers(v []*label.Matcher) *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.SetMatchers(v)
 	})
 }
 
 // UpdateMatchers sets the "matchers" field to the value that was provided on create.
-func (u *SilenceUpsertOne) UpdateMatchers() *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) UpdateMatchers() *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.UpdateMatchers()
 	})
 }
 
 // ClearMatchers clears the value of the "matchers" field.
-func (u *SilenceUpsertOne) ClearMatchers() *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) ClearMatchers() *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.ClearMatchers()
 	})
 }
 
 // SetStartsAt sets the "starts_at" field.
-func (u *SilenceUpsertOne) SetStartsAt(v time.Time) *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) SetStartsAt(v time.Time) *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.SetStartsAt(v)
 	})
 }
 
 // UpdateStartsAt sets the "starts_at" field to the value that was provided on create.
-func (u *SilenceUpsertOne) UpdateStartsAt() *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) UpdateStartsAt() *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.UpdateStartsAt()
 	})
 }
 
 // SetEndsAt sets the "ends_at" field.
-func (u *SilenceUpsertOne) SetEndsAt(v time.Time) *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) SetEndsAt(v time.Time) *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.SetEndsAt(v)
 	})
 }
 
 // UpdateEndsAt sets the "ends_at" field to the value that was provided on create.
-func (u *SilenceUpsertOne) UpdateEndsAt() *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) UpdateEndsAt() *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.UpdateEndsAt()
 	})
 }
 
 // SetComments sets the "comments" field.
-func (u *SilenceUpsertOne) SetComments(v string) *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) SetComments(v string) *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.SetComments(v)
 	})
 }
 
 // UpdateComments sets the "comments" field to the value that was provided on create.
-func (u *SilenceUpsertOne) UpdateComments() *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) UpdateComments() *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.UpdateComments()
 	})
 }
 
 // ClearComments clears the value of the "comments" field.
-func (u *SilenceUpsertOne) ClearComments() *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) ClearComments() *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.ClearComments()
 	})
 }
 
 // SetState sets the "state" field.
-func (u *SilenceUpsertOne) SetState(v alert.SilenceState) *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) SetState(v silence.SilenceState) *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.SetState(v)
 	})
 }
 
 // UpdateState sets the "state" field to the value that was provided on create.
-func (u *SilenceUpsertOne) UpdateState() *SilenceUpsertOne {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertOne) UpdateState() *MsgSilenceUpsertOne {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.UpdateState()
 	})
 }
 
 // Exec executes the query.
-func (u *SilenceUpsertOne) Exec(ctx context.Context) error {
+func (u *MsgSilenceUpsertOne) Exec(ctx context.Context) error {
 	if len(u.create.conflict) == 0 {
-		return errors.New("ent: missing options for SilenceCreate.OnConflict")
+		return errors.New("ent: missing options for MsgSilenceCreate.OnConflict")
 	}
 	return u.create.Exec(ctx)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (u *SilenceUpsertOne) ExecX(ctx context.Context) {
+func (u *MsgSilenceUpsertOne) ExecX(ctx context.Context) {
 	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *SilenceUpsertOne) ID(ctx context.Context) (id int, err error) {
+func (u *MsgSilenceUpsertOne) ID(ctx context.Context) (id int, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -705,7 +705,7 @@ func (u *SilenceUpsertOne) ID(ctx context.Context) (id int, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *SilenceUpsertOne) IDX(ctx context.Context) int {
+func (u *MsgSilenceUpsertOne) IDX(ctx context.Context) int {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -713,28 +713,28 @@ func (u *SilenceUpsertOne) IDX(ctx context.Context) int {
 	return id
 }
 
-// SilenceCreateBulk is the builder for creating many Silence entities in bulk.
-type SilenceCreateBulk struct {
+// MsgSilenceCreateBulk is the builder for creating many MsgSilence entities in bulk.
+type MsgSilenceCreateBulk struct {
 	config
 	err      error
-	builders []*SilenceCreate
+	builders []*MsgSilenceCreate
 	conflict []sql.ConflictOption
 }
 
-// Save creates the Silence entities in the database.
-func (_c *SilenceCreateBulk) Save(ctx context.Context) ([]*Silence, error) {
+// Save creates the MsgSilence entities in the database.
+func (_c *MsgSilenceCreateBulk) Save(ctx context.Context) ([]*MsgSilence, error) {
 	if _c.err != nil {
 		return nil, _c.err
 	}
 	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
-	nodes := make([]*Silence, len(_c.builders))
+	nodes := make([]*MsgSilence, len(_c.builders))
 	mutators := make([]Mutator, len(_c.builders))
 	for i := range _c.builders {
 		func(i int, root context.Context) {
 			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				mutation, ok := m.(*SilenceMutation)
+				mutation, ok := m.(*MsgSilenceMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
 				}
@@ -782,7 +782,7 @@ func (_c *SilenceCreateBulk) Save(ctx context.Context) ([]*Silence, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (_c *SilenceCreateBulk) SaveX(ctx context.Context) []*Silence {
+func (_c *MsgSilenceCreateBulk) SaveX(ctx context.Context) []*MsgSilence {
 	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -791,13 +791,13 @@ func (_c *SilenceCreateBulk) SaveX(ctx context.Context) []*Silence {
 }
 
 // Exec executes the query.
-func (_c *SilenceCreateBulk) Exec(ctx context.Context) error {
+func (_c *MsgSilenceCreateBulk) Exec(ctx context.Context) error {
 	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_c *SilenceCreateBulk) ExecX(ctx context.Context) {
+func (_c *MsgSilenceCreateBulk) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
@@ -806,7 +806,7 @@ func (_c *SilenceCreateBulk) ExecX(ctx context.Context) {
 // OnConflict allows configuring the `ON CONFLICT` / `ON DUPLICATE KEY` clause
 // of the `INSERT` statement. For example:
 //
-//	client.Silence.CreateBulk(builders...).
+//	client.MsgSilence.CreateBulk(builders...).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -814,13 +814,13 @@ func (_c *SilenceCreateBulk) ExecX(ctx context.Context) {
 //		).
 //		// Override some of the fields with custom
 //		// update values.
-//		Update(func(u *ent.SilenceUpsert) {
+//		Update(func(u *ent.MsgSilenceUpsert) {
 //			SetCreatedBy(v+v).
 //		}).
 //		Exec(ctx)
-func (_c *SilenceCreateBulk) OnConflict(opts ...sql.ConflictOption) *SilenceUpsertBulk {
+func (_c *MsgSilenceCreateBulk) OnConflict(opts ...sql.ConflictOption) *MsgSilenceUpsertBulk {
 	_c.conflict = opts
-	return &SilenceUpsertBulk{
+	return &MsgSilenceUpsertBulk{
 		create: _c,
 	}
 }
@@ -828,48 +828,48 @@ func (_c *SilenceCreateBulk) OnConflict(opts ...sql.ConflictOption) *SilenceUpse
 // OnConflictColumns calls `OnConflict` and configures the columns
 // as conflict target. Using this option is equivalent to using:
 //
-//	client.Silence.Create().
+//	client.MsgSilence.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (_c *SilenceCreateBulk) OnConflictColumns(columns ...string) *SilenceUpsertBulk {
+func (_c *MsgSilenceCreateBulk) OnConflictColumns(columns ...string) *MsgSilenceUpsertBulk {
 	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
-	return &SilenceUpsertBulk{
+	return &MsgSilenceUpsertBulk{
 		create: _c,
 	}
 }
 
-// SilenceUpsertBulk is the builder for "upsert"-ing
-// a bulk of Silence nodes.
-type SilenceUpsertBulk struct {
-	create *SilenceCreateBulk
+// MsgSilenceUpsertBulk is the builder for "upsert"-ing
+// a bulk of MsgSilence nodes.
+type MsgSilenceUpsertBulk struct {
+	create *MsgSilenceCreateBulk
 }
 
 // UpdateNewValues updates the mutable fields using the new values that
 // were set on create. Using this option is equivalent to using:
 //
-//	client.Silence.Create().
+//	client.MsgSilence.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
 //			sql.ResolveWith(func(u *sql.UpdateSet) {
-//				u.SetIgnore(silence.FieldID)
+//				u.SetIgnore(msgsilence.FieldID)
 //			}),
 //		).
 //		Exec(ctx)
-func (u *SilenceUpsertBulk) UpdateNewValues() *SilenceUpsertBulk {
+func (u *MsgSilenceUpsertBulk) UpdateNewValues() *MsgSilenceUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		for _, b := range u.create.builders {
 			if _, exists := b.mutation.ID(); exists {
-				s.SetIgnore(silence.FieldID)
+				s.SetIgnore(msgsilence.FieldID)
 			}
 			if _, exists := b.mutation.CreatedBy(); exists {
-				s.SetIgnore(silence.FieldCreatedBy)
+				s.SetIgnore(msgsilence.FieldCreatedBy)
 			}
 			if _, exists := b.mutation.CreatedAt(); exists {
-				s.SetIgnore(silence.FieldCreatedAt)
+				s.SetIgnore(msgsilence.FieldCreatedAt)
 			}
 			if _, exists := b.mutation.TenantID(); exists {
-				s.SetIgnore(silence.FieldTenantID)
+				s.SetIgnore(msgsilence.FieldTenantID)
 			}
 		}
 	}))
@@ -879,181 +879,181 @@ func (u *SilenceUpsertBulk) UpdateNewValues() *SilenceUpsertBulk {
 // Ignore sets each column to itself in case of conflict.
 // Using this option is equivalent to using:
 //
-//	client.Silence.Create().
+//	client.MsgSilence.Create().
 //		OnConflict(sql.ResolveWithIgnore()).
 //		Exec(ctx)
-func (u *SilenceUpsertBulk) Ignore() *SilenceUpsertBulk {
+func (u *MsgSilenceUpsertBulk) Ignore() *MsgSilenceUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithIgnore())
 	return u
 }
 
 // DoNothing configures the conflict_action to `DO NOTHING`.
 // Supported only by SQLite and PostgreSQL.
-func (u *SilenceUpsertBulk) DoNothing() *SilenceUpsertBulk {
+func (u *MsgSilenceUpsertBulk) DoNothing() *MsgSilenceUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.DoNothing())
 	return u
 }
 
-// Update allows overriding fields `UPDATE` values. See the SilenceCreateBulk.OnConflict
+// Update allows overriding fields `UPDATE` values. See the MsgSilenceCreateBulk.OnConflict
 // documentation for more info.
-func (u *SilenceUpsertBulk) Update(set func(*SilenceUpsert)) *SilenceUpsertBulk {
+func (u *MsgSilenceUpsertBulk) Update(set func(*MsgSilenceUpsert)) *MsgSilenceUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(update *sql.UpdateSet) {
-		set(&SilenceUpsert{UpdateSet: update})
+		set(&MsgSilenceUpsert{UpdateSet: update})
 	}))
 	return u
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (u *SilenceUpsertBulk) SetUpdatedBy(v int) *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) SetUpdatedBy(v int) *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.SetUpdatedBy(v)
 	})
 }
 
 // AddUpdatedBy adds v to the "updated_by" field.
-func (u *SilenceUpsertBulk) AddUpdatedBy(v int) *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) AddUpdatedBy(v int) *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.AddUpdatedBy(v)
 	})
 }
 
 // UpdateUpdatedBy sets the "updated_by" field to the value that was provided on create.
-func (u *SilenceUpsertBulk) UpdateUpdatedBy() *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) UpdateUpdatedBy() *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.UpdateUpdatedBy()
 	})
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (u *SilenceUpsertBulk) ClearUpdatedBy() *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) ClearUpdatedBy() *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.ClearUpdatedBy()
 	})
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (u *SilenceUpsertBulk) SetUpdatedAt(v time.Time) *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) SetUpdatedAt(v time.Time) *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.SetUpdatedAt(v)
 	})
 }
 
 // UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
-func (u *SilenceUpsertBulk) UpdateUpdatedAt() *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) UpdateUpdatedAt() *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.UpdateUpdatedAt()
 	})
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (u *SilenceUpsertBulk) ClearUpdatedAt() *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) ClearUpdatedAt() *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.ClearUpdatedAt()
 	})
 }
 
 // SetMatchers sets the "matchers" field.
-func (u *SilenceUpsertBulk) SetMatchers(v []*label.Matcher) *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) SetMatchers(v []*label.Matcher) *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.SetMatchers(v)
 	})
 }
 
 // UpdateMatchers sets the "matchers" field to the value that was provided on create.
-func (u *SilenceUpsertBulk) UpdateMatchers() *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) UpdateMatchers() *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.UpdateMatchers()
 	})
 }
 
 // ClearMatchers clears the value of the "matchers" field.
-func (u *SilenceUpsertBulk) ClearMatchers() *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) ClearMatchers() *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.ClearMatchers()
 	})
 }
 
 // SetStartsAt sets the "starts_at" field.
-func (u *SilenceUpsertBulk) SetStartsAt(v time.Time) *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) SetStartsAt(v time.Time) *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.SetStartsAt(v)
 	})
 }
 
 // UpdateStartsAt sets the "starts_at" field to the value that was provided on create.
-func (u *SilenceUpsertBulk) UpdateStartsAt() *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) UpdateStartsAt() *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.UpdateStartsAt()
 	})
 }
 
 // SetEndsAt sets the "ends_at" field.
-func (u *SilenceUpsertBulk) SetEndsAt(v time.Time) *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) SetEndsAt(v time.Time) *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.SetEndsAt(v)
 	})
 }
 
 // UpdateEndsAt sets the "ends_at" field to the value that was provided on create.
-func (u *SilenceUpsertBulk) UpdateEndsAt() *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) UpdateEndsAt() *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.UpdateEndsAt()
 	})
 }
 
 // SetComments sets the "comments" field.
-func (u *SilenceUpsertBulk) SetComments(v string) *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) SetComments(v string) *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.SetComments(v)
 	})
 }
 
 // UpdateComments sets the "comments" field to the value that was provided on create.
-func (u *SilenceUpsertBulk) UpdateComments() *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) UpdateComments() *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.UpdateComments()
 	})
 }
 
 // ClearComments clears the value of the "comments" field.
-func (u *SilenceUpsertBulk) ClearComments() *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) ClearComments() *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.ClearComments()
 	})
 }
 
 // SetState sets the "state" field.
-func (u *SilenceUpsertBulk) SetState(v alert.SilenceState) *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) SetState(v silence.SilenceState) *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.SetState(v)
 	})
 }
 
 // UpdateState sets the "state" field to the value that was provided on create.
-func (u *SilenceUpsertBulk) UpdateState() *SilenceUpsertBulk {
-	return u.Update(func(s *SilenceUpsert) {
+func (u *MsgSilenceUpsertBulk) UpdateState() *MsgSilenceUpsertBulk {
+	return u.Update(func(s *MsgSilenceUpsert) {
 		s.UpdateState()
 	})
 }
 
 // Exec executes the query.
-func (u *SilenceUpsertBulk) Exec(ctx context.Context) error {
+func (u *MsgSilenceUpsertBulk) Exec(ctx context.Context) error {
 	if u.create.err != nil {
 		return u.create.err
 	}
 	for i, b := range u.create.builders {
 		if len(b.conflict) != 0 {
-			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the SilenceCreateBulk instead", i)
+			return fmt.Errorf("ent: OnConflict was set for builder %d. Set it on the MsgSilenceCreateBulk instead", i)
 		}
 	}
 	if len(u.create.conflict) == 0 {
-		return errors.New("ent: missing options for SilenceCreateBulk.OnConflict")
+		return errors.New("ent: missing options for MsgSilenceCreateBulk.OnConflict")
 	}
 	return u.create.Exec(ctx)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (u *SilenceUpsertBulk) ExecX(ctx context.Context) {
+func (u *MsgSilenceUpsertBulk) ExecX(ctx context.Context) {
 	if err := u.create.Exec(ctx); err != nil {
 		panic(err)
 	}

@@ -3,6 +3,14 @@ package oas
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"regexp"
+	"runtime"
+	"sort"
+	"strings"
+	"sync"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/contrib/telemetry/otelweb"
@@ -17,20 +25,26 @@ import (
 	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service"
+	"github.com/woocoos/msgcenter/service/kosdk"
 	"github.com/woocoos/msgcenter/service/provider"
 	"github.com/woocoos/msgcenter/service/silence"
-	"net/http"
-	"regexp"
-	"runtime"
-	"sort"
-	"sync"
-	"time"
 )
 
 type (
 	getAlertStatusFn func(label.Fingerprint) alert.MarkerStatus
 	setAlertStatusFn func(label.LabelSet)
 )
+
+// defaultAlertStatus returns an unprocessed status since per-group markers
+// are not accessible from the API layer. The actual silenced/inhibited state
+// is tracked within the notification pipeline via per-group AlertMarker.
+func defaultAlertStatus(_ label.Fingerprint) alert.MarkerStatus {
+	return alert.MarkerStatus{
+		State:       alert.AlertStateUnprocessed,
+		SilencedBy:  []int{},
+		InhibitedBy: []string{},
+	}
+}
 
 type ServerImpl struct {
 	uptime         time.Time
@@ -62,7 +76,7 @@ func NewServer(app *woocoo.App, am *service.AlertManager, web *web.Server) (*Ser
 		coordinator: am.Coordinator,
 		alerts:      am.Alerts,
 		silences:    am.Silences,
-		statusFunc:  am.Marker.Status,
+		statusFunc:  defaultAlertStatus,
 		metric:      metrics.NewAlerts("v2"),
 		webServer:   web,
 	}
@@ -153,10 +167,11 @@ func (s *ServerImpl) GetAlerts(c *gin.Context, request *GetAlertsRequest) (res G
 	now := time.Now()
 
 	s.mu.RLock()
-	for a := range alerts.Next() {
+	for pAlert := range alerts.Next() {
 		if err = alerts.Err(); err != nil {
 			break
 		}
+		a := pAlert.Data
 
 		routes := s.route.Match(a.Labels)
 		receivers := make([]string, 0, len(routes))
@@ -316,7 +331,11 @@ func (s *ServerImpl) PostAlerts(c *gin.Context, req *PostAlertsRequest) error {
 		}
 		validAlerts = append(validAlerts, a)
 	}
-	if err := s.alerts.Put(validAlerts...); err != nil {
+
+	// Resolve OSS storage URLs in dynamic attachments to local mount paths.
+	s.resolveAttachmentPaths(validAlerts)
+
+	if err := s.alerts.Put(c, validAlerts...); err != nil {
 		return err
 	}
 
@@ -327,6 +346,42 @@ func removeEmptyLabels(ls label.LabelSet) {
 	for k, v := range ls {
 		if string(v) == "" {
 			delete(ls, k)
+		}
+	}
+}
+
+// resolveAttachmentPaths resolves OSS storage URLs in alert annotations to local mount paths.
+// This allows the email notifier to attach files directly from the mounted filesystem
+// instead of downloading them via HTTP.
+func (s *ServerImpl) resolveAttachmentPaths(alerts []*alert.Alert) {
+	if s.coordinator.KOSdk == nil || len(s.coordinator.MountPaths) == 0 {
+		return
+	}
+	for _, a := range alerts {
+		v, ok := a.Annotations[alert.DynamicAttachmentAnnotation]
+		if !ok || v == "" {
+			continue
+		}
+		tenantID := string(a.Labels[label.TenantLabel])
+		if tenantID == "" {
+			continue
+		}
+		var resolved []string
+		changed := false
+		for _, p := range strings.Split(v, alert.DynamicAttachmentSeparator) {
+			p = strings.TrimSpace(p)
+			if p == "" {
+				continue
+			}
+			if localPath, ok := kosdk.ResolveMountPath(s.coordinator.KOSdk, s.coordinator.MountPaths, tenantID, p); ok {
+				resolved = append(resolved, localPath)
+				changed = true
+			} else {
+				resolved = append(resolved, p)
+			}
+		}
+		if changed {
+			a.Annotations[alert.DynamicAttachmentAnnotation] = strings.Join(resolved, alert.DynamicAttachmentSeparator)
 		}
 	}
 }
@@ -393,7 +448,7 @@ func (s *ServerImpl) PostSilences(c *gin.Context, req *PostSilencesRequest) (res
 		return nil, err
 	}
 
-	sid, err := s.silences.Set(&silence.Entry{
+	sid, err := s.silences.Set(c, &silence.Entry{
 		ID:        sil.ID,
 		UpdatedAt: sil.UpdatedAt,
 		Matchers:  sil.Matchers,
@@ -434,7 +489,7 @@ func AlertToOpenAPIAlert(alert *alert.Alert, status alert.MarkerStatus, receiver
 		Fingerprint: alert.Fingerprint().String(),
 		Receivers:   apiReceivers,
 		Status: AlertStatus{
-			State:       string(status.State),
+			State:       AlertStatusState(status.State),
 			SilencedBy:  status.SilencedBy,
 			InhibitedBy: status.InhibitedBy,
 		},
@@ -449,9 +504,13 @@ func OpenAPIAlertsToAlerts(apiAlerts PostableAlerts) []*alert.Alert {
 		a := alert.Alert{
 			Labels:       APILabelSetToModelLabelSet(apiAlert.Labels),
 			Annotations:  APILabelSetToModelLabelSet(apiAlert.Annotations),
-			StartsAt:     apiAlert.StartsAt,
-			EndsAt:       apiAlert.EndsAt,
 			GeneratorURL: apiAlert.GeneratorURL,
+		}
+		if apiAlert.StartsAt != nil {
+			a.StartsAt = *apiAlert.StartsAt
+		}
+		if apiAlert.EndsAt != nil {
+			a.EndsAt = *apiAlert.EndsAt
 		}
 		alerts = append(alerts, &a)
 	}
@@ -459,7 +518,7 @@ func OpenAPIAlertsToAlerts(apiAlerts PostableAlerts) []*alert.Alert {
 	return alerts
 }
 
-// ModelLabelSetToAPILabelSet converts prometheus_model.LabelSet to open_api_models.LabelSet.
+// ModelLabelSetToAPILabelSet converts label.LabelSet to open_api_models.LabelSet.
 func ModelLabelSetToAPILabelSet(modelLabelSet label.LabelSet) LabelSet {
 	apiLabelSet := LabelSet{}
 	for key, value := range modelLabelSet {
@@ -469,7 +528,7 @@ func ModelLabelSetToAPILabelSet(modelLabelSet label.LabelSet) LabelSet {
 	return apiLabelSet
 }
 
-// APILabelSetToModelLabelSet converts open_api_models.LabelSet to prometheus_model.LabelSet.
+// APILabelSetToModelLabelSet converts open_api_models.LabelSet to label.LabelSet.
 func APILabelSetToModelLabelSet(apiLabelSet LabelSet) label.LabelSet {
 	modelLabelSet := label.LabelSet{}
 	for key, value := range apiLabelSet {
@@ -480,8 +539,8 @@ func APILabelSetToModelLabelSet(apiLabelSet LabelSet) label.LabelSet {
 }
 
 // PostableSilenceToEnt converts *open_api_models.PostableSilenc to *silencepb.Silence.
-func PostableSilenceToEnt(s *PostableSilence) (*ent.Silence, error) {
-	sil := &ent.Silence{
+func PostableSilenceToEnt(s *PostableSilence) (*ent.MsgSilence, error) {
+	sil := &ent.MsgSilence{
 		ID:        s.ID,
 		StartsAt:  s.StartsAt,
 		EndsAt:    s.EndsAt,
@@ -504,7 +563,7 @@ func GettableSilenceFromProto(s *silence.Entry) (*GettableSilence, error) {
 	start := s.StartsAt
 	end := s.EndsAt
 	updated := s.UpdatedAt
-	state := string(alert.CalcSilenceState(start, end))
+	state := string(silence.CalcSilenceState(start, end))
 	sil := &GettableSilence{
 		Silence: &Silence{
 			StartsAt: start,
@@ -515,7 +574,7 @@ func GettableSilenceFromProto(s *silence.Entry) (*GettableSilence, error) {
 		ID:        s.ID,
 		UpdatedAt: updated,
 		Status: SilenceStatus{
-			State: state,
+			State: SilenceStatusState(state),
 		},
 	}
 
@@ -577,10 +636,10 @@ func CheckSilenceMatchesFilterLabels(s *silence.Entry, matchers []*label.Matcher
 	return true
 }
 
-var silenceStateOrder = map[alert.SilenceState]int{
-	alert.SilenceStateActive:  1,
-	alert.SilenceStatePending: 2,
-	alert.SilenceStateExpired: 3,
+var silenceStateOrder = map[silence.SilenceState]int{
+	silence.SilenceStateActive:  1,
+	silence.SilenceStatePending: 2,
+	silence.SilenceStateExpired: 3,
 }
 
 // SortSilences sorts first according to the state "active, pending, expired"
@@ -590,21 +649,21 @@ var silenceStateOrder = map[alert.SilenceState]int{
 // expired are ordered based on which one expired most recently
 func SortSilences(sils GettableSilences) {
 	sort.Slice(sils, func(i, j int) bool {
-		state1 := alert.SilenceState(sils[i].Status.State)
-		state2 := alert.SilenceState(sils[j].Status.State)
+		state1 := silence.SilenceState(sils[i].Status.State)
+		state2 := silence.SilenceState(sils[j].Status.State)
 		if state1 != state2 {
 			return silenceStateOrder[state1] < silenceStateOrder[state2]
 		}
 		switch state1 {
-		case alert.SilenceStateActive:
+		case silence.SilenceStateActive:
 			endsAt1 := sils[i].Silence.EndsAt
 			endsAt2 := sils[j].Silence.EndsAt
 			return endsAt1.Before(endsAt2)
-		case alert.SilenceStatePending:
+		case silence.SilenceStatePending:
 			startsAt1 := sils[i].Silence.StartsAt
 			startsAt2 := sils[j].Silence.StartsAt
 			return startsAt1.Before(startsAt2)
-		case alert.SilenceStateExpired:
+		case silence.SilenceStateExpired:
 			endsAt1 := sils[i].Silence.EndsAt
 			endsAt2 := sils[j].Silence.EndsAt
 			return endsAt1.After(endsAt2)

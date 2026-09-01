@@ -2,43 +2,42 @@ package msg
 
 import (
 	"context"
+	"time"
+
 	"entgo.io/contrib/entgql"
-	"errors"
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/handler/extension"
+	gqlgen "github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/google/uuid"
-	"github.com/gorilla/websocket"
 	"github.com/tsingsun/woocoo/contrib/gql"
+	"github.com/tsingsun/woocoo/contrib/telemetry/otelweb"
 	"github.com/tsingsun/woocoo/pkg/conf"
-	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/tsingsun/woocoo/web"
+	"github.com/tsingsun/woocoo/web/handler/authz"
 	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/woocoos/knockout-go/pkg/fmterr"
-	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/knockout-go/pkg/koapp"
 	"github.com/woocoos/knockout-go/pkg/middleware"
 	"github.com/woocoos/msgcenter/api/graphql"
 	"github.com/woocoos/msgcenter/ent"
-	"go.uber.org/zap"
-	"net/http"
-	"strconv"
 )
 
 // Server alert server, includes: API提醒服务,包括API及消息分发功能,可选服务包括: UI
 type Server struct {
-	appCnf    *conf.AppConfiguration
-	dbClient  *ent.Client
-	msgClient *redisx.Client
-	webSrv    *web.Server
-	subs      *PubSub
+	appCnf                *conf.AppConfiguration
+	dbClient              *ent.Client
+	msgClient             *redisx.Client
+	webSrv                *web.Server
+	subs                  *PubSub
+	serverID              string
+	keepAlivePingInterval time.Duration
 }
 
 func NewServer(cnf *conf.AppConfiguration) *Server {
 	s := &Server{
-		appCnf: cnf,
+		appCnf:                cnf,
+		keepAlivePingInterval: 30 * time.Second,
 	}
 	// 初始化错误处理
 	if err := fmterr.InitErrorHandler(cnf.Sub("errors")); err != nil {
@@ -59,6 +58,7 @@ func (s *Server) buildEntClient() {
 		Org:         "portal",
 		OrgRoleUser: "portal",
 		UserAddr:    "portal",
+		UserDevice:  "portal",
 	})
 	if s.appCnf.Development {
 		s.dbClient = ent.NewClient(ent.Driver(drv), ent.Debug(), scfg)
@@ -73,7 +73,8 @@ func (s *Server) buildPubSub() {
 		panic(err)
 	}
 	s.msgClient = cli
-	s.subs = NewPubSub(cli)
+	s.serverID = uuid.New().String()
+	s.subs = NewPubSub(cli, s.serverID)
 }
 
 func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
@@ -82,79 +83,37 @@ func (s *Server) buildWebServer(cnf *conf.AppConfiguration) {
 		gql.RegisterMiddleware(),
 		middleware.RegisterTenantID(),
 		middleware.RegisterTokenSigner(),
-		//web.RegisterMiddleware(otelweb.NewMiddleware()),
+		otelweb.RegisterMiddleware(),
+		web.WithMiddlewareNewFunc("authz", authz.Middleware),
 	)
-	//gql use msg resolver
-	gqlsrv := handler.New(NewSchema(
+
+	// 手动创建 gqlgen server，确保 SSE transport 在注册前已添加，
+	// 使 buildGraphqlServer 中 SupportStream() 能正确检测并设置 isSupportStream=true
+	gqlsrv := gqlgen.New(NewSchema(
 		graphql.WithClient(s.dbClient),
 		graphql.WithMsgClient(s.msgClient.UniversalClient),
 		graphql.WithPubSub(s.subs),
 	))
-
-	gqlsrv.AddTransport(transport.Websocket{
-		KeepAlivePingInterval: 10,
-		Upgrader: websocket.Upgrader{
-			CheckOrigin: func(r *http.Request) bool {
-				return true
-			},
-		},
-		InitFunc:  s.wsInit,
-		CloseFunc: s.wsClose,
-		ErrorFunc: s.wsError,
+	// SSE 必须在 POST 之前，否则 POST transport 会匹配所有 POST 请求（它不检查 Accept 头），
+	// SSE transport 永远不会被选中
+	gqlsrv.AddTransport(transport.SSE{
+		KeepAlivePingInterval: s.keepAlivePingInterval,
 	})
-
 	gqlsrv.AddTransport(transport.Options{})
 	gqlsrv.AddTransport(transport.GET{})
 	gqlsrv.AddTransport(transport.POST{})
 	gqlsrv.AddTransport(transport.MultipartForm{})
-
 	gqlsrv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
 
-	gqlsrv.Use(extension.Introspection{})
-	gqlsrv.Use(extension.AutomaticPersistedQuery{
-		Cache: lru.New[string](100),
-	})
+	// RegisterGraphqlServer 内部调用 SupportStream 发送测试请求，
+	// AroundResponses/Use 必须在其之后注册，避免测试请求触发中间件 panic
+	if err := gql.RegisterGraphqlServer(s.webSrv, gqlsrv); err != nil {
+		panic(err)
+	}
 
 	gqlsrv.AroundResponses(middleware.SimplePagination())
 	// mutation事务
 	gqlsrv.Use(entgql.Transactioner{TxOpener: s.dbClient})
-	if err := gql.RegisterGraphqlServer(s.webSrv, gqlsrv); err != nil {
-		log.Fatal(err)
-	}
-}
-
-// websocket 初始化连接,只做了简单的验证,根据需求.看是否需要提前验证.
-func (s *Server) wsInit(ctx context.Context, initPayload transport.InitPayload) (context.Context, *transport.InitPayload, error) {
-	bearer := initPayload.Authorization()
-	if bearer == "" {
-		return nil, nil, errors.New("authorization required")
-	}
-	gctx, err := gql.FromIncomingContext(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
-	gctx.Request.Header.Set("Authorization", bearer)
-	tidstr := initPayload.GetString(identity.TenantHeaderKey)
-	tid, _ := strconv.Atoi(tidstr)
-	if tid == 0 {
-		return nil, nil, identity.ErrMisTenantID
-	}
-	gctx.Request.Header.Set(identity.TenantHeaderKey, tidstr)
-	ctx = context.WithValue(ctx, connectionIDKey, uuid.New())
-	return ctx, &initPayload, nil
-}
-
-func (s *Server) wsClose(ctx context.Context, code int) {
-	if err := s.subs.RemoveConn(ctx); err != nil {
-		logger.Error("remove ws connect error", zap.Error(err))
-	}
-}
-
-func (s *Server) wsError(ctx context.Context, err error) {
-	var websocketError transport.WebsocketError
-	if !errors.As(err, &websocketError) {
-		logger.Error("remove ws connect error", zap.Error(err))
-	}
 }
 
 func (s *Server) Start(ctx context.Context) error {

@@ -1,7 +1,7 @@
 import { MsgEvent, MsgType } from '@/generated/msgsrv/graphql';
 import { createMsgEvent, getMsgEventInfo, updateMsgEvent } from '@/services/msgsrv/event';
 import { updateFormat } from '@/util';
-import { DrawerForm, ProFormCheckbox, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
+import { DrawerForm, ProFormCheckbox, ProFormSwitch, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import InputMsgType from '../../type/components/input';
@@ -13,6 +13,7 @@ type ProFormData = {
   name: string;
   modes: string[];
   comments?: string | null;
+  canSubs?: boolean;
 };
 
 export default (props: {
@@ -48,6 +49,7 @@ export default (props: {
       const initData: ProFormData = {
         name: '',
         modes: [],
+        canSubs: false,
       }
       if (props.id) {
         const result = await getMsgEventInfo(props.id);
@@ -57,6 +59,7 @@ export default (props: {
           initData.name = result.name;
           initData.modes = result.modes.split(',');
           initData.comments = result.comments;
+          initData.canSubs = result.canSubs ?? false;
         }
       }
       return initData;
@@ -72,12 +75,14 @@ export default (props: {
           msgTypeID: values.msgType?.id || '',
           name: values.name,
           comments: values.comments,
+          canSubs: values.canSubs ?? false,
         }, info || {}))
         : await createMsgEvent({
           modes: values.modes.join(','),
           msgTypeID: values.msgType?.id || '',
           name: values.name,
           comments: values.comments,
+          canSubs: values.canSubs ?? false,
         });
       if (result?.id) {
         setSaveDisabled(true);
@@ -127,6 +132,10 @@ export default (props: {
         ]}>
         <InputMsgType />
       </ProFormText>
+      <ProFormSwitch
+        name="canSubs"
+        label={t('open_subscription')}
+      />
       <ProFormCheckbox.Group
         name="modes"
         label={t('way_receiving')}

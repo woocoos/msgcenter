@@ -26,6 +26,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"io"
 	"net/mail"
 	"net/smtp"
 
@@ -166,6 +167,17 @@ func (e *Email) SetHTML(body string) *Email {
 // Caller can use filename as content id to reference the attachment in the email body.
 func (e *Email) AttachFile(filename string) (*email.Attachment, error) {
 	return e.e.AttachFile(filename)
+}
+
+// Attach attaches data from an io.Reader as an email attachment.
+// contentType may be empty, in which case "application/octet-stream" is used.
+func (e *Email) Attach(r io.Reader, filename string, contentType string) (*email.Attachment, error) {
+	return e.e.Attach(r, filename, contentType)
+}
+
+// Attachments returns all attached attachments.
+func (e *Email) Attachments() []*email.Attachment {
+	return e.e.Attachments
 }
 
 // SMTPAuthType is the type of SMTP authentication.

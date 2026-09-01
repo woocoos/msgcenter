@@ -12,6 +12,7 @@
 {{ end }}Source: {{ .GeneratorURL }}
 {{ end }}{{ end }}
 
+{{ define "webhook.default.subject" }}{{ . }}{{ end}}
 {{ define "webhook.default.body" }}{{ . | toJSON }}{{ end}}
 
 {{ define "message.default.subject" }}{{ template "__subject" . }}{{ end }}

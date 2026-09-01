@@ -1,11 +1,11 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal } from 'antd';
-import { useRef, useState } from 'react';
+import { Key, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
 import { getOrgs } from '@knockout-js/api';
 import Create from './components/create';
-import { Silence, SilenceSilenceState, SilenceWhereInput } from '@/generated/msgsrv/graphql';
+import { MsgSilence, MsgSilenceSilenceState, MsgSilenceWhereInput } from '@/generated/msgsrv/graphql';
 import { EnumSilenceMatchType, EnumSilenceStatus, delSilence, getSilenceList } from '@/services/msgsrv/silence';
 import { OrgSelect } from '@knockout-js/org';
 import { Org, OrgKind } from '@knockout-js/api/ucenter';
@@ -19,7 +19,7 @@ export default () => {
     { t } = useTranslation(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
-    columns: ProColumns<Silence>[] = [
+    columns: ProColumns<MsgSilence>[] = [
       // 有需要排序配置  sorter: true
       {
         title: t('org'), dataIndex: 'org', width: 120,
@@ -59,7 +59,7 @@ export default () => {
         width: 120,
         render: (text, record) => {
           return (<Space>
-            <Auth authKey="updateSilence">
+            <Auth authKey="updateMsgSilence">
               <a
                 key="editor"
                 onClick={() => {
@@ -71,7 +71,7 @@ export default () => {
                 {t('edit')}
               </a>
             </Auth>
-            <Auth authKey="createSilence">
+            <Auth authKey="createMsgSilence">
               <a
                 key="editor"
                 onClick={() => {
@@ -83,7 +83,7 @@ export default () => {
                 {t('copy')}
               </a>
             </Auth>
-            <Auth authKey="deleteSilence">
+            <Auth authKey="deleteMsgSilence">
               <a key="delete" onClick={() => onDel(record)}>
                 {t('delete')}
               </a>
@@ -93,9 +93,9 @@ export default () => {
       },
     ],
     [orgs, setOrgs] = useState<Org[]>([]),
-    [dataSource, setDataSource] = useState<Silence[]>([]),
+    [dataSource, setDataSource] = useState<MsgSilence[]>([]),
     // 选中处理
-    [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
+    [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]),
     // 弹出层处理
     [modal, setModal] = useState<{
       open: boolean;
@@ -111,7 +111,7 @@ export default () => {
 
 
   const
-    onDel = (record: Silence) => {
+    onDel = (record: MsgSilence) => {
       Modal.confirm({
         title: t('delete'),
         content: `${t('confirm_delete')}：${record.id}`,
@@ -157,7 +157,7 @@ export default () => {
           toolbar={{
             title: t('silence_msg_list'),
             actions: [
-              <Auth authKey="createSilence">
+              <Auth authKey="createMsgSilence">
                 <Button
                   key="created"
                   type="primary"
@@ -174,19 +174,19 @@ export default () => {
           columns={columns}
           dataSource={dataSource}
           request={async (params, sort, filter) => {
-            const table = { data: [] as Silence[], success: true, total: 0 },
-              where: SilenceWhereInput = {};
+            const table = { data: [] as MsgSilence[], success: true, total: 0 },
+              where: MsgSilenceWhereInput = {};
             where.tenantID = params.org?.id;
             where.startsAt = params.startsAt
             where.endsAt = params.endsAt
-            where.stateIn = filter.status as SilenceSilenceState[]
+            where.stateIn = filter.status as MsgSilenceSilenceState[]
             const result = await getSilenceList({
               current: params.current,
               pageSize: params.pageSize,
               where,
             });
             if (result?.totalCount) {
-              table.data = result.edges?.map(item => item?.node) as Silence[]
+              table.data = result.edges?.map(item => item?.node) as MsgSilence[]
               setOrgs(await getOrgs(table.data.map(item => item.tenantID || '')))
               table.total = result.totalCount;
             }
@@ -196,7 +196,7 @@ export default () => {
           }}
           rowSelection={{
             selectedRowKeys: selectedRowKeys,
-            onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
+            onChange: (selectedRowKeys) => { setSelectedRowKeys(selectedRowKeys); },
             type: 'checkbox',
           }}
         />

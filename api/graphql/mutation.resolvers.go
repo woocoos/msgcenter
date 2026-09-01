@@ -14,6 +14,7 @@ import (
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
+	"github.com/woocoos/msgcenter/api/graphql/scalars"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
@@ -21,6 +22,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
+	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service/silence"
@@ -98,10 +100,15 @@ func (r *mutationResolver) DeleteMsgEvent(ctx context.Context, id int) (bool, er
 	} else if has {
 		return false, fmt.Errorf("the active status cannot be deleted")
 	}
-	if has, err := client.MsgEvent.Query().Where(msgevent.HasCustomerTemplate()).Exist(ctx); err != nil {
+	if has, err := client.MsgEvent.Query().Where(msgevent.ID(id), msgevent.HasCustomerTemplate()).Exist(ctx); err != nil {
 		return false, err
 	} else if has {
 		return false, fmt.Errorf("cannot be deleted. msgevent is associated with msgtemplate")
+	}
+	if has, err := client.MsgEvent.Query().Where(msgevent.ID(id), msgevent.HasSubscribers()).Exist(ctx); err != nil {
+		return false, err
+	} else if has {
+		return false, fmt.Errorf("cannot be deleted. msgevent has subscribers")
 	}
 	err := ent.FromContext(ctx).MsgEvent.DeleteOneID(id).Exec(ctx)
 	return err == nil, err
@@ -332,6 +339,21 @@ func (r *mutationResolver) CreateMsgSubscriber(ctx context.Context, inputs []*en
 		if (v.UserID == nil && v.OrgRoleID == nil) || (v.UserID != nil && v.OrgRoleID != nil) {
 			return nil, fmt.Errorf("only one of userID and orgRoleID")
 		}
+		// 验证 msg_type_id 和 msg_event_id 互斥且必选其一
+		typeID := 0
+		if v.MsgTypeID != nil {
+			typeID = *v.MsgTypeID
+		}
+		eventID := 0
+		if v.MsgEventID != nil {
+			eventID = *v.MsgEventID
+		}
+		if typeID != 0 && eventID != 0 {
+			return nil, fmt.Errorf("msg_type_id and msg_event_id are mutually exclusive")
+		}
+		if typeID == 0 && eventID == 0 {
+			return nil, fmt.Errorf("either msg_type_id or msg_event_id must be set")
+		}
 		// 检查是否已订阅
 		exclude := false
 		if v.Exclude != nil {
@@ -345,11 +367,18 @@ func (r *mutationResolver) CreateMsgSubscriber(ctx context.Context, inputs []*en
 		if v.OrgRoleID != nil {
 			orid = *v.OrgRoleID
 		}
-		has, err := client.MsgSubscriber.Query().Where(
+		// 构建查询条件
+		predicates := []predicate.MsgSubscriber{
 			msgsubscriber.TenantID(v.TenantID),
-			msgsubscriber.MsgTypeID(v.MsgTypeID),
 			msgsubscriber.ExcludeEQ(exclude),
-			msgsubscriber.Or(msgsubscriber.UserIDEQ(uid), msgsubscriber.OrgRoleIDEQ(orid))).Exist(ctx)
+			msgsubscriber.Or(msgsubscriber.UserIDEQ(uid), msgsubscriber.OrgRoleIDEQ(orid)),
+		}
+		if typeID != 0 {
+			predicates = append(predicates, msgsubscriber.MsgTypeID(typeID))
+		} else {
+			predicates = append(predicates, msgsubscriber.MsgEventID(eventID))
+		}
+		has, err := client.MsgSubscriber.Query().Where(predicates...).Exist(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -371,13 +400,13 @@ func (r *mutationResolver) DeleteMsgSubscriber(ctx context.Context, ids []int) (
 	return err == nil, err
 }
 
-// CreateSilence is the resolver for the createSilence field.
-func (r *mutationResolver) CreateSilence(ctx context.Context, input ent.CreateSilenceInput) (*ent.Silence, error) {
-	sil, err := ent.FromContext(ctx).Silence.Create().SetInput(input).Save(ctx)
+// CreateMsgSilence is the resolver for the createMsgSilence field.
+func (r *mutationResolver) CreateMsgSilence(ctx context.Context, input ent.CreateMsgSilenceInput) (*ent.MsgSilence, error) {
+	sil, err := ent.FromContext(ctx).MsgSilence.Create().SetInput(input).Save(ctx)
 	if err != nil {
 		return nil, err
 	}
-	_, err = r.Silences.Set(&silence.Entry{
+	_, err = r.Silences.Set(ctx, &silence.Entry{
 		ID:        sil.ID,
 		UpdatedAt: sil.UpdatedAt,
 		Matchers:  sil.Matchers,
@@ -388,14 +417,14 @@ func (r *mutationResolver) CreateSilence(ctx context.Context, input ent.CreateSi
 	return sil, err
 }
 
-// UpdateSilence is the resolver for the updateSilence field.
-func (r *mutationResolver) UpdateSilence(ctx context.Context, id int, input ent.UpdateSilenceInput) (*ent.Silence, error) {
+// UpdateMsgSilence is the resolver for the updateMsgSilence field.
+func (r *mutationResolver) UpdateMsgSilence(ctx context.Context, id int, input ent.UpdateMsgSilenceInput) (*ent.MsgSilence, error) {
 	client := ent.FromContext(ctx)
-	sil, err := client.Silence.UpdateOneID(id).SetInput(input).Save(ctx)
+	sil, err := client.MsgSilence.UpdateOneID(id).SetInput(input).Save(ctx)
 	if err != nil {
 		return nil, err
 	}
-	id, err = r.Silences.Set(&silence.Entry{
+	id, err = r.Silences.Set(ctx, &silence.Entry{
 		ID:        sil.ID,
 		UpdatedAt: sil.UpdatedAt,
 		Matchers:  sil.Matchers,
@@ -409,15 +438,15 @@ func (r *mutationResolver) UpdateSilence(ctx context.Context, id int, input ent.
 	if sil.ID == id {
 		return sil, nil
 	}
-	mu := client.Silence.UpdateOne(sil).Mutation()
+	mu := client.MsgSilence.UpdateOne(sil).Mutation()
 	mu.SetOp(ent.OpCreate)
 	v, err := client.Mutate(ctx, mu)
-	return v.(*ent.Silence), err
+	return v.(*ent.MsgSilence), err
 }
 
-// DeleteSilence is the resolver for the deleteSilence field.
-func (r *mutationResolver) DeleteSilence(ctx context.Context, id int) (bool, error) {
-	err := ent.FromContext(ctx).Silence.DeleteOneID(id).Exec(ctx)
+// DeleteMsgSilence is the resolver for the deleteMsgSilence field.
+func (r *mutationResolver) DeleteMsgSilence(ctx context.Context, id int) (bool, error) {
+	err := ent.FromContext(ctx).MsgSilence.DeleteOneID(id).Exec(ctx)
 	if err != nil {
 		return false, err
 	}
@@ -568,11 +597,64 @@ func (r *routeInputResolver) Matchers(ctx context.Context, obj *profile.Route, d
 	return nil
 }
 
+// Apps is the resolver for the apps field.
+func (r *umengConfigInputResolver) Apps(ctx context.Context, obj *profile.UmengConfig, data scalars.UmengApps) error {
+	obj.Apps = map[string]*profile.UmengAppConfig(data)
+	return nil
+}
+
+// ReceiveType is the resolver for the receiveType field.
+func (r *webhookConfigInputResolver) ReceiveType(ctx context.Context, obj *profile.WebhookConfig, data *string) error {
+	if data == nil {
+		return nil
+	}
+	rt := profile.WebhookReceiveType(*data)
+	if err := profile.WebhookReceiveTypeValidator(rt); err != nil {
+		return err
+	}
+	obj.ReceiveType = rt
+	return nil
+}
+
+// URL is the resolver for the url field.
+func (r *webhookConfigInputResolver) URL(ctx context.Context, obj *profile.WebhookConfig, data *string) error {
+	if data == nil {
+		return nil
+	}
+	u := &profile.URL{}
+	if err := u.UnmarshalText([]byte(*data)); err != nil {
+		return err
+	}
+	obj.URL = u
+	return nil
+}
+
+// MaxAlerts is the resolver for the maxAlerts field.
+func (r *webhookConfigInputResolver) MaxAlerts(ctx context.Context, obj *profile.WebhookConfig, data *int) error {
+	if data == nil {
+		return nil
+	}
+	obj.MaxAlerts = uint64(*data)
+	return nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
 // RouteInput returns generated.RouteInputResolver implementation.
 func (r *Resolver) RouteInput() generated.RouteInputResolver { return &routeInputResolver{r} }
 
+// UmengConfigInput returns generated.UmengConfigInputResolver implementation.
+func (r *Resolver) UmengConfigInput() generated.UmengConfigInputResolver {
+	return &umengConfigInputResolver{r}
+}
+
+// WebhookConfigInput returns generated.WebhookConfigInputResolver implementation.
+func (r *Resolver) WebhookConfigInput() generated.WebhookConfigInputResolver {
+	return &webhookConfigInputResolver{r}
+}
+
 type mutationResolver struct{ *Resolver }
 type routeInputResolver struct{ *Resolver }
+type umengConfigInputResolver struct{ *Resolver }
+type webhookConfigInputResolver struct{ *Resolver }

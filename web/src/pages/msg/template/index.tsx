@@ -1,6 +1,6 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, Dropdown } from 'antd';
-import { useRef, useState } from 'react';
+import { Key, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
 import { Link, useSearchParams } from '@ice/runtime';
@@ -13,7 +13,7 @@ import { getOrgs } from '@knockout-js/api';
 import { Org } from '@knockout-js/api/ucenter';
 import Test from './components/test';
 import { delDataSource, saveDataSource } from '@/util';
-import {TemplateType} from '../event'
+import { TemplateType } from '../event'
 import store from '@/store'
 
 export default () => {
@@ -38,6 +38,18 @@ export default () => {
       },
       { title: t('subject'), dataIndex: 'subject', width: 120 },
       {
+        title: '模板范围', dataIndex: 'userID', width: 100, search: false,
+        render(text, record) {
+          if (record.userID && record.userID != "0") {
+            return `用户(${record.userID})`;
+          }
+          if (record.tenantID && record.tenantID != "0") {
+            return '租户';
+          }
+          return '全局';
+        },
+      },
+      {
         title: t('way_receiving'), dataIndex: 'receiverType', width: 120, search: false,
         filters: true,
         valueEnum: EnumMsgTemplateFormat,
@@ -58,7 +70,20 @@ export default () => {
         render: (text, record) => {
           return (<Space>
             {
-              record.status === MsgTemplateSimpleStatus.Active ? <></> : <Auth authKey="updateMsgTemplate">
+              record.status === MsgTemplateSimpleStatus.Active ? <a
+                key="view"
+                onClick={() => {
+                  setModal({
+                    open: true,
+                    title: `${t('view')}:${record.name}`,
+                    id: record.id,
+                    receiverType: record.receiverType,
+                    readonly: true,
+                  });
+                }}
+              >
+                {t('view')}
+              </a> : <Auth authKey="updateMsgTemplate">
                 <a
                   key="editor"
                   onClick={() => {
@@ -92,18 +117,20 @@ export default () => {
                 </a>
               </Auth>
             }
-            {
-              record.status === MsgTemplateSimpleStatus.Active && record.receiverType != MsgTemplateReceiverType.Webhook ? <a
-                onClick={() => {
-                  setModal({
-                    open: true,
-                    title: `${t('test')}:${record.name}`,
-                    id: record.id,
-                    type: 'test',
-                  });
-                }}
-              >{t('test')}</a> : <></>
-            }
+            <Auth authKey={['testSendMessageTpl', 'testSendEmailTpl']} keyAndOr='or'>
+              {
+                record.status === MsgTemplateSimpleStatus.Active && record.receiverType != MsgTemplateReceiverType.Webhook ? <a
+                  onClick={() => {
+                    setModal({
+                      open: true,
+                      title: `${t('test')}:${record.name}`,
+                      id: record.id,
+                      type: 'test',
+                    });
+                  }}
+                >{t('test')}</a> : <></>
+              }
+            </Auth>
           </Space>);
         },
       },
@@ -111,14 +138,15 @@ export default () => {
     [orgs, setOrgs] = useState<Org[]>([]),
     [dataSource, setDataSource] = useState<MsgTemplate[]>([]),
     // 选中处理
-    [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
+    [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]),
     // 弹出层处理
     [modal, setModal] = useState<{
       open: boolean;
       title: string;
       id: string;
       receiverType?: MsgTemplateReceiverType;
-      type?: 'test'
+      type?: 'test';
+      readonly?: boolean;
     }>({
       open: false,
       title: '',
@@ -175,13 +203,13 @@ export default () => {
   return (
     <PageContainer
       header={{
-        title: searchParams.get('type')=== TemplateType.customer?t('temp_customer'):t('temp_default'),
+        title: searchParams.get('type') === TemplateType.customer ? t('temp_customer') : t('temp_default'),
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
             { title: t('msg_center') },
             { title: <Link to={'/msg/event'}>{t('msg_event')}</Link> },
-            { title: searchParams.get('type')=== TemplateType.customer?t('temp_customer'):t('temp_default') },
+            { title: searchParams.get('type') === TemplateType.customer ? t('temp_customer') : t('temp_default') },
           ],
         },
       }}
@@ -228,7 +256,7 @@ export default () => {
             where.msgEventID = msgEvent.id
             if (searchParams.get('type') == TemplateType.customer) {
               where.tenantID = userState.tenantId
-            }else {
+            } else {
               where.tenantIDIsNil = true
             }
 
@@ -253,7 +281,7 @@ export default () => {
         }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
-          onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
+          onChange: (selectedRowKeys) => { setSelectedRowKeys(selectedRowKeys); },
           type: 'checkbox',
         }}
       />
@@ -263,11 +291,12 @@ export default () => {
           title={modal.title}
           type={searchParams.get('type')}
           id={modal.id}
+          readonly={modal.readonly}
           onClose={(isSuccess, newInfo) => {
             if (isSuccess && newInfo) {
               setDataSource(saveDataSource(dataSource, newInfo))
             }
-            setModal({ open: false, title: modal.title, id: '', receiverType: modal.receiverType });
+            setModal({ open: false, title: modal.title, id: '', receiverType: modal.receiverType, readonly: false });
           }}
           msgEvent={msgEventInfo}
           receiverType={modal.receiverType || MsgTemplateReceiverType.Email}

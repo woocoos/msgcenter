@@ -12,36 +12,36 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
+	"github.com/woocoos/msgcenter/ent/msgsilence"
 	"github.com/woocoos/msgcenter/ent/predicate"
-	"github.com/woocoos/msgcenter/ent/silence"
-	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
+	"github.com/woocoos/msgcenter/service/silence"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
 
-// SilenceUpdate is the builder for updating Silence entities.
-type SilenceUpdate struct {
+// MsgSilenceUpdate is the builder for updating MsgSilence entities.
+type MsgSilenceUpdate struct {
 	config
 	hooks    []Hook
-	mutation *SilenceMutation
+	mutation *MsgSilenceMutation
 }
 
-// Where appends a list predicates to the SilenceUpdate builder.
-func (_u *SilenceUpdate) Where(ps ...predicate.Silence) *SilenceUpdate {
+// Where appends a list predicates to the MsgSilenceUpdate builder.
+func (_u *MsgSilenceUpdate) Where(ps ...predicate.MsgSilence) *MsgSilenceUpdate {
 	_u.mutation.Where(ps...)
 	return _u
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (_u *SilenceUpdate) SetUpdatedBy(v int) *SilenceUpdate {
+func (_u *MsgSilenceUpdate) SetUpdatedBy(v int) *MsgSilenceUpdate {
 	_u.mutation.ResetUpdatedBy()
 	_u.mutation.SetUpdatedBy(v)
 	return _u
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (_u *SilenceUpdate) SetNillableUpdatedBy(v *int) *SilenceUpdate {
+func (_u *MsgSilenceUpdate) SetNillableUpdatedBy(v *int) *MsgSilenceUpdate {
 	if v != nil {
 		_u.SetUpdatedBy(*v)
 	}
@@ -49,25 +49,25 @@ func (_u *SilenceUpdate) SetNillableUpdatedBy(v *int) *SilenceUpdate {
 }
 
 // AddUpdatedBy adds value to the "updated_by" field.
-func (_u *SilenceUpdate) AddUpdatedBy(v int) *SilenceUpdate {
+func (_u *MsgSilenceUpdate) AddUpdatedBy(v int) *MsgSilenceUpdate {
 	_u.mutation.AddUpdatedBy(v)
 	return _u
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (_u *SilenceUpdate) ClearUpdatedBy() *SilenceUpdate {
+func (_u *MsgSilenceUpdate) ClearUpdatedBy() *MsgSilenceUpdate {
 	_u.mutation.ClearUpdatedBy()
 	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (_u *SilenceUpdate) SetUpdatedAt(v time.Time) *SilenceUpdate {
+func (_u *MsgSilenceUpdate) SetUpdatedAt(v time.Time) *MsgSilenceUpdate {
 	_u.mutation.SetUpdatedAt(v)
 	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (_u *SilenceUpdate) SetNillableUpdatedAt(v *time.Time) *SilenceUpdate {
+func (_u *MsgSilenceUpdate) SetNillableUpdatedAt(v *time.Time) *MsgSilenceUpdate {
 	if v != nil {
 		_u.SetUpdatedAt(*v)
 	}
@@ -75,37 +75,37 @@ func (_u *SilenceUpdate) SetNillableUpdatedAt(v *time.Time) *SilenceUpdate {
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (_u *SilenceUpdate) ClearUpdatedAt() *SilenceUpdate {
+func (_u *MsgSilenceUpdate) ClearUpdatedAt() *MsgSilenceUpdate {
 	_u.mutation.ClearUpdatedAt()
 	return _u
 }
 
 // SetMatchers sets the "matchers" field.
-func (_u *SilenceUpdate) SetMatchers(v []*label.Matcher) *SilenceUpdate {
+func (_u *MsgSilenceUpdate) SetMatchers(v []*label.Matcher) *MsgSilenceUpdate {
 	_u.mutation.SetMatchers(v)
 	return _u
 }
 
 // AppendMatchers appends value to the "matchers" field.
-func (_u *SilenceUpdate) AppendMatchers(v []*label.Matcher) *SilenceUpdate {
+func (_u *MsgSilenceUpdate) AppendMatchers(v []*label.Matcher) *MsgSilenceUpdate {
 	_u.mutation.AppendMatchers(v)
 	return _u
 }
 
 // ClearMatchers clears the value of the "matchers" field.
-func (_u *SilenceUpdate) ClearMatchers() *SilenceUpdate {
+func (_u *MsgSilenceUpdate) ClearMatchers() *MsgSilenceUpdate {
 	_u.mutation.ClearMatchers()
 	return _u
 }
 
 // SetStartsAt sets the "starts_at" field.
-func (_u *SilenceUpdate) SetStartsAt(v time.Time) *SilenceUpdate {
+func (_u *MsgSilenceUpdate) SetStartsAt(v time.Time) *MsgSilenceUpdate {
 	_u.mutation.SetStartsAt(v)
 	return _u
 }
 
 // SetNillableStartsAt sets the "starts_at" field if the given value is not nil.
-func (_u *SilenceUpdate) SetNillableStartsAt(v *time.Time) *SilenceUpdate {
+func (_u *MsgSilenceUpdate) SetNillableStartsAt(v *time.Time) *MsgSilenceUpdate {
 	if v != nil {
 		_u.SetStartsAt(*v)
 	}
@@ -113,13 +113,13 @@ func (_u *SilenceUpdate) SetNillableStartsAt(v *time.Time) *SilenceUpdate {
 }
 
 // SetEndsAt sets the "ends_at" field.
-func (_u *SilenceUpdate) SetEndsAt(v time.Time) *SilenceUpdate {
+func (_u *MsgSilenceUpdate) SetEndsAt(v time.Time) *MsgSilenceUpdate {
 	_u.mutation.SetEndsAt(v)
 	return _u
 }
 
 // SetNillableEndsAt sets the "ends_at" field if the given value is not nil.
-func (_u *SilenceUpdate) SetNillableEndsAt(v *time.Time) *SilenceUpdate {
+func (_u *MsgSilenceUpdate) SetNillableEndsAt(v *time.Time) *MsgSilenceUpdate {
 	if v != nil {
 		_u.SetEndsAt(*v)
 	}
@@ -127,13 +127,13 @@ func (_u *SilenceUpdate) SetNillableEndsAt(v *time.Time) *SilenceUpdate {
 }
 
 // SetComments sets the "comments" field.
-func (_u *SilenceUpdate) SetComments(v string) *SilenceUpdate {
+func (_u *MsgSilenceUpdate) SetComments(v string) *MsgSilenceUpdate {
 	_u.mutation.SetComments(v)
 	return _u
 }
 
 // SetNillableComments sets the "comments" field if the given value is not nil.
-func (_u *SilenceUpdate) SetNillableComments(v *string) *SilenceUpdate {
+func (_u *MsgSilenceUpdate) SetNillableComments(v *string) *MsgSilenceUpdate {
 	if v != nil {
 		_u.SetComments(*v)
 	}
@@ -141,37 +141,37 @@ func (_u *SilenceUpdate) SetNillableComments(v *string) *SilenceUpdate {
 }
 
 // ClearComments clears the value of the "comments" field.
-func (_u *SilenceUpdate) ClearComments() *SilenceUpdate {
+func (_u *MsgSilenceUpdate) ClearComments() *MsgSilenceUpdate {
 	_u.mutation.ClearComments()
 	return _u
 }
 
 // SetState sets the "state" field.
-func (_u *SilenceUpdate) SetState(v alert.SilenceState) *SilenceUpdate {
+func (_u *MsgSilenceUpdate) SetState(v silence.SilenceState) *MsgSilenceUpdate {
 	_u.mutation.SetState(v)
 	return _u
 }
 
 // SetNillableState sets the "state" field if the given value is not nil.
-func (_u *SilenceUpdate) SetNillableState(v *alert.SilenceState) *SilenceUpdate {
+func (_u *MsgSilenceUpdate) SetNillableState(v *silence.SilenceState) *MsgSilenceUpdate {
 	if v != nil {
 		_u.SetState(*v)
 	}
 	return _u
 }
 
-// Mutation returns the SilenceMutation object of the builder.
-func (_u *SilenceUpdate) Mutation() *SilenceMutation {
+// Mutation returns the MsgSilenceMutation object of the builder.
+func (_u *MsgSilenceUpdate) Mutation() *MsgSilenceMutation {
 	return _u.mutation
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (_u *SilenceUpdate) Save(ctx context.Context) (int, error) {
+func (_u *MsgSilenceUpdate) Save(ctx context.Context) (int, error) {
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (_u *SilenceUpdate) SaveX(ctx context.Context) int {
+func (_u *MsgSilenceUpdate) SaveX(ctx context.Context) int {
 	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -180,36 +180,36 @@ func (_u *SilenceUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (_u *SilenceUpdate) Exec(ctx context.Context) error {
+func (_u *MsgSilenceUpdate) Exec(ctx context.Context) error {
 	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_u *SilenceUpdate) ExecX(ctx context.Context) {
+func (_u *MsgSilenceUpdate) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (_u *SilenceUpdate) check() error {
+func (_u *MsgSilenceUpdate) check() error {
 	if v, ok := _u.mutation.State(); ok {
-		if err := silence.StateValidator(v); err != nil {
-			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "Silence.state": %w`, err)}
+		if err := msgsilence.StateValidator(v); err != nil {
+			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "MsgSilence.state": %w`, err)}
 		}
 	}
 	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "Silence.user"`)
+		return errors.New(`ent: clearing a required unique edge "MsgSilence.user"`)
 	}
 	return nil
 }
 
-func (_u *SilenceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+func (_u *MsgSilenceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(silence.Table, silence.Columns, sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(msgsilence.Table, msgsilence.Columns, sqlgraph.NewFieldSpec(msgsilence.FieldID, field.TypeInt))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -218,51 +218,51 @@ func (_u *SilenceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 	}
 	if value, ok := _u.mutation.UpdatedBy(); ok {
-		_spec.SetField(silence.FieldUpdatedBy, field.TypeInt, value)
+		_spec.SetField(msgsilence.FieldUpdatedBy, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.AddedUpdatedBy(); ok {
-		_spec.AddField(silence.FieldUpdatedBy, field.TypeInt, value)
+		_spec.AddField(msgsilence.FieldUpdatedBy, field.TypeInt, value)
 	}
 	if _u.mutation.UpdatedByCleared() {
-		_spec.ClearField(silence.FieldUpdatedBy, field.TypeInt)
+		_spec.ClearField(msgsilence.FieldUpdatedBy, field.TypeInt)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(silence.FieldUpdatedAt, field.TypeTime, value)
+		_spec.SetField(msgsilence.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if _u.mutation.UpdatedAtCleared() {
-		_spec.ClearField(silence.FieldUpdatedAt, field.TypeTime)
+		_spec.ClearField(msgsilence.FieldUpdatedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Matchers(); ok {
-		_spec.SetField(silence.FieldMatchers, field.TypeJSON, value)
+		_spec.SetField(msgsilence.FieldMatchers, field.TypeJSON, value)
 	}
 	if value, ok := _u.mutation.AppendedMatchers(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, silence.FieldMatchers, value)
+			sqljson.Append(u, msgsilence.FieldMatchers, value)
 		})
 	}
 	if _u.mutation.MatchersCleared() {
-		_spec.ClearField(silence.FieldMatchers, field.TypeJSON)
+		_spec.ClearField(msgsilence.FieldMatchers, field.TypeJSON)
 	}
 	if value, ok := _u.mutation.StartsAt(); ok {
-		_spec.SetField(silence.FieldStartsAt, field.TypeTime, value)
+		_spec.SetField(msgsilence.FieldStartsAt, field.TypeTime, value)
 	}
 	if value, ok := _u.mutation.EndsAt(); ok {
-		_spec.SetField(silence.FieldEndsAt, field.TypeTime, value)
+		_spec.SetField(msgsilence.FieldEndsAt, field.TypeTime, value)
 	}
 	if value, ok := _u.mutation.Comments(); ok {
-		_spec.SetField(silence.FieldComments, field.TypeString, value)
+		_spec.SetField(msgsilence.FieldComments, field.TypeString, value)
 	}
 	if _u.mutation.CommentsCleared() {
-		_spec.ClearField(silence.FieldComments, field.TypeString)
+		_spec.ClearField(msgsilence.FieldComments, field.TypeString)
 	}
 	if value, ok := _u.mutation.State(); ok {
-		_spec.SetField(silence.FieldState, field.TypeEnum, value)
+		_spec.SetField(msgsilence.FieldState, field.TypeEnum, value)
 	}
-	_spec.Node.Schema = _u.schemaConfig.Silence
+	_spec.Node.Schema = _u.schemaConfig.MsgSilence
 	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
-			err = &NotFoundError{silence.Label}
+			err = &NotFoundError{msgsilence.Label}
 		} else if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -272,23 +272,23 @@ func (_u *SilenceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	return _node, nil
 }
 
-// SilenceUpdateOne is the builder for updating a single Silence entity.
-type SilenceUpdateOne struct {
+// MsgSilenceUpdateOne is the builder for updating a single MsgSilence entity.
+type MsgSilenceUpdateOne struct {
 	config
 	fields   []string
 	hooks    []Hook
-	mutation *SilenceMutation
+	mutation *MsgSilenceMutation
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (_u *SilenceUpdateOne) SetUpdatedBy(v int) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) SetUpdatedBy(v int) *MsgSilenceUpdateOne {
 	_u.mutation.ResetUpdatedBy()
 	_u.mutation.SetUpdatedBy(v)
 	return _u
 }
 
 // SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (_u *SilenceUpdateOne) SetNillableUpdatedBy(v *int) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) SetNillableUpdatedBy(v *int) *MsgSilenceUpdateOne {
 	if v != nil {
 		_u.SetUpdatedBy(*v)
 	}
@@ -296,25 +296,25 @@ func (_u *SilenceUpdateOne) SetNillableUpdatedBy(v *int) *SilenceUpdateOne {
 }
 
 // AddUpdatedBy adds value to the "updated_by" field.
-func (_u *SilenceUpdateOne) AddUpdatedBy(v int) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) AddUpdatedBy(v int) *MsgSilenceUpdateOne {
 	_u.mutation.AddUpdatedBy(v)
 	return _u
 }
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
-func (_u *SilenceUpdateOne) ClearUpdatedBy() *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) ClearUpdatedBy() *MsgSilenceUpdateOne {
 	_u.mutation.ClearUpdatedBy()
 	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (_u *SilenceUpdateOne) SetUpdatedAt(v time.Time) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) SetUpdatedAt(v time.Time) *MsgSilenceUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
 	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (_u *SilenceUpdateOne) SetNillableUpdatedAt(v *time.Time) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) SetNillableUpdatedAt(v *time.Time) *MsgSilenceUpdateOne {
 	if v != nil {
 		_u.SetUpdatedAt(*v)
 	}
@@ -322,37 +322,37 @@ func (_u *SilenceUpdateOne) SetNillableUpdatedAt(v *time.Time) *SilenceUpdateOne
 }
 
 // ClearUpdatedAt clears the value of the "updated_at" field.
-func (_u *SilenceUpdateOne) ClearUpdatedAt() *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) ClearUpdatedAt() *MsgSilenceUpdateOne {
 	_u.mutation.ClearUpdatedAt()
 	return _u
 }
 
 // SetMatchers sets the "matchers" field.
-func (_u *SilenceUpdateOne) SetMatchers(v []*label.Matcher) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) SetMatchers(v []*label.Matcher) *MsgSilenceUpdateOne {
 	_u.mutation.SetMatchers(v)
 	return _u
 }
 
 // AppendMatchers appends value to the "matchers" field.
-func (_u *SilenceUpdateOne) AppendMatchers(v []*label.Matcher) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) AppendMatchers(v []*label.Matcher) *MsgSilenceUpdateOne {
 	_u.mutation.AppendMatchers(v)
 	return _u
 }
 
 // ClearMatchers clears the value of the "matchers" field.
-func (_u *SilenceUpdateOne) ClearMatchers() *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) ClearMatchers() *MsgSilenceUpdateOne {
 	_u.mutation.ClearMatchers()
 	return _u
 }
 
 // SetStartsAt sets the "starts_at" field.
-func (_u *SilenceUpdateOne) SetStartsAt(v time.Time) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) SetStartsAt(v time.Time) *MsgSilenceUpdateOne {
 	_u.mutation.SetStartsAt(v)
 	return _u
 }
 
 // SetNillableStartsAt sets the "starts_at" field if the given value is not nil.
-func (_u *SilenceUpdateOne) SetNillableStartsAt(v *time.Time) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) SetNillableStartsAt(v *time.Time) *MsgSilenceUpdateOne {
 	if v != nil {
 		_u.SetStartsAt(*v)
 	}
@@ -360,13 +360,13 @@ func (_u *SilenceUpdateOne) SetNillableStartsAt(v *time.Time) *SilenceUpdateOne 
 }
 
 // SetEndsAt sets the "ends_at" field.
-func (_u *SilenceUpdateOne) SetEndsAt(v time.Time) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) SetEndsAt(v time.Time) *MsgSilenceUpdateOne {
 	_u.mutation.SetEndsAt(v)
 	return _u
 }
 
 // SetNillableEndsAt sets the "ends_at" field if the given value is not nil.
-func (_u *SilenceUpdateOne) SetNillableEndsAt(v *time.Time) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) SetNillableEndsAt(v *time.Time) *MsgSilenceUpdateOne {
 	if v != nil {
 		_u.SetEndsAt(*v)
 	}
@@ -374,13 +374,13 @@ func (_u *SilenceUpdateOne) SetNillableEndsAt(v *time.Time) *SilenceUpdateOne {
 }
 
 // SetComments sets the "comments" field.
-func (_u *SilenceUpdateOne) SetComments(v string) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) SetComments(v string) *MsgSilenceUpdateOne {
 	_u.mutation.SetComments(v)
 	return _u
 }
 
 // SetNillableComments sets the "comments" field if the given value is not nil.
-func (_u *SilenceUpdateOne) SetNillableComments(v *string) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) SetNillableComments(v *string) *MsgSilenceUpdateOne {
 	if v != nil {
 		_u.SetComments(*v)
 	}
@@ -388,50 +388,50 @@ func (_u *SilenceUpdateOne) SetNillableComments(v *string) *SilenceUpdateOne {
 }
 
 // ClearComments clears the value of the "comments" field.
-func (_u *SilenceUpdateOne) ClearComments() *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) ClearComments() *MsgSilenceUpdateOne {
 	_u.mutation.ClearComments()
 	return _u
 }
 
 // SetState sets the "state" field.
-func (_u *SilenceUpdateOne) SetState(v alert.SilenceState) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) SetState(v silence.SilenceState) *MsgSilenceUpdateOne {
 	_u.mutation.SetState(v)
 	return _u
 }
 
 // SetNillableState sets the "state" field if the given value is not nil.
-func (_u *SilenceUpdateOne) SetNillableState(v *alert.SilenceState) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) SetNillableState(v *silence.SilenceState) *MsgSilenceUpdateOne {
 	if v != nil {
 		_u.SetState(*v)
 	}
 	return _u
 }
 
-// Mutation returns the SilenceMutation object of the builder.
-func (_u *SilenceUpdateOne) Mutation() *SilenceMutation {
+// Mutation returns the MsgSilenceMutation object of the builder.
+func (_u *MsgSilenceUpdateOne) Mutation() *MsgSilenceMutation {
 	return _u.mutation
 }
 
-// Where appends a list predicates to the SilenceUpdate builder.
-func (_u *SilenceUpdateOne) Where(ps ...predicate.Silence) *SilenceUpdateOne {
+// Where appends a list predicates to the MsgSilenceUpdate builder.
+func (_u *MsgSilenceUpdateOne) Where(ps ...predicate.MsgSilence) *MsgSilenceUpdateOne {
 	_u.mutation.Where(ps...)
 	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (_u *SilenceUpdateOne) Select(field string, fields ...string) *SilenceUpdateOne {
+func (_u *MsgSilenceUpdateOne) Select(field string, fields ...string) *MsgSilenceUpdateOne {
 	_u.fields = append([]string{field}, fields...)
 	return _u
 }
 
-// Save executes the query and returns the updated Silence entity.
-func (_u *SilenceUpdateOne) Save(ctx context.Context) (*Silence, error) {
+// Save executes the query and returns the updated MsgSilence entity.
+func (_u *MsgSilenceUpdateOne) Save(ctx context.Context) (*MsgSilence, error) {
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (_u *SilenceUpdateOne) SaveX(ctx context.Context) *Silence {
+func (_u *MsgSilenceUpdateOne) SaveX(ctx context.Context) *MsgSilence {
 	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -440,49 +440,49 @@ func (_u *SilenceUpdateOne) SaveX(ctx context.Context) *Silence {
 }
 
 // Exec executes the query on the entity.
-func (_u *SilenceUpdateOne) Exec(ctx context.Context) error {
+func (_u *MsgSilenceUpdateOne) Exec(ctx context.Context) error {
 	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_u *SilenceUpdateOne) ExecX(ctx context.Context) {
+func (_u *MsgSilenceUpdateOne) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (_u *SilenceUpdateOne) check() error {
+func (_u *MsgSilenceUpdateOne) check() error {
 	if v, ok := _u.mutation.State(); ok {
-		if err := silence.StateValidator(v); err != nil {
-			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "Silence.state": %w`, err)}
+		if err := msgsilence.StateValidator(v); err != nil {
+			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "MsgSilence.state": %w`, err)}
 		}
 	}
 	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "Silence.user"`)
+		return errors.New(`ent: clearing a required unique edge "MsgSilence.user"`)
 	}
 	return nil
 }
 
-func (_u *SilenceUpdateOne) sqlSave(ctx context.Context) (_node *Silence, err error) {
+func (_u *MsgSilenceUpdateOne) sqlSave(ctx context.Context) (_node *MsgSilence, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(silence.Table, silence.Columns, sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(msgsilence.Table, msgsilence.Columns, sqlgraph.NewFieldSpec(msgsilence.FieldID, field.TypeInt))
 	id, ok := _u.mutation.ID()
 	if !ok {
-		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Silence.id" for update`)}
+		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "MsgSilence.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
 	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, silence.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, msgsilence.FieldID)
 		for _, f := range fields {
-			if !silence.ValidColumn(f) {
+			if !msgsilence.ValidColumn(f) {
 				return nil, &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 			}
-			if f != silence.FieldID {
+			if f != msgsilence.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, f)
 			}
 		}
@@ -495,54 +495,54 @@ func (_u *SilenceUpdateOne) sqlSave(ctx context.Context) (_node *Silence, err er
 		}
 	}
 	if value, ok := _u.mutation.UpdatedBy(); ok {
-		_spec.SetField(silence.FieldUpdatedBy, field.TypeInt, value)
+		_spec.SetField(msgsilence.FieldUpdatedBy, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.AddedUpdatedBy(); ok {
-		_spec.AddField(silence.FieldUpdatedBy, field.TypeInt, value)
+		_spec.AddField(msgsilence.FieldUpdatedBy, field.TypeInt, value)
 	}
 	if _u.mutation.UpdatedByCleared() {
-		_spec.ClearField(silence.FieldUpdatedBy, field.TypeInt)
+		_spec.ClearField(msgsilence.FieldUpdatedBy, field.TypeInt)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(silence.FieldUpdatedAt, field.TypeTime, value)
+		_spec.SetField(msgsilence.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if _u.mutation.UpdatedAtCleared() {
-		_spec.ClearField(silence.FieldUpdatedAt, field.TypeTime)
+		_spec.ClearField(msgsilence.FieldUpdatedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Matchers(); ok {
-		_spec.SetField(silence.FieldMatchers, field.TypeJSON, value)
+		_spec.SetField(msgsilence.FieldMatchers, field.TypeJSON, value)
 	}
 	if value, ok := _u.mutation.AppendedMatchers(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, silence.FieldMatchers, value)
+			sqljson.Append(u, msgsilence.FieldMatchers, value)
 		})
 	}
 	if _u.mutation.MatchersCleared() {
-		_spec.ClearField(silence.FieldMatchers, field.TypeJSON)
+		_spec.ClearField(msgsilence.FieldMatchers, field.TypeJSON)
 	}
 	if value, ok := _u.mutation.StartsAt(); ok {
-		_spec.SetField(silence.FieldStartsAt, field.TypeTime, value)
+		_spec.SetField(msgsilence.FieldStartsAt, field.TypeTime, value)
 	}
 	if value, ok := _u.mutation.EndsAt(); ok {
-		_spec.SetField(silence.FieldEndsAt, field.TypeTime, value)
+		_spec.SetField(msgsilence.FieldEndsAt, field.TypeTime, value)
 	}
 	if value, ok := _u.mutation.Comments(); ok {
-		_spec.SetField(silence.FieldComments, field.TypeString, value)
+		_spec.SetField(msgsilence.FieldComments, field.TypeString, value)
 	}
 	if _u.mutation.CommentsCleared() {
-		_spec.ClearField(silence.FieldComments, field.TypeString)
+		_spec.ClearField(msgsilence.FieldComments, field.TypeString)
 	}
 	if value, ok := _u.mutation.State(); ok {
-		_spec.SetField(silence.FieldState, field.TypeEnum, value)
+		_spec.SetField(msgsilence.FieldState, field.TypeEnum, value)
 	}
-	_spec.Node.Schema = _u.schemaConfig.Silence
+	_spec.Node.Schema = _u.schemaConfig.MsgSilence
 	ctx = internal.NewSchemaConfigContext(ctx, _u.schemaConfig)
-	_node = &Silence{config: _u.config}
+	_node = &MsgSilence{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
 	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
-			err = &NotFoundError{silence.Label}
+			err = &NotFoundError{msgsilence.Label}
 		} else if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}

@@ -21,6 +21,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
+	"github.com/woocoos/msgcenter/ent/msgsilence"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -28,9 +29,9 @@ import (
 	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
-	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
+	"github.com/woocoos/msgcenter/ent/userdevice"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
@@ -50,6 +51,8 @@ type Client struct {
 	MsgInternal *MsgInternalClient
 	// MsgInternalTo is the client for interacting with the MsgInternalTo builders.
 	MsgInternalTo *MsgInternalToClient
+	// MsgSilence is the client for interacting with the MsgSilence builders.
+	MsgSilence *MsgSilenceClient
 	// MsgSubscriber is the client for interacting with the MsgSubscriber builders.
 	MsgSubscriber *MsgSubscriberClient
 	// MsgTemplate is the client for interacting with the MsgTemplate builders.
@@ -64,12 +67,12 @@ type Client struct {
 	Org *OrgClient
 	// OrgRoleUser is the client for interacting with the OrgRoleUser builders.
 	OrgRoleUser *OrgRoleUserClient
-	// Silence is the client for interacting with the Silence builders.
-	Silence *SilenceClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// UserAddr is the client for interacting with the UserAddr builders.
 	UserAddr *UserAddrClient
+	// UserDevice is the client for interacting with the UserDevice builders.
+	UserDevice *UserDeviceClient
 	// additional fields for node api
 	tables tables
 }
@@ -88,6 +91,7 @@ func (c *Client) init() {
 	c.MsgEvent = NewMsgEventClient(c.config)
 	c.MsgInternal = NewMsgInternalClient(c.config)
 	c.MsgInternalTo = NewMsgInternalToClient(c.config)
+	c.MsgSilence = NewMsgSilenceClient(c.config)
 	c.MsgSubscriber = NewMsgSubscriberClient(c.config)
 	c.MsgTemplate = NewMsgTemplateClient(c.config)
 	c.MsgType = NewMsgTypeClient(c.config)
@@ -95,9 +99,9 @@ func (c *Client) init() {
 	c.NlogAlert = NewNlogAlertClient(c.config)
 	c.Org = NewOrgClient(c.config)
 	c.OrgRoleUser = NewOrgRoleUserClient(c.config)
-	c.Silence = NewSilenceClient(c.config)
 	c.User = NewUserClient(c.config)
 	c.UserAddr = NewUserAddrClient(c.config)
+	c.UserDevice = NewUserDeviceClient(c.config)
 }
 
 type (
@@ -197,6 +201,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		MsgEvent:      NewMsgEventClient(cfg),
 		MsgInternal:   NewMsgInternalClient(cfg),
 		MsgInternalTo: NewMsgInternalToClient(cfg),
+		MsgSilence:    NewMsgSilenceClient(cfg),
 		MsgSubscriber: NewMsgSubscriberClient(cfg),
 		MsgTemplate:   NewMsgTemplateClient(cfg),
 		MsgType:       NewMsgTypeClient(cfg),
@@ -204,9 +209,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		NlogAlert:     NewNlogAlertClient(cfg),
 		Org:           NewOrgClient(cfg),
 		OrgRoleUser:   NewOrgRoleUserClient(cfg),
-		Silence:       NewSilenceClient(cfg),
 		User:          NewUserClient(cfg),
 		UserAddr:      NewUserAddrClient(cfg),
+		UserDevice:    NewUserDeviceClient(cfg),
 	}, nil
 }
 
@@ -231,6 +236,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		MsgEvent:      NewMsgEventClient(cfg),
 		MsgInternal:   NewMsgInternalClient(cfg),
 		MsgInternalTo: NewMsgInternalToClient(cfg),
+		MsgSilence:    NewMsgSilenceClient(cfg),
 		MsgSubscriber: NewMsgSubscriberClient(cfg),
 		MsgTemplate:   NewMsgTemplateClient(cfg),
 		MsgType:       NewMsgTypeClient(cfg),
@@ -238,9 +244,9 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		NlogAlert:     NewNlogAlertClient(cfg),
 		Org:           NewOrgClient(cfg),
 		OrgRoleUser:   NewOrgRoleUserClient(cfg),
-		Silence:       NewSilenceClient(cfg),
 		User:          NewUserClient(cfg),
 		UserAddr:      NewUserAddrClient(cfg),
+		UserDevice:    NewUserDeviceClient(cfg),
 	}, nil
 }
 
@@ -271,8 +277,8 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal, c.MsgInternalTo,
-		c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert, c.Org,
-		c.OrgRoleUser, c.Silence, c.User, c.UserAddr,
+		c.MsgSilence, c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert,
+		c.Org, c.OrgRoleUser, c.User, c.UserAddr, c.UserDevice,
 	} {
 		n.Use(hooks...)
 	}
@@ -283,8 +289,8 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal, c.MsgInternalTo,
-		c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert, c.Org,
-		c.OrgRoleUser, c.Silence, c.User, c.UserAddr,
+		c.MsgSilence, c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert,
+		c.Org, c.OrgRoleUser, c.User, c.UserAddr, c.UserDevice,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -303,6 +309,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.MsgInternal.mutate(ctx, m)
 	case *MsgInternalToMutation:
 		return c.MsgInternalTo.mutate(ctx, m)
+	case *MsgSilenceMutation:
+		return c.MsgSilence.mutate(ctx, m)
 	case *MsgSubscriberMutation:
 		return c.MsgSubscriber.mutate(ctx, m)
 	case *MsgTemplateMutation:
@@ -317,12 +325,12 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Org.mutate(ctx, m)
 	case *OrgRoleUserMutation:
 		return c.OrgRoleUser.mutate(ctx, m)
-	case *SilenceMutation:
-		return c.Silence.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	case *UserAddrMutation:
 		return c.UserAddr.mutate(ctx, m)
+	case *UserDeviceMutation:
+		return c.UserDevice.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -781,6 +789,25 @@ func (c *MsgEventClient) QueryMsgType(_m *MsgEvent) *MsgTypeQuery {
 	return query
 }
 
+// QuerySubscribers queries the subscribers edge of a MsgEvent.
+func (c *MsgEventClient) QuerySubscribers(_m *MsgEvent) *MsgSubscriberQuery {
+	query := (&MsgSubscriberClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msgevent.Table, msgevent.FieldID, id),
+			sqlgraph.To(msgsubscriber.Table, msgsubscriber.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, msgevent.SubscribersTable, msgevent.SubscribersColumn),
+		)
+		schemaConfig := _m.schemaConfig
+		step.To.Schema = schemaConfig.MsgSubscriber
+		step.Edge.Schema = schemaConfig.MsgSubscriber
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryCustomerTemplate queries the customer_template edge of a MsgEvent.
 func (c *MsgEventClient) QueryCustomerTemplate(_m *MsgEvent) *MsgTemplateQuery {
 	query := (&MsgTemplateClient{config: c.config}).Query()
@@ -1153,6 +1180,160 @@ func (c *MsgInternalToClient) mutate(ctx context.Context, m *MsgInternalToMutati
 	}
 }
 
+// MsgSilenceClient is a client for the MsgSilence schema.
+type MsgSilenceClient struct {
+	config
+}
+
+// NewMsgSilenceClient returns a client for the MsgSilence from the given config.
+func NewMsgSilenceClient(c config) *MsgSilenceClient {
+	return &MsgSilenceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `msgsilence.Hooks(f(g(h())))`.
+func (c *MsgSilenceClient) Use(hooks ...Hook) {
+	c.hooks.MsgSilence = append(c.hooks.MsgSilence, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `msgsilence.Intercept(f(g(h())))`.
+func (c *MsgSilenceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MsgSilence = append(c.inters.MsgSilence, interceptors...)
+}
+
+// Create returns a builder for creating a MsgSilence entity.
+func (c *MsgSilenceClient) Create() *MsgSilenceCreate {
+	mutation := newMsgSilenceMutation(c.config, OpCreate)
+	return &MsgSilenceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MsgSilence entities.
+func (c *MsgSilenceClient) CreateBulk(builders ...*MsgSilenceCreate) *MsgSilenceCreateBulk {
+	return &MsgSilenceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MsgSilenceClient) MapCreateBulk(slice any, setFunc func(*MsgSilenceCreate, int)) *MsgSilenceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MsgSilenceCreateBulk{err: fmt.Errorf("calling to MsgSilenceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MsgSilenceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MsgSilenceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MsgSilence.
+func (c *MsgSilenceClient) Update() *MsgSilenceUpdate {
+	mutation := newMsgSilenceMutation(c.config, OpUpdate)
+	return &MsgSilenceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MsgSilenceClient) UpdateOne(_m *MsgSilence) *MsgSilenceUpdateOne {
+	mutation := newMsgSilenceMutation(c.config, OpUpdateOne, withMsgSilence(_m))
+	return &MsgSilenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MsgSilenceClient) UpdateOneID(id int) *MsgSilenceUpdateOne {
+	mutation := newMsgSilenceMutation(c.config, OpUpdateOne, withMsgSilenceID(id))
+	return &MsgSilenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MsgSilence.
+func (c *MsgSilenceClient) Delete() *MsgSilenceDelete {
+	mutation := newMsgSilenceMutation(c.config, OpDelete)
+	return &MsgSilenceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MsgSilenceClient) DeleteOne(_m *MsgSilence) *MsgSilenceDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MsgSilenceClient) DeleteOneID(id int) *MsgSilenceDeleteOne {
+	builder := c.Delete().Where(msgsilence.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MsgSilenceDeleteOne{builder}
+}
+
+// Query returns a query builder for MsgSilence.
+func (c *MsgSilenceClient) Query() *MsgSilenceQuery {
+	return &MsgSilenceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMsgSilence},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MsgSilence entity by its id.
+func (c *MsgSilenceClient) Get(ctx context.Context, id int) (*MsgSilence, error) {
+	return c.Query().Where(msgsilence.ID(id)).Only(entcache.WithEntryKey(ctx, "MsgSilence", id))
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MsgSilenceClient) GetX(ctx context.Context, id int) *MsgSilence {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a MsgSilence.
+func (c *MsgSilenceClient) QueryUser(_m *MsgSilence) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msgsilence.Table, msgsilence.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, msgsilence.UserTable, msgsilence.UserColumn),
+		)
+		schemaConfig := _m.schemaConfig
+		step.To.Schema = schemaConfig.User
+		step.Edge.Schema = schemaConfig.MsgSilence
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *MsgSilenceClient) Hooks() []Hook {
+	hooks := c.hooks.MsgSilence
+	return append(hooks[:len(hooks):len(hooks)], msgsilence.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *MsgSilenceClient) Interceptors() []Interceptor {
+	inters := c.inters.MsgSilence
+	return append(inters[:len(inters):len(inters)], msgsilence.Interceptors[:]...)
+}
+
+func (c *MsgSilenceClient) mutate(ctx context.Context, m *MsgSilenceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MsgSilenceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MsgSilenceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MsgSilenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MsgSilenceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MsgSilence mutation op: %q", m.Op())
+	}
+}
+
 // MsgSubscriberClient is a client for the MsgSubscriber schema.
 type MsgSubscriberClient struct {
 	config
@@ -1273,6 +1454,25 @@ func (c *MsgSubscriberClient) QueryMsgType(_m *MsgSubscriber) *MsgTypeQuery {
 		)
 		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgSubscriber
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryMsgEvent queries the msg_event edge of a MsgSubscriber.
+func (c *MsgSubscriberClient) QueryMsgEvent(_m *MsgSubscriber) *MsgEventQuery {
+	query := (&MsgEventClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msgsubscriber.Table, msgsubscriber.FieldID, id),
+			sqlgraph.To(msgevent.Table, msgevent.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, msgsubscriber.MsgEventTable, msgsubscriber.MsgEventColumn),
+		)
+		schemaConfig := _m.schemaConfig
+		step.To.Schema = schemaConfig.MsgEvent
 		step.Edge.Schema = schemaConfig.MsgSubscriber
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -2123,8 +2323,7 @@ func (c *OrgClient) QueryMsgAlerts(_m *Org) *MsgAlertQuery {
 
 // Hooks returns the client hooks.
 func (c *OrgClient) Hooks() []Hook {
-	hooks := c.hooks.Org
-	return append(hooks[:len(hooks):len(hooks)], org.Hooks[:]...)
+	return c.hooks.Org
 }
 
 // Interceptors returns the client interceptors.
@@ -2257,8 +2456,7 @@ func (c *OrgRoleUserClient) GetX(ctx context.Context, id int) *OrgRoleUser {
 
 // Hooks returns the client hooks.
 func (c *OrgRoleUserClient) Hooks() []Hook {
-	hooks := c.hooks.OrgRoleUser
-	return append(hooks[:len(hooks):len(hooks)], orgroleuser.Hooks[:]...)
+	return c.hooks.OrgRoleUser
 }
 
 // Interceptors returns the client interceptors.
@@ -2278,160 +2476,6 @@ func (c *OrgRoleUserClient) mutate(ctx context.Context, m *OrgRoleUserMutation) 
 		return (&OrgRoleUserDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown OrgRoleUser mutation op: %q", m.Op())
-	}
-}
-
-// SilenceClient is a client for the Silence schema.
-type SilenceClient struct {
-	config
-}
-
-// NewSilenceClient returns a client for the Silence from the given config.
-func NewSilenceClient(c config) *SilenceClient {
-	return &SilenceClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `silence.Hooks(f(g(h())))`.
-func (c *SilenceClient) Use(hooks ...Hook) {
-	c.hooks.Silence = append(c.hooks.Silence, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `silence.Intercept(f(g(h())))`.
-func (c *SilenceClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Silence = append(c.inters.Silence, interceptors...)
-}
-
-// Create returns a builder for creating a Silence entity.
-func (c *SilenceClient) Create() *SilenceCreate {
-	mutation := newSilenceMutation(c.config, OpCreate)
-	return &SilenceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of Silence entities.
-func (c *SilenceClient) CreateBulk(builders ...*SilenceCreate) *SilenceCreateBulk {
-	return &SilenceCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *SilenceClient) MapCreateBulk(slice any, setFunc func(*SilenceCreate, int)) *SilenceCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &SilenceCreateBulk{err: fmt.Errorf("calling to SilenceClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*SilenceCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &SilenceCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for Silence.
-func (c *SilenceClient) Update() *SilenceUpdate {
-	mutation := newSilenceMutation(c.config, OpUpdate)
-	return &SilenceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *SilenceClient) UpdateOne(_m *Silence) *SilenceUpdateOne {
-	mutation := newSilenceMutation(c.config, OpUpdateOne, withSilence(_m))
-	return &SilenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *SilenceClient) UpdateOneID(id int) *SilenceUpdateOne {
-	mutation := newSilenceMutation(c.config, OpUpdateOne, withSilenceID(id))
-	return &SilenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for Silence.
-func (c *SilenceClient) Delete() *SilenceDelete {
-	mutation := newSilenceMutation(c.config, OpDelete)
-	return &SilenceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *SilenceClient) DeleteOne(_m *Silence) *SilenceDeleteOne {
-	return c.DeleteOneID(_m.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *SilenceClient) DeleteOneID(id int) *SilenceDeleteOne {
-	builder := c.Delete().Where(silence.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &SilenceDeleteOne{builder}
-}
-
-// Query returns a query builder for Silence.
-func (c *SilenceClient) Query() *SilenceQuery {
-	return &SilenceQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeSilence},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a Silence entity by its id.
-func (c *SilenceClient) Get(ctx context.Context, id int) (*Silence, error) {
-	return c.Query().Where(silence.ID(id)).Only(entcache.WithEntryKey(ctx, "Silence", id))
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *SilenceClient) GetX(ctx context.Context, id int) *Silence {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryUser queries the user edge of a Silence.
-func (c *SilenceClient) QueryUser(_m *Silence) *UserQuery {
-	query := (&UserClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := _m.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(silence.Table, silence.FieldID, id),
-			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, silence.UserTable, silence.UserColumn),
-		)
-		schemaConfig := _m.schemaConfig
-		step.To.Schema = schemaConfig.User
-		step.Edge.Schema = schemaConfig.Silence
-		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *SilenceClient) Hooks() []Hook {
-	hooks := c.hooks.Silence
-	return append(hooks[:len(hooks):len(hooks)], silence.Hooks[:]...)
-}
-
-// Interceptors returns the client interceptors.
-func (c *SilenceClient) Interceptors() []Interceptor {
-	inters := c.inters.Silence
-	return append(inters[:len(inters):len(inters)], silence.Interceptors[:]...)
-}
-
-func (c *SilenceClient) mutate(ctx context.Context, m *SilenceMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&SilenceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&SilenceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&SilenceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&SilenceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown Silence mutation op: %q", m.Op())
 	}
 }
 
@@ -2544,18 +2588,18 @@ func (c *UserClient) GetX(ctx context.Context, id int) *User {
 }
 
 // QuerySilences queries the silences edge of a User.
-func (c *UserClient) QuerySilences(_m *User) *SilenceQuery {
-	query := (&SilenceClient{config: c.config}).Query()
+func (c *UserClient) QuerySilences(_m *User) *MsgSilenceQuery {
+	query := (&MsgSilenceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, id),
-			sqlgraph.To(silence.Table, silence.FieldID),
+			sqlgraph.To(msgsilence.Table, msgsilence.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.SilencesTable, user.SilencesColumn),
 		)
 		schemaConfig := _m.schemaConfig
-		step.To.Schema = schemaConfig.Silence
-		step.Edge.Schema = schemaConfig.Silence
+		step.To.Schema = schemaConfig.MsgSilence
+		step.Edge.Schema = schemaConfig.MsgSilence
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
@@ -2583,8 +2627,7 @@ func (c *UserClient) QueryAddresses(_m *User) *UserAddrQuery {
 
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
-	hooks := c.hooks.User
-	return append(hooks[:len(hooks):len(hooks)], user.Hooks[:]...)
+	return c.hooks.User
 }
 
 // Interceptors returns the client interceptors.
@@ -2736,8 +2779,7 @@ func (c *UserAddrClient) QueryUser(_m *UserAddr) *UserQuery {
 
 // Hooks returns the client hooks.
 func (c *UserAddrClient) Hooks() []Hook {
-	hooks := c.hooks.UserAddr
-	return append(hooks[:len(hooks):len(hooks)], useraddr.Hooks[:]...)
+	return c.hooks.UserAddr
 }
 
 // Interceptors returns the client interceptors.
@@ -2760,17 +2802,150 @@ func (c *UserAddrClient) mutate(ctx context.Context, m *UserAddrMutation) (Value
 	}
 }
 
+// UserDeviceClient is a client for the UserDevice schema.
+type UserDeviceClient struct {
+	config
+}
+
+// NewUserDeviceClient returns a client for the UserDevice from the given config.
+func NewUserDeviceClient(c config) *UserDeviceClient {
+	return &UserDeviceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `userdevice.Hooks(f(g(h())))`.
+func (c *UserDeviceClient) Use(hooks ...Hook) {
+	c.hooks.UserDevice = append(c.hooks.UserDevice, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `userdevice.Intercept(f(g(h())))`.
+func (c *UserDeviceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserDevice = append(c.inters.UserDevice, interceptors...)
+}
+
+// Create returns a builder for creating a UserDevice entity.
+func (c *UserDeviceClient) Create() *UserDeviceCreate {
+	mutation := newUserDeviceMutation(c.config, OpCreate)
+	return &UserDeviceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserDevice entities.
+func (c *UserDeviceClient) CreateBulk(builders ...*UserDeviceCreate) *UserDeviceCreateBulk {
+	return &UserDeviceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserDeviceClient) MapCreateBulk(slice any, setFunc func(*UserDeviceCreate, int)) *UserDeviceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserDeviceCreateBulk{err: fmt.Errorf("calling to UserDeviceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserDeviceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserDeviceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserDevice.
+func (c *UserDeviceClient) Update() *UserDeviceUpdate {
+	mutation := newUserDeviceMutation(c.config, OpUpdate)
+	return &UserDeviceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserDeviceClient) UpdateOne(_m *UserDevice) *UserDeviceUpdateOne {
+	mutation := newUserDeviceMutation(c.config, OpUpdateOne, withUserDevice(_m))
+	return &UserDeviceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserDeviceClient) UpdateOneID(id int) *UserDeviceUpdateOne {
+	mutation := newUserDeviceMutation(c.config, OpUpdateOne, withUserDeviceID(id))
+	return &UserDeviceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserDevice.
+func (c *UserDeviceClient) Delete() *UserDeviceDelete {
+	mutation := newUserDeviceMutation(c.config, OpDelete)
+	return &UserDeviceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UserDeviceClient) DeleteOne(_m *UserDevice) *UserDeviceDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UserDeviceClient) DeleteOneID(id int) *UserDeviceDeleteOne {
+	builder := c.Delete().Where(userdevice.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserDeviceDeleteOne{builder}
+}
+
+// Query returns a query builder for UserDevice.
+func (c *UserDeviceClient) Query() *UserDeviceQuery {
+	return &UserDeviceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserDevice},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UserDevice entity by its id.
+func (c *UserDeviceClient) Get(ctx context.Context, id int) (*UserDevice, error) {
+	return c.Query().Where(userdevice.ID(id)).Only(entcache.WithEntryKey(ctx, "UserDevice", id))
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserDeviceClient) GetX(ctx context.Context, id int) *UserDevice {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *UserDeviceClient) Hooks() []Hook {
+	return c.hooks.UserDevice
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserDeviceClient) Interceptors() []Interceptor {
+	return c.inters.UserDevice
+}
+
+func (c *UserDeviceClient) mutate(ctx context.Context, m *UserDeviceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserDeviceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserDeviceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserDeviceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserDeviceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserDevice mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSubscriber,
-		MsgTemplate, MsgType, Nlog, NlogAlert, Org, OrgRoleUser, Silence, User,
-		UserAddr []ent.Hook
+		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSilence,
+		MsgSubscriber, MsgTemplate, MsgType, Nlog, NlogAlert, Org, OrgRoleUser, User,
+		UserAddr, UserDevice []ent.Hook
 	}
 	inters struct {
-		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSubscriber,
-		MsgTemplate, MsgType, Nlog, NlogAlert, Org, OrgRoleUser, Silence, User,
-		UserAddr []ent.Interceptor
+		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSilence,
+		MsgSubscriber, MsgTemplate, MsgType, Nlog, NlogAlert, Org, OrgRoleUser, User,
+		UserAddr, UserDevice []ent.Interceptor
 	}
 )
 
