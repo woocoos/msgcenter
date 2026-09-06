@@ -221,8 +221,27 @@ func overrideWebHookConfig(basedir, attdir string, client *ent.Client) notify.Cu
 func overrideUmengConfig(basedir, attdir string, client *ent.Client) notify.CustomerConfigFunc[profile.UmengConfig] {
 	return func(ctx context.Context, cfg *profile.UmengConfig, set label.LabelSet,
 	) error {
-		// Umeng config does not support template overrides from database.
-		// Template rendering is handled in the notifier using default templates.
+		data, err := findTemplate(ctx, basedir, attdir, client, profile.ReceiverUmeng, set)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return nil
+			}
+			return err
+		}
+		ev, err := data.QueryEvent().WithMsgType(func(query *ent.MsgTypeQuery) {
+			query.Select(msgtype.FieldCategory)
+		}).Only(ctx)
+		if err != nil {
+			// must have
+			return err
+		}
+		mt, err := ev.MsgType(ctx)
+		if err != nil {
+			return err
+		}
+		cfg.Extras["category"] = mt.Category
+		cfg.Subject = data.Subject
+		cfg.Body = data.Body
 		return nil
 	}
 }

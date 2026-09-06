@@ -213,6 +213,7 @@ type ComplexityRoot struct {
 	}
 
 	MsgInternal struct {
+		AlertID       func(childComplexity int) int
 		Body          func(childComplexity int) int
 		Category      func(childComplexity int) int
 		CreatedAt     func(childComplexity int) int
@@ -221,6 +222,7 @@ type ComplexityRoot struct {
 		HasReadCounts func(childComplexity int) int
 		ID            func(childComplexity int) int
 		MsgInternalTo func(childComplexity int) int
+		ReceiverType  func(childComplexity int) int
 		Redirect      func(childComplexity int) int
 		Subject       func(childComplexity int) int
 		TenantID      func(childComplexity int) int
@@ -507,8 +509,10 @@ type ComplexityRoot struct {
 	UmengConfig struct {
 		APIURL         func(childComplexity int) int
 		Apps           func(childComplexity int) int
+		Body           func(childComplexity int) int
 		ProductionMode func(childComplexity int) int
 		SendResolved   func(childComplexity int) int
+		Subject        func(childComplexity int) int
 	}
 
 	User struct {
@@ -1302,6 +1306,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgEventEdge.Node(childComplexity), true
 
+	case "MsgInternal.alertID":
+		if e.complexity.MsgInternal.AlertID == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.AlertID(childComplexity), true
+
 	case "MsgInternal.body":
 		if e.complexity.MsgInternal.Body == nil {
 			break
@@ -1357,6 +1368,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgInternal.MsgInternalTo(childComplexity), true
+
+	case "MsgInternal.receiverType":
+		if e.complexity.MsgInternal.ReceiverType == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.ReceiverType(childComplexity), true
 
 	case "MsgInternal.redirect":
 		if e.complexity.MsgInternal.Redirect == nil {
@@ -3018,6 +3036,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UmengConfig.Apps(childComplexity), true
 
+	case "UmengConfig.body":
+		if e.complexity.UmengConfig.Body == nil {
+			break
+		}
+
+		return e.complexity.UmengConfig.Body(childComplexity), true
+
 	case "UmengConfig.productionMode":
 		if e.complexity.UmengConfig.ProductionMode == nil {
 			break
@@ -3031,6 +3056,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UmengConfig.SendResolved(childComplexity), true
+
+	case "UmengConfig.subject":
+		if e.complexity.UmengConfig.Subject == nil {
+			break
+		}
+
+		return e.complexity.UmengConfig.Subject(childComplexity), true
 
 	case "User.displayName":
 		if e.complexity.User.DisplayName == nil {
@@ -4319,6 +4351,14 @@ type MsgInternal implements Node {
   消息跳转
   """
   redirect: String
+  """
+  消息模式:站内信,app推送,邮件,短信,微信等
+  """
+  receiverType: MsgInternalReceiverType!
+  """
+  消息ID
+  """
+  alertID: Int
   msgInternalTo: [MsgInternalTo!]
 }
 """
@@ -4369,6 +4409,15 @@ Properties by which MsgInternal connections can be ordered.
 """
 enum MsgInternalOrderField {
   createdAt
+}
+"""
+MsgInternalReceiverType is enum for the field receiver_type
+"""
+enum MsgInternalReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
+  email
+  message
+  webhook
+  umeng
 }
 type MsgInternalTo implements Node {
   id: ID!
@@ -4676,6 +4725,26 @@ input MsgInternalWhereInput {
   redirectNotNil: Boolean
   redirectEqualFold: String
   redirectContainsFold: String
+  """
+  receiver_type field predicates
+  """
+  receiverType: MsgInternalReceiverType
+  receiverTypeNEQ: MsgInternalReceiverType
+  receiverTypeIn: [MsgInternalReceiverType!]
+  receiverTypeNotIn: [MsgInternalReceiverType!]
+  """
+  alert_id field predicates
+  """
+  alertID: Int
+  alertIDNEQ: Int
+  alertIDIn: [Int!]
+  alertIDNotIn: [Int!]
+  alertIDGT: Int
+  alertIDGTE: Int
+  alertIDLT: Int
+  alertIDLTE: Int
+  alertIDIsNil: Boolean
+  alertIDNotNil: Boolean
   """
   msg_internal_to edge predicates
   """
@@ -6489,6 +6558,8 @@ type UmengConfig {
     apiURL: String
     apps: UmengApps!
     productionMode: Boolean
+    subject: String
+    body: String
 }
 
 enum RouteStrType {

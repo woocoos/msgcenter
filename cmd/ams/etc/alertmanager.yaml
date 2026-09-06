@@ -27,8 +27,14 @@ receivers:
     messageConfig:
       sendResolved: false
   - name: umeng
-    umengConfig:
-      sendResolved: false
+    umengConfigs:
+      - sendResolved: false
+        apps:
+          # Android 应用配置, 对应友盟的应用名称
+          qeelyn-dev-android:
+            appKey: "${UMENG_ANDROID_APP_KEY}"
+            appMasterSecret: "${UMENG_ANDROID_APP_MASTER_SECRET}"
+            platform: "android"
 inhibit_rules:
   - source_match:
       severity: "critical"

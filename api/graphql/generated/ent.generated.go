@@ -5597,6 +5597,91 @@ func (ec *executionContext) fieldContext_MsgInternal_redirect(_ context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _MsgInternal_receiverType(ctx context.Context, field graphql.CollectedField, obj *ent.MsgInternal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgInternal_receiverType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ReceiverType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(profile.ReceiverType)
+	fc.Result = res
+	return ec.marshalNMsgInternalReceiverType2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgInternal_receiverType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgInternal",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type MsgInternalReceiverType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgInternal_alertID(ctx context.Context, field graphql.CollectedField, obj *ent.MsgInternal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgInternal_alertID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AlertID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgInternal_alertID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgInternal",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MsgInternal_msgInternalTo(ctx context.Context, field graphql.CollectedField, obj *ent.MsgInternal) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MsgInternal_msgInternalTo(ctx, field)
 	if err != nil {
@@ -5949,6 +6034,10 @@ func (ec *executionContext) fieldContext_MsgInternalEdge_node(_ context.Context,
 				return ec.fieldContext_MsgInternal_format(ctx, field)
 			case "redirect":
 				return ec.fieldContext_MsgInternal_redirect(ctx, field)
+			case "receiverType":
+				return ec.fieldContext_MsgInternal_receiverType(ctx, field)
+			case "alertID":
+				return ec.fieldContext_MsgInternal_alertID(ctx, field)
 			case "msgInternalTo":
 				return ec.fieldContext_MsgInternal_msgInternalTo(ctx, field)
 			case "toSendCounts":
@@ -6369,6 +6458,10 @@ func (ec *executionContext) fieldContext_MsgInternalTo_msgInternal(_ context.Con
 				return ec.fieldContext_MsgInternal_format(ctx, field)
 			case "redirect":
 				return ec.fieldContext_MsgInternal_redirect(ctx, field)
+			case "receiverType":
+				return ec.fieldContext_MsgInternal_receiverType(ctx, field)
+			case "alertID":
+				return ec.fieldContext_MsgInternal_alertID(ctx, field)
 			case "msgInternalTo":
 				return ec.fieldContext_MsgInternal_msgInternalTo(ctx, field)
 			case "toSendCounts":
@@ -16856,7 +16949,7 @@ func (ec *executionContext) unmarshalInputMsgInternalWhereInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "category", "categoryNEQ", "categoryIn", "categoryNotIn", "categoryGT", "categoryGTE", "categoryLT", "categoryLTE", "categoryContains", "categoryHasPrefix", "categoryHasSuffix", "categoryEqualFold", "categoryContainsFold", "subject", "subjectNEQ", "subjectIn", "subjectNotIn", "subjectGT", "subjectGTE", "subjectLT", "subjectLTE", "subjectContains", "subjectHasPrefix", "subjectHasSuffix", "subjectEqualFold", "subjectContainsFold", "format", "formatNEQ", "formatIn", "formatNotIn", "formatGT", "formatGTE", "formatLT", "formatLTE", "formatContains", "formatHasPrefix", "formatHasSuffix", "formatEqualFold", "formatContainsFold", "redirect", "redirectNEQ", "redirectIn", "redirectNotIn", "redirectGT", "redirectGTE", "redirectLT", "redirectLTE", "redirectContains", "redirectHasPrefix", "redirectHasSuffix", "redirectIsNil", "redirectNotNil", "redirectEqualFold", "redirectContainsFold", "hasMsgInternalTo", "hasMsgInternalToWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "category", "categoryNEQ", "categoryIn", "categoryNotIn", "categoryGT", "categoryGTE", "categoryLT", "categoryLTE", "categoryContains", "categoryHasPrefix", "categoryHasSuffix", "categoryEqualFold", "categoryContainsFold", "subject", "subjectNEQ", "subjectIn", "subjectNotIn", "subjectGT", "subjectGTE", "subjectLT", "subjectLTE", "subjectContains", "subjectHasPrefix", "subjectHasSuffix", "subjectEqualFold", "subjectContainsFold", "format", "formatNEQ", "formatIn", "formatNotIn", "formatGT", "formatGTE", "formatLT", "formatLTE", "formatContains", "formatHasPrefix", "formatHasSuffix", "formatEqualFold", "formatContainsFold", "redirect", "redirectNEQ", "redirectIn", "redirectNotIn", "redirectGT", "redirectGTE", "redirectLT", "redirectLTE", "redirectContains", "redirectHasPrefix", "redirectHasSuffix", "redirectIsNil", "redirectNotNil", "redirectEqualFold", "redirectContainsFold", "receiverType", "receiverTypeNEQ", "receiverTypeIn", "receiverTypeNotIn", "alertID", "alertIDNEQ", "alertIDIn", "alertIDNotIn", "alertIDGT", "alertIDGTE", "alertIDLT", "alertIDLTE", "alertIDIsNil", "alertIDNotNil", "hasMsgInternalTo", "hasMsgInternalToWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -17626,6 +17719,104 @@ func (ec *executionContext) unmarshalInputMsgInternalWhereInput(ctx context.Cont
 				return it, err
 			}
 			it.RedirectContainsFold = data
+		case "receiverType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverType"))
+			data, err := ec.unmarshalOMsgInternalReceiverType2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ReceiverType = data
+		case "receiverTypeNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverTypeNEQ"))
+			data, err := ec.unmarshalOMsgInternalReceiverType2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ReceiverTypeNEQ = data
+		case "receiverTypeIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverTypeIn"))
+			data, err := ec.unmarshalOMsgInternalReceiverType2ᚕgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverTypeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ReceiverTypeIn = data
+		case "receiverTypeNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverTypeNotIn"))
+			data, err := ec.unmarshalOMsgInternalReceiverType2ᚕgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverTypeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ReceiverTypeNotIn = data
+		case "alertID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertID"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AlertID = data
+		case "alertIDNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDNEQ"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AlertIDNEQ = data
+		case "alertIDIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDIn"))
+			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AlertIDIn = data
+		case "alertIDNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDNotIn"))
+			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AlertIDNotIn = data
+		case "alertIDGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDGT"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AlertIDGT = data
+		case "alertIDGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDGTE"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AlertIDGTE = data
+		case "alertIDLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDLT"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AlertIDLT = data
+		case "alertIDLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDLTE"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AlertIDLTE = data
+		case "alertIDIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AlertIDIsNil = data
+		case "alertIDNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AlertIDNotNil = data
 		case "hasMsgInternalTo":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasMsgInternalTo"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -23603,6 +23794,13 @@ func (ec *executionContext) _MsgInternal(ctx context.Context, sel ast.SelectionS
 			}
 		case "redirect":
 			out.Values[i] = ec._MsgInternal_redirect(ctx, field, obj)
+		case "receiverType":
+			out.Values[i] = ec._MsgInternal_receiverType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "alertID":
+			out.Values[i] = ec._MsgInternal_alertID(ctx, field, obj)
 		case "msgInternalTo":
 			field := field
 
@@ -26344,6 +26542,16 @@ func (ec *executionContext) marshalNMsgInternalOrderField2ᚖgithubᚗcomᚋwooc
 	return v
 }
 
+func (ec *executionContext) unmarshalNMsgInternalReceiverType2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverType(ctx context.Context, v any) (profile.ReceiverType, error) {
+	var res profile.ReceiverType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNMsgInternalReceiverType2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverType(ctx context.Context, sel ast.SelectionSet, v profile.ReceiverType) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) marshalNMsgInternalTo2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalTo(ctx context.Context, sel ast.SelectionSet, v *ent.MsgInternalTo) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -27652,6 +27860,87 @@ func (ec *executionContext) unmarshalOMsgInternalOrder2ᚖgithubᚗcomᚋwoocoos
 	}
 	res, err := ec.unmarshalInputMsgInternalOrder(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOMsgInternalReceiverType2ᚕgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverTypeᚄ(ctx context.Context, v any) ([]profile.ReceiverType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]profile.ReceiverType, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNMsgInternalReceiverType2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverType(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOMsgInternalReceiverType2ᚕgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []profile.ReceiverType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMsgInternalReceiverType2githubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverType(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOMsgInternalReceiverType2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverType(ctx context.Context, v any) (*profile.ReceiverType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(profile.ReceiverType)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOMsgInternalReceiverType2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverType(ctx context.Context, sel ast.SelectionSet, v *profile.ReceiverType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) marshalOMsgInternalTo2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalToᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.MsgInternalTo) graphql.Marshaler {

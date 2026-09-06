@@ -1694,6 +1694,24 @@ type MsgInternalWhereInput struct {
 	RedirectEqualFold    *string  `json:"redirectEqualFold,omitempty"`
 	RedirectContainsFold *string  `json:"redirectContainsFold,omitempty"`
 
+	// "receiver_type" field predicates.
+	ReceiverType      *profile.ReceiverType  `json:"receiverType,omitempty"`
+	ReceiverTypeNEQ   *profile.ReceiverType  `json:"receiverTypeNEQ,omitempty"`
+	ReceiverTypeIn    []profile.ReceiverType `json:"receiverTypeIn,omitempty"`
+	ReceiverTypeNotIn []profile.ReceiverType `json:"receiverTypeNotIn,omitempty"`
+
+	// "alert_id" field predicates.
+	AlertID       *int  `json:"alertID,omitempty"`
+	AlertIDNEQ    *int  `json:"alertIDNEQ,omitempty"`
+	AlertIDIn     []int `json:"alertIDIn,omitempty"`
+	AlertIDNotIn  []int `json:"alertIDNotIn,omitempty"`
+	AlertIDGT     *int  `json:"alertIDGT,omitempty"`
+	AlertIDGTE    *int  `json:"alertIDGTE,omitempty"`
+	AlertIDLT     *int  `json:"alertIDLT,omitempty"`
+	AlertIDLTE    *int  `json:"alertIDLTE,omitempty"`
+	AlertIDIsNil  bool  `json:"alertIDIsNil,omitempty"`
+	AlertIDNotNil bool  `json:"alertIDNotNil,omitempty"`
+
 	// "msg_internal_to" edge predicates.
 	HasMsgInternalTo     *bool                      `json:"hasMsgInternalTo,omitempty"`
 	HasMsgInternalToWith []*MsgInternalToWhereInput `json:"hasMsgInternalToWith,omitempty"`
@@ -2087,6 +2105,48 @@ func (i *MsgInternalWhereInput) P() (predicate.MsgInternal, error) {
 	}
 	if i.RedirectContainsFold != nil {
 		predicates = append(predicates, msginternal.RedirectContainsFold(*i.RedirectContainsFold))
+	}
+	if i.ReceiverType != nil {
+		predicates = append(predicates, msginternal.ReceiverTypeEQ(*i.ReceiverType))
+	}
+	if i.ReceiverTypeNEQ != nil {
+		predicates = append(predicates, msginternal.ReceiverTypeNEQ(*i.ReceiverTypeNEQ))
+	}
+	if len(i.ReceiverTypeIn) > 0 {
+		predicates = append(predicates, msginternal.ReceiverTypeIn(i.ReceiverTypeIn...))
+	}
+	if len(i.ReceiverTypeNotIn) > 0 {
+		predicates = append(predicates, msginternal.ReceiverTypeNotIn(i.ReceiverTypeNotIn...))
+	}
+	if i.AlertID != nil {
+		predicates = append(predicates, msginternal.AlertIDEQ(*i.AlertID))
+	}
+	if i.AlertIDNEQ != nil {
+		predicates = append(predicates, msginternal.AlertIDNEQ(*i.AlertIDNEQ))
+	}
+	if len(i.AlertIDIn) > 0 {
+		predicates = append(predicates, msginternal.AlertIDIn(i.AlertIDIn...))
+	}
+	if len(i.AlertIDNotIn) > 0 {
+		predicates = append(predicates, msginternal.AlertIDNotIn(i.AlertIDNotIn...))
+	}
+	if i.AlertIDGT != nil {
+		predicates = append(predicates, msginternal.AlertIDGT(*i.AlertIDGT))
+	}
+	if i.AlertIDGTE != nil {
+		predicates = append(predicates, msginternal.AlertIDGTE(*i.AlertIDGTE))
+	}
+	if i.AlertIDLT != nil {
+		predicates = append(predicates, msginternal.AlertIDLT(*i.AlertIDLT))
+	}
+	if i.AlertIDLTE != nil {
+		predicates = append(predicates, msginternal.AlertIDLTE(*i.AlertIDLTE))
+	}
+	if i.AlertIDIsNil {
+		predicates = append(predicates, msginternal.AlertIDIsNil())
+	}
+	if i.AlertIDNotNil {
+		predicates = append(predicates, msginternal.AlertIDNotNil())
 	}
 
 	if i.HasMsgInternalTo != nil {

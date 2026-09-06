@@ -3,11 +3,14 @@
 package msginternal
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/woocoos/msgcenter/pkg/profile"
 )
 
 const (
@@ -35,6 +38,10 @@ const (
 	FieldFormat = "format"
 	// FieldRedirect holds the string denoting the redirect field in the database.
 	FieldRedirect = "redirect"
+	// FieldReceiverType holds the string denoting the receiver_type field in the database.
+	FieldReceiverType = "receiver_type"
+	// FieldAlertID holds the string denoting the alert_id field in the database.
+	FieldAlertID = "alert_id"
 	// EdgeMsgInternalTo holds the string denoting the msg_internal_to edge name in mutations.
 	EdgeMsgInternalTo = "msg_internal_to"
 	// Table holds the table name of the msginternal in the database.
@@ -61,6 +68,8 @@ var Columns = []string{
 	FieldBody,
 	FieldFormat,
 	FieldRedirect,
+	FieldReceiverType,
+	FieldAlertID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -86,6 +95,16 @@ var (
 	// CategoryValidator is a validator for the "category" field. It is called by the builders before save.
 	CategoryValidator func(string) error
 )
+
+// ReceiverTypeValidator is a validator for the "receiver_type" field enum values. It is called by the builders before save.
+func ReceiverTypeValidator(rt profile.ReceiverType) error {
+	switch rt.String() {
+	case "email", "message", "webhook", "umeng":
+		return nil
+	default:
+		return fmt.Errorf("msginternal: invalid enum value for receiver_type field: %q", rt)
+	}
+}
 
 // OrderOption defines the ordering options for the MsgInternal queries.
 type OrderOption func(*sql.Selector)
@@ -145,6 +164,16 @@ func ByRedirect(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRedirect, opts...).ToFunc()
 }
 
+// ByReceiverType orders the results by the receiver_type field.
+func ByReceiverType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldReceiverType, opts...).ToFunc()
+}
+
+// ByAlertID orders the results by the alert_id field.
+func ByAlertID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAlertID, opts...).ToFunc()
+}
+
 // ByMsgInternalToCount orders the results by msg_internal_to count.
 func ByMsgInternalToCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -165,3 +194,10 @@ func newMsgInternalToStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, MsgInternalToTable, MsgInternalToColumn),
 	)
 }
+
+var (
+	// profile.ReceiverType must implement graphql.Marshaler.
+	_ graphql.Marshaler = (*profile.ReceiverType)(nil)
+	// profile.ReceiverType must implement graphql.Unmarshaler.
+	_ graphql.Unmarshaler = (*profile.ReceiverType)(nil)
+)

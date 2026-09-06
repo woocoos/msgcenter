@@ -98,6 +98,7 @@ func open(ctx context.Context, driverName, dsn string) (*ent.Client, error) {
 			Org:         "portal",
 			OrgRoleUser: "portal",
 			UserAddr:    "portal",
+			UserDevice:  "portal",
 		}),
 	)
 	if err != nil {
@@ -347,11 +348,11 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetCreatedBy(1).SaveX(ctx)
 
 	client.MsgInternal.Create().SetID(1).SetTenantID(1).SetSubject("subject1").SetBody("body1").SetFormat("text").
-		SetCategory("订阅类型").SetCreatedBy(1).SaveX(ctx)
+		SetCategory("订阅类型").SetReceiverType(profile.ReceiverMessage).SetCreatedBy(1).SaveX(ctx)
 	client.MsgInternalTo.Create().SetID(1).SetTenantID(1).SetCreatedAt(time.Now()).SetMsgInternalID(1).
 		SetUserID(1).SaveX(ctx)
 	client.MsgInternal.Create().SetID(2).SetTenantID(1).SetSubject("subject2").SetBody("body2").SetFormat("text").
-		SetCategory("订阅类型").SetCreatedBy(1).SaveX(ctx)
+		SetCategory("订阅类型").SetReceiverType(profile.ReceiverMessage).SetCreatedBy(1).SaveX(ctx)
 	client.MsgInternalTo.Create().SetID(2).SetTenantID(1).SetCreatedAt(time.Now()).SetMsgInternalID(2).
 		SetUserID(1).SaveX(ctx)
 }

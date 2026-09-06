@@ -37,6 +37,7 @@ var (
 	DefaultUmengConfig = UmengConfig{
 		SendResolved: false,
 		APIURL:       "https://msgapi.umeng.com/api/send",
+		Extras:       make(map[string]string),
 	}
 )
 
@@ -307,6 +308,12 @@ type UmengConfig struct {
 	Apps map[string]*UmengAppConfig `yaml:"apps,omitempty" json:"apps,omitempty"`
 	// ProductionMode indicates whether to use production environment.
 	ProductionMode *bool `yaml:"productionMode,omitempty" json:"productionMode,omitempty"`
+	// Template for POST message body.
+	Subject string `yaml:"subject,omitempty" json:"subject,omitempty"`
+	// Body is a template with JSON-string. WebHook uses application/json content type.
+	Body string `yaml:"body,omitempty" json:"body,omitempty"`
+	// key-values
+	Extras map[string]string `yaml:"extras,omitempty" json:"extras,omitempty"`
 }
 
 func (c *UmengConfig) Validate() error {

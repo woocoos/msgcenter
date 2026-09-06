@@ -82,6 +82,8 @@ type UmengConfig {
     apiURL: String
     apps: UmengApps!
     productionMode: Boolean
+    subject: String
+    body: String
 }
 
 enum RouteStrType {

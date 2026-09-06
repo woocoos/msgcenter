@@ -8,6 +8,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/woocoos/msgcenter/ent/predicate"
+	"github.com/woocoos/msgcenter/pkg/profile"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
@@ -105,6 +106,11 @@ func Format(v string) predicate.MsgInternal {
 // Redirect applies equality check predicate on the "redirect" field. It's identical to RedirectEQ.
 func Redirect(v string) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldEQ(FieldRedirect, v))
+}
+
+// AlertID applies equality check predicate on the "alert_id" field. It's identical to AlertIDEQ.
+func AlertID(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldEQ(FieldAlertID, v))
 }
 
 // CreatedByEQ applies the EQ predicate on the "created_by" field.
@@ -670,6 +676,86 @@ func RedirectEqualFold(v string) predicate.MsgInternal {
 // RedirectContainsFold applies the ContainsFold predicate on the "redirect" field.
 func RedirectContainsFold(v string) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldContainsFold(FieldRedirect, v))
+}
+
+// ReceiverTypeEQ applies the EQ predicate on the "receiver_type" field.
+func ReceiverTypeEQ(v profile.ReceiverType) predicate.MsgInternal {
+	vc := v
+	return predicate.MsgInternal(sql.FieldEQ(FieldReceiverType, vc))
+}
+
+// ReceiverTypeNEQ applies the NEQ predicate on the "receiver_type" field.
+func ReceiverTypeNEQ(v profile.ReceiverType) predicate.MsgInternal {
+	vc := v
+	return predicate.MsgInternal(sql.FieldNEQ(FieldReceiverType, vc))
+}
+
+// ReceiverTypeIn applies the In predicate on the "receiver_type" field.
+func ReceiverTypeIn(vs ...profile.ReceiverType) predicate.MsgInternal {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MsgInternal(sql.FieldIn(FieldReceiverType, v...))
+}
+
+// ReceiverTypeNotIn applies the NotIn predicate on the "receiver_type" field.
+func ReceiverTypeNotIn(vs ...profile.ReceiverType) predicate.MsgInternal {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MsgInternal(sql.FieldNotIn(FieldReceiverType, v...))
+}
+
+// AlertIDEQ applies the EQ predicate on the "alert_id" field.
+func AlertIDEQ(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldEQ(FieldAlertID, v))
+}
+
+// AlertIDNEQ applies the NEQ predicate on the "alert_id" field.
+func AlertIDNEQ(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNEQ(FieldAlertID, v))
+}
+
+// AlertIDIn applies the In predicate on the "alert_id" field.
+func AlertIDIn(vs ...int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldIn(FieldAlertID, vs...))
+}
+
+// AlertIDNotIn applies the NotIn predicate on the "alert_id" field.
+func AlertIDNotIn(vs ...int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNotIn(FieldAlertID, vs...))
+}
+
+// AlertIDGT applies the GT predicate on the "alert_id" field.
+func AlertIDGT(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldGT(FieldAlertID, v))
+}
+
+// AlertIDGTE applies the GTE predicate on the "alert_id" field.
+func AlertIDGTE(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldGTE(FieldAlertID, v))
+}
+
+// AlertIDLT applies the LT predicate on the "alert_id" field.
+func AlertIDLT(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldLT(FieldAlertID, v))
+}
+
+// AlertIDLTE applies the LTE predicate on the "alert_id" field.
+func AlertIDLTE(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldLTE(FieldAlertID, v))
+}
+
+// AlertIDIsNil applies the IsNil predicate on the "alert_id" field.
+func AlertIDIsNil() predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldIsNull(FieldAlertID))
+}
+
+// AlertIDNotNil applies the NotNil predicate on the "alert_id" field.
+func AlertIDNotNil() predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNotNull(FieldAlertID))
 }
 
 // HasMsgInternalTo applies the HasEdge predicate on the "msg_internal_to" edge.

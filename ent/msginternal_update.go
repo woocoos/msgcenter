@@ -14,6 +14,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/predicate"
+	"github.com/woocoos/msgcenter/pkg/profile"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
@@ -160,6 +161,47 @@ func (_u *MsgInternalUpdate) ClearRedirect() *MsgInternalUpdate {
 	return _u
 }
 
+// SetReceiverType sets the "receiver_type" field.
+func (_u *MsgInternalUpdate) SetReceiverType(v profile.ReceiverType) *MsgInternalUpdate {
+	_u.mutation.SetReceiverType(v)
+	return _u
+}
+
+// SetNillableReceiverType sets the "receiver_type" field if the given value is not nil.
+func (_u *MsgInternalUpdate) SetNillableReceiverType(v *profile.ReceiverType) *MsgInternalUpdate {
+	if v != nil {
+		_u.SetReceiverType(*v)
+	}
+	return _u
+}
+
+// SetAlertID sets the "alert_id" field.
+func (_u *MsgInternalUpdate) SetAlertID(v int) *MsgInternalUpdate {
+	_u.mutation.ResetAlertID()
+	_u.mutation.SetAlertID(v)
+	return _u
+}
+
+// SetNillableAlertID sets the "alert_id" field if the given value is not nil.
+func (_u *MsgInternalUpdate) SetNillableAlertID(v *int) *MsgInternalUpdate {
+	if v != nil {
+		_u.SetAlertID(*v)
+	}
+	return _u
+}
+
+// AddAlertID adds value to the "alert_id" field.
+func (_u *MsgInternalUpdate) AddAlertID(v int) *MsgInternalUpdate {
+	_u.mutation.AddAlertID(v)
+	return _u
+}
+
+// ClearAlertID clears the value of the "alert_id" field.
+func (_u *MsgInternalUpdate) ClearAlertID() *MsgInternalUpdate {
+	_u.mutation.ClearAlertID()
+	return _u
+}
+
 // AddMsgInternalToIDs adds the "msg_internal_to" edge to the MsgInternalTo entity by IDs.
 func (_u *MsgInternalUpdate) AddMsgInternalToIDs(ids ...int) *MsgInternalUpdate {
 	_u.mutation.AddMsgInternalToIDs(ids...)
@@ -235,6 +277,11 @@ func (_u *MsgInternalUpdate) check() error {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.category": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.ReceiverType(); ok {
+		if err := msginternal.ReceiverTypeValidator(v); err != nil {
+			return &ValidationError{Name: "receiver_type", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.receiver_type": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -285,6 +332,18 @@ func (_u *MsgInternalUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	}
 	if _u.mutation.RedirectCleared() {
 		_spec.ClearField(msginternal.FieldRedirect, field.TypeString)
+	}
+	if value, ok := _u.mutation.ReceiverType(); ok {
+		_spec.SetField(msginternal.FieldReceiverType, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.AlertID(); ok {
+		_spec.SetField(msginternal.FieldAlertID, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedAlertID(); ok {
+		_spec.AddField(msginternal.FieldAlertID, field.TypeInt, value)
+	}
+	if _u.mutation.AlertIDCleared() {
+		_spec.ClearField(msginternal.FieldAlertID, field.TypeInt)
 	}
 	if _u.mutation.MsgInternalToCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -485,6 +544,47 @@ func (_u *MsgInternalUpdateOne) ClearRedirect() *MsgInternalUpdateOne {
 	return _u
 }
 
+// SetReceiverType sets the "receiver_type" field.
+func (_u *MsgInternalUpdateOne) SetReceiverType(v profile.ReceiverType) *MsgInternalUpdateOne {
+	_u.mutation.SetReceiverType(v)
+	return _u
+}
+
+// SetNillableReceiverType sets the "receiver_type" field if the given value is not nil.
+func (_u *MsgInternalUpdateOne) SetNillableReceiverType(v *profile.ReceiverType) *MsgInternalUpdateOne {
+	if v != nil {
+		_u.SetReceiverType(*v)
+	}
+	return _u
+}
+
+// SetAlertID sets the "alert_id" field.
+func (_u *MsgInternalUpdateOne) SetAlertID(v int) *MsgInternalUpdateOne {
+	_u.mutation.ResetAlertID()
+	_u.mutation.SetAlertID(v)
+	return _u
+}
+
+// SetNillableAlertID sets the "alert_id" field if the given value is not nil.
+func (_u *MsgInternalUpdateOne) SetNillableAlertID(v *int) *MsgInternalUpdateOne {
+	if v != nil {
+		_u.SetAlertID(*v)
+	}
+	return _u
+}
+
+// AddAlertID adds value to the "alert_id" field.
+func (_u *MsgInternalUpdateOne) AddAlertID(v int) *MsgInternalUpdateOne {
+	_u.mutation.AddAlertID(v)
+	return _u
+}
+
+// ClearAlertID clears the value of the "alert_id" field.
+func (_u *MsgInternalUpdateOne) ClearAlertID() *MsgInternalUpdateOne {
+	_u.mutation.ClearAlertID()
+	return _u
+}
+
 // AddMsgInternalToIDs adds the "msg_internal_to" edge to the MsgInternalTo entity by IDs.
 func (_u *MsgInternalUpdateOne) AddMsgInternalToIDs(ids ...int) *MsgInternalUpdateOne {
 	_u.mutation.AddMsgInternalToIDs(ids...)
@@ -573,6 +673,11 @@ func (_u *MsgInternalUpdateOne) check() error {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.category": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.ReceiverType(); ok {
+		if err := msginternal.ReceiverTypeValidator(v); err != nil {
+			return &ValidationError{Name: "receiver_type", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.receiver_type": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -640,6 +745,18 @@ func (_u *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgInternal
 	}
 	if _u.mutation.RedirectCleared() {
 		_spec.ClearField(msginternal.FieldRedirect, field.TypeString)
+	}
+	if value, ok := _u.mutation.ReceiverType(); ok {
+		_spec.SetField(msginternal.FieldReceiverType, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.AlertID(); ok {
+		_spec.SetField(msginternal.FieldAlertID, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedAlertID(); ok {
+		_spec.AddField(msginternal.FieldAlertID, field.TypeInt, value)
+	}
+	if _u.mutation.AlertIDCleared() {
+		_spec.ClearField(msginternal.FieldAlertID, field.TypeInt)
 	}
 	if _u.mutation.MsgInternalToCleared() {
 		edge := &sqlgraph.EdgeSpec{

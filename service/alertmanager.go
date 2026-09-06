@@ -148,6 +148,7 @@ func (am *AlertManager) buildDBClient(cnf *conf.AppConfiguration) {
 		Org:         "portal",
 		OrgRoleUser: "portal",
 		UserAddr:    "portal",
+		UserDevice:  "portal",
 	})
 	if cnf.Development {
 		am.DB = ent.NewClient(ent.Driver(drv), ent.Debug(), scfg)

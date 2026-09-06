@@ -3643,6 +3643,9 @@ type MsgInternalMutation struct {
 	body                   *string
 	format                 *string
 	redirect               *string
+	receiver_type          *profile.ReceiverType
+	alert_id               *int
+	addalert_id            *int
 	clearedFields          map[string]struct{}
 	msg_internal_to        map[int]struct{}
 	removedmsg_internal_to map[int]struct{}
@@ -4229,6 +4232,112 @@ func (m *MsgInternalMutation) ResetRedirect() {
 	delete(m.clearedFields, msginternal.FieldRedirect)
 }
 
+// SetReceiverType sets the "receiver_type" field.
+func (m *MsgInternalMutation) SetReceiverType(pt profile.ReceiverType) {
+	m.receiver_type = &pt
+}
+
+// ReceiverType returns the value of the "receiver_type" field in the mutation.
+func (m *MsgInternalMutation) ReceiverType() (r profile.ReceiverType, exists bool) {
+	v := m.receiver_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReceiverType returns the old "receiver_type" field's value of the MsgInternal entity.
+// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalMutation) OldReceiverType(ctx context.Context) (v profile.ReceiverType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReceiverType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReceiverType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReceiverType: %w", err)
+	}
+	return oldValue.ReceiverType, nil
+}
+
+// ResetReceiverType resets all changes to the "receiver_type" field.
+func (m *MsgInternalMutation) ResetReceiverType() {
+	m.receiver_type = nil
+}
+
+// SetAlertID sets the "alert_id" field.
+func (m *MsgInternalMutation) SetAlertID(i int) {
+	m.alert_id = &i
+	m.addalert_id = nil
+}
+
+// AlertID returns the value of the "alert_id" field in the mutation.
+func (m *MsgInternalMutation) AlertID() (r int, exists bool) {
+	v := m.alert_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAlertID returns the old "alert_id" field's value of the MsgInternal entity.
+// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalMutation) OldAlertID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAlertID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAlertID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAlertID: %w", err)
+	}
+	return oldValue.AlertID, nil
+}
+
+// AddAlertID adds i to the "alert_id" field.
+func (m *MsgInternalMutation) AddAlertID(i int) {
+	if m.addalert_id != nil {
+		*m.addalert_id += i
+	} else {
+		m.addalert_id = &i
+	}
+}
+
+// AddedAlertID returns the value that was added to the "alert_id" field in this mutation.
+func (m *MsgInternalMutation) AddedAlertID() (r int, exists bool) {
+	v := m.addalert_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearAlertID clears the value of the "alert_id" field.
+func (m *MsgInternalMutation) ClearAlertID() {
+	m.alert_id = nil
+	m.addalert_id = nil
+	m.clearedFields[msginternal.FieldAlertID] = struct{}{}
+}
+
+// AlertIDCleared returns if the "alert_id" field was cleared in this mutation.
+func (m *MsgInternalMutation) AlertIDCleared() bool {
+	_, ok := m.clearedFields[msginternal.FieldAlertID]
+	return ok
+}
+
+// ResetAlertID resets all changes to the "alert_id" field.
+func (m *MsgInternalMutation) ResetAlertID() {
+	m.alert_id = nil
+	m.addalert_id = nil
+	delete(m.clearedFields, msginternal.FieldAlertID)
+}
+
 // AddMsgInternalToIDs adds the "msg_internal_to" edge to the MsgInternalTo entity by ids.
 func (m *MsgInternalMutation) AddMsgInternalToIDs(ids ...int) {
 	if m.msg_internal_to == nil {
@@ -4317,7 +4426,7 @@ func (m *MsgInternalMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MsgInternalMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 12)
 	if m.created_by != nil {
 		fields = append(fields, msginternal.FieldCreatedBy)
 	}
@@ -4348,6 +4457,12 @@ func (m *MsgInternalMutation) Fields() []string {
 	if m.redirect != nil {
 		fields = append(fields, msginternal.FieldRedirect)
 	}
+	if m.receiver_type != nil {
+		fields = append(fields, msginternal.FieldReceiverType)
+	}
+	if m.alert_id != nil {
+		fields = append(fields, msginternal.FieldAlertID)
+	}
 	return fields
 }
 
@@ -4376,6 +4491,10 @@ func (m *MsgInternalMutation) Field(name string) (ent.Value, bool) {
 		return m.Format()
 	case msginternal.FieldRedirect:
 		return m.Redirect()
+	case msginternal.FieldReceiverType:
+		return m.ReceiverType()
+	case msginternal.FieldAlertID:
+		return m.AlertID()
 	}
 	return nil, false
 }
@@ -4405,6 +4524,10 @@ func (m *MsgInternalMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldFormat(ctx)
 	case msginternal.FieldRedirect:
 		return m.OldRedirect(ctx)
+	case msginternal.FieldReceiverType:
+		return m.OldReceiverType(ctx)
+	case msginternal.FieldAlertID:
+		return m.OldAlertID(ctx)
 	}
 	return nil, fmt.Errorf("unknown MsgInternal field %s", name)
 }
@@ -4484,6 +4607,20 @@ func (m *MsgInternalMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRedirect(v)
 		return nil
+	case msginternal.FieldReceiverType:
+		v, ok := value.(profile.ReceiverType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReceiverType(v)
+		return nil
+	case msginternal.FieldAlertID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAlertID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown MsgInternal field %s", name)
 }
@@ -4501,6 +4638,9 @@ func (m *MsgInternalMutation) AddedFields() []string {
 	if m.addtenant_id != nil {
 		fields = append(fields, msginternal.FieldTenantID)
 	}
+	if m.addalert_id != nil {
+		fields = append(fields, msginternal.FieldAlertID)
+	}
 	return fields
 }
 
@@ -4515,6 +4655,8 @@ func (m *MsgInternalMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedUpdatedBy()
 	case msginternal.FieldTenantID:
 		return m.AddedTenantID()
+	case msginternal.FieldAlertID:
+		return m.AddedAlertID()
 	}
 	return nil, false
 }
@@ -4545,6 +4687,13 @@ func (m *MsgInternalMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddTenantID(v)
 		return nil
+	case msginternal.FieldAlertID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddAlertID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown MsgInternal numeric field %s", name)
 }
@@ -4564,6 +4713,9 @@ func (m *MsgInternalMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(msginternal.FieldRedirect) {
 		fields = append(fields, msginternal.FieldRedirect)
+	}
+	if m.FieldCleared(msginternal.FieldAlertID) {
+		fields = append(fields, msginternal.FieldAlertID)
 	}
 	return fields
 }
@@ -4590,6 +4742,9 @@ func (m *MsgInternalMutation) ClearField(name string) error {
 		return nil
 	case msginternal.FieldRedirect:
 		m.ClearRedirect()
+		return nil
+	case msginternal.FieldAlertID:
+		m.ClearAlertID()
 		return nil
 	}
 	return fmt.Errorf("unknown MsgInternal nullable field %s", name)
@@ -4628,6 +4783,12 @@ func (m *MsgInternalMutation) ResetField(name string) error {
 		return nil
 	case msginternal.FieldRedirect:
 		m.ResetRedirect()
+		return nil
+	case msginternal.FieldReceiverType:
+		m.ResetReceiverType()
+		return nil
+	case msginternal.FieldAlertID:
+		m.ResetAlertID()
 		return nil
 	}
 	return fmt.Errorf("unknown MsgInternal field %s", name)

@@ -768,6 +768,16 @@ func (_m *MsgInternalQuery) collectField(ctx context.Context, oneNode bool, opCt
 				selectedFields = append(selectedFields, msginternal.FieldRedirect)
 				fieldSeen[msginternal.FieldRedirect] = struct{}{}
 			}
+		case "receiverType":
+			if _, ok := fieldSeen[msginternal.FieldReceiverType]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldReceiverType)
+				fieldSeen[msginternal.FieldReceiverType] = struct{}{}
+			}
+		case "alertID":
+			if _, ok := fieldSeen[msginternal.FieldAlertID]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldAlertID)
+				fieldSeen[msginternal.FieldAlertID] = struct{}{}
+			}
 		case "id":
 		case "__typename":
 		default:

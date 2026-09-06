@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/redis/go-redis/v9"
 	"github.com/tsingsun/woocoo/pkg/log"
 	ecx "github.com/woocoos/knockout-go/ent/clientx"
@@ -17,8 +20,6 @@ import (
 	"github.com/woocoos/msgcenter/pkg/push"
 	"github.com/woocoos/msgcenter/template"
 	"go.uber.org/zap"
-	"strconv"
-	"strings"
 )
 
 var (
@@ -94,7 +95,15 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 		return n.client.Tx(ctx)
 	}, func(itx ecx.Transactor) error {
 		tx := itx.(*ent.Tx)
-		msg := tx.MsgInternal.Create().SetCreatedBy(0).SetCategory(config.Extras["category"])
+		msg := tx.MsgInternal.Create().
+			SetCreatedBy(0).
+			SetCategory(config.Extras["category"]).
+			SetReceiverType(profile.ReceiverMessage)
+		if idStr := data.CommonAnnotations[label.AlertIDAnnotation]; idStr != "" {
+			if aid, err := strconv.Atoi(idStr); err == nil {
+				msg.SetAlertID(aid)
+			}
+		}
 		if config.Subject != "" {
 			msg.SetSubject(tmpl(config.Subject))
 			if err != nil {

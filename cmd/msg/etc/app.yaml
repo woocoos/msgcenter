@@ -11,6 +11,9 @@ jwt: &jwt
   signingMethod: "HS256"
   signingKey: "secret"
 
+includeFiles:
+  - "etc/local.yaml"
+
 web:
   server:
     addr: 127.0.0.1:10074

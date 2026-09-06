@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
+	"github.com/woocoos/msgcenter/pkg/profile"
 )
 
 // MsgInternalCreate is the builder for creating a MsgInternal entity.
@@ -123,6 +124,26 @@ func (_c *MsgInternalCreate) SetNillableRedirect(v *string) *MsgInternalCreate {
 	return _c
 }
 
+// SetReceiverType sets the "receiver_type" field.
+func (_c *MsgInternalCreate) SetReceiverType(v profile.ReceiverType) *MsgInternalCreate {
+	_c.mutation.SetReceiverType(v)
+	return _c
+}
+
+// SetAlertID sets the "alert_id" field.
+func (_c *MsgInternalCreate) SetAlertID(v int) *MsgInternalCreate {
+	_c.mutation.SetAlertID(v)
+	return _c
+}
+
+// SetNillableAlertID sets the "alert_id" field if the given value is not nil.
+func (_c *MsgInternalCreate) SetNillableAlertID(v *int) *MsgInternalCreate {
+	if v != nil {
+		_c.SetAlertID(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *MsgInternalCreate) SetID(v int) *MsgInternalCreate {
 	_c.mutation.SetID(v)
@@ -216,6 +237,14 @@ func (_c *MsgInternalCreate) check() error {
 	if _, ok := _c.mutation.Format(); !ok {
 		return &ValidationError{Name: "format", err: errors.New(`ent: missing required field "MsgInternal.format"`)}
 	}
+	if _, ok := _c.mutation.ReceiverType(); !ok {
+		return &ValidationError{Name: "receiver_type", err: errors.New(`ent: missing required field "MsgInternal.receiver_type"`)}
+	}
+	if v, ok := _c.mutation.ReceiverType(); ok {
+		if err := msginternal.ReceiverTypeValidator(v); err != nil {
+			return &ValidationError{Name: "receiver_type", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.receiver_type": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -289,6 +318,14 @@ func (_c *MsgInternalCreate) createSpec() (*MsgInternal, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Redirect(); ok {
 		_spec.SetField(msginternal.FieldRedirect, field.TypeString, value)
 		_node.Redirect = value
+	}
+	if value, ok := _c.mutation.ReceiverType(); ok {
+		_spec.SetField(msginternal.FieldReceiverType, field.TypeEnum, value)
+		_node.ReceiverType = value
+	}
+	if value, ok := _c.mutation.AlertID(); ok {
+		_spec.SetField(msginternal.FieldAlertID, field.TypeInt, value)
+		_node.AlertID = value
 	}
 	if nodes := _c.mutation.MsgInternalToIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -470,6 +507,42 @@ func (u *MsgInternalUpsert) UpdateRedirect() *MsgInternalUpsert {
 // ClearRedirect clears the value of the "redirect" field.
 func (u *MsgInternalUpsert) ClearRedirect() *MsgInternalUpsert {
 	u.SetNull(msginternal.FieldRedirect)
+	return u
+}
+
+// SetReceiverType sets the "receiver_type" field.
+func (u *MsgInternalUpsert) SetReceiverType(v profile.ReceiverType) *MsgInternalUpsert {
+	u.Set(msginternal.FieldReceiverType, v)
+	return u
+}
+
+// UpdateReceiverType sets the "receiver_type" field to the value that was provided on create.
+func (u *MsgInternalUpsert) UpdateReceiverType() *MsgInternalUpsert {
+	u.SetExcluded(msginternal.FieldReceiverType)
+	return u
+}
+
+// SetAlertID sets the "alert_id" field.
+func (u *MsgInternalUpsert) SetAlertID(v int) *MsgInternalUpsert {
+	u.Set(msginternal.FieldAlertID, v)
+	return u
+}
+
+// UpdateAlertID sets the "alert_id" field to the value that was provided on create.
+func (u *MsgInternalUpsert) UpdateAlertID() *MsgInternalUpsert {
+	u.SetExcluded(msginternal.FieldAlertID)
+	return u
+}
+
+// AddAlertID adds v to the "alert_id" field.
+func (u *MsgInternalUpsert) AddAlertID(v int) *MsgInternalUpsert {
+	u.Add(msginternal.FieldAlertID, v)
+	return u
+}
+
+// ClearAlertID clears the value of the "alert_id" field.
+func (u *MsgInternalUpsert) ClearAlertID() *MsgInternalUpsert {
+	u.SetNull(msginternal.FieldAlertID)
 	return u
 }
 
@@ -660,6 +733,48 @@ func (u *MsgInternalUpsertOne) UpdateRedirect() *MsgInternalUpsertOne {
 func (u *MsgInternalUpsertOne) ClearRedirect() *MsgInternalUpsertOne {
 	return u.Update(func(s *MsgInternalUpsert) {
 		s.ClearRedirect()
+	})
+}
+
+// SetReceiverType sets the "receiver_type" field.
+func (u *MsgInternalUpsertOne) SetReceiverType(v profile.ReceiverType) *MsgInternalUpsertOne {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.SetReceiverType(v)
+	})
+}
+
+// UpdateReceiverType sets the "receiver_type" field to the value that was provided on create.
+func (u *MsgInternalUpsertOne) UpdateReceiverType() *MsgInternalUpsertOne {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.UpdateReceiverType()
+	})
+}
+
+// SetAlertID sets the "alert_id" field.
+func (u *MsgInternalUpsertOne) SetAlertID(v int) *MsgInternalUpsertOne {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.SetAlertID(v)
+	})
+}
+
+// AddAlertID adds v to the "alert_id" field.
+func (u *MsgInternalUpsertOne) AddAlertID(v int) *MsgInternalUpsertOne {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.AddAlertID(v)
+	})
+}
+
+// UpdateAlertID sets the "alert_id" field to the value that was provided on create.
+func (u *MsgInternalUpsertOne) UpdateAlertID() *MsgInternalUpsertOne {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.UpdateAlertID()
+	})
+}
+
+// ClearAlertID clears the value of the "alert_id" field.
+func (u *MsgInternalUpsertOne) ClearAlertID() *MsgInternalUpsertOne {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.ClearAlertID()
 	})
 }
 
@@ -1016,6 +1131,48 @@ func (u *MsgInternalUpsertBulk) UpdateRedirect() *MsgInternalUpsertBulk {
 func (u *MsgInternalUpsertBulk) ClearRedirect() *MsgInternalUpsertBulk {
 	return u.Update(func(s *MsgInternalUpsert) {
 		s.ClearRedirect()
+	})
+}
+
+// SetReceiverType sets the "receiver_type" field.
+func (u *MsgInternalUpsertBulk) SetReceiverType(v profile.ReceiverType) *MsgInternalUpsertBulk {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.SetReceiverType(v)
+	})
+}
+
+// UpdateReceiverType sets the "receiver_type" field to the value that was provided on create.
+func (u *MsgInternalUpsertBulk) UpdateReceiverType() *MsgInternalUpsertBulk {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.UpdateReceiverType()
+	})
+}
+
+// SetAlertID sets the "alert_id" field.
+func (u *MsgInternalUpsertBulk) SetAlertID(v int) *MsgInternalUpsertBulk {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.SetAlertID(v)
+	})
+}
+
+// AddAlertID adds v to the "alert_id" field.
+func (u *MsgInternalUpsertBulk) AddAlertID(v int) *MsgInternalUpsertBulk {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.AddAlertID(v)
+	})
+}
+
+// UpdateAlertID sets the "alert_id" field to the value that was provided on create.
+func (u *MsgInternalUpsertBulk) UpdateAlertID() *MsgInternalUpsertBulk {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.UpdateAlertID()
+	})
+}
+
+// ClearAlertID clears the value of the "alert_id" field.
+func (u *MsgInternalUpsertBulk) ClearAlertID() *MsgInternalUpsertBulk {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.ClearAlertID()
 	})
 }
 

@@ -16,6 +16,8 @@ import (
 	"time"
 
 	"github.com/tsingsun/woocoo/pkg/log"
+	ecx "github.com/woocoos/knockout-go/ent/clientx"
+	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/userdevice"
@@ -167,6 +169,9 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (bool, er
 		GroupKey: groupKey.String(),
 	}
 
+	// 将渲染后的消息存入数据库
+	n.saveToDB(ctx, config, msg)
+
 	// If apps are configured, query user devices and send per-app.
 	if len(config.Apps) > 0 {
 		return n.notifyMultiApp(ctx, config, msg)
@@ -174,6 +179,71 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (bool, er
 
 	// Single app mode: use first app credentials.
 	return n.notifySingleApp(ctx, config, msg, "")
+}
+
+// saveToDB 将渲染后的推送消息存入 MsgInternal 及 MsgInternalTo，
+// 使推送消息在站内信中也有记录。DB 写入失败不影响推送流程。
+func (n *Notifier) saveToDB(ctx context.Context, config *profile.UmengConfig, msg *Message) {
+	if n.db == nil {
+		return
+	}
+	ts, _ := notify.Tenant(ctx)
+	tid, err := strconv.Atoi(ts)
+	if err != nil {
+		logger.Warn("invalid tenant id for db save", zap.String("tenant", ts))
+		return
+	}
+
+	title, body := n.renderTitleBody(config, msg)
+
+	userIDs := extractUserIDs(msg)
+
+	err = ecx.WithTx(ctx, func(ctx context.Context) (ecx.Transactor, error) {
+		return n.db.Tx(ctx)
+	}, func(itx ecx.Transactor) error {
+		tx := itx.(*ent.Tx)
+		create := tx.MsgInternal.Create().
+			SetCreatedBy(0).
+			SetSubject(title).
+			SetCategory(config.Extras["category"]).
+			SetBody(body).
+			SetFormat("text").
+			SetTenantID(tid).
+			SetReceiverType(profile.ReceiverUmeng)
+
+		if idStr := msg.Data.CommonAnnotations[label.AlertIDAnnotation]; idStr != "" {
+			if aid, err := strconv.Atoi(idStr); err == nil {
+				create.SetAlertID(aid)
+			}
+		}
+		nctx := schemax.SkipTenantPrivacy(ctx)
+		row, err := create.Save(nctx)
+		if err != nil {
+			return err
+		}
+
+		if len(userIDs) > 0 {
+			tos := make([]*ent.MsgInternalToCreate, 0, len(userIDs))
+			for _, uidStr := range userIDs {
+				uid, err := strconv.Atoi(uidStr)
+				if err != nil {
+					continue
+				}
+				tos = append(tos, tx.MsgInternalTo.Create().
+					SetTenantID(tid).SetUserID(uid).SetMsgInternalID(row.ID))
+			}
+			if len(tos) > 0 {
+				_, err = tx.MsgInternalTo.CreateBulk(tos...).Save(nctx)
+				if err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		logger.Warn("save umeng message to db failed", zap.Error(err))
+	}
 }
 
 // notifyMultiApp sends push notifications to multiple apps based on user devices.
@@ -462,16 +532,7 @@ func (n *Notifier) buildRequestForAndroid(config *profile.UmengConfig, msg *Mess
 
 	// Build Android-specific payload inline.
 	// Android uses a flat body structure with title, text, ticker, etc.
-	title := n.renderString(`{{ template "umeng.default.title" . }}`, msg)
-	text := n.renderString(`{{ template "umeng.default.text" . }}`, msg)
-
-	// If templates are not rendered, use fallback values.
-	if strings.Contains(title, "{{ template") {
-		title = "消息通知"
-	}
-	if strings.Contains(text, "{{ template") {
-		text = "您有一条新消息"
-	}
+	title, text := n.renderTitleBody(config, msg)
 
 	body := map[string]any{
 		"title":  title,
@@ -520,8 +581,7 @@ func (n *Notifier) buildRequestForIOS(config *profile.UmengConfig, msg *Message,
 
 	// Build iOS-specific payload inline.
 	// iOS follows APNs standard with aps dictionary structure.
-	title := n.renderString(`{{ template "umeng.default.title" . }}`, msg)
-	text := n.renderString(`{{ template "umeng.default.text" . }}`, msg)
+	title, text := n.renderTitleBody(config, msg)
 	payload := map[string]any{
 		"display_type": "notification",
 		"aps": map[string]any{
@@ -559,8 +619,7 @@ func (n *Notifier) buildRequestForHarmonyOS(config *profile.UmengConfig, msg *Me
 
 	// Build HarmonyOS-specific payload inline.
 	// HarmonyOS uses a structure similar to Android but with some differences.
-	title := n.renderString(`{{ template "umeng.default.title" . }}`, msg)
-	text := n.renderString(`{{ template "umeng.default.text" . }}`, msg)
+	title, text := n.renderTitleBody(config, msg)
 	payload := map[string]any{
 		"display_type": "notification",
 		"body": map[string]any{
@@ -591,16 +650,34 @@ func (n *Notifier) buildRequestForHarmonyOS(config *profile.UmengConfig, msg *Me
 	return req, nil
 }
 
-// renderString renders a Go template string with the message data.
-func (n *Notifier) renderString(tpl string, msg *Message) string {
-	if tpl == "" {
-		return ""
+// renderTitleBody 按优先级渲染推送标题和正文：
+// config.Subject/Body → umeng 默认模板 → 硬编码兜底
+func (n *Notifier) renderTitleBody(config *profile.UmengConfig, msg *Message) (title, body string) {
+	var tmplErr error
+	tmpl := notify.TmplText(n.tmpl, msg.Data, &tmplErr)
+
+	if config.Subject != "" {
+		title = tmpl(config.Subject)
 	}
-	result, err := n.tmpl.ExecuteTextString(tpl, msg)
-	if err != nil {
-		return tpl
+	if tmplErr != nil || title == "" {
+		title = tmpl(`{{ template "umeng.default.title" . }}`)
+		tmplErr = nil
 	}
-	return result
+	if title == "" {
+		title = "消息通知"
+	}
+
+	if config.Body != "" {
+		body = tmpl(config.Body)
+	}
+	if tmplErr != nil || body == "" {
+		body = tmpl(`{{ template "umeng.default.text" . }}`)
+		tmplErr = nil
+	}
+	if body == "" {
+		body = "您有一条新消息"
+	}
+	return
 }
 
 func md5Hex(s string) string {

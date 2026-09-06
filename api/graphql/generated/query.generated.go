@@ -1778,6 +1778,10 @@ func (ec *executionContext) fieldContext_Receiver_umengConfigs(_ context.Context
 				return ec.fieldContext_UmengConfig_apps(ctx, field)
 			case "productionMode":
 				return ec.fieldContext_UmengConfig_productionMode(ctx, field)
+			case "subject":
+				return ec.fieldContext_UmengConfig_subject(ctx, field)
+			case "body":
+				return ec.fieldContext_UmengConfig_body(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UmengConfig", field.Name)
 		},
@@ -2387,6 +2391,88 @@ func (ec *executionContext) fieldContext_UmengConfig_productionMode(_ context.Co
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UmengConfig_subject(ctx context.Context, field graphql.CollectedField, obj *profile.UmengConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UmengConfig_subject(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Subject, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UmengConfig_subject(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UmengConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UmengConfig_body(ctx context.Context, field graphql.CollectedField, obj *profile.UmengConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UmengConfig_body(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Body, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UmengConfig_body(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UmengConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3455,6 +3541,10 @@ func (ec *executionContext) _UmengConfig(ctx context.Context, sel ast.SelectionS
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "productionMode":
 			out.Values[i] = ec._UmengConfig_productionMode(ctx, field, obj)
+		case "subject":
+			out.Values[i] = ec._UmengConfig_subject(ctx, field, obj)
+		case "body":
+			out.Values[i] = ec._UmengConfig_body(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

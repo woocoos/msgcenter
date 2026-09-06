@@ -108,6 +108,8 @@ var (
 		{Name: "body", Type: field.TypeString, Nullable: true},
 		{Name: "format", Type: field.TypeString},
 		{Name: "redirect", Type: field.TypeString, Nullable: true},
+		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "message", "webhook", "umeng"}},
+		{Name: "alert_id", Type: field.TypeInt, Nullable: true},
 	}
 	// MsgInternalTable holds the schema information for the "msg_internal" table.
 	MsgInternalTable = &schema.Table{

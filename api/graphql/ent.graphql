@@ -1003,6 +1003,14 @@ type MsgInternal implements Node {
   消息跳转
   """
   redirect: String
+  """
+  消息模式:站内信,app推送,邮件,短信,微信等
+  """
+  receiverType: MsgInternalReceiverType!
+  """
+  消息ID
+  """
+  alertID: Int
   msgInternalTo: [MsgInternalTo!]
 }
 """
@@ -1053,6 +1061,15 @@ Properties by which MsgInternal connections can be ordered.
 """
 enum MsgInternalOrderField {
   createdAt
+}
+"""
+MsgInternalReceiverType is enum for the field receiver_type
+"""
+enum MsgInternalReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
+  email
+  message
+  webhook
+  umeng
 }
 type MsgInternalTo implements Node {
   id: ID!
@@ -1360,6 +1377,26 @@ input MsgInternalWhereInput {
   redirectNotNil: Boolean
   redirectEqualFold: String
   redirectContainsFold: String
+  """
+  receiver_type field predicates
+  """
+  receiverType: MsgInternalReceiverType
+  receiverTypeNEQ: MsgInternalReceiverType
+  receiverTypeIn: [MsgInternalReceiverType!]
+  receiverTypeNotIn: [MsgInternalReceiverType!]
+  """
+  alert_id field predicates
+  """
+  alertID: Int
+  alertIDNEQ: Int
+  alertIDIn: [Int!]
+  alertIDNotIn: [Int!]
+  alertIDGT: Int
+  alertIDGTE: Int
+  alertIDLT: Int
+  alertIDLTE: Int
+  alertIDIsNil: Boolean
+  alertIDNotNil: Boolean
   """
   msg_internal_to edge predicates
   """

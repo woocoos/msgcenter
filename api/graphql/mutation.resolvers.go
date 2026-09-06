@@ -546,9 +546,9 @@ func (r *mutationResolver) TestSendMessageTpl(ctx context.Context, tplID int, us
 	if err != nil {
 		return false, err
 	}
-	if temp.ReceiverType != profile.ReceiverMessage {
-		return false, fmt.Errorf("tplID:%d not an message template", tplID)
-	}
+	//if temp.ReceiverType != profile.ReceiverMessage {
+	//	return false, fmt.Errorf("tplID:%d not an message template", tplID)
+	//}
 	tid, err := identity.TenantIDFromContext(ctx)
 	if err != nil {
 		return false, err
