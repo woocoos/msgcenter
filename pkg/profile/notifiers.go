@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"maps"
 	"strconv"
 	"time"
 
@@ -381,6 +382,10 @@ func (c *UmengConfig) Clone() *UmengConfig {
 			pv := *v
 			clone.Apps[k] = &pv
 		}
+	}
+	if c.Extras != nil {
+		clone.Extras = make(map[string]string, len(c.Extras))
+		maps.Copy(clone.Extras, c.Extras)
 	}
 	return &clone
 }
