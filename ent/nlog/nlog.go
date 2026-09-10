@@ -36,6 +36,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldExpiresAt holds the string denoting the expires_at field in the database.
 	FieldExpiresAt = "expires_at"
+	// FieldErrMsg holds the string denoting the err_msg field in the database.
+	FieldErrMsg = "err_msg"
 	// EdgeAlerts holds the string denoting the alerts edge name in mutations.
 	EdgeAlerts = "alerts"
 	// EdgeNlogAlert holds the string denoting the nlog_alert edge name in mutations.
@@ -68,6 +70,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldExpiresAt,
+	FieldErrMsg,
 }
 
 var (
@@ -159,6 +162,11 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByExpiresAt orders the results by the expires_at field.
 func ByExpiresAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldExpiresAt, opts...).ToFunc()
+}
+
+// ByErrMsg orders the results by the err_msg field.
+func ByErrMsg(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldErrMsg, opts...).ToFunc()
 }
 
 // ByAlertsCount orders the results by alerts count.

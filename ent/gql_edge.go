@@ -37,6 +37,18 @@ func (_m *MsgAlert) Org(ctx context.Context) (*Org, error) {
 	return result, err
 }
 
+func (_m *MsgAlert) MsgInternal(ctx context.Context) (result []*MsgInternal, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = _m.NamedMsgInternal(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = _m.Edges.MsgInternalOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = _m.QueryMsgInternal().All(ctx)
+	}
+	return result, err
+}
+
 func (_m *MsgAlert) NlogAlerts(
 	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *NlogAlertOrder, where *NlogAlertWhereInput,
 ) (*NlogAlertConnection, error) {
@@ -45,7 +57,7 @@ func (_m *MsgAlert) NlogAlerts(
 		WithNlogAlertFilter(where.Filter),
 	}
 	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := _m.Edges.totalCount[2][alias]
+	totalCount, hasTotalCount := _m.Edges.totalCount[3][alias]
 	if nodes, err := _m.NamedNlogAlerts(alias); err == nil || hasTotalCount {
 		pager, err := newNlogAlertPager(opts, last != nil)
 		if err != nil {
@@ -100,6 +112,14 @@ func (_m *MsgInternal) MsgInternalTo(ctx context.Context) (result []*MsgInternal
 		result, err = _m.QueryMsgInternalTo().All(ctx)
 	}
 	return result, err
+}
+
+func (_m *MsgInternal) Alert(ctx context.Context) (*MsgAlert, error) {
+	result, err := _m.Edges.AlertOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryAlert().Only(ctx)
+	}
+	return result, MaskNotFound(err)
 }
 
 func (_m *MsgInternalTo) MsgInternal(ctx context.Context) (*MsgInternal, error) {

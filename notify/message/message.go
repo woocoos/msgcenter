@@ -133,13 +133,15 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 			return err
 		}
 
+		alertNameStr := data.CommonAnnotations[label.AlertNameLabel]
 		pushData.Message = push.Message{
 			Title:   row.Subject,
 			Format:  msgtemplate.Format(row.Format),
 			Content: row.Body,
 			Extras: map[label.LabelName]string{
-				"action":   "internal",
-				"actionID": strconv.Itoa(row.ID),
+				"action":    "internal",
+				"actionID":  strconv.Itoa(row.ID),
+				"alertName": alertNameStr,
 			},
 		}
 

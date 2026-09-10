@@ -57,5 +57,7 @@ func (MsgInternal) Fields() []ent.Field {
 func (MsgInternal) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("msg_internal_to", MsgInternalTo.Type),
+		edge.From("alert", MsgAlert.Type).Ref("msg_internal").Unique().
+			Field("alert_id"),
 	}
 }

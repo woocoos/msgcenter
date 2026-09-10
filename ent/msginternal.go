@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/pkg/profile"
 )
@@ -52,11 +53,13 @@ type MsgInternal struct {
 type MsgInternalEdges struct {
 	// MsgInternalTo holds the value of the msg_internal_to edge.
 	MsgInternalTo []*MsgInternalTo `json:"msg_internal_to,omitempty"`
+	// Alert holds the value of the alert edge.
+	Alert *MsgAlert `json:"alert,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [2]map[string]int
 
 	namedMsgInternalTo map[string][]*MsgInternalTo
 }
@@ -68,6 +71,17 @@ func (e MsgInternalEdges) MsgInternalToOrErr() ([]*MsgInternalTo, error) {
 		return e.MsgInternalTo, nil
 	}
 	return nil, &NotLoadedError{edge: "msg_internal_to"}
+}
+
+// AlertOrErr returns the Alert value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MsgInternalEdges) AlertOrErr() (*MsgAlert, error) {
+	if e.Alert != nil {
+		return e.Alert, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: msgalert.Label}
+	}
+	return nil, &NotLoadedError{edge: "alert"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -190,6 +204,11 @@ func (_m *MsgInternal) Value(name string) (ent.Value, error) {
 // QueryMsgInternalTo queries the "msg_internal_to" edge of the MsgInternal entity.
 func (_m *MsgInternal) QueryMsgInternalTo() *MsgInternalToQuery {
 	return NewMsgInternalClient(_m.config).QueryMsgInternalTo(_m)
+}
+
+// QueryAlert queries the "alert" edge of the MsgInternal entity.
+func (_m *MsgInternal) QueryAlert() *MsgAlertQuery {
+	return NewMsgInternalClient(_m.config).QueryAlert(_m)
 }
 
 // Update returns a builder for updating this MsgInternal.

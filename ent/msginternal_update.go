@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/predicate"
@@ -177,7 +178,6 @@ func (_u *MsgInternalUpdate) SetNillableReceiverType(v *profile.ReceiverType) *M
 
 // SetAlertID sets the "alert_id" field.
 func (_u *MsgInternalUpdate) SetAlertID(v int) *MsgInternalUpdate {
-	_u.mutation.ResetAlertID()
 	_u.mutation.SetAlertID(v)
 	return _u
 }
@@ -187,12 +187,6 @@ func (_u *MsgInternalUpdate) SetNillableAlertID(v *int) *MsgInternalUpdate {
 	if v != nil {
 		_u.SetAlertID(*v)
 	}
-	return _u
-}
-
-// AddAlertID adds value to the "alert_id" field.
-func (_u *MsgInternalUpdate) AddAlertID(v int) *MsgInternalUpdate {
-	_u.mutation.AddAlertID(v)
 	return _u
 }
 
@@ -215,6 +209,11 @@ func (_u *MsgInternalUpdate) AddMsgInternalTo(v ...*MsgInternalTo) *MsgInternalU
 		ids[i] = v[i].ID
 	}
 	return _u.AddMsgInternalToIDs(ids...)
+}
+
+// SetAlert sets the "alert" edge to the MsgAlert entity.
+func (_u *MsgInternalUpdate) SetAlert(v *MsgAlert) *MsgInternalUpdate {
+	return _u.SetAlertID(v.ID)
 }
 
 // Mutation returns the MsgInternalMutation object of the builder.
@@ -241,6 +240,12 @@ func (_u *MsgInternalUpdate) RemoveMsgInternalTo(v ...*MsgInternalTo) *MsgIntern
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveMsgInternalToIDs(ids...)
+}
+
+// ClearAlert clears the "alert" edge to the MsgAlert entity.
+func (_u *MsgInternalUpdate) ClearAlert() *MsgInternalUpdate {
+	_u.mutation.ClearAlert()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -336,15 +341,6 @@ func (_u *MsgInternalUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	if value, ok := _u.mutation.ReceiverType(); ok {
 		_spec.SetField(msginternal.FieldReceiverType, field.TypeEnum, value)
 	}
-	if value, ok := _u.mutation.AlertID(); ok {
-		_spec.SetField(msginternal.FieldAlertID, field.TypeInt, value)
-	}
-	if value, ok := _u.mutation.AddedAlertID(); ok {
-		_spec.AddField(msginternal.FieldAlertID, field.TypeInt, value)
-	}
-	if _u.mutation.AlertIDCleared() {
-		_spec.ClearField(msginternal.FieldAlertID, field.TypeInt)
-	}
 	if _u.mutation.MsgInternalToCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -388,6 +384,37 @@ func (_u *MsgInternalUpdate) sqlSave(ctx context.Context) (_node int, err error)
 			},
 		}
 		edge.Schema = _u.schemaConfig.MsgInternalTo
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.AlertCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   msginternal.AlertTable,
+			Columns: []string{msginternal.AlertColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgInternal
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.AlertIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   msginternal.AlertTable,
+			Columns: []string{msginternal.AlertColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgInternal
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -560,7 +587,6 @@ func (_u *MsgInternalUpdateOne) SetNillableReceiverType(v *profile.ReceiverType)
 
 // SetAlertID sets the "alert_id" field.
 func (_u *MsgInternalUpdateOne) SetAlertID(v int) *MsgInternalUpdateOne {
-	_u.mutation.ResetAlertID()
 	_u.mutation.SetAlertID(v)
 	return _u
 }
@@ -570,12 +596,6 @@ func (_u *MsgInternalUpdateOne) SetNillableAlertID(v *int) *MsgInternalUpdateOne
 	if v != nil {
 		_u.SetAlertID(*v)
 	}
-	return _u
-}
-
-// AddAlertID adds value to the "alert_id" field.
-func (_u *MsgInternalUpdateOne) AddAlertID(v int) *MsgInternalUpdateOne {
-	_u.mutation.AddAlertID(v)
 	return _u
 }
 
@@ -598,6 +618,11 @@ func (_u *MsgInternalUpdateOne) AddMsgInternalTo(v ...*MsgInternalTo) *MsgIntern
 		ids[i] = v[i].ID
 	}
 	return _u.AddMsgInternalToIDs(ids...)
+}
+
+// SetAlert sets the "alert" edge to the MsgAlert entity.
+func (_u *MsgInternalUpdateOne) SetAlert(v *MsgAlert) *MsgInternalUpdateOne {
+	return _u.SetAlertID(v.ID)
 }
 
 // Mutation returns the MsgInternalMutation object of the builder.
@@ -624,6 +649,12 @@ func (_u *MsgInternalUpdateOne) RemoveMsgInternalTo(v ...*MsgInternalTo) *MsgInt
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveMsgInternalToIDs(ids...)
+}
+
+// ClearAlert clears the "alert" edge to the MsgAlert entity.
+func (_u *MsgInternalUpdateOne) ClearAlert() *MsgInternalUpdateOne {
+	_u.mutation.ClearAlert()
+	return _u
 }
 
 // Where appends a list predicates to the MsgInternalUpdate builder.
@@ -749,15 +780,6 @@ func (_u *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgInternal
 	if value, ok := _u.mutation.ReceiverType(); ok {
 		_spec.SetField(msginternal.FieldReceiverType, field.TypeEnum, value)
 	}
-	if value, ok := _u.mutation.AlertID(); ok {
-		_spec.SetField(msginternal.FieldAlertID, field.TypeInt, value)
-	}
-	if value, ok := _u.mutation.AddedAlertID(); ok {
-		_spec.AddField(msginternal.FieldAlertID, field.TypeInt, value)
-	}
-	if _u.mutation.AlertIDCleared() {
-		_spec.ClearField(msginternal.FieldAlertID, field.TypeInt)
-	}
 	if _u.mutation.MsgInternalToCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -801,6 +823,37 @@ func (_u *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgInternal
 			},
 		}
 		edge.Schema = _u.schemaConfig.MsgInternalTo
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.AlertCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   msginternal.AlertTable,
+			Columns: []string{msginternal.AlertColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgInternal
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.AlertIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   msginternal.AlertTable,
+			Columns: []string{msginternal.AlertColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgInternal
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}

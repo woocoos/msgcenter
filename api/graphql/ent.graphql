@@ -290,6 +290,7 @@ type MsgAlert implements Node {
     where: NlogWhereInput
   ): NlogConnection!
   org: Org!
+  msgInternal: [MsgInternal!]
   nlogAlerts: [NlogAlert!]
 }
 """
@@ -479,6 +480,11 @@ input MsgAlertWhereInput {
   """
   hasNlog: Boolean
   hasNlogWith: [NlogWhereInput!]
+  """
+  msg_internal edge predicates
+  """
+  hasMsgInternal: Boolean
+  hasMsgInternalWith: [MsgInternalWhereInput!]
   """
   nlog_alerts edge predicates
   """
@@ -1010,8 +1016,9 @@ type MsgInternal implements Node {
   """
   消息ID
   """
-  alertID: Int
+  alertID: ID
   msgInternalTo: [MsgInternalTo!]
+  alert: MsgAlert
 }
 """
 A connection to a list of items.
@@ -1387,14 +1394,10 @@ input MsgInternalWhereInput {
   """
   alert_id field predicates
   """
-  alertID: Int
-  alertIDNEQ: Int
-  alertIDIn: [Int!]
-  alertIDNotIn: [Int!]
-  alertIDGT: Int
-  alertIDGTE: Int
-  alertIDLT: Int
-  alertIDLTE: Int
+  alertID: ID
+  alertIDNEQ: ID
+  alertIDIn: [ID!]
+  alertIDNotIn: [ID!]
   alertIDIsNil: Boolean
   alertIDNotNil: Boolean
   """
@@ -1402,6 +1405,11 @@ input MsgInternalWhereInput {
   """
   hasMsgInternalTo: Boolean
   hasMsgInternalToWith: [MsgInternalToWhereInput!]
+  """
+  alert edge predicates
+  """
+  hasAlert: Boolean
+  hasAlertWith: [MsgAlertWhereInput!]
 }
 type MsgSilence implements Node {
   id: ID!
@@ -2463,6 +2471,10 @@ type Nlog implements Node {
   过期时间
   """
   expiresAt: Time!
+  """
+  错误信息，有值表示未发送成功：如：邮件已发往邮件服务器，邮件服务器发送失败，记录其错误信息
+  """
+  errMsg: String
   alerts: [MsgAlert!]
   nlogAlert: [NlogAlert!]
 }
@@ -2714,6 +2726,24 @@ input NlogWhereInput {
   expiresAtGTE: Time
   expiresAtLT: Time
   expiresAtLTE: Time
+  """
+  err_msg field predicates
+  """
+  errMsg: String
+  errMsgNEQ: String
+  errMsgIn: [String!]
+  errMsgNotIn: [String!]
+  errMsgGT: String
+  errMsgGTE: String
+  errMsgLT: String
+  errMsgLTE: String
+  errMsgContains: String
+  errMsgHasPrefix: String
+  errMsgHasSuffix: String
+  errMsgIsNil: Boolean
+  errMsgNotNil: Boolean
+  errMsgEqualFold: String
+  errMsgContainsFold: String
   """
   alerts edge predicates
   """

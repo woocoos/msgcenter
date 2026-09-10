@@ -57,16 +57,19 @@ type MsgAlertEdges struct {
 	Nlog []*Nlog `json:"nlog,omitempty"`
 	// Org holds the value of the org edge.
 	Org *Org `json:"org,omitempty"`
+	// MsgInternal holds the value of the msg_internal edge.
+	MsgInternal []*MsgInternal `json:"msg_internal,omitempty"`
 	// NlogAlerts holds the value of the nlog_alerts edge.
 	NlogAlerts []*NlogAlert `json:"nlog_alerts,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
+	totalCount [4]map[string]int
 
-	namedNlog       map[string][]*Nlog
-	namedNlogAlerts map[string][]*NlogAlert
+	namedNlog        map[string][]*Nlog
+	namedMsgInternal map[string][]*MsgInternal
+	namedNlogAlerts  map[string][]*NlogAlert
 }
 
 // NlogOrErr returns the Nlog value or an error if the edge
@@ -89,10 +92,19 @@ func (e MsgAlertEdges) OrgOrErr() (*Org, error) {
 	return nil, &NotLoadedError{edge: "org"}
 }
 
+// MsgInternalOrErr returns the MsgInternal value or an error if the edge
+// was not loaded in eager-loading.
+func (e MsgAlertEdges) MsgInternalOrErr() ([]*MsgInternal, error) {
+	if e.loadedTypes[2] {
+		return e.MsgInternal, nil
+	}
+	return nil, &NotLoadedError{edge: "msg_internal"}
+}
+
 // NlogAlertsOrErr returns the NlogAlerts value or an error if the edge
 // was not loaded in eager-loading.
 func (e MsgAlertEdges) NlogAlertsOrErr() ([]*NlogAlert, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		return e.NlogAlerts, nil
 	}
 	return nil, &NotLoadedError{edge: "nlog_alerts"}
@@ -233,6 +245,11 @@ func (_m *MsgAlert) QueryOrg() *OrgQuery {
 	return NewMsgAlertClient(_m.config).QueryOrg(_m)
 }
 
+// QueryMsgInternal queries the "msg_internal" edge of the MsgAlert entity.
+func (_m *MsgAlert) QueryMsgInternal() *MsgInternalQuery {
+	return NewMsgAlertClient(_m.config).QueryMsgInternal(_m)
+}
+
 // QueryNlogAlerts queries the "nlog_alerts" edge of the MsgAlert entity.
 func (_m *MsgAlert) QueryNlogAlerts() *NlogAlertQuery {
 	return NewMsgAlertClient(_m.config).QueryNlogAlerts(_m)
@@ -321,6 +338,30 @@ func (_m *MsgAlert) appendNamedNlog(name string, edges ...*Nlog) {
 		_m.Edges.namedNlog[name] = []*Nlog{}
 	} else {
 		_m.Edges.namedNlog[name] = append(_m.Edges.namedNlog[name], edges...)
+	}
+}
+
+// NamedMsgInternal returns the MsgInternal named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (_m *MsgAlert) NamedMsgInternal(name string) ([]*MsgInternal, error) {
+	if _m.Edges.namedMsgInternal == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := _m.Edges.namedMsgInternal[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (_m *MsgAlert) appendNamedMsgInternal(name string, edges ...*MsgInternal) {
+	if _m.Edges.namedMsgInternal == nil {
+		_m.Edges.namedMsgInternal = make(map[string][]*MsgInternal)
+	}
+	if len(edges) == 0 {
+		_m.Edges.namedMsgInternal[name] = []*MsgInternal{}
+	} else {
+		_m.Edges.namedMsgInternal[name] = append(_m.Edges.namedMsgInternal[name], edges...)
 	}
 }
 

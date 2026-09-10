@@ -158,6 +158,18 @@ func (_m *MsgAlertQuery) collectField(ctx context.Context, oneNode bool, opCtx *
 				selectedFields = append(selectedFields, msgalert.FieldTenantID)
 				fieldSeen[msgalert.FieldTenantID] = struct{}{}
 			}
+		case "msgInternal":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&MsgInternalClient{config: _m.config}).Query()
+			)
+			if err := query.collectField(ctx, false, opCtx, field, path, mayAddCondition(satisfies, msginternalImplementors)...); err != nil {
+				return err
+			}
+			_m.WithNamedMsgInternal(alias, func(wq *MsgInternalQuery) {
+				*wq = *query
+			})
 		case "nlogAlerts":
 			var (
 				alias = field.Alias
@@ -201,10 +213,10 @@ func (_m *MsgAlertQuery) collectField(ctx context.Context, oneNode bool, opCtx *
 						}
 						for i := range nodes {
 							n := m[nodes[i].ID]
-							if nodes[i].Edges.totalCount[2] == nil {
-								nodes[i].Edges.totalCount[2] = make(map[string]int)
+							if nodes[i].Edges.totalCount[3] == nil {
+								nodes[i].Edges.totalCount[3] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[2][alias] = n
+							nodes[i].Edges.totalCount[3][alias] = n
 						}
 						return nil
 					})
@@ -212,10 +224,10 @@ func (_m *MsgAlertQuery) collectField(ctx context.Context, oneNode bool, opCtx *
 					_m.loadTotal = append(_m.loadTotal, func(_ context.Context, nodes []*MsgAlert) error {
 						for i := range nodes {
 							n := len(nodes[i].Edges.NlogAlerts)
-							if nodes[i].Edges.totalCount[2] == nil {
-								nodes[i].Edges.totalCount[2] = make(map[string]int)
+							if nodes[i].Edges.totalCount[3] == nil {
+								nodes[i].Edges.totalCount[3] = make(map[string]int)
 							}
-							nodes[i].Edges.totalCount[2][alias] = n
+							nodes[i].Edges.totalCount[3][alias] = n
 						}
 						return nil
 					})
@@ -718,6 +730,20 @@ func (_m *MsgInternalQuery) collectField(ctx context.Context, oneNode bool, opCt
 			_m.WithNamedMsgInternalTo(alias, func(wq *MsgInternalToQuery) {
 				*wq = *query
 			})
+		case "alert":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&MsgAlertClient{config: _m.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, msgalertImplementors)...); err != nil {
+				return err
+			}
+			_m.withAlert = query
+			if _, ok := fieldSeen[msginternal.FieldAlertID]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldAlertID)
+				fieldSeen[msginternal.FieldAlertID] = struct{}{}
+			}
 		case "createdBy":
 			if _, ok := fieldSeen[msginternal.FieldCreatedBy]; !ok {
 				selectedFields = append(selectedFields, msginternal.FieldCreatedBy)
@@ -1762,6 +1788,11 @@ func (_m *NlogQuery) collectField(ctx context.Context, oneNode bool, opCtx *grap
 			if _, ok := fieldSeen[nlog.FieldExpiresAt]; !ok {
 				selectedFields = append(selectedFields, nlog.FieldExpiresAt)
 				fieldSeen[nlog.FieldExpiresAt] = struct{}{}
+			}
+		case "errMsg":
+			if _, ok := fieldSeen[nlog.FieldErrMsg]; !ok {
+				selectedFields = append(selectedFields, nlog.FieldErrMsg)
+				fieldSeen[nlog.FieldErrMsg] = struct{}{}
 			}
 		case "id":
 		case "__typename":

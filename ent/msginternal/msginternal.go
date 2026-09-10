@@ -44,6 +44,8 @@ const (
 	FieldAlertID = "alert_id"
 	// EdgeMsgInternalTo holds the string denoting the msg_internal_to edge name in mutations.
 	EdgeMsgInternalTo = "msg_internal_to"
+	// EdgeAlert holds the string denoting the alert edge name in mutations.
+	EdgeAlert = "alert"
 	// Table holds the table name of the msginternal in the database.
 	Table = "msg_internal"
 	// MsgInternalToTable is the table that holds the msg_internal_to relation/edge.
@@ -53,6 +55,13 @@ const (
 	MsgInternalToInverseTable = "msg_internal_to"
 	// MsgInternalToColumn is the table column denoting the msg_internal_to relation/edge.
 	MsgInternalToColumn = "msg_internal_id"
+	// AlertTable is the table that holds the alert relation/edge.
+	AlertTable = "msg_internal"
+	// AlertInverseTable is the table name for the MsgAlert entity.
+	// It exists in this package in order to avoid circular dependency with the "msgalert" package.
+	AlertInverseTable = "msg_alert"
+	// AlertColumn is the table column denoting the alert relation/edge.
+	AlertColumn = "alert_id"
 )
 
 // Columns holds all SQL columns for msginternal fields.
@@ -187,11 +196,25 @@ func ByMsgInternalTo(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newMsgInternalToStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByAlertField orders the results by alert field.
+func ByAlertField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAlertStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newMsgInternalToStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MsgInternalToInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, MsgInternalToTable, MsgInternalToColumn),
+	)
+}
+func newAlertStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AlertInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, AlertTable, AlertColumn),
 	)
 }
 

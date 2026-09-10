@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
@@ -12,7 +14,6 @@ import (
 	"github.com/woocoos/msgcenter/ent/intercept"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/version"
-	"time"
 )
 
 // Nlog 提醒的发送记录,记录着由哪个接收者,发送通道类型,发送执行通道.
@@ -53,6 +54,7 @@ func (Nlog) Fields() []ent.Field {
 		field.Time("updated_at").Optional().
 			Annotations(entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput)),
 		field.Time("expires_at").Comment("过期时间"),
+		field.String("err_msg").Optional().Comment("错误信息，有值表示未发送成功：如：邮件已发往邮件服务器，邮件服务器发送失败，记录其错误信息"),
 	}
 }
 

@@ -116,6 +116,14 @@ var (
 		Name:       "msg_internal",
 		Columns:    MsgInternalColumns,
 		PrimaryKey: []*schema.Column{MsgInternalColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "msg_internal_msg_alert_msg_internal",
+				Columns:    []*schema.Column{MsgInternalColumns[12]},
+				RefColumns: []*schema.Column{MsgAlertColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// MsgInternalToColumns holds the columns for the "msg_internal_to" table.
 	MsgInternalToColumns = []*schema.Column{
@@ -287,6 +295,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "expires_at", Type: field.TypeTime},
+		{Name: "err_msg", Type: field.TypeString, Nullable: true},
 	}
 	// MsgNlogTable holds the schema information for the "msg_nlog" table.
 	MsgNlogTable = &schema.Table{
@@ -448,6 +457,7 @@ func init() {
 	MsgEventTable.Annotation = &entsql.Annotation{
 		Table: "msg_event",
 	}
+	MsgInternalTable.ForeignKeys[0].RefTable = MsgAlertTable
 	MsgInternalTable.Annotation = &entsql.Annotation{
 		Table: "msg_internal",
 	}

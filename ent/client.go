@@ -482,6 +482,25 @@ func (c *MsgAlertClient) QueryOrg(_m *MsgAlert) *OrgQuery {
 	return query
 }
 
+// QueryMsgInternal queries the msg_internal edge of a MsgAlert.
+func (c *MsgAlertClient) QueryMsgInternal(_m *MsgAlert) *MsgInternalQuery {
+	query := (&MsgInternalClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msgalert.Table, msgalert.FieldID, id),
+			sqlgraph.To(msginternal.Table, msginternal.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, msgalert.MsgInternalTable, msgalert.MsgInternalColumn),
+		)
+		schemaConfig := _m.schemaConfig
+		step.To.Schema = schemaConfig.MsgInternal
+		step.Edge.Schema = schemaConfig.MsgInternal
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryNlogAlerts queries the nlog_alerts edge of a MsgAlert.
 func (c *MsgAlertClient) QueryNlogAlerts(_m *MsgAlert) *NlogAlertQuery {
 	query := (&NlogAlertClient{config: c.config}).Query()
@@ -974,6 +993,25 @@ func (c *MsgInternalClient) QueryMsgInternalTo(_m *MsgInternal) *MsgInternalToQu
 		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.MsgInternalTo
 		step.Edge.Schema = schemaConfig.MsgInternalTo
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAlert queries the alert edge of a MsgInternal.
+func (c *MsgInternalClient) QueryAlert(_m *MsgInternal) *MsgAlertQuery {
+	query := (&MsgAlertClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msginternal.Table, msginternal.FieldID, id),
+			sqlgraph.To(msgalert.Table, msgalert.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, msginternal.AlertTable, msginternal.AlertColumn),
+		)
+		schemaConfig := _m.schemaConfig
+		step.To.Schema = schemaConfig.MsgAlert
+		step.Edge.Schema = schemaConfig.MsgInternal
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}

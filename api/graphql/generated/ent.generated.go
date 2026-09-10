@@ -2752,6 +2752,83 @@ func (ec *executionContext) fieldContext_MsgAlert_org(_ context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _MsgAlert_msgInternal(ctx context.Context, field graphql.CollectedField, obj *ent.MsgAlert) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgAlert_msgInternal(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MsgInternal(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.MsgInternal)
+	fc.Result = res
+	return ec.marshalOMsgInternal2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgAlert_msgInternal(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgAlert",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgInternal_id(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_MsgInternal_createdBy(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgInternal_createdAt(ctx, field)
+			case "updatedBy":
+				return ec.fieldContext_MsgInternal_updatedBy(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgInternal_updatedAt(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgInternal_tenantID(ctx, field)
+			case "category":
+				return ec.fieldContext_MsgInternal_category(ctx, field)
+			case "subject":
+				return ec.fieldContext_MsgInternal_subject(ctx, field)
+			case "body":
+				return ec.fieldContext_MsgInternal_body(ctx, field)
+			case "format":
+				return ec.fieldContext_MsgInternal_format(ctx, field)
+			case "redirect":
+				return ec.fieldContext_MsgInternal_redirect(ctx, field)
+			case "receiverType":
+				return ec.fieldContext_MsgInternal_receiverType(ctx, field)
+			case "alertID":
+				return ec.fieldContext_MsgInternal_alertID(ctx, field)
+			case "msgInternalTo":
+				return ec.fieldContext_MsgInternal_msgInternalTo(ctx, field)
+			case "alert":
+				return ec.fieldContext_MsgInternal_alert(ctx, field)
+			case "toSendCounts":
+				return ec.fieldContext_MsgInternal_toSendCounts(ctx, field)
+			case "hasReadCounts":
+				return ec.fieldContext_MsgInternal_hasReadCounts(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgInternal", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MsgAlert_nlogAlerts(ctx context.Context, field graphql.CollectedField, obj *ent.MsgAlert) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MsgAlert_nlogAlerts(ctx, field)
 	if err != nil {
@@ -3018,6 +3095,8 @@ func (ec *executionContext) fieldContext_MsgAlertEdge_node(_ context.Context, fi
 				return ec.fieldContext_MsgAlert_nlog(ctx, field)
 			case "org":
 				return ec.fieldContext_MsgAlert_org(ctx, field)
+			case "msgInternal":
+				return ec.fieldContext_MsgAlert_msgInternal(ctx, field)
 			case "nlogAlerts":
 				return ec.fieldContext_MsgAlert_nlogAlerts(ctx, field)
 			}
@@ -5666,7 +5745,7 @@ func (ec *executionContext) _MsgInternal_alertID(ctx context.Context, field grap
 	}
 	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalOInt2int(ctx, field.Selections, res)
+	return ec.marshalOID2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MsgInternal_alertID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5676,7 +5755,7 @@ func (ec *executionContext) fieldContext_MsgInternal_alertID(_ context.Context, 
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5738,6 +5817,83 @@ func (ec *executionContext) fieldContext_MsgInternal_msgInternalTo(_ context.Con
 				return ec.fieldContext_MsgInternalTo_user(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgInternalTo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MsgInternal_alert(ctx context.Context, field graphql.CollectedField, obj *ent.MsgInternal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgInternal_alert(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Alert(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgAlert)
+	fc.Result = res
+	return ec.marshalOMsgAlert2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgAlert(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgInternal_alert(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgInternal",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_MsgAlert_id(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_MsgAlert_tenantID(ctx, field)
+			case "labels":
+				return ec.fieldContext_MsgAlert_labels(ctx, field)
+			case "annotations":
+				return ec.fieldContext_MsgAlert_annotations(ctx, field)
+			case "startsAt":
+				return ec.fieldContext_MsgAlert_startsAt(ctx, field)
+			case "endsAt":
+				return ec.fieldContext_MsgAlert_endsAt(ctx, field)
+			case "url":
+				return ec.fieldContext_MsgAlert_url(ctx, field)
+			case "timeout":
+				return ec.fieldContext_MsgAlert_timeout(ctx, field)
+			case "fingerprint":
+				return ec.fieldContext_MsgAlert_fingerprint(ctx, field)
+			case "state":
+				return ec.fieldContext_MsgAlert_state(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_MsgAlert_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_MsgAlert_updatedAt(ctx, field)
+			case "deleted":
+				return ec.fieldContext_MsgAlert_deleted(ctx, field)
+			case "nlog":
+				return ec.fieldContext_MsgAlert_nlog(ctx, field)
+			case "org":
+				return ec.fieldContext_MsgAlert_org(ctx, field)
+			case "msgInternal":
+				return ec.fieldContext_MsgAlert_msgInternal(ctx, field)
+			case "nlogAlerts":
+				return ec.fieldContext_MsgAlert_nlogAlerts(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgAlert", field.Name)
 		},
 	}
 	return fc, nil
@@ -6040,6 +6196,8 @@ func (ec *executionContext) fieldContext_MsgInternalEdge_node(_ context.Context,
 				return ec.fieldContext_MsgInternal_alertID(ctx, field)
 			case "msgInternalTo":
 				return ec.fieldContext_MsgInternal_msgInternalTo(ctx, field)
+			case "alert":
+				return ec.fieldContext_MsgInternal_alert(ctx, field)
 			case "toSendCounts":
 				return ec.fieldContext_MsgInternal_toSendCounts(ctx, field)
 			case "hasReadCounts":
@@ -6464,6 +6622,8 @@ func (ec *executionContext) fieldContext_MsgInternalTo_msgInternal(_ context.Con
 				return ec.fieldContext_MsgInternal_alertID(ctx, field)
 			case "msgInternalTo":
 				return ec.fieldContext_MsgInternal_msgInternalTo(ctx, field)
+			case "alert":
+				return ec.fieldContext_MsgInternal_alert(ctx, field)
 			case "toSendCounts":
 				return ec.fieldContext_MsgInternal_toSendCounts(ctx, field)
 			case "hasReadCounts":
@@ -11113,6 +11273,47 @@ func (ec *executionContext) fieldContext_Nlog_expiresAt(_ context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _Nlog_errMsg(ctx context.Context, field graphql.CollectedField, obj *ent.Nlog) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Nlog_errMsg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ErrMsg, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Nlog_errMsg(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Nlog",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Nlog_alerts(ctx context.Context, field graphql.CollectedField, obj *ent.Nlog) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Nlog_alerts(ctx, field)
 	if err != nil {
@@ -11179,6 +11380,8 @@ func (ec *executionContext) fieldContext_Nlog_alerts(_ context.Context, field gr
 				return ec.fieldContext_MsgAlert_nlog(ctx, field)
 			case "org":
 				return ec.fieldContext_MsgAlert_org(ctx, field)
+			case "msgInternal":
+				return ec.fieldContext_MsgAlert_msgInternal(ctx, field)
 			case "nlogAlerts":
 				return ec.fieldContext_MsgAlert_nlogAlerts(ctx, field)
 			}
@@ -11478,6 +11681,8 @@ func (ec *executionContext) fieldContext_NlogAlert_nlog(_ context.Context, field
 				return ec.fieldContext_Nlog_updatedAt(ctx, field)
 			case "expiresAt":
 				return ec.fieldContext_Nlog_expiresAt(ctx, field)
+			case "errMsg":
+				return ec.fieldContext_Nlog_errMsg(ctx, field)
 			case "alerts":
 				return ec.fieldContext_Nlog_alerts(ctx, field)
 			case "nlogAlert":
@@ -11558,6 +11763,8 @@ func (ec *executionContext) fieldContext_NlogAlert_alert(_ context.Context, fiel
 				return ec.fieldContext_MsgAlert_nlog(ctx, field)
 			case "org":
 				return ec.fieldContext_MsgAlert_org(ctx, field)
+			case "msgInternal":
+				return ec.fieldContext_MsgAlert_msgInternal(ctx, field)
 			case "nlogAlerts":
 				return ec.fieldContext_MsgAlert_nlogAlerts(ctx, field)
 			}
@@ -11768,6 +11975,8 @@ func (ec *executionContext) fieldContext_NlogEdge_node(_ context.Context, field 
 				return ec.fieldContext_Nlog_updatedAt(ctx, field)
 			case "expiresAt":
 				return ec.fieldContext_Nlog_expiresAt(ctx, field)
+			case "errMsg":
+				return ec.fieldContext_Nlog_errMsg(ctx, field)
 			case "alerts":
 				return ec.fieldContext_Nlog_alerts(ctx, field)
 			case "nlogAlert":
@@ -12097,6 +12306,8 @@ func (ec *executionContext) fieldContext_Org_msgAlerts(_ context.Context, field 
 				return ec.fieldContext_MsgAlert_nlog(ctx, field)
 			case "org":
 				return ec.fieldContext_MsgAlert_org(ctx, field)
+			case "msgInternal":
+				return ec.fieldContext_MsgAlert_msgInternal(ctx, field)
 			case "nlogAlerts":
 				return ec.fieldContext_MsgAlert_nlogAlerts(ctx, field)
 			}
@@ -14274,7 +14485,7 @@ func (ec *executionContext) unmarshalInputMsgAlertWhereInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "startsAt", "startsAtNEQ", "startsAtIn", "startsAtNotIn", "startsAtGT", "startsAtGTE", "startsAtLT", "startsAtLTE", "endsAt", "endsAtNEQ", "endsAtIn", "endsAtNotIn", "endsAtGT", "endsAtGTE", "endsAtLT", "endsAtLTE", "endsAtIsNil", "endsAtNotNil", "url", "urlNEQ", "urlIn", "urlNotIn", "urlGT", "urlGTE", "urlLT", "urlLTE", "urlContains", "urlHasPrefix", "urlHasSuffix", "urlIsNil", "urlNotNil", "urlEqualFold", "urlContainsFold", "timeout", "timeoutNEQ", "fingerprint", "fingerprintNEQ", "fingerprintIn", "fingerprintNotIn", "fingerprintGT", "fingerprintGTE", "fingerprintLT", "fingerprintLTE", "fingerprintContains", "fingerprintHasPrefix", "fingerprintHasSuffix", "fingerprintEqualFold", "fingerprintContainsFold", "state", "stateNEQ", "stateIn", "stateNotIn", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "deleted", "deletedNEQ", "hasNlog", "hasNlogWith", "hasNlogAlerts", "hasNlogAlertsWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "startsAt", "startsAtNEQ", "startsAtIn", "startsAtNotIn", "startsAtGT", "startsAtGTE", "startsAtLT", "startsAtLTE", "endsAt", "endsAtNEQ", "endsAtIn", "endsAtNotIn", "endsAtGT", "endsAtGTE", "endsAtLT", "endsAtLTE", "endsAtIsNil", "endsAtNotNil", "url", "urlNEQ", "urlIn", "urlNotIn", "urlGT", "urlGTE", "urlLT", "urlLTE", "urlContains", "urlHasPrefix", "urlHasSuffix", "urlIsNil", "urlNotNil", "urlEqualFold", "urlContainsFold", "timeout", "timeoutNEQ", "fingerprint", "fingerprintNEQ", "fingerprintIn", "fingerprintNotIn", "fingerprintGT", "fingerprintGTE", "fingerprintLT", "fingerprintLTE", "fingerprintContains", "fingerprintHasPrefix", "fingerprintHasSuffix", "fingerprintEqualFold", "fingerprintContainsFold", "state", "stateNEQ", "stateIn", "stateNotIn", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "deleted", "deletedNEQ", "hasNlog", "hasNlogWith", "hasMsgInternal", "hasMsgInternalWith", "hasNlogAlerts", "hasNlogAlertsWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14904,6 +15115,20 @@ func (ec *executionContext) unmarshalInputMsgAlertWhereInput(ctx context.Context
 				return it, err
 			}
 			it.HasNlogWith = data
+		case "hasMsgInternal":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasMsgInternal"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasMsgInternal = data
+		case "hasMsgInternalWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasMsgInternalWith"))
+			data, err := ec.unmarshalOMsgInternalWhereInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasMsgInternalWith = data
 		case "hasNlogAlerts":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasNlogAlerts"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -16949,7 +17174,7 @@ func (ec *executionContext) unmarshalInputMsgInternalWhereInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "category", "categoryNEQ", "categoryIn", "categoryNotIn", "categoryGT", "categoryGTE", "categoryLT", "categoryLTE", "categoryContains", "categoryHasPrefix", "categoryHasSuffix", "categoryEqualFold", "categoryContainsFold", "subject", "subjectNEQ", "subjectIn", "subjectNotIn", "subjectGT", "subjectGTE", "subjectLT", "subjectLTE", "subjectContains", "subjectHasPrefix", "subjectHasSuffix", "subjectEqualFold", "subjectContainsFold", "format", "formatNEQ", "formatIn", "formatNotIn", "formatGT", "formatGTE", "formatLT", "formatLTE", "formatContains", "formatHasPrefix", "formatHasSuffix", "formatEqualFold", "formatContainsFold", "redirect", "redirectNEQ", "redirectIn", "redirectNotIn", "redirectGT", "redirectGTE", "redirectLT", "redirectLTE", "redirectContains", "redirectHasPrefix", "redirectHasSuffix", "redirectIsNil", "redirectNotNil", "redirectEqualFold", "redirectContainsFold", "receiverType", "receiverTypeNEQ", "receiverTypeIn", "receiverTypeNotIn", "alertID", "alertIDNEQ", "alertIDIn", "alertIDNotIn", "alertIDGT", "alertIDGTE", "alertIDLT", "alertIDLTE", "alertIDIsNil", "alertIDNotNil", "hasMsgInternalTo", "hasMsgInternalToWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "category", "categoryNEQ", "categoryIn", "categoryNotIn", "categoryGT", "categoryGTE", "categoryLT", "categoryLTE", "categoryContains", "categoryHasPrefix", "categoryHasSuffix", "categoryEqualFold", "categoryContainsFold", "subject", "subjectNEQ", "subjectIn", "subjectNotIn", "subjectGT", "subjectGTE", "subjectLT", "subjectLTE", "subjectContains", "subjectHasPrefix", "subjectHasSuffix", "subjectEqualFold", "subjectContainsFold", "format", "formatNEQ", "formatIn", "formatNotIn", "formatGT", "formatGTE", "formatLT", "formatLTE", "formatContains", "formatHasPrefix", "formatHasSuffix", "formatEqualFold", "formatContainsFold", "redirect", "redirectNEQ", "redirectIn", "redirectNotIn", "redirectGT", "redirectGTE", "redirectLT", "redirectLTE", "redirectContains", "redirectHasPrefix", "redirectHasSuffix", "redirectIsNil", "redirectNotNil", "redirectEqualFold", "redirectContainsFold", "receiverType", "receiverTypeNEQ", "receiverTypeIn", "receiverTypeNotIn", "alertID", "alertIDNEQ", "alertIDIn", "alertIDNotIn", "alertIDIsNil", "alertIDNotNil", "hasMsgInternalTo", "hasMsgInternalToWith", "hasAlert", "hasAlertWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -17749,60 +17974,32 @@ func (ec *executionContext) unmarshalInputMsgInternalWhereInput(ctx context.Cont
 			it.ReceiverTypeNotIn = data
 		case "alertID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertID"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.AlertID = data
 		case "alertIDNEQ":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDNEQ"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.AlertIDNEQ = data
 		case "alertIDIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.AlertIDIn = data
 		case "alertIDNotIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDNotIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.AlertIDNotIn = data
-		case "alertIDGT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDGT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.AlertIDGT = data
-		case "alertIDGTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDGTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.AlertIDGTE = data
-		case "alertIDLT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDLT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.AlertIDLT = data
-		case "alertIDLTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDLTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.AlertIDLTE = data
 		case "alertIDIsNil":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alertIDIsNil"))
 			data, err := ec.unmarshalOBoolean2bool(ctx, v)
@@ -17831,6 +18028,20 @@ func (ec *executionContext) unmarshalInputMsgInternalWhereInput(ctx context.Cont
 				return it, err
 			}
 			it.HasMsgInternalToWith = data
+		case "hasAlert":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAlert"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasAlert = data
+		case "hasAlertWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAlertWith"))
+			data, err := ec.unmarshalOMsgAlertWhereInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgAlertWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.HasAlertWith = data
 		}
 	}
 
@@ -21427,7 +21638,7 @@ func (ec *executionContext) unmarshalInputNlogWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "groupKey", "groupKeyNEQ", "groupKeyIn", "groupKeyNotIn", "groupKeyGT", "groupKeyGTE", "groupKeyLT", "groupKeyLTE", "groupKeyContains", "groupKeyHasPrefix", "groupKeyHasSuffix", "groupKeyEqualFold", "groupKeyContainsFold", "receiver", "receiverNEQ", "receiverIn", "receiverNotIn", "receiverGT", "receiverGTE", "receiverLT", "receiverLTE", "receiverContains", "receiverHasPrefix", "receiverHasSuffix", "receiverEqualFold", "receiverContainsFold", "receiverType", "receiverTypeNEQ", "receiverTypeIn", "receiverTypeNotIn", "idx", "idxNEQ", "idxIn", "idxNotIn", "idxGT", "idxGTE", "idxLT", "idxLTE", "sendAt", "sendAtNEQ", "sendAtIn", "sendAtNotIn", "sendAtGT", "sendAtGTE", "sendAtLT", "sendAtLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "expiresAt", "expiresAtNEQ", "expiresAtIn", "expiresAtNotIn", "expiresAtGT", "expiresAtGTE", "expiresAtLT", "expiresAtLTE", "hasAlerts", "hasAlertsWith", "hasNlogAlert", "hasNlogAlertWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "groupKey", "groupKeyNEQ", "groupKeyIn", "groupKeyNotIn", "groupKeyGT", "groupKeyGTE", "groupKeyLT", "groupKeyLTE", "groupKeyContains", "groupKeyHasPrefix", "groupKeyHasSuffix", "groupKeyEqualFold", "groupKeyContainsFold", "receiver", "receiverNEQ", "receiverIn", "receiverNotIn", "receiverGT", "receiverGTE", "receiverLT", "receiverLTE", "receiverContains", "receiverHasPrefix", "receiverHasSuffix", "receiverEqualFold", "receiverContainsFold", "receiverType", "receiverTypeNEQ", "receiverTypeIn", "receiverTypeNotIn", "idx", "idxNEQ", "idxIn", "idxNotIn", "idxGT", "idxGTE", "idxLT", "idxLTE", "sendAt", "sendAtNEQ", "sendAtIn", "sendAtNotIn", "sendAtGT", "sendAtGTE", "sendAtLT", "sendAtLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "expiresAt", "expiresAtNEQ", "expiresAtIn", "expiresAtNotIn", "expiresAtGT", "expiresAtGTE", "expiresAtLT", "expiresAtLTE", "errMsg", "errMsgNEQ", "errMsgIn", "errMsgNotIn", "errMsgGT", "errMsgGTE", "errMsgLT", "errMsgLTE", "errMsgContains", "errMsgHasPrefix", "errMsgHasSuffix", "errMsgIsNil", "errMsgNotNil", "errMsgEqualFold", "errMsgContainsFold", "hasAlerts", "hasAlertsWith", "hasNlogAlert", "hasNlogAlertWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -22071,6 +22282,111 @@ func (ec *executionContext) unmarshalInputNlogWhereInput(ctx context.Context, ob
 				return it, err
 			}
 			it.ExpiresAtLTE = data
+		case "errMsg":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("errMsg"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ErrMsg = data
+		case "errMsgNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("errMsgNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ErrMsgNEQ = data
+		case "errMsgIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("errMsgIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ErrMsgIn = data
+		case "errMsgNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("errMsgNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ErrMsgNotIn = data
+		case "errMsgGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("errMsgGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ErrMsgGT = data
+		case "errMsgGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("errMsgGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ErrMsgGTE = data
+		case "errMsgLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("errMsgLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ErrMsgLT = data
+		case "errMsgLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("errMsgLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ErrMsgLTE = data
+		case "errMsgContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("errMsgContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ErrMsgContains = data
+		case "errMsgHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("errMsgHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ErrMsgHasPrefix = data
+		case "errMsgHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("errMsgHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ErrMsgHasSuffix = data
+		case "errMsgIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("errMsgIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ErrMsgIsNil = data
+		case "errMsgNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("errMsgNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ErrMsgNotNil = data
+		case "errMsgEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("errMsgEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ErrMsgEqualFold = data
+		case "errMsgContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("errMsgContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ErrMsgContainsFold = data
 		case "hasAlerts":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAlerts"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -23027,6 +23343,39 @@ func (ec *executionContext) _MsgAlert(ctx context.Context, sel ast.SelectionSet,
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "msgInternal":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MsgAlert_msgInternal(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "nlogAlerts":
 			field := field
 
@@ -23811,6 +24160,39 @@ func (ec *executionContext) _MsgInternal(ctx context.Context, sel ast.SelectionS
 					}
 				}()
 				res = ec._MsgInternal_msgInternalTo(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "alert":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._MsgInternal_alert(ctx, field, obj)
 				return res
 			}
 
@@ -25222,6 +25604,8 @@ func (ec *executionContext) _Nlog(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "errMsg":
+			out.Values[i] = ec._Nlog_errMsg(ctx, field, obj)
 		case "alerts":
 			field := field
 
@@ -27797,6 +28181,53 @@ func (ec *executionContext) unmarshalOMsgEventWhereInput2ᚖgithubᚗcomᚋwooco
 	}
 	res, err := ec.unmarshalInputMsgEventWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOMsgInternal2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.MsgInternal) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMsgInternal2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternal(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalOMsgInternal2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternal(ctx context.Context, sel ast.SelectionSet, v *ent.MsgInternal) graphql.Marshaler {

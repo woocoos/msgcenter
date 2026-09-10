@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -163,6 +164,11 @@ func (_c *MsgInternalCreate) AddMsgInternalTo(v ...*MsgInternalTo) *MsgInternalC
 		ids[i] = v[i].ID
 	}
 	return _c.AddMsgInternalToIDs(ids...)
+}
+
+// SetAlert sets the "alert" edge to the MsgAlert entity.
+func (_c *MsgInternalCreate) SetAlert(v *MsgAlert) *MsgInternalCreate {
+	return _c.SetAlertID(v.ID)
 }
 
 // Mutation returns the MsgInternalMutation object of the builder.
@@ -323,10 +329,6 @@ func (_c *MsgInternalCreate) createSpec() (*MsgInternal, *sqlgraph.CreateSpec) {
 		_spec.SetField(msginternal.FieldReceiverType, field.TypeEnum, value)
 		_node.ReceiverType = value
 	}
-	if value, ok := _c.mutation.AlertID(); ok {
-		_spec.SetField(msginternal.FieldAlertID, field.TypeInt, value)
-		_node.AlertID = value
-	}
 	if nodes := _c.mutation.MsgInternalToIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -342,6 +344,24 @@ func (_c *MsgInternalCreate) createSpec() (*MsgInternal, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.AlertIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   msginternal.AlertTable,
+			Columns: []string{msginternal.AlertColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _c.schemaConfig.MsgInternal
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.AlertID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -531,12 +551,6 @@ func (u *MsgInternalUpsert) SetAlertID(v int) *MsgInternalUpsert {
 // UpdateAlertID sets the "alert_id" field to the value that was provided on create.
 func (u *MsgInternalUpsert) UpdateAlertID() *MsgInternalUpsert {
 	u.SetExcluded(msginternal.FieldAlertID)
-	return u
-}
-
-// AddAlertID adds v to the "alert_id" field.
-func (u *MsgInternalUpsert) AddAlertID(v int) *MsgInternalUpsert {
-	u.Add(msginternal.FieldAlertID, v)
 	return u
 }
 
@@ -754,13 +768,6 @@ func (u *MsgInternalUpsertOne) UpdateReceiverType() *MsgInternalUpsertOne {
 func (u *MsgInternalUpsertOne) SetAlertID(v int) *MsgInternalUpsertOne {
 	return u.Update(func(s *MsgInternalUpsert) {
 		s.SetAlertID(v)
-	})
-}
-
-// AddAlertID adds v to the "alert_id" field.
-func (u *MsgInternalUpsertOne) AddAlertID(v int) *MsgInternalUpsertOne {
-	return u.Update(func(s *MsgInternalUpsert) {
-		s.AddAlertID(v)
 	})
 }
 
@@ -1152,13 +1159,6 @@ func (u *MsgInternalUpsertBulk) UpdateReceiverType() *MsgInternalUpsertBulk {
 func (u *MsgInternalUpsertBulk) SetAlertID(v int) *MsgInternalUpsertBulk {
 	return u.Update(func(s *MsgInternalUpsert) {
 		s.SetAlertID(v)
-	})
-}
-
-// AddAlertID adds v to the "alert_id" field.
-func (u *MsgInternalUpsertBulk) AddAlertID(v int) *MsgInternalUpsertBulk {
-	return u.Update(func(s *MsgInternalUpsert) {
-		s.AddAlertID(v)
 	})
 }
 

@@ -95,6 +95,20 @@ func (_c *NlogCreate) SetExpiresAt(v time.Time) *NlogCreate {
 	return _c
 }
 
+// SetErrMsg sets the "err_msg" field.
+func (_c *NlogCreate) SetErrMsg(v string) *NlogCreate {
+	_c.mutation.SetErrMsg(v)
+	return _c
+}
+
+// SetNillableErrMsg sets the "err_msg" field if the given value is not nil.
+func (_c *NlogCreate) SetNillableErrMsg(v *string) *NlogCreate {
+	if v != nil {
+		_c.SetErrMsg(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *NlogCreate) SetID(v int) *NlogCreate {
 	_c.mutation.SetID(v)
@@ -278,6 +292,10 @@ func (_c *NlogCreate) createSpec() (*Nlog, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.ExpiresAt(); ok {
 		_spec.SetField(nlog.FieldExpiresAt, field.TypeTime, value)
 		_node.ExpiresAt = value
+	}
+	if value, ok := _c.mutation.ErrMsg(); ok {
+		_spec.SetField(nlog.FieldErrMsg, field.TypeString, value)
+		_node.ErrMsg = value
 	}
 	if nodes := _c.mutation.AlertsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -465,6 +483,24 @@ func (u *NlogUpsert) UpdateExpiresAt() *NlogUpsert {
 	return u
 }
 
+// SetErrMsg sets the "err_msg" field.
+func (u *NlogUpsert) SetErrMsg(v string) *NlogUpsert {
+	u.Set(nlog.FieldErrMsg, v)
+	return u
+}
+
+// UpdateErrMsg sets the "err_msg" field to the value that was provided on create.
+func (u *NlogUpsert) UpdateErrMsg() *NlogUpsert {
+	u.SetExcluded(nlog.FieldErrMsg)
+	return u
+}
+
+// ClearErrMsg clears the value of the "err_msg" field.
+func (u *NlogUpsert) ClearErrMsg() *NlogUpsert {
+	u.SetNull(nlog.FieldErrMsg)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -628,6 +664,27 @@ func (u *NlogUpsertOne) SetExpiresAt(v time.Time) *NlogUpsertOne {
 func (u *NlogUpsertOne) UpdateExpiresAt() *NlogUpsertOne {
 	return u.Update(func(s *NlogUpsert) {
 		s.UpdateExpiresAt()
+	})
+}
+
+// SetErrMsg sets the "err_msg" field.
+func (u *NlogUpsertOne) SetErrMsg(v string) *NlogUpsertOne {
+	return u.Update(func(s *NlogUpsert) {
+		s.SetErrMsg(v)
+	})
+}
+
+// UpdateErrMsg sets the "err_msg" field to the value that was provided on create.
+func (u *NlogUpsertOne) UpdateErrMsg() *NlogUpsertOne {
+	return u.Update(func(s *NlogUpsert) {
+		s.UpdateErrMsg()
+	})
+}
+
+// ClearErrMsg clears the value of the "err_msg" field.
+func (u *NlogUpsertOne) ClearErrMsg() *NlogUpsertOne {
+	return u.Update(func(s *NlogUpsert) {
+		s.ClearErrMsg()
 	})
 }
 
@@ -960,6 +1017,27 @@ func (u *NlogUpsertBulk) SetExpiresAt(v time.Time) *NlogUpsertBulk {
 func (u *NlogUpsertBulk) UpdateExpiresAt() *NlogUpsertBulk {
 	return u.Update(func(s *NlogUpsert) {
 		s.UpdateExpiresAt()
+	})
+}
+
+// SetErrMsg sets the "err_msg" field.
+func (u *NlogUpsertBulk) SetErrMsg(v string) *NlogUpsertBulk {
+	return u.Update(func(s *NlogUpsert) {
+		s.SetErrMsg(v)
+	})
+}
+
+// UpdateErrMsg sets the "err_msg" field to the value that was provided on create.
+func (u *NlogUpsertBulk) UpdateErrMsg() *NlogUpsertBulk {
+	return u.Update(func(s *NlogUpsert) {
+		s.UpdateErrMsg()
+	})
+}
+
+// ClearErrMsg clears the value of the "err_msg" field.
+func (u *NlogUpsertBulk) ClearErrMsg() *NlogUpsertBulk {
+	return u.Update(func(s *NlogUpsert) {
+		s.ClearErrMsg()
 	})
 }
 

@@ -728,26 +728,6 @@ func AlertIDNotIn(vs ...int) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldNotIn(FieldAlertID, vs...))
 }
 
-// AlertIDGT applies the GT predicate on the "alert_id" field.
-func AlertIDGT(v int) predicate.MsgInternal {
-	return predicate.MsgInternal(sql.FieldGT(FieldAlertID, v))
-}
-
-// AlertIDGTE applies the GTE predicate on the "alert_id" field.
-func AlertIDGTE(v int) predicate.MsgInternal {
-	return predicate.MsgInternal(sql.FieldGTE(FieldAlertID, v))
-}
-
-// AlertIDLT applies the LT predicate on the "alert_id" field.
-func AlertIDLT(v int) predicate.MsgInternal {
-	return predicate.MsgInternal(sql.FieldLT(FieldAlertID, v))
-}
-
-// AlertIDLTE applies the LTE predicate on the "alert_id" field.
-func AlertIDLTE(v int) predicate.MsgInternal {
-	return predicate.MsgInternal(sql.FieldLTE(FieldAlertID, v))
-}
-
 // AlertIDIsNil applies the IsNil predicate on the "alert_id" field.
 func AlertIDIsNil() predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldIsNull(FieldAlertID))
@@ -779,6 +759,35 @@ func HasMsgInternalToWith(preds ...predicate.MsgInternalTo) predicate.MsgInterna
 		schemaConfig := internal.SchemaConfigFromContext(s.Context())
 		step.To.Schema = schemaConfig.MsgInternalTo
 		step.Edge.Schema = schemaConfig.MsgInternalTo
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAlert applies the HasEdge predicate on the "alert" edge.
+func HasAlert() predicate.MsgInternal {
+	return predicate.MsgInternal(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, AlertTable, AlertColumn),
+		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgAlert
+		step.Edge.Schema = schemaConfig.MsgInternal
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAlertWith applies the HasEdge predicate on the "alert" edge with a given conditions (other predicates).
+func HasAlertWith(preds ...predicate.MsgAlert) predicate.MsgInternal {
+	return predicate.MsgInternal(func(s *sql.Selector) {
+		step := newAlertStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgAlert
+		step.Edge.Schema = schemaConfig.MsgInternal
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

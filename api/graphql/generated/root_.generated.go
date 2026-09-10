@@ -132,6 +132,7 @@ type ComplexityRoot struct {
 		Fingerprint func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Labels      func(childComplexity int) int
+		MsgInternal func(childComplexity int) int
 		Nlog        func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.NlogOrder, where *ent.NlogWhereInput) int
 		NlogAlerts  func(childComplexity int) int
 		Org         func(childComplexity int) int
@@ -213,6 +214,7 @@ type ComplexityRoot struct {
 	}
 
 	MsgInternal struct {
+		Alert         func(childComplexity int) int
 		AlertID       func(childComplexity int) int
 		Body          func(childComplexity int) int
 		Category      func(childComplexity int) int
@@ -410,6 +412,7 @@ type ComplexityRoot struct {
 	Nlog struct {
 		Alerts       func(childComplexity int) int
 		CreatedAt    func(childComplexity int) int
+		ErrMsg       func(childComplexity int) int
 		ExpiresAt    func(childComplexity int) int
 		GroupKey     func(childComplexity int) int
 		ID           func(childComplexity int) int
@@ -918,6 +921,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgAlert.Labels(childComplexity), true
 
+	case "MsgAlert.msgInternal":
+		if e.complexity.MsgAlert.MsgInternal == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.MsgInternal(childComplexity), true
+
 	case "MsgAlert.nlog":
 		if e.complexity.MsgAlert.Nlog == nil {
 			break
@@ -1305,6 +1315,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgEventEdge.Node(childComplexity), true
+
+	case "MsgInternal.alert":
+		if e.complexity.MsgInternal.Alert == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.Alert(childComplexity), true
 
 	case "MsgInternal.alertID":
 		if e.complexity.MsgInternal.AlertID == nil {
@@ -2462,6 +2479,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Nlog.CreatedAt(childComplexity), true
+
+	case "Nlog.errMsg":
+		if e.complexity.Nlog.ErrMsg == nil {
+			break
+		}
+
+		return e.complexity.Nlog.ErrMsg(childComplexity), true
 
 	case "Nlog.expiresAt":
 		if e.complexity.Nlog.ExpiresAt == nil {
@@ -3638,6 +3662,7 @@ type MsgAlert implements Node {
     where: NlogWhereInput
   ): NlogConnection!
   org: Org!
+  msgInternal: [MsgInternal!]
   nlogAlerts: [NlogAlert!]
 }
 """
@@ -3827,6 +3852,11 @@ input MsgAlertWhereInput {
   """
   hasNlog: Boolean
   hasNlogWith: [NlogWhereInput!]
+  """
+  msg_internal edge predicates
+  """
+  hasMsgInternal: Boolean
+  hasMsgInternalWith: [MsgInternalWhereInput!]
   """
   nlog_alerts edge predicates
   """
@@ -4358,8 +4388,9 @@ type MsgInternal implements Node {
   """
   消息ID
   """
-  alertID: Int
+  alertID: ID
   msgInternalTo: [MsgInternalTo!]
+  alert: MsgAlert
 }
 """
 A connection to a list of items.
@@ -4735,14 +4766,10 @@ input MsgInternalWhereInput {
   """
   alert_id field predicates
   """
-  alertID: Int
-  alertIDNEQ: Int
-  alertIDIn: [Int!]
-  alertIDNotIn: [Int!]
-  alertIDGT: Int
-  alertIDGTE: Int
-  alertIDLT: Int
-  alertIDLTE: Int
+  alertID: ID
+  alertIDNEQ: ID
+  alertIDIn: [ID!]
+  alertIDNotIn: [ID!]
   alertIDIsNil: Boolean
   alertIDNotNil: Boolean
   """
@@ -4750,6 +4777,11 @@ input MsgInternalWhereInput {
   """
   hasMsgInternalTo: Boolean
   hasMsgInternalToWith: [MsgInternalToWhereInput!]
+  """
+  alert edge predicates
+  """
+  hasAlert: Boolean
+  hasAlertWith: [MsgAlertWhereInput!]
 }
 type MsgSilence implements Node {
   id: ID!
@@ -5811,6 +5843,10 @@ type Nlog implements Node {
   过期时间
   """
   expiresAt: Time!
+  """
+  错误信息，有值表示未发送成功：如：邮件已发往邮件服务器，邮件服务器发送失败，记录其错误信息
+  """
+  errMsg: String
   alerts: [MsgAlert!]
   nlogAlert: [NlogAlert!]
 }
@@ -6062,6 +6098,24 @@ input NlogWhereInput {
   expiresAtGTE: Time
   expiresAtLT: Time
   expiresAtLTE: Time
+  """
+  err_msg field predicates
+  """
+  errMsg: String
+  errMsgNEQ: String
+  errMsgIn: [String!]
+  errMsgNotIn: [String!]
+  errMsgGT: String
+  errMsgGTE: String
+  errMsgLT: String
+  errMsgLTE: String
+  errMsgContains: String
+  errMsgHasPrefix: String
+  errMsgHasSuffix: String
+  errMsgIsNil: Boolean
+  errMsgNotNil: Boolean
+  errMsgEqualFold: String
+  errMsgContainsFold: String
   """
   alerts edge predicates
   """

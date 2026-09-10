@@ -65,32 +65,35 @@ const (
 // MsgAlertMutation represents an operation that mutates the MsgAlert nodes in the graph.
 type MsgAlertMutation struct {
 	config
-	op                 Op
-	typ                string
-	id                 *int
-	labels             **label.LabelSet
-	annotations        **label.LabelSet
-	starts_at          *time.Time
-	ends_at            *time.Time
-	url                *string
-	timeout            *bool
-	fingerprint        *string
-	state              *alert.AlertStatus
-	created_at         *time.Time
-	updated_at         *time.Time
-	deleted            *bool
-	clearedFields      map[string]struct{}
-	nlog               map[int]struct{}
-	removednlog        map[int]struct{}
-	clearednlog        bool
-	org                *int
-	clearedorg         bool
-	nlog_alerts        map[int]struct{}
-	removednlog_alerts map[int]struct{}
-	clearednlog_alerts bool
-	done               bool
-	oldValue           func(context.Context) (*MsgAlert, error)
-	predicates         []predicate.MsgAlert
+	op                  Op
+	typ                 string
+	id                  *int
+	labels              **label.LabelSet
+	annotations         **label.LabelSet
+	starts_at           *time.Time
+	ends_at             *time.Time
+	url                 *string
+	timeout             *bool
+	fingerprint         *string
+	state               *alert.AlertStatus
+	created_at          *time.Time
+	updated_at          *time.Time
+	deleted             *bool
+	clearedFields       map[string]struct{}
+	nlog                map[int]struct{}
+	removednlog         map[int]struct{}
+	clearednlog         bool
+	org                 *int
+	clearedorg          bool
+	msg_internal        map[int]struct{}
+	removedmsg_internal map[int]struct{}
+	clearedmsg_internal bool
+	nlog_alerts         map[int]struct{}
+	removednlog_alerts  map[int]struct{}
+	clearednlog_alerts  bool
+	done                bool
+	oldValue            func(context.Context) (*MsgAlert, error)
+	predicates          []predicate.MsgAlert
 }
 
 var _ ent.Mutation = (*MsgAlertMutation)(nil)
@@ -788,6 +791,60 @@ func (m *MsgAlertMutation) ResetOrg() {
 	m.clearedorg = false
 }
 
+// AddMsgInternalIDs adds the "msg_internal" edge to the MsgInternal entity by ids.
+func (m *MsgAlertMutation) AddMsgInternalIDs(ids ...int) {
+	if m.msg_internal == nil {
+		m.msg_internal = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.msg_internal[ids[i]] = struct{}{}
+	}
+}
+
+// ClearMsgInternal clears the "msg_internal" edge to the MsgInternal entity.
+func (m *MsgAlertMutation) ClearMsgInternal() {
+	m.clearedmsg_internal = true
+}
+
+// MsgInternalCleared reports if the "msg_internal" edge to the MsgInternal entity was cleared.
+func (m *MsgAlertMutation) MsgInternalCleared() bool {
+	return m.clearedmsg_internal
+}
+
+// RemoveMsgInternalIDs removes the "msg_internal" edge to the MsgInternal entity by IDs.
+func (m *MsgAlertMutation) RemoveMsgInternalIDs(ids ...int) {
+	if m.removedmsg_internal == nil {
+		m.removedmsg_internal = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.msg_internal, ids[i])
+		m.removedmsg_internal[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedMsgInternal returns the removed IDs of the "msg_internal" edge to the MsgInternal entity.
+func (m *MsgAlertMutation) RemovedMsgInternalIDs() (ids []int) {
+	for id := range m.removedmsg_internal {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// MsgInternalIDs returns the "msg_internal" edge IDs in the mutation.
+func (m *MsgAlertMutation) MsgInternalIDs() (ids []int) {
+	for id := range m.msg_internal {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetMsgInternal resets all changes to the "msg_internal" edge.
+func (m *MsgAlertMutation) ResetMsgInternal() {
+	m.msg_internal = nil
+	m.clearedmsg_internal = false
+	m.removedmsg_internal = nil
+}
+
 // AddNlogAlertIDs adds the "nlog_alerts" edge to the NlogAlert entity by ids.
 func (m *MsgAlertMutation) AddNlogAlertIDs(ids ...int) {
 	if m.nlog_alerts == nil {
@@ -1198,12 +1255,15 @@ func (m *MsgAlertMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MsgAlertMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.nlog != nil {
 		edges = append(edges, msgalert.EdgeNlog)
 	}
 	if m.org != nil {
 		edges = append(edges, msgalert.EdgeOrg)
+	}
+	if m.msg_internal != nil {
+		edges = append(edges, msgalert.EdgeMsgInternal)
 	}
 	if m.nlog_alerts != nil {
 		edges = append(edges, msgalert.EdgeNlogAlerts)
@@ -1225,6 +1285,12 @@ func (m *MsgAlertMutation) AddedIDs(name string) []ent.Value {
 		if id := m.org; id != nil {
 			return []ent.Value{*id}
 		}
+	case msgalert.EdgeMsgInternal:
+		ids := make([]ent.Value, 0, len(m.msg_internal))
+		for id := range m.msg_internal {
+			ids = append(ids, id)
+		}
+		return ids
 	case msgalert.EdgeNlogAlerts:
 		ids := make([]ent.Value, 0, len(m.nlog_alerts))
 		for id := range m.nlog_alerts {
@@ -1237,9 +1303,12 @@ func (m *MsgAlertMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MsgAlertMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removednlog != nil {
 		edges = append(edges, msgalert.EdgeNlog)
+	}
+	if m.removedmsg_internal != nil {
+		edges = append(edges, msgalert.EdgeMsgInternal)
 	}
 	if m.removednlog_alerts != nil {
 		edges = append(edges, msgalert.EdgeNlogAlerts)
@@ -1257,6 +1326,12 @@ func (m *MsgAlertMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case msgalert.EdgeMsgInternal:
+		ids := make([]ent.Value, 0, len(m.removedmsg_internal))
+		for id := range m.removedmsg_internal {
+			ids = append(ids, id)
+		}
+		return ids
 	case msgalert.EdgeNlogAlerts:
 		ids := make([]ent.Value, 0, len(m.removednlog_alerts))
 		for id := range m.removednlog_alerts {
@@ -1269,12 +1344,15 @@ func (m *MsgAlertMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MsgAlertMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearednlog {
 		edges = append(edges, msgalert.EdgeNlog)
 	}
 	if m.clearedorg {
 		edges = append(edges, msgalert.EdgeOrg)
+	}
+	if m.clearedmsg_internal {
+		edges = append(edges, msgalert.EdgeMsgInternal)
 	}
 	if m.clearednlog_alerts {
 		edges = append(edges, msgalert.EdgeNlogAlerts)
@@ -1290,6 +1368,8 @@ func (m *MsgAlertMutation) EdgeCleared(name string) bool {
 		return m.clearednlog
 	case msgalert.EdgeOrg:
 		return m.clearedorg
+	case msgalert.EdgeMsgInternal:
+		return m.clearedmsg_internal
 	case msgalert.EdgeNlogAlerts:
 		return m.clearednlog_alerts
 	}
@@ -1316,6 +1396,9 @@ func (m *MsgAlertMutation) ResetEdge(name string) error {
 		return nil
 	case msgalert.EdgeOrg:
 		m.ResetOrg()
+		return nil
+	case msgalert.EdgeMsgInternal:
+		m.ResetMsgInternal()
 		return nil
 	case msgalert.EdgeNlogAlerts:
 		m.ResetNlogAlerts()
@@ -3644,12 +3727,12 @@ type MsgInternalMutation struct {
 	format                 *string
 	redirect               *string
 	receiver_type          *profile.ReceiverType
-	alert_id               *int
-	addalert_id            *int
 	clearedFields          map[string]struct{}
 	msg_internal_to        map[int]struct{}
 	removedmsg_internal_to map[int]struct{}
 	clearedmsg_internal_to bool
+	alert                  *int
+	clearedalert           bool
 	done                   bool
 	oldValue               func(context.Context) (*MsgInternal, error)
 	predicates             []predicate.MsgInternal
@@ -4270,13 +4353,12 @@ func (m *MsgInternalMutation) ResetReceiverType() {
 
 // SetAlertID sets the "alert_id" field.
 func (m *MsgInternalMutation) SetAlertID(i int) {
-	m.alert_id = &i
-	m.addalert_id = nil
+	m.alert = &i
 }
 
 // AlertID returns the value of the "alert_id" field in the mutation.
 func (m *MsgInternalMutation) AlertID() (r int, exists bool) {
-	v := m.alert_id
+	v := m.alert
 	if v == nil {
 		return
 	}
@@ -4300,28 +4382,9 @@ func (m *MsgInternalMutation) OldAlertID(ctx context.Context) (v int, err error)
 	return oldValue.AlertID, nil
 }
 
-// AddAlertID adds i to the "alert_id" field.
-func (m *MsgInternalMutation) AddAlertID(i int) {
-	if m.addalert_id != nil {
-		*m.addalert_id += i
-	} else {
-		m.addalert_id = &i
-	}
-}
-
-// AddedAlertID returns the value that was added to the "alert_id" field in this mutation.
-func (m *MsgInternalMutation) AddedAlertID() (r int, exists bool) {
-	v := m.addalert_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ClearAlertID clears the value of the "alert_id" field.
 func (m *MsgInternalMutation) ClearAlertID() {
-	m.alert_id = nil
-	m.addalert_id = nil
+	m.alert = nil
 	m.clearedFields[msginternal.FieldAlertID] = struct{}{}
 }
 
@@ -4333,8 +4396,7 @@ func (m *MsgInternalMutation) AlertIDCleared() bool {
 
 // ResetAlertID resets all changes to the "alert_id" field.
 func (m *MsgInternalMutation) ResetAlertID() {
-	m.alert_id = nil
-	m.addalert_id = nil
+	m.alert = nil
 	delete(m.clearedFields, msginternal.FieldAlertID)
 }
 
@@ -4390,6 +4452,33 @@ func (m *MsgInternalMutation) ResetMsgInternalTo() {
 	m.msg_internal_to = nil
 	m.clearedmsg_internal_to = false
 	m.removedmsg_internal_to = nil
+}
+
+// ClearAlert clears the "alert" edge to the MsgAlert entity.
+func (m *MsgInternalMutation) ClearAlert() {
+	m.clearedalert = true
+	m.clearedFields[msginternal.FieldAlertID] = struct{}{}
+}
+
+// AlertCleared reports if the "alert" edge to the MsgAlert entity was cleared.
+func (m *MsgInternalMutation) AlertCleared() bool {
+	return m.AlertIDCleared() || m.clearedalert
+}
+
+// AlertIDs returns the "alert" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AlertID instead. It exists only for internal usage by the builders.
+func (m *MsgInternalMutation) AlertIDs() (ids []int) {
+	if id := m.alert; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAlert resets all changes to the "alert" edge.
+func (m *MsgInternalMutation) ResetAlert() {
+	m.alert = nil
+	m.clearedalert = false
 }
 
 // Where appends a list predicates to the MsgInternalMutation builder.
@@ -4460,7 +4549,7 @@ func (m *MsgInternalMutation) Fields() []string {
 	if m.receiver_type != nil {
 		fields = append(fields, msginternal.FieldReceiverType)
 	}
-	if m.alert_id != nil {
+	if m.alert != nil {
 		fields = append(fields, msginternal.FieldAlertID)
 	}
 	return fields
@@ -4638,9 +4727,6 @@ func (m *MsgInternalMutation) AddedFields() []string {
 	if m.addtenant_id != nil {
 		fields = append(fields, msginternal.FieldTenantID)
 	}
-	if m.addalert_id != nil {
-		fields = append(fields, msginternal.FieldAlertID)
-	}
 	return fields
 }
 
@@ -4655,8 +4741,6 @@ func (m *MsgInternalMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedUpdatedBy()
 	case msginternal.FieldTenantID:
 		return m.AddedTenantID()
-	case msginternal.FieldAlertID:
-		return m.AddedAlertID()
 	}
 	return nil, false
 }
@@ -4686,13 +4770,6 @@ func (m *MsgInternalMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddTenantID(v)
-		return nil
-	case msginternal.FieldAlertID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddAlertID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown MsgInternal numeric field %s", name)
@@ -4796,9 +4873,12 @@ func (m *MsgInternalMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MsgInternalMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.msg_internal_to != nil {
 		edges = append(edges, msginternal.EdgeMsgInternalTo)
+	}
+	if m.alert != nil {
+		edges = append(edges, msginternal.EdgeAlert)
 	}
 	return edges
 }
@@ -4813,13 +4893,17 @@ func (m *MsgInternalMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case msginternal.EdgeAlert:
+		if id := m.alert; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MsgInternalMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.removedmsg_internal_to != nil {
 		edges = append(edges, msginternal.EdgeMsgInternalTo)
 	}
@@ -4842,9 +4926,12 @@ func (m *MsgInternalMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MsgInternalMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedmsg_internal_to {
 		edges = append(edges, msginternal.EdgeMsgInternalTo)
+	}
+	if m.clearedalert {
+		edges = append(edges, msginternal.EdgeAlert)
 	}
 	return edges
 }
@@ -4855,6 +4942,8 @@ func (m *MsgInternalMutation) EdgeCleared(name string) bool {
 	switch name {
 	case msginternal.EdgeMsgInternalTo:
 		return m.clearedmsg_internal_to
+	case msginternal.EdgeAlert:
+		return m.clearedalert
 	}
 	return false
 }
@@ -4863,6 +4952,9 @@ func (m *MsgInternalMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *MsgInternalMutation) ClearEdge(name string) error {
 	switch name {
+	case msginternal.EdgeAlert:
+		m.ClearAlert()
+		return nil
 	}
 	return fmt.Errorf("unknown MsgInternal unique edge %s", name)
 }
@@ -4873,6 +4965,9 @@ func (m *MsgInternalMutation) ResetEdge(name string) error {
 	switch name {
 	case msginternal.EdgeMsgInternalTo:
 		m.ResetMsgInternalTo()
+		return nil
+	case msginternal.EdgeAlert:
+		m.ResetAlert()
 		return nil
 	}
 	return fmt.Errorf("unknown MsgInternal edge %s", name)
@@ -11186,6 +11281,7 @@ type NlogMutation struct {
 	created_at        *time.Time
 	updated_at        *time.Time
 	expires_at        *time.Time
+	err_msg           *string
 	clearedFields     map[string]struct{}
 	alerts            map[int]struct{}
 	removedalerts     map[int]struct{}
@@ -11679,6 +11775,55 @@ func (m *NlogMutation) ResetExpiresAt() {
 	m.expires_at = nil
 }
 
+// SetErrMsg sets the "err_msg" field.
+func (m *NlogMutation) SetErrMsg(s string) {
+	m.err_msg = &s
+}
+
+// ErrMsg returns the value of the "err_msg" field in the mutation.
+func (m *NlogMutation) ErrMsg() (r string, exists bool) {
+	v := m.err_msg
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldErrMsg returns the old "err_msg" field's value of the Nlog entity.
+// If the Nlog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NlogMutation) OldErrMsg(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldErrMsg is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldErrMsg requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldErrMsg: %w", err)
+	}
+	return oldValue.ErrMsg, nil
+}
+
+// ClearErrMsg clears the value of the "err_msg" field.
+func (m *NlogMutation) ClearErrMsg() {
+	m.err_msg = nil
+	m.clearedFields[nlog.FieldErrMsg] = struct{}{}
+}
+
+// ErrMsgCleared returns if the "err_msg" field was cleared in this mutation.
+func (m *NlogMutation) ErrMsgCleared() bool {
+	_, ok := m.clearedFields[nlog.FieldErrMsg]
+	return ok
+}
+
+// ResetErrMsg resets all changes to the "err_msg" field.
+func (m *NlogMutation) ResetErrMsg() {
+	m.err_msg = nil
+	delete(m.clearedFields, nlog.FieldErrMsg)
+}
+
 // AddAlertIDs adds the "alerts" edge to the MsgAlert entity by ids.
 func (m *NlogMutation) AddAlertIDs(ids ...int) {
 	if m.alerts == nil {
@@ -11821,7 +11966,7 @@ func (m *NlogMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NlogMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.tenant_id != nil {
 		fields = append(fields, nlog.FieldTenantID)
 	}
@@ -11849,6 +11994,9 @@ func (m *NlogMutation) Fields() []string {
 	if m.expires_at != nil {
 		fields = append(fields, nlog.FieldExpiresAt)
 	}
+	if m.err_msg != nil {
+		fields = append(fields, nlog.FieldErrMsg)
+	}
 	return fields
 }
 
@@ -11875,6 +12023,8 @@ func (m *NlogMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case nlog.FieldExpiresAt:
 		return m.ExpiresAt()
+	case nlog.FieldErrMsg:
+		return m.ErrMsg()
 	}
 	return nil, false
 }
@@ -11902,6 +12052,8 @@ func (m *NlogMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldUpdatedAt(ctx)
 	case nlog.FieldExpiresAt:
 		return m.OldExpiresAt(ctx)
+	case nlog.FieldErrMsg:
+		return m.OldErrMsg(ctx)
 	}
 	return nil, fmt.Errorf("unknown Nlog field %s", name)
 }
@@ -11974,6 +12126,13 @@ func (m *NlogMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetExpiresAt(v)
 		return nil
+	case nlog.FieldErrMsg:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetErrMsg(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Nlog field %s", name)
 }
@@ -12034,6 +12193,9 @@ func (m *NlogMutation) ClearedFields() []string {
 	if m.FieldCleared(nlog.FieldUpdatedAt) {
 		fields = append(fields, nlog.FieldUpdatedAt)
 	}
+	if m.FieldCleared(nlog.FieldErrMsg) {
+		fields = append(fields, nlog.FieldErrMsg)
+	}
 	return fields
 }
 
@@ -12050,6 +12212,9 @@ func (m *NlogMutation) ClearField(name string) error {
 	switch name {
 	case nlog.FieldUpdatedAt:
 		m.ClearUpdatedAt()
+		return nil
+	case nlog.FieldErrMsg:
+		m.ClearErrMsg()
 		return nil
 	}
 	return fmt.Errorf("unknown Nlog nullable field %s", name)
@@ -12085,6 +12250,9 @@ func (m *NlogMutation) ResetField(name string) error {
 		return nil
 	case nlog.FieldExpiresAt:
 		m.ResetExpiresAt()
+		return nil
+	case nlog.FieldErrMsg:
+		m.ResetErrMsg()
 		return nil
 	}
 	return fmt.Errorf("unknown Nlog field %s", name)
