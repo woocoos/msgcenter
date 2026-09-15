@@ -13,10 +13,8 @@ receivers:
   - name: "internal"
     webhookConfigs:
       - url: "http://127.0.0.1:5001/"
-  - name: dingtalk-webhook-config
+  - name: webhook-dingtalk
     webhookConfigs:
-      - sendResolved: false
-        url: http://192.168.0.13:30536/dingtalk/webhook1/send
   - name: email
     emailConfigs:
       - authPassword:
@@ -28,6 +26,15 @@ receivers:
   - name: message
     messageConfig:
       sendResolved: false
+  - name: umeng
+    umengConfigs:
+      - sendResolved: false
+        apps:
+          # Android 应用配置, 对应友盟的应用名称
+          qeelyn-dev-android:
+            appKey: "${UMENG_ANDROID_APP_KEY}"
+            appMasterSecret: "${UMENG_ANDROID_APP_MASTER_SECRET}"
+            platform: "android"
 inhibit_rules:
   - source_match:
       severity: "critical"

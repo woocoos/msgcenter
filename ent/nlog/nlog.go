@@ -36,6 +36,10 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldExpiresAt holds the string denoting the expires_at field in the database.
 	FieldExpiresAt = "expires_at"
+	// FieldErrMsg holds the string denoting the err_msg field in the database.
+	FieldErrMsg = "err_msg"
+	// FieldMessageID holds the string denoting the message_id field in the database.
+	FieldMessageID = "message_id"
 	// EdgeAlerts holds the string denoting the alerts edge name in mutations.
 	EdgeAlerts = "alerts"
 	// EdgeNlogAlert holds the string denoting the nlog_alert edge name in mutations.
@@ -68,6 +72,8 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldExpiresAt,
+	FieldErrMsg,
+	FieldMessageID,
 }
 
 var (
@@ -101,7 +107,7 @@ var (
 // ReceiverTypeValidator is a validator for the "receiver_type" field enum values. It is called by the builders before save.
 func ReceiverTypeValidator(rt profile.ReceiverType) error {
 	switch rt.String() {
-	case "email", "message", "webhook":
+	case "email", "message", "webhook", "umeng":
 		return nil
 	default:
 		return fmt.Errorf("nlog: invalid enum value for receiver_type field: %q", rt)
@@ -159,6 +165,16 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByExpiresAt orders the results by the expires_at field.
 func ByExpiresAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldExpiresAt, opts...).ToFunc()
+}
+
+// ByErrMsg orders the results by the err_msg field.
+func ByErrMsg(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldErrMsg, opts...).ToFunc()
+}
+
+// ByMessageID orders the results by the message_id field.
+func ByMessageID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMessageID, opts...).ToFunc()
 }
 
 // ByAlertsCount orders the results by alerts count.

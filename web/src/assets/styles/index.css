@@ -10,6 +10,136 @@
   border: 0 none;
 }
 
-.ant-breadcrumb {
-  padding-block-start: 0 !important;
+.ant-pro-table .ant-pro-table-search.ko-pro-table-search {
+  margin-block-end: 0;
+  padding-block-end: 16px;
+}
+
+.ant-pro-table .ant-pro-table-search.ko-pro-table-search .ant-pro-query-filter.ant-pro-query-filter {
+  padding-bottom: 0;
+  padding-top: 16px;
+}
+
+.ant-pro-page-container.ko-page-container>.ant-page-header {
+  padding-inline-end: 0;
+  padding-block-end: 0;
+  padding-block-start: 0;
+}
+
+.ko-page-container>.ant-page-header .ant-page-header-heading {
+  display: none;
+}
+
+.ko-page-container .ant-breadcrumb-link {
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.ko-page-container .ant-pro-table-list-toolbar-container {
+  border-top: solid 1px #eeeef1;
+}
+
+.ko-detail-subTitle {
+  padding: 16px 24px 0 24px;
+}
+
+.ko-detail-subTitle .label {
+  color: #686a8f
+}
+
+.ko-detail-subTitle.ko-detail-subTitle-end {
+  padding-bottom: 16px;
+  border-bottom: solid 1px #eeeef1;
+}
+
+.ko-readonly-tags {
+  min-height: 32px;
+  padding: 2px 11px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  transition: border-color 0.2s;
+  cursor: text;
+}
+
+.ko-readonly-tags .ant-tag {
+  font-size: 14px;
+  height: 24px;
+  line-height: 22px;
+}
+
+.ko-readonly-tags:hover {
+  border-color: #1677ff;
+}
+
+.ko-detail-tabs .ant-tabs-nav {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.ko-table-small-toolbar .ant-pro-table-list-toolbar-container {
+  padding-top: 0;
+}
+
+.ko-table-small-toolbar .ant-pro-table-list-toolbar-container .ant-pro-table-list-toolbar-title {
+  font-size: 14px;
+}
+
+.ko-divider-gray {
+  border-inline-start-color: #bcbec3;
+}
+
+.ko-detail-container {
+  background-color: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .13);
+}
+
+.ko-detail-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.ko-detail-tabs-proCard.ant-pro-card .ant-pro-card-header .ant-pro-card-title {
+  font-size: 15px;
+  height: 32px;
+  line-height: 32px;
+  font-weight: 600;
+}
+
+.ko-detail-tabs-proCard.ant-pro-card .ant-pro-card-header {
+  padding-block: 0;
+}
+
+.ko-detail-tabs-proTable-action .ant-pro-table-list-toolbar-container {
+  padding-block-start: 0;
+  padding-block-end: 12px;
+  border-top: none;
+}
+
+.ko-detail-tabs-proTable-action .ant-pro-table-list-toolbar-title {
+  height: 32px;
+  line-height: 32px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.ko-tree-form-title {
+  height: 32px;
+  line-height: 32px;
+  font-size: 15px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.ko-page-container .ka-content {
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .13);
+  background-color: #ffffff;
+  border-radius: 6px;
+}
+
+.ko-page-tabs>.ant-pro-card-body {
+  padding-block-start: 0;
 }

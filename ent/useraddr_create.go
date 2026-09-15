@@ -186,9 +186,7 @@ func (_c *UserAddrCreate) Mutation() *UserAddrMutation {
 
 // Save creates the UserAddr in the database.
 func (_c *UserAddrCreate) Save(ctx context.Context) (*UserAddr, error) {
-	if err := _c.defaults(); err != nil {
-		return nil, err
-	}
+	_c.defaults()
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -215,12 +213,11 @@ func (_c *UserAddrCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_c *UserAddrCreate) defaults() error {
+func (_c *UserAddrCreate) defaults() {
 	if _, ok := _c.mutation.IsDefault(); !ok {
 		v := useraddr.DefaultIsDefault
 		_c.mutation.SetIsDefault(v)
 	}
-	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.

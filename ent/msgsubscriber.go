@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/user"
@@ -29,6 +30,8 @@ type MsgSubscriber struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// 应用消息类型ID
 	MsgTypeID int `json:"msg_type_id,omitempty"`
+	// 应用消息事件ID
+	MsgEventID int `json:"msg_event_id,omitempty"`
 	// 组织ID
 	TenantID int `json:"tenant_id,omitempty"`
 	// 用户ID
@@ -47,13 +50,15 @@ type MsgSubscriber struct {
 type MsgSubscriberEdges struct {
 	// MsgType holds the value of the msg_type edge.
 	MsgType *MsgType `json:"msg_type,omitempty"`
+	// MsgEvent holds the value of the msg_event edge.
+	MsgEvent *MsgEvent `json:"msg_event,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [3]map[string]int
 }
 
 // MsgTypeOrErr returns the MsgType value or an error if the edge
@@ -67,12 +72,23 @@ func (e MsgSubscriberEdges) MsgTypeOrErr() (*MsgType, error) {
 	return nil, &NotLoadedError{edge: "msg_type"}
 }
 
+// MsgEventOrErr returns the MsgEvent value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MsgSubscriberEdges) MsgEventOrErr() (*MsgEvent, error) {
+	if e.MsgEvent != nil {
+		return e.MsgEvent, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: msgevent.Label}
+	}
+	return nil, &NotLoadedError{edge: "msg_event"}
+}
+
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e MsgSubscriberEdges) UserOrErr() (*User, error) {
 	if e.User != nil {
 		return e.User, nil
-	} else if e.loadedTypes[1] {
+	} else if e.loadedTypes[2] {
 		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "user"}
@@ -85,7 +101,7 @@ func (*MsgSubscriber) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case msgsubscriber.FieldExclude:
 			values[i] = new(sql.NullBool)
-		case msgsubscriber.FieldID, msgsubscriber.FieldCreatedBy, msgsubscriber.FieldUpdatedBy, msgsubscriber.FieldMsgTypeID, msgsubscriber.FieldTenantID, msgsubscriber.FieldUserID, msgsubscriber.FieldOrgRoleID:
+		case msgsubscriber.FieldID, msgsubscriber.FieldCreatedBy, msgsubscriber.FieldUpdatedBy, msgsubscriber.FieldMsgTypeID, msgsubscriber.FieldMsgEventID, msgsubscriber.FieldTenantID, msgsubscriber.FieldUserID, msgsubscriber.FieldOrgRoleID:
 			values[i] = new(sql.NullInt64)
 		case msgsubscriber.FieldCreatedAt, msgsubscriber.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -140,6 +156,12 @@ func (_m *MsgSubscriber) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.MsgTypeID = int(value.Int64)
 			}
+		case msgsubscriber.FieldMsgEventID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field msg_event_id", values[i])
+			} else if value.Valid {
+				_m.MsgEventID = int(value.Int64)
+			}
 		case msgsubscriber.FieldTenantID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
@@ -180,6 +202,11 @@ func (_m *MsgSubscriber) Value(name string) (ent.Value, error) {
 // QueryMsgType queries the "msg_type" edge of the MsgSubscriber entity.
 func (_m *MsgSubscriber) QueryMsgType() *MsgTypeQuery {
 	return NewMsgSubscriberClient(_m.config).QueryMsgType(_m)
+}
+
+// QueryMsgEvent queries the "msg_event" edge of the MsgSubscriber entity.
+func (_m *MsgSubscriber) QueryMsgEvent() *MsgEventQuery {
+	return NewMsgSubscriberClient(_m.config).QueryMsgEvent(_m)
 }
 
 // QueryUser queries the "user" edge of the MsgSubscriber entity.
@@ -224,6 +251,9 @@ func (_m *MsgSubscriber) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("msg_type_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.MsgTypeID))
+	builder.WriteString(", ")
+	builder.WriteString("msg_event_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.MsgEventID))
 	builder.WriteString(", ")
 	builder.WriteString("tenant_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))

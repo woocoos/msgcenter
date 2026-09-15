@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/woocoos/msgcenter/ent/silence"
+	"github.com/woocoos/msgcenter/ent/msgsilence"
 	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
 )
@@ -41,14 +41,14 @@ func (_c *UserCreate) SetID(v int) *UserCreate {
 	return _c
 }
 
-// AddSilenceIDs adds the "silences" edge to the Silence entity by IDs.
+// AddSilenceIDs adds the "silences" edge to the MsgSilence entity by IDs.
 func (_c *UserCreate) AddSilenceIDs(ids ...int) *UserCreate {
 	_c.mutation.AddSilenceIDs(ids...)
 	return _c
 }
 
-// AddSilences adds the "silences" edges to the Silence entity.
-func (_c *UserCreate) AddSilences(v ...*Silence) *UserCreate {
+// AddSilences adds the "silences" edges to the MsgSilence entity.
+func (_c *UserCreate) AddSilences(v ...*MsgSilence) *UserCreate {
 	ids := make([]int, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
@@ -161,10 +161,10 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Columns: []string{user.SilencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(msgsilence.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = _c.schemaConfig.Silence
+		edge.Schema = _c.schemaConfig.MsgSilence
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}

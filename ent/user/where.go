@@ -203,19 +203,19 @@ func HasSilences() predicate.User {
 			sqlgraph.Edge(sqlgraph.O2M, false, SilencesTable, SilencesColumn),
 		)
 		schemaConfig := internal.SchemaConfigFromContext(s.Context())
-		step.To.Schema = schemaConfig.Silence
-		step.Edge.Schema = schemaConfig.Silence
+		step.To.Schema = schemaConfig.MsgSilence
+		step.Edge.Schema = schemaConfig.MsgSilence
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
 // HasSilencesWith applies the HasEdge predicate on the "silences" edge with a given conditions (other predicates).
-func HasSilencesWith(preds ...predicate.Silence) predicate.User {
+func HasSilencesWith(preds ...predicate.MsgSilence) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := newSilencesStep()
 		schemaConfig := internal.SchemaConfigFromContext(s.Context())
-		step.To.Schema = schemaConfig.Silence
-		step.Edge.Schema = schemaConfig.Silence
+		step.To.Schema = schemaConfig.MsgSilence
+		step.Edge.Schema = schemaConfig.MsgSilence
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

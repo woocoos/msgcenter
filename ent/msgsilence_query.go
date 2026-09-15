@@ -11,61 +11,61 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/woocoos/msgcenter/ent/msgsilence"
 	"github.com/woocoos/msgcenter/ent/predicate"
-	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
 
-// SilenceQuery is the builder for querying Silence entities.
-type SilenceQuery struct {
+// MsgSilenceQuery is the builder for querying MsgSilence entities.
+type MsgSilenceQuery struct {
 	config
 	ctx        *QueryContext
-	order      []silence.OrderOption
+	order      []msgsilence.OrderOption
 	inters     []Interceptor
-	predicates []predicate.Silence
+	predicates []predicate.MsgSilence
 	withUser   *UserQuery
 	modifiers  []func(*sql.Selector)
-	loadTotal  []func(context.Context, []*Silence) error
+	loadTotal  []func(context.Context, []*MsgSilence) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the SilenceQuery builder.
-func (_q *SilenceQuery) Where(ps ...predicate.Silence) *SilenceQuery {
+// Where adds a new predicate for the MsgSilenceQuery builder.
+func (_q *MsgSilenceQuery) Where(ps ...predicate.MsgSilence) *MsgSilenceQuery {
 	_q.predicates = append(_q.predicates, ps...)
 	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (_q *SilenceQuery) Limit(limit int) *SilenceQuery {
+func (_q *MsgSilenceQuery) Limit(limit int) *MsgSilenceQuery {
 	_q.ctx.Limit = &limit
 	return _q
 }
 
 // Offset to start from.
-func (_q *SilenceQuery) Offset(offset int) *SilenceQuery {
+func (_q *MsgSilenceQuery) Offset(offset int) *MsgSilenceQuery {
 	_q.ctx.Offset = &offset
 	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (_q *SilenceQuery) Unique(unique bool) *SilenceQuery {
+func (_q *MsgSilenceQuery) Unique(unique bool) *MsgSilenceQuery {
 	_q.ctx.Unique = &unique
 	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (_q *SilenceQuery) Order(o ...silence.OrderOption) *SilenceQuery {
+func (_q *MsgSilenceQuery) Order(o ...msgsilence.OrderOption) *MsgSilenceQuery {
 	_q.order = append(_q.order, o...)
 	return _q
 }
 
 // QueryUser chains the current query on the "user" edge.
-func (_q *SilenceQuery) QueryUser() *UserQuery {
+func (_q *MsgSilenceQuery) QueryUser() *UserQuery {
 	query := (&UserClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
@@ -76,34 +76,34 @@ func (_q *SilenceQuery) QueryUser() *UserQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(silence.Table, silence.FieldID, selector),
+			sqlgraph.From(msgsilence.Table, msgsilence.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, silence.UserTable, silence.UserColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, msgsilence.UserTable, msgsilence.UserColumn),
 		)
 		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.User
-		step.Edge.Schema = schemaConfig.Silence
+		step.Edge.Schema = schemaConfig.MsgSilence
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
-// First returns the first Silence entity from the query.
-// Returns a *NotFoundError when no Silence was found.
-func (_q *SilenceQuery) First(ctx context.Context) (*Silence, error) {
+// First returns the first MsgSilence entity from the query.
+// Returns a *NotFoundError when no MsgSilence was found.
+func (_q *MsgSilenceQuery) First(ctx context.Context) (*MsgSilence, error) {
 	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{silence.Label}
+		return nil, &NotFoundError{msgsilence.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (_q *SilenceQuery) FirstX(ctx context.Context) *Silence {
+func (_q *MsgSilenceQuery) FirstX(ctx context.Context) *MsgSilence {
 	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -111,22 +111,22 @@ func (_q *SilenceQuery) FirstX(ctx context.Context) *Silence {
 	return node
 }
 
-// FirstID returns the first Silence ID from the query.
-// Returns a *NotFoundError when no Silence ID was found.
-func (_q *SilenceQuery) FirstID(ctx context.Context) (id int, err error) {
+// FirstID returns the first MsgSilence ID from the query.
+// Returns a *NotFoundError when no MsgSilence ID was found.
+func (_q *MsgSilenceQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{silence.Label}
+		err = &NotFoundError{msgsilence.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *SilenceQuery) FirstIDX(ctx context.Context) int {
+func (_q *MsgSilenceQuery) FirstIDX(ctx context.Context) int {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -134,10 +134,10 @@ func (_q *SilenceQuery) FirstIDX(ctx context.Context) int {
 	return id
 }
 
-// Only returns a single Silence entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one Silence entity is found.
-// Returns a *NotFoundError when no Silence entities are found.
-func (_q *SilenceQuery) Only(ctx context.Context) (*Silence, error) {
+// Only returns a single MsgSilence entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one MsgSilence entity is found.
+// Returns a *NotFoundError when no MsgSilence entities are found.
+func (_q *MsgSilenceQuery) Only(ctx context.Context) (*MsgSilence, error) {
 	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
@@ -146,14 +146,14 @@ func (_q *SilenceQuery) Only(ctx context.Context) (*Silence, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{silence.Label}
+		return nil, &NotFoundError{msgsilence.Label}
 	default:
-		return nil, &NotSingularError{silence.Label}
+		return nil, &NotSingularError{msgsilence.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (_q *SilenceQuery) OnlyX(ctx context.Context) *Silence {
+func (_q *MsgSilenceQuery) OnlyX(ctx context.Context) *MsgSilence {
 	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -161,10 +161,10 @@ func (_q *SilenceQuery) OnlyX(ctx context.Context) *Silence {
 	return node
 }
 
-// OnlyID is like Only, but returns the only Silence ID in the query.
-// Returns a *NotSingularError when more than one Silence ID is found.
+// OnlyID is like Only, but returns the only MsgSilence ID in the query.
+// Returns a *NotSingularError when more than one MsgSilence ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *SilenceQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *MsgSilenceQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
@@ -173,15 +173,15 @@ func (_q *SilenceQuery) OnlyID(ctx context.Context) (id int, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{silence.Label}
+		err = &NotFoundError{msgsilence.Label}
 	default:
-		err = &NotSingularError{silence.Label}
+		err = &NotSingularError{msgsilence.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *SilenceQuery) OnlyIDX(ctx context.Context) int {
+func (_q *MsgSilenceQuery) OnlyIDX(ctx context.Context) int {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -189,18 +189,18 @@ func (_q *SilenceQuery) OnlyIDX(ctx context.Context) int {
 	return id
 }
 
-// All executes the query and returns a list of Silences.
-func (_q *SilenceQuery) All(ctx context.Context) ([]*Silence, error) {
+// All executes the query and returns a list of MsgSilences.
+func (_q *MsgSilenceQuery) All(ctx context.Context) ([]*MsgSilence, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*Silence, *SilenceQuery]()
-	return withInterceptors[[]*Silence](ctx, _q, qr, _q.inters)
+	qr := querierAll[[]*MsgSilence, *MsgSilenceQuery]()
+	return withInterceptors[[]*MsgSilence](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (_q *SilenceQuery) AllX(ctx context.Context) []*Silence {
+func (_q *MsgSilenceQuery) AllX(ctx context.Context) []*MsgSilence {
 	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
@@ -208,20 +208,20 @@ func (_q *SilenceQuery) AllX(ctx context.Context) []*Silence {
 	return nodes
 }
 
-// IDs executes the query and returns a list of Silence IDs.
-func (_q *SilenceQuery) IDs(ctx context.Context) (ids []int, err error) {
+// IDs executes the query and returns a list of MsgSilence IDs.
+func (_q *MsgSilenceQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
-	if err = _q.Select(silence.FieldID).Scan(ctx, &ids); err != nil {
+	if err = _q.Select(msgsilence.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *SilenceQuery) IDsX(ctx context.Context) []int {
+func (_q *MsgSilenceQuery) IDsX(ctx context.Context) []int {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -230,16 +230,16 @@ func (_q *SilenceQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (_q *SilenceQuery) Count(ctx context.Context) (int, error) {
+func (_q *MsgSilenceQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, _q, querierCount[*SilenceQuery](), _q.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*MsgSilenceQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (_q *SilenceQuery) CountX(ctx context.Context) int {
+func (_q *MsgSilenceQuery) CountX(ctx context.Context) int {
 	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -248,7 +248,7 @@ func (_q *SilenceQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (_q *SilenceQuery) Exist(ctx context.Context) (bool, error) {
+func (_q *MsgSilenceQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
 	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
@@ -261,7 +261,7 @@ func (_q *SilenceQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (_q *SilenceQuery) ExistX(ctx context.Context) bool {
+func (_q *MsgSilenceQuery) ExistX(ctx context.Context) bool {
 	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -269,18 +269,18 @@ func (_q *SilenceQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the SilenceQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the MsgSilenceQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (_q *SilenceQuery) Clone() *SilenceQuery {
+func (_q *MsgSilenceQuery) Clone() *MsgSilenceQuery {
 	if _q == nil {
 		return nil
 	}
-	return &SilenceQuery{
+	return &MsgSilenceQuery{
 		config:     _q.config,
 		ctx:        _q.ctx.Clone(),
-		order:      append([]silence.OrderOption{}, _q.order...),
+		order:      append([]msgsilence.OrderOption{}, _q.order...),
 		inters:     append([]Interceptor{}, _q.inters...),
-		predicates: append([]predicate.Silence{}, _q.predicates...),
+		predicates: append([]predicate.MsgSilence{}, _q.predicates...),
 		withUser:   _q.withUser.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
@@ -290,7 +290,7 @@ func (_q *SilenceQuery) Clone() *SilenceQuery {
 
 // WithUser tells the query-builder to eager-load the nodes that are connected to
 // the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *SilenceQuery) WithUser(opts ...func(*UserQuery)) *SilenceQuery {
+func (_q *MsgSilenceQuery) WithUser(opts ...func(*UserQuery)) *MsgSilenceQuery {
 	query := (&UserClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
@@ -309,15 +309,15 @@ func (_q *SilenceQuery) WithUser(opts ...func(*UserQuery)) *SilenceQuery {
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.Silence.Query().
-//		GroupBy(silence.FieldCreatedBy).
+//	client.MsgSilence.Query().
+//		GroupBy(msgsilence.FieldCreatedBy).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (_q *SilenceQuery) GroupBy(field string, fields ...string) *SilenceGroupBy {
+func (_q *MsgSilenceQuery) GroupBy(field string, fields ...string) *MsgSilenceGroupBy {
 	_q.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &SilenceGroupBy{build: _q}
+	grbuild := &MsgSilenceGroupBy{build: _q}
 	grbuild.flds = &_q.ctx.Fields
-	grbuild.label = silence.Label
+	grbuild.label = msgsilence.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -331,23 +331,23 @@ func (_q *SilenceQuery) GroupBy(field string, fields ...string) *SilenceGroupBy 
 //		CreatedBy int `json:"created_by,omitempty"`
 //	}
 //
-//	client.Silence.Query().
-//		Select(silence.FieldCreatedBy).
+//	client.MsgSilence.Query().
+//		Select(msgsilence.FieldCreatedBy).
 //		Scan(ctx, &v)
-func (_q *SilenceQuery) Select(fields ...string) *SilenceSelect {
+func (_q *MsgSilenceQuery) Select(fields ...string) *MsgSilenceSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
-	sbuild := &SilenceSelect{SilenceQuery: _q}
-	sbuild.label = silence.Label
+	sbuild := &MsgSilenceSelect{MsgSilenceQuery: _q}
+	sbuild.label = msgsilence.Label
 	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a SilenceSelect configured with the given aggregations.
-func (_q *SilenceQuery) Aggregate(fns ...AggregateFunc) *SilenceSelect {
+// Aggregate returns a MsgSilenceSelect configured with the given aggregations.
+func (_q *MsgSilenceQuery) Aggregate(fns ...AggregateFunc) *MsgSilenceSelect {
 	return _q.Select().Aggregate(fns...)
 }
 
-func (_q *SilenceQuery) prepareQuery(ctx context.Context) error {
+func (_q *MsgSilenceQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
@@ -359,7 +359,7 @@ func (_q *SilenceQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range _q.ctx.Fields {
-		if !silence.ValidColumn(f) {
+		if !msgsilence.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -373,24 +373,24 @@ func (_q *SilenceQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (_q *SilenceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Silence, error) {
+func (_q *MsgSilenceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*MsgSilence, error) {
 	var (
-		nodes       = []*Silence{}
+		nodes       = []*MsgSilence{}
 		_spec       = _q.querySpec()
 		loadedTypes = [1]bool{
 			_q.withUser != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*Silence).scanValues(nil, columns)
+		return (*MsgSilence).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &Silence{config: _q.config}
+		node := &MsgSilence{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	_spec.Node.Schema = _q.schemaConfig.Silence
+	_spec.Node.Schema = _q.schemaConfig.MsgSilence
 	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
 	if len(_q.modifiers) > 0 {
 		_spec.Modifiers = _q.modifiers
@@ -406,7 +406,7 @@ func (_q *SilenceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Sile
 	}
 	if query := _q.withUser; query != nil {
 		if err := _q.loadUser(ctx, query, nodes, nil,
-			func(n *Silence, e *User) { n.Edges.User = e }); err != nil {
+			func(n *MsgSilence, e *User) { n.Edges.User = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -418,9 +418,9 @@ func (_q *SilenceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Sile
 	return nodes, nil
 }
 
-func (_q *SilenceQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Silence, init func(*Silence), assign func(*Silence, *User)) error {
+func (_q *MsgSilenceQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*MsgSilence, init func(*MsgSilence), assign func(*MsgSilence, *User)) error {
 	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Silence)
+	nodeids := make(map[int][]*MsgSilence)
 	for i := range nodes {
 		fk := nodes[i].CreatedBy
 		if _, ok := nodeids[fk]; !ok {
@@ -448,9 +448,9 @@ func (_q *SilenceQuery) loadUser(ctx context.Context, query *UserQuery, nodes []
 	return nil
 }
 
-func (_q *SilenceQuery) sqlCount(ctx context.Context) (int, error) {
+func (_q *MsgSilenceQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
-	_spec.Node.Schema = _q.schemaConfig.Silence
+	_spec.Node.Schema = _q.schemaConfig.MsgSilence
 	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
 	if len(_q.modifiers) > 0 {
 		_spec.Modifiers = _q.modifiers
@@ -462,8 +462,8 @@ func (_q *SilenceQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (_q *SilenceQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(silence.Table, silence.Columns, sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt))
+func (_q *MsgSilenceQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(msgsilence.Table, msgsilence.Columns, sqlgraph.NewFieldSpec(msgsilence.FieldID, field.TypeInt))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -472,14 +472,14 @@ func (_q *SilenceQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, silence.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, msgsilence.FieldID)
 		for i := range fields {
-			if fields[i] != silence.FieldID {
+			if fields[i] != msgsilence.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
 		if _q.withUser != nil {
-			_spec.Node.AddColumnOnce(silence.FieldCreatedBy)
+			_spec.Node.AddColumnOnce(msgsilence.FieldCreatedBy)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {
@@ -505,12 +505,12 @@ func (_q *SilenceQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (_q *SilenceQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (_q *MsgSilenceQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(_q.driver.Dialect())
-	t1 := builder.Table(silence.Table)
+	t1 := builder.Table(msgsilence.Table)
 	columns := _q.ctx.Fields
 	if len(columns) == 0 {
-		columns = silence.Columns
+		columns = msgsilence.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if _q.sql != nil {
@@ -520,7 +520,7 @@ func (_q *SilenceQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	t1.Schema(_q.schemaConfig.Silence)
+	t1.Schema(_q.schemaConfig.MsgSilence)
 	ctx = internal.NewSchemaConfigContext(ctx, _q.schemaConfig)
 	selector.WithContext(ctx)
 	for _, p := range _q.predicates {
@@ -540,28 +540,28 @@ func (_q *SilenceQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// SilenceGroupBy is the group-by builder for Silence entities.
-type SilenceGroupBy struct {
+// MsgSilenceGroupBy is the group-by builder for MsgSilence entities.
+type MsgSilenceGroupBy struct {
 	selector
-	build *SilenceQuery
+	build *MsgSilenceQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (_g *SilenceGroupBy) Aggregate(fns ...AggregateFunc) *SilenceGroupBy {
+func (_g *MsgSilenceGroupBy) Aggregate(fns ...AggregateFunc) *MsgSilenceGroupBy {
 	_g.fns = append(_g.fns, fns...)
 	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_g *SilenceGroupBy) Scan(ctx context.Context, v any) error {
+func (_g *MsgSilenceGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
 	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*SilenceQuery, *SilenceGroupBy](ctx, _g.build, _g, _g.build.inters, v)
+	return scanWithInterceptors[*MsgSilenceQuery, *MsgSilenceGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (_g *SilenceGroupBy) sqlScan(ctx context.Context, root *SilenceQuery, v any) error {
+func (_g *MsgSilenceGroupBy) sqlScan(ctx context.Context, root *MsgSilenceQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(_g.fns))
 	for _, fn := range _g.fns {
@@ -588,28 +588,28 @@ func (_g *SilenceGroupBy) sqlScan(ctx context.Context, root *SilenceQuery, v any
 	return sql.ScanSlice(rows, v)
 }
 
-// SilenceSelect is the builder for selecting fields of Silence entities.
-type SilenceSelect struct {
-	*SilenceQuery
+// MsgSilenceSelect is the builder for selecting fields of MsgSilence entities.
+type MsgSilenceSelect struct {
+	*MsgSilenceQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (_s *SilenceSelect) Aggregate(fns ...AggregateFunc) *SilenceSelect {
+func (_s *MsgSilenceSelect) Aggregate(fns ...AggregateFunc) *MsgSilenceSelect {
 	_s.fns = append(_s.fns, fns...)
 	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_s *SilenceSelect) Scan(ctx context.Context, v any) error {
+func (_s *MsgSilenceSelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
 	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*SilenceQuery, *SilenceSelect](ctx, _s.SilenceQuery, _s, _s.inters, v)
+	return scanWithInterceptors[*MsgSilenceQuery, *MsgSilenceSelect](ctx, _s.MsgSilenceQuery, _s, _s.inters, v)
 }
 
-func (_s *SilenceSelect) sqlScan(ctx context.Context, root *SilenceQuery, v any) error {
+func (_s *MsgSilenceSelect) sqlScan(ctx context.Context, root *MsgSilenceQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(_s.fns))
 	for _, fn := range _s.fns {

@@ -11,6 +11,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/vektah/gqlparser/v2/ast"
+	"github.com/woocoos/msgcenter/api/graphql/scalars"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -39,9 +40,9 @@ type MutationResolver interface {
 	DisableMsgTemplate(ctx context.Context, id int) (*ent.MsgTemplate, error)
 	CreateMsgSubscriber(ctx context.Context, inputs []*ent.CreateMsgSubscriberInput) ([]*ent.MsgSubscriber, error)
 	DeleteMsgSubscriber(ctx context.Context, ids []int) (bool, error)
-	CreateSilence(ctx context.Context, input ent.CreateSilenceInput) (*ent.Silence, error)
-	UpdateSilence(ctx context.Context, id int, input ent.UpdateSilenceInput) (*ent.Silence, error)
-	DeleteSilence(ctx context.Context, id int) (bool, error)
+	CreateMsgSilence(ctx context.Context, input ent.CreateMsgSilenceInput) (*ent.MsgSilence, error)
+	UpdateMsgSilence(ctx context.Context, id int, input ent.UpdateMsgSilenceInput) (*ent.MsgSilence, error)
+	DeleteMsgSilence(ctx context.Context, id int) (bool, error)
 	MarkMsgInternalToReadOrUnRead(ctx context.Context, ids []int, read bool) (bool, error)
 	MarkMsgInternalToDeleted(ctx context.Context, ids []int) (bool, error)
 	TestSendEmailTpl(ctx context.Context, tplID int, email string, labels map[string]string, annotations map[string]string) (bool, error)
@@ -51,6 +52,16 @@ type MutationResolver interface {
 
 type RouteInputResolver interface {
 	Matchers(ctx context.Context, obj *profile.Route, data []*label.Matcher) error
+}
+type UmengConfigInputResolver interface {
+	Apps(ctx context.Context, obj *profile.UmengConfig, data scalars.UmengApps) error
+}
+type WebhookConfigInputResolver interface {
+	ReceiveType(ctx context.Context, obj *profile.WebhookConfig, data *string) error
+
+	URL(ctx context.Context, obj *profile.WebhookConfig, data *string) error
+
+	MaxAlerts(ctx context.Context, obj *profile.WebhookConfig, data *int) error
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -110,6 +121,34 @@ func (ec *executionContext) field_Mutation_createMsgEvent_argsInput(
 	}
 
 	var zeroVal ent.CreateMsgEventInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_createMsgSilence_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createMsgSilence_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_createMsgSilence_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ent.CreateMsgSilenceInput, error) {
+	if _, ok := rawArgs["input"]; !ok {
+		var zeroVal ent.CreateMsgSilenceInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreateMsgSilenceInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐCreateMsgSilenceInput(ctx, tmp)
+	}
+
+	var zeroVal ent.CreateMsgSilenceInput
 	return zeroVal, nil
 }
 
@@ -197,34 +236,6 @@ func (ec *executionContext) field_Mutation_createMsgType_argsInput(
 	return zeroVal, nil
 }
 
-func (ec *executionContext) field_Mutation_createSilence_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Mutation_createSilence_argsInput(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Mutation_createSilence_argsInput(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (ent.CreateSilenceInput, error) {
-	if _, ok := rawArgs["input"]; !ok {
-		var zeroVal ent.CreateSilenceInput
-		return zeroVal, nil
-	}
-
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNCreateSilenceInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐCreateSilenceInput(ctx, tmp)
-	}
-
-	var zeroVal ent.CreateSilenceInput
-	return zeroVal, nil
-}
-
 func (ec *executionContext) field_Mutation_deleteMsgChannel_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -264,6 +275,34 @@ func (ec *executionContext) field_Mutation_deleteMsgEvent_args(ctx context.Conte
 	return args, nil
 }
 func (ec *executionContext) field_Mutation_deleteMsgEvent_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNID2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteMsgSilence_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteMsgSilence_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteMsgSilence_argsID(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (int, error) {
@@ -348,34 +387,6 @@ func (ec *executionContext) field_Mutation_deleteMsgType_args(ctx context.Contex
 	return args, nil
 }
 func (ec *executionContext) field_Mutation_deleteMsgType_argsID(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (int, error) {
-	if _, ok := rawArgs["id"]; !ok {
-		var zeroVal int
-		return zeroVal, nil
-	}
-
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-	if tmp, ok := rawArgs["id"]; ok {
-		return ec.unmarshalNID2int(ctx, tmp)
-	}
-
-	var zeroVal int
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteSilence_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Mutation_deleteSilence_argsID(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg0
-	return args, nil
-}
-func (ec *executionContext) field_Mutation_deleteSilence_argsID(
 	ctx context.Context,
 	rawArgs map[string]any,
 ) (int, error) {
@@ -936,6 +947,57 @@ func (ec *executionContext) field_Mutation_updateMsgEvent_argsInput(
 	return zeroVal, nil
 }
 
+func (ec *executionContext) field_Mutation_updateMsgSilence_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateMsgSilence_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := ec.field_Mutation_updateMsgSilence_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_updateMsgSilence_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNID2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateMsgSilence_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ent.UpdateMsgSilenceInput, error) {
+	if _, ok := rawArgs["input"]; !ok {
+		var zeroVal ent.UpdateMsgSilenceInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUpdateMsgSilenceInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐUpdateMsgSilenceInput(ctx, tmp)
+	}
+
+	var zeroVal ent.UpdateMsgSilenceInput
+	return zeroVal, nil
+}
+
 func (ec *executionContext) field_Mutation_updateMsgTemplate_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1035,57 +1097,6 @@ func (ec *executionContext) field_Mutation_updateMsgType_argsInput(
 	}
 
 	var zeroVal ent.UpdateMsgTypeInput
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Mutation_updateSilence_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := ec.field_Mutation_updateSilence_argsID(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["id"] = arg0
-	arg1, err := ec.field_Mutation_updateSilence_argsInput(ctx, rawArgs)
-	if err != nil {
-		return nil, err
-	}
-	args["input"] = arg1
-	return args, nil
-}
-func (ec *executionContext) field_Mutation_updateSilence_argsID(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (int, error) {
-	if _, ok := rawArgs["id"]; !ok {
-		var zeroVal int
-		return zeroVal, nil
-	}
-
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-	if tmp, ok := rawArgs["id"]; ok {
-		return ec.unmarshalNID2int(ctx, tmp)
-	}
-
-	var zeroVal int
-	return zeroVal, nil
-}
-
-func (ec *executionContext) field_Mutation_updateSilence_argsInput(
-	ctx context.Context,
-	rawArgs map[string]any,
-) (ent.UpdateSilenceInput, error) {
-	if _, ok := rawArgs["input"]; !ok {
-		var zeroVal ent.UpdateSilenceInput
-		return zeroVal, nil
-	}
-
-	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-	if tmp, ok := rawArgs["input"]; ok {
-		return ec.unmarshalNUpdateSilenceInput2githubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐUpdateSilenceInput(ctx, tmp)
-	}
-
-	var zeroVal ent.UpdateSilenceInput
 	return zeroVal, nil
 }
 
@@ -1395,12 +1406,22 @@ func (ec *executionContext) fieldContext_Mutation_createMsgEvent(ctx context.Con
 				return ec.fieldContext_MsgEvent_route(ctx, field)
 			case "modes":
 				return ec.fieldContext_MsgEvent_modes(ctx, field)
+			case "canSubs":
+				return ec.fieldContext_MsgEvent_canSubs(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_MsgEvent_subscribers(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
 			case "routeStr":
 				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
+			case "subscriberUsers":
+				return ec.fieldContext_MsgEvent_subscriberUsers(ctx, field)
+			case "subscriberRoles":
+				return ec.fieldContext_MsgEvent_subscriberRoles(ctx, field)
+			case "excludeSubscriberUsers":
+				return ec.fieldContext_MsgEvent_excludeSubscriberUsers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -1480,12 +1501,22 @@ func (ec *executionContext) fieldContext_Mutation_updateMsgEvent(ctx context.Con
 				return ec.fieldContext_MsgEvent_route(ctx, field)
 			case "modes":
 				return ec.fieldContext_MsgEvent_modes(ctx, field)
+			case "canSubs":
+				return ec.fieldContext_MsgEvent_canSubs(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_MsgEvent_subscribers(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
 			case "routeStr":
 				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
+			case "subscriberUsers":
+				return ec.fieldContext_MsgEvent_subscriberUsers(ctx, field)
+			case "subscriberRoles":
+				return ec.fieldContext_MsgEvent_subscriberRoles(ctx, field)
+			case "excludeSubscriberUsers":
+				return ec.fieldContext_MsgEvent_excludeSubscriberUsers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -1620,12 +1651,22 @@ func (ec *executionContext) fieldContext_Mutation_enableMsgEvent(ctx context.Con
 				return ec.fieldContext_MsgEvent_route(ctx, field)
 			case "modes":
 				return ec.fieldContext_MsgEvent_modes(ctx, field)
+			case "canSubs":
+				return ec.fieldContext_MsgEvent_canSubs(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_MsgEvent_subscribers(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
 			case "routeStr":
 				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
+			case "subscriberUsers":
+				return ec.fieldContext_MsgEvent_subscriberUsers(ctx, field)
+			case "subscriberRoles":
+				return ec.fieldContext_MsgEvent_subscriberRoles(ctx, field)
+			case "excludeSubscriberUsers":
+				return ec.fieldContext_MsgEvent_excludeSubscriberUsers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -1705,12 +1746,22 @@ func (ec *executionContext) fieldContext_Mutation_disableMsgEvent(ctx context.Co
 				return ec.fieldContext_MsgEvent_route(ctx, field)
 			case "modes":
 				return ec.fieldContext_MsgEvent_modes(ctx, field)
+			case "canSubs":
+				return ec.fieldContext_MsgEvent_canSubs(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgEvent_msgType(ctx, field)
+			case "subscribers":
+				return ec.fieldContext_MsgEvent_subscribers(ctx, field)
 			case "customerTemplate":
 				return ec.fieldContext_MsgEvent_customerTemplate(ctx, field)
 			case "routeStr":
 				return ec.fieldContext_MsgEvent_routeStr(ctx, field)
+			case "subscriberUsers":
+				return ec.fieldContext_MsgEvent_subscriberUsers(ctx, field)
+			case "subscriberRoles":
+				return ec.fieldContext_MsgEvent_subscriberRoles(ctx, field)
+			case "excludeSubscriberUsers":
+				return ec.fieldContext_MsgEvent_excludeSubscriberUsers(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgEvent", field.Name)
 		},
@@ -2155,6 +2206,8 @@ func (ec *executionContext) fieldContext_Mutation_createMsgTemplate(ctx context.
 				return ec.fieldContext_MsgTemplate_msgEventID(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_MsgTemplate_tenantID(ctx, field)
+			case "userID":
+				return ec.fieldContext_MsgTemplate_userID(ctx, field)
 			case "name":
 				return ec.fieldContext_MsgTemplate_name(ctx, field)
 			case "status":
@@ -2256,6 +2309,8 @@ func (ec *executionContext) fieldContext_Mutation_updateMsgTemplate(ctx context.
 				return ec.fieldContext_MsgTemplate_msgEventID(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_MsgTemplate_tenantID(ctx, field)
+			case "userID":
+				return ec.fieldContext_MsgTemplate_userID(ctx, field)
 			case "name":
 				return ec.fieldContext_MsgTemplate_name(ctx, field)
 			case "status":
@@ -2412,6 +2467,8 @@ func (ec *executionContext) fieldContext_Mutation_enableMsgTemplate(ctx context.
 				return ec.fieldContext_MsgTemplate_msgEventID(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_MsgTemplate_tenantID(ctx, field)
+			case "userID":
+				return ec.fieldContext_MsgTemplate_userID(ctx, field)
 			case "name":
 				return ec.fieldContext_MsgTemplate_name(ctx, field)
 			case "status":
@@ -2513,6 +2570,8 @@ func (ec *executionContext) fieldContext_Mutation_disableMsgTemplate(ctx context
 				return ec.fieldContext_MsgTemplate_msgEventID(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_MsgTemplate_tenantID(ctx, field)
+			case "userID":
+				return ec.fieldContext_MsgTemplate_userID(ctx, field)
 			case "name":
 				return ec.fieldContext_MsgTemplate_name(ctx, field)
 			case "status":
@@ -2610,6 +2669,8 @@ func (ec *executionContext) fieldContext_Mutation_createMsgSubscriber(ctx contex
 				return ec.fieldContext_MsgSubscriber_updatedAt(ctx, field)
 			case "msgTypeID":
 				return ec.fieldContext_MsgSubscriber_msgTypeID(ctx, field)
+			case "msgEventID":
+				return ec.fieldContext_MsgSubscriber_msgEventID(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_MsgSubscriber_tenantID(ctx, field)
 			case "userID":
@@ -2620,6 +2681,8 @@ func (ec *executionContext) fieldContext_Mutation_createMsgSubscriber(ctx contex
 				return ec.fieldContext_MsgSubscriber_exclude(ctx, field)
 			case "msgType":
 				return ec.fieldContext_MsgSubscriber_msgType(ctx, field)
+			case "msgEvent":
+				return ec.fieldContext_MsgSubscriber_msgEvent(ctx, field)
 			case "user":
 				return ec.fieldContext_MsgSubscriber_user(ctx, field)
 			}
@@ -2695,8 +2758,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteMsgSubscriber(ctx contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createSilence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createSilence(ctx, field)
+func (ec *executionContext) _Mutation_createMsgSilence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createMsgSilence(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2709,7 +2772,7 @@ func (ec *executionContext) _Mutation_createSilence(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateSilence(rctx, fc.Args["input"].(ent.CreateSilenceInput))
+		return ec.resolvers.Mutation().CreateMsgSilence(rctx, fc.Args["input"].(ent.CreateMsgSilenceInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2721,12 +2784,12 @@ func (ec *executionContext) _Mutation_createSilence(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ent.Silence)
+	res := resTmp.(*ent.MsgSilence)
 	fc.Result = res
-	return ec.marshalNSilence2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilence(ctx, field.Selections, res)
+	return ec.marshalNMsgSilence2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgSilence(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_createSilence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_createMsgSilence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -2735,31 +2798,31 @@ func (ec *executionContext) fieldContext_Mutation_createSilence(ctx context.Cont
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Silence_id(ctx, field)
+				return ec.fieldContext_MsgSilence_id(ctx, field)
 			case "createdBy":
-				return ec.fieldContext_Silence_createdBy(ctx, field)
+				return ec.fieldContext_MsgSilence_createdBy(ctx, field)
 			case "createdAt":
-				return ec.fieldContext_Silence_createdAt(ctx, field)
+				return ec.fieldContext_MsgSilence_createdAt(ctx, field)
 			case "updatedBy":
-				return ec.fieldContext_Silence_updatedBy(ctx, field)
+				return ec.fieldContext_MsgSilence_updatedBy(ctx, field)
 			case "updatedAt":
-				return ec.fieldContext_Silence_updatedAt(ctx, field)
+				return ec.fieldContext_MsgSilence_updatedAt(ctx, field)
 			case "tenantID":
-				return ec.fieldContext_Silence_tenantID(ctx, field)
+				return ec.fieldContext_MsgSilence_tenantID(ctx, field)
 			case "matchers":
-				return ec.fieldContext_Silence_matchers(ctx, field)
+				return ec.fieldContext_MsgSilence_matchers(ctx, field)
 			case "startsAt":
-				return ec.fieldContext_Silence_startsAt(ctx, field)
+				return ec.fieldContext_MsgSilence_startsAt(ctx, field)
 			case "endsAt":
-				return ec.fieldContext_Silence_endsAt(ctx, field)
+				return ec.fieldContext_MsgSilence_endsAt(ctx, field)
 			case "comments":
-				return ec.fieldContext_Silence_comments(ctx, field)
+				return ec.fieldContext_MsgSilence_comments(ctx, field)
 			case "state":
-				return ec.fieldContext_Silence_state(ctx, field)
+				return ec.fieldContext_MsgSilence_state(ctx, field)
 			case "user":
-				return ec.fieldContext_Silence_user(ctx, field)
+				return ec.fieldContext_MsgSilence_user(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Silence", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type MsgSilence", field.Name)
 		},
 	}
 	defer func() {
@@ -2769,15 +2832,15 @@ func (ec *executionContext) fieldContext_Mutation_createSilence(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createSilence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_createMsgSilence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_updateSilence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_updateSilence(ctx, field)
+func (ec *executionContext) _Mutation_updateMsgSilence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateMsgSilence(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2790,7 +2853,7 @@ func (ec *executionContext) _Mutation_updateSilence(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateSilence(rctx, fc.Args["id"].(int), fc.Args["input"].(ent.UpdateSilenceInput))
+		return ec.resolvers.Mutation().UpdateMsgSilence(rctx, fc.Args["id"].(int), fc.Args["input"].(ent.UpdateMsgSilenceInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2802,12 +2865,12 @@ func (ec *executionContext) _Mutation_updateSilence(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ent.Silence)
+	res := resTmp.(*ent.MsgSilence)
 	fc.Result = res
-	return ec.marshalNSilence2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐSilence(ctx, field.Selections, res)
+	return ec.marshalNMsgSilence2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgSilence(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_updateSilence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_updateMsgSilence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -2816,31 +2879,31 @@ func (ec *executionContext) fieldContext_Mutation_updateSilence(ctx context.Cont
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Silence_id(ctx, field)
+				return ec.fieldContext_MsgSilence_id(ctx, field)
 			case "createdBy":
-				return ec.fieldContext_Silence_createdBy(ctx, field)
+				return ec.fieldContext_MsgSilence_createdBy(ctx, field)
 			case "createdAt":
-				return ec.fieldContext_Silence_createdAt(ctx, field)
+				return ec.fieldContext_MsgSilence_createdAt(ctx, field)
 			case "updatedBy":
-				return ec.fieldContext_Silence_updatedBy(ctx, field)
+				return ec.fieldContext_MsgSilence_updatedBy(ctx, field)
 			case "updatedAt":
-				return ec.fieldContext_Silence_updatedAt(ctx, field)
+				return ec.fieldContext_MsgSilence_updatedAt(ctx, field)
 			case "tenantID":
-				return ec.fieldContext_Silence_tenantID(ctx, field)
+				return ec.fieldContext_MsgSilence_tenantID(ctx, field)
 			case "matchers":
-				return ec.fieldContext_Silence_matchers(ctx, field)
+				return ec.fieldContext_MsgSilence_matchers(ctx, field)
 			case "startsAt":
-				return ec.fieldContext_Silence_startsAt(ctx, field)
+				return ec.fieldContext_MsgSilence_startsAt(ctx, field)
 			case "endsAt":
-				return ec.fieldContext_Silence_endsAt(ctx, field)
+				return ec.fieldContext_MsgSilence_endsAt(ctx, field)
 			case "comments":
-				return ec.fieldContext_Silence_comments(ctx, field)
+				return ec.fieldContext_MsgSilence_comments(ctx, field)
 			case "state":
-				return ec.fieldContext_Silence_state(ctx, field)
+				return ec.fieldContext_MsgSilence_state(ctx, field)
 			case "user":
-				return ec.fieldContext_Silence_user(ctx, field)
+				return ec.fieldContext_MsgSilence_user(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Silence", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type MsgSilence", field.Name)
 		},
 	}
 	defer func() {
@@ -2850,15 +2913,15 @@ func (ec *executionContext) fieldContext_Mutation_updateSilence(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateSilence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_updateMsgSilence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_deleteSilence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteSilence(ctx, field)
+func (ec *executionContext) _Mutation_deleteMsgSilence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteMsgSilence(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2871,7 +2934,7 @@ func (ec *executionContext) _Mutation_deleteSilence(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteSilence(rctx, fc.Args["id"].(int))
+		return ec.resolvers.Mutation().DeleteMsgSilence(rctx, fc.Args["id"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2888,7 +2951,7 @@ func (ec *executionContext) _Mutation_deleteSilence(ctx context.Context, field g
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_deleteSilence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_deleteMsgSilence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -2905,7 +2968,7 @@ func (ec *executionContext) fieldContext_Mutation_deleteSilence(ctx context.Cont
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteSilence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_deleteMsgSilence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3352,7 +3415,7 @@ func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "emailConfigs", "messageConfig"}
+	fieldsInOrder := [...]string{"name", "emailConfigs", "messageConfig", "webhookConfigs", "umengConfigs"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3380,6 +3443,20 @@ func (ec *executionContext) unmarshalInputReceiverInput(ctx context.Context, obj
 				return it, err
 			}
 			it.MessageConfig = data
+		case "webhookConfigs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("webhookConfigs"))
+			data, err := ec.unmarshalOWebhookConfigInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐWebhookConfig(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.WebhookConfigs = data
+		case "umengConfigs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("umengConfigs"))
+			data, err := ec.unmarshalOUmengConfigInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐUmengConfig(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UmengConfigs = data
 		}
 	}
 
@@ -3472,6 +3549,152 @@ func (ec *executionContext) unmarshalInputRouteInput(ctx context.Context, obj an
 				return it, err
 			}
 			it.RepeatInterval = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUmengConfigInput(ctx context.Context, obj any) (profile.UmengConfig, error) {
+	var it profile.UmengConfig
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"sendResolved", "apiURL", "apps", "productionMode"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "sendResolved":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sendResolved"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SendResolved = data
+		case "apiURL":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("apiURL"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.APIURL = data
+		case "apps":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("apps"))
+			data, err := ec.unmarshalNUmengApps2githubᚗcomᚋwoocoosᚋmsgcenterᚋapiᚋgraphqlᚋscalarsᚐUmengApps(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.UmengConfigInput().Apps(ctx, &it, data); err != nil {
+				return it, err
+			}
+		case "productionMode":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("productionMode"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProductionMode = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputWebhookConfigInput(ctx context.Context, obj any) (profile.WebhookConfig, error) {
+	var it profile.WebhookConfig
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"sendResolved", "receiveType", "secret", "url", "urlFile", "maxAlerts", "timeout", "headers", "subject", "body"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "sendResolved":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sendResolved"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SendResolved = data
+		case "receiveType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiveType"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.WebhookConfigInput().ReceiveType(ctx, &it, data); err != nil {
+				return it, err
+			}
+		case "secret":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("secret"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Secret = data
+		case "url":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.WebhookConfigInput().URL(ctx, &it, data); err != nil {
+				return it, err
+			}
+		case "urlFile":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("urlFile"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.URLFile = data
+		case "maxAlerts":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("maxAlerts"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			if err = ec.resolvers.WebhookConfigInput().MaxAlerts(ctx, &it, data); err != nil {
+				return it, err
+			}
+		case "timeout":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("timeout"))
+			data, err := ec.unmarshalODuration2timeᚐDuration(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Timeout = data
+		case "headers":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("headers"))
+			data, err := ec.unmarshalOMapString2map(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Headers = data
+		case "subject":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subject"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Subject = data
+		case "body":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("body"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Body = data
 		}
 	}
 
@@ -3645,23 +3868,23 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createSilence":
+		case "createMsgSilence":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createSilence(ctx, field)
+				return ec._Mutation_createMsgSilence(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "updateSilence":
+		case "updateMsgSilence":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateSilence(ctx, field)
+				return ec._Mutation_updateMsgSilence(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "deleteSilence":
+		case "deleteMsgSilence":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteSilence(ctx, field)
+				return ec._Mutation_deleteMsgSilence(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -3819,6 +4042,58 @@ func (ec *executionContext) unmarshalORouteInput2ᚖgithubᚗcomᚋwoocoosᚋmsg
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputRouteInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOUmengConfigInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐUmengConfig(ctx context.Context, v any) ([]*profile.UmengConfig, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*profile.UmengConfig, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOUmengConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐUmengConfig(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOUmengConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐUmengConfig(ctx context.Context, v any) (*profile.UmengConfig, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUmengConfigInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOWebhookConfigInput2ᚕᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐWebhookConfig(ctx context.Context, v any) ([]*profile.WebhookConfig, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*profile.WebhookConfig, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOWebhookConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐWebhookConfig(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOWebhookConfigInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐWebhookConfig(ctx context.Context, v any) (*profile.WebhookConfig, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputWebhookConfigInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

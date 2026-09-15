@@ -85,7 +85,7 @@ export default (props: {
         let result: boolean | null = null;
         if (info.receiverType === MsgTemplateReceiverType.Email) {
           result = await testSendEamil(info.id, values.email ?? '', values.labels, values.annotations);
-        } else if (info.receiverType === MsgTemplateReceiverType.Message) {
+        } else {
           result = await testSendMessage(info.id, values.userID ?? '', values.labels, values.annotations);
         }
         if (result) {
@@ -126,13 +126,12 @@ export default (props: {
       {info?.receiverType === MsgTemplateReceiverType.Email ? <ProFormText
         name="email"
         label={t('receive_mail')}
-      /> : <></>}
-      {info?.receiverType === MsgTemplateReceiverType.Message ? <ProFormText
+      /> : <ProFormText
         name="userID"
         label={t('receiver')}
       >
         <UserSelect changeValue="id" />
-      </ProFormText> : <></>}
+      </ProFormText>}
       <ProFormText name="labels" label={`labels ${t('argument')}`} tooltip={`${t('default_added')}：receiver、alertname、tenant、skipSub、timestamp`}>
         <StringRecord />
       </ProFormText>

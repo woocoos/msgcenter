@@ -5,10 +5,6 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"github.com/woocoos/knockout-go/api"
-	"github.com/woocoos/knockout-go/api/auth"
-	"github.com/woocoos/msgcenter/pkg/alert"
-	"github.com/woocoos/msgcenter/pkg/label"
 	tmplhtml "html/template"
 	"io/fs"
 	"net/url"
@@ -19,6 +15,11 @@ import (
 	"strings"
 	tmpltext "text/template"
 	"text/template/parse"
+
+	"github.com/woocoos/knockout-go/api"
+	"github.com/woocoos/knockout-go/api/auth"
+	"github.com/woocoos/msgcenter/pkg/alert"
+	"github.com/woocoos/msgcenter/pkg/label"
 )
 
 var (
@@ -208,7 +209,7 @@ func MustParse(t *Template, err error) *Template {
 }
 
 // ExecuteTextString needs a meaningful doc comment (TODO(fabxc)).
-func (t *Template) ExecuteTextString(text string, data interface{}) (string, error) {
+func (t *Template) ExecuteTextString(text string, data any) (string, error) {
 	if text == "" {
 		return "", nil
 	}
@@ -226,7 +227,7 @@ func (t *Template) ExecuteTextString(text string, data interface{}) (string, err
 }
 
 // ExecuteHTMLString needs a meaningful doc comment (TODO(fabxc)).
-func (t *Template) ExecuteHTMLString(html string, data interface{}) (string, error) {
+func (t *Template) ExecuteHTMLString(html string, data any) (string, error) {
 	if html == "" {
 		return "", nil
 	}

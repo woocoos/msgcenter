@@ -4,6 +4,8 @@ import "github.com/woocoos/msgcenter/pkg/label"
 
 // InhibitRule 抑制规则.
 type InhibitRule struct {
+	// Name is an optional name for the inhibition rule.
+	Name string `yaml:"name,omitempty" json:"name,omitempty"`
 	// SourceMatchers defines a set of label matchers that have to be fulfilled for source alerts.
 	SourceMatchers label.Matchers `yaml:"sourceMatchers,omitempty" json:"sourceMatchers,omitempty"`
 	// TargetMatchers defines a set of label matchers that have to be fulfilled for target alerts.
