@@ -59,7 +59,7 @@ type PushServer interface {
 type NlogServer interface {
 	// UpdateNlog Update notification log fields by messageId or alertID+receiverType
 	// (POST /nlogs/update)
-	UpdateNlog(*gin.Context, *UpdateNlogRequest) (*UpdateNlogResponse, error)
+	UpdateNlog(*gin.Context, *UpdateNlogRequest) error
 }
 
 type UnimplementedGeneralServer struct {
@@ -125,7 +125,7 @@ func (UnimplementedPushServer) PostPush(c *gin.Context, req *PostPushRequest) (e
 type UnimplementedNlogServer struct {
 }
 
-func (UnimplementedNlogServer) UpdateNlog(c *gin.Context, req *UpdateNlogRequest) (_ *UpdateNlogResponse, err error) {
+func (UnimplementedNlogServer) UpdateNlog(c *gin.Context, req *UpdateNlogRequest) (err error) {
 	err = fmt.Errorf("method UpdateNlog not implemented")
 	return
 }

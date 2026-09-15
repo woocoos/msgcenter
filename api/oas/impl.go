@@ -678,7 +678,7 @@ func SortSilences(sils GettableSilences) {
 	})
 }
 
-func (s *ServerImpl) UpdateNlog(c *gin.Context, req *UpdateNlogRequest) (*UpdateNlogResponse, error) {
+func (s *ServerImpl) UpdateNlog(c *gin.Context, req *UpdateNlogRequest) error {
 	ctx := schemax.SkipTenantPrivacy(c.Request.Context())
 
 	if req.MessageId != "" {
@@ -688,13 +688,13 @@ func (s *ServerImpl) UpdateNlog(c *gin.Context, req *UpdateNlogRequest) (*Update
 			SetErrMsg(req.ErrMsg).
 			Save(ctx)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		if updated == 0 {
 			c.Status(http.StatusNotFound)
-			return nil, nil
+			return nil
 		}
-		return &UpdateNlogResponse{Updated: updated}, nil
+		return nil
 	}
 
 	// 通过 alertID + receiverType 查找最早的未处理 Nlog (err_msg 为空)
@@ -710,14 +710,11 @@ func (s *ServerImpl) UpdateNlog(c *gin.Context, req *UpdateNlogRequest) (*Update
 	if err != nil {
 		if ent.IsNotFound(err) {
 			c.Status(http.StatusNotFound)
-			return nil, nil
+			return nil
 		}
-		return nil, err
+		return err
 	}
 	// 按 ID 直接更新, 避免 nl.Update() 的额外开销
-	updated, err := s.db.Nlog.Update().Where(nlog.ID(nl.ID)).SetErrMsg(req.ErrMsg).Save(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &UpdateNlogResponse{Updated: updated}, nil
+	_, err = s.db.Nlog.Update().Where(nlog.ID(nl.ID)).SetErrMsg(req.ErrMsg).Save(ctx)
+	return err
 }

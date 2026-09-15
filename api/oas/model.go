@@ -162,30 +162,6 @@ type PostableSilence struct {
 	*Silence `json:",inline"`
 }
 
-// AlertStatusState defines the type for the state.state enum field.
-type AlertStatusState string
-
-// AlertStatusState values.
-const (
-	AlertStatusStateUnprocessed AlertStatusState = "unprocessed"
-	AlertStatusStateActive      AlertStatusState = "active"
-	AlertStatusStateSuppressed  AlertStatusState = "suppressed"
-)
-
-func (s AlertStatusState) String() string {
-	return string(s)
-}
-
-// AlertStatusStateValidator is a validator for the AlertStatusState field enum values.
-func AlertStatusStateValidator(s AlertStatusState) error {
-	switch s {
-	case AlertStatusStateUnprocessed, AlertStatusStateActive, AlertStatusStateSuppressed:
-		return nil
-	default:
-		return fmt.Errorf("AlertStatusState does not allow the value '%s'", s)
-	}
-}
-
 // SilenceStatusState defines the type for the state.state enum field.
 type SilenceStatusState string
 
@@ -207,6 +183,30 @@ func SilenceStatusStateValidator(s SilenceStatusState) error {
 		return nil
 	default:
 		return fmt.Errorf("SilenceStatusState does not allow the value '%s'", s)
+	}
+}
+
+// AlertStatusState defines the type for the state.state enum field.
+type AlertStatusState string
+
+// AlertStatusState values.
+const (
+	AlertStatusStateUnprocessed AlertStatusState = "unprocessed"
+	AlertStatusStateActive      AlertStatusState = "active"
+	AlertStatusStateSuppressed  AlertStatusState = "suppressed"
+)
+
+func (s AlertStatusState) String() string {
+	return string(s)
+}
+
+// AlertStatusStateValidator is a validator for the AlertStatusState field enum values.
+func AlertStatusStateValidator(s AlertStatusState) error {
+	switch s {
+	case AlertStatusStateUnprocessed, AlertStatusStateActive, AlertStatusStateSuppressed:
+		return nil
+	default:
+		return fmt.Errorf("AlertStatusState does not allow the value '%s'", s)
 	}
 }
 

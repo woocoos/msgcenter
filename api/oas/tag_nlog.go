@@ -6,8 +6,3 @@ package oas
 type UpdateNlogRequest struct {
 	NlogUpdate `json:",inline"`
 }
-
-type UpdateNlogResponse struct {
-	// Updated Number of Nlog records updated
-	Updated int `json:"updated,omitempty"`
-}

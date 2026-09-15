@@ -362,14 +362,6 @@ paths:
       responses:
         200:
           description: Update Nlog response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  updated:
-                    type: integer
-                    description: Number of Nlog records updated
         400:
           description: Bad request
           content:

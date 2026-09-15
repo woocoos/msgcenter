@@ -295,7 +295,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "expires_at", Type: field.TypeTime},
-		{Name: "err_msg", Type: field.TypeString, Nullable: true},
+		{Name: "err_msg", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "message_id", Type: field.TypeString, Nullable: true},
 	}
 	// MsgNlogTable holds the schema information for the "msg_nlog" table.

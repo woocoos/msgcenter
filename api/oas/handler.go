@@ -196,15 +196,10 @@ func wrapUpdateNlog(si NlogServer) func(c *gin.Context) {
 			handler.AbortWithError(c, http.StatusBadRequest, err)
 			return
 		}
-		resp, err := si.UpdateNlog(c, &req)
+		err := si.UpdateNlog(c, &req)
 		if err != nil {
 			c.Error(err)
 			return
 		}
-		if resp == nil {
-			handler.AbortWithError(c, http.StatusBadRequest, errors.New("No matching Nlog found"))
-			return
-		}
-		handler.NegotiateResponse(c, http.StatusOK, resp, []string{"application/json"})
 	}
 }

@@ -54,7 +54,7 @@ func (Nlog) Fields() []ent.Field {
 		field.Time("updated_at").Optional().
 			Annotations(entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput)),
 		field.Time("expires_at").Comment("过期时间"),
-		field.String("err_msg").Optional().Comment("错误信息，有值表示未发送成功：如：邮件已发往邮件服务器，邮件服务器发送失败，记录其错误信息"),
+		field.Text("err_msg").Optional().Comment("错误信息，有值表示未发送成功：如：邮件已发往邮件服务器，邮件服务器发送失败，记录其错误信息"),
 		field.String("message_id").Optional().Comment("邮件消息ID，用于关联邮件发送回执"),
 	}
 }

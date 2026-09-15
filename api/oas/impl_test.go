@@ -927,7 +927,7 @@ func (s *serviceSuite) TestUpdateNlog() {
 	gc.Request = gc.Request.WithContext(ctx)
 
 	// FIFO 顺序: 最早的未处理 Nlog (nlog1) 应优先被更新
-	resp, err := s.server.UpdateNlog(gc, &UpdateNlogRequest{
+	err := s.server.UpdateNlog(gc, &UpdateNlogRequest{
 		NlogUpdate: NlogUpdate{
 			AlertID:      msAlert.ID,
 			ReceiverType: string(profile.ReceiverEmail),
@@ -935,8 +935,6 @@ func (s *serviceSuite) TestUpdateNlog() {
 		},
 	})
 	s.Require().NoError(err)
-	s.Require().NotNil(resp)
-	s.Equal(1, resp.Updated)
 
 	// nlog1 (最早) 应被更新
 	updated1 := s.Client.Nlog.GetX(ctx, nlog1.ID)
@@ -950,7 +948,7 @@ func (s *serviceSuite) TestUpdateNlog() {
 	gc1b, _ := gin.CreateTestContext(httptest.NewRecorder())
 	gc1b.Request = httptest.NewRequest(http.MethodPost, "/nlogs/update", nil)
 	gc1b.Request = gc1b.Request.WithContext(ctx)
-	resp, err = s.server.UpdateNlog(gc1b, &UpdateNlogRequest{
+	err = s.server.UpdateNlog(gc1b, &UpdateNlogRequest{
 		NlogUpdate: NlogUpdate{
 			AlertID:      msAlert.ID,
 			ReceiverType: string(profile.ReceiverEmail),
@@ -958,8 +956,6 @@ func (s *serviceSuite) TestUpdateNlog() {
 		},
 	})
 	s.Require().NoError(err)
-	s.Require().NotNil(resp)
-	s.Equal(1, resp.Updated)
 
 	updated2 = s.Client.Nlog.GetX(ctx, nlog2.ID)
 	s.Equal("second error", updated2.ErrMsg)
@@ -971,7 +967,7 @@ func (s *serviceSuite) TestUpdateNlog() {
 	gcSkip, _ := gin.CreateTestContext(httptest.NewRecorder())
 	gcSkip.Request = httptest.NewRequest(http.MethodPost, "/nlogs/update", nil)
 	gcSkip.Request = gcSkip.Request.WithContext(ctx)
-	resp, err = s.server.UpdateNlog(gcSkip, &UpdateNlogRequest{
+	err = s.server.UpdateNlog(gcSkip, &UpdateNlogRequest{
 		NlogUpdate: NlogUpdate{
 			AlertID:      msAlert.ID,
 			ReceiverType: string(profile.ReceiverEmail),
@@ -979,17 +975,17 @@ func (s *serviceSuite) TestUpdateNlog() {
 		},
 	})
 	s.Require().NoError(err)
-	s.Nil(resp, "should return nil when all matching Nlogs already have err_msg")
+	s.Equal(http.StatusNotFound, gcSkip.Writer.Status())
 
 	// nlog2 的 ErrMsg 不应被覆盖
 	updated2After := s.Client.Nlog.GetX(ctx, nlog2.ID)
 	s.Equal("second error", updated2After.ErrMsg)
 
-	// 不存在的 alertID 应返回 nil (404)
+	// 不存在的 alertID 应返回 404
 	gc2, _ := gin.CreateTestContext(httptest.NewRecorder())
 	gc2.Request = httptest.NewRequest(http.MethodPost, "/nlogs/update", nil)
 	gc2.Request = gc2.Request.WithContext(ctx)
-	resp, err = s.server.UpdateNlog(gc2, &UpdateNlogRequest{
+	err = s.server.UpdateNlog(gc2, &UpdateNlogRequest{
 		NlogUpdate: NlogUpdate{
 			AlertID:      99999,
 			ReceiverType: string(profile.ReceiverEmail),
@@ -997,7 +993,7 @@ func (s *serviceSuite) TestUpdateNlog() {
 		},
 	})
 	s.Require().NoError(err)
-	s.Nil(resp)
+	s.Equal(http.StatusNotFound, gc2.Writer.Status())
 
 	// 通过 messageId 精确匹配
 	nlogWithMsg := s.Client.Nlog.Create().
@@ -1010,29 +1006,27 @@ func (s *serviceSuite) TestUpdateNlog() {
 	gc3, _ := gin.CreateTestContext(httptest.NewRecorder())
 	gc3.Request = httptest.NewRequest(http.MethodPost, "/nlogs/update", nil)
 	gc3.Request = gc3.Request.WithContext(ctx)
-	resp, err = s.server.UpdateNlog(gc3, &UpdateNlogRequest{
+	err = s.server.UpdateNlog(gc3, &UpdateNlogRequest{
 		NlogUpdate: NlogUpdate{
 			MessageId: "test-trace-id-123",
 			ErrMsg:    "callback error from cloud provider",
 		},
 	})
 	s.Require().NoError(err)
-	s.Require().NotNil(resp)
-	s.Equal(1, resp.Updated)
 
 	updated3 := s.Client.Nlog.GetX(ctx, nlogWithMsg.ID)
 	s.Equal("callback error from cloud provider", updated3.ErrMsg)
 
-	// 不存在的 messageId 应返回 nil (404)
+	// 不存在的 messageId 应返回 404
 	gc4, _ := gin.CreateTestContext(httptest.NewRecorder())
 	gc4.Request = httptest.NewRequest(http.MethodPost, "/nlogs/update", nil)
 	gc4.Request = gc4.Request.WithContext(ctx)
-	resp, err = s.server.UpdateNlog(gc4, &UpdateNlogRequest{
+	err = s.server.UpdateNlog(gc4, &UpdateNlogRequest{
 		NlogUpdate: NlogUpdate{
 			MessageId: "non-existent-id",
 			ErrMsg:    "should not match",
 		},
 	})
 	s.Require().NoError(err)
-	s.Nil(resp)
+	s.Equal(http.StatusNotFound, gc4.Writer.Status())
 }
