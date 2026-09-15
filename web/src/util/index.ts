@@ -456,3 +456,70 @@ export const delDataSource = <T extends { id: string }>(dataSource: Array<T>, id
   }
   return dataSource.filter(item => item[keys.id] != id)
 }
+
+const mousedownStore: {
+  clickCount: number
+  clickTimer?: NodeJS.Timeout
+} = {
+  clickCount: 0,
+  clickTimer: undefined
+};
+
+/**
+ * 通过onMousedown区分单击和双击，解决文本选中和点击冲突问题
+ * @param handle
+ */
+export function onMousedown(handle?: {
+  /**
+   * 触发点击事件的元素
+   */
+  target?: HTMLElement
+  /**
+   * 排除的元素类名
+   */
+  exclusionClassNames?: string[],
+  /**
+   * 选中文本事件
+   * @returns
+   */
+  textSelection?: () => void,
+  /**
+   * 单机点击事件
+   * @returns
+   */
+  click?: () => void,
+  /**
+   * 双击事件
+   * @returns
+   */
+  doubleClick?: () => void,
+}) {
+  const exclusionClassNames = ['checkbox', 'expand', 'radio', ...(handle?.exclusionClassNames ?? [])]
+  if (handle?.target) {
+    if (
+      ['a', 'svg', 'path'].includes(handle.target.tagName.toLowerCase()) ||
+      exclusionClassNames.some(name => handle.target?.className?.includes(name))
+    ) {
+      return;
+    }
+  }
+  mousedownStore.clickCount++;
+  if (mousedownStore.clickCount === 1) {
+    // 第一次点击，启动计时器
+    mousedownStore.clickTimer = setTimeout(() => {
+      // 检查是否有文本选中
+      const selection = window.getSelection();
+      if (selection && selection.toString().length > 0) {
+        handle?.textSelection?.();
+      } else {
+        handle?.click?.();
+      }
+      mousedownStore.clickCount = 0;
+    }, 300);
+  } else if (mousedownStore.clickCount === 2) {
+    // 双击
+    clearTimeout(mousedownStore.clickTimer);
+    handle?.doubleClick?.();
+    mousedownStore.clickCount = 0;
+  }
+}

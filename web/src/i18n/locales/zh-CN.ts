@@ -197,6 +197,8 @@ export default {
     view_content: '查看内容',
     more_message: '更多消息',
     query_message: '消息查询',
+    previous: '上一条',
+    next: '下一条',
 
     // 创建
     create_msg_type: '创建消息类型',

@@ -194,6 +194,8 @@ export default {
     view_content: 'view content',
     more_message: 'more message',
     query_message: 'query message',
+    previous: 'Previous',
+    next: 'Next',
 
     // 创建
     create_msg_type: 'Create message type',

@@ -21,14 +21,14 @@ dependencies:
     specifier: 0.1.17
     version: 0.1.17(react@18.3.1)
   '@knockout-js/ice-urql':
-    specifier: 0.1.21
-    version: 0.1.21(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1)
+    specifier: 0.1.22
+    version: 0.1.22(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1)
   '@knockout-js/layout':
-    specifier: 0.1.26
-    version: 0.1.26(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
+    specifier: 0.1.29
+    version: 0.1.29(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
   '@knockout-js/org':
-    specifier: 0.1.17
-    version: 0.1.17(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
+    specifier: 0.1.23
+    version: 0.1.23(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
   '@monaco-editor/react':
     specifier: ^4.5.1
     version: 4.7.0(monaco-editor@0.52.2)(react-dom@18.3.1)(react@18.3.1)
@@ -65,6 +65,9 @@ dependencies:
   react:
     specifier: ^18.2.0
     version: 18.3.1
+  react-antd-column-resize:
+    specifier: ^1.0.3
+    version: 1.0.3(react-dom@18.3.1)(react@18.3.1)
   react-dom:
     specifier: ^18.2.0
     version: 18.3.1(react@18.3.1)
@@ -3228,8 +3231,8 @@ packages:
       - supports-color
     dev: false
 
-  /@knockout-js/ice-urql@0.1.21(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-qscAmr3FaFbWnym9h6evcowzHYKn9f7qJI6feSg7wf397bj28FxRxjI/gRJYPRWkXCvdnDiG/eLrtHbeGOLSyg==}
+  /@knockout-js/ice-urql@0.1.22(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-ZwSmurZEsuVYvW/4EasubXV1/Nw9RD0he2wjSDqxBpu+RWtxzRjqaVcWGXucDrMG4igmBD7FpUgQjSlOuad8qw==}
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
@@ -3254,8 +3257,8 @@ packages:
       - supports-color
     dev: false
 
-  /@knockout-js/layout@0.1.26(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-Q6yPYajbSfLGpPIu3o5WZJD3aVT/686QuS9Qo6/U0IqvZndXikYRdInE/OKhn7g2j7kjge8tLOZQsJN3AZIJwQ==}
+  /@knockout-js/layout@0.1.29(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-AkXRqL5HK4nDcQfXaSAOa+dvpjesjOGTW/lrLzq9lxAf0l9KU/4sAmhtZtYIBAv9s4vk2uP++7E6j3cXqBNXiw==}
     peerDependencies:
       react: ^17 || ^18
     dependencies:
@@ -3267,7 +3270,7 @@ packages:
       '@ice/jsx-runtime': 0.2.2(react@18.3.1)
       '@ice/runtime': 1.5.6(react-dom@18.3.1)(react@18.3.1)
       '@knockout-js/api': 0.1.17(react@18.3.1)
-      '@knockout-js/ice-urql': 0.1.21(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1)
+      '@knockout-js/ice-urql': 0.1.22(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1)
       '@swc/helpers': 0.5.23
       antd: 5.29.3(react-dom@18.3.1)(react@18.3.1)
       dayjs: 1.11.21
@@ -3289,8 +3292,8 @@ packages:
       - supports-color
     dev: false
 
-  /@knockout-js/org@0.1.17(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1):
-    resolution: {integrity: sha512-JSVNIXhCX3IzyQ80VkXxqXex07Ncx202p8lt7EqHVsTahQ+83L5jNnF1/Yt7Kufkfm6lfCNUQPGkGREMjmvE2A==}
+  /@knockout-js/org@0.1.23(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-VZPJkiwUM6fPq12XlvEedqqcitEnz1fHu4owzHqAaeY7F5cQs+N2RyvLoC5djKQW8jE+DBPdRqfZJ3ULSj9BWw==}
     peerDependencies:
       react: ^17 || ^18
     dependencies:
@@ -3298,8 +3301,8 @@ packages:
       '@ant-design/pro-components': 2.8.10(antd@5.29.3)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
       '@ice/jsx-runtime': 0.2.2(react@18.3.1)
       '@knockout-js/api': 0.1.17(react@18.3.1)
-      '@knockout-js/ice-urql': 0.1.21(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1)
-      '@knockout-js/layout': 0.1.26(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
+      '@knockout-js/ice-urql': 0.1.22(@urql/core@5.2.0)(graphql@16.14.2)(react-dom@18.3.1)(react@18.3.1)
+      '@knockout-js/layout': 0.1.29(@urql/core@5.2.0)(graphql@16.14.2)(prop-types@15.8.1)(rc-field-form@2.7.1)(react-dom@18.3.1)(react@18.3.1)
       '@swc/helpers': 0.5.23
       antd: 5.29.3(react-dom@18.3.1)(react@18.3.1)
       react: 18.3.1
@@ -9164,6 +9167,18 @@ packages:
       - prop-types
     dev: false
 
+  /react-antd-column-resize@1.0.3(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-JOuwMwR3N5xs3VKZ2pEfA3KWO394WJL9OgqYs7zeYhaD9buEK42kvVtrs590iEK0qmRatrsei11lekjY9ilNrQ==}
+    peerDependencies:
+      react: '>=16.9.0'
+      react-dom: '>=16.9.0'
+    dependencies:
+      rc-util: 5.44.4(react-dom@18.3.1)(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-resizable: 3.2.0(react-dom@18.3.1)(react@18.3.1)
+    dev: false
+
   /react-dom@18.3.1(react@18.3.1):
     resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
     peerDependencies:
@@ -9258,6 +9273,18 @@ packages:
   /react-refresh@0.14.0:
     resolution: {integrity: sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==}
     engines: {node: '>=0.10.0'}
+
+  /react-resizable@3.2.0(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-3NKQ0SLZV7rs3LQHeXlOzDSRQfFrkX6TVet77/Qk03zqiZyee37b7N8/gwDJAA8UUjRz7PdWCCy49hcso45SMQ==}
+    peerDependencies:
+      react: '>= 16.3'
+      react-dom: '>= 16.3'
+    dependencies:
+      prop-types: 15.8.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-draggable: 4.7.0(react-dom@18.3.1)(react@18.3.1)
+    dev: false
 
   /react-router-dom@6.21.3(react-dom@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-kNzubk7n4YHSrErzjLK72j0B5i969GsuCGazRl3G6j1zqZBLjuSlYBdVdkDOgzGdPIffUOc9nmgiadTEVoq91g==}
