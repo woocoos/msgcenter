@@ -167,11 +167,12 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 			Name: "email",
 			EmailConfigs: []*profile.EmailConfig{
 				{
-					SmartHost:    profile.HostPort{Host: "localhost", Port: "1025"},
-					To:           `{{ template "email.to" . }}`,
-					From:         "1 <serviceSuite@localhost>",
-					AuthUsername: "user1",
-					AuthPassword: "password1",
+					SmartHost:     profile.HostPort{Host: "localhost", Port: "1025"},
+					To:            `{{ template "email.to" . }}`,
+					From:          "1 <serviceSuite@localhost>",
+					AuthUsername:  "user1",
+					AuthPassword:  "password1",
+					TraceIDHeader: "X-User-Notify-TraceId",
 				},
 			},
 		}).SaveX(ctx)

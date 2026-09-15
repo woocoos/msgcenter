@@ -198,8 +198,18 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 	if _, ok := config.Headers["Message-Id"]; !ok {
 		var rnd [8]byte
 		rand.Read(rnd[:])
-		msgID := fmt.Sprintf("<%d.%x@%s>", time.Now().UnixNano(), rnd, n.hostname)
-		email.SetHeader("Message-Id", msgID)
+		rawID := fmt.Sprintf("%d.%x", time.Now().UnixNano(), rnd)
+		email.SetHeader("Message-Id", fmt.Sprintf("<%s@%s>", rawID, n.hostname))
+
+		// 写入追踪 header, 用于关联邮件发送回执与 Nlog
+		if config.TraceIDHeader != "" {
+			email.SetHeader(config.TraceIDHeader, rawID)
+		}
+
+		// 写入 context 指针, 供下游 SetNotifiesStage 存入 Nlog
+		if ptr := notify.MessageID(ctx); ptr != nil {
+			*ptr = rawID
+		}
 	}
 
 	// Email threading: add References and In-Reply-To headers.

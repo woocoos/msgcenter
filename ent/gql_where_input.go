@@ -4935,6 +4935,23 @@ type NlogWhereInput struct {
 	ErrMsgEqualFold    *string  `json:"errMsgEqualFold,omitempty"`
 	ErrMsgContainsFold *string  `json:"errMsgContainsFold,omitempty"`
 
+	// "message_id" field predicates.
+	MessageID             *string  `json:"messageID,omitempty"`
+	MessageIDNEQ          *string  `json:"messageIDNEQ,omitempty"`
+	MessageIDIn           []string `json:"messageIDIn,omitempty"`
+	MessageIDNotIn        []string `json:"messageIDNotIn,omitempty"`
+	MessageIDGT           *string  `json:"messageIDGT,omitempty"`
+	MessageIDGTE          *string  `json:"messageIDGTE,omitempty"`
+	MessageIDLT           *string  `json:"messageIDLT,omitempty"`
+	MessageIDLTE          *string  `json:"messageIDLTE,omitempty"`
+	MessageIDContains     *string  `json:"messageIDContains,omitempty"`
+	MessageIDHasPrefix    *string  `json:"messageIDHasPrefix,omitempty"`
+	MessageIDHasSuffix    *string  `json:"messageIDHasSuffix,omitempty"`
+	MessageIDIsNil        bool     `json:"messageIDIsNil,omitempty"`
+	MessageIDNotNil       bool     `json:"messageIDNotNil,omitempty"`
+	MessageIDEqualFold    *string  `json:"messageIDEqualFold,omitempty"`
+	MessageIDContainsFold *string  `json:"messageIDContainsFold,omitempty"`
+
 	// "alerts" edge predicates.
 	HasAlerts     *bool                 `json:"hasAlerts,omitempty"`
 	HasAlertsWith []*MsgAlertWhereInput `json:"hasAlertsWith,omitempty"`
@@ -5323,6 +5340,51 @@ func (i *NlogWhereInput) P() (predicate.Nlog, error) {
 	}
 	if i.ErrMsgContainsFold != nil {
 		predicates = append(predicates, nlog.ErrMsgContainsFold(*i.ErrMsgContainsFold))
+	}
+	if i.MessageID != nil {
+		predicates = append(predicates, nlog.MessageIDEQ(*i.MessageID))
+	}
+	if i.MessageIDNEQ != nil {
+		predicates = append(predicates, nlog.MessageIDNEQ(*i.MessageIDNEQ))
+	}
+	if len(i.MessageIDIn) > 0 {
+		predicates = append(predicates, nlog.MessageIDIn(i.MessageIDIn...))
+	}
+	if len(i.MessageIDNotIn) > 0 {
+		predicates = append(predicates, nlog.MessageIDNotIn(i.MessageIDNotIn...))
+	}
+	if i.MessageIDGT != nil {
+		predicates = append(predicates, nlog.MessageIDGT(*i.MessageIDGT))
+	}
+	if i.MessageIDGTE != nil {
+		predicates = append(predicates, nlog.MessageIDGTE(*i.MessageIDGTE))
+	}
+	if i.MessageIDLT != nil {
+		predicates = append(predicates, nlog.MessageIDLT(*i.MessageIDLT))
+	}
+	if i.MessageIDLTE != nil {
+		predicates = append(predicates, nlog.MessageIDLTE(*i.MessageIDLTE))
+	}
+	if i.MessageIDContains != nil {
+		predicates = append(predicates, nlog.MessageIDContains(*i.MessageIDContains))
+	}
+	if i.MessageIDHasPrefix != nil {
+		predicates = append(predicates, nlog.MessageIDHasPrefix(*i.MessageIDHasPrefix))
+	}
+	if i.MessageIDHasSuffix != nil {
+		predicates = append(predicates, nlog.MessageIDHasSuffix(*i.MessageIDHasSuffix))
+	}
+	if i.MessageIDIsNil {
+		predicates = append(predicates, nlog.MessageIDIsNil())
+	}
+	if i.MessageIDNotNil {
+		predicates = append(predicates, nlog.MessageIDNotNil())
+	}
+	if i.MessageIDEqualFold != nil {
+		predicates = append(predicates, nlog.MessageIDEqualFold(*i.MessageIDEqualFold))
+	}
+	if i.MessageIDContainsFold != nil {
+		predicates = append(predicates, nlog.MessageIDContainsFold(*i.MessageIDContainsFold))
 	}
 
 	if i.HasAlerts != nil {

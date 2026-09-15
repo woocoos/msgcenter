@@ -2475,6 +2475,10 @@ type Nlog implements Node {
   错误信息，有值表示未发送成功：如：邮件已发往邮件服务器，邮件服务器发送失败，记录其错误信息
   """
   errMsg: String
+  """
+  邮件消息ID，用于关联邮件发送回执
+  """
+  messageID: String
   alerts: [MsgAlert!]
   nlogAlert: [NlogAlert!]
 }
@@ -2744,6 +2748,24 @@ input NlogWhereInput {
   errMsgNotNil: Boolean
   errMsgEqualFold: String
   errMsgContainsFold: String
+  """
+  message_id field predicates
+  """
+  messageID: String
+  messageIDNEQ: String
+  messageIDIn: [String!]
+  messageIDNotIn: [String!]
+  messageIDGT: String
+  messageIDGTE: String
+  messageIDLT: String
+  messageIDLTE: String
+  messageIDContains: String
+  messageIDHasPrefix: String
+  messageIDHasSuffix: String
+  messageIDIsNil: Boolean
+  messageIDNotNil: Boolean
+  messageIDEqualFold: String
+  messageIDContainsFold: String
   """
   alerts edge predicates
   """

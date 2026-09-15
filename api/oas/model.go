@@ -131,6 +131,17 @@ type GettableSilences []*GettableSilence
 
 type Matchers []*Matcher
 
+type NlogUpdate struct {
+	// AlertID Alert ID to find related Nlog records (used with receiverType)
+	AlertID int `json:"alertID,omitempty"`
+	// ErrMsg Error message to update
+	ErrMsg string `binding:"required" json:"errMsg"`
+	// MessageId Message ID to find the exact Nlog record (from email delivery callback)
+	MessageId string `json:"messageId,omitempty"`
+	// ReceiverType Receiver type to filter Nlog records (used with alertID)
+	ReceiverType string `json:"receiverType,omitempty"`
+}
+
 type PostableAlert struct {
 	// Annotations A set of labels. Labels are key/value pairs that are attached to
 	// alerts. Labels are used to specify identifying attributes of alerts,
@@ -149,30 +160,6 @@ type PostableAlerts []*PostableAlert
 type PostableSilence struct {
 	ID       int `json:"id,omitempty"`
 	*Silence `json:",inline"`
-}
-
-// SilenceStatusState defines the type for the state.state enum field.
-type SilenceStatusState string
-
-// SilenceStatusState values.
-const (
-	SilenceStatusStateExpired SilenceStatusState = "expired"
-	SilenceStatusStateActive  SilenceStatusState = "active"
-	SilenceStatusStatePending SilenceStatusState = "pending"
-)
-
-func (s SilenceStatusState) String() string {
-	return string(s)
-}
-
-// SilenceStatusStateValidator is a validator for the SilenceStatusState field enum values.
-func SilenceStatusStateValidator(s SilenceStatusState) error {
-	switch s {
-	case SilenceStatusStateExpired, SilenceStatusStateActive, SilenceStatusStatePending:
-		return nil
-	default:
-		return fmt.Errorf("SilenceStatusState does not allow the value '%s'", s)
-	}
 }
 
 // AlertStatusState defines the type for the state.state enum field.
@@ -196,6 +183,30 @@ func AlertStatusStateValidator(s AlertStatusState) error {
 		return nil
 	default:
 		return fmt.Errorf("AlertStatusState does not allow the value '%s'", s)
+	}
+}
+
+// SilenceStatusState defines the type for the state.state enum field.
+type SilenceStatusState string
+
+// SilenceStatusState values.
+const (
+	SilenceStatusStateExpired SilenceStatusState = "expired"
+	SilenceStatusStateActive  SilenceStatusState = "active"
+	SilenceStatusStatePending SilenceStatusState = "pending"
+)
+
+func (s SilenceStatusState) String() string {
+	return string(s)
+}
+
+// SilenceStatusStateValidator is a validator for the SilenceStatusState field enum values.
+func SilenceStatusStateValidator(s SilenceStatusState) error {
+	switch s {
+	case SilenceStatusStateExpired, SilenceStatusStateActive, SilenceStatusStatePending:
+		return nil
+	default:
+		return fmt.Errorf("SilenceStatusState does not allow the value '%s'", s)
 	}
 }
 

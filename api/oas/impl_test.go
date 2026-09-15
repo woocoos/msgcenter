@@ -229,6 +229,65 @@ func (s *serviceSuite) TestPostAlerts() {
 	s.Require().Equal("nobody@localhost", mail.To[0]["Address"])
 }
 
+func (s *serviceSuite) TestPostAlerts_TraceIDHeader() {
+	countBefore, err := s.maildev.MessageCount()
+	s.Require().NoError(err)
+
+	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+	req := PostableAlerts{
+		{
+			Alert: &Alert{
+				Labels: map[string]string{
+					"alertname":         "AlterPassword",
+					label.TenantLabel:   "1",
+					label.ToUserIDLabel: "1",
+				},
+			},
+			Annotations: map[string]string{
+				"summary": "trace id test",
+				"text":    "text",
+			},
+			EndsAt:   new(time.Now().Add(time.Hour)),
+			StartsAt: new(time.Now()),
+		},
+	}
+	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
+
+	// 等待邮件到达
+	var mail *maildev.MailDevEmail
+	for i := 0; i < 20; i++ {
+		time.Sleep(500 * time.Millisecond)
+		count, err := s.maildev.MessageCount()
+		s.Require().NoError(err)
+		if count > countBefore {
+			mail, err = s.maildev.GetEmailAt(0)
+			s.Require().NoError(err)
+			break
+		}
+	}
+	s.Require().NotNil(mail, "email should arrive within 10 seconds")
+
+	// 获取完整邮件, MessageID 即为 trace ID (同一 rawID)
+	msg, err := s.maildev.GetMessage(mail.ID)
+	s.Require().NoError(err)
+	s.NotEmpty(msg.MessageID, "Message-ID should be present")
+	traceID := msg.MessageID
+
+	// 验证 Nlog 中存储了相同的 message_id
+	// Mailpit 返回的 MessageID 格式为 "rawID@hostname", Nlog 存的是 "rawID"
+	nlogs, err := s.Client.Nlog.Query().All(schemax.SkipTenantPrivacy(context.Background()))
+	s.Require().NoError(err)
+	s.NotEmpty(nlogs, "should have at least one Nlog")
+	var found bool
+	for _, nl := range nlogs {
+		if nl.MessageID != "" && strings.HasPrefix(traceID, nl.MessageID) {
+			found = true
+			break
+		}
+	}
+	s.True(found, "Nlog message_id should be a prefix of the email Message-ID")
+}
+
 // TestPostAlertsWithDynamicAttachments tests email notification with dynamic attachments
 // from alert annotations, including both HTTP URL and local file path.
 func (s *serviceSuite) TestPostAlertsWithDynamicAttachments() {
@@ -835,4 +894,145 @@ func (s *serviceSuite) TestPostSilence() {
 	res, err := s.server.PostSilences(ctx, &PostSilencesRequest{PostableSilence: req})
 	s.Require().NoError(err)
 	s.NotZero(res.SilenceID)
+}
+
+func (s *serviceSuite) TestUpdateNlog() {
+	ctx := s.NewTestCtx()
+
+	// 创建 MsgAlert 作为关联目标
+	alertLabels := label.LabelSet{"alertname": "TestNlogErr"}
+	msAlert := s.Client.MsgAlert.Create().
+		SetTenantID(1).SetLabels(&alertLabels).
+		SetFingerprint("test-nlog-err").SetState(alert.AlertFiring).
+		SetStartsAt(time.Now()).SetEndsAt(time.Now().Add(time.Hour)).
+		SaveX(ctx)
+
+	// 创建两条相同 alert+receiverType 的 Nlog, 模拟多次通知发送
+	nlog1 := s.Client.Nlog.Create().
+		SetTenantID(1).SetReceiver("email").SetGroupKey("test-group").
+		SetReceiverType(profile.ReceiverEmail).SetIdx(0).
+		SetExpiresAt(time.Now().Add(24*time.Hour)).SetSendAt(time.Now()).
+		AddAlertIDs(msAlert.ID).
+		SaveX(ctx)
+
+	nlog2 := s.Client.Nlog.Create().
+		SetTenantID(1).SetReceiver("email").SetGroupKey("test-group").
+		SetReceiverType(profile.ReceiverEmail).SetIdx(0).
+		SetExpiresAt(time.Now().Add(24*time.Hour)).SetSendAt(time.Now()).
+		AddAlertIDs(msAlert.ID).
+		SaveX(ctx)
+
+	gc, _ := gin.CreateTestContext(httptest.NewRecorder())
+	gc.Request = httptest.NewRequest(http.MethodPost, "/nlogs/update", nil)
+	gc.Request = gc.Request.WithContext(ctx)
+
+	// FIFO 顺序: 最早的未处理 Nlog (nlog1) 应优先被更新
+	resp, err := s.server.UpdateNlog(gc, &UpdateNlogRequest{
+		NlogUpdate: NlogUpdate{
+			AlertID:      msAlert.ID,
+			ReceiverType: string(profile.ReceiverEmail),
+			ErrMsg:       "first error",
+		},
+	})
+	s.Require().NoError(err)
+	s.Require().NotNil(resp)
+	s.Equal(1, resp.Updated)
+
+	// nlog1 (最早) 应被更新
+	updated1 := s.Client.Nlog.GetX(ctx, nlog1.ID)
+	s.Equal("first error", updated1.ErrMsg)
+
+	// nlog2 (较新) 不应被影响
+	updated2 := s.Client.Nlog.GetX(ctx, nlog2.ID)
+	s.Empty(updated2.ErrMsg)
+
+	// 再次请求, 应更新 nlog2 (下一个未处理的)
+	gc1b, _ := gin.CreateTestContext(httptest.NewRecorder())
+	gc1b.Request = httptest.NewRequest(http.MethodPost, "/nlogs/update", nil)
+	gc1b.Request = gc1b.Request.WithContext(ctx)
+	resp, err = s.server.UpdateNlog(gc1b, &UpdateNlogRequest{
+		NlogUpdate: NlogUpdate{
+			AlertID:      msAlert.ID,
+			ReceiverType: string(profile.ReceiverEmail),
+			ErrMsg:       "second error",
+		},
+	})
+	s.Require().NoError(err)
+	s.Require().NotNil(resp)
+	s.Equal(1, resp.Updated)
+
+	updated2 = s.Client.Nlog.GetX(ctx, nlog2.ID)
+	s.Equal("second error", updated2.ErrMsg)
+
+	// 已处理的 Nlog (err_msg 有值) 不应被 alertID+receiverType 匹配
+	// 先给 nlog1 也设置 err_msg, 模拟全部已处理
+	s.Client.Nlog.UpdateOneID(nlog1.ID).SetErrMsg("already processed").ExecX(ctx)
+
+	gcSkip, _ := gin.CreateTestContext(httptest.NewRecorder())
+	gcSkip.Request = httptest.NewRequest(http.MethodPost, "/nlogs/update", nil)
+	gcSkip.Request = gcSkip.Request.WithContext(ctx)
+	resp, err = s.server.UpdateNlog(gcSkip, &UpdateNlogRequest{
+		NlogUpdate: NlogUpdate{
+			AlertID:      msAlert.ID,
+			ReceiverType: string(profile.ReceiverEmail),
+			ErrMsg:       "should not overwrite",
+		},
+	})
+	s.Require().NoError(err)
+	s.Nil(resp, "should return nil when all matching Nlogs already have err_msg")
+
+	// nlog2 的 ErrMsg 不应被覆盖
+	updated2After := s.Client.Nlog.GetX(ctx, nlog2.ID)
+	s.Equal("second error", updated2After.ErrMsg)
+
+	// 不存在的 alertID 应返回 nil (404)
+	gc2, _ := gin.CreateTestContext(httptest.NewRecorder())
+	gc2.Request = httptest.NewRequest(http.MethodPost, "/nlogs/update", nil)
+	gc2.Request = gc2.Request.WithContext(ctx)
+	resp, err = s.server.UpdateNlog(gc2, &UpdateNlogRequest{
+		NlogUpdate: NlogUpdate{
+			AlertID:      99999,
+			ReceiverType: string(profile.ReceiverEmail),
+			ErrMsg:       "should not match",
+		},
+	})
+	s.Require().NoError(err)
+	s.Nil(resp)
+
+	// 通过 messageId 精确匹配
+	nlogWithMsg := s.Client.Nlog.Create().
+		SetTenantID(1).SetReceiver("email").SetGroupKey("test-group-msg").
+		SetReceiverType(profile.ReceiverEmail).SetIdx(0).
+		SetMessageID("test-trace-id-123").
+		SetExpiresAt(time.Now().Add(24*time.Hour)).SetSendAt(time.Now()).
+		SaveX(ctx)
+
+	gc3, _ := gin.CreateTestContext(httptest.NewRecorder())
+	gc3.Request = httptest.NewRequest(http.MethodPost, "/nlogs/update", nil)
+	gc3.Request = gc3.Request.WithContext(ctx)
+	resp, err = s.server.UpdateNlog(gc3, &UpdateNlogRequest{
+		NlogUpdate: NlogUpdate{
+			MessageId: "test-trace-id-123",
+			ErrMsg:    "callback error from cloud provider",
+		},
+	})
+	s.Require().NoError(err)
+	s.Require().NotNil(resp)
+	s.Equal(1, resp.Updated)
+
+	updated3 := s.Client.Nlog.GetX(ctx, nlogWithMsg.ID)
+	s.Equal("callback error from cloud provider", updated3.ErrMsg)
+
+	// 不存在的 messageId 应返回 nil (404)
+	gc4, _ := gin.CreateTestContext(httptest.NewRecorder())
+	gc4.Request = httptest.NewRequest(http.MethodPost, "/nlogs/update", nil)
+	gc4.Request = gc4.Request.WithContext(ctx)
+	resp, err = s.server.UpdateNlog(gc4, &UpdateNlogRequest{
+		NlogUpdate: NlogUpdate{
+			MessageId: "non-existent-id",
+			ErrMsg:    "should not match",
+		},
+	})
+	s.Require().NoError(err)
+	s.Nil(resp)
 }

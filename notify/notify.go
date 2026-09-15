@@ -430,6 +430,10 @@ func (r RetryStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.C
 }
 
 func (r RetryStage) exec(ctx context.Context, alerts ...*alert.Alert) (context.Context, []*alert.Alert, error) {
+	// 注入 message_id 指针, 供 email notifier 写入, SetNotifiesStage 读取
+	var msgID string
+	ctx = WithMessageID(ctx, &msgID)
+
 	var sent []*alert.Alert
 
 	// If we shouldn't send notifications for resolved alerts, but there are only

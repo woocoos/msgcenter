@@ -164,6 +164,26 @@ func (_u *NlogUpdate) ClearErrMsg() *NlogUpdate {
 	return _u
 }
 
+// SetMessageID sets the "message_id" field.
+func (_u *NlogUpdate) SetMessageID(v string) *NlogUpdate {
+	_u.mutation.SetMessageID(v)
+	return _u
+}
+
+// SetNillableMessageID sets the "message_id" field if the given value is not nil.
+func (_u *NlogUpdate) SetNillableMessageID(v *string) *NlogUpdate {
+	if v != nil {
+		_u.SetMessageID(*v)
+	}
+	return _u
+}
+
+// ClearMessageID clears the value of the "message_id" field.
+func (_u *NlogUpdate) ClearMessageID() *NlogUpdate {
+	_u.mutation.ClearMessageID()
+	return _u
+}
+
 // AddAlertIDs adds the "alerts" edge to the MsgAlert entity by IDs.
 func (_u *NlogUpdate) AddAlertIDs(ids ...int) *NlogUpdate {
 	_u.mutation.AddAlertIDs(ids...)
@@ -322,6 +342,12 @@ func (_u *NlogUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.ErrMsgCleared() {
 		_spec.ClearField(nlog.FieldErrMsg, field.TypeString)
+	}
+	if value, ok := _u.mutation.MessageID(); ok {
+		_spec.SetField(nlog.FieldMessageID, field.TypeString, value)
+	}
+	if _u.mutation.MessageIDCleared() {
+		_spec.ClearField(nlog.FieldMessageID, field.TypeString)
 	}
 	if _u.mutation.AlertsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -584,6 +610,26 @@ func (_u *NlogUpdateOne) ClearErrMsg() *NlogUpdateOne {
 	return _u
 }
 
+// SetMessageID sets the "message_id" field.
+func (_u *NlogUpdateOne) SetMessageID(v string) *NlogUpdateOne {
+	_u.mutation.SetMessageID(v)
+	return _u
+}
+
+// SetNillableMessageID sets the "message_id" field if the given value is not nil.
+func (_u *NlogUpdateOne) SetNillableMessageID(v *string) *NlogUpdateOne {
+	if v != nil {
+		_u.SetMessageID(*v)
+	}
+	return _u
+}
+
+// ClearMessageID clears the value of the "message_id" field.
+func (_u *NlogUpdateOne) ClearMessageID() *NlogUpdateOne {
+	_u.mutation.ClearMessageID()
+	return _u
+}
+
 // AddAlertIDs adds the "alerts" edge to the MsgAlert entity by IDs.
 func (_u *NlogUpdateOne) AddAlertIDs(ids ...int) *NlogUpdateOne {
 	_u.mutation.AddAlertIDs(ids...)
@@ -772,6 +818,12 @@ func (_u *NlogUpdateOne) sqlSave(ctx context.Context) (_node *Nlog, err error) {
 	}
 	if _u.mutation.ErrMsgCleared() {
 		_spec.ClearField(nlog.FieldErrMsg, field.TypeString)
+	}
+	if value, ok := _u.mutation.MessageID(); ok {
+		_spec.SetField(nlog.FieldMessageID, field.TypeString, value)
+	}
+	if _u.mutation.MessageIDCleared() {
+		_spec.ClearField(nlog.FieldMessageID, field.TypeString)
 	}
 	if _u.mutation.AlertsCleared() {
 		edge := &sqlgraph.EdgeSpec{

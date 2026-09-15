@@ -189,11 +189,17 @@ func (n NlogCallback) CreateLog(ctx context.Context, r *profile.ReceiverKey, gke
 		}
 		alertids = append(alertids, ids...)
 	}
-	row, err := n.db.Nlog.Create().SetTenantID(tenantID).SetReceiver(r.Name).
+	create := n.db.Nlog.Create().SetTenantID(tenantID).SetReceiver(r.Name).
 		SetGroupKey(gkey).SetReceiverType(profile.ReceiverType(r.Integration)).SetIdx(int(r.Index)).
 		SetExpiresAt(expiresAt).SetSendAt(time.Now()).
-		AddAlertIDs(alertids...).
-		Save(tctx)
+		AddAlertIDs(alertids...)
+
+	// 从 context 读取 email notifier 写入的 message_id
+	if ptr := notify.MessageID(ctx); ptr != nil && *ptr != "" {
+		create = create.SetMessageID(*ptr)
+	}
+
+	row, err := create.Save(tctx)
 
 	if err != nil {
 		return 0, err

@@ -18,8 +18,11 @@ import (
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
 	"github.com/tsingsun/woocoo/web"
 	"github.com/tsingsun/woocoo/web/handler"
+	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/msgcenter/dispatch"
 	"github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/nlog"
+	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/metrics"
@@ -57,6 +60,7 @@ type ServerImpl struct {
 	coordinator *service.Coordinator
 	alerts      provider.Alerts
 	silences    *silence.Silences
+	db          *ent.Client
 
 	webServer *web.Server
 	// mu protects config, setAlertStatus and route.
@@ -68,6 +72,7 @@ func RegisterHandlers(router *gin.RouterGroup, srv *ServerImpl) {
 	RegisterReceiverHandlers(router, srv)
 	RegisterSilenceHandlers(router, srv)
 	RegisterAlertHandlers(router, srv)
+	RegisterNlogHandlers(router, srv)
 }
 
 func NewServer(app *woocoo.App, am *service.AlertManager, web *web.Server) (*ServerImpl, error) {
@@ -76,6 +81,7 @@ func NewServer(app *woocoo.App, am *service.AlertManager, web *web.Server) (*Ser
 		coordinator: am.Coordinator,
 		alerts:      am.Alerts,
 		silences:    am.Silences,
+		db:          am.DB,
 		statusFunc:  defaultAlertStatus,
 		metric:      metrics.NewAlerts("v2"),
 		webServer:   web,
@@ -670,4 +676,48 @@ func SortSilences(sils GettableSilences) {
 		}
 		return false
 	})
+}
+
+func (s *ServerImpl) UpdateNlog(c *gin.Context, req *UpdateNlogRequest) (*UpdateNlogResponse, error) {
+	ctx := schemax.SkipTenantPrivacy(c.Request.Context())
+
+	if req.MessageId != "" {
+		// 通过 message_id 直接更新
+		updated, err := s.db.Nlog.Update().
+			Where(nlog.MessageIDEQ(req.MessageId)).
+			SetErrMsg(req.ErrMsg).
+			Save(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if updated == 0 {
+			c.Status(http.StatusNotFound)
+			return nil, nil
+		}
+		return &UpdateNlogResponse{Updated: updated}, nil
+	}
+
+	// 通过 alertID + receiverType 查找最早的未处理 Nlog (err_msg 为空)
+	// 按 ID 升序, 确保按发送顺序处理 (FIFO)
+	nl, err := s.db.Nlog.Query().
+		Where(
+			nlog.HasNlogAlertWith(nlogalert.AlertIDEQ(req.AlertID)),
+			nlog.ReceiverTypeEQ(profile.ReceiverType(req.ReceiverType)),
+			nlog.ErrMsgIsNil(),
+		).
+		Order(nlog.ByID()).
+		First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			c.Status(http.StatusNotFound)
+			return nil, nil
+		}
+		return nil, err
+	}
+	// 按 ID 直接更新, 避免 nl.Update() 的额外开销
+	updated, err := s.db.Nlog.Update().Where(nlog.ID(nl.ID)).SetErrMsg(req.ErrMsg).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &UpdateNlogResponse{Updated: updated}, nil
 }

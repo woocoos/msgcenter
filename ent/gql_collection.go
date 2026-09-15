@@ -1794,6 +1794,11 @@ func (_m *NlogQuery) collectField(ctx context.Context, oneNode bool, opCtx *grap
 				selectedFields = append(selectedFields, nlog.FieldErrMsg)
 				fieldSeen[nlog.FieldErrMsg] = struct{}{}
 			}
+		case "messageID":
+			if _, ok := fieldSeen[nlog.FieldMessageID]; !ok {
+				selectedFields = append(selectedFields, nlog.FieldMessageID)
+				fieldSeen[nlog.FieldMessageID] = struct{}{}
+			}
 		case "id":
 		case "__typename":
 		default:

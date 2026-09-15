@@ -11282,6 +11282,7 @@ type NlogMutation struct {
 	updated_at        *time.Time
 	expires_at        *time.Time
 	err_msg           *string
+	message_id        *string
 	clearedFields     map[string]struct{}
 	alerts            map[int]struct{}
 	removedalerts     map[int]struct{}
@@ -11824,6 +11825,55 @@ func (m *NlogMutation) ResetErrMsg() {
 	delete(m.clearedFields, nlog.FieldErrMsg)
 }
 
+// SetMessageID sets the "message_id" field.
+func (m *NlogMutation) SetMessageID(s string) {
+	m.message_id = &s
+}
+
+// MessageID returns the value of the "message_id" field in the mutation.
+func (m *NlogMutation) MessageID() (r string, exists bool) {
+	v := m.message_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMessageID returns the old "message_id" field's value of the Nlog entity.
+// If the Nlog object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NlogMutation) OldMessageID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMessageID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMessageID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMessageID: %w", err)
+	}
+	return oldValue.MessageID, nil
+}
+
+// ClearMessageID clears the value of the "message_id" field.
+func (m *NlogMutation) ClearMessageID() {
+	m.message_id = nil
+	m.clearedFields[nlog.FieldMessageID] = struct{}{}
+}
+
+// MessageIDCleared returns if the "message_id" field was cleared in this mutation.
+func (m *NlogMutation) MessageIDCleared() bool {
+	_, ok := m.clearedFields[nlog.FieldMessageID]
+	return ok
+}
+
+// ResetMessageID resets all changes to the "message_id" field.
+func (m *NlogMutation) ResetMessageID() {
+	m.message_id = nil
+	delete(m.clearedFields, nlog.FieldMessageID)
+}
+
 // AddAlertIDs adds the "alerts" edge to the MsgAlert entity by ids.
 func (m *NlogMutation) AddAlertIDs(ids ...int) {
 	if m.alerts == nil {
@@ -11966,7 +12016,7 @@ func (m *NlogMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NlogMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.tenant_id != nil {
 		fields = append(fields, nlog.FieldTenantID)
 	}
@@ -11997,6 +12047,9 @@ func (m *NlogMutation) Fields() []string {
 	if m.err_msg != nil {
 		fields = append(fields, nlog.FieldErrMsg)
 	}
+	if m.message_id != nil {
+		fields = append(fields, nlog.FieldMessageID)
+	}
 	return fields
 }
 
@@ -12025,6 +12078,8 @@ func (m *NlogMutation) Field(name string) (ent.Value, bool) {
 		return m.ExpiresAt()
 	case nlog.FieldErrMsg:
 		return m.ErrMsg()
+	case nlog.FieldMessageID:
+		return m.MessageID()
 	}
 	return nil, false
 }
@@ -12054,6 +12109,8 @@ func (m *NlogMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldExpiresAt(ctx)
 	case nlog.FieldErrMsg:
 		return m.OldErrMsg(ctx)
+	case nlog.FieldMessageID:
+		return m.OldMessageID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Nlog field %s", name)
 }
@@ -12133,6 +12190,13 @@ func (m *NlogMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetErrMsg(v)
 		return nil
+	case nlog.FieldMessageID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMessageID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Nlog field %s", name)
 }
@@ -12196,6 +12260,9 @@ func (m *NlogMutation) ClearedFields() []string {
 	if m.FieldCleared(nlog.FieldErrMsg) {
 		fields = append(fields, nlog.FieldErrMsg)
 	}
+	if m.FieldCleared(nlog.FieldMessageID) {
+		fields = append(fields, nlog.FieldMessageID)
+	}
 	return fields
 }
 
@@ -12215,6 +12282,9 @@ func (m *NlogMutation) ClearField(name string) error {
 		return nil
 	case nlog.FieldErrMsg:
 		m.ClearErrMsg()
+		return nil
+	case nlog.FieldMessageID:
+		m.ClearMessageID()
 		return nil
 	}
 	return fmt.Errorf("unknown Nlog nullable field %s", name)
@@ -12253,6 +12323,9 @@ func (m *NlogMutation) ResetField(name string) error {
 		return nil
 	case nlog.FieldErrMsg:
 		m.ResetErrMsg()
+		return nil
+	case nlog.FieldMessageID:
+		m.ResetMessageID()
 		return nil
 	}
 	return fmt.Errorf("unknown Nlog field %s", name)

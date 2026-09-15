@@ -74,7 +74,6 @@ func (c *MessageConfig) Clone() *MessageConfig {
 type EmailConfig struct {
 	SendResolved bool `yaml:"sendResolved" json:"sendResolved"`
 	// Email address to notify.
-	// To 一般采用模板的方式接收动态参数
 	To           string   `yaml:"to,omitempty" json:"to,omitempty"`
 	From         string   `yaml:"from,omitempty" json:"from,omitempty"`
 	Subject      string   `yaml:"subject,omitempty" json:"subject,omitempty"`
@@ -96,6 +95,8 @@ type EmailConfig struct {
 	ForceImplicitTLS *bool `yaml:"forceImplicitTls,omitempty" json:"forceImplicitTls,omitempty"`
 	// Threading configures email threading via References/In-Reply-To headers.
 	Threading EmailThreading `yaml:"threading,omitempty" json:"threading,omitempty"`
+	// TraceIDHeader supports email trace. See cloud provider.
+	TraceIDHeader string `yaml:"traceIdHeader,omitempty" json:"traceIdHeader,omitempty"`
 }
 
 // EmailThreading configures email threading.
