@@ -2,10 +2,12 @@ package template
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"math"
 	"net/url"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -27,8 +29,24 @@ var DefaultFuncs = map[string]any{
 		return cases.Title(language.AmericanEnglish).String(text)
 	},
 	"trimSpace": strings.TrimSpace,
-	"join": func(sep string, s []string) string {
-		return strings.Join(s, sep)
+	"join": func(sep string, v any) (string, error) {
+		if s, ok := v.([]string); ok {
+			return strings.Join(s, sep), nil
+		}
+
+		value := reflect.ValueOf(v)
+		switch {
+		case !value.IsValid():
+			return "", nil
+		case value.Kind() == reflect.Slice, value.Kind() == reflect.Array:
+			parts := make([]string, 0, value.Len())
+			for i := range value.Len() {
+				parts = append(parts, fmt.Sprint(value.Index(i).Interface()))
+			}
+			return strings.Join(parts, sep), nil
+		default:
+			return "", fmt.Errorf("join expects a slice or array, got %T", v)
+		}
 	},
 	"match": regexp.MatchString,
 	"safeHtml": func(text string) tmplhtml.HTML {
@@ -47,6 +65,17 @@ var DefaultFuncs = map[string]any{
 	},
 	"markdown":       markdownEscapeString,
 	"toJSON":         toJson,
+	// base64encode 和 base64decode 使用 URL-safe 字母表, 结果可直接嵌入 URL 查询参数.
+	"base64encode": func(text string) string {
+		return base64.URLEncoding.EncodeToString([]byte(text))
+	},
+	"base64decode": func(text string) (string, error) {
+		decoded, err := base64.URLEncoding.DecodeString(text)
+		if err != nil {
+			return "", err
+		}
+		return string(decoded), nil
+	},
 	"now":            time.Now,
 	"since":          time.Since,
 	"date":           func(fmt string, t time.Time) string { return t.Format(fmt) },

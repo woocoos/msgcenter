@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"sync"
@@ -771,12 +772,20 @@ func (s *Silences) Version() int {
 
 // CountState counts silences by state.
 func (s *Silences) CountState(states ...SilenceState) (int, error) {
-	// This could probably be optimized.
-	sils, _, err := s.Query(QState(time.Now(), states...))
-	if err != nil {
-		return -1, err
+	now := time.Now()
+	count := 0
+
+	s.mtx.RLock()
+	defer s.mtx.RUnlock()
+
+	for _, sv := range s.vi {
+		if sil, ok := s.st[sv.id]; ok {
+			if slices.Contains(states, getState(sil, now)) {
+				count++
+			}
+		}
 	}
-	return len(sils), nil
+	return count, nil
 }
 
 func (s *Silences) query(qs ...any) ([]*Entry, int, error) {

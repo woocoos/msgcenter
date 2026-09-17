@@ -33,7 +33,8 @@ func TestDefaultFuncs_Registered(t *testing.T) {
 	expected := []string{
 		"toUpper", "toLower", "title", "trimSpace", "join", "match",
 		"safeHtml", "safeUrl", "urlUnescape", "reReplaceAll", "stringSlice",
-		"markdown", "toJSON", "now", "since", "date", "tz",
+		"markdown", "toJSON", "base64encode", "base64decode",
+		"now", "since", "date", "tz",
 		"toDate", "mustToDate", "humanizeDuration", "list", "append", "dict",
 	}
 	for _, name := range expected {
@@ -170,4 +171,64 @@ func TestPipeline_DateTzHumanize(t *testing.T) {
 		nil,
 	)
 	assert.Equal(t, "2024-06-15 16:30 CST", result)
+}
+
+func TestJoin_StringSlice(t *testing.T) {
+	t.Parallel()
+	result := execTemplate(t, `{{ . | join "," }}`, []string{"a", "b", "c"})
+	assert.Equal(t, "a,b,c", result)
+}
+
+func TestJoin_WithList(t *testing.T) {
+	t.Parallel()
+	result := execTemplate(t, `{{ list "a" "b" "c" | join "," }}`, nil)
+	assert.Equal(t, "a,b,c", result)
+}
+
+func TestJoin_MixedTypes(t *testing.T) {
+	t.Parallel()
+	result := execTemplate(t, `{{ list 1 true "x" | join "," }}`, nil)
+	assert.Equal(t, "1,true,x", result)
+}
+
+func TestJoin_UnsupportedType(t *testing.T) {
+	t.Parallel()
+	tmpl, err := template.New("test").Funcs(DefaultFuncs).Parse(`{{ "" | join "," }}`)
+	require.NoError(t, err)
+	err = tmpl.Execute(&writer{}, nil)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "join expects a slice or array")
+}
+
+func TestJoin_NilValue(t *testing.T) {
+	t.Parallel()
+	result := execTemplate(t, `{{ . | join "," }}`, nil)
+	assert.Equal(t, "", result)
+}
+
+func TestBase64Encode(t *testing.T) {
+	t.Parallel()
+	result := execTemplate(t, `{{ "test" | base64encode }}`, nil)
+	assert.Equal(t, "dGVzdA==", result)
+}
+
+func TestBase64Encode_URLSafe(t *testing.T) {
+	t.Parallel()
+	// URL-safe 编码: > 应编码为 - 而非 +
+	result := execTemplate(t, `{{ "flush>>" | base64encode }}`, nil)
+	assert.Equal(t, "Zmx1c2g-Pg==", result)
+}
+
+func TestBase64Decode(t *testing.T) {
+	t.Parallel()
+	result := execTemplate(t, `{{ "dGVzdA==" | base64decode }}`, nil)
+	assert.Equal(t, "test", result)
+}
+
+func TestBase64Decode_Invalid(t *testing.T) {
+	t.Parallel()
+	tmpl, err := template.New("test").Funcs(DefaultFuncs).Parse(`{{ "not-valid-base64!" | base64decode }}`)
+	require.NoError(t, err)
+	err = tmpl.Execute(&writer{}, nil)
+	assert.Error(t, err)
 }

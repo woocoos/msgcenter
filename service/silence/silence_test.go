@@ -535,3 +535,46 @@ func TestSilencerPostDeleteEvictsCache(t *testing.T) {
 	entry = s.cache.get(fp)
 	require.Positive(t, entry.count(), "unrelated PostGC should not evict other entries")
 }
+
+func BenchmarkCountState(b *testing.B) {
+	b.Run("100 silences", func(b *testing.B) {
+		benchmarkCountState(b, 100)
+	})
+	b.Run("1000 silences", func(b *testing.B) {
+		benchmarkCountState(b, 1000)
+	})
+	b.Run("10000 silences", func(b *testing.B) {
+		benchmarkCountState(b, 10000)
+	})
+}
+
+func benchmarkCountState(b *testing.B, numSilences int) {
+	s, err := New(Options{
+		Retention:           time.Hour,
+		MaintenanceInterval: time.Minute,
+	})
+	require.NoError(b, err)
+
+	now := time.Now()
+
+	for i := range numSilences {
+		sil := &Entry{
+			Matchers:  []*label.Matcher{{Type: label.MatchEqual, Name: "alertname", Value: fmt.Sprintf("alert_%d", i)}},
+			StartsAt:  now.Add(-time.Minute),
+			EndsAt:    now.Add(time.Hour),
+			UpdatedAt: now,
+		}
+		_, err := s.Set(context.Background(), sil)
+		require.NoError(b, err)
+	}
+
+	count, err := s.CountState(SilenceStateActive)
+	require.NoError(b, err)
+	require.Equal(b, numSilences, count)
+
+	b.ResetTimer()
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		_, _ = s.CountState(SilenceStateActive)
+	}
+}
