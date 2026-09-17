@@ -73,6 +73,7 @@ func TestRolverSuite(t *testing.T) {
 	require.NoError(t, err)
 	s.webhook.Start()
 	defer s.webhook.Close()
+	s.WebhookHost = "127.0.0.1:5001"
 	suite.Run(t, s)
 }
 

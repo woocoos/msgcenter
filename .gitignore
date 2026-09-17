@@ -13,6 +13,7 @@
 # Test binary, built with `go test -c`
 *.test
 test/tmp
+api/oas/tmp
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 

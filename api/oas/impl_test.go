@@ -29,6 +29,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
+	"github.com/woocoos/msgcenter/ent/useraddr"
 	"github.com/woocoos/msgcenter/notify/webhook"
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
@@ -132,10 +133,11 @@ func TestServiceSuite(t *testing.T) {
 			return
 		}))
 	var err error
-	s.webhook.Listener, err = net.Listen("tcp", "127.0.0.1:5001")
+	s.webhook.Listener, err = net.Listen("tcp", "127.0.0.1:5002")
 	require.NoError(t, err)
 	s.webhook.Start()
 	defer s.webhook.Close()
+	s.WebhookHost = "127.0.0.1:5002"
 	suite.Run(t, s)
 }
 
@@ -178,11 +180,30 @@ func (s *serviceSuite) SetupSuite() {
 func (s *serviceSuite) initData() error {
 	ctx := s.NewTestCtx()
 
+	// Create test users with email addresses for email notification tests.
+	s.Client.User.Create().SetID(999).SetPrincipalName("ultpl").SetDisplayName("User Level Template Test").SaveX(ctx)
+	s.Client.UserAddr.Create().SetUserID(999).SetAddrType(useraddr.AddrTypeContact).SetEmail("ultpl@example.com").SetIsDefault(true).SaveX(ctx)
+
+	s.Client.User.Create().SetID(1000).SetPrincipalName("ossmount").SetDisplayName("OSS Mount Test").SaveX(ctx)
+	s.Client.UserAddr.Create().SetUserID(1000).SetAddrType(useraddr.AddrTypeContact).SetEmail("ossmount@example.com").SetIsDefault(true).SaveX(ctx)
+
 	// Create a user-level template for user 1 on AlterPassword event.
 	// This template has a distinct subject to verify user-level template priority.
 	s.Client.MsgTemplate.Create().
 		SetMsgTypeID(1).SetEventID(1).SetTenantID(1).SetUserID(1).
 		SetName("UserCustomAlterPassword").SetCreatedBy(1).
+		SetStatus(typex.SimpleStatusActive).
+		SetFormat(msgtemplate.FormatTxt).
+		SetReceiverType(profile.ReceiverEmail).
+		SetTo(`{{ template "email.to" . }}`).
+		SetSubject(`用户定制模板测试`).
+		SetBody(`{{ template "1.alterpwd.txt" . }}`).
+		SaveX(ctx)
+
+	// Create a user-level template for a unique user to avoid group_interval blocking in tests.
+	s.Client.MsgTemplate.Create().
+		SetMsgTypeID(1).SetEventID(1).SetTenantID(1).SetUserID(999).
+		SetName("UserCustomAlterPasswordUltpl").SetCreatedBy(1).
 		SetStatus(typex.SimpleStatusActive).
 		SetFormat(msgtemplate.FormatTxt).
 		SetReceiverType(profile.ReceiverEmail).
@@ -362,19 +383,17 @@ func (s *serviceSuite) TestPostAlertsWithDynamicAttachments() {
 // are resolved to local mount paths at the API stage, so the email notifier
 // attaches the file directly from the mounted filesystem.
 func (s *serviceSuite) TestPostAlertsWithDynamicAttachments_OSSMount() {
-	// Record message count before sending to locate our email precisely.
-	countBefore, err := s.maildev.MessageCount()
-	s.Require().NoError(err)
+	s.Require().NoError(s.maildev.DeleteAllEmails())
 
 	// Verify KOSdk was initialized with the mock provider.
 	s.Require().NotNil(s.server.coordinator.KOSdk, "KOSdk must be initialized")
 	s.Require().NotEmpty(s.server.coordinator.MountPaths, "mountPaths must be configured")
 
 	// Create a local file at the expected mount path.
-	mountDir := "tmp/oss-mount/test-bucket"
+	// The mount path in config is "/tmp/oss-mount/test-bucket", use absolute path.
+	mountDir := filepath.FromSlash("/tmp/oss-mount/test-bucket")
 	s.Require().NoError(os.MkdirAll(mountDir, 0o755))
-	localFile, err := filepath.Abs(mountDir + "/test-attachment.txt")
-	s.Require().NoError(err)
+	localFile := filepath.Join(mountDir, "test-attachment.txt")
 	s.Require().NoError(os.WriteFile(localFile, []byte("oss mount test content"), 0o644))
 	defer os.Remove(localFile)
 
@@ -388,12 +407,11 @@ func (s *serviceSuite) TestPostAlertsWithDynamicAttachments_OSSMount() {
 				Labels: map[string]string{
 					"alertname":       "AlterPassword",
 					label.TenantLabel: "1",
-					// Use unique user to create a distinct group, avoiding group_interval delay.
-					label.ToUserIDLabel: "ossmount",
+					// Use unique user 1000 to create a distinct group, avoiding group_interval delay.
+					label.ToUserIDLabel: "1000",
 				},
 			},
 			Annotations: map[string]string{
-				"to":                              "alerts@example.com",
 				"summary":                         "oss mount attachment test",
 				alert.DynamicAttachmentAnnotation: ossURL,
 			},
@@ -403,23 +421,19 @@ func (s *serviceSuite) TestPostAlertsWithDynamicAttachments_OSSMount() {
 	}
 	s.Require().NoError(s.server.PostAlerts(ctx, &PostAlertsRequest{PostableAlerts: req}))
 
-	// Poll for the email to arrive: wait for message count to increase.
+	// Poll for the email to arrive.
 	var mail *maildev.MailDevEmail
 	for i := 0; i < 20; i++ {
 		time.Sleep(500 * time.Millisecond)
-		count, err := s.maildev.MessageCount()
-		s.Require().NoError(err)
-		if count > countBefore {
-			// New email arrived, it's at index 0 (newest-first order).
-			mail, err = s.maildev.GetEmailAt(0)
-			s.Require().NoError(err)
+		mail, _ = s.maildev.GetEmailAt(0)
+		if mail != nil {
 			break
 		}
 	}
 	s.Require().NotNil(mail, "email should arrive within 10 seconds")
 
 	// Verify the email was sent with the local file as attachment.
-	s.Require().Equal("alerts@example.com", mail.To[0]["Address"])
+	s.Require().Equal("ossmount@example.com", mail.To[0]["Address"])
 	s.Require().Greater(mail.Attachments, 0, "email should have at least 1 attachment")
 
 	msg, err := s.maildev.GetMessage(mail.ID)
@@ -789,8 +803,7 @@ func (s *serviceSuite) TestMessage() {
 
 // TestUserLevelTemplate verifies that user-level templates take priority over tenant-level templates.
 func (s *serviceSuite) TestUserLevelTemplate() {
-	countBefore, err := s.maildev.MessageCount()
-	s.Require().NoError(err)
+	s.Require().NoError(s.maildev.DeleteAllEmails())
 
 	ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
 	req := PostableAlerts{
@@ -799,8 +812,8 @@ func (s *serviceSuite) TestUserLevelTemplate() {
 				Labels: map[string]string{
 					"alertname":       "AlterPassword",
 					label.TenantLabel: "1",
-					// User 1 has a custom user-level template.
-					label.ToUserIDLabel: "1",
+					// Use unique user 999 to avoid group_interval blocking.
+					label.ToUserIDLabel: "999",
 				},
 			},
 			Annotations: map[string]string{
@@ -816,11 +829,8 @@ func (s *serviceSuite) TestUserLevelTemplate() {
 	var mail *maildev.MailDevEmail
 	for i := 0; i < 20; i++ {
 		time.Sleep(500 * time.Millisecond)
-		count, err := s.maildev.MessageCount()
-		s.Require().NoError(err)
-		if count > countBefore {
-			mail, err = s.maildev.GetEmailAt(0)
-			s.Require().NoError(err)
+		mail, _ = s.maildev.GetEmailAt(0)
+		if mail != nil {
 			break
 		}
 	}

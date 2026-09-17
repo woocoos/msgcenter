@@ -41,11 +41,22 @@ type BaseSuite struct {
 	Client          *ent.Client
 	AlertManager    *service.AlertManager
 	redis           *miniredis.Miniredis
+	// WebhookHost 是 webhook mock 服务器的 host:port, 默认为 "127.0.0.1:5001".
+	// 使用动态端口时, 在 Setup 前设置为实际地址.
+	WebhookHost string
 }
 
 func (o *BaseSuite) Setup() error {
+	if o.WebhookHost == "" {
+		o.WebhookHost = "127.0.0.1:5001"
+	}
 	o.App = initTestApp()
 	o.Cnf = o.App.AppConfiguration()
+	// 覆盖配置中的 webhook 地址, 使其与实际监听端口一致.
+	o.Cnf.Parser().Set("kosdk.client.oauth2.endpoint.tokenURL", "http://"+o.WebhookHost+"/token")
+	o.Cnf.Parser().Set("kosdk.plugin.msg.basePath", "http://"+o.WebhookHost+"/api/v2")
+	o.Cnf.Parser().Set("kosdk.plugin.fs.basePath", "http://"+o.WebhookHost)
+	o.Cnf.Parser().Set("kosdk.plugin.auth.basePath", "http://"+o.WebhookHost)
 	o.redis = initMiniRedis(o.Cnf)
 
 	koapp.BuildCacheComponents(o.Cnf)
@@ -59,7 +70,7 @@ func (o *BaseSuite) Setup() error {
 		return err
 	}
 	o.Client = client
-	initDatabase(context.Background(), o.Client)
+	initDatabase(context.Background(), o.Client, o.WebhookHost)
 
 	// alert
 	metrics.BuildGlobal()
@@ -120,7 +131,7 @@ func initMiniRedis(cnf *conf.AppConfiguration) *miniredis.Miniredis {
 	return db
 }
 
-func initDatabase(ctx context.Context, client *ent.Client) {
+func initDatabase(ctx context.Context, client *ent.Client, webhookHost string) {
 	ctx = identity.WithTenantID(ctx, 1)
 	client.MsgType.Create().SetName("alert").SetID(1).SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
 		SetAppID(1).SetCategory("账户安全").SetCanSubs(true).SetCanCustom(true).SaveX(ctx)
@@ -229,7 +240,7 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 			Name: "webhook",
 			WebhookConfigs: []*profile.WebhookConfig{
 				{
-					URL: &profile.URL{Host: "localhost:5001", Scheme: "http", Path: "/webhook"},
+					URL: &profile.URL{Host: webhookHost, Scheme: "http", Path: "/webhook"},
 				},
 			},
 		}).SaveX(ctx)
@@ -239,7 +250,7 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 			Name: "webhook",
 			WebhookConfigs: []*profile.WebhookConfig{
 				{
-					URL: &profile.URL{Host: "localhost:5001", Scheme: "http", Path: "/webhook"},
+					URL: &profile.URL{Host: webhookHost, Scheme: "http", Path: "/webhook"},
 				},
 			},
 		}).SaveX(ctx)
@@ -303,7 +314,7 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetBody(`{{ template "1.msggroupby.txt" . }}`).SaveX(ctx)
 
 	// DingTalk webhook test data
-	dingtalkURL, _ := url.Parse("http://127.0.0.1:5001/webhook")
+	dingtalkURL, _ := url.Parse("http://" + webhookHost + "/webhook")
 	//dingtalkURL.RawQuery = "access_token=736f6d40c5ea62d05edb78a18c5a9d5d47867ecc67234356abdc0487328c426d"
 	client.MsgChannel.Create().SetName("webhook-dingtalk").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
 		SetTenantID(1).SetReceiverType(profile.ReceiverWebhook).
