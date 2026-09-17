@@ -1,5 +1,5 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
-import { Button, Space, Modal, Divider, Typography } from 'antd';
+import { Button, Space, Modal, Divider, Typography, Tag } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
@@ -76,6 +76,10 @@ const List = () => {
           title: t('status'), dataIndex: 'status', width: 120, align: 'center', search: false,
           filters: true,
           valueEnum: EnumMsgChannelStatus,
+          render(_, record) {
+            const enumItem = record.status ? EnumMsgChannelStatus[record.status] : undefined;
+            return <Tag color={enumItem?.tagColor}>{enumItem?.text ?? '-'}</Tag>;
+          },
         },
         { title: t('description'), dataIndex: 'comments', width: 200, search: false, ellipsis: true },
         // 占位列

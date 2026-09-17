@@ -1,19 +1,19 @@
 import { gql } from "@/generated/msgsrv";
-import { CreateMsgSilenceInput, OrderDirection, MsgSilenceOrder, MsgSilenceOrderField, MsgSilenceWhereInput, UpdateMsgSilenceInput } from "@/generated/msgsrv/graphql";
+import { CreateMsgSilenceInput, OrderDirection, MsgSilenceOrder, MsgSilenceOrderField, MsgSilenceWhereInput, UpdateMsgSilenceInput, MsgSilenceSilenceState, MatchType } from "@/generated/msgsrv/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 export const EnumSilenceStatus = {
-  active: { text: 'active', status: 'success' },
-  expired: { text: 'expired', status: 'default' },
-  pending: { text: 'pending', status: 'warning' },
+  [MsgSilenceSilenceState.Active]: { text: 'active', tagColor: '#30c880' },
+  [MsgSilenceSilenceState.Expired]: { text: 'expired', tagColor: '#dcdee1' },
+  [MsgSilenceSilenceState.Pending]: { text: 'pending', tagColor: '#ffcc5f' },
 };
 
 export const EnumSilenceMatchType = {
-  MatchEqual: { text: '=', },
-  MatchNotEqual: { text: '!=', },
-  MatchRegexp: { text: '=~', },
-  MatchNotRegexp: { text: '!~', },
+  [MatchType.MatchEqual]: { text: '=', },
+  [MatchType.MatchNotEqual]: { text: '!=', },
+  [MatchType.MatchRegexp]: { text: '=~', },
+  [MatchType.MatchNotRegexp]: { text: '!~', },
 };
 
 const querySilenceList = gql(/* GraphQL */`query silenceList($first: Int,$orderBy:MsgSilenceOrder,$where:MsgSilenceWhereInput){

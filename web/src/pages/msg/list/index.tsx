@@ -5,7 +5,7 @@ import { Link } from "@ice/runtime";
 import { OrgKind } from "@knockout-js/api/ucenter";
 import { KeepAlive } from "@knockout-js/layout";
 import { OrgSelect } from "@knockout-js/org";
-import { Divider, Space, Typography } from "antd";
+import { Divider, Space, Typography, Tag } from "antd";
 import { definePageConfig } from "ice";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -69,6 +69,10 @@ const List = () => {
           title: t('status'), dataIndex: 'state', width: 120, align: 'center', search: false,
           filters: true,
           valueEnum: EnumMsgAlertStatus,
+          render(_, record) {
+            const enumItem = EnumMsgAlertStatus[record.state];
+            return <Tag color={enumItem?.tagColor}>{enumItem?.text ?? '-'}</Tag>;
+          },
         },
         // 占位列
         { search: false, hideInSetting: true },

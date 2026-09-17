@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import store from '@/store';
 import { MsgEvent, MsgEventWhereInput } from '@/generated/msgsrv/graphql';
-import { EnumMsgEventStatus, getMsgEventList } from '@/services/msgsrv/event';
+import { getMsgEventList } from '@/services/msgsrv/event';
 import { DictSelect, DictText } from '@knockout-js/org';
 
 export default (props: {
@@ -82,19 +82,19 @@ export default (props: {
           if (params.comments) {
             where.commentsContains = params.comments;
           }
-            const result = await getMsgEventList({
-              current: params.current,
-              pageSize: params.pageSize,
-              where,
-            });
-            if (result?.totalCount && result.edges) {
-              for (const item of result.edges) {
-                if (item?.node) {
-                  table.data.push(item.node as MsgEvent);
-                }
+          const result = await getMsgEventList({
+            current: params.current,
+            pageSize: params.pageSize,
+            where,
+          });
+          if (result?.totalCount && result.edges) {
+            for (const item of result.edges) {
+              if (item?.node) {
+                table.data.push(item.node as MsgEvent);
               }
-              table.total = result.totalCount;
             }
+            table.total = result.totalCount;
+          }
           setSelectedRowKeys([]);
           setDataSource(table.data);
           return table;
@@ -102,7 +102,7 @@ export default (props: {
         pagination={{ showSizeChanger: true }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
-          onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
+          onChange: (selectedRowKeys) => { setSelectedRowKeys(selectedRowKeys as string[]); },
           type: props.isMultiple ? 'checkbox' : 'radio',
         }}
         onRow={(record) => {

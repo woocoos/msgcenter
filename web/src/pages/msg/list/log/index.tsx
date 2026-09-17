@@ -12,6 +12,7 @@ import { useResizableProTable, routeBreadcrumb } from "@/util/hook";
 const List = () => {
   const { t } = useTranslation(),
     [searchParams] = useSearchParams(),
+    msgAlertId = searchParams.get('id'),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     // 可调整列宽的 ProTable
@@ -70,14 +71,15 @@ const List = () => {
           labelWidth: 70,
         }}
         rowKey={'id'}
-        toolbar={{}}
+        toolbar={{
+          title: `${t('msg_log')}-ID：${msgAlertId}`
+        }}
         scroll={{ x: tableWidth }}
         components={components}
         columns={finalColumns}
         columnsState={{ defaultValue: { id: { show: false } } }}
         request={async (params, sort, filter) => {
           const table = { data: [] as Nlog[], success: true, total: 0 },
-            msgAlertId = searchParams.get('id') ?? '',
             where: NlogWhereInput = {};
           where.tenantID = params.tenant?.id;
           where.sendAt = params.sendAt;

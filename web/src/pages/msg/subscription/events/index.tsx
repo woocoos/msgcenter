@@ -103,11 +103,11 @@ const List = () => {
           className: 'ko-pro-table-search',
           searchText: `${t('query')}`,
           resetText: `${t('reset')}`,
-          labelWidth: 70,
+          labelWidth: 96,
         }}
         rowKey={'id'}
         toolbar={{
-          title: `${t('msg_type')}: ${msgTypeName}`,
+          title: `${t('event_subscription')}-${t('msg_type')}: ${msgTypeName}`,
         }}
         scroll={{ x: tableWidth }}
         components={components}
@@ -204,14 +204,10 @@ const List = () => {
 };
 
 export default () => {
-  const [breadcrumbNames] = routeBreadcrumb();
   return (
     <PageContainer
       className="ko-page-container"
       header={{
-        breadcrumb: {
-          items: breadcrumbNames.map(item => ({ title: item })),
-        },
       }}
     >
       <div className="ka-content">

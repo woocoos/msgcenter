@@ -1,5 +1,5 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
-import { Button, Space, Modal, Dropdown, Divider, Typography } from 'antd';
+import { Button, Space, Modal, Dropdown, Divider, Typography, Tag } from 'antd';
 import { Key, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
@@ -9,7 +9,6 @@ import { EnumMsgTemplateFormat, EnumMsgTemplateReceiverType, EnumMsgTemplateStat
 import { getMsgEventInfo } from '@/services/msgsrv/event';
 import { DownOutlined } from '@ant-design/icons';
 import Create from './components/create';
-import { getOrgs } from '@knockout-js/api';
 import { Org } from '@knockout-js/api/ucenter';
 import Test from './components/test';
 import { delDataSource, saveDataSource, onMousedown } from '@/util';
@@ -23,6 +22,7 @@ const List = () => {
     { t } = useTranslation(),
     userState = store.getModelState('user'),
     [searchParams] = useSearchParams(),
+    paramsType = searchParams.get('type'),
     [msgEventInfo, setMsgEventInfo] = useState<MsgEvent>(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
@@ -88,6 +88,10 @@ const List = () => {
           title: t('status'), dataIndex: 'status', width: 120, align: 'center', search: false,
           filters: true,
           valueEnum: EnumMsgTemplateStatus,
+          render(_, record) {
+            const enumItem = EnumMsgTemplateStatus[record.status as keyof typeof EnumMsgTemplateStatus];
+            return <Tag color={enumItem?.tagColor}>{enumItem?.text ?? '-'}</Tag>;
+          },
         },
         { title: t('description'), dataIndex: 'comments', width: 200, search: false, ellipsis: true },
         // 占位列
@@ -231,7 +235,7 @@ const List = () => {
         }}
         rowKey={'id'}
         toolbar={{
-          title: `${t('msg_event')}:${msgEventInfo?.name}`,
+          title: `${t('msg_event')}-${t(`temp_${paramsType}`)}:${msgEventInfo?.name ?? ''}`,
           actions: [
             <Auth authKey="createMsgTemplate">
               <Dropdown menu={{
@@ -264,7 +268,7 @@ const List = () => {
           const msgEvent = msgEventInfo?.id ? msgEventInfo : await getMsgEvent();
           if (msgEvent?.id) {
             where.msgEventID = msgEvent.id
-            if (searchParams.get('type') == TemplateType.customer) {
+            if (paramsType == TemplateType.customer) {
               where.tenantID = userState.tenantId
             } else {
               where.tenantIDIsNil = true
@@ -313,7 +317,7 @@ const List = () => {
         <Create
           open={modal.open}
           title={modal.title}
-          type={searchParams.get('type')}
+          type={paramsType}
           id={modal.id}
           readonly={modal.readonly}
           onClose={(isSuccess, newInfo) => {
@@ -342,8 +346,6 @@ const List = () => {
 
 export default () => {
   const [breadcrumbNames] = routeBreadcrumb();
-  const { t } = useTranslation(),
-    [searchParams] = useSearchParams();
   return (
     <PageContainer
       className="ko-page-container"

@@ -4,6 +4,8 @@ import {
   MsgTemplateFormat,
   MsgTemplateOrder,
   MsgTemplateOrderField,
+  MsgTemplateReceiverType,
+  MsgTemplateSimpleStatus,
   MsgTemplateWhereInput,
   OrderDirection,
   UpdateMsgTemplateInput
@@ -12,21 +14,22 @@ import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 export const EnumMsgTemplateStatus = {
-  active: { text: '活跃', status: 'success' },
-  inactive: { text: '失活', status: 'default' },
-  processing: { text: '处理中', status: 'warning' },
+  [MsgTemplateSimpleStatus.Active]: { text: '生效', tagColor: '#30c880' },
+  [MsgTemplateSimpleStatus.Inactive]: { text: '未生效', tagColor: '#dcdee1' },
+  [MsgTemplateSimpleStatus.Processing]: { text: '处理中', tagColor: '#00C8FF' },
+  [MsgTemplateSimpleStatus.Disabled]: { text: '禁用', tagColor: '#ff3030 ' },
 };
 
 export const EnumMsgTemplateReceiverType = {
-  email: { text: 'email' },
-  message: { text: 'message' },
-  webhook: { text: 'webhook' },
-  umeng: { text: 'umeng' },
+  [MsgTemplateReceiverType.Email]: { text: 'email' },
+  [MsgTemplateReceiverType.Message]: { text: 'message' },
+  [MsgTemplateReceiverType.Webhook]: { text: 'webhook' },
+  [MsgTemplateReceiverType.Umeng]: { text: 'umeng' },
 };
 
 export const EnumMsgTemplateFormat = {
-  txt: { text: 'txt' },
-  html: { text: 'html' },
+  [MsgTemplateFormat.Txt]: { text: 'txt' },
+  [MsgTemplateFormat.Html]: { text: 'html' },
 };
 
 const queryMsgTemplateList = gql(/* GraphQL */`query msgTemplateList($first: Int,$orderBy:MsgTemplateOrder,$where:MsgTemplateWhereInput){
@@ -151,7 +154,7 @@ export async function getMsgTemplateInfo(msgTemplateId: string) {
  * @param body
  * @returns
  */
-export async function getMsgTemplateDefine(format: MsgTemplateFormat,body: string) {
+export async function getMsgTemplateDefine(format: MsgTemplateFormat, body: string) {
   const result = await query(queryMsgTemplateDefineByName, {
     body: body,
     format: format,
@@ -286,7 +289,7 @@ export async function testSendMessage(tplID: string, userID: string, labels?: Re
  * @returns
  */
 export async function refreshTemplateParams() {
-  const result = await mutation(mutationRefreshTempParams,{})
+  const result = await mutation(mutationRefreshTempParams, {})
   if (result.data?.refreshTemplateParams) {
     return result.data.refreshTemplateParams
   }

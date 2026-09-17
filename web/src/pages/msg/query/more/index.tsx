@@ -3,7 +3,7 @@ import { EnumMsgAlertStatus, getFormatMsgAlertMore, getRenderMsgAlert } from '@/
 import { ActionType, PageContainer, ProTable } from '@ant-design/pro-components';
 import { Link, useSearchParams } from '@ice/runtime';
 import { KeepAlive } from '@knockout-js/layout';
-import { Modal, Space, Typography, Divider } from 'antd';
+import { Modal, Space, Typography, Divider, Tag } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResizableProTable, routeBreadcrumb } from '@/util/hook';
@@ -84,6 +84,10 @@ const List = () => {
           search: false,
           filters: true,
           valueEnum: EnumMsgAlertStatus,
+          render(_, record) {
+            const enumItem = EnumMsgAlertStatus[record.state];
+            return <Tag color={enumItem?.tagColor}>{enumItem?.text ?? '-'}</Tag>;
+          },
         },
         // 占位列
         { search: false, hideInSetting: true },
@@ -136,15 +140,17 @@ const List = () => {
         request={async (params, sort, filter) => {
           const table = { data: [] as FormatMsgAlert[], success: true, total: 0 };
           const msgAlertId = searchParams.get('id');
-          const result = await getFormatMsgAlertMore(
-            msgAlertId,
-          );
-          if (result && result.length > 0) {
-            table.data = result as FormatMsgAlert[];
-            table.total = result.length;
-            // 消息事件名称
-            if (result[0]) {
-              setMsgEventComments(result[0].msgEventComments || '');
+          if (msgAlertId) {
+            const result = await getFormatMsgAlertMore(
+              msgAlertId,
+            );
+            if (result && result.length > 0) {
+              table.data = result as FormatMsgAlert[];
+              table.total = result.length;
+              // 消息事件名称
+              if (result[0]) {
+                setMsgEventComments(result[0].msgEventComments || '');
+              }
             }
           }
           return table;

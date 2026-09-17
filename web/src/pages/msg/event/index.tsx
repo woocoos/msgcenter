@@ -1,5 +1,5 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
-import {Button, Space, Modal, message, Divider, Typography} from 'antd';
+import { Button, Space, Modal, message, Divider, Typography, Tag } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
@@ -41,7 +41,7 @@ const List = () => {
       id: '',
       scene: 'editor'
     }),
-    [loadingTempParams,setLoadingTempParams] = useState(false),
+    [loadingTempParams, setLoadingTempParams] = useState(false),
     // 可调整列宽的 ProTable
     { columns: finalColumns, components, tableWidth } = useResizableProTable<MsgEvent>(() => ({
       columns: [
@@ -80,6 +80,13 @@ const List = () => {
         { title: t('msg_event_name'), dataIndex: 'name', width: 160 },
         {
           title: t('way_receiving'), dataIndex: 'modes', width: 140, search: false,
+          filters: true,
+          valueEnum: {
+            email: { text: 'email' },
+            message: { text: 'message' },
+            webhook: { text: 'webhook' },
+            umeng: { text: 'umeng' },
+          },
           render(text, record) {
             return record.modes?.split(',')?.join('、')
           },
@@ -88,16 +95,20 @@ const List = () => {
           title: t('open_subscription'), dataIndex: 'canSubs', width: 120, search: false,
           align: 'center',
           valueEnum: {
-            true: { text: t('yes'), status: 'Success' },
-            false: { text: t('no'), status: 'Default' },
+            true: { text: t('yes'), },
+            false: { text: t('no'), },
           },
         },
         {
           title: t('status'), dataIndex: 'status', width: 120, align: 'center', search: false,
           filters: true,
           valueEnum: EnumMsgEventStatus,
+          render(_, record) {
+            const enumItem = EnumMsgEventStatus[record.status as keyof typeof EnumMsgEventStatus];
+            return <Tag color={enumItem?.tagColor}>{enumItem?.text ?? '-'}</Tag>;
+          },
         },
-        { title: t('description'), dataIndex: 'comments', width: 200, search: false, ellipsis: true },
+        { title: t('description'), dataIndex: 'comments', width: 200, ellipsis: true },
         // 占位列
         { search: false, hideInSetting: true },
         // 操作列
@@ -219,6 +230,16 @@ const List = () => {
         rowKey={'id'}
         toolbar={{
           actions: [
+            <Auth authKey={'refreshTemplateParams'}>
+              <Button size="middle" loading={loadingTempParams} onClick={async () => {
+                setLoadingTempParams(true)
+                let result = await refreshTemplateParams();
+                if (result) {
+                  message.success(t('submit_success'));
+                }
+                setLoadingTempParams(false)
+              }}>{t('template_params_refresh')}</Button>
+            </Auth>,
             <Auth authKey="createMsgEvent">
               <Button
                 key="created"
@@ -246,14 +267,26 @@ const List = () => {
         request={async (params, sort, filter) => {
           const table = { data: [] as MsgEvent[], success: true, total: 0 },
             where: MsgEventWhereInput = {};
-          where.nameContains = params.name;
+          if (params.name) {
+            where.nameContains = params.name;
+          }
           if (params.msgTypeName || params.msgTypeCategory) {
             where.hasMsgTypeWith = [{
               nameContains: params.msgTypeName,
               categoryContains: params.msgTypeCategory,
             }];
           }
-          where.statusIn = filter.status as MsgEventSimpleStatus[]
+          if (filter.modes?.length) {
+            where.or = filter.modes.map(m => ({
+              modesContains: `${m}`
+            }))
+          }
+          if (filter.status?.length) {
+            where.statusIn = filter.status as MsgEventSimpleStatus[]
+          }
+          if (params.comments) {
+            where.commentsContains = params.comments
+          }
           const result = await getMsgEventList({
             current: params.current,
             pageSize: params.pageSize,
@@ -326,7 +359,7 @@ const List = () => {
 export default () => {
   const { t } = useTranslation(),
     [breadcrumbNames] = routeBreadcrumb();
-  const [loadingTempParams,setLoadingTempParams] = useState(false);
+
   return (
     <PageContainer
       className="ko-page-container"
@@ -334,16 +367,6 @@ export default () => {
         breadcrumb: {
           items: breadcrumbNames.map(item => ({ title: item })),
         },
-        extra: <Auth authKey={'refreshTemplateParams'}>
-          <Button size="middle" loading={loadingTempParams} onClick={ async () => {
-            setLoadingTempParams(true )
-            let result = await refreshTemplateParams();
-            if (result){
-              message.success(t('submit_success'));
-            }
-            setLoadingTempParams(false)
-          }}>{t('template_params_refresh')}</Button>
-        </Auth>,
       }}
     >
       <KeepAlive clearAlive>

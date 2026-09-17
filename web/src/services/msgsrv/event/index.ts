@@ -1,12 +1,13 @@
 import { gql } from "@/generated/msgsrv";
-import { CreateMsgEventInput, MsgEventOrder, MsgEventOrderField, MsgEventWhereInput, OrderDirection, RouteStrType, UpdateMsgEventInput } from "@/generated/msgsrv/graphql";
+import { CreateMsgEventInput, MsgEventOrder, MsgEventOrderField, MsgEventSimpleStatus, MsgEventWhereInput, OrderDirection, RouteStrType, UpdateMsgEventInput } from "@/generated/msgsrv/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 export const EnumMsgEventStatus = {
-  active: { text: 'active', status: 'success' },
-  inactive: { text: 'inactive', status: 'default' },
-  processing: { text: 'processing', status: 'warning' },
+  [MsgEventSimpleStatus.Active]: { text: '生效', tagColor: '#30c880' },
+  [MsgEventSimpleStatus.Inactive]: { text: '未生效', tagColor: '#dcdee1' },
+  [MsgEventSimpleStatus.Processing]: { text: '处理中', tagColor: '#00C8FF' },
+  [MsgEventSimpleStatus.Disabled]: { text: '禁用', tagColor: '#ff3030' },
 };
 
 const queryMsgEventList = gql(/* GraphQL */`query msgEventList($first: Int,$orderBy:MsgEventOrder,$where:MsgEventWhereInput){

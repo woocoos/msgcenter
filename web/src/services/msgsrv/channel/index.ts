@@ -1,20 +1,20 @@
 import { gql } from "@/generated/msgsrv";
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
-import { CreateMsgChannelInput, MsgChannelOrder, MsgChannelOrderField, MsgChannelWhereInput, UpdateMsgChannelInput, OrderDirection } from "@/generated/msgsrv/graphql";
+import { CreateMsgChannelInput, MsgChannelOrder, MsgChannelOrderField, MsgChannelWhereInput, UpdateMsgChannelInput, OrderDirection, MsgChannelSimpleStatus, MsgChannelReceiverType } from "@/generated/msgsrv/graphql";
 import { gid } from "@knockout-js/api";
 
-
 export const EnumMsgChannelReceiverType = {
-  email: { text: 'email' },
-  message: { text: 'message' },
-  webhook: { text: 'webhook' },
-  umeng: { text: 'umeng' },
+  [MsgChannelReceiverType.Email]: { text: 'email' },
+  [MsgChannelReceiverType.Message]: { text: 'message' },
+  [MsgChannelReceiverType.Webhook]: { text: 'webhook' },
+  [MsgChannelReceiverType.Umeng]: { text: 'umeng' },
 };
 
 export const EnumMsgChannelStatus = {
-  active: { text: '活跃', status: 'success' },
-  inactive: { text: '失活', status: 'default' },
-  processing: { text: '处理中', status: 'warning' },
+  [MsgChannelSimpleStatus.Active]: { text: '生效', tagColor: '#30c880' },
+  [MsgChannelSimpleStatus.Inactive]: { text: '未生效', tagColor: '#dcdee1' },
+  [MsgChannelSimpleStatus.Processing]: { text: '处理中', tagColor: '#00C8FF' },
+  [MsgChannelSimpleStatus.Disabled]: { text: '禁用', tagColor: '#ff3030 ' },
 };
 
 const queryMsgChannelList = gql(/* GraphQL */`query msgChannelList($first: Int,$orderBy:MsgChannelOrder,$where:MsgChannelWhereInput){

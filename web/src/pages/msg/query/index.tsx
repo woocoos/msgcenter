@@ -8,7 +8,7 @@ import {
 import { ActionType, PageContainer, ProTable } from '@ant-design/pro-components';
 import { KeepAlive, Modal } from '@knockout-js/layout';
 import { UserSelect } from '@knockout-js/org';
-import { Space, Typography, Divider } from 'antd';
+import { Space, Typography, Divider, Tag } from 'antd';
 import { definePageConfig, useNavigate } from 'ice';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -116,6 +116,10 @@ const List = () => {
           search: false,
           filters: true,
           valueEnum: EnumMsgAlertStatus,
+          render(_, record) {
+            const enumItem = EnumMsgAlertStatus[record.state];
+            return <Tag color={enumItem?.tagColor}>{enumItem?.text ?? '-'}</Tag>;
+          },
         },
         // 占位列
         { search: false, hideInSetting: true },
