@@ -20,6 +20,9 @@ import (
 	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent"
+	"github.com/woocoos/msgcenter/ent/org"
+	"github.com/woocoos/msgcenter/ent/orguser"
+	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/userdevice"
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/pkg/alert"
@@ -197,6 +200,9 @@ func (n *Notifier) saveToDB(ctx context.Context, config *profile.UmengConfig, ms
 	title, body := n.renderTitleBody(config, msg)
 
 	userIDs := extractUserIDs(msg)
+	if len(userIDs) == 0 {
+		userIDs = n.resolveBroadcastUserIDs(ctx, tid)
+	}
 
 	err = ecx.WithTx(ctx, func(ctx context.Context) (ecx.Transactor, error) {
 		return n.db.Tx(ctx)
@@ -244,6 +250,40 @@ func (n *Notifier) saveToDB(ctx context.Context, config *profile.UmengConfig, ms
 	if err != nil {
 		logger.Warn("save umeng message to db failed", zap.Error(err))
 	}
+}
+
+// resolveBroadcastUserIDs 查询租户（含子组织）下所有拥有活跃 Android/iOS 设备的用户 ID。
+// 用于广播消息场景，extractUserIDs 返回空时作为站内信收件人。
+func (n *Notifier) resolveBroadcastUserIDs(ctx context.Context, tid int) []string {
+	rootOrg, err := n.db.Org.Get(ctx, tid)
+	if err != nil {
+		logger.Warn("get root org for broadcast failed", zap.Int("tenant_id", tid), zap.Error(err))
+		return nil
+	}
+
+	ids, err := n.db.OrgUser.Query().
+		Where(orguser.HasOrgWith(
+			org.Or(org.PathContains(rootOrg.Path), org.IDEQ(tid)),
+		)).
+		QueryUser().
+		Where(user.HasDevicesWith(
+			userdevice.StatusEQ(typex.SimpleStatusActive),
+			userdevice.Or(
+				userdevice.SystemNameContainsFold("Android"),
+				userdevice.SystemNameContainsFold("iOS"),
+			),
+		)).
+		IDs(ctx)
+	if err != nil {
+		logger.Warn("resolve broadcast user ids failed", zap.Int("tenant_id", tid), zap.Error(err))
+		return nil
+	}
+
+	result := make([]string, len(ids))
+	for i, id := range ids {
+		result[i] = strconv.Itoa(id)
+	}
+	return result
 }
 
 // notifyMultiApp sends push notifications to multiple apps based on user devices.

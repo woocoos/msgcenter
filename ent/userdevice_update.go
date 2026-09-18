@@ -248,9 +248,6 @@ func (_u *UserDeviceUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 			}
 		}
 	}
-	if _u.mutation.UserIDCleared() {
-		_spec.ClearField(userdevice.FieldUserID, field.TypeInt)
-	}
 	if value, ok := _u.mutation.DeviceUID(); ok {
 		_spec.SetField(userdevice.FieldDeviceUID, field.TypeString, value)
 	}
@@ -559,9 +556,6 @@ func (_u *UserDeviceUpdateOne) sqlSave(ctx context.Context) (_node *UserDevice, 
 				ps[i](selector)
 			}
 		}
-	}
-	if _u.mutation.UserIDCleared() {
-		_spec.ClearField(userdevice.FieldUserID, field.TypeInt)
 	}
 	if value, ok := _u.mutation.DeviceUID(); ok {
 		_spec.SetField(userdevice.FieldDeviceUID, field.TypeString, value)

@@ -254,6 +254,22 @@ func (_m *Org) MsgAlerts(ctx context.Context) (result []*MsgAlert, err error) {
 	return result, err
 }
 
+func (_m *OrgUser) Org(ctx context.Context) (*Org, error) {
+	result, err := _m.Edges.OrgOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryOrg().Only(ctx)
+	}
+	return result, err
+}
+
+func (_m *OrgUser) User(ctx context.Context) (*User, error) {
+	result, err := _m.Edges.UserOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryUser().Only(ctx)
+	}
+	return result, err
+}
+
 func (_m *User) Silences(ctx context.Context) (result []*MsgSilence, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = _m.NamedSilences(graphql.GetFieldContext(ctx).Field.Alias)

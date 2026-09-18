@@ -366,6 +366,32 @@ var (
 		Columns:    OrgRoleUserColumns,
 		PrimaryKey: []*schema.Column{OrgRoleUserColumns[0]},
 	}
+	// OrgUserColumns holds the columns for the "org_user" table.
+	OrgUserColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "org_id", Type: field.TypeInt},
+		{Name: "user_id", Type: field.TypeInt},
+	}
+	// OrgUserTable holds the schema information for the "org_user" table.
+	OrgUserTable = &schema.Table{
+		Name:       "org_user",
+		Columns:    OrgUserColumns,
+		PrimaryKey: []*schema.Column{OrgUserColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "org_user_org_org",
+				Columns:    []*schema.Column{OrgUserColumns[1]},
+				RefColumns: []*schema.Column{OrgColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "org_user_user_user",
+				Columns:    []*schema.Column{OrgUserColumns[2]},
+				RefColumns: []*schema.Column{UserColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// UserColumns holds the columns for the "user" table.
 	UserColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -410,7 +436,6 @@ var (
 	// UserDeviceColumns holds the columns for the "user_device" table.
 	UserDeviceColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "user_id", Type: field.TypeInt, Nullable: true},
 		{Name: "device_uid", Type: field.TypeString, Size: 64},
 		{Name: "device_name", Type: field.TypeString, Nullable: true, Size: 45},
 		{Name: "system_name", Type: field.TypeString, Nullable: true, Size: 45},
@@ -418,12 +443,21 @@ var (
 		{Name: "app_version", Type: field.TypeString, Nullable: true, Size: 45},
 		{Name: "device_model", Type: field.TypeString, Nullable: true, Size: 45},
 		{Name: "status", Type: field.TypeEnum, Nullable: true, Enums: []string{"active", "inactive", "processing", "disabled"}},
+		{Name: "user_id", Type: field.TypeInt, Nullable: true},
 	}
 	// UserDeviceTable holds the schema information for the "user_device" table.
 	UserDeviceTable = &schema.Table{
 		Name:       "user_device",
 		Columns:    UserDeviceColumns,
 		PrimaryKey: []*schema.Column{UserDeviceColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_device_user_devices",
+				Columns:    []*schema.Column{UserDeviceColumns[8]},
+				RefColumns: []*schema.Column{UserColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
@@ -440,6 +474,7 @@ var (
 		MsgNlogAlertTable,
 		OrgTable,
 		OrgRoleUserTable,
+		OrgUserTable,
 		UserTable,
 		UserAddrTable,
 		UserDeviceTable,
@@ -498,6 +533,11 @@ func init() {
 	OrgRoleUserTable.Annotation = &entsql.Annotation{
 		Table: "org_role_user",
 	}
+	OrgUserTable.ForeignKeys[0].RefTable = OrgTable
+	OrgUserTable.ForeignKeys[1].RefTable = UserTable
+	OrgUserTable.Annotation = &entsql.Annotation{
+		Table: "org_user",
+	}
 	UserTable.Annotation = &entsql.Annotation{
 		Table: "user",
 	}
@@ -505,6 +545,7 @@ func init() {
 	UserAddrTable.Annotation = &entsql.Annotation{
 		Table: "user_addr",
 	}
+	UserDeviceTable.ForeignKeys[0].RefTable = UserTable
 	UserDeviceTable.Annotation = &entsql.Annotation{
 		Table: "user_device",
 	}

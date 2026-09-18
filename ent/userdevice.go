@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
+	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/userdevice"
 )
 
@@ -33,8 +34,33 @@ type UserDevice struct {
 	// 设备型号
 	DeviceModel string `json:"device_model,omitempty"`
 	// 状态,可用或不可用及其他待确认状态
-	Status       typex.SimpleStatus `json:"status,omitempty"`
+	Status typex.SimpleStatus `json:"status,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserDeviceQuery when eager-loading is set.
+	Edges        UserDeviceEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// UserDeviceEdges holds the relations/edges for other nodes in the graph.
+type UserDeviceEdges struct {
+	// User holds the value of the user edge.
+	User *User `json:"user,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+	// totalCount holds the count of the edges above.
+	totalCount [1]map[string]int
+}
+
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UserDeviceEdges) UserOrErr() (*User, error) {
+	if e.User != nil {
+		return e.User, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: user.Label}
+	}
+	return nil, &NotLoadedError{edge: "user"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -126,6 +152,11 @@ func (_m *UserDevice) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (_m *UserDevice) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
+}
+
+// QueryUser queries the "user" edge of the UserDevice entity.
+func (_m *UserDevice) QueryUser() *UserQuery {
+	return NewUserDeviceClient(_m.config).QueryUser(_m)
 }
 
 // Update returns a builder for updating this UserDevice.

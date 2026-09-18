@@ -4,8 +4,11 @@ package userdevice
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/predicate"
+
+	"github.com/woocoos/msgcenter/ent/internal"
 )
 
 // ID filters vertices based on their ID field.
@@ -106,26 +109,6 @@ func UserIDIn(vs ...int) predicate.UserDevice {
 // UserIDNotIn applies the NotIn predicate on the "user_id" field.
 func UserIDNotIn(vs ...int) predicate.UserDevice {
 	return predicate.UserDevice(sql.FieldNotIn(FieldUserID, vs...))
-}
-
-// UserIDGT applies the GT predicate on the "user_id" field.
-func UserIDGT(v int) predicate.UserDevice {
-	return predicate.UserDevice(sql.FieldGT(FieldUserID, v))
-}
-
-// UserIDGTE applies the GTE predicate on the "user_id" field.
-func UserIDGTE(v int) predicate.UserDevice {
-	return predicate.UserDevice(sql.FieldGTE(FieldUserID, v))
-}
-
-// UserIDLT applies the LT predicate on the "user_id" field.
-func UserIDLT(v int) predicate.UserDevice {
-	return predicate.UserDevice(sql.FieldLT(FieldUserID, v))
-}
-
-// UserIDLTE applies the LTE predicate on the "user_id" field.
-func UserIDLTE(v int) predicate.UserDevice {
-	return predicate.UserDevice(sql.FieldLTE(FieldUserID, v))
 }
 
 // UserIDIsNil applies the IsNil predicate on the "user_id" field.
@@ -616,6 +599,35 @@ func StatusIsNil() predicate.UserDevice {
 // StatusNotNil applies the NotNil predicate on the "status" field.
 func StatusNotNil() predicate.UserDevice {
 	return predicate.UserDevice(sql.FieldNotNull(FieldStatus))
+}
+
+// HasUser applies the HasEdge predicate on the "user" edge.
+func HasUser() predicate.UserDevice {
+	return predicate.UserDevice(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
+		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.User
+		step.Edge.Schema = schemaConfig.UserDevice
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
+func HasUserWith(preds ...predicate.User) predicate.UserDevice {
+	return predicate.UserDevice(func(s *sql.Selector) {
+		step := newUserStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.User
+		step.Edge.Schema = schemaConfig.UserDevice
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

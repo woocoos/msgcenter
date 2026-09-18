@@ -94,6 +94,7 @@ input EmailConfigInput {
     authSecret: String
     authIdentity: String
     headers: MapString
+    traceIdHeader: String
 }
 
 input MessageConfigInput {

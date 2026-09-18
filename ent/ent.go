@@ -25,6 +25,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
+	"github.com/woocoos/msgcenter/ent/orguser"
 	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
 	"github.com/woocoos/msgcenter/ent/userdevice"
@@ -101,6 +102,7 @@ func checkColumn(t, c string) error {
 			nlogalert.Table:     nlogalert.ValidColumn,
 			org.Table:           org.ValidColumn,
 			orgroleuser.Table:   orgroleuser.ValidColumn,
+			orguser.Table:       orguser.ValidColumn,
 			user.Table:          user.ValidColumn,
 			useraddr.Table:      useraddr.ValidColumn,
 			userdevice.Table:    userdevice.ValidColumn,

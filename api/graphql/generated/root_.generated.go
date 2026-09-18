@@ -57,15 +57,16 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	EmailConfig struct {
-		AuthIdentity func(childComplexity int) int
-		AuthPassword func(childComplexity int) int
-		AuthSecret   func(childComplexity int) int
-		AuthType     func(childComplexity int) int
-		AuthUsername func(childComplexity int) int
-		From         func(childComplexity int) int
-		Headers      func(childComplexity int) int
-		SmartHost    func(childComplexity int) int
-		To           func(childComplexity int) int
+		AuthIdentity  func(childComplexity int) int
+		AuthPassword  func(childComplexity int) int
+		AuthSecret    func(childComplexity int) int
+		AuthType      func(childComplexity int) int
+		AuthUsername  func(childComplexity int) int
+		From          func(childComplexity int) int
+		Headers       func(childComplexity int) int
+		SmartHost     func(childComplexity int) int
+		To            func(childComplexity int) int
+		TraceIDHeader func(childComplexity int) int
 	}
 
 	FormatMsgAlert struct {
@@ -417,6 +418,7 @@ type ComplexityRoot struct {
 		GroupKey     func(childComplexity int) int
 		ID           func(childComplexity int) int
 		Idx          func(childComplexity int) int
+		MessageID    func(childComplexity int) int
 		NlogAlert    func(childComplexity int) int
 		Receiver     func(childComplexity int) int
 		ReceiverType func(childComplexity int) int
@@ -454,6 +456,14 @@ type ComplexityRoot struct {
 		Path      func(childComplexity int) int
 	}
 
+	OrgUser struct {
+		ID     func(childComplexity int) int
+		Org    func(childComplexity int) int
+		OrgID  func(childComplexity int) int
+		User   func(childComplexity int) int
+		UserID func(childComplexity int) int
+	}
+
 	PageInfo struct {
 		EndCursor       func(childComplexity int) int
 		HasNextPage     func(childComplexity int) int
@@ -462,6 +472,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		AppPushMsgs                           func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalOrder, where *ent.MsgInternalWhereInput) int
+		AppUnreadPushMsgs                     func(childComplexity int) int
 		DeviceConnected                       func(childComplexity int, deviceID string) int
 		FormatMsgAlertMore                    func(childComplexity int, msgAlertID int) int
 		FormatMsgAlerts                       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, alertName *string, userID *string, receiverType *profile.ReceiverType, where *ent.MsgAlertWhereInput, orderBy *ent.MsgAlertOrder) int
@@ -626,6 +638,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.EmailConfig.To(childComplexity), true
+
+	case "EmailConfig.traceIdHeader":
+		if e.complexity.EmailConfig.TraceIDHeader == nil {
+			break
+		}
+
+		return e.complexity.EmailConfig.TraceIDHeader(childComplexity), true
 
 	case "FormatMsgAlert.createdAt":
 		if e.complexity.FormatMsgAlert.CreatedAt == nil {
@@ -2515,6 +2534,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Nlog.Idx(childComplexity), true
 
+	case "Nlog.messageID":
+		if e.complexity.Nlog.MessageID == nil {
+			break
+		}
+
+		return e.complexity.Nlog.MessageID(childComplexity), true
+
 	case "Nlog.nlogAlert":
 		if e.complexity.Nlog.NlogAlert == nil {
 			break
@@ -2676,6 +2702,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Org.Path(childComplexity), true
 
+	case "OrgUser.id":
+		if e.complexity.OrgUser.ID == nil {
+			break
+		}
+
+		return e.complexity.OrgUser.ID(childComplexity), true
+
+	case "OrgUser.org":
+		if e.complexity.OrgUser.Org == nil {
+			break
+		}
+
+		return e.complexity.OrgUser.Org(childComplexity), true
+
+	case "OrgUser.orgID":
+		if e.complexity.OrgUser.OrgID == nil {
+			break
+		}
+
+		return e.complexity.OrgUser.OrgID(childComplexity), true
+
+	case "OrgUser.user":
+		if e.complexity.OrgUser.User == nil {
+			break
+		}
+
+		return e.complexity.OrgUser.User(childComplexity), true
+
+	case "OrgUser.userID":
+		if e.complexity.OrgUser.UserID == nil {
+			break
+		}
+
+		return e.complexity.OrgUser.UserID(childComplexity), true
+
 	case "PageInfo.endCursor":
 		if e.complexity.PageInfo.EndCursor == nil {
 			break
@@ -2703,6 +2764,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PageInfo.StartCursor(childComplexity), true
+
+	case "Query.appPushMsgs":
+		if e.complexity.Query.AppPushMsgs == nil {
+			break
+		}
+
+		args, err := ec.field_Query_appPushMsgs_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AppPushMsgs(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgInternalOrder), args["where"].(*ent.MsgInternalWhereInput)), true
+
+	case "Query.appUnreadPushMsgs":
+		if e.complexity.Query.AppUnreadPushMsgs == nil {
+			break
+		}
+
+		return e.complexity.Query.AppUnreadPushMsgs(childComplexity), true
 
 	case "Query.deviceConnected":
 		if e.complexity.Query.DeviceConnected == nil {
@@ -5847,6 +5927,10 @@ type Nlog implements Node {
   错误信息，有值表示未发送成功：如：邮件已发往邮件服务器，邮件服务器发送失败，记录其错误信息
   """
   errMsg: String
+  """
+  邮件消息ID，用于关联邮件发送回执
+  """
+  messageID: String
   alerts: [MsgAlert!]
   nlogAlert: [NlogAlert!]
 }
@@ -6117,6 +6201,24 @@ input NlogWhereInput {
   errMsgEqualFold: String
   errMsgContainsFold: String
   """
+  message_id field predicates
+  """
+  messageID: String
+  messageIDNEQ: String
+  messageIDIn: [String!]
+  messageIDNotIn: [String!]
+  messageIDGT: String
+  messageIDGTE: String
+  messageIDLT: String
+  messageIDLTE: String
+  messageIDContains: String
+  messageIDHasPrefix: String
+  messageIDHasSuffix: String
+  messageIDIsNil: Boolean
+  messageIDNotNil: Boolean
+  messageIDEqualFold: String
+  messageIDContainsFold: String
+  """
   alerts edge predicates
   """
   hasAlerts: Boolean
@@ -6163,6 +6265,22 @@ type Org implements Node {
   消息列表
   """
   msgAlerts: [MsgAlert!]
+}
+type OrgUser implements Node {
+  """
+  组织ID
+  """
+  id: ID!
+  """
+  组织ID
+  """
+  orgID: ID!
+  """
+  用户ID
+  """
+  userID: ID!
+  org: Org!
+  user: User!
 }
 """
 Information about pagination in a connection.
@@ -6587,6 +6705,7 @@ type EmailConfig {
     authSecret: String!
     authIdentity: String!
     headers: MapString
+    traceIdHeader: String
 }
 
 type MessageConfig {
@@ -6795,6 +6914,17 @@ extend type Query {
         """消息模板的body数据"""
         body:String!
     ):String!
+    """app推送消息列表"""
+    appPushMsgs(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgInternalOrder
+        where: MsgInternalWhereInput
+    ): MsgInternalConnection!
+    """app推送消息未读数"""
+    appUnreadPushMsgs:Int!
 }`, BuiltIn: false},
 	{Name: "../mutation.graphql", Input: `type Mutation {
     """ 创建消息类型 """
@@ -6892,6 +7022,7 @@ input EmailConfigInput {
     authSecret: String
     authIdentity: String
     headers: MapString
+    traceIdHeader: String
 }
 
 input MessageConfigInput {

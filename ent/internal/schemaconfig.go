@@ -21,6 +21,7 @@ type SchemaConfig struct {
 	NlogAlert     string // NlogAlert table.
 	Org           string // Org table.
 	OrgRoleUser   string // OrgRoleUser table.
+	OrgUser       string // OrgUser table.
 	User          string // User table.
 	UserAddr      string // UserAddr table.
 	UserDevice    string // UserDevice table.

@@ -23,6 +23,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/org"
+	"github.com/woocoos/msgcenter/ent/orguser"
 	"github.com/woocoos/msgcenter/ent/user"
 )
 
@@ -2062,6 +2063,103 @@ type orgPaginateArgs struct {
 
 func newOrgPaginateArgs(rv map[string]any) *orgPaginateArgs {
 	args := &orgPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_m *OrgUserQuery) CollectFields(ctx context.Context, satisfies ...string) (*OrgUserQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return _m, nil
+	}
+	if err := _m.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return _m, nil
+}
+
+func (_m *OrgUserQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(orguser.Columns))
+		selectedFields = []string{orguser.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "org":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&OrgClient{config: _m.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, orgImplementors)...); err != nil {
+				return err
+			}
+			_m.withOrg = query
+			if _, ok := fieldSeen[orguser.FieldOrgID]; !ok {
+				selectedFields = append(selectedFields, orguser.FieldOrgID)
+				fieldSeen[orguser.FieldOrgID] = struct{}{}
+			}
+		case "user":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&UserClient{config: _m.config}).Query()
+			)
+			if err := query.collectField(ctx, oneNode, opCtx, field, path, mayAddCondition(satisfies, userImplementors)...); err != nil {
+				return err
+			}
+			_m.withUser = query
+			if _, ok := fieldSeen[orguser.FieldUserID]; !ok {
+				selectedFields = append(selectedFields, orguser.FieldUserID)
+				fieldSeen[orguser.FieldUserID] = struct{}{}
+			}
+		case "orgID":
+			if _, ok := fieldSeen[orguser.FieldOrgID]; !ok {
+				selectedFields = append(selectedFields, orguser.FieldOrgID)
+				fieldSeen[orguser.FieldOrgID] = struct{}{}
+			}
+		case "userID":
+			if _, ok := fieldSeen[orguser.FieldUserID]; !ok {
+				selectedFields = append(selectedFields, orguser.FieldUserID)
+				fieldSeen[orguser.FieldUserID] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		_m.Select(selectedFields...)
+	}
+	return nil
+}
+
+type orguserPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []OrgUserPaginateOption
+}
+
+func newOrgUserPaginateArgs(rv map[string]any) *orguserPaginateArgs {
+	args := &orguserPaginateArgs{}
 	if rv == nil {
 		return args
 	}

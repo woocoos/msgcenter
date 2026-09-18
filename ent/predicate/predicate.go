@@ -45,6 +45,9 @@ type Org func(*sql.Selector)
 // OrgRoleUser is the predicate function for orgroleuser builders.
 type OrgRoleUser func(*sql.Selector)
 
+// OrgUser is the predicate function for orguser builders.
+type OrgUser func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
 

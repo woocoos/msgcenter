@@ -29,6 +29,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
+	"github.com/woocoos/msgcenter/ent/orguser"
 	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
 	"github.com/woocoos/msgcenter/ent/userdevice"
@@ -67,6 +68,8 @@ type Client struct {
 	Org *OrgClient
 	// OrgRoleUser is the client for interacting with the OrgRoleUser builders.
 	OrgRoleUser *OrgRoleUserClient
+	// OrgUser is the client for interacting with the OrgUser builders.
+	OrgUser *OrgUserClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// UserAddr is the client for interacting with the UserAddr builders.
@@ -99,6 +102,7 @@ func (c *Client) init() {
 	c.NlogAlert = NewNlogAlertClient(c.config)
 	c.Org = NewOrgClient(c.config)
 	c.OrgRoleUser = NewOrgRoleUserClient(c.config)
+	c.OrgUser = NewOrgUserClient(c.config)
 	c.User = NewUserClient(c.config)
 	c.UserAddr = NewUserAddrClient(c.config)
 	c.UserDevice = NewUserDeviceClient(c.config)
@@ -209,6 +213,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		NlogAlert:     NewNlogAlertClient(cfg),
 		Org:           NewOrgClient(cfg),
 		OrgRoleUser:   NewOrgRoleUserClient(cfg),
+		OrgUser:       NewOrgUserClient(cfg),
 		User:          NewUserClient(cfg),
 		UserAddr:      NewUserAddrClient(cfg),
 		UserDevice:    NewUserDeviceClient(cfg),
@@ -244,6 +249,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		NlogAlert:     NewNlogAlertClient(cfg),
 		Org:           NewOrgClient(cfg),
 		OrgRoleUser:   NewOrgRoleUserClient(cfg),
+		OrgUser:       NewOrgUserClient(cfg),
 		User:          NewUserClient(cfg),
 		UserAddr:      NewUserAddrClient(cfg),
 		UserDevice:    NewUserDeviceClient(cfg),
@@ -278,7 +284,7 @@ func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal, c.MsgInternalTo,
 		c.MsgSilence, c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert,
-		c.Org, c.OrgRoleUser, c.User, c.UserAddr, c.UserDevice,
+		c.Org, c.OrgRoleUser, c.OrgUser, c.User, c.UserAddr, c.UserDevice,
 	} {
 		n.Use(hooks...)
 	}
@@ -290,7 +296,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.MsgAlert, c.MsgChannel, c.MsgEvent, c.MsgInternal, c.MsgInternalTo,
 		c.MsgSilence, c.MsgSubscriber, c.MsgTemplate, c.MsgType, c.Nlog, c.NlogAlert,
-		c.Org, c.OrgRoleUser, c.User, c.UserAddr, c.UserDevice,
+		c.Org, c.OrgRoleUser, c.OrgUser, c.User, c.UserAddr, c.UserDevice,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -325,6 +331,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Org.mutate(ctx, m)
 	case *OrgRoleUserMutation:
 		return c.OrgRoleUser.mutate(ctx, m)
+	case *OrgUserMutation:
+		return c.OrgUser.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	case *UserAddrMutation:
@@ -2517,6 +2525,177 @@ func (c *OrgRoleUserClient) mutate(ctx context.Context, m *OrgRoleUserMutation) 
 	}
 }
 
+// OrgUserClient is a client for the OrgUser schema.
+type OrgUserClient struct {
+	config
+}
+
+// NewOrgUserClient returns a client for the OrgUser from the given config.
+func NewOrgUserClient(c config) *OrgUserClient {
+	return &OrgUserClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `orguser.Hooks(f(g(h())))`.
+func (c *OrgUserClient) Use(hooks ...Hook) {
+	c.hooks.OrgUser = append(c.hooks.OrgUser, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `orguser.Intercept(f(g(h())))`.
+func (c *OrgUserClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OrgUser = append(c.inters.OrgUser, interceptors...)
+}
+
+// Create returns a builder for creating a OrgUser entity.
+func (c *OrgUserClient) Create() *OrgUserCreate {
+	mutation := newOrgUserMutation(c.config, OpCreate)
+	return &OrgUserCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OrgUser entities.
+func (c *OrgUserClient) CreateBulk(builders ...*OrgUserCreate) *OrgUserCreateBulk {
+	return &OrgUserCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OrgUserClient) MapCreateBulk(slice any, setFunc func(*OrgUserCreate, int)) *OrgUserCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OrgUserCreateBulk{err: fmt.Errorf("calling to OrgUserClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OrgUserCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OrgUserCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OrgUser.
+func (c *OrgUserClient) Update() *OrgUserUpdate {
+	mutation := newOrgUserMutation(c.config, OpUpdate)
+	return &OrgUserUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OrgUserClient) UpdateOne(_m *OrgUser) *OrgUserUpdateOne {
+	mutation := newOrgUserMutation(c.config, OpUpdateOne, withOrgUser(_m))
+	return &OrgUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OrgUserClient) UpdateOneID(id int) *OrgUserUpdateOne {
+	mutation := newOrgUserMutation(c.config, OpUpdateOne, withOrgUserID(id))
+	return &OrgUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OrgUser.
+func (c *OrgUserClient) Delete() *OrgUserDelete {
+	mutation := newOrgUserMutation(c.config, OpDelete)
+	return &OrgUserDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OrgUserClient) DeleteOne(_m *OrgUser) *OrgUserDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OrgUserClient) DeleteOneID(id int) *OrgUserDeleteOne {
+	builder := c.Delete().Where(orguser.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OrgUserDeleteOne{builder}
+}
+
+// Query returns a query builder for OrgUser.
+func (c *OrgUserClient) Query() *OrgUserQuery {
+	return &OrgUserQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOrgUser},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OrgUser entity by its id.
+func (c *OrgUserClient) Get(ctx context.Context, id int) (*OrgUser, error) {
+	return c.Query().Where(orguser.ID(id)).Only(entcache.WithEntryKey(ctx, "OrgUser", id))
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OrgUserClient) GetX(ctx context.Context, id int) *OrgUser {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryOrg queries the org edge of a OrgUser.
+func (c *OrgUserClient) QueryOrg(_m *OrgUser) *OrgQuery {
+	query := (&OrgClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(orguser.Table, orguser.FieldID, id),
+			sqlgraph.To(org.Table, org.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, orguser.OrgTable, orguser.OrgColumn),
+		)
+		schemaConfig := _m.schemaConfig
+		step.To.Schema = schemaConfig.Org
+		step.Edge.Schema = schemaConfig.OrgUser
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUser queries the user edge of a OrgUser.
+func (c *OrgUserClient) QueryUser(_m *OrgUser) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(orguser.Table, orguser.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, orguser.UserTable, orguser.UserColumn),
+		)
+		schemaConfig := _m.schemaConfig
+		step.To.Schema = schemaConfig.User
+		step.Edge.Schema = schemaConfig.OrgUser
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *OrgUserClient) Hooks() []Hook {
+	return c.hooks.OrgUser
+}
+
+// Interceptors returns the client interceptors.
+func (c *OrgUserClient) Interceptors() []Interceptor {
+	return c.inters.OrgUser
+}
+
+func (c *OrgUserClient) mutate(ctx context.Context, m *OrgUserMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OrgUserCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OrgUserUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OrgUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OrgUserDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OrgUser mutation op: %q", m.Op())
+	}
+}
+
 // UserClient is a client for the User schema.
 type UserClient struct {
 	config
@@ -2657,6 +2836,25 @@ func (c *UserClient) QueryAddresses(_m *User) *UserAddrQuery {
 		schemaConfig := _m.schemaConfig
 		step.To.Schema = schemaConfig.UserAddr
 		step.Edge.Schema = schemaConfig.UserAddr
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDevices queries the devices edge of a User.
+func (c *UserClient) QueryDevices(_m *User) *UserDeviceQuery {
+	query := (&UserDeviceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(userdevice.Table, userdevice.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.DevicesTable, user.DevicesColumn),
+		)
+		schemaConfig := _m.schemaConfig
+		step.To.Schema = schemaConfig.UserDevice
+		step.Edge.Schema = schemaConfig.UserDevice
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
 	}
@@ -2948,6 +3146,25 @@ func (c *UserDeviceClient) GetX(ctx context.Context, id int) *UserDevice {
 	return obj
 }
 
+// QueryUser queries the user edge of a UserDevice.
+func (c *UserDeviceClient) QueryUser(_m *UserDevice) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(userdevice.Table, userdevice.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, userdevice.UserTable, userdevice.UserColumn),
+		)
+		schemaConfig := _m.schemaConfig
+		step.To.Schema = schemaConfig.User
+		step.Edge.Schema = schemaConfig.UserDevice
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserDeviceClient) Hooks() []Hook {
 	return c.hooks.UserDevice
@@ -2977,13 +3194,13 @@ func (c *UserDeviceClient) mutate(ctx context.Context, m *UserDeviceMutation) (V
 type (
 	hooks struct {
 		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSilence,
-		MsgSubscriber, MsgTemplate, MsgType, Nlog, NlogAlert, Org, OrgRoleUser, User,
-		UserAddr, UserDevice []ent.Hook
+		MsgSubscriber, MsgTemplate, MsgType, Nlog, NlogAlert, Org, OrgRoleUser,
+		OrgUser, User, UserAddr, UserDevice []ent.Hook
 	}
 	inters struct {
 		MsgAlert, MsgChannel, MsgEvent, MsgInternal, MsgInternalTo, MsgSilence,
-		MsgSubscriber, MsgTemplate, MsgType, Nlog, NlogAlert, Org, OrgRoleUser, User,
-		UserAddr, UserDevice []ent.Interceptor
+		MsgSubscriber, MsgTemplate, MsgType, Nlog, NlogAlert, Org, OrgRoleUser,
+		OrgUser, User, UserAddr, UserDevice []ent.Interceptor
 	}
 )
 

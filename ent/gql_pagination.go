@@ -28,6 +28,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/org"
+	"github.com/woocoos/msgcenter/ent/orguser"
 	"github.com/woocoos/msgcenter/ent/user"
 )
 
@@ -3647,6 +3648,258 @@ func (_m *Org) ToEdge(order *OrgOrder) *OrgEdge {
 		order = DefaultOrgOrder
 	}
 	return &OrgEdge{
+		Node:   _m,
+		Cursor: order.Field.toCursor(_m),
+	}
+}
+
+// OrgUserEdge is the edge representation of OrgUser.
+type OrgUserEdge struct {
+	Node   *OrgUser `json:"node"`
+	Cursor Cursor   `json:"cursor"`
+}
+
+// OrgUserConnection is the connection containing edges to OrgUser.
+type OrgUserConnection struct {
+	Edges      []*OrgUserEdge `json:"edges"`
+	PageInfo   PageInfo       `json:"pageInfo"`
+	TotalCount int            `json:"totalCount"`
+}
+
+func (c *OrgUserConnection) build(nodes []*OrgUser, pager *orguserPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *OrgUser
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *OrgUser {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *OrgUser {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*OrgUserEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &OrgUserEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// OrgUserPaginateOption enables pagination customization.
+type OrgUserPaginateOption func(*orguserPager) error
+
+// WithOrgUserOrder configures pagination ordering.
+func WithOrgUserOrder(order *OrgUserOrder) OrgUserPaginateOption {
+	if order == nil {
+		order = DefaultOrgUserOrder
+	}
+	o := *order
+	return func(pager *orguserPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultOrgUserOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithOrgUserFilter configures pagination filter.
+func WithOrgUserFilter(filter func(*OrgUserQuery) (*OrgUserQuery, error)) OrgUserPaginateOption {
+	return func(pager *orguserPager) error {
+		if filter == nil {
+			return errors.New("OrgUserQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type orguserPager struct {
+	reverse bool
+	order   *OrgUserOrder
+	filter  func(*OrgUserQuery) (*OrgUserQuery, error)
+}
+
+func newOrgUserPager(opts []OrgUserPaginateOption, reverse bool) (*orguserPager, error) {
+	pager := &orguserPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultOrgUserOrder
+	}
+	return pager, nil
+}
+
+func (p *orguserPager) applyFilter(query *OrgUserQuery) (*OrgUserQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *orguserPager) toCursor(_m *OrgUser) Cursor {
+	return p.order.Field.toCursor(_m)
+}
+
+func (p *orguserPager) applyCursors(query *OrgUserQuery, after, before *Cursor) (*OrgUserQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultOrgUserOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *orguserPager) applyOrder(query *OrgUserQuery) *OrgUserQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultOrgUserOrder.Field {
+		query = query.Order(DefaultOrgUserOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *orguserPager) orderExpr(query *OrgUserQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultOrgUserOrder.Field {
+			b.Comma().Ident(DefaultOrgUserOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to OrgUser.
+func (_m *OrgUserQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...OrgUserPaginateOption,
+) (*OrgUserConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newOrgUserPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if _m, err = pager.applyFilter(_m); err != nil {
+		return nil, err
+	}
+	conn := &OrgUserConnection{Edges: []*OrgUserEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			c := _m.Clone()
+			c.ctx.Fields = nil
+			if conn.TotalCount, err = c.Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if _m, err = pager.applyCursors(_m, after, before); err != nil {
+		return nil, err
+	}
+	limit := paginateLimit(first, last)
+	if limit != 0 {
+		_m.Limit(limit)
+	}
+	if sp, ok := pagination.SimplePaginationFromContext(ctx); ok {
+		_m.Offset(sp.Offset(first, last))
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := _m.collectField(ctx, limit == 1, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	_m = pager.applyOrder(_m)
+	nodes, err := _m.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// OrgUserOrderField defines the ordering field of OrgUser.
+type OrgUserOrderField struct {
+	// Value extracts the ordering value from the given OrgUser.
+	Value    func(*OrgUser) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) orguser.OrderOption
+	toCursor func(*OrgUser) Cursor
+}
+
+// OrgUserOrder defines the ordering of OrgUser.
+type OrgUserOrder struct {
+	Direction OrderDirection     `json:"direction"`
+	Field     *OrgUserOrderField `json:"field"`
+}
+
+// DefaultOrgUserOrder is the default ordering of OrgUser.
+var DefaultOrgUserOrder = &OrgUserOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &OrgUserOrderField{
+		Value: func(_m *OrgUser) (ent.Value, error) {
+			return _m.ID, nil
+		},
+		column: orguser.FieldID,
+		toTerm: orguser.ByID,
+		toCursor: func(_m *OrgUser) Cursor {
+			return Cursor{ID: _m.ID}
+		},
+	},
+}
+
+// ToEdge converts OrgUser into OrgUserEdge.
+func (_m *OrgUser) ToEdge(order *OrgUserOrder) *OrgUserEdge {
+	if order == nil {
+		order = DefaultOrgUserOrder
+	}
+	return &OrgUserEdge{
 		Node:   _m,
 		Cursor: order.Field.toCursor(_m),
 	}

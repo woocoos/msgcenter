@@ -16,6 +16,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/predicate"
 	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
+	"github.com/woocoos/msgcenter/ent/userdevice"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
@@ -29,10 +30,12 @@ type UserQuery struct {
 	predicates         []predicate.User
 	withSilences       *MsgSilenceQuery
 	withAddresses      *UserAddrQuery
+	withDevices        *UserDeviceQuery
 	modifiers          []func(*sql.Selector)
 	loadTotal          []func(context.Context, []*User) error
 	withNamedSilences  map[string]*MsgSilenceQuery
 	withNamedAddresses map[string]*UserAddrQuery
+	withNamedDevices   map[string]*UserDeviceQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -113,6 +116,31 @@ func (_q *UserQuery) QueryAddresses() *UserAddrQuery {
 		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.UserAddr
 		step.Edge.Schema = schemaConfig.UserAddr
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDevices chains the current query on the "devices" edge.
+func (_q *UserQuery) QueryDevices() *UserDeviceQuery {
+	query := (&UserDeviceClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(userdevice.Table, userdevice.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.DevicesTable, user.DevicesColumn),
+		)
+		schemaConfig := _q.schemaConfig
+		step.To.Schema = schemaConfig.UserDevice
+		step.Edge.Schema = schemaConfig.UserDevice
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
@@ -313,6 +341,7 @@ func (_q *UserQuery) Clone() *UserQuery {
 		predicates:    append([]predicate.User{}, _q.predicates...),
 		withSilences:  _q.withSilences.Clone(),
 		withAddresses: _q.withAddresses.Clone(),
+		withDevices:   _q.withDevices.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -338,6 +367,17 @@ func (_q *UserQuery) WithAddresses(opts ...func(*UserAddrQuery)) *UserQuery {
 		opt(query)
 	}
 	_q.withAddresses = query
+	return _q
+}
+
+// WithDevices tells the query-builder to eager-load the nodes that are connected to
+// the "devices" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithDevices(opts ...func(*UserDeviceQuery)) *UserQuery {
+	query := (&UserDeviceClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withDevices = query
 	return _q
 }
 
@@ -419,9 +459,10 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = _q.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			_q.withSilences != nil,
 			_q.withAddresses != nil,
+			_q.withDevices != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -461,6 +502,13 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
+	if query := _q.withDevices; query != nil {
+		if err := _q.loadDevices(ctx, query, nodes,
+			func(n *User) { n.Edges.Devices = []*UserDevice{} },
+			func(n *User, e *UserDevice) { n.Edges.Devices = append(n.Edges.Devices, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range _q.withNamedSilences {
 		if err := _q.loadSilences(ctx, query, nodes,
 			func(n *User) { n.appendNamedSilences(name) },
@@ -472,6 +520,13 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := _q.loadAddresses(ctx, query, nodes,
 			func(n *User) { n.appendNamedAddresses(name) },
 			func(n *User, e *UserAddr) { n.appendNamedAddresses(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range _q.withNamedDevices {
+		if err := _q.loadDevices(ctx, query, nodes,
+			func(n *User) { n.appendNamedDevices(name) },
+			func(n *User, e *UserDevice) { n.appendNamedDevices(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -528,6 +583,36 @@ func (_q *UserQuery) loadAddresses(ctx context.Context, query *UserAddrQuery, no
 	}
 	query.Where(predicate.UserAddr(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.AddressesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UserID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *UserQuery) loadDevices(ctx context.Context, query *UserDeviceQuery, nodes []*User, init func(*User), assign func(*User, *UserDevice)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(userdevice.FieldUserID)
+	}
+	query.Where(predicate.UserDevice(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.DevicesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -658,6 +743,20 @@ func (_q *UserQuery) WithNamedAddresses(name string, opts ...func(*UserAddrQuery
 		_q.withNamedAddresses = make(map[string]*UserAddrQuery)
 	}
 	_q.withNamedAddresses[name] = query
+	return _q
+}
+
+// WithNamedDevices tells the query-builder to eager-load the nodes that are connected to the "devices"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithNamedDevices(name string, opts ...func(*UserDeviceQuery)) *UserQuery {
+	query := (&UserDeviceClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if _q.withNamedDevices == nil {
+		_q.withNamedDevices = make(map[string]*UserDeviceQuery)
+	}
+	_q.withNamedDevices[name] = query
 	return _q
 }
 

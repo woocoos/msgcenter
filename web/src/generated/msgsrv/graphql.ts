@@ -175,6 +175,7 @@ export type EmailConfig = {
   headers?: Maybe<Scalars['MapString']['output']>;
   smartHost: Scalars['HostPort']['output'];
   to: Scalars['String']['output'];
+  traceIdHeader?: Maybe<Scalars['String']['output']>;
 };
 
 export type EmailConfigInput = {
@@ -187,6 +188,7 @@ export type EmailConfigInput = {
   headers?: InputMaybe<Scalars['MapString']['input']>;
   smartHost: Scalars['HostPort']['input'];
   to: Scalars['String']['input'];
+  traceIdHeader?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type FormatMsgAlert = {
@@ -301,6 +303,7 @@ export type MsgAlert = Node & {
   id: Scalars['ID']['output'];
   /** 标签 */
   labels?: Maybe<Scalars['MapString']['output']>;
+  msgInternal?: Maybe<Array<MsgInternal>>;
   nlog: NlogConnection;
   nlogAlerts?: Maybe<Array<NlogAlert>>;
   org: Org;
@@ -410,6 +413,9 @@ export type MsgAlertWhereInput = {
   fingerprintLTE?: InputMaybe<Scalars['String']['input']>;
   fingerprintNEQ?: InputMaybe<Scalars['String']['input']>;
   fingerprintNotIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  /** msg_internal edge predicates */
+  hasMsgInternal?: InputMaybe<Scalars['Boolean']['input']>;
+  hasMsgInternalWith?: InputMaybe<Array<MsgInternalWhereInput>>;
   /** nlog edge predicates */
   hasNlog?: InputMaybe<Scalars['Boolean']['input']>;
   /** nlog_alerts edge predicates */
@@ -871,8 +877,9 @@ export type MsgEventWhereInput = {
 
 export type MsgInternal = Node & {
   __typename?: 'MsgInternal';
+  alert?: Maybe<MsgAlert>;
   /** 消息ID */
-  alertID?: Maybe<Scalars['Int']['output']>;
+  alertID?: Maybe<Scalars['ID']['output']>;
   /** 消息体 */
   body?: Maybe<Scalars['String']['output']>;
   /** 消息类型分类 */
@@ -1069,15 +1076,11 @@ export type MsgInternalToWhereInput = {
  */
 export type MsgInternalWhereInput = {
   /** alert_id field predicates */
-  alertID?: InputMaybe<Scalars['Int']['input']>;
-  alertIDGT?: InputMaybe<Scalars['Int']['input']>;
-  alertIDGTE?: InputMaybe<Scalars['Int']['input']>;
-  alertIDIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  alertID?: InputMaybe<Scalars['ID']['input']>;
+  alertIDIn?: InputMaybe<Array<Scalars['ID']['input']>>;
   alertIDIsNil?: InputMaybe<Scalars['Boolean']['input']>;
-  alertIDLT?: InputMaybe<Scalars['Int']['input']>;
-  alertIDLTE?: InputMaybe<Scalars['Int']['input']>;
-  alertIDNEQ?: InputMaybe<Scalars['Int']['input']>;
-  alertIDNotIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  alertIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  alertIDNotIn?: InputMaybe<Array<Scalars['ID']['input']>>;
   alertIDNotNil?: InputMaybe<Scalars['Boolean']['input']>;
   and?: InputMaybe<Array<MsgInternalWhereInput>>;
   /** category field predicates */
@@ -1126,6 +1129,9 @@ export type MsgInternalWhereInput = {
   formatLTE?: InputMaybe<Scalars['String']['input']>;
   formatNEQ?: InputMaybe<Scalars['String']['input']>;
   formatNotIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  /** alert edge predicates */
+  hasAlert?: InputMaybe<Scalars['Boolean']['input']>;
+  hasAlertWith?: InputMaybe<Array<MsgAlertWhereInput>>;
   /** msg_internal_to edge predicates */
   hasMsgInternalTo?: InputMaybe<Scalars['Boolean']['input']>;
   hasMsgInternalToWith?: InputMaybe<Array<MsgInternalToWhereInput>>;
@@ -2220,6 +2226,8 @@ export type Nlog = Node & {
   __typename?: 'Nlog';
   alerts?: Maybe<Array<MsgAlert>>;
   createdAt: Scalars['Time']['output'];
+  /** 错误信息，有值表示未发送成功：如：邮件已发往邮件服务器，邮件服务器发送失败，记录其错误信息 */
+  errMsg?: Maybe<Scalars['String']['output']>;
   /** 过期时间 */
   expiresAt: Scalars['Time']['output'];
   /** 分组键 */
@@ -2227,6 +2235,8 @@ export type Nlog = Node & {
   id: Scalars['ID']['output'];
   /** 通道的索引位置 */
   idx: Scalars['Int']['output'];
+  /** 邮件消息ID，用于关联邮件发送回执 */
+  messageID?: Maybe<Scalars['String']['output']>;
   nlogAlert?: Maybe<Array<NlogAlert>>;
   /** 接收组名称 */
   receiver: Scalars['String']['output'];
@@ -2348,6 +2358,22 @@ export type NlogWhereInput = {
   createdAtLTE?: InputMaybe<Scalars['Time']['input']>;
   createdAtNEQ?: InputMaybe<Scalars['Time']['input']>;
   createdAtNotIn?: InputMaybe<Array<Scalars['Time']['input']>>;
+  /** err_msg field predicates */
+  errMsg?: InputMaybe<Scalars['String']['input']>;
+  errMsgContains?: InputMaybe<Scalars['String']['input']>;
+  errMsgContainsFold?: InputMaybe<Scalars['String']['input']>;
+  errMsgEqualFold?: InputMaybe<Scalars['String']['input']>;
+  errMsgGT?: InputMaybe<Scalars['String']['input']>;
+  errMsgGTE?: InputMaybe<Scalars['String']['input']>;
+  errMsgHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  errMsgHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  errMsgIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  errMsgIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  errMsgLT?: InputMaybe<Scalars['String']['input']>;
+  errMsgLTE?: InputMaybe<Scalars['String']['input']>;
+  errMsgNEQ?: InputMaybe<Scalars['String']['input']>;
+  errMsgNotIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  errMsgNotNil?: InputMaybe<Scalars['Boolean']['input']>;
   /** expires_at field predicates */
   expiresAt?: InputMaybe<Scalars['Time']['input']>;
   expiresAtGT?: InputMaybe<Scalars['Time']['input']>;
@@ -2395,6 +2421,22 @@ export type NlogWhereInput = {
   idxLTE?: InputMaybe<Scalars['Int']['input']>;
   idxNEQ?: InputMaybe<Scalars['Int']['input']>;
   idxNotIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** message_id field predicates */
+  messageID?: InputMaybe<Scalars['String']['input']>;
+  messageIDContains?: InputMaybe<Scalars['String']['input']>;
+  messageIDContainsFold?: InputMaybe<Scalars['String']['input']>;
+  messageIDEqualFold?: InputMaybe<Scalars['String']['input']>;
+  messageIDGT?: InputMaybe<Scalars['String']['input']>;
+  messageIDGTE?: InputMaybe<Scalars['String']['input']>;
+  messageIDHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  messageIDHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  messageIDIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  messageIDIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  messageIDLT?: InputMaybe<Scalars['String']['input']>;
+  messageIDLTE?: InputMaybe<Scalars['String']['input']>;
+  messageIDNEQ?: InputMaybe<Scalars['String']['input']>;
+  messageIDNotIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  messageIDNotNil?: InputMaybe<Scalars['Boolean']['input']>;
   not?: InputMaybe<NlogWhereInput>;
   or?: InputMaybe<Array<NlogWhereInput>>;
   /** receiver field predicates */
@@ -2476,6 +2518,18 @@ export type Org = Node & {
   path?: Maybe<Scalars['String']['output']>;
 };
 
+export type OrgUser = Node & {
+  __typename?: 'OrgUser';
+  /** 组织ID */
+  id: Scalars['ID']['output'];
+  org: Org;
+  /** 组织ID */
+  orgID: Scalars['ID']['output'];
+  user: User;
+  /** 用户ID */
+  userID: Scalars['ID']['output'];
+};
+
 /**
  * Information about pagination in a connection.
  * https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
@@ -2494,6 +2548,10 @@ export type PageInfo = {
 
 export type Query = {
   __typename?: 'Query';
+  /** app推送消息列表 */
+  appPushMsgs: MsgInternalConnection;
+  /** app推送消息未读数 */
+  appUnreadPushMsgs: Scalars['Int']['output'];
   /** 查询设备是否已有活跃的WebSocket连接 */
   deviceConnected: Scalars['Boolean']['output'];
   /** 查询消息体发送的所有消息 */
@@ -2534,6 +2592,16 @@ export type Query = {
   userUnreadMsgInternals: Scalars['Int']['output'];
   /** 消息分类站内信未读数 */
   userUnreadMsgInternalsFromMsgCategory: Array<Scalars['Int']['output']>;
+};
+
+
+export type QueryAppPushMsgsArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<MsgInternalOrder>;
+  where?: InputMaybe<MsgInternalWhereInput>;
 };
 
 
@@ -2970,14 +3038,14 @@ export type MsgChannelInfoQueryVariables = Exact<{
 }>;
 
 
-export type MsgChannelInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string, name: string, receiverType: MsgChannelReceiverType, tenantID: string, comments?: string | null, status?: MsgChannelSimpleStatus | null, createdAt: any } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'User', id: string } | null };
+export type MsgChannelInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string, name: string, receiverType: MsgChannelReceiverType, tenantID: string, comments?: string | null, status?: MsgChannelSimpleStatus | null, createdAt: any } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'OrgUser', id: string } | { __typename?: 'User', id: string } | null };
 
 export type MsgChannelReceiverInfoQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type MsgChannelReceiverInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string, name: string, receiverType: MsgChannelReceiverType, tenantID: string, comments?: string | null, status?: MsgChannelSimpleStatus | null, createdAt: any, receiver?: { __typename?: 'Receiver', name: string, emailConfigs?: Array<{ __typename?: 'EmailConfig', authIdentity: string, authPassword: string, authSecret: string, authType: string, authUsername: string, from?: string | null, headers?: any | null, smartHost: any, to: string } | null> | null, messageConfig?: { __typename?: 'MessageConfig', redirect?: string | null, subject?: string | null, to?: string | null } | null, webhookConfigs?: Array<{ __typename?: 'WebhookConfig', sendResolved?: boolean | null, url?: string | null, urlFile?: string | null, maxAlerts?: number | null, timeout?: any | null, headers?: any | null, subject?: string | null, body?: string | null } | null> | null, umengConfigs?: Array<{ __typename?: 'UmengConfig', sendResolved?: boolean | null, apiURL?: string | null, apps: any, productionMode?: boolean | null } | null> | null } | null } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'User', id: string } | null };
+export type MsgChannelReceiverInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string, name: string, receiverType: MsgChannelReceiverType, tenantID: string, comments?: string | null, status?: MsgChannelSimpleStatus | null, createdAt: any, receiver?: { __typename?: 'Receiver', name: string, emailConfigs?: Array<{ __typename?: 'EmailConfig', authIdentity: string, authPassword: string, authSecret: string, authType: string, authUsername: string, from?: string | null, headers?: any | null, smartHost: any, to: string } | null> | null, messageConfig?: { __typename?: 'MessageConfig', redirect?: string | null, subject?: string | null, to?: string | null } | null, webhookConfigs?: Array<{ __typename?: 'WebhookConfig', sendResolved?: boolean | null, url?: string | null, urlFile?: string | null, maxAlerts?: number | null, timeout?: any | null, headers?: any | null, subject?: string | null, body?: string | null } | null> | null, umengConfigs?: Array<{ __typename?: 'UmengConfig', sendResolved?: boolean | null, apiURL?: string | null, apps: any, productionMode?: boolean | null } | null> | null } | null } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'OrgUser', id: string } | { __typename?: 'User', id: string } | null };
 
 export type CreateMsgChannelMutationVariables = Exact<{
   input: CreateMsgChannelInput;
@@ -3029,7 +3097,7 @@ export type MsgEventInfoQueryVariables = Exact<{
 }>;
 
 
-export type MsgEventInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string, name: string, comments?: string | null, status?: MsgEventSimpleStatus | null, createdAt: any, msgTypeID: string, modes: string, canSubs?: boolean | null, msgType: { __typename?: 'MsgType', id: string, category: string, appID?: string | null, name: string } } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'User', id: string } | null };
+export type MsgEventInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string, name: string, comments?: string | null, status?: MsgEventSimpleStatus | null, createdAt: any, msgTypeID: string, modes: string, canSubs?: boolean | null, msgType: { __typename?: 'MsgType', id: string, category: string, appID?: string | null, name: string } } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'OrgUser', id: string } | { __typename?: 'User', id: string } | null };
 
 export type MsgEventInfoRouteQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
@@ -3037,7 +3105,7 @@ export type MsgEventInfoRouteQueryVariables = Exact<{
 }>;
 
 
-export type MsgEventInfoRouteQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string, name: string, comments?: string | null, status?: MsgEventSimpleStatus | null, createdAt: any, msgTypeID: string, modes: string, canSubs?: boolean | null, routeStr: string, msgType: { __typename?: 'MsgType', id: string, category: string, appID?: string | null, name: string } } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'User', id: string } | null };
+export type MsgEventInfoRouteQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string, name: string, comments?: string | null, status?: MsgEventSimpleStatus | null, createdAt: any, msgTypeID: string, modes: string, canSubs?: boolean | null, routeStr: string, msgType: { __typename?: 'MsgType', id: string, category: string, appID?: string | null, name: string } } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'OrgUser', id: string } | { __typename?: 'User', id: string } | null };
 
 export type CreateMsgEventMutationVariables = Exact<{
   input: CreateMsgEventInput;
@@ -3089,7 +3157,7 @@ export type MsgEventWithSubsQueryVariables = Exact<{
 }>;
 
 
-export type MsgEventWithSubsQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string, name: string, comments?: string | null, status?: MsgEventSimpleStatus | null, createdAt: any, msgTypeID: string, modes: string, canSubs?: boolean | null, msgType: { __typename?: 'MsgType', id: string, category: string, appID?: string | null, name: string }, subscriberUsers: Array<{ __typename?: 'MsgSubscriber', id: string, userID?: string | null, orgRoleID?: string | null, exclude?: boolean | null }>, subscriberRoles: Array<{ __typename?: 'MsgSubscriber', id: string, userID?: string | null, orgRoleID?: string | null, exclude?: boolean | null }>, excludeSubscriberUsers: Array<{ __typename?: 'MsgSubscriber', id: string, userID?: string | null, orgRoleID?: string | null, exclude?: boolean | null }> } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'User', id: string } | null };
+export type MsgEventWithSubsQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string, name: string, comments?: string | null, status?: MsgEventSimpleStatus | null, createdAt: any, msgTypeID: string, modes: string, canSubs?: boolean | null, msgType: { __typename?: 'MsgType', id: string, category: string, appID?: string | null, name: string }, subscriberUsers: Array<{ __typename?: 'MsgSubscriber', id: string, userID?: string | null, orgRoleID?: string | null, exclude?: boolean | null }>, subscriberRoles: Array<{ __typename?: 'MsgSubscriber', id: string, userID?: string | null, orgRoleID?: string | null, exclude?: boolean | null }>, excludeSubscriberUsers: Array<{ __typename?: 'MsgSubscriber', id: string, userID?: string | null, orgRoleID?: string | null, exclude?: boolean | null }> } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'OrgUser', id: string } | { __typename?: 'User', id: string } | null };
 
 export type MsgInternalListQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3114,7 +3182,7 @@ export type MsgInternalInfoQueryVariables = Exact<{
 }>;
 
 
-export type MsgInternalInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string, tenantID: number, createdBy: number, createdAt: any, subject: string, body?: string | null, format: string, redirect?: string | null, category: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'User', id: string } | null };
+export type MsgInternalInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string, tenantID: number, createdBy: number, createdAt: any, subject: string, body?: string | null, format: string, redirect?: string | null, category: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'OrgUser', id: string } | { __typename?: 'User', id: string } | null };
 
 export type UserMsgCategoryQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3133,7 +3201,7 @@ export type MsgInternalToInfoQueryVariables = Exact<{
 }>;
 
 
-export type MsgInternalToInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string, msgInternalID: string, createdAt: any, deleteAt?: any | null, readAt?: any | null, userID: string, msgInternal: { __typename?: 'MsgInternal', id: string, tenantID: number, createdBy: number, createdAt: any, subject: string, body?: string | null, format: string, redirect?: string | null, category: string } } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'User', id: string } | null };
+export type MsgInternalToInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string, msgInternalID: string, createdAt: any, deleteAt?: any | null, readAt?: any | null, userID: string, msgInternal: { __typename?: 'MsgInternal', id: string, tenantID: number, createdBy: number, createdAt: any, subject: string, body?: string | null, format: string, redirect?: string | null, category: string } } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'OrgUser', id: string } | { __typename?: 'User', id: string } | null };
 
 export type MarkMsgReadMutationVariables = Exact<{
   ids: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
@@ -3199,7 +3267,7 @@ export type MsgAlertLogListQueryVariables = Exact<{
 }>;
 
 
-export type MsgAlertLogListQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string, nlog: { __typename?: 'NlogConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'NlogEdge', cursor: any, node?: { __typename?: 'Nlog', id: string, sendAt: any, expiresAt: any, groupKey: string, receiver: string, receiverType: NlogReceiverType } | null } | null> | null } } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'User', id: string } | null };
+export type MsgAlertLogListQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string, nlog: { __typename?: 'NlogConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'NlogEdge', cursor: any, node?: { __typename?: 'Nlog', id: string, sendAt: any, expiresAt: any, groupKey: string, receiver: string, receiverType: NlogReceiverType } | null } | null> | null } } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'OrgUser', id: string } | { __typename?: 'User', id: string } | null };
 
 export type SilenceListQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -3215,7 +3283,7 @@ export type SilenceInfoQueryVariables = Exact<{
 }>;
 
 
-export type SilenceInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string, tenantID: number, startsAt: any, endsAt: any, comments?: string | null, state: MsgSilenceSilenceState, matchers?: Array<{ __typename?: 'Matcher', type: MatchType, name: string, value: string } | null> | null } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'User', id: string } | null };
+export type SilenceInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string, tenantID: number, startsAt: any, endsAt: any, comments?: string | null, state: MsgSilenceSilenceState, matchers?: Array<{ __typename?: 'Matcher', type: MatchType, name: string, value: string } | null> | null } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'OrgUser', id: string } | { __typename?: 'User', id: string } | null };
 
 export type CreateMsgSilenceMutationVariables = Exact<{
   input: CreateMsgSilenceInput;
@@ -3253,7 +3321,7 @@ export type MsgTemplateInfoQueryVariables = Exact<{
 }>;
 
 
-export type MsgTemplateInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string, name: string, comments?: string | null, status?: MsgTemplateSimpleStatus | null, createdAt: any, msgTypeID: number, msgEventID: string, tenantID?: string | null, userID?: string | null, receiverType: MsgTemplateReceiverType, format: MsgTemplateFormat, subject?: string | null, from?: string | null, to?: string | null, cc?: string | null, bcc?: string | null, body?: string | null, tpl?: string | null, attachments?: Array<string> | null } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'User', id: string } | null };
+export type MsgTemplateInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string, name: string, comments?: string | null, status?: MsgTemplateSimpleStatus | null, createdAt: any, msgTypeID: number, msgEventID: string, tenantID?: string | null, userID?: string | null, receiverType: MsgTemplateReceiverType, format: MsgTemplateFormat, subject?: string | null, from?: string | null, to?: string | null, cc?: string | null, bcc?: string | null, body?: string | null, tpl?: string | null, attachments?: Array<string> | null } | { __typename?: 'MsgType', id: string } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'OrgUser', id: string } | { __typename?: 'User', id: string } | null };
 
 export type MsgTemplateDefineByNameQueryVariables = Exact<{
   format: MsgTemplateFormat;
@@ -3338,7 +3406,7 @@ export type MsgTypeInfoQueryVariables = Exact<{
 }>;
 
 
-export type MsgTypeInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string, name: string, comments?: string | null, appID?: string | null, status?: MsgTypeSimpleStatus | null, category: string, canSubs?: boolean | null, canCustom?: boolean | null, createdAt: any } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'User', id: string } | null };
+export type MsgTypeInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string, name: string, comments?: string | null, appID?: string | null, status?: MsgTypeSimpleStatus | null, category: string, canSubs?: boolean | null, canCustom?: boolean | null, createdAt: any } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'OrgUser', id: string } | { __typename?: 'User', id: string } | null };
 
 export type CreateMsgTypeMutationVariables = Exact<{
   input: CreateMsgTypeInput;
@@ -3384,7 +3452,7 @@ export type MsgTypeAndSubInfoQueryVariables = Exact<{
 }>;
 
 
-export type MsgTypeAndSubInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string, name: string, comments?: string | null, appID?: string | null, status?: MsgTypeSimpleStatus | null, category: string, canSubs?: boolean | null, canCustom?: boolean | null, createdAt: any, subscriberUsers: Array<{ __typename?: 'MsgSubscriber', id: string, tenantID: string, msgTypeID?: string | null, userID?: string | null }>, subscriberRoles: Array<{ __typename?: 'MsgSubscriber', id: string, tenantID: string, msgTypeID?: string | null, orgRoleID?: string | null }>, excludeSubscriberUsers: Array<{ __typename?: 'MsgSubscriber', id: string, tenantID: string, msgTypeID?: string | null, userID?: string | null }> } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'User', id: string } | null };
+export type MsgTypeAndSubInfoQuery = { __typename?: 'Query', node?: { __typename?: 'MsgAlert', id: string } | { __typename?: 'MsgChannel', id: string } | { __typename?: 'MsgEvent', id: string } | { __typename?: 'MsgInternal', id: string } | { __typename?: 'MsgInternalTo', id: string } | { __typename?: 'MsgSilence', id: string } | { __typename?: 'MsgSubscriber', id: string } | { __typename?: 'MsgTemplate', id: string } | { __typename?: 'MsgType', id: string, name: string, comments?: string | null, appID?: string | null, status?: MsgTypeSimpleStatus | null, category: string, canSubs?: boolean | null, canCustom?: boolean | null, createdAt: any, subscriberUsers: Array<{ __typename?: 'MsgSubscriber', id: string, tenantID: string, msgTypeID?: string | null, userID?: string | null }>, subscriberRoles: Array<{ __typename?: 'MsgSubscriber', id: string, tenantID: string, msgTypeID?: string | null, orgRoleID?: string | null }>, excludeSubscriberUsers: Array<{ __typename?: 'MsgSubscriber', id: string, tenantID: string, msgTypeID?: string | null, userID?: string | null }> } | { __typename?: 'Nlog', id: string } | { __typename?: 'NlogAlert', id: string } | { __typename?: 'Org', id: string } | { __typename?: 'OrgUser', id: string } | { __typename?: 'User', id: string } | null };
 
 export type CreateMsgSubscriberMutationVariables = Exact<{
   inputs: Array<CreateMsgSubscriberInput> | CreateMsgSubscriberInput;

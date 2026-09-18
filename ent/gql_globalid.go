@@ -86,6 +86,12 @@ func (_m *Org) GlobalID(context.Context) (string, error) {
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
+// GlobalID returns the global identifier for the given OrgUser node.
+func (_m *OrgUser) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("OrgUser:%d", _m.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
 // GlobalID returns the global identifier for the given User node.
 func (_m *User) GlobalID(context.Context) (string, error) {
 	id := fmt.Sprintf("User:%d", _m.ID)
@@ -133,6 +139,8 @@ func GlobalID(tp, id string) (string, error) {
 	case "NlogAlert":
 		break
 	case "Org":
+		break
+	case "OrgUser":
 		break
 	case "User":
 		break

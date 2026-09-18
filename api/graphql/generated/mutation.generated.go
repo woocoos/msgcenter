@@ -3250,7 +3250,7 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"to", "from", "smartHost", "authType", "authUsername", "authPassword", "authSecret", "authIdentity", "headers"}
+	fieldsInOrder := [...]string{"to", "from", "smartHost", "authType", "authUsername", "authPassword", "authSecret", "authIdentity", "headers", "traceIdHeader"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3320,6 +3320,13 @@ func (ec *executionContext) unmarshalInputEmailConfigInput(ctx context.Context, 
 				return it, err
 			}
 			it.Headers = data
+		case "traceIdHeader":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("traceIdHeader"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TraceIDHeader = data
 		}
 	}
 

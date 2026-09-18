@@ -57,6 +57,7 @@ type EmailConfig {
     authSecret: String!
     authIdentity: String!
     headers: MapString
+    traceIdHeader: String
 }
 
 type MessageConfig {
@@ -265,4 +266,15 @@ extend type Query {
         """消息模板的body数据"""
         body:String!
     ):String!
+    """app推送消息列表"""
+    appPushMsgs(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgInternalOrder
+        where: MsgInternalWhereInput
+    ): MsgInternalConnection!
+    """app推送消息未读数"""
+    appUnreadPushMsgs:Int!
 }

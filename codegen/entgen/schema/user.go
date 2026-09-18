@@ -38,6 +38,7 @@ func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("silences", MsgSilence.Type).Comment("静默"),
 		edge.To("addresses", UserAddr.Type).Comment("用户联系信息"),
+		edge.To("devices", UserDevice.Type).Comment("用户设备"),
 	}
 }
 
@@ -68,6 +69,35 @@ func (Org) Fields() []ent.Field {
 func (Org) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("msg_alerts", MsgAlert.Type).Comment("消息列表"),
+	}
+}
+
+// OrgUser holds the schema definition for the Org entity.
+type OrgUser struct {
+	ent.Schema
+}
+
+// Annotations of the OrgUser.
+func (OrgUser) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entsql.Annotation{Table: "org_user"},
+		entgql.Skip(entgql.SkipEnumField, entgql.SkipOrderField, entgql.SkipWhereInput, entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
+	}
+}
+
+// Fields of the OrgUser.
+func (OrgUser) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("id").Comment("组织ID"),
+		field.Int("org_id").Comment("组织ID"),
+		field.Int("user_id").Comment("用户ID"),
+	}
+}
+
+func (OrgUser) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("org", Org.Type).Unique().Required().Field("org_id"),
+		edge.To("user", User.Type).Unique().Required().Field("user_id"),
 	}
 }
 
@@ -160,5 +190,12 @@ func (UserDevice) Fields() []ent.Field {
 		field.String("app_version").MaxLen(45).Optional().Comment("app版本"),
 		field.String("device_model").MaxLen(45).Optional().Comment("设备型号"),
 		field.Enum("status").GoType(typex.SimpleStatus("")).Optional().Comment("状态,可用或不可用及其他待确认状态"),
+	}
+}
+
+// Edges of the UserDevice.
+func (UserDevice) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.From("user", User.Type).Ref("devices").Unique().Immutable().Field("user_id"),
 	}
 }

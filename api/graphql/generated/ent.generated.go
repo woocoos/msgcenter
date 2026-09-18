@@ -68,6 +68,8 @@ type QueryResolver interface {
 	UserUnreadMsgInternalsFromMsgCategory(ctx context.Context, categories []string) ([]int, error)
 	UserUnreadMsgInternals(ctx context.Context) (int, error)
 	MsgTemplateDefineByName(ctx context.Context, format msgtemplate.Format, body string) (string, error)
+	AppPushMsgs(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalOrder, where *ent.MsgInternalWhereInput) (*ent.MsgInternalConnection, error)
+	AppUnreadPushMsgs(ctx context.Context) (int, error)
 	DeviceConnected(ctx context.Context, deviceID string) (bool, error)
 }
 
@@ -271,6 +273,149 @@ func (ec *executionContext) field_Query___type_argsName(
 	}
 
 	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_appPushMsgs_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_appPushMsgs_argsAfter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg0
+	arg1, err := ec.field_Query_appPushMsgs_argsFirst(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg1
+	arg2, err := ec.field_Query_appPushMsgs_argsBefore(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg2
+	arg3, err := ec.field_Query_appPushMsgs_argsLast(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg3
+	arg4, err := ec.field_Query_appPushMsgs_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
+	arg5, err := ec.field_Query_appPushMsgs_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg5
+	return args, nil
+}
+func (ec *executionContext) field_Query_appPushMsgs_argsAfter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*entgql.Cursor[int], error) {
+	if _, ok := rawArgs["after"]; !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+	if tmp, ok := rawArgs["after"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_appPushMsgs_argsFirst(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	if _, ok := rawArgs["first"]; !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+	if tmp, ok := rawArgs["first"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_appPushMsgs_argsBefore(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*entgql.Cursor[int], error) {
+	if _, ok := rawArgs["before"]; !ok {
+		var zeroVal *entgql.Cursor[int]
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+	if tmp, ok := rawArgs["before"]; ok {
+		return ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+	}
+
+	var zeroVal *entgql.Cursor[int]
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_appPushMsgs_argsLast(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*int, error) {
+	if _, ok := rawArgs["last"]; !ok {
+		var zeroVal *int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+	if tmp, ok := rawArgs["last"]; ok {
+		return ec.unmarshalOInt2ᚖint(ctx, tmp)
+	}
+
+	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_appPushMsgs_argsOrderBy(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*ent.MsgInternalOrder, error) {
+	if _, ok := rawArgs["orderBy"]; !ok {
+		var zeroVal *ent.MsgInternalOrder
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
+	if tmp, ok := rawArgs["orderBy"]; ok {
+		return ec.unmarshalOMsgInternalOrder2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalOrder(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgInternalOrder
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_appPushMsgs_argsWhere(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*ent.MsgInternalWhereInput, error) {
+	if _, ok := rawArgs["where"]; !ok {
+		var zeroVal *ent.MsgInternalWhereInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+	if tmp, ok := rawArgs["where"]; ok {
+		return ec.unmarshalOMsgInternalWhereInput2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalWhereInput(ctx, tmp)
+	}
+
+	var zeroVal *ent.MsgInternalWhereInput
 	return zeroVal, nil
 }
 
@@ -11314,6 +11459,47 @@ func (ec *executionContext) fieldContext_Nlog_errMsg(_ context.Context, field gr
 	return fc, nil
 }
 
+func (ec *executionContext) _Nlog_messageID(ctx context.Context, field graphql.CollectedField, obj *ent.Nlog) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Nlog_messageID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MessageID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Nlog_messageID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Nlog",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Nlog_alerts(ctx context.Context, field graphql.CollectedField, obj *ent.Nlog) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Nlog_alerts(ctx, field)
 	if err != nil {
@@ -11683,6 +11869,8 @@ func (ec *executionContext) fieldContext_NlogAlert_nlog(_ context.Context, field
 				return ec.fieldContext_Nlog_expiresAt(ctx, field)
 			case "errMsg":
 				return ec.fieldContext_Nlog_errMsg(ctx, field)
+			case "messageID":
+				return ec.fieldContext_Nlog_messageID(ctx, field)
 			case "alerts":
 				return ec.fieldContext_Nlog_alerts(ctx, field)
 			case "nlogAlert":
@@ -11977,6 +12165,8 @@ func (ec *executionContext) fieldContext_NlogEdge_node(_ context.Context, field 
 				return ec.fieldContext_Nlog_expiresAt(ctx, field)
 			case "errMsg":
 				return ec.fieldContext_Nlog_errMsg(ctx, field)
+			case "messageID":
+				return ec.fieldContext_Nlog_messageID(ctx, field)
 			case "alerts":
 				return ec.fieldContext_Nlog_alerts(ctx, field)
 			case "nlogAlert":
@@ -12312,6 +12502,250 @@ func (ec *executionContext) fieldContext_Org_msgAlerts(_ context.Context, field 
 				return ec.fieldContext_MsgAlert_nlogAlerts(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MsgAlert", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OrgUser_id(ctx context.Context, field graphql.CollectedField, obj *ent.OrgUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OrgUser_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OrgUser_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OrgUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OrgUser_orgID(ctx context.Context, field graphql.CollectedField, obj *ent.OrgUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OrgUser_orgID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OrgID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OrgUser_orgID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OrgUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OrgUser_userID(ctx context.Context, field graphql.CollectedField, obj *ent.OrgUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OrgUser_userID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OrgUser_userID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OrgUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OrgUser_org(ctx context.Context, field graphql.CollectedField, obj *ent.OrgUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OrgUser_org(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Org(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Org)
+	fc.Result = res
+	return ec.marshalNOrg2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐOrg(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OrgUser_org(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OrgUser",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Org_id(ctx, field)
+			case "ownerID":
+				return ec.fieldContext_Org_ownerID(ctx, field)
+			case "kind":
+				return ec.fieldContext_Org_kind(ctx, field)
+			case "parentID":
+				return ec.fieldContext_Org_parentID(ctx, field)
+			case "path":
+				return ec.fieldContext_Org_path(ctx, field)
+			case "msgAlerts":
+				return ec.fieldContext_Org_msgAlerts(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Org", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _OrgUser_user(ctx context.Context, field graphql.CollectedField, obj *ent.OrgUser) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OrgUser_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.User(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.User)
+	fc.Result = res
+	return ec.marshalNUser2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐUser(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OrgUser_user(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OrgUser",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "principalName":
+				return ec.fieldContext_User_principalName(ctx, field)
+			case "displayName":
+				return ec.fieldContext_User_displayName(ctx, field)
+			case "silences":
+				return ec.fieldContext_User_silences(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
 	return fc, nil
@@ -13605,6 +14039,113 @@ func (ec *executionContext) fieldContext_Query_msgTemplateDefineByName(ctx conte
 	if fc.Args, err = ec.field_Query_msgTemplateDefineByName_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_appPushMsgs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_appPushMsgs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AppPushMsgs(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.MsgInternalOrder), fc.Args["where"].(*ent.MsgInternalWhereInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.MsgInternalConnection)
+	fc.Result = res
+	return ec.marshalNMsgInternalConnection2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋentᚐMsgInternalConnection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_appPushMsgs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_MsgInternalConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_MsgInternalConnection_pageInfo(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_MsgInternalConnection_totalCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MsgInternalConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_appPushMsgs_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_appUnreadPushMsgs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_appUnreadPushMsgs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AppUnreadPushMsgs(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_appUnreadPushMsgs(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
 	}
 	return fc, nil
 }
@@ -21638,7 +22179,7 @@ func (ec *executionContext) unmarshalInputNlogWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "groupKey", "groupKeyNEQ", "groupKeyIn", "groupKeyNotIn", "groupKeyGT", "groupKeyGTE", "groupKeyLT", "groupKeyLTE", "groupKeyContains", "groupKeyHasPrefix", "groupKeyHasSuffix", "groupKeyEqualFold", "groupKeyContainsFold", "receiver", "receiverNEQ", "receiverIn", "receiverNotIn", "receiverGT", "receiverGTE", "receiverLT", "receiverLTE", "receiverContains", "receiverHasPrefix", "receiverHasSuffix", "receiverEqualFold", "receiverContainsFold", "receiverType", "receiverTypeNEQ", "receiverTypeIn", "receiverTypeNotIn", "idx", "idxNEQ", "idxIn", "idxNotIn", "idxGT", "idxGTE", "idxLT", "idxLTE", "sendAt", "sendAtNEQ", "sendAtIn", "sendAtNotIn", "sendAtGT", "sendAtGTE", "sendAtLT", "sendAtLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "expiresAt", "expiresAtNEQ", "expiresAtIn", "expiresAtNotIn", "expiresAtGT", "expiresAtGTE", "expiresAtLT", "expiresAtLTE", "errMsg", "errMsgNEQ", "errMsgIn", "errMsgNotIn", "errMsgGT", "errMsgGTE", "errMsgLT", "errMsgLTE", "errMsgContains", "errMsgHasPrefix", "errMsgHasSuffix", "errMsgIsNil", "errMsgNotNil", "errMsgEqualFold", "errMsgContainsFold", "hasAlerts", "hasAlertsWith", "hasNlogAlert", "hasNlogAlertWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "groupKey", "groupKeyNEQ", "groupKeyIn", "groupKeyNotIn", "groupKeyGT", "groupKeyGTE", "groupKeyLT", "groupKeyLTE", "groupKeyContains", "groupKeyHasPrefix", "groupKeyHasSuffix", "groupKeyEqualFold", "groupKeyContainsFold", "receiver", "receiverNEQ", "receiverIn", "receiverNotIn", "receiverGT", "receiverGTE", "receiverLT", "receiverLTE", "receiverContains", "receiverHasPrefix", "receiverHasSuffix", "receiverEqualFold", "receiverContainsFold", "receiverType", "receiverTypeNEQ", "receiverTypeIn", "receiverTypeNotIn", "idx", "idxNEQ", "idxIn", "idxNotIn", "idxGT", "idxGTE", "idxLT", "idxLTE", "sendAt", "sendAtNEQ", "sendAtIn", "sendAtNotIn", "sendAtGT", "sendAtGTE", "sendAtLT", "sendAtLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "expiresAt", "expiresAtNEQ", "expiresAtIn", "expiresAtNotIn", "expiresAtGT", "expiresAtGTE", "expiresAtLT", "expiresAtLTE", "errMsg", "errMsgNEQ", "errMsgIn", "errMsgNotIn", "errMsgGT", "errMsgGTE", "errMsgLT", "errMsgLTE", "errMsgContains", "errMsgHasPrefix", "errMsgHasSuffix", "errMsgIsNil", "errMsgNotNil", "errMsgEqualFold", "errMsgContainsFold", "messageID", "messageIDNEQ", "messageIDIn", "messageIDNotIn", "messageIDGT", "messageIDGTE", "messageIDLT", "messageIDLTE", "messageIDContains", "messageIDHasPrefix", "messageIDHasSuffix", "messageIDIsNil", "messageIDNotNil", "messageIDEqualFold", "messageIDContainsFold", "hasAlerts", "hasAlertsWith", "hasNlogAlert", "hasNlogAlertWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -22387,6 +22928,111 @@ func (ec *executionContext) unmarshalInputNlogWhereInput(ctx context.Context, ob
 				return it, err
 			}
 			it.ErrMsgContainsFold = data
+		case "messageID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageID"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageID = data
+		case "messageIDNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageIDNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageIDNEQ = data
+		case "messageIDIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageIDIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageIDIn = data
+		case "messageIDNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageIDNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageIDNotIn = data
+		case "messageIDGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageIDGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageIDGT = data
+		case "messageIDGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageIDGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageIDGTE = data
+		case "messageIDLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageIDLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageIDLT = data
+		case "messageIDLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageIDLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageIDLTE = data
+		case "messageIDContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageIDContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageIDContains = data
+		case "messageIDHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageIDHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageIDHasPrefix = data
+		case "messageIDHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageIDHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageIDHasSuffix = data
+		case "messageIDIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageIDIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageIDIsNil = data
+		case "messageIDNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageIDNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageIDNotNil = data
+		case "messageIDEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageIDEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageIDEqualFold = data
+		case "messageIDContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("messageIDContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MessageIDContainsFold = data
 		case "hasAlerts":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAlerts"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
@@ -23079,6 +23725,11 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._User(ctx, sel, obj)
+	case *ent.OrgUser:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._OrgUser(ctx, sel, obj)
 	case *ent.Org:
 		if obj == nil {
 			return graphql.Null
@@ -25606,6 +26257,8 @@ func (ec *executionContext) _Nlog(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "errMsg":
 			out.Values[i] = ec._Nlog_errMsg(ctx, field, obj)
+		case "messageID":
+			out.Values[i] = ec._Nlog_messageID(ctx, field, obj)
 		case "alerts":
 			field := field
 
@@ -25942,6 +26595,127 @@ func (ec *executionContext) _Org(ctx context.Context, sel ast.SelectionSet, obj 
 					}
 				}()
 				res = ec._Org_msgAlerts(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var orgUserImplementors = []string{"OrgUser", "Node"}
+
+func (ec *executionContext) _OrgUser(ctx context.Context, sel ast.SelectionSet, obj *ent.OrgUser) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, orgUserImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("OrgUser")
+		case "id":
+			out.Values[i] = ec._OrgUser_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "orgID":
+			out.Values[i] = ec._OrgUser_orgID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "userID":
+			out.Values[i] = ec._OrgUser_userID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "org":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._OrgUser_org(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "user":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._OrgUser_user(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
@@ -26452,6 +27226,50 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_msgTemplateDefineByName(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "appPushMsgs":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_appPushMsgs(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "appUnreadPushMsgs":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_appUnreadPushMsgs(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}

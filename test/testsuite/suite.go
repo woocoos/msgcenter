@@ -110,6 +110,7 @@ func open(ctx context.Context, driverName, dsn string) (*ent.Client, error) {
 			OrgRoleUser: "portal",
 			UserAddr:    "portal",
 			UserDevice:  "portal",
+			OrgUser:     "portal",
 		}),
 	)
 	if err != nil {

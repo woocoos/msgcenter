@@ -2814,6 +2814,22 @@ type Org implements Node {
   """
   msgAlerts: [MsgAlert!]
 }
+type OrgUser implements Node {
+  """
+  组织ID
+  """
+  id: ID!
+  """
+  组织ID
+  """
+  orgID: ID!
+  """
+  用户ID
+  """
+  userID: ID!
+  org: Org!
+  user: User!
+}
 """
 Information about pagination in a connection.
 https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo

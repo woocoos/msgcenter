@@ -38,6 +38,8 @@ type Tx struct {
 	Org *OrgClient
 	// OrgRoleUser is the client for interacting with the OrgRoleUser builders.
 	OrgRoleUser *OrgRoleUserClient
+	// OrgUser is the client for interacting with the OrgUser builders.
+	OrgUser *OrgUserClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 	// UserAddr is the client for interacting with the UserAddr builders.
@@ -188,6 +190,7 @@ func (tx *Tx) init() {
 	tx.NlogAlert = NewNlogAlertClient(tx.config)
 	tx.Org = NewOrgClient(tx.config)
 	tx.OrgRoleUser = NewOrgRoleUserClient(tx.config)
+	tx.OrgUser = NewOrgUserClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 	tx.UserAddr = NewUserAddrClient(tx.config)
 	tx.UserDevice = NewUserDeviceClient(tx.config)

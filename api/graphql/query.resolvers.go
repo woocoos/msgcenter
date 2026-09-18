@@ -13,6 +13,7 @@ import (
 	"regexp"
 
 	"entgo.io/contrib/entgql"
+	"github.com/woocoos/knockout-go/api/auth"
 	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
@@ -344,6 +345,53 @@ func (r *queryResolver) MsgTemplateDefineByName(ctx context.Context, format msgt
 		return "", err
 	}
 	return tmpl, nil
+}
+
+// AppPushMsgs is the resolver for the appPushMsgs field.
+func (r *queryResolver) AppPushMsgs(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalOrder, where *ent.MsgInternalWhereInput) (*ent.MsgInternalConnection, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	uid, err := identity.UserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ret, _, err := r.kosdk.Auth().AuthAPI.GetDomain(context.Background(), &auth.GetDomainRequest{
+		OrgID: tid,
+	})
+	did := ret.ParentID
+	return r.client.MsgInternal.Query().Where(
+		msginternal.ReceiverTypeIn(profile.ReceiverUmeng),
+		msginternal.Or(msginternal.TenantIDEQ(tid), msginternal.TenantIDEQ(did)),
+		msginternal.HasMsgInternalToWith(msginternalto.UserID(uid)),
+	).Paginate(schemax.SkipTenantPrivacy(ctx), after, first, before, last,
+		ent.WithMsgInternalOrder(orderBy),
+		ent.WithMsgInternalFilter(where.Filter))
+}
+
+// AppUnreadPushMsgs is the resolver for the appUnreadPushMsgs field.
+func (r *queryResolver) AppUnreadPushMsgs(ctx context.Context) (int, error) {
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return 0, err
+	}
+	uid, err := identity.UserIDFromContext(ctx)
+	if err != nil {
+		return 0, err
+	}
+	ret, _, err := r.kosdk.Auth().AuthAPI.GetDomain(context.Background(), &auth.GetDomainRequest{
+		OrgID: tid,
+	})
+	did := ret.ParentID
+	return r.client.MsgInternalTo.Query().Where(
+		msginternalto.UserID(uid),
+		msginternalto.ReadAtIsNil(),
+		msginternalto.HasMsgInternalWith(
+			msginternal.ReceiverTypeIn(profile.ReceiverUmeng),
+			msginternal.Or(msginternal.TenantIDEQ(tid), msginternal.TenantIDEQ(did)),
+		),
+	).Count(ctx)
 }
 
 // Matchers is the resolver for the matchers field.

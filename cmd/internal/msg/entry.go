@@ -59,6 +59,7 @@ func (s *Server) buildEntClient() {
 		OrgRoleUser: "portal",
 		UserAddr:    "portal",
 		UserDevice:  "portal",
+		OrgUser:     "portal",
 	})
 	if s.appCnf.Development {
 		s.dbClient = ent.NewClient(ent.Driver(drv), ent.Debug(), scfg)

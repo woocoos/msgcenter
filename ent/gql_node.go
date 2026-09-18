@@ -27,6 +27,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/org"
+	"github.com/woocoos/msgcenter/ent/orguser"
 	"github.com/woocoos/msgcenter/ent/user"
 	"golang.org/x/sync/semaphore"
 )
@@ -95,6 +96,11 @@ var orgImplementors = []string{"Org", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
 func (*Org) IsNode() {}
+
+var orguserImplementors = []string{"OrgUser", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*OrgUser) IsNode() {}
 
 var userImplementors = []string{"User", "Node"}
 
@@ -267,6 +273,15 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			}
 		}
 		return query.Only(entcache.WithRefEntryKey(ctx, "Org", id))
+	case "OrgUser":
+		query := c.OrgUser.Query().
+			Where(orguser.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, orguserImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(entcache.WithRefEntryKey(ctx, "OrgUser", id))
 	case "User":
 		query := c.User.Query().
 			Where(user.ID(id))
@@ -529,6 +544,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Org.Query().
 			Where(org.IDIn(ids...))
 		query, err := query.CollectFields(ctx, orgImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case "OrgUser":
+		query := c.OrgUser.Query().
+			Where(orguser.IDIn(ids...))
+		query, err := query.CollectFields(ctx, orguserImplementors...)
 		if err != nil {
 			return nil, err
 		}

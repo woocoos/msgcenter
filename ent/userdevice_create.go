@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
+	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/userdevice"
 )
 
@@ -132,6 +133,11 @@ func (_c *UserDeviceCreate) SetID(v int) *UserDeviceCreate {
 	return _c
 }
 
+// SetUser sets the "user" edge to the User entity.
+func (_c *UserDeviceCreate) SetUser(v *User) *UserDeviceCreate {
+	return _c.SetUserID(v.ID)
+}
+
 // Mutation returns the UserDeviceMutation object of the builder.
 func (_c *UserDeviceCreate) Mutation() *UserDeviceMutation {
 	return _c.mutation
@@ -238,10 +244,6 @@ func (_c *UserDeviceCreate) createSpec() (*UserDevice, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := _c.mutation.UserID(); ok {
-		_spec.SetField(userdevice.FieldUserID, field.TypeInt, value)
-		_node.UserID = value
-	}
 	if value, ok := _c.mutation.DeviceUID(); ok {
 		_spec.SetField(userdevice.FieldDeviceUID, field.TypeString, value)
 		_node.DeviceUID = value
@@ -269,6 +271,24 @@ func (_c *UserDeviceCreate) createSpec() (*UserDevice, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(userdevice.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
+	}
+	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   userdevice.UserTable,
+			Columns: []string{userdevice.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _c.schemaConfig.UserDevice
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.UserID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

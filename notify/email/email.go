@@ -187,6 +187,15 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 		}
 	}
 
+	// Set X-User-* headers from alert labels and alert_id from annotations.
+	for _, a := range alerts {
+		for name, value := range a.Labels {
+			if strings.HasPrefix(string(name), "X-User") {
+				email.SetHeader(string(name), value)
+			}
+		}
+	}
+
 	// Attach dynamic attachments from alert annotations.
 	if dynPaths := dynamicAttachmentPaths(alerts); len(dynPaths) > 0 {
 		if err := n.attachFiles(email, dynPaths); err != nil {

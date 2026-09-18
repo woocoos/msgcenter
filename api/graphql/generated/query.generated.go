@@ -439,6 +439,47 @@ func (ec *executionContext) fieldContext_EmailConfig_headers(_ context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _EmailConfig_traceIdHeader(ctx context.Context, field graphql.CollectedField, obj *profile.EmailConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_EmailConfig_traceIdHeader(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TraceIDHeader, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_EmailConfig_traceIdHeader(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "EmailConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _FormatMsgAlert_id(ctx context.Context, field graphql.CollectedField, obj *model.FormatMsgAlert) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_FormatMsgAlert_id(ctx, field)
 	if err != nil {
@@ -1617,6 +1658,8 @@ func (ec *executionContext) fieldContext_Receiver_emailConfigs(_ context.Context
 				return ec.fieldContext_EmailConfig_authIdentity(ctx, field)
 			case "headers":
 				return ec.fieldContext_EmailConfig_headers(ctx, field)
+			case "traceIdHeader":
+				return ec.fieldContext_EmailConfig_traceIdHeader(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type EmailConfig", field.Name)
 		},
@@ -3073,6 +3116,8 @@ func (ec *executionContext) _EmailConfig(ctx context.Context, sel ast.SelectionS
 			}
 		case "headers":
 			out.Values[i] = ec._EmailConfig_headers(ctx, field, obj)
+		case "traceIdHeader":
+			out.Values[i] = ec._EmailConfig_traceIdHeader(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
