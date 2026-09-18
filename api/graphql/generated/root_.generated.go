@@ -45,7 +45,11 @@ type ResolverRoot interface {
 	Query() QueryResolver
 	Route() RouteResolver
 	Subscription() SubscriptionResolver
+	UmengConfig() UmengConfigResolver
+	WebhookConfig() WebhookConfigResolver
 	RouteInput() RouteInputResolver
+	UmengConfigInput() UmengConfigInputResolver
+	WebhookConfigInput() WebhookConfigInputResolver
 }
 
 type DirectiveRoot struct {
@@ -53,15 +57,16 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	EmailConfig struct {
-		AuthIdentity func(childComplexity int) int
-		AuthPassword func(childComplexity int) int
-		AuthSecret   func(childComplexity int) int
-		AuthType     func(childComplexity int) int
-		AuthUsername func(childComplexity int) int
-		From         func(childComplexity int) int
-		Headers      func(childComplexity int) int
-		SmartHost    func(childComplexity int) int
-		To           func(childComplexity int) int
+		AuthIdentity  func(childComplexity int) int
+		AuthPassword  func(childComplexity int) int
+		AuthSecret    func(childComplexity int) int
+		AuthType      func(childComplexity int) int
+		AuthUsername  func(childComplexity int) int
+		From          func(childComplexity int) int
+		Headers       func(childComplexity int) int
+		SmartHost     func(childComplexity int) int
+		To            func(childComplexity int) int
+		TraceIDHeader func(childComplexity int) int
 	}
 
 	FormatMsgAlert struct {
@@ -128,6 +133,7 @@ type ComplexityRoot struct {
 		Fingerprint func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Labels      func(childComplexity int) int
+		MsgInternal func(childComplexity int) int
 		Nlog        func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.NlogOrder, where *ent.NlogWhereInput) int
 		NlogAlerts  func(childComplexity int) int
 		Org         func(childComplexity int) int
@@ -176,20 +182,25 @@ type ComplexityRoot struct {
 	}
 
 	MsgEvent struct {
-		Comments         func(childComplexity int) int
-		CreatedAt        func(childComplexity int) int
-		CreatedBy        func(childComplexity int) int
-		CustomerTemplate func(childComplexity int) int
-		ID               func(childComplexity int) int
-		Modes            func(childComplexity int) int
-		MsgType          func(childComplexity int) int
-		MsgTypeID        func(childComplexity int) int
-		Name             func(childComplexity int) int
-		Route            func(childComplexity int) int
-		RouteStr         func(childComplexity int, typeArg model.RouteStrType) int
-		Status           func(childComplexity int) int
-		UpdatedAt        func(childComplexity int) int
-		UpdatedBy        func(childComplexity int) int
+		CanSubs                func(childComplexity int) int
+		Comments               func(childComplexity int) int
+		CreatedAt              func(childComplexity int) int
+		CreatedBy              func(childComplexity int) int
+		CustomerTemplate       func(childComplexity int) int
+		ExcludeSubscriberUsers func(childComplexity int) int
+		ID                     func(childComplexity int) int
+		Modes                  func(childComplexity int) int
+		MsgType                func(childComplexity int) int
+		MsgTypeID              func(childComplexity int) int
+		Name                   func(childComplexity int) int
+		Route                  func(childComplexity int) int
+		RouteStr               func(childComplexity int, typeArg model.RouteStrType) int
+		Status                 func(childComplexity int) int
+		SubscriberRoles        func(childComplexity int) int
+		SubscriberUsers        func(childComplexity int) int
+		Subscribers            func(childComplexity int) int
+		UpdatedAt              func(childComplexity int) int
+		UpdatedBy              func(childComplexity int) int
 	}
 
 	MsgEventConnection struct {
@@ -204,6 +215,8 @@ type ComplexityRoot struct {
 	}
 
 	MsgInternal struct {
+		Alert         func(childComplexity int) int
+		AlertID       func(childComplexity int) int
 		Body          func(childComplexity int) int
 		Category      func(childComplexity int) int
 		CreatedAt     func(childComplexity int) int
@@ -212,6 +225,7 @@ type ComplexityRoot struct {
 		HasReadCounts func(childComplexity int) int
 		ID            func(childComplexity int) int
 		MsgInternalTo func(childComplexity int) int
+		ReceiverType  func(childComplexity int) int
 		Redirect      func(childComplexity int) int
 		Subject       func(childComplexity int) int
 		TenantID      func(childComplexity int) int
@@ -254,19 +268,47 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
-	MsgSubscriber struct {
+	MsgSilence struct {
+		Comments  func(childComplexity int) int
 		CreatedAt func(childComplexity int) int
 		CreatedBy func(childComplexity int) int
-		Exclude   func(childComplexity int) int
+		EndsAt    func(childComplexity int) int
 		ID        func(childComplexity int) int
-		MsgType   func(childComplexity int) int
-		MsgTypeID func(childComplexity int) int
-		OrgRoleID func(childComplexity int) int
+		Matchers  func(childComplexity int) int
+		StartsAt  func(childComplexity int) int
+		State     func(childComplexity int) int
 		TenantID  func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 		UpdatedBy func(childComplexity int) int
 		User      func(childComplexity int) int
-		UserID    func(childComplexity int) int
+	}
+
+	MsgSilenceConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	MsgSilenceEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	MsgSubscriber struct {
+		CreatedAt  func(childComplexity int) int
+		CreatedBy  func(childComplexity int) int
+		Exclude    func(childComplexity int) int
+		ID         func(childComplexity int) int
+		MsgEvent   func(childComplexity int) int
+		MsgEventID func(childComplexity int) int
+		MsgType    func(childComplexity int) int
+		MsgTypeID  func(childComplexity int) int
+		OrgRoleID  func(childComplexity int) int
+		TenantID   func(childComplexity int) int
+		UpdatedAt  func(childComplexity int) int
+		UpdatedBy  func(childComplexity int) int
+		User       func(childComplexity int) int
+		UserID     func(childComplexity int) int
 	}
 
 	MsgTemplate struct {
@@ -292,6 +334,7 @@ type ComplexityRoot struct {
 		Tpl          func(childComplexity int) int
 		UpdatedAt    func(childComplexity int) int
 		UpdatedBy    func(childComplexity int) int
+		UserID       func(childComplexity int) int
 	}
 
 	MsgTemplateConnection struct {
@@ -339,16 +382,16 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateMsgChannel              func(childComplexity int, input ent.CreateMsgChannelInput) int
 		CreateMsgEvent                func(childComplexity int, input ent.CreateMsgEventInput) int
+		CreateMsgSilence              func(childComplexity int, input ent.CreateMsgSilenceInput) int
 		CreateMsgSubscriber           func(childComplexity int, inputs []*ent.CreateMsgSubscriberInput) int
 		CreateMsgTemplate             func(childComplexity int, input ent.CreateMsgTemplateInput) int
 		CreateMsgType                 func(childComplexity int, input ent.CreateMsgTypeInput) int
-		CreateSilence                 func(childComplexity int, input ent.CreateSilenceInput) int
 		DeleteMsgChannel              func(childComplexity int, id int) int
 		DeleteMsgEvent                func(childComplexity int, id int) int
+		DeleteMsgSilence              func(childComplexity int, id int) int
 		DeleteMsgSubscriber           func(childComplexity int, ids []int) int
 		DeleteMsgTemplate             func(childComplexity int, id int) int
 		DeleteMsgType                 func(childComplexity int, id int) int
-		DeleteSilence                 func(childComplexity int, id int) int
 		DisableMsgChannel             func(childComplexity int, id int) int
 		DisableMsgEvent               func(childComplexity int, id int) int
 		DisableMsgTemplate            func(childComplexity int, id int) int
@@ -362,18 +405,20 @@ type ComplexityRoot struct {
 		TestSendMessageTpl            func(childComplexity int, tplID int, userID int, labels map[string]string, annotations map[string]string) int
 		UpdateMsgChannel              func(childComplexity int, id int, input ent.UpdateMsgChannelInput) int
 		UpdateMsgEvent                func(childComplexity int, id int, input ent.UpdateMsgEventInput) int
+		UpdateMsgSilence              func(childComplexity int, id int, input ent.UpdateMsgSilenceInput) int
 		UpdateMsgTemplate             func(childComplexity int, id int, input ent.UpdateMsgTemplateInput) int
 		UpdateMsgType                 func(childComplexity int, id int, input ent.UpdateMsgTypeInput) int
-		UpdateSilence                 func(childComplexity int, id int, input ent.UpdateSilenceInput) int
 	}
 
 	Nlog struct {
 		Alerts       func(childComplexity int) int
 		CreatedAt    func(childComplexity int) int
+		ErrMsg       func(childComplexity int) int
 		ExpiresAt    func(childComplexity int) int
 		GroupKey     func(childComplexity int) int
 		ID           func(childComplexity int) int
 		Idx          func(childComplexity int) int
+		MessageID    func(childComplexity int) int
 		NlogAlert    func(childComplexity int) int
 		Receiver     func(childComplexity int) int
 		ReceiverType func(childComplexity int) int
@@ -411,6 +456,14 @@ type ComplexityRoot struct {
 		Path      func(childComplexity int) int
 	}
 
+	OrgUser struct {
+		ID     func(childComplexity int) int
+		Org    func(childComplexity int) int
+		OrgID  func(childComplexity int) int
+		User   func(childComplexity int) int
+		UserID func(childComplexity int) int
+	}
+
 	PageInfo struct {
 		EndCursor       func(childComplexity int) int
 		HasNextPage     func(childComplexity int) int
@@ -419,6 +472,9 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		AppPushMsgs                           func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalOrder, where *ent.MsgInternalWhereInput) int
+		AppUnreadPushMsgs                     func(childComplexity int) int
+		DeviceConnected                       func(childComplexity int, deviceID string) int
 		FormatMsgAlertMore                    func(childComplexity int, msgAlertID int) int
 		FormatMsgAlerts                       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, alertName *string, userID *string, receiverType *profile.ReceiverType, where *ent.MsgAlertWhereInput, orderBy *ent.MsgAlertOrder) int
 		MsgAlerts                             func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) int
@@ -433,7 +489,7 @@ type ComplexityRoot struct {
 		Node                                  func(childComplexity int, id string) int
 		Nodes                                 func(childComplexity int, ids []string) int
 		RenderMsgAlert                        func(childComplexity int, msgAlertID int, receiver string) int
-		Silences                              func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SilenceOrder, where *ent.SilenceWhereInput) int
+		Silences                              func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgSilenceOrder, where *ent.MsgSilenceWhereInput) int
 		UserMsgInternalTos                    func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) int
 		UserSubMsgCategory                    func(childComplexity int) int
 		UserUnreadMsgInternals                func(childComplexity int) int
@@ -441,9 +497,11 @@ type ComplexityRoot struct {
 	}
 
 	Receiver struct {
-		EmailConfigs  func(childComplexity int) int
-		MessageConfig func(childComplexity int) int
-		Name          func(childComplexity int) int
+		EmailConfigs   func(childComplexity int) int
+		MessageConfig  func(childComplexity int) int
+		Name           func(childComplexity int) int
+		UmengConfigs   func(childComplexity int) int
+		WebhookConfigs func(childComplexity int) int
 	}
 
 	Route struct {
@@ -459,34 +517,17 @@ type ComplexityRoot struct {
 		Routes              func(childComplexity int) int
 	}
 
-	Silence struct {
-		Comments  func(childComplexity int) int
-		CreatedAt func(childComplexity int) int
-		CreatedBy func(childComplexity int) int
-		EndsAt    func(childComplexity int) int
-		ID        func(childComplexity int) int
-		Matchers  func(childComplexity int) int
-		StartsAt  func(childComplexity int) int
-		State     func(childComplexity int) int
-		TenantID  func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
-		UpdatedBy func(childComplexity int) int
-		User      func(childComplexity int) int
-	}
-
-	SilenceConnection struct {
-		Edges      func(childComplexity int) int
-		PageInfo   func(childComplexity int) int
-		TotalCount func(childComplexity int) int
-	}
-
-	SilenceEdge struct {
-		Cursor func(childComplexity int) int
-		Node   func(childComplexity int) int
-	}
-
 	Subscription struct {
 		Message func(childComplexity int) int
+	}
+
+	UmengConfig struct {
+		APIURL         func(childComplexity int) int
+		Apps           func(childComplexity int) int
+		Body           func(childComplexity int) int
+		ProductionMode func(childComplexity int) int
+		SendResolved   func(childComplexity int) int
+		Subject        func(childComplexity int) int
 	}
 
 	User struct {
@@ -501,6 +542,18 @@ type ComplexityRoot struct {
 		Mobile func(childComplexity int) int
 		Name   func(childComplexity int) int
 		UserID func(childComplexity int) int
+	}
+
+	WebhookConfig struct {
+		Body         func(childComplexity int) int
+		Headers      func(childComplexity int) int
+		MaxAlerts    func(childComplexity int) int
+		ReceiveType  func(childComplexity int) int
+		SendResolved func(childComplexity int) int
+		Subject      func(childComplexity int) int
+		Timeout      func(childComplexity int) int
+		URL          func(childComplexity int) int
+		URLFile      func(childComplexity int) int
 	}
 }
 
@@ -585,6 +638,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.EmailConfig.To(childComplexity), true
+
+	case "EmailConfig.traceIdHeader":
+		if e.complexity.EmailConfig.TraceIDHeader == nil {
+			break
+		}
+
+		return e.complexity.EmailConfig.TraceIDHeader(childComplexity), true
 
 	case "FormatMsgAlert.createdAt":
 		if e.complexity.FormatMsgAlert.CreatedAt == nil {
@@ -880,6 +940,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgAlert.Labels(childComplexity), true
 
+	case "MsgAlert.msgInternal":
+		if e.complexity.MsgAlert.MsgInternal == nil {
+			break
+		}
+
+		return e.complexity.MsgAlert.MsgInternal(childComplexity), true
+
 	case "MsgAlert.nlog":
 		if e.complexity.MsgAlert.Nlog == nil {
 			break
@@ -1095,6 +1162,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgChannelEdge.Node(childComplexity), true
 
+	case "MsgEvent.canSubs":
+		if e.complexity.MsgEvent.CanSubs == nil {
+			break
+		}
+
+		return e.complexity.MsgEvent.CanSubs(childComplexity), true
+
 	case "MsgEvent.comments":
 		if e.complexity.MsgEvent.Comments == nil {
 			break
@@ -1122,6 +1196,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgEvent.CustomerTemplate(childComplexity), true
+
+	case "MsgEvent.excludeSubscriberUsers":
+		if e.complexity.MsgEvent.ExcludeSubscriberUsers == nil {
+			break
+		}
+
+		return e.complexity.MsgEvent.ExcludeSubscriberUsers(childComplexity), true
 
 	case "MsgEvent.id":
 		if e.complexity.MsgEvent.ID == nil {
@@ -1184,6 +1265,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgEvent.Status(childComplexity), true
 
+	case "MsgEvent.subscriberRoles":
+		if e.complexity.MsgEvent.SubscriberRoles == nil {
+			break
+		}
+
+		return e.complexity.MsgEvent.SubscriberRoles(childComplexity), true
+
+	case "MsgEvent.subscriberUsers":
+		if e.complexity.MsgEvent.SubscriberUsers == nil {
+			break
+		}
+
+		return e.complexity.MsgEvent.SubscriberUsers(childComplexity), true
+
+	case "MsgEvent.subscribers":
+		if e.complexity.MsgEvent.Subscribers == nil {
+			break
+		}
+
+		return e.complexity.MsgEvent.Subscribers(childComplexity), true
+
 	case "MsgEvent.updatedAt":
 		if e.complexity.MsgEvent.UpdatedAt == nil {
 			break
@@ -1232,6 +1334,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgEventEdge.Node(childComplexity), true
+
+	case "MsgInternal.alert":
+		if e.complexity.MsgInternal.Alert == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.Alert(childComplexity), true
+
+	case "MsgInternal.alertID":
+		if e.complexity.MsgInternal.AlertID == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.AlertID(childComplexity), true
 
 	case "MsgInternal.body":
 		if e.complexity.MsgInternal.Body == nil {
@@ -1288,6 +1404,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgInternal.MsgInternalTo(childComplexity), true
+
+	case "MsgInternal.receiverType":
+		if e.complexity.MsgInternal.ReceiverType == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.ReceiverType(childComplexity), true
 
 	case "MsgInternal.redirect":
 		if e.complexity.MsgInternal.Redirect == nil {
@@ -1464,6 +1587,125 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MsgInternalToEdge.Node(childComplexity), true
 
+	case "MsgSilence.comments":
+		if e.complexity.MsgSilence.Comments == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.Comments(childComplexity), true
+
+	case "MsgSilence.createdAt":
+		if e.complexity.MsgSilence.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.CreatedAt(childComplexity), true
+
+	case "MsgSilence.createdBy":
+		if e.complexity.MsgSilence.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.CreatedBy(childComplexity), true
+
+	case "MsgSilence.endsAt":
+		if e.complexity.MsgSilence.EndsAt == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.EndsAt(childComplexity), true
+
+	case "MsgSilence.id":
+		if e.complexity.MsgSilence.ID == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.ID(childComplexity), true
+
+	case "MsgSilence.matchers":
+		if e.complexity.MsgSilence.Matchers == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.Matchers(childComplexity), true
+
+	case "MsgSilence.startsAt":
+		if e.complexity.MsgSilence.StartsAt == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.StartsAt(childComplexity), true
+
+	case "MsgSilence.state":
+		if e.complexity.MsgSilence.State == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.State(childComplexity), true
+
+	case "MsgSilence.tenantID":
+		if e.complexity.MsgSilence.TenantID == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.TenantID(childComplexity), true
+
+	case "MsgSilence.updatedAt":
+		if e.complexity.MsgSilence.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.UpdatedAt(childComplexity), true
+
+	case "MsgSilence.updatedBy":
+		if e.complexity.MsgSilence.UpdatedBy == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.UpdatedBy(childComplexity), true
+
+	case "MsgSilence.user":
+		if e.complexity.MsgSilence.User == nil {
+			break
+		}
+
+		return e.complexity.MsgSilence.User(childComplexity), true
+
+	case "MsgSilenceConnection.edges":
+		if e.complexity.MsgSilenceConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.MsgSilenceConnection.Edges(childComplexity), true
+
+	case "MsgSilenceConnection.pageInfo":
+		if e.complexity.MsgSilenceConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.MsgSilenceConnection.PageInfo(childComplexity), true
+
+	case "MsgSilenceConnection.totalCount":
+		if e.complexity.MsgSilenceConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.MsgSilenceConnection.TotalCount(childComplexity), true
+
+	case "MsgSilenceEdge.cursor":
+		if e.complexity.MsgSilenceEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.MsgSilenceEdge.Cursor(childComplexity), true
+
+	case "MsgSilenceEdge.node":
+		if e.complexity.MsgSilenceEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.MsgSilenceEdge.Node(childComplexity), true
+
 	case "MsgSubscriber.createdAt":
 		if e.complexity.MsgSubscriber.CreatedAt == nil {
 			break
@@ -1491,6 +1733,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgSubscriber.ID(childComplexity), true
+
+	case "MsgSubscriber.msgEvent":
+		if e.complexity.MsgSubscriber.MsgEvent == nil {
+			break
+		}
+
+		return e.complexity.MsgSubscriber.MsgEvent(childComplexity), true
+
+	case "MsgSubscriber.msgEventID":
+		if e.complexity.MsgSubscriber.MsgEventID == nil {
+			break
+		}
+
+		return e.complexity.MsgSubscriber.MsgEventID(childComplexity), true
 
 	case "MsgSubscriber.msgType":
 		if e.complexity.MsgSubscriber.MsgType == nil {
@@ -1701,6 +1957,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgTemplate.UpdatedBy(childComplexity), true
+
+	case "MsgTemplate.userID":
+		if e.complexity.MsgTemplate.UserID == nil {
+			break
+		}
+
+		return e.complexity.MsgTemplate.UserID(childComplexity), true
 
 	case "MsgTemplateConnection.edges":
 		if e.complexity.MsgTemplateConnection.Edges == nil {
@@ -1915,6 +2178,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateMsgEvent(childComplexity, args["input"].(ent.CreateMsgEventInput)), true
 
+	case "Mutation.createMsgSilence":
+		if e.complexity.Mutation.CreateMsgSilence == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createMsgSilence_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateMsgSilence(childComplexity, args["input"].(ent.CreateMsgSilenceInput)), true
+
 	case "Mutation.createMsgSubscriber":
 		if e.complexity.Mutation.CreateMsgSubscriber == nil {
 			break
@@ -1951,18 +2226,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateMsgType(childComplexity, args["input"].(ent.CreateMsgTypeInput)), true
 
-	case "Mutation.createSilence":
-		if e.complexity.Mutation.CreateSilence == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createSilence_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateSilence(childComplexity, args["input"].(ent.CreateSilenceInput)), true
-
 	case "Mutation.deleteMsgChannel":
 		if e.complexity.Mutation.DeleteMsgChannel == nil {
 			break
@@ -1986,6 +2249,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteMsgEvent(childComplexity, args["id"].(int)), true
+
+	case "Mutation.deleteMsgSilence":
+		if e.complexity.Mutation.DeleteMsgSilence == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteMsgSilence_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteMsgSilence(childComplexity, args["id"].(int)), true
 
 	case "Mutation.deleteMsgSubscriber":
 		if e.complexity.Mutation.DeleteMsgSubscriber == nil {
@@ -2022,18 +2297,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteMsgType(childComplexity, args["id"].(int)), true
-
-	case "Mutation.deleteSilence":
-		if e.complexity.Mutation.DeleteSilence == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteSilence_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteSilence(childComplexity, args["id"].(int)), true
 
 	case "Mutation.disableMsgChannel":
 		if e.complexity.Mutation.DisableMsgChannel == nil {
@@ -2186,6 +2449,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateMsgEvent(childComplexity, args["id"].(int), args["input"].(ent.UpdateMsgEventInput)), true
 
+	case "Mutation.updateMsgSilence":
+		if e.complexity.Mutation.UpdateMsgSilence == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateMsgSilence_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateMsgSilence(childComplexity, args["id"].(int), args["input"].(ent.UpdateMsgSilenceInput)), true
+
 	case "Mutation.updateMsgTemplate":
 		if e.complexity.Mutation.UpdateMsgTemplate == nil {
 			break
@@ -2210,18 +2485,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateMsgType(childComplexity, args["id"].(int), args["input"].(ent.UpdateMsgTypeInput)), true
 
-	case "Mutation.updateSilence":
-		if e.complexity.Mutation.UpdateSilence == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_updateSilence_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.UpdateSilence(childComplexity, args["id"].(int), args["input"].(ent.UpdateSilenceInput)), true
-
 	case "Nlog.alerts":
 		if e.complexity.Nlog.Alerts == nil {
 			break
@@ -2235,6 +2498,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Nlog.CreatedAt(childComplexity), true
+
+	case "Nlog.errMsg":
+		if e.complexity.Nlog.ErrMsg == nil {
+			break
+		}
+
+		return e.complexity.Nlog.ErrMsg(childComplexity), true
 
 	case "Nlog.expiresAt":
 		if e.complexity.Nlog.ExpiresAt == nil {
@@ -2263,6 +2533,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Nlog.Idx(childComplexity), true
+
+	case "Nlog.messageID":
+		if e.complexity.Nlog.MessageID == nil {
+			break
+		}
+
+		return e.complexity.Nlog.MessageID(childComplexity), true
 
 	case "Nlog.nlogAlert":
 		if e.complexity.Nlog.NlogAlert == nil {
@@ -2425,6 +2702,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Org.Path(childComplexity), true
 
+	case "OrgUser.id":
+		if e.complexity.OrgUser.ID == nil {
+			break
+		}
+
+		return e.complexity.OrgUser.ID(childComplexity), true
+
+	case "OrgUser.org":
+		if e.complexity.OrgUser.Org == nil {
+			break
+		}
+
+		return e.complexity.OrgUser.Org(childComplexity), true
+
+	case "OrgUser.orgID":
+		if e.complexity.OrgUser.OrgID == nil {
+			break
+		}
+
+		return e.complexity.OrgUser.OrgID(childComplexity), true
+
+	case "OrgUser.user":
+		if e.complexity.OrgUser.User == nil {
+			break
+		}
+
+		return e.complexity.OrgUser.User(childComplexity), true
+
+	case "OrgUser.userID":
+		if e.complexity.OrgUser.UserID == nil {
+			break
+		}
+
+		return e.complexity.OrgUser.UserID(childComplexity), true
+
 	case "PageInfo.endCursor":
 		if e.complexity.PageInfo.EndCursor == nil {
 			break
@@ -2452,6 +2764,37 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PageInfo.StartCursor(childComplexity), true
+
+	case "Query.appPushMsgs":
+		if e.complexity.Query.AppPushMsgs == nil {
+			break
+		}
+
+		args, err := ec.field_Query_appPushMsgs_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.AppPushMsgs(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgInternalOrder), args["where"].(*ent.MsgInternalWhereInput)), true
+
+	case "Query.appUnreadPushMsgs":
+		if e.complexity.Query.AppUnreadPushMsgs == nil {
+			break
+		}
+
+		return e.complexity.Query.AppUnreadPushMsgs(childComplexity), true
+
+	case "Query.deviceConnected":
+		if e.complexity.Query.DeviceConnected == nil {
+			break
+		}
+
+		args, err := ec.field_Query_deviceConnected_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.DeviceConnected(childComplexity, args["deviceId"].(string)), true
 
 	case "Query.formatMsgAlertMore":
 		if e.complexity.Query.FormatMsgAlertMore == nil {
@@ -2631,7 +2974,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Silences(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.SilenceOrder), args["where"].(*ent.SilenceWhereInput)), true
+		return e.complexity.Query.Silences(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgSilenceOrder), args["where"].(*ent.MsgSilenceWhereInput)), true
 
 	case "Query.userMsgInternalTos":
 		if e.complexity.Query.UserMsgInternalTos == nil {
@@ -2691,6 +3034,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Receiver.Name(childComplexity), true
+
+	case "Receiver.umengConfigs":
+		if e.complexity.Receiver.UmengConfigs == nil {
+			break
+		}
+
+		return e.complexity.Receiver.UmengConfigs(childComplexity), true
+
+	case "Receiver.webhookConfigs":
+		if e.complexity.Receiver.WebhookConfigs == nil {
+			break
+		}
+
+		return e.complexity.Receiver.WebhookConfigs(childComplexity), true
 
 	case "Route.activeTimeIntervals":
 		if e.complexity.Route.ActiveTimeIntervals == nil {
@@ -2762,131 +3119,54 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Route.Routes(childComplexity), true
 
-	case "Silence.comments":
-		if e.complexity.Silence.Comments == nil {
-			break
-		}
-
-		return e.complexity.Silence.Comments(childComplexity), true
-
-	case "Silence.createdAt":
-		if e.complexity.Silence.CreatedAt == nil {
-			break
-		}
-
-		return e.complexity.Silence.CreatedAt(childComplexity), true
-
-	case "Silence.createdBy":
-		if e.complexity.Silence.CreatedBy == nil {
-			break
-		}
-
-		return e.complexity.Silence.CreatedBy(childComplexity), true
-
-	case "Silence.endsAt":
-		if e.complexity.Silence.EndsAt == nil {
-			break
-		}
-
-		return e.complexity.Silence.EndsAt(childComplexity), true
-
-	case "Silence.id":
-		if e.complexity.Silence.ID == nil {
-			break
-		}
-
-		return e.complexity.Silence.ID(childComplexity), true
-
-	case "Silence.matchers":
-		if e.complexity.Silence.Matchers == nil {
-			break
-		}
-
-		return e.complexity.Silence.Matchers(childComplexity), true
-
-	case "Silence.startsAt":
-		if e.complexity.Silence.StartsAt == nil {
-			break
-		}
-
-		return e.complexity.Silence.StartsAt(childComplexity), true
-
-	case "Silence.state":
-		if e.complexity.Silence.State == nil {
-			break
-		}
-
-		return e.complexity.Silence.State(childComplexity), true
-
-	case "Silence.tenantID":
-		if e.complexity.Silence.TenantID == nil {
-			break
-		}
-
-		return e.complexity.Silence.TenantID(childComplexity), true
-
-	case "Silence.updatedAt":
-		if e.complexity.Silence.UpdatedAt == nil {
-			break
-		}
-
-		return e.complexity.Silence.UpdatedAt(childComplexity), true
-
-	case "Silence.updatedBy":
-		if e.complexity.Silence.UpdatedBy == nil {
-			break
-		}
-
-		return e.complexity.Silence.UpdatedBy(childComplexity), true
-
-	case "Silence.user":
-		if e.complexity.Silence.User == nil {
-			break
-		}
-
-		return e.complexity.Silence.User(childComplexity), true
-
-	case "SilenceConnection.edges":
-		if e.complexity.SilenceConnection.Edges == nil {
-			break
-		}
-
-		return e.complexity.SilenceConnection.Edges(childComplexity), true
-
-	case "SilenceConnection.pageInfo":
-		if e.complexity.SilenceConnection.PageInfo == nil {
-			break
-		}
-
-		return e.complexity.SilenceConnection.PageInfo(childComplexity), true
-
-	case "SilenceConnection.totalCount":
-		if e.complexity.SilenceConnection.TotalCount == nil {
-			break
-		}
-
-		return e.complexity.SilenceConnection.TotalCount(childComplexity), true
-
-	case "SilenceEdge.cursor":
-		if e.complexity.SilenceEdge.Cursor == nil {
-			break
-		}
-
-		return e.complexity.SilenceEdge.Cursor(childComplexity), true
-
-	case "SilenceEdge.node":
-		if e.complexity.SilenceEdge.Node == nil {
-			break
-		}
-
-		return e.complexity.SilenceEdge.Node(childComplexity), true
-
 	case "Subscription.message":
 		if e.complexity.Subscription.Message == nil {
 			break
 		}
 
 		return e.complexity.Subscription.Message(childComplexity), true
+
+	case "UmengConfig.apiURL":
+		if e.complexity.UmengConfig.APIURL == nil {
+			break
+		}
+
+		return e.complexity.UmengConfig.APIURL(childComplexity), true
+
+	case "UmengConfig.apps":
+		if e.complexity.UmengConfig.Apps == nil {
+			break
+		}
+
+		return e.complexity.UmengConfig.Apps(childComplexity), true
+
+	case "UmengConfig.body":
+		if e.complexity.UmengConfig.Body == nil {
+			break
+		}
+
+		return e.complexity.UmengConfig.Body(childComplexity), true
+
+	case "UmengConfig.productionMode":
+		if e.complexity.UmengConfig.ProductionMode == nil {
+			break
+		}
+
+		return e.complexity.UmengConfig.ProductionMode(childComplexity), true
+
+	case "UmengConfig.sendResolved":
+		if e.complexity.UmengConfig.SendResolved == nil {
+			break
+		}
+
+		return e.complexity.UmengConfig.SendResolved(childComplexity), true
+
+	case "UmengConfig.subject":
+		if e.complexity.UmengConfig.Subject == nil {
+			break
+		}
+
+		return e.complexity.UmengConfig.Subject(childComplexity), true
 
 	case "User.displayName":
 		if e.complexity.User.DisplayName == nil {
@@ -2944,6 +3224,69 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserInfo.UserID(childComplexity), true
 
+	case "WebhookConfig.body":
+		if e.complexity.WebhookConfig.Body == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.Body(childComplexity), true
+
+	case "WebhookConfig.headers":
+		if e.complexity.WebhookConfig.Headers == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.Headers(childComplexity), true
+
+	case "WebhookConfig.maxAlerts":
+		if e.complexity.WebhookConfig.MaxAlerts == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.MaxAlerts(childComplexity), true
+
+	case "WebhookConfig.receiveType":
+		if e.complexity.WebhookConfig.ReceiveType == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.ReceiveType(childComplexity), true
+
+	case "WebhookConfig.sendResolved":
+		if e.complexity.WebhookConfig.SendResolved == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.SendResolved(childComplexity), true
+
+	case "WebhookConfig.subject":
+		if e.complexity.WebhookConfig.Subject == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.Subject(childComplexity), true
+
+	case "WebhookConfig.timeout":
+		if e.complexity.WebhookConfig.Timeout == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.Timeout(childComplexity), true
+
+	case "WebhookConfig.url":
+		if e.complexity.WebhookConfig.URL == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.URL(childComplexity), true
+
+	case "WebhookConfig.urlFile":
+		if e.complexity.WebhookConfig.URLFile == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.URLFile(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -2954,10 +3297,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCreateMsgChannelInput,
 		ec.unmarshalInputCreateMsgEventInput,
+		ec.unmarshalInputCreateMsgSilenceInput,
 		ec.unmarshalInputCreateMsgSubscriberInput,
 		ec.unmarshalInputCreateMsgTemplateInput,
 		ec.unmarshalInputCreateMsgTypeInput,
-		ec.unmarshalInputCreateSilenceInput,
 		ec.unmarshalInputEmailConfigInput,
 		ec.unmarshalInputMatcherInput,
 		ec.unmarshalInputMessageConfigInput,
@@ -2971,6 +3314,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputMsgInternalToOrder,
 		ec.unmarshalInputMsgInternalToWhereInput,
 		ec.unmarshalInputMsgInternalWhereInput,
+		ec.unmarshalInputMsgSilenceOrder,
+		ec.unmarshalInputMsgSilenceWhereInput,
 		ec.unmarshalInputMsgSubscriberOrder,
 		ec.unmarshalInputMsgSubscriberWhereInput,
 		ec.unmarshalInputMsgTemplateOrder,
@@ -2983,14 +3328,14 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputNlogWhereInput,
 		ec.unmarshalInputReceiverInput,
 		ec.unmarshalInputRouteInput,
-		ec.unmarshalInputSilenceOrder,
-		ec.unmarshalInputSilenceWhereInput,
+		ec.unmarshalInputUmengConfigInput,
 		ec.unmarshalInputUpdateMsgChannelInput,
 		ec.unmarshalInputUpdateMsgEventInput,
+		ec.unmarshalInputUpdateMsgSilenceInput,
 		ec.unmarshalInputUpdateMsgSubscriberInput,
 		ec.unmarshalInputUpdateMsgTemplateInput,
 		ec.unmarshalInputUpdateMsgTypeInput,
-		ec.unmarshalInputUpdateSilenceInput,
+		ec.unmarshalInputWebhookConfigInput,
 	)
 	first := true
 
@@ -3154,7 +3499,41 @@ input CreateMsgEventInput {
   根据route配置对应的以,分隔的mode列表
   """
   modes: String!
+  """
+  是否可订阅
+  """
+  canSubs: Boolean
   msgTypeID: ID!
+}
+"""
+CreateMsgSilenceInput is used for create MsgSilence object.
+Input was generated by ent.
+"""
+input CreateMsgSilenceInput {
+  """
+  租户ID
+  """
+  tenantID: Int!
+  """
+  应用ID
+  """
+  matchers: [MatcherInput]
+  """
+  开始时间
+  """
+  startsAt: Time!
+  """
+  结束时间
+  """
+  endsAt: Time!
+  """
+  备注
+  """
+  comments: String
+  """
+  状态
+  """
+  state: MsgSilenceSilenceState
 }
 """
 CreateMsgSubscriberInput is used for create MsgSubscriber object.
@@ -3173,7 +3552,8 @@ input CreateMsgSubscriberInput {
   是否排除
   """
   exclude: Boolean
-  msgTypeID: ID!
+  msgTypeID: ID
+  msgEventID: ID
   userID: ID
 }
 """
@@ -3186,9 +3566,13 @@ input CreateMsgTemplateInput {
   """
   msgTypeID: Int!
   """
-  组织ID
+  租户ID
   """
   tenantID: ID
+  """
+  用户ID，为空表示租户级或全局模板
+  """
+  userID: ID
   """
   消息模板名称
   """
@@ -3272,36 +3656,6 @@ input CreateMsgTypeInput {
   是否可定制
   """
   canCustom: Boolean
-}
-"""
-CreateSilenceInput is used for create Silence object.
-Input was generated by ent.
-"""
-input CreateSilenceInput {
-  """
-  租户ID
-  """
-  tenantID: Int!
-  """
-  应用ID
-  """
-  matchers: [MatcherInput]
-  """
-  开始时间
-  """
-  startsAt: Time!
-  """
-  结束时间
-  """
-  endsAt: Time!
-  """
-  备注
-  """
-  comments: String
-  """
-  状态
-  """
-  state: SilenceSilenceState
 }
 """
 Define a Relay Cursor type:
@@ -3388,6 +3742,7 @@ type MsgAlert implements Node {
     where: NlogWhereInput
   ): NlogConnection!
   org: Org!
+  msgInternal: [MsgInternal!]
   nlogAlerts: [NlogAlert!]
 }
 """
@@ -3578,6 +3933,11 @@ input MsgAlertWhereInput {
   hasNlog: Boolean
   hasNlogWith: [NlogWhereInput!]
   """
+  msg_internal edge predicates
+  """
+  hasMsgInternal: Boolean
+  hasMsgInternalWith: [MsgInternalWhereInput!]
+  """
   nlog_alerts edge predicates
   """
   hasNlogAlerts: Boolean
@@ -3670,6 +4030,7 @@ enum MsgChannelReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/pr
   email
   message
   webhook
+  umeng
 }
 """
 MsgChannelSimpleStatus is enum for the field status
@@ -3840,9 +4201,17 @@ type MsgEvent implements Node {
   """
   modes: String!
   """
+  是否可订阅
+  """
+  canSubs: Boolean
+  """
   消息类型
   """
   msgType: MsgType!
+  """
+  订阅者
+  """
+  subscribers: [MsgSubscriber!]
   """
   自定义的消息模板
   """
@@ -4040,10 +4409,22 @@ input MsgEventWhereInput {
   modesEqualFold: String
   modesContainsFold: String
   """
+  can_subs field predicates
+  """
+  canSubs: Boolean
+  canSubsNEQ: Boolean
+  canSubsIsNil: Boolean
+  canSubsNotNil: Boolean
+  """
   msg_type edge predicates
   """
   hasMsgType: Boolean
   hasMsgTypeWith: [MsgTypeWhereInput!]
+  """
+  subscribers edge predicates
+  """
+  hasSubscribers: Boolean
+  hasSubscribersWith: [MsgSubscriberWhereInput!]
   """
   customer_template edge predicates
   """
@@ -4080,7 +4461,16 @@ type MsgInternal implements Node {
   消息跳转
   """
   redirect: String
+  """
+  消息模式:站内信,app推送,邮件,短信,微信等
+  """
+  receiverType: MsgInternalReceiverType!
+  """
+  消息ID
+  """
+  alertID: ID
   msgInternalTo: [MsgInternalTo!]
+  alert: MsgAlert
 }
 """
 A connection to a list of items.
@@ -4130,6 +4520,15 @@ Properties by which MsgInternal connections can be ordered.
 """
 enum MsgInternalOrderField {
   createdAt
+}
+"""
+MsgInternalReceiverType is enum for the field receiver_type
+"""
+enum MsgInternalReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.ReceiverType") {
+  email
+  message
+  webhook
+  umeng
 }
 type MsgInternalTo implements Node {
   id: ID!
@@ -4438,10 +4837,227 @@ input MsgInternalWhereInput {
   redirectEqualFold: String
   redirectContainsFold: String
   """
+  receiver_type field predicates
+  """
+  receiverType: MsgInternalReceiverType
+  receiverTypeNEQ: MsgInternalReceiverType
+  receiverTypeIn: [MsgInternalReceiverType!]
+  receiverTypeNotIn: [MsgInternalReceiverType!]
+  """
+  alert_id field predicates
+  """
+  alertID: ID
+  alertIDNEQ: ID
+  alertIDIn: [ID!]
+  alertIDNotIn: [ID!]
+  alertIDIsNil: Boolean
+  alertIDNotNil: Boolean
+  """
   msg_internal_to edge predicates
   """
   hasMsgInternalTo: Boolean
   hasMsgInternalToWith: [MsgInternalToWhereInput!]
+  """
+  alert edge predicates
+  """
+  hasAlert: Boolean
+  hasAlertWith: [MsgAlertWhereInput!]
+}
+type MsgSilence implements Node {
+  id: ID!
+  createdBy: ID!
+  createdAt: Time!
+  updatedBy: Int
+  updatedAt: Time
+  """
+  租户ID
+  """
+  tenantID: Int!
+  """
+  应用ID
+  """
+  matchers: [Matcher]
+  """
+  开始时间
+  """
+  startsAt: Time!
+  """
+  结束时间
+  """
+  endsAt: Time!
+  """
+  备注
+  """
+  comments: String
+  """
+  状态
+  """
+  state: MsgSilenceSilenceState!
+  """
+  创建人
+  """
+  user: User!
+}
+"""
+A connection to a list of items.
+"""
+type MsgSilenceConnection {
+  """
+  A list of edges.
+  """
+  edges: [MsgSilenceEdge]
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  Identifies the total count of items in the connection.
+  """
+  totalCount: Int!
+}
+"""
+An edge in a connection.
+"""
+type MsgSilenceEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: MsgSilence
+  """
+  A cursor for use in pagination.
+  """
+  cursor: Cursor!
+}
+"""
+Ordering options for MsgSilence connections
+"""
+input MsgSilenceOrder {
+  """
+  The ordering direction.
+  """
+  direction: OrderDirection! = ASC
+  """
+  The field by which to order MsgSilences.
+  """
+  field: MsgSilenceOrderField!
+}
+"""
+Properties by which MsgSilence connections can be ordered.
+"""
+enum MsgSilenceOrderField {
+  createdAt
+}
+"""
+MsgSilenceSilenceState is enum for the field state
+"""
+enum MsgSilenceSilenceState @goModel(model: "github.com/woocoos/msgcenter/service/silence.SilenceState") {
+  expired
+  active
+  pending
+}
+"""
+MsgSilenceWhereInput is used for filtering MsgSilence objects.
+Input was generated by ent.
+"""
+input MsgSilenceWhereInput {
+  not: MsgSilenceWhereInput
+  and: [MsgSilenceWhereInput!]
+  or: [MsgSilenceWhereInput!]
+  """
+  id field predicates
+  """
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  """
+  created_by field predicates
+  """
+  createdBy: ID
+  createdByNEQ: ID
+  createdByIn: [ID!]
+  createdByNotIn: [ID!]
+  """
+  created_at field predicates
+  """
+  createdAt: Time
+  createdAtNEQ: Time
+  createdAtIn: [Time!]
+  createdAtNotIn: [Time!]
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtLT: Time
+  createdAtLTE: Time
+  """
+  updated_by field predicates
+  """
+  updatedBy: Int
+  updatedByNEQ: Int
+  updatedByIn: [Int!]
+  updatedByNotIn: [Int!]
+  updatedByGT: Int
+  updatedByGTE: Int
+  updatedByLT: Int
+  updatedByLTE: Int
+  updatedByIsNil: Boolean
+  updatedByNotNil: Boolean
+  """
+  updated_at field predicates
+  """
+  updatedAt: Time
+  updatedAtNEQ: Time
+  updatedAtIn: [Time!]
+  updatedAtNotIn: [Time!]
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtIsNil: Boolean
+  updatedAtNotNil: Boolean
+  """
+  tenant_id field predicates
+  """
+  tenantID: Int
+  tenantIDNEQ: Int
+  tenantIDIn: [Int!]
+  tenantIDNotIn: [Int!]
+  tenantIDGT: Int
+  tenantIDGTE: Int
+  tenantIDLT: Int
+  tenantIDLTE: Int
+  """
+  starts_at field predicates
+  """
+  startsAt: Time
+  startsAtNEQ: Time
+  startsAtIn: [Time!]
+  startsAtNotIn: [Time!]
+  startsAtGT: Time
+  startsAtGTE: Time
+  startsAtLT: Time
+  startsAtLTE: Time
+  """
+  ends_at field predicates
+  """
+  endsAt: Time
+  endsAtNEQ: Time
+  endsAtIn: [Time!]
+  endsAtNotIn: [Time!]
+  endsAtGT: Time
+  endsAtGTE: Time
+  endsAtLT: Time
+  endsAtLTE: Time
+  """
+  state field predicates
+  """
+  state: MsgSilenceSilenceState
+  stateNEQ: MsgSilenceSilenceState
+  stateIn: [MsgSilenceSilenceState!]
+  stateNotIn: [MsgSilenceSilenceState!]
 }
 type MsgSubscriber implements Node {
   id: ID!
@@ -4452,7 +5068,11 @@ type MsgSubscriber implements Node {
   """
   应用消息类型ID
   """
-  msgTypeID: ID!
+  msgTypeID: ID
+  """
+  应用消息事件ID
+  """
+  msgEventID: ID
   """
   组织ID
   """
@@ -4469,7 +5089,8 @@ type MsgSubscriber implements Node {
   是否排除
   """
   exclude: Boolean
-  msgType: MsgType!
+  msgType: MsgType
+  msgEvent: MsgEvent
   user: User
 }
 """
@@ -4565,6 +5186,17 @@ input MsgSubscriberWhereInput {
   msgTypeIDNEQ: ID
   msgTypeIDIn: [ID!]
   msgTypeIDNotIn: [ID!]
+  msgTypeIDIsNil: Boolean
+  msgTypeIDNotNil: Boolean
+  """
+  msg_event_id field predicates
+  """
+  msgEventID: ID
+  msgEventIDNEQ: ID
+  msgEventIDIn: [ID!]
+  msgEventIDNotIn: [ID!]
+  msgEventIDIsNil: Boolean
+  msgEventIDNotNil: Boolean
   """
   tenant_id field predicates
   """
@@ -4610,6 +5242,11 @@ input MsgSubscriberWhereInput {
   """
   hasMsgType: Boolean
   hasMsgTypeWith: [MsgTypeWhereInput!]
+  """
+  msg_event edge predicates
+  """
+  hasMsgEvent: Boolean
+  hasMsgEventWith: [MsgEventWhereInput!]
 }
 type MsgTemplate implements Node {
   id: ID!
@@ -4626,9 +5263,13 @@ type MsgTemplate implements Node {
   """
   msgEventID: ID!
   """
-  组织ID
+  租户ID
   """
   tenantID: ID
+  """
+  用户ID，为空表示租户级或全局模板
+  """
+  userID: ID
   """
   消息模板名称
   """
@@ -4746,6 +5387,7 @@ enum MsgTemplateReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/p
   email
   message
   webhook
+  umeng
 }
 """
 MsgTemplateSimpleStatus is enum for the field status
@@ -4854,6 +5496,19 @@ input MsgTemplateWhereInput {
   tenantIDLTE: ID
   tenantIDIsNil: Boolean
   tenantIDNotNil: Boolean
+  """
+  user_id field predicates
+  """
+  userID: ID
+  userIDNEQ: ID
+  userIDIn: [ID!]
+  userIDNotIn: [ID!]
+  userIDGT: ID
+  userIDGTE: ID
+  userIDLT: ID
+  userIDLTE: ID
+  userIDIsNil: Boolean
+  userIDNotNil: Boolean
   """
   name field predicates
   """
@@ -5268,6 +5923,14 @@ type Nlog implements Node {
   过期时间
   """
   expiresAt: Time!
+  """
+  错误信息，有值表示未发送成功：如：邮件已发往邮件服务器，邮件服务器发送失败，记录其错误信息
+  """
+  errMsg: String
+  """
+  邮件消息ID，用于关联邮件发送回执
+  """
+  messageID: String
   alerts: [MsgAlert!]
   nlogAlert: [NlogAlert!]
 }
@@ -5391,6 +6054,7 @@ enum NlogReceiverType @goModel(model: "github.com/woocoos/msgcenter/pkg/profile.
   email
   message
   webhook
+  umeng
 }
 """
 NlogWhereInput is used for filtering Nlog objects.
@@ -5519,6 +6183,42 @@ input NlogWhereInput {
   expiresAtLT: Time
   expiresAtLTE: Time
   """
+  err_msg field predicates
+  """
+  errMsg: String
+  errMsgNEQ: String
+  errMsgIn: [String!]
+  errMsgNotIn: [String!]
+  errMsgGT: String
+  errMsgGTE: String
+  errMsgLT: String
+  errMsgLTE: String
+  errMsgContains: String
+  errMsgHasPrefix: String
+  errMsgHasSuffix: String
+  errMsgIsNil: Boolean
+  errMsgNotNil: Boolean
+  errMsgEqualFold: String
+  errMsgContainsFold: String
+  """
+  message_id field predicates
+  """
+  messageID: String
+  messageIDNEQ: String
+  messageIDIn: [String!]
+  messageIDNotIn: [String!]
+  messageIDGT: String
+  messageIDGTE: String
+  messageIDLT: String
+  messageIDLTE: String
+  messageIDContains: String
+  messageIDHasPrefix: String
+  messageIDHasSuffix: String
+  messageIDIsNil: Boolean
+  messageIDNotNil: Boolean
+  messageIDEqualFold: String
+  messageIDContainsFold: String
+  """
   alerts edge predicates
   """
   hasAlerts: Boolean
@@ -5565,6 +6265,22 @@ type Org implements Node {
   消息列表
   """
   msgAlerts: [MsgAlert!]
+}
+type OrgUser implements Node {
+  """
+  组织ID
+  """
+  id: ID!
+  """
+  组织ID
+  """
+  orgID: ID!
+  """
+  用户ID
+  """
+  userID: ID!
+  org: Org!
+  user: User!
 }
 """
 Information about pagination in a connection.
@@ -5676,202 +6392,6 @@ type Query {
     where: MsgInternalToWhereInput
   ): MsgInternalToConnection!
 }
-type Silence implements Node {
-  id: ID!
-  createdBy: ID!
-  createdAt: Time!
-  updatedBy: Int
-  updatedAt: Time
-  """
-  租户ID
-  """
-  tenantID: Int!
-  """
-  应用ID
-  """
-  matchers: [Matcher]
-  """
-  开始时间
-  """
-  startsAt: Time!
-  """
-  结束时间
-  """
-  endsAt: Time!
-  """
-  备注
-  """
-  comments: String
-  """
-  状态
-  """
-  state: SilenceSilenceState!
-  """
-  创建人
-  """
-  user: User!
-}
-"""
-A connection to a list of items.
-"""
-type SilenceConnection {
-  """
-  A list of edges.
-  """
-  edges: [SilenceEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type SilenceEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Silence
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for Silence connections
-"""
-input SilenceOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order Silences.
-  """
-  field: SilenceOrderField!
-}
-"""
-Properties by which Silence connections can be ordered.
-"""
-enum SilenceOrderField {
-  createdAt
-}
-"""
-SilenceSilenceState is enum for the field state
-"""
-enum SilenceSilenceState @goModel(model: "github.com/woocoos/msgcenter/pkg/alert.SilenceState") {
-  expired
-  active
-  pending
-}
-"""
-SilenceWhereInput is used for filtering Silence objects.
-Input was generated by ent.
-"""
-input SilenceWhereInput {
-  not: SilenceWhereInput
-  and: [SilenceWhereInput!]
-  or: [SilenceWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  created_by field predicates
-  """
-  createdBy: ID
-  createdByNEQ: ID
-  createdByIn: [ID!]
-  createdByNotIn: [ID!]
-  """
-  created_at field predicates
-  """
-  createdAt: Time
-  createdAtNEQ: Time
-  createdAtIn: [Time!]
-  createdAtNotIn: [Time!]
-  createdAtGT: Time
-  createdAtGTE: Time
-  createdAtLT: Time
-  createdAtLTE: Time
-  """
-  updated_by field predicates
-  """
-  updatedBy: Int
-  updatedByNEQ: Int
-  updatedByIn: [Int!]
-  updatedByNotIn: [Int!]
-  updatedByGT: Int
-  updatedByGTE: Int
-  updatedByLT: Int
-  updatedByLTE: Int
-  updatedByIsNil: Boolean
-  updatedByNotNil: Boolean
-  """
-  updated_at field predicates
-  """
-  updatedAt: Time
-  updatedAtNEQ: Time
-  updatedAtIn: [Time!]
-  updatedAtNotIn: [Time!]
-  updatedAtGT: Time
-  updatedAtGTE: Time
-  updatedAtLT: Time
-  updatedAtLTE: Time
-  updatedAtIsNil: Boolean
-  updatedAtNotNil: Boolean
-  """
-  tenant_id field predicates
-  """
-  tenantID: Int
-  tenantIDNEQ: Int
-  tenantIDIn: [Int!]
-  tenantIDNotIn: [Int!]
-  tenantIDGT: Int
-  tenantIDGTE: Int
-  tenantIDLT: Int
-  tenantIDLTE: Int
-  """
-  starts_at field predicates
-  """
-  startsAt: Time
-  startsAtNEQ: Time
-  startsAtIn: [Time!]
-  startsAtNotIn: [Time!]
-  startsAtGT: Time
-  startsAtGTE: Time
-  startsAtLT: Time
-  startsAtLTE: Time
-  """
-  ends_at field predicates
-  """
-  endsAt: Time
-  endsAtNEQ: Time
-  endsAtIn: [Time!]
-  endsAtNotIn: [Time!]
-  endsAtGT: Time
-  endsAtGTE: Time
-  endsAtLT: Time
-  endsAtLTE: Time
-  """
-  state field predicates
-  """
-  state: SilenceSilenceState
-  stateNEQ: SilenceSilenceState
-  stateIn: [SilenceSilenceState!]
-  stateNotIn: [SilenceSilenceState!]
-}
 """
 The builtin Time type
 """
@@ -5927,7 +6447,41 @@ input UpdateMsgEventInput {
   根据route配置对应的以,分隔的mode列表
   """
   modes: String
+  """
+  是否可订阅
+  """
+  canSubs: Boolean
+  clearCanSubs: Boolean
   msgTypeID: ID
+}
+"""
+UpdateMsgSilenceInput is used for update MsgSilence object.
+Input was generated by ent.
+"""
+input UpdateMsgSilenceInput {
+  """
+  应用ID
+  """
+  matchers: [MatcherInput]
+  appendMatchers: [MatcherInput]
+  clearMatchers: Boolean
+  """
+  开始时间
+  """
+  startsAt: Time
+  """
+  结束时间
+  """
+  endsAt: Time
+  """
+  备注
+  """
+  comments: String
+  clearComments: Boolean
+  """
+  状态
+  """
+  state: MsgSilenceSilenceState
 }
 """
 UpdateMsgSubscriberInput is used for update MsgSubscriber object.
@@ -5949,6 +6503,9 @@ input UpdateMsgSubscriberInput {
   exclude: Boolean
   clearExclude: Boolean
   msgTypeID: ID
+  clearMsgType: Boolean
+  msgEventID: ID
+  clearMsgEvent: Boolean
   userID: ID
   clearUser: Boolean
 }
@@ -5962,10 +6519,15 @@ input UpdateMsgTemplateInput {
   """
   msgTypeID: Int
   """
-  组织ID
+  租户ID
   """
   tenantID: ID
   clearTenantID: Boolean
+  """
+  用户ID，为空表示租户级或全局模板
+  """
+  userID: ID
+  clearUserID: Boolean
   """
   消息模板名称
   """
@@ -6065,35 +6627,6 @@ input UpdateMsgTypeInput {
   canCustom: Boolean
   clearCanCustom: Boolean
 }
-"""
-UpdateSilenceInput is used for update Silence object.
-Input was generated by ent.
-"""
-input UpdateSilenceInput {
-  """
-  应用ID
-  """
-  matchers: [MatcherInput]
-  appendMatchers: [MatcherInput]
-  clearMatchers: Boolean
-  """
-  开始时间
-  """
-  startsAt: Time
-  """
-  结束时间
-  """
-  endsAt: Time
-  """
-  备注
-  """
-  comments: String
-  clearComments: Boolean
-  """
-  状态
-  """
-  state: SilenceSilenceState
-}
 type User implements Node {
   """
   ID
@@ -6110,7 +6643,7 @@ type User implements Node {
   """
   静默
   """
-  silences: [Silence!]
+  silences: [MsgSilence!]
 }
 `, BuiltIn: false},
 	{Name: "../query.graphql", Input: `""" time duration: RFCXXX duration string, e.g. 1h30m """
@@ -6119,6 +6652,8 @@ scalar Duration
 scalar LabelName
 """ map[string]string JSON Raw """
 scalar MapString
+""" map[string]*UmengAppConfig JSON Raw """
+scalar UmengApps
 """ host:port """
 scalar HostPort
 
@@ -6156,6 +6691,8 @@ type Receiver {
     name: String!
     emailConfigs: [EmailConfig]
     messageConfig: MessageConfig
+    webhookConfigs: [WebhookConfig]
+    umengConfigs: [UmengConfig]
 }
 
 type EmailConfig {
@@ -6168,12 +6705,34 @@ type EmailConfig {
     authSecret: String!
     authIdentity: String!
     headers: MapString
+    traceIdHeader: String
 }
 
 type MessageConfig {
     to: String
     subject: String
     redirect: String
+}
+
+type WebhookConfig {
+    sendResolved: Boolean
+    receiveType: String
+    url: String
+    urlFile: String
+    maxAlerts: Int
+    timeout: Duration
+    headers: MapString
+    subject: String
+    body: String
+}
+
+type UmengConfig {
+    sendResolved: Boolean
+    apiURL: String
+    apps: UmengApps!
+    productionMode: Boolean
+    subject: String
+    body: String
 }
 
 enum RouteStrType {
@@ -6192,6 +6751,12 @@ extend type MsgType {
 
 extend type MsgEvent {
     routeStr(type: RouteStrType!): String!
+    """ 订阅的用户 """
+    subscriberUsers:[MsgSubscriber!]!
+    """ 订阅的用户组 """
+    subscriberRoles:[MsgSubscriber!]!
+    """ 排除的用户 """
+    excludeSubscriberUsers:[MsgSubscriber!]!
 }
 
 extend type MsgInternal {
@@ -6292,9 +6857,9 @@ extend type Query {
         first: Int
         before: Cursor
         last: Int
-        orderBy: SilenceOrder
-        where: SilenceWhereInput
-    ):SilenceConnection!
+        orderBy: MsgSilenceOrder
+        where: MsgSilenceWhereInput
+    ):MsgSilenceConnection!
 
     """消息列表"""
     msgAlerts(
@@ -6349,6 +6914,17 @@ extend type Query {
         """消息模板的body数据"""
         body:String!
     ):String!
+    """app推送消息列表"""
+    appPushMsgs(
+        after: Cursor
+        first: Int
+        before: Cursor
+        last: Int
+        orderBy: MsgInternalOrder
+        where: MsgInternalWhereInput
+    ): MsgInternalConnection!
+    """app推送消息未读数"""
+    appUnreadPushMsgs:Int!
 }`, BuiltIn: false},
 	{Name: "../mutation.graphql", Input: `type Mutation {
     """ 创建消息类型 """
@@ -6392,11 +6968,11 @@ extend type Query {
     """ 删除订阅 """
     deleteMsgSubscriber(ids: [ID!]!): Boolean!
     """ 创建静默 """
-    createSilence(input: CreateSilenceInput!): Silence!
+    createMsgSilence(input: CreateMsgSilenceInput!): MsgSilence!
     """ 更新静默 """
-    updateSilence(id: ID!, input: UpdateSilenceInput!): Silence!
+    updateMsgSilence(id: ID!, input: UpdateMsgSilenceInput!): MsgSilence!
     """ 删除静默 """
-    deleteSilence(id: ID!): Boolean!
+    deleteMsgSilence(id: ID!): Boolean!
     """ 设置站内信消息已读未读 """
     markMsgInternalToReadOrUnRead(ids: [ID!]!, read: Boolean!): Boolean!
     """ 删除站内信消息 """
@@ -6432,6 +7008,8 @@ input ReceiverInput {
     name: String!
     emailConfigs: [EmailConfigInput]
     messageConfig: MessageConfigInput
+    webhookConfigs: [WebhookConfigInput]
+    umengConfigs: [UmengConfigInput]
 }
 
 input EmailConfigInput {
@@ -6444,12 +7022,33 @@ input EmailConfigInput {
     authSecret: String
     authIdentity: String
     headers: MapString
+    traceIdHeader: String
 }
 
 input MessageConfigInput {
     to: String
     subject: String
     redirect: String
+}
+
+input WebhookConfigInput {
+    sendResolved: Boolean
+    receiveType: String
+    secret: String
+    url: String
+    urlFile: String
+    maxAlerts: Int
+    timeout: Duration
+    headers: MapString
+    subject: String
+    body: String
+}
+
+input UmengConfigInput {
+    sendResolved: Boolean
+    apiURL: String
+    apps: UmengApps!
+    productionMode: Boolean
 }`, BuiltIn: false},
 	{Name: "../subscription.graphql", Input: `type Subscription {
     # internal message
@@ -6477,6 +7076,11 @@ type MessageFilter {
     appCode: String!
     userId: ID!
     deviceId:String!
+}
+
+extend type Query {
+    """查询设备是否已有活跃的WebSocket连接"""
+    deviceConnected(deviceId: String!): Boolean!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)

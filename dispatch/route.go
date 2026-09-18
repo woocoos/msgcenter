@@ -1,16 +1,25 @@
+// Copyright 2023 woocoos
+//
+// Derived from Prometheus Alertmanager (https://github.com/prometheus/alertmanager).
+// Original Copyright 2016-2026 The Prometheus Authors.
+// Licensed under the Apache License 2.0.
+
 package dispatch
 
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"strings"
+	"time"
+
+	"sort"
+
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"go.uber.org/zap"
-	"sort"
-	"strings"
-	"time"
 )
 
 // DefaultRouteOpts are the defaulting routing options which apply
@@ -28,6 +37,9 @@ var DefaultRouteOpts = RouteOpts{
 type Route struct {
 	parent *Route
 
+	// Idx is the post-order traversal index, used to index into routeGroupsSlice.
+	Idx int
+
 	// The configuration parameters for matches of this route.
 	RouteOpts RouteOpts
 
@@ -42,8 +54,14 @@ type Route struct {
 	Routes []*Route
 }
 
-// NewRoute returns a new route.
+// NewRoute returns a new route. If parent is nil, this is the root route
+// and indices are assigned via post-order traversal.
 func NewRoute(cr *profile.Route, parent *Route) *Route {
+	var counter int
+	return newRoute(cr, parent, &counter)
+}
+
+func newRoute(cr *profile.Route, parent *Route, counter *int) *Route {
 	// Create default and overwrite with configured settings.
 	opts := DefaultRouteOpts
 	if parent != nil {
@@ -54,16 +72,14 @@ func NewRoute(cr *profile.Route, parent *Route) *Route {
 		opts.Receiver = cr.Receiver
 	}
 
-	if cr.GroupBy != nil {
+	if len(cr.GroupBy) > 0 {
 		opts.GroupBy = map[label.LabelName]struct{}{}
 		for _, ln := range cr.GroupBy {
 			opts.GroupBy[ln] = struct{}{}
 		}
 		opts.GroupByAll = false
-	} else {
-		if cr.GroupByAll {
-			opts.GroupByAll = cr.GroupByAll
-		}
+	} else if cr.GroupByAll {
+		opts.GroupByAll = cr.GroupByAll
 	}
 
 	if cr.GroupWait != nil {
@@ -94,9 +110,22 @@ func NewRoute(cr *profile.Route, parent *Route) *Route {
 		Continue:  cr.Continue,
 	}
 
-	route.Routes = NewRoutes(cr.Routes, route)
+	// Build children first (post-order: children get smaller indices).
+	route.Routes = newRoutes(cr.Routes, route, counter)
+
+	// Assign index after children are built.
+	route.Idx = *counter
+	*counter++
 
 	return route
+}
+
+func newRoutes(croutes []*profile.Route, parent *Route, counter *int) []*Route {
+	res := make([]*Route, 0, len(croutes))
+	for _, cr := range croutes {
+		res = append(res, newRoute(cr, parent, counter))
+	}
+	return res
 }
 
 func (r *Route) Apply(cfg *conf.Configuration) {
@@ -110,15 +139,6 @@ func (r *Route) Apply(cfg *conf.Configuration) {
 			)
 		}
 	})
-}
-
-// NewRoutes returns a slice of routes.
-func NewRoutes(croutes []*profile.Route, parent *Route) []*Route {
-	res := []*Route{}
-	for _, cr := range croutes {
-		res = append(res, NewRoute(cr, parent))
-	}
-	return res
 }
 
 // Match does a depth-first left-to-right search through the route tree
@@ -157,6 +177,26 @@ func (r *Route) Key() string {
 		b.WriteRune('/')
 	}
 	b.WriteString(r.Matchers.String())
+	return b.String()
+}
+
+// ID returns a unique identifier for the route within the routing tree.
+func (r *Route) ID() string {
+	b := strings.Builder{}
+	if r.parent != nil {
+		b.WriteString(r.parent.ID())
+		b.WriteRune('/')
+	}
+	b.WriteString(r.Matchers.String())
+	if r.parent != nil {
+		for i := range r.parent.Routes {
+			if r == r.parent.Routes[i] {
+				b.WriteRune('/')
+				b.WriteString(strconv.Itoa(i))
+				break
+			}
+		}
+	}
 	return b.String()
 }
 

@@ -2,6 +2,11 @@ package testsuite
 
 import (
 	"context"
+	"net/url"
+	"os"
+	"path/filepath"
+	"time"
+
 	"github.com/alicebob/miniredis/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/suite"
@@ -19,15 +24,13 @@ import (
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service"
 	"github.com/woocoos/msgcenter/test"
-	"os"
-	"path/filepath"
-	"time"
 )
 
 var (
 	alterPassWordEventName = "AlterPassword"
 	SubEventName           = "SubEvent"
 	WebhookEventName       = "WebhookEvent"
+	DingtalkEventName      = "DingtalkEvent"
 )
 
 type BaseSuite struct {
@@ -38,11 +41,22 @@ type BaseSuite struct {
 	Client          *ent.Client
 	AlertManager    *service.AlertManager
 	redis           *miniredis.Miniredis
+	// WebhookHost 是 webhook mock 服务器的 host:port, 默认为 "127.0.0.1:5001".
+	// 使用动态端口时, 在 Setup 前设置为实际地址.
+	WebhookHost string
 }
 
 func (o *BaseSuite) Setup() error {
+	if o.WebhookHost == "" {
+		o.WebhookHost = "127.0.0.1:5001"
+	}
 	o.App = initTestApp()
 	o.Cnf = o.App.AppConfiguration()
+	// 覆盖配置中的 webhook 地址, 使其与实际监听端口一致.
+	o.Cnf.Parser().Set("kosdk.client.oauth2.endpoint.tokenURL", "http://"+o.WebhookHost+"/token")
+	o.Cnf.Parser().Set("kosdk.plugin.msg.basePath", "http://"+o.WebhookHost+"/api/v2")
+	o.Cnf.Parser().Set("kosdk.plugin.fs.basePath", "http://"+o.WebhookHost)
+	o.Cnf.Parser().Set("kosdk.plugin.auth.basePath", "http://"+o.WebhookHost)
 	o.redis = initMiniRedis(o.Cnf)
 
 	koapp.BuildCacheComponents(o.Cnf)
@@ -56,7 +70,7 @@ func (o *BaseSuite) Setup() error {
 		return err
 	}
 	o.Client = client
-	initDatabase(context.Background(), o.Client)
+	initDatabase(context.Background(), o.Client, o.WebhookHost)
 
 	// alert
 	metrics.BuildGlobal()
@@ -95,6 +109,8 @@ func open(ctx context.Context, driverName, dsn string) (*ent.Client, error) {
 			Org:         "portal",
 			OrgRoleUser: "portal",
 			UserAddr:    "portal",
+			UserDevice:  "portal",
+			OrgUser:     "portal",
 		}),
 	)
 	if err != nil {
@@ -116,7 +132,7 @@ func initMiniRedis(cnf *conf.AppConfiguration) *miniredis.Miniredis {
 	return db
 }
 
-func initDatabase(ctx context.Context, client *ent.Client) {
+func initDatabase(ctx context.Context, client *ent.Client, webhookHost string) {
 	ctx = identity.WithTenantID(ctx, 1)
 	client.MsgType.Create().SetName("alert").SetID(1).SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
 		SetAppID(1).SetCategory("账户安全").SetCanSubs(true).SetCanCustom(true).SaveX(ctx)
@@ -147,13 +163,13 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		}).SaveX(ctx)
 	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(1).SetTenantID(1).SetName(alterPassWordEventName).SetCreatedBy(1).
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
-		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
+		SetSubject(`{{ with .CommonAnnotations }}{{.summary}}密码到期提醒{{.text}}{{end}}`).SetCc(`{{ template "email.cc" . }}`).
 		SetBcc(`{{ template "email.bcc" . }}`).
 		SetBody(`{{ template "1.alterpwd.txt" . }}`).SaveX(ctx)
 	// 默认模板
 	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(1).SetName(alterPassWordEventName).SetCreatedBy(1).
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
-		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
+		SetSubject(`{{ with .CommonAnnotations }}{{.summary}}密码到期提醒{{.text}}{{end}}`).SetCc(`{{ template "email.cc" . }}`).
 		SetBcc(`{{ template "email.bcc" . }}`).
 		SetBody(`{{ template "1.alterpwd.txt" . }}`).SaveX(ctx)
 
@@ -163,11 +179,12 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 			Name: "email",
 			EmailConfigs: []*profile.EmailConfig{
 				{
-					SmartHost:    profile.HostPort{Host: "localhost", Port: "1025"},
-					To:           `{{ template "email.to" . }}`,
-					From:         "1 <serviceSuite@localhost>",
-					AuthUsername: "user1",
-					AuthPassword: "password1",
+					SmartHost:     profile.HostPort{Host: "localhost", Port: "1025"},
+					To:            `{{ template "email.to" . }}`,
+					From:          "1 <serviceSuite@localhost>",
+					AuthUsername:  "user1",
+					AuthPassword:  "password1",
+					TraceIDHeader: "X-User-Notify-TraceId",
 				},
 			},
 		}).SaveX(ctx)
@@ -224,7 +241,17 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 			Name: "webhook",
 			WebhookConfigs: []*profile.WebhookConfig{
 				{
-					URL: &profile.URL{Host: "localhost:5001", Scheme: "http", Path: "/webhook"},
+					URL: &profile.URL{Host: webhookHost, Scheme: "http", Path: "/webhook"},
+				},
+			},
+		}).SaveX(ctx)
+	client.MsgChannel.Create().SetName("webhook").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
+		SetTenantID(1000).SetReceiverType(profile.ReceiverWebhook).
+		SetReceiver(&profile.Receiver{
+			Name: "webhook",
+			WebhookConfigs: []*profile.WebhookConfig{
+				{
+					URL: &profile.URL{Host: webhookHost, Scheme: "http", Path: "/webhook"},
 				},
 			},
 		}).SaveX(ctx)
@@ -287,6 +314,30 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
 		SetBody(`{{ template "1.msggroupby.txt" . }}`).SaveX(ctx)
 
+	// DingTalk webhook test data
+	dingtalkURL, _ := url.Parse("http://" + webhookHost + "/webhook")
+	//dingtalkURL.RawQuery = "access_token=736f6d40c5ea62d05edb78a18c5a9d5d47867ecc67234356abdc0487328c426d"
+	client.MsgChannel.Create().SetName("webhook-dingtalk").SetStatus(typex.SimpleStatusActive).SetCreatedBy(1).
+		SetTenantID(1).SetReceiverType(profile.ReceiverWebhook).
+		SetReceiver(&profile.Receiver{
+			Name: "webhook-dingtalk",
+			WebhookConfigs: []*profile.WebhookConfig{
+				{
+					URL:         (*profile.URL)(dingtalkURL),
+					ReceiveType: profile.WebhookReceiveTypeDingtalk,
+					Secret:      "SEC5b3e1c7f245653a502a4726bedcb93bc6327e2e0f3fb75980f4c28ff4be2d851",
+					Body:        `{{ template "1.dingtalk.txt" . }}`,
+				},
+			},
+		}).SaveX(ctx)
+	client.MsgEvent.Create().SetID(6).SetMsgTypeID(1).SetName(DingtalkEventName).SetStatus(typex.SimpleStatusActive).
+		SetCreatedBy(1).SetModes("webhook").SaveX(ctx)
+	client.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(6).SetTenantID(1).SetName(DingtalkEventName).SetCreatedBy(1).
+		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverWebhook).
+		SetSubject(`钉钉告警`).
+		SetBody(`{{ template "1.dingtalk.txt" . }}`).
+		SaveX(ctx)
+
 	client.User.Create().SetID(1).SetDisplayName("admin,.").SetPrincipalName("admin").SaveX(ctx)
 	client.UserAddr.Create().SetID(1).SetUserID(1).SetEmail("alerts@example.com").
 		SetMobile("13800138000").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)
@@ -297,6 +348,7 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 	client.UserAddr.Create().SetID(3).SetUserID(3).SetEmail("nobody@localhost").
 		SetMobile("13800138002").SetAddrType(useraddr.AddrTypeContact).SaveX(ctx)
 	client.Org.Create().SetID(1).SetOwnerID(1).SetKind("root").SetParentID(0).SaveX(ctx)
+	client.Org.Create().SetID(1000).SetOwnerID(1).SetKind("root").SetParentID(0).SaveX(ctx)
 	client.OrgRoleUser.Create().SetID(1).SetOrgID(1).SetUserID(1).SetOrgRoleID(12).SetOrgUserID(3).
 		SaveX(ctx)
 	client.OrgRoleUser.Create().SetID(2).SetOrgID(1).SetUserID(2).SetOrgRoleID(13).SetOrgUserID(4).
@@ -309,11 +361,11 @@ func initDatabase(ctx context.Context, client *ent.Client) {
 		SetCreatedBy(1).SaveX(ctx)
 
 	client.MsgInternal.Create().SetID(1).SetTenantID(1).SetSubject("subject1").SetBody("body1").SetFormat("text").
-		SetCategory("订阅类型").SetCreatedBy(1).SaveX(ctx)
+		SetCategory("订阅类型").SetReceiverType(profile.ReceiverMessage).SetCreatedBy(1).SaveX(ctx)
 	client.MsgInternalTo.Create().SetID(1).SetTenantID(1).SetCreatedAt(time.Now()).SetMsgInternalID(1).
 		SetUserID(1).SaveX(ctx)
 	client.MsgInternal.Create().SetID(2).SetTenantID(1).SetSubject("subject2").SetBody("body2").SetFormat("text").
-		SetCategory("订阅类型").SetCreatedBy(1).SaveX(ctx)
+		SetCategory("订阅类型").SetReceiverType(profile.ReceiverMessage).SetCreatedBy(1).SaveX(ctx)
 	client.MsgInternalTo.Create().SetID(2).SetTenantID(1).SetCreatedAt(time.Now()).SetMsgInternalID(2).
 		SetUserID(1).SaveX(ctx)
 }

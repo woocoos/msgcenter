@@ -1,4 +1,4 @@
-import { MatcherInput, Silence } from '@/generated/msgsrv/graphql';
+import { MatcherInput, MsgSilence } from '@/generated/msgsrv/graphql';
 import { dateRangeTurnDuration, durationTurnEndDate, getDate, updateFormat } from '@/util';
 import { DrawerForm, ProFormDateTimeRangePicker, ProFormInstance, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { useEffect, useRef, useState } from 'react';
@@ -24,12 +24,12 @@ export default (props: {
   title?: string;
   id?: string | null;
   isCopy?: boolean;
-  onClose: (isSuccess?: boolean, newInfo?: Silence) => void;
+  onClose: (isSuccess?: boolean, newInfo?: MsgSilence) => void;
 }) => {
   const { t } = useTranslation(),
     formRef = useRef<ProFormInstance<ProFormData>>(),
     [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
-    [info, setInfo] = useState<Silence>(),
+    [info, setInfo] = useState<MsgSilence>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
@@ -57,7 +57,7 @@ export default (props: {
       if (props.id) {
         const result = await getSilenceInfo(props.id);
         if (result?.id) {
-          setInfo(result as Silence);
+          setInfo(result as MsgSilence);
           result.matchers?.forEach(item => {
             if (item) {
               initData.matchers.push({
@@ -99,7 +99,7 @@ export default (props: {
         : await createSilence(input);
       if (result?.id) {
         setSaveDisabled(true);
-        props.onClose(true, result as Silence);
+        props.onClose(true, result as MsgSilence);
       }
       setSaveLoading(false);
       return false;

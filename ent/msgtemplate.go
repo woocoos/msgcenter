@@ -33,8 +33,10 @@ type MsgTemplate struct {
 	MsgTypeID int `json:"msg_type_id,omitempty"`
 	// 消息事件ID
 	MsgEventID int `json:"msg_event_id,omitempty"`
-	// 组织ID
+	// 租户ID
 	TenantID int `json:"tenant_id,omitempty"`
+	// 用户ID，为空表示租户级或全局模板
+	UserID int `json:"user_id,omitempty"`
 	// 消息模板名称
 	Name string `json:"name,omitempty"`
 	// 状态
@@ -96,7 +98,7 @@ func (*MsgTemplate) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case msgtemplate.FieldAttachments:
 			values[i] = new([]byte)
-		case msgtemplate.FieldID, msgtemplate.FieldCreatedBy, msgtemplate.FieldUpdatedBy, msgtemplate.FieldMsgTypeID, msgtemplate.FieldMsgEventID, msgtemplate.FieldTenantID:
+		case msgtemplate.FieldID, msgtemplate.FieldCreatedBy, msgtemplate.FieldUpdatedBy, msgtemplate.FieldMsgTypeID, msgtemplate.FieldMsgEventID, msgtemplate.FieldTenantID, msgtemplate.FieldUserID:
 			values[i] = new(sql.NullInt64)
 		case msgtemplate.FieldName, msgtemplate.FieldStatus, msgtemplate.FieldReceiverType, msgtemplate.FieldFormat, msgtemplate.FieldSubject, msgtemplate.FieldFrom, msgtemplate.FieldTo, msgtemplate.FieldCc, msgtemplate.FieldBcc, msgtemplate.FieldBody, msgtemplate.FieldTpl, msgtemplate.FieldComments:
 			values[i] = new(sql.NullString)
@@ -164,6 +166,12 @@ func (_m *MsgTemplate) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
 			} else if value.Valid {
 				_m.TenantID = int(value.Int64)
+			}
+		case msgtemplate.FieldUserID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
+			} else if value.Valid {
+				_m.UserID = int(value.Int64)
 			}
 		case msgtemplate.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -306,6 +314,9 @@ func (_m *MsgTemplate) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("tenant_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
+	builder.WriteString(", ")
+	builder.WriteString("user_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.UserID))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(_m.Name)

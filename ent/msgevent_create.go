@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/pkg/profile"
@@ -126,6 +127,20 @@ func (_c *MsgEventCreate) SetModes(v string) *MsgEventCreate {
 	return _c
 }
 
+// SetCanSubs sets the "can_subs" field.
+func (_c *MsgEventCreate) SetCanSubs(v bool) *MsgEventCreate {
+	_c.mutation.SetCanSubs(v)
+	return _c
+}
+
+// SetNillableCanSubs sets the "can_subs" field if the given value is not nil.
+func (_c *MsgEventCreate) SetNillableCanSubs(v *bool) *MsgEventCreate {
+	if v != nil {
+		_c.SetCanSubs(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *MsgEventCreate) SetID(v int) *MsgEventCreate {
 	_c.mutation.SetID(v)
@@ -135,6 +150,21 @@ func (_c *MsgEventCreate) SetID(v int) *MsgEventCreate {
 // SetMsgType sets the "msg_type" edge to the MsgType entity.
 func (_c *MsgEventCreate) SetMsgType(v *MsgType) *MsgEventCreate {
 	return _c.SetMsgTypeID(v.ID)
+}
+
+// AddSubscriberIDs adds the "subscribers" edge to the MsgSubscriber entity by IDs.
+func (_c *MsgEventCreate) AddSubscriberIDs(ids ...int) *MsgEventCreate {
+	_c.mutation.AddSubscriberIDs(ids...)
+	return _c
+}
+
+// AddSubscribers adds the "subscribers" edges to the MsgSubscriber entity.
+func (_c *MsgEventCreate) AddSubscribers(v ...*MsgSubscriber) *MsgEventCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddSubscriberIDs(ids...)
 }
 
 // AddCustomerTemplateIDs adds the "customer_template" edge to the MsgTemplate entity by IDs.
@@ -199,6 +229,10 @@ func (_c *MsgEventCreate) defaults() error {
 	if _, ok := _c.mutation.Status(); !ok {
 		v := msgevent.DefaultStatus
 		_c.mutation.SetStatus(v)
+	}
+	if _, ok := _c.mutation.CanSubs(); !ok {
+		v := msgevent.DefaultCanSubs
+		_c.mutation.SetCanSubs(v)
 	}
 	return nil
 }
@@ -308,6 +342,10 @@ func (_c *MsgEventCreate) createSpec() (*MsgEvent, *sqlgraph.CreateSpec) {
 		_spec.SetField(msgevent.FieldModes, field.TypeString, value)
 		_node.Modes = value
 	}
+	if value, ok := _c.mutation.CanSubs(); ok {
+		_spec.SetField(msgevent.FieldCanSubs, field.TypeBool, value)
+		_node.CanSubs = value
+	}
 	if nodes := _c.mutation.MsgTypeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -324,6 +362,23 @@ func (_c *MsgEventCreate) createSpec() (*MsgEvent, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.MsgTypeID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.SubscribersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   msgevent.SubscribersTable,
+			Columns: []string{msgevent.SubscribersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _c.schemaConfig.MsgSubscriber
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.CustomerTemplateIDs(); len(nodes) > 0 {
@@ -524,6 +579,24 @@ func (u *MsgEventUpsert) SetModes(v string) *MsgEventUpsert {
 // UpdateModes sets the "modes" field to the value that was provided on create.
 func (u *MsgEventUpsert) UpdateModes() *MsgEventUpsert {
 	u.SetExcluded(msgevent.FieldModes)
+	return u
+}
+
+// SetCanSubs sets the "can_subs" field.
+func (u *MsgEventUpsert) SetCanSubs(v bool) *MsgEventUpsert {
+	u.Set(msgevent.FieldCanSubs, v)
+	return u
+}
+
+// UpdateCanSubs sets the "can_subs" field to the value that was provided on create.
+func (u *MsgEventUpsert) UpdateCanSubs() *MsgEventUpsert {
+	u.SetExcluded(msgevent.FieldCanSubs)
+	return u
+}
+
+// ClearCanSubs clears the value of the "can_subs" field.
+func (u *MsgEventUpsert) ClearCanSubs() *MsgEventUpsert {
+	u.SetNull(msgevent.FieldCanSubs)
 	return u
 }
 
@@ -732,6 +805,27 @@ func (u *MsgEventUpsertOne) SetModes(v string) *MsgEventUpsertOne {
 func (u *MsgEventUpsertOne) UpdateModes() *MsgEventUpsertOne {
 	return u.Update(func(s *MsgEventUpsert) {
 		s.UpdateModes()
+	})
+}
+
+// SetCanSubs sets the "can_subs" field.
+func (u *MsgEventUpsertOne) SetCanSubs(v bool) *MsgEventUpsertOne {
+	return u.Update(func(s *MsgEventUpsert) {
+		s.SetCanSubs(v)
+	})
+}
+
+// UpdateCanSubs sets the "can_subs" field to the value that was provided on create.
+func (u *MsgEventUpsertOne) UpdateCanSubs() *MsgEventUpsertOne {
+	return u.Update(func(s *MsgEventUpsert) {
+		s.UpdateCanSubs()
+	})
+}
+
+// ClearCanSubs clears the value of the "can_subs" field.
+func (u *MsgEventUpsertOne) ClearCanSubs() *MsgEventUpsertOne {
+	return u.Update(func(s *MsgEventUpsert) {
+		s.ClearCanSubs()
 	})
 }
 
@@ -1106,6 +1200,27 @@ func (u *MsgEventUpsertBulk) SetModes(v string) *MsgEventUpsertBulk {
 func (u *MsgEventUpsertBulk) UpdateModes() *MsgEventUpsertBulk {
 	return u.Update(func(s *MsgEventUpsert) {
 		s.UpdateModes()
+	})
+}
+
+// SetCanSubs sets the "can_subs" field.
+func (u *MsgEventUpsertBulk) SetCanSubs(v bool) *MsgEventUpsertBulk {
+	return u.Update(func(s *MsgEventUpsert) {
+		s.SetCanSubs(v)
+	})
+}
+
+// UpdateCanSubs sets the "can_subs" field to the value that was provided on create.
+func (u *MsgEventUpsertBulk) UpdateCanSubs() *MsgEventUpsertBulk {
+	return u.Update(func(s *MsgEventUpsert) {
+		s.UpdateCanSubs()
+	})
+}
+
+// ClearCanSubs clears the value of the "can_subs" field.
+func (u *MsgEventUpsertBulk) ClearCanSubs() *MsgEventUpsertBulk {
+	return u.Update(func(s *MsgEventUpsert) {
+		s.ClearCanSubs()
 	})
 }
 

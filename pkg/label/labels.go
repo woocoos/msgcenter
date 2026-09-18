@@ -5,10 +5,12 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"github.com/tsingsun/woocoo/pkg/gds"
 	"sort"
 	"strconv"
+	"strings"
 	"unicode/utf8"
+
+	"github.com/tsingsun/woocoo/pkg/gds"
 )
 
 const (
@@ -22,6 +24,11 @@ const (
 	SkipSubscribeLabel = "skipSub"
 	// SkipTempParamsLabel is the label name for the skip template params. Y/N
 	SkipTempParamsLabel = "skipTempParams"
+	// AppSetLabel is the label name for the target application set (business application name).
+	AppSetLabel = "appSet"
+	// AlertIDAnnotation is the annotation key for storing alert database ID.
+	// This is set by AlertCallback.PreStore after saving to database.
+	AlertIDAnnotation = "__alert_id__"
 )
 
 type LabelName string
@@ -33,12 +40,7 @@ func (ln LabelName) IsValid() bool {
 	if len(ln) == 0 {
 		return false
 	}
-	for i, b := range ln {
-		if !((b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || b == '_' || (b >= '0' && b <= '9' && i > 0)) {
-			return false
-		}
-	}
-	return true
+	return utf8.ValidString(string(ln))
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -87,6 +89,24 @@ func (ls LabelSet) Clone() LabelSet {
 		clone[k] = v
 	}
 	return clone
+}
+
+// UserIDsFromLabels returns the user IDs from the labels.
+func UserIDsFromLabels(set LabelSet) ([]int, error) {
+	ul, ok := set[ToUserIDLabel]
+	if !ok {
+		return nil, nil
+	}
+	ids := strings.Split(ul, ",")
+	uis := make([]int, 0, len(ids))
+	for _, id := range ids {
+		uid, _ := strconv.Atoi(id)
+		if uid == 0 {
+			continue
+		}
+		uis = append(uis, uid)
+	}
+	return uis, nil
 }
 
 // Equal returns true iff both label sets have exactly the same key/value pairs.

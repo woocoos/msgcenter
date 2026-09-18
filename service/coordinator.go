@@ -5,6 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
+	"sync"
+	"time"
+
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/tsingsun/woocoo/pkg/store/redisx"
@@ -18,6 +24,7 @@ import (
 	"github.com/woocoos/msgcenter/notify"
 	"github.com/woocoos/msgcenter/notify/email"
 	"github.com/woocoos/msgcenter/notify/message"
+	"github.com/woocoos/msgcenter/notify/umeng"
 	"github.com/woocoos/msgcenter/notify/webhook"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/metrics"
@@ -25,11 +32,6 @@ import (
 	"github.com/woocoos/msgcenter/service/kosdk"
 	"github.com/woocoos/msgcenter/template"
 	"go.uber.org/zap"
-	"os"
-	"path/filepath"
-	"strconv"
-	"sync"
-	"time"
 )
 
 var logger = log.Component("config")
@@ -48,6 +50,8 @@ type Coordinator struct {
 	db *ent.Client
 	// knockout sdk
 	KOSdk *api.SDK
+	// MountPaths maps bucket name to local mount path.
+	MountPaths map[string]string
 }
 
 // NewCoordinator returns a new coordinator with the given configuration for alert manager.
@@ -219,7 +223,7 @@ func (c *Coordinator) loadTempParams(tempParams map[string]map[string]string) er
 	m := tps.ToStringMap()
 	for oid, vm := range m {
 		out := make(map[string]string)
-		for k, v := range vm.(map[string]interface{}) {
+		for k, v := range vm.(map[string]any) {
 			out[k] = fmt.Sprintf("%v", v)
 		}
 		tempParams[oid] = out
@@ -463,6 +467,11 @@ func (c *Coordinator) buildReceiverIntegrations(nc profile.Receiver, tmpl *templ
 	for i, cfg := range nc.WebhookConfigs {
 		add("webhook", i, func() (notify.Notifier, error) {
 			return webhook.New(cfg, tmpl, overrideWebHookConfig(basedir, attdir, c.db))
+		})
+	}
+	for i, cfg := range nc.UmengConfigs {
+		add("umeng", i, func() (notify.Notifier, error) {
+			return umeng.New(cfg, tmpl, overrideUmengConfig(basedir, attdir, c.db), c.db)
 		})
 	}
 	if nc.MessageConfig != nil {

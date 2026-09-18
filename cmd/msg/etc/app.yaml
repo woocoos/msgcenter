@@ -11,6 +11,9 @@ jwt: &jwt
   signingMethod: "HS256"
   signingKey: "secret"
 
+includeFiles:
+  - "etc/local.yaml"
+
 web:
   server:
     addr: 127.0.0.1:10074
@@ -30,16 +33,14 @@ web:
       - graphql:
           basePath: "/graphql"
           middlewares:
+            - tenant:
+            - jwt: *jwt
+            - tokenSign: # 利用IDE开发时,可注释
             - graphql:
                 group: "/graphql"
                 withAuthorization: false
                 publicErrorMsg: "系统内部异常，请联系管理员"
                 appCode: "msg"
-                middlewares:
-                  operation:
-                    - tenant:
-                    - jwt: *jwt
-                    - tokenSign: # 利用IDE开发时,可注释
                 header: ## dev mode, remove in production, set the value in your .env.local
                   X-Tenant-ID: ${TENANT}
                   Authorization: "${AUTHORIZATION}"

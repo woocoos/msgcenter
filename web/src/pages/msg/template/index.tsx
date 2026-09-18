@@ -1,6 +1,6 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
-import { Button, Space, Modal, Dropdown } from 'antd';
-import { useRef, useState } from 'react';
+import { Button, Space, Modal, Dropdown, Divider, Typography, Tag } from 'antd';
+import { Key, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
 import { Link, useSearchParams } from '@ice/runtime';
@@ -9,121 +9,171 @@ import { EnumMsgTemplateFormat, EnumMsgTemplateReceiverType, EnumMsgTemplateStat
 import { getMsgEventInfo } from '@/services/msgsrv/event';
 import { DownOutlined } from '@ant-design/icons';
 import Create from './components/create';
-import { getOrgs } from '@knockout-js/api';
 import { Org } from '@knockout-js/api/ucenter';
 import Test from './components/test';
-import { delDataSource, saveDataSource } from '@/util';
-import {TemplateType} from '../event'
+import { delDataSource, saveDataSource, onMousedown } from '@/util';
+import { TemplateType } from '../event'
+import { routeBreadcrumb } from '@/util/hook';
+import { useResizableProTable } from '@/util/hook';
 import store from '@/store'
 
-export default () => {
+const List = () => {
   const { token } = useToken(),
     { t } = useTranslation(),
     userState = store.getModelState('user'),
     [searchParams] = useSearchParams(),
+    paramsType = searchParams.get('type'),
     [msgEventInfo, setMsgEventInfo] = useState<MsgEvent>(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
-    columns: ProColumns<MsgTemplate>[] = [
-      // 有需要排序配置  sorter: true
-      // {
-      //   title: t('org'), dataIndex: 'org', width: 120,
-      //   render: (text, record) => {
-      //     const org = orgs.find(item => item.id == record.tenantID)
-      //     return record.tenantID ? org?.name || record.tenantID : '';
-      //   },
-      // },
-      {
-        title: t('name'), dataIndex: 'name', width: 120,
-      },
-      { title: t('subject'), dataIndex: 'subject', width: 120 },
-      {
-        title: t('way_receiving'), dataIndex: 'receiverType', width: 120, search: false,
-        filters: true,
-        valueEnum: EnumMsgTemplateFormat,
-      },
-      {
-        title: t('status'), dataIndex: 'status', width: 120, search: false,
-        filters: true,
-        valueEnum: EnumMsgTemplateStatus,
-      },
-      { title: t('description'), dataIndex: 'comments', width: 120, search: false },
-      {
-        title: t('operation'),
-        dataIndex: 'actions',
-        fixed: 'right',
-        align: 'center',
-        search: false,
-        width: 160,
-        render: (text, record) => {
-          return (<Space>
-            {
-              record.status === MsgTemplateSimpleStatus.Active ? <></> : <Auth authKey="updateMsgTemplate">
-                <a
-                  key="editor"
-                  onClick={() => {
-                    setModal({
-                      open: true,
-                      title: `${t('edit')}:${record.name}`,
-                      id: record.id,
-                      receiverType: record.receiverType,
-                    });
-                  }}
-                >
-                  {t('edit')}
-                </a>
-              </Auth>
-            }
-            {
-              record.status === MsgTemplateSimpleStatus.Active ? <></> : <Auth authKey="deleteMsgTemplate">
-                <a key="delete" onClick={() => onDel(record)}>
-                  {t('delete')}
-                </a>
-              </Auth>
-            }
-            {
-              record.status === MsgTemplateSimpleStatus.Active ? <Auth authKey="disableMsgTemplate">
-                <a key="disable" style={{ color: '#ff0000' }} onClick={() => onClickStatus(record)}>
-                  {t('disable')}
-                </a>
-              </Auth> : <Auth authKey="enableMsgTemplate">
-                <a key="enable" onClick={() => onClickStatus(record)}>
-                  {t('enable')}
-                </a>
-              </Auth>
-            }
-            {
-              record.status === MsgTemplateSimpleStatus.Active && record.receiverType != MsgTemplateReceiverType.Webhook ? <a
-                onClick={() => {
-                  setModal({
-                    open: true,
-                    title: `${t('test')}:${record.name}`,
-                    id: record.id,
-                    type: 'test',
-                  });
-                }}
-              >{t('test')}</a> : <></>
-            }
-          </Space>);
-        },
-      },
-    ],
     [orgs, setOrgs] = useState<Org[]>([]),
     [dataSource, setDataSource] = useState<MsgTemplate[]>([]),
     // 选中处理
-    [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
+    [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]),
     // 弹出层处理
     [modal, setModal] = useState<{
       open: boolean;
       title: string;
       id: string;
       receiverType?: MsgTemplateReceiverType;
-      type?: 'test'
+      type?: 'test';
+      readonly?: boolean;
     }>({
       open: false,
       title: '',
       id: '',
-    });
+    }),
+    // 可调整列宽的 ProTable
+    { columns: finalColumns, components, tableWidth } = useResizableProTable<MsgTemplate>(() => ({
+      columns: [
+        // ID 列（首位，默认隐藏，可复制）
+        {
+          title: 'ID',
+          dataIndex: 'id',
+          width: 100,
+          order: -999,
+          render(_, record) {
+            return (
+              <Typography.Text
+                copyable={{ text: record.id, tooltips: ['复制 ID', '已复制'] }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {record.id}
+              </Typography.Text>
+            );
+          },
+        },
+        {
+          title: t('name'), dataIndex: 'name', width: 160,
+        },
+        { title: t('subject'), dataIndex: 'subject', width: 160 },
+        {
+          title: '模板范围', dataIndex: 'userID', width: 100, search: false,
+          render(text, record) {
+            if (record.userID && record.userID != "0") {
+              return `用户(${record.userID})`;
+            }
+            if (record.tenantID && record.tenantID != "0") {
+              return '租户';
+            }
+            return '全局';
+          },
+        },
+        {
+          title: t('way_receiving'), dataIndex: 'receiverType', width: 120, align: 'center', search: false,
+          filters: true,
+          valueEnum: EnumMsgTemplateFormat,
+        },
+        {
+          title: t('status'), dataIndex: 'status', width: 120, align: 'center', search: false,
+          filters: true,
+          valueEnum: EnumMsgTemplateStatus,
+          render(_, record) {
+            const enumItem = EnumMsgTemplateStatus[record.status as keyof typeof EnumMsgTemplateStatus];
+            return <Tag color={enumItem?.tagColor}>{enumItem?.text ?? '-'}</Tag>;
+          },
+        },
+        { title: t('description'), dataIndex: 'comments', width: 200, search: false, ellipsis: true },
+        // 占位列
+        { search: false, hideInSetting: true },
+        // 操作列
+        {
+          title: t('operation'),
+          dataIndex: 'actions',
+          fixed: 'right',
+          align: 'center',
+          search: false,
+          width: 220,
+          hideInSetting: true,
+          render: (text, record) => {
+            return (<Space split={<Divider type="vertical" className="ko-divider-gray" />} size={0}>
+              {
+                record.status === MsgTemplateSimpleStatus.Active ? <Typography.Link
+                  key="view"
+                  onClick={() => {
+                    setModal({
+                      open: true,
+                      title: `${t('view')}:${record.name}`,
+                      id: record.id,
+                      receiverType: record.receiverType,
+                      readonly: true,
+                    });
+                  }}
+                >
+                  {t('view')}
+                </Typography.Link> : <Auth authKey="updateMsgTemplate">
+                  <Typography.Link
+                    key="editor"
+                    onClick={() => {
+                      setModal({
+                        open: true,
+                        title: `${t('edit')}:${record.name}`,
+                        id: record.id,
+                        receiverType: record.receiverType,
+                      });
+                    }}
+                  >
+                    {t('edit')}
+                  </Typography.Link>
+                </Auth>
+              }
+              {
+                record.status === MsgTemplateSimpleStatus.Active ? <></> : <Auth authKey="deleteMsgTemplate">
+                  <Typography.Link key="delete" onClick={() => onDel(record)}>
+                    {t('delete')}
+                  </Typography.Link>
+                </Auth>
+              }
+              {
+                record.status === MsgTemplateSimpleStatus.Active ? <Auth authKey="disableMsgTemplate">
+                  <Typography.Link key="disable" style={{ color: '#ff0000' }} onClick={() => onClickStatus(record)}>
+                    {t('disable')}
+                  </Typography.Link>
+                </Auth> : <Auth authKey="enableMsgTemplate">
+                  <Typography.Link key="enable" onClick={() => onClickStatus(record)}>
+                    {t('enable')}
+                  </Typography.Link>
+                </Auth>
+              }
+              <Auth authKey={['testSendMessageTpl', 'testSendEmailTpl']} keyAndOr='or'>
+                {
+                  record.status === MsgTemplateSimpleStatus.Active && record.receiverType != MsgTemplateReceiverType.Webhook ? <Typography.Link
+                    onClick={() => {
+                      setModal({
+                        open: true,
+                        title: `${t('test')}:${record.name}`,
+                        id: record.id,
+                        type: 'test',
+                      });
+                    }}
+                  >{t('test')}</Typography.Link> : <></>
+                }
+              </Auth>
+            </Space>);
+          },
+        },
+      ],
+    }), []);
 
 
   const
@@ -173,29 +223,19 @@ export default () => {
 
 
   return (
-    <PageContainer
-      header={{
-        title: searchParams.get('type')=== TemplateType.customer?t('temp_customer'):t('temp_default'),
-        style: { background: token.colorBgContainer },
-        breadcrumb: {
-          items: [
-            { title: t('msg_center') },
-            { title: <Link to={'/msg/event'}>{t('msg_event')}</Link> },
-            { title: searchParams.get('type')=== TemplateType.customer?t('temp_customer'):t('temp_default') },
-          ],
-        },
-      }}
-    >
+    <>
       <ProTable
         actionRef={proTableRef}
+        sticky={dataSource.length > 0 ? { offsetHeader: 56 } : undefined}
         search={{
+          className: 'ko-pro-table-search',
           searchText: `${t('query')}`,
           resetText: `${t('reset')}`,
-          labelWidth: 'auto',
+          labelWidth: 70,
         }}
         rowKey={'id'}
         toolbar={{
-          title: `${t('msg_event')}:${msgEventInfo?.name}`,
+          title: `${t('msg_event')}-${t(`temp_${paramsType}`)}:${msgEventInfo?.name ?? ''}`,
           actions: [
             <Auth authKey="createMsgTemplate">
               <Dropdown menu={{
@@ -217,8 +257,10 @@ export default () => {
             </Auth>,
           ],
         }}
-        scroll={{ x: 'max-content' }}
-        columns={columns}
+        scroll={{ x: tableWidth }}
+        components={components}
+        columns={finalColumns}
+        columnsState={{ defaultValue: { id: { show: false } } }}
         dataSource={dataSource}
         request={async (params, sort, filter) => {
           const table = { data: [] as MsgTemplate[], success: true, total: 0 },
@@ -226,9 +268,9 @@ export default () => {
           const msgEvent = msgEventInfo?.id ? msgEventInfo : await getMsgEvent();
           if (msgEvent?.id) {
             where.msgEventID = msgEvent.id
-            if (searchParams.get('type') == TemplateType.customer) {
+            if (paramsType == TemplateType.customer) {
               where.tenantID = userState.tenantId
-            }else {
+            } else {
               where.tenantIDIsNil = true
             }
 
@@ -251,23 +293,38 @@ export default () => {
           setDataSource(table.data);
           return table;
         }}
+        pagination={{ showSizeChanger: true }}
         rowSelection={{
-          selectedRowKeys: selectedRowKeys,
-          onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
-          type: 'checkbox',
+          type: 'radio',
+          hideSelectAll: false,
+          selectedRowKeys,
+          onChange: (rowKeys) => setSelectedRowKeys(rowKeys as Key[]),
         }}
+        onRow={(record) => ({
+          onMouseDown: (e) => {
+            onMousedown({
+              target: e.target as HTMLElement,
+              click: () => {
+                setSelectedRowKeys(prev =>
+                  prev.includes(record.id) ? [] : [record.id]
+                );
+              },
+            });
+          },
+        })}
       />
       {msgEventInfo && modal.type != 'test' ?
         <Create
           open={modal.open}
           title={modal.title}
-          type={searchParams.get('type')}
+          type={paramsType}
           id={modal.id}
+          readonly={modal.readonly}
           onClose={(isSuccess, newInfo) => {
             if (isSuccess && newInfo) {
               setDataSource(saveDataSource(dataSource, newInfo))
             }
-            setModal({ open: false, title: modal.title, id: '', receiverType: modal.receiverType });
+            setModal({ open: false, title: modal.title, id: '', receiverType: modal.receiverType, readonly: false });
           }}
           msgEvent={msgEventInfo}
           receiverType={modal.receiverType || MsgTemplateReceiverType.Email}
@@ -283,7 +340,24 @@ export default () => {
           }}
         /> : <></>
       }
+    </>
+  );
+};
 
+export default () => {
+  const [breadcrumbNames] = routeBreadcrumb();
+  return (
+    <PageContainer
+      className="ko-page-container"
+      header={{
+        breadcrumb: {
+          items: breadcrumbNames.map(item => ({ title: item })),
+        },
+      }}
+    >
+      <div className="ka-content">
+        <List />
+      </div>
     </PageContainer>
   );
 };

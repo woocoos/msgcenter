@@ -1,11 +1,13 @@
 import { gql } from '@/generated/msgsrv';
 import {
+  MsgAlertAlertStatus,
   MsgAlertOrder,
   MsgAlertOrderField,
   MsgAlertWhereInput,
   MsgTemplateReceiverType,
   NlogOrder,
   NlogOrderField,
+  NlogReceiverType,
   NlogWhereInput,
   OrderDirection,
 } from '@/generated/msgsrv/graphql';
@@ -13,15 +15,16 @@ import { gid } from '@knockout-js/api';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request';
 
 export const EnumMsgAlertStatus = {
-  firing: { text: 'firing', status: 'success' },
-  none: { text: 'none', status: 'default' },
-  resolved: { text: 'resolved', status: 'processing' },
+  [MsgAlertAlertStatus.Firing]: { text: 'firing', tagColor: '#30c880' },
+  [MsgAlertAlertStatus.None]: { text: 'none', tagColor: '#dcdee1' },
+  [MsgAlertAlertStatus.Resolved]: { text: 'resolved', tagColor: '#00C8FF' },
 };
 
 export const EnumNlogReceiverType = {
-  email: { text: 'email' },
-  message: { text: 'message' },
-  webhook: { text: 'webhook' },
+  [NlogReceiverType.Email]: { text: 'email' },
+  [NlogReceiverType.Message]: { text: 'message' },
+  [NlogReceiverType.Webhook]: { text: 'webhook' },
+  [NlogReceiverType.Umeng]: { text: 'umeng' },
 };
 
 const queryMsgAlertList = gql(/* GraphQL */`query msgAlertList($first: Int,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){
@@ -148,10 +151,10 @@ export async function getFormatMsgAlertList(
  * @param msgAlertID
  * @returns
  */
-export async function getFormatMsgAlertMore(msgAlertID: string | null) {
+export async function getFormatMsgAlertMore(msgAlertID: string) {
   const result = await query(queryFormatMsgAlertMoreList, {
-      msgAlertID,
-    });
+    msgAlertID,
+  });
   if (result.data?.formatMsgAlertMore) {
     return result.data.formatMsgAlertMore;
   }
@@ -164,7 +167,7 @@ export async function getFormatMsgAlertMore(msgAlertID: string | null) {
  * @param receiver
  * @returns
  */
-export async function getRenderMsgAlert(msgAlertID: string, receiver: string | undefined) {
+export async function getRenderMsgAlert(msgAlertID: string, receiver: string) {
   const result = await query(queryRenderMsgAlert, {
     msgAlertID, receiver,
   });

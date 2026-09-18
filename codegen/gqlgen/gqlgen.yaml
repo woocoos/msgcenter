@@ -50,6 +50,9 @@ models:
   MapString:
     model:
       - github.com/woocoos/knockout-go/ent/schemax/typex.MapString
+  UmengApps:
+    model:
+      - github.com/woocoos/msgcenter/api/graphql/scalars.UmengApps
   HostPort:
     model:
       - github.com/woocoos/msgcenter/pkg/profile.HostPort
@@ -68,6 +71,9 @@ models:
   MatchType:
     model:
       - github.com/woocoos/msgcenter/pkg/label.MatchType
+  SilenceState:
+    model:
+      - github.com/woocoos/msgcenter/service/silence.SilenceState
   LabelName:
     model:
       - github.com/woocoos/msgcenter/pkg/label.LabelName
@@ -89,6 +95,18 @@ models:
   MessageConfigInput:
     model:
       - github.com/woocoos/msgcenter/pkg/profile.MessageConfig
+  WebhookConfig:
+    model:
+      - github.com/woocoos/msgcenter/pkg/profile.WebhookConfig
+  WebhookConfigInput:
+    model:
+      - github.com/woocoos/msgcenter/pkg/profile.WebhookConfig
+  UmengConfig:
+    model:
+      - github.com/woocoos/msgcenter/pkg/profile.UmengConfig
+  UmengConfigInput:
+    model:
+      - github.com/woocoos/msgcenter/pkg/profile.UmengConfig
 directives:
   constraint:
     skip_runtime: true

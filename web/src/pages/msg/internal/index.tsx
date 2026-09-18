@@ -1,17 +1,18 @@
 import Auth from "@/components/auth";
 import { MsgInternalTo, MsgInternalToWhereInput } from "@/generated/msgsrv/graphql";
 import { delMarkMsg, getUserMsgCategory, getUserMsgCategoryNum, getUserMsgInternalList, markMsgRead } from "@/services/msgsrv/internal";
-import { DownOutlined } from "@ant-design/icons";
-import { ActionType, PageContainer, ProColumns, ProTable, useToken } from "@ant-design/pro-components";
-import { Link } from "@ice/runtime";
-import { KeepAlive } from "@knockout-js/layout";
+import { DownOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components";
+import { KeepAlive, Modal } from "@knockout-js/layout";
 import { DictText } from "@knockout-js/org";
-import { Badge, Button, Dropdown, Popconfirm, Space, Tabs, message } from "antd";
+import { Badge, Button, Dropdown, Popconfirm, Space, Tabs, Typography, Divider, message } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./index.module.css";
 import { definePageConfig } from "ice";
 import { delDataSource } from "@/util";
+import { useResizableProTable, routeBreadcrumb } from "@/util/hook";
+import Detail from "@/pages/msg/internal/detail";
 
 type CategoryTag = {
   name: string,
@@ -19,67 +20,97 @@ type CategoryTag = {
   num: number,
 }
 
-export default () => {
-  const { token } = useToken(),
-    { t } = useTranslation(),
+const List = () => {
+  const { t } = useTranslation(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     [selectCategory, setSelectCategory] = useState('all'),
     [selectItems, setSelectItems] = useState('all'),
     [categorys, setCategorys] = useState<CategoryTag[]>([]),
-    columns: ProColumns<MsgInternalTo>[] = [
-      // 有需要排序配置  sorter: true
-      {
-        title: t('subject'), dataIndex: 'subject', width: 120,
-        renderText(text, record, index, action) {
-          return record.readAt ? record.msgInternal.subject : <Badge color="red" text={record.msgInternal.subject} />
-        },
-      },
-      {
-        title: t('msg_type_category'), dataIndex: 'category', width: 120,
-        renderText(text, record, index, action) {
-          return <DictText dictCode="MsgCategory" value={record.msgInternal.category} />
-        },
-      },
-      {
-        title: t('created_at'), dataIndex: 'createdAt', width: 120, valueType: "dateTime"
-      },
-      {
-        title: t('operation'),
-        dataIndex: 'actions',
-        fixed: 'right',
-        align: 'center',
-        search: false,
-        width: 80,
-        render: (text, record) => {
-          return (<Space>
-            <Link to={`/msg/internal/detail?toid=${record.id}`} >
-              {t('detail')}
-            </Link>
-            <Auth authKey="markMsgInternalToDeleted">
-              <Popconfirm
-                title={t('delete')}
-                description={`${t('confirm_delete')}：${record.msgInternal.subject}`}
-                onConfirm={async () => {
-                  const result = await delMarkMsg([record.id]);
-                  if (result) {
-                    setDataSource(delDataSource(dataSource, record.id))
-                    message.success(t('submit_success'));
-                  }
-                }}
-              >
-                <a>
-                  {t('delete')}
-                </a>
-              </Popconfirm>
-            </Auth>
-          </Space>);
-        },
-      },
-    ],
     [dataSource, setDataSource] = useState<MsgInternalTo[]>([]),
     // 选中处理
-    [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
+    [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
+    // 详情弹窗
+    [detailModal, setDetailModal] = useState<{ show: boolean; id: string; key: number }>({
+      show: false, id: '', key: 0,
+    }),
+    // 可调整列宽的 ProTable
+    { columns: finalColumns, components, tableWidth } = useResizableProTable<MsgInternalTo>(() => ({
+      columns: [
+        // ID 列（首位，默认隐藏，可复制）
+        {
+          title: 'ID',
+          dataIndex: 'id',
+          width: 100,
+          order: -999,
+          render(_, record) {
+            return (
+              <Typography.Text
+                copyable={{ text: record.id, tooltips: ['复制 ID', '已复制'] }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {record.id}
+              </Typography.Text>
+            );
+          },
+        },
+        {
+          title: t('subject'), dataIndex: 'subject', width: 260,
+          renderText(text, record, index, action) {
+            return record.readAt ? record.msgInternal.subject : <Badge color="red" text={record.msgInternal.subject} />
+          },
+        },
+        {
+          title: t('msg_type_category'), dataIndex: 'category', width: 120, align: 'center',
+          renderText(text, record, index, action) {
+            return <DictText dictCode="MsgCategory" value={record.msgInternal.category} />
+          },
+        },
+        {
+          title: t('created_at'), dataIndex: 'createdAt', width: 160, valueType: "dateTime"
+        },
+        // 占位列
+        { search: false, hideInSetting: true },
+        // 操作列
+        {
+          title: t('operation'),
+          dataIndex: 'actions',
+          fixed: 'right',
+          align: 'center',
+          search: false,
+          width: 120,
+          hideInSetting: true,
+          render: (text, record) => {
+            return (<Space split={<Divider type="vertical" className="ko-divider-gray" />} size={0}>
+              <Typography.Link
+                onClick={() => {
+                  setDetailModal({ show: true, id: record.id, key: Date.now() });
+                }}
+              >
+                {t('detail')}
+              </Typography.Link>
+              <Auth authKey="markMsgInternalToDeleted">
+                <Popconfirm
+                  title={t('delete')}
+                  description={`${t('confirm_delete')}：${record.msgInternal.subject}`}
+                  onConfirm={async () => {
+                    const result = await delMarkMsg([record.id]);
+                    if (result) {
+                      setDataSource(delDataSource(dataSource, record.id))
+                      message.success(t('submit_success'));
+                    }
+                  }}
+                >
+                  <Typography.Link>
+                    {t('delete')}
+                  </Typography.Link>
+                </Popconfirm>
+              </Auth>
+            </Space>);
+          },
+        },
+      ],
+    }), []);
 
   const requestCategory = async () => {
     let allNum = 0;
@@ -93,7 +124,7 @@ export default () => {
           const curNum = numResult[i] ?? 0;
           cList.push({
             name: cResult[i],
-            code: `${i}`,
+            code: cResult[i],
             num: curNum,
           })
           allNum += curNum;
@@ -114,22 +145,12 @@ export default () => {
     requestCategory();
   }, [])
 
-  return <KeepAlive clearAlive>
-    <PageContainer
-      header={{
-        title: t('station_msg'),
-        style: { background: token.colorBgContainer },
-        breadcrumb: {
-          items: [
-            { title: t('msg_center') },
-            { title: t('station_msg') },
-          ],
-        },
-      }}
-    >
+  return (
+    <>
       <DictText dictCode="MsgCategory" />
       <ProTable
         actionRef={proTableRef}
+        sticky={dataSource.length > 0 ? { offsetHeader: 56 } : undefined}
         search={false}
         className={styles.tableTabs}
         rowKey={'id'}
@@ -139,10 +160,13 @@ export default () => {
             activeKey={selectCategory}
             items={categorys.map(item => (
               {
-                key: item.code, label: <span key={item.code}>
-                  {item.code === 'all' ? item.name : <DictText dictCode="MsgCategory" value={item.name} />}
-                  {`${item.num ? `(${item.num})` : ''} `}
-                </span>
+                key: item.code,
+                label: (
+                  <span key={item.code}>
+                    {item.code === 'all' ? item.name : <DictText dictCode="MsgCategory" value={item.name} />}
+                    {`${item.num ? `(${item.num})` : ''} `}
+                  </span>
+                )
               }
             ))}
             onChange={(activeKey) => {
@@ -194,8 +218,10 @@ export default () => {
             </Auth>
           ],
         }}
-        scroll={{ x: 'max-content' }}
-        columns={columns}
+        scroll={{ x: tableWidth }}
+        components={components}
+        columns={finalColumns}
+        columnsState={{ defaultValue: { id: { show: false } } }}
         dataSource={dataSource}
         request={async (params, sort, filter) => {
           const table = { data: [] as MsgInternalTo[], success: true, total: 0 },
@@ -223,18 +249,91 @@ export default () => {
             })
             table.total = result.totalCount;
           }
+          setDataSource(table.data)
           setSelectedRowKeys([]);
           return table;
         }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
-          onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
+          onChange: (selectedRowKeys) => { setSelectedRowKeys(selectedRowKeys as string[]); },
           type: 'checkbox',
         }}
       />
+      <Modal
+        title={t('station_msg_detail')}
+        open={detailModal.show}
+        destroyOnHidden
+        width={1100}
+        onCancel={() => {
+          setDetailModal({ show: false, id: '', key: 0 });
+        }}
+        footer={
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Button
+              icon={<LeftOutlined />}
+              disabled={!detailModal.id || dataSource.findIndex(d => d.id === detailModal.id) <= 0}
+              onClick={() => {
+                const currentIndex = dataSource.findIndex(d => d.id === detailModal.id);
+                if (currentIndex > 0) {
+                  const prevItem = dataSource[currentIndex - 1];
+                  if (prevItem) {
+                    setDetailModal({ show: true, id: prevItem.id, key: Date.now() });
+                  }
+                }
+              }}
+            >
+              {t('previous')}
+            </Button>
+            <Button
+              disabled={!detailModal.id || dataSource.findIndex(d => d.id === detailModal.id) >= dataSource.length - 1}
+              onClick={() => {
+                const currentIndex = dataSource.findIndex(d => d.id === detailModal.id);
+                if (currentIndex < dataSource.length - 1) {
+                  const nextItem = dataSource[currentIndex + 1];
+                  if (nextItem) {
+                    setDetailModal({ show: true, id: nextItem.id, key: Date.now() });
+                  }
+                }
+              }}
+            >
+              {t('next')}
+              <RightOutlined />
+            </Button>
+          </div>
+        }
+      >
+        {detailModal.id ? (
+          <Detail
+            key={detailModal.key}
+            id={detailModal.id}
+            onRead={() => {
+              proTableRef.current?.reload();
+              requestCategory();
+            }}
+          />
+        ) : null}
+      </Modal>
+    </>
+  );
+};
+
+export default () => {
+  const [breadcrumbNames] = routeBreadcrumb();
+  return (
+    <PageContainer
+      className="ko-page-container"
+      header={{
+        breadcrumb: {
+          items: breadcrumbNames.map(item => ({ title: item })),
+        },
+      }}
+    >
+      <KeepAlive clearAlive>
+        <List />
+      </KeepAlive>
     </PageContainer>
-  </KeepAlive>
-}
+  );
+};
 
 export const pageConfig = definePageConfig(() => ({
   auth: ['/msg/internal'],

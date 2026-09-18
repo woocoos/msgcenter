@@ -11,6 +11,14 @@ import (
 	"github.com/woocoos/msgcenter/api/graphql/model"
 )
 
+// DeviceConnected is the resolver for the deviceConnected field.
+func (r *queryResolver) DeviceConnected(ctx context.Context, deviceID string) (bool, error) {
+	if r.PubSub == nil {
+		return false, nil
+	}
+	return r.PubSub.HasDeviceConnection(deviceID), nil
+}
+
 // Message is the resolver for the Message field.
 func (r *subscriptionResolver) Message(ctx context.Context) (<-chan *model.Message, error) {
 	return r.PubSub.Subscribe(ctx, string(SubTopicMessage))
