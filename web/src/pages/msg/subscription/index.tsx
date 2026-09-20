@@ -216,6 +216,9 @@ const List = () => {
         pagination={false}
         expandable={{
           expandedRowKeys,
+          onExpandedRowsChange: (expandedRows) => {
+            setExpandedRowKeys(expandedRows as string[]);
+          },
         }}
       />
       <Settings
