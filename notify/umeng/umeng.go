@@ -263,7 +263,7 @@ func (n *Notifier) resolveBroadcastUserIDs(ctx context.Context, tid int) []strin
 
 	ids, err := n.db.OrgUser.Query().
 		Where(orguser.HasOrgWith(
-			org.Or(org.PathContains(rootOrg.Path), org.IDEQ(tid)),
+			org.Or(org.PathHasPrefix(rootOrg.Path), org.IDEQ(tid)),
 		)).
 		QueryUser().
 		Where(user.HasDevicesWith(

@@ -10,7 +10,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/woocoos/knockout-go/api/auth"
 	"github.com/woocoos/knockout-go/api/msg"
+	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
@@ -464,6 +466,8 @@ func (r *mutationResolver) MarkMsgInternalToReadOrUnRead(ctx context.Context, id
 	if err != nil {
 		return false, err
 	}
+
+	// First try to update by tid + uid
 	update := ent.FromContext(ctx).MsgInternalTo.Update().Where(
 		msginternalto.IDIn(ids...), msginternalto.UserID(uid), msginternalto.TenantID(tid),
 	)
@@ -472,8 +476,39 @@ func (r *mutationResolver) MarkMsgInternalToReadOrUnRead(ctx context.Context, id
 	} else {
 		update.ClearReadAt()
 	}
-	err = update.Exec(ctx)
-	return err == nil, err
+
+	affected, err := update.Save(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	// If no rows affected, try with did (parent domain ID)
+	if affected == 0 {
+		ret, _, err := r.kosdk.Auth().AuthAPI.GetDomain(context.Background(), &auth.GetDomainRequest{
+			OrgID: tid,
+		})
+		if err != nil {
+			return false, err
+		}
+		did := ret.ParentID
+
+		update = ent.FromContext(ctx).MsgInternalTo.Update().Where(
+			msginternalto.IDIn(ids...), msginternalto.UserID(uid), msginternalto.TenantID(did),
+		)
+		if read {
+			update.SetReadAt(time.Now())
+		} else {
+			update.ClearReadAt()
+		}
+
+		// Skip tenant privacy to avoid automatic tenant_id filter from interceptor
+		_, err = update.Save(schemax.SkipTenantPrivacy(ctx))
+		if err != nil {
+			return false, err
+		}
+	}
+
+	return true, nil
 }
 
 // MarkMsgInternalToDeleted is the resolver for the markMsgInternalToDeleted field.

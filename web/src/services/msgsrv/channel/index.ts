@@ -46,7 +46,7 @@ const queryMsgChannelReceiverInfo = gql(/* GraphQL */`query msgChannelReceiverIn
       receiver{
         name,
         emailConfigs{
-          authIdentity,authPassword,authSecret,authType,authUsername,from,headers,smartHost,to
+          authIdentity,authPassword,authSecret,authType,authUsername,from,headers,smartHost,to,traceIdHeader
         },
         messageConfig{
           redirect,subject,to

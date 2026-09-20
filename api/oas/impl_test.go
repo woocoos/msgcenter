@@ -391,9 +391,11 @@ func (s *serviceSuite) TestPostAlertsWithDynamicAttachments_OSSMount() {
 
 	// Create a local file at the expected mount path.
 	// The mount path in config is "/tmp/oss-mount/test-bucket", use absolute path.
-	mountDir := filepath.FromSlash("/tmp/oss-mount/test-bucket")
+	mountDir := filepath.FromSlash("tmp/oss-mount/test-bucket")
 	s.Require().NoError(os.MkdirAll(mountDir, 0o755))
 	localFile := filepath.Join(mountDir, "test-attachment.txt")
+	localFile, err := filepath.Abs(localFile)
+	s.Require().NoError(err)
 	s.Require().NoError(os.WriteFile(localFile, []byte("oss mount test content"), 0o644))
 	defer os.Remove(localFile)
 
@@ -921,14 +923,14 @@ func (s *serviceSuite) TestUpdateNlog() {
 	nlog1 := s.Client.Nlog.Create().
 		SetTenantID(1).SetReceiver("email").SetGroupKey("test-group").
 		SetReceiverType(profile.ReceiverEmail).SetIdx(0).
-		SetExpiresAt(time.Now().Add(24*time.Hour)).SetSendAt(time.Now()).
+		SetExpiresAt(time.Now().Add(24 * time.Hour)).SetSendAt(time.Now()).
 		AddAlertIDs(msAlert.ID).
 		SaveX(ctx)
 
 	nlog2 := s.Client.Nlog.Create().
 		SetTenantID(1).SetReceiver("email").SetGroupKey("test-group").
 		SetReceiverType(profile.ReceiverEmail).SetIdx(0).
-		SetExpiresAt(time.Now().Add(24*time.Hour)).SetSendAt(time.Now()).
+		SetExpiresAt(time.Now().Add(24 * time.Hour)).SetSendAt(time.Now()).
 		AddAlertIDs(msAlert.ID).
 		SaveX(ctx)
 
@@ -1010,7 +1012,7 @@ func (s *serviceSuite) TestUpdateNlog() {
 		SetTenantID(1).SetReceiver("email").SetGroupKey("test-group-msg").
 		SetReceiverType(profile.ReceiverEmail).SetIdx(0).
 		SetMessageID("test-trace-id-123").
-		SetExpiresAt(time.Now().Add(24*time.Hour)).SetSendAt(time.Now()).
+		SetExpiresAt(time.Now().Add(24 * time.Hour)).SetSendAt(time.Now()).
 		SaveX(ctx)
 
 	gc3, _ := gin.CreateTestContext(httptest.NewRecorder())

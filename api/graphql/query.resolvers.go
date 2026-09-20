@@ -365,7 +365,9 @@ func (r *queryResolver) AppPushMsgs(ctx context.Context, after *entgql.Cursor[in
 		msginternal.ReceiverTypeIn(profile.ReceiverUmeng),
 		msginternal.Or(msginternal.TenantIDEQ(tid), msginternal.TenantIDEQ(did)),
 		msginternal.HasMsgInternalToWith(msginternalto.UserID(uid)),
-	).Paginate(schemax.SkipTenantPrivacy(ctx), after, first, before, last,
+	).WithMsgInternalTo(func(query *ent.MsgInternalToQuery) {
+		query.Where(msginternalto.UserID(uid), msginternalto.Or(msginternalto.TenantIDEQ(tid), msginternalto.TenantIDEQ(did)))
+	}).Paginate(schemax.SkipTenantPrivacy(schemax.SkipTenantPrivacy(ctx)), after, first, before, last,
 		ent.WithMsgInternalOrder(orderBy),
 		ent.WithMsgInternalFilter(where.Filter))
 }
@@ -387,11 +389,11 @@ func (r *queryResolver) AppUnreadPushMsgs(ctx context.Context) (int, error) {
 	return r.client.MsgInternalTo.Query().Where(
 		msginternalto.UserID(uid),
 		msginternalto.ReadAtIsNil(),
+		msginternalto.Or(msginternalto.TenantIDEQ(tid), msginternalto.TenantIDEQ(did)),
 		msginternalto.HasMsgInternalWith(
 			msginternal.ReceiverTypeIn(profile.ReceiverUmeng),
-			msginternal.Or(msginternal.TenantIDEQ(tid), msginternal.TenantIDEQ(did)),
 		),
-	).Count(ctx)
+	).Count(schemax.SkipTenantPrivacy(ctx))
 }
 
 // Matchers is the resolver for the matchers field.
