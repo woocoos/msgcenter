@@ -3,6 +3,7 @@ package notify
 import (
 	"context"
 	"strconv"
+	"time"
 
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
@@ -87,6 +88,19 @@ func (u EventSubscribeStage) exec(ctx context.Context, alerts ...*alert.Alert) (
 		uls := make([]*alert.Alert, len(alerts))
 		for i, a := range alerts {
 			ac := a.Clone()
+			// flush 清空了 firing alert 副本的 EndsAt，从 mem.Alerts 取原始 alert 恢复时间字段，
+			// 避免 clone 以零值 EndsAt Put 回后永不 GC 且重复发送。
+			if ac.EndsAt.IsZero() || ac.StartsAt.IsZero() {
+				if orig, err := u.alerts.Get(a.Fingerprint()); err == nil {
+					if ac.StartsAt.IsZero() {
+						ac.StartsAt = orig.StartsAt
+					}
+					if ac.EndsAt.IsZero() {
+						ac.EndsAt = orig.EndsAt
+						ac.Timeout = orig.Timeout
+					}
+				}
+			}
 			ac.Labels[label.ToUserIDLabel] = uid
 			ac.Labels[label.SkipSubscribeLabel] = "Y"
 			uls[i] = ac
@@ -95,5 +109,16 @@ func (u EventSubscribeStage) exec(ctx context.Context, alerts ...*alert.Alert) (
 			return ctx, nil, err
 		}
 	}
+
+	// 将原始 alert 标记为 resolved 放回 mem.Alerts，使 aggrGroup 停止重复 flush。
+	now := time.Now()
+	for _, a := range alerts {
+		resolved := a.Clone()
+		resolved.EndsAt = now
+		if err := u.alerts.Put(ctx, resolved); err != nil {
+			return ctx, nil, err
+		}
+	}
+
 	return ctx, nil, nil
 }
