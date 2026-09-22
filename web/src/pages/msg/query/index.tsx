@@ -62,12 +62,22 @@ const List = () => {
         {
           title: t('receiving_type'),
           dataIndex: 'receiverType',
-          width: 120,
+          hideInTable: true,
           valueType: 'select',
           valueEnum: EnumNlogReceiverType,
           order: 3,
           render: (text, record) => {
-            return record.receiverType || '-';
+            return '';
+          },
+        },
+        {
+          title: t('receiving_type'),
+          dataIndex: 'modes',
+          width: 120,
+          search: false,
+          order: 3,
+          render: (text, record) => {
+            return record.modes || '-';
           },
         },
         {

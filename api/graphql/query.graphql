@@ -145,6 +145,8 @@ type FormatMsgAlert{
     users: [UserInfo]
     """是否存在多条消息"""
     hasMultiMsg: Boolean!
+    """所有匹配路由的receiver名称，逗号分隔"""
+    modes: String
     """消息状态"""
     state: MsgAlertAlertStatus!
     createdAt: Time!

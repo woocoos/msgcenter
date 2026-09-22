@@ -74,6 +74,7 @@ type ComplexityRoot struct {
 		EndsAt             func(childComplexity int) int
 		HasMultiMsg        func(childComplexity int) int
 		ID                 func(childComplexity int) int
+		Modes              func(childComplexity int) int
 		MsgChannelComments func(childComplexity int) int
 		MsgEventComments   func(childComplexity int) int
 		MsgTemplateTitle   func(childComplexity int) int
@@ -673,6 +674,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.FormatMsgAlert.ID(childComplexity), true
+
+	case "FormatMsgAlert.modes":
+		if e.complexity.FormatMsgAlert.Modes == nil {
+			break
+		}
+
+		return e.complexity.FormatMsgAlert.Modes(childComplexity), true
 
 	case "FormatMsgAlert.msgChannelComments":
 		if e.complexity.FormatMsgAlert.MsgChannelComments == nil {
@@ -6793,6 +6801,8 @@ type FormatMsgAlert{
     users: [UserInfo]
     """是否存在多条消息"""
     hasMultiMsg: Boolean!
+    """所有匹配路由的receiver名称，逗号分隔"""
+    modes: String
     """消息状态"""
     state: MsgAlertAlertStatus!
     createdAt: Time!

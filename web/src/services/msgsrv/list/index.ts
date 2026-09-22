@@ -43,7 +43,7 @@ const queryFormatMsgAlertList = gql(/* GraphQL */`query formatMsgAlerts($first: 
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
-        id,startsAt,endsAt,tenantID,state,msgEventComments,msgChannelComments,msgTemplateTitle,receiverType,users{name,email},state,receiver,hasMultiMsg,
+        id,startsAt,endsAt,tenantID,state,msgEventComments,msgChannelComments,msgTemplateTitle,receiverType,users{name,email},state,receiver,hasMultiMsg,modes
       }
     }
   }
@@ -51,7 +51,7 @@ const queryFormatMsgAlertList = gql(/* GraphQL */`query formatMsgAlerts($first: 
 
 const queryFormatMsgAlertMoreList = gql(/* GraphQL */`query formatMsgAlertMore($msgAlertID:ID!){
   formatMsgAlertMore(msgAlertID: $msgAlertID){
-    id,startsAt,endsAt,tenantID,state,msgEventComments,msgChannelComments,msgTemplateTitle,receiverType,users{name,email},state,receiver,hasMultiMsg,
+    id,startsAt,endsAt,tenantID,state,msgEventComments,msgChannelComments,msgTemplateTitle,receiverType,users{name,email},state,receiver,hasMultiMsg,modes
   }
 }`);
 

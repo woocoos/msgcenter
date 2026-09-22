@@ -121,9 +121,14 @@ func (s *Service) FormatMsgAlerts(ctx context.Context, after *entgql.Cursor[int]
 		if formatMsgAlert == nil {
 			continue
 		}
-		if formatMsgAlert != nil {
-			formatMsgAlert.HasMultiMsg = hasMultiMsg
+		formatMsgAlert.HasMultiMsg = hasMultiMsg
+		// 收集所有匹配路由的 receiver 名称
+		receivers := make([]string, 0, len(rs))
+		for _, r := range rs {
+			receivers = append(receivers, r.RouteOpts.Receiver)
 		}
+		modes := strings.Join(receivers, ",")
+		formatMsgAlert.Modes = &modes
 		formatMsgAlerts = append(formatMsgAlerts, &model.FormatMsgAlertEdge{
 			Cursor: msgAlert.Cursor,
 			Node:   formatMsgAlert,
@@ -152,12 +157,12 @@ func (s *Service) formatMsgAlert(ctx context.Context, msgAlert *ent.MsgAlert, ro
 	routeOpt := route.RouteOpts
 	msgTemp, err := s.findMsgTemplate(ctx, routeOpt.Receiver, a)
 	if err != nil {
-		logger.Error("find msg template", zap.Error(err), zap.Int("alertID", msgAlert.ID))
+		logger.Error("not find msg template", zap.Error(err), zap.Int("alertID", msgAlert.ID))
 		return nil, nil
 	}
 	// 模板标题
 	if msgTemp != nil {
-		data := notify.GetTemplateData(ctx, s.am.Coordinator.Template, []*alert.Alert{&a})
+		data := s.am.Coordinator.Template.Data("", nil, []*alert.Alert{&a}...)
 		msgTemplateTitle, err = s.am.Coordinator.Template.ExecuteHTMLString(msgTemp.Subject, data)
 		if err != nil {
 			return nil, err

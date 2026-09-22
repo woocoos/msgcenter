@@ -179,6 +179,8 @@ type FormatMsgAlert {
   """是否存在多条消息"""
   hasMultiMsg: Boolean!
   id: ID!
+  """所有匹配路由的receiver名称，逗号分隔"""
+  modes: String
   """消息通道描述"""
   msgChannelComments: String
   """消息事件描述"""

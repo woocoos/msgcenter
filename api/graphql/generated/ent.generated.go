@@ -13708,6 +13708,8 @@ func (ec *executionContext) fieldContext_Query_formatMsgAlertMore(ctx context.Co
 				return ec.fieldContext_FormatMsgAlert_users(ctx, field)
 			case "hasMultiMsg":
 				return ec.fieldContext_FormatMsgAlert_hasMultiMsg(ctx, field)
+			case "modes":
+				return ec.fieldContext_FormatMsgAlert_modes(ctx, field)
 			case "state":
 				return ec.fieldContext_FormatMsgAlert_state(ctx, field)
 			case "createdAt":

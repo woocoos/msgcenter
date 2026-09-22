@@ -959,6 +959,47 @@ func (ec *executionContext) fieldContext_FormatMsgAlert_hasMultiMsg(_ context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _FormatMsgAlert_modes(ctx context.Context, field graphql.CollectedField, obj *model.FormatMsgAlert) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FormatMsgAlert_modes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Modes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FormatMsgAlert_modes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FormatMsgAlert",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _FormatMsgAlert_state(ctx context.Context, field graphql.CollectedField, obj *model.FormatMsgAlert) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_FormatMsgAlert_state(ctx, field)
 	if err != nil {
@@ -1250,6 +1291,8 @@ func (ec *executionContext) fieldContext_FormatMsgAlertEdge_node(_ context.Conte
 				return ec.fieldContext_FormatMsgAlert_users(ctx, field)
 			case "hasMultiMsg":
 				return ec.fieldContext_FormatMsgAlert_hasMultiMsg(ctx, field)
+			case "modes":
+				return ec.fieldContext_FormatMsgAlert_modes(ctx, field)
 			case "state":
 				return ec.fieldContext_FormatMsgAlert_state(ctx, field)
 			case "createdAt":
@@ -3192,6 +3235,8 @@ func (ec *executionContext) _FormatMsgAlert(ctx context.Context, sel ast.Selecti
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "modes":
+			out.Values[i] = ec._FormatMsgAlert_modes(ctx, field, obj)
 		case "state":
 			out.Values[i] = ec._FormatMsgAlert_state(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
