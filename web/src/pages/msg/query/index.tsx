@@ -21,11 +21,12 @@ const List = () => {
     { t } = useTranslation(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
-    iframeRef = useRef<HTMLIFrameElement>(null),
     [modal, setModal] = useState<{
       show: boolean;
+      srcDoc: string;
     }>({
       show: false,
+      srcDoc: '',
     }),
     // 可调整列宽的 ProTable
     { columns: finalColumns, components, tableWidth } = useResizableProTable<FormatMsgAlert>(() => ({
@@ -147,14 +148,7 @@ const List = () => {
               <Space split={<Divider type="vertical" className="ko-divider-gray" />} size={0}>
                 <Typography.Link onClick={async () => {
                   const result = await getRenderMsgAlert(record.id, record.receiver);
-                  setModal({ show: true });
-                  setTimeout(() => {
-                    if (iframeRef.current?.contentWindow) {
-                      iframeRef.current.contentWindow.document.write(`<pre>${result}</pre>`);
-                    } else if (iframeRef.current?.contentDocument) {
-                      iframeRef.current.contentDocument.write(`<pre>${result}</pre>`);
-                    }
-                  }, 200);
+                  setModal({ show: true, srcDoc: result });
                 }}>
                   {t('view_content')}
                 </Typography.Link>
@@ -226,7 +220,7 @@ const List = () => {
           setModal({ show: false });
         }}
       >
-        <iframe style={{ width: '100%', height: '60vh', border: '0 none' }} ref={iframeRef} />
+        <iframe style={{ width: '100%', height: '60vh', border: '0 none' }} srcDoc={modal.srcDoc} />
       </Modal>
     </>
   );

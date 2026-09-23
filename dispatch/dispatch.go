@@ -353,7 +353,17 @@ func (d *Dispatcher) runAG(ag *aggrGroup) {
 	go ag.run(func(ctx context.Context, alerts ...*alert.Alert) bool {
 		_, _, err := d.stage.Exec(ctx, alerts...)
 		if err != nil {
-			fs := []zap.Field{zap.Int("num_alerts", len(alerts)), zap.Error(err)}
+			alertIDs := make([]string, 0, len(alerts))
+			for _, a := range alerts {
+				if id, ok := a.Annotations[label.AlertIDAnnotation]; ok {
+					alertIDs = append(alertIDs, id)
+				}
+			}
+			fs := []zap.Field{
+				zap.Int("num_alerts", len(alerts)),
+				zap.Strings("alertIDs", alertIDs),
+				zap.Error(err),
+			}
 			if errors.Is(ctx.Err(), context.Canceled) {
 				logger.Debug("notify for alerts failed", fs...)
 			} else {

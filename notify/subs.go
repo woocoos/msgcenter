@@ -111,10 +111,13 @@ func (u EventSubscribeStage) exec(ctx context.Context, alerts ...*alert.Alert) (
 	}
 
 	// 将原始 alert 标记为 resolved 放回 mem.Alerts，使 aggrGroup 停止重复 flush。
+	// 加上 SkipSubscribeLabel 防止 resolved alert 再次经过 EventSubscribeStage 时
+	// 重新展开 clone 导致重复通知。
 	now := time.Now()
 	for _, a := range alerts {
 		resolved := a.Clone()
 		resolved.EndsAt = now
+		resolved.Labels[label.SkipSubscribeLabel] = "Y"
 		if err := u.alerts.Put(ctx, resolved); err != nil {
 			return ctx, nil, err
 		}

@@ -54,20 +54,21 @@ func (u *UserSubscribe) SubUsers(ctx context.Context, al *alert.Alert) ([]notify
 		return nil, nil // 事件不存在，返回空
 	}
 
-	// 检查事件是否允许订阅
-	if !event.CanSubs {
-		return nil, nil // 事件不允许订阅，返回空
-	}
-
 	// 构建查询条件：支持事件级订阅和类型级订阅
 	var predicates []predicate.MsgSubscriber
 	predicates = append(predicates, msgsubscriber.TenantID(tenantID))
 
-	// 匹配条件：msg_event_id = eventID OR msg_type_id = event.MsgTypeID
-	predicates = append(predicates, msgsubscriber.Or(
-		msgsubscriber.MsgEventID(event.ID),
-		msgsubscriber.MsgTypeID(event.Edges.MsgType.ID),
-	))
+	// 匹配条件：根据 CanSubs 决定是否加入事件级订阅
+	if event.CanSubs {
+		// 事件允许订阅：msg_event_id = eventID OR msg_type_id = event.MsgTypeID
+		predicates = append(predicates, msgsubscriber.Or(
+			msgsubscriber.MsgEventID(event.ID),
+			msgsubscriber.MsgTypeID(event.Edges.MsgType.ID),
+		))
+	} else {
+		// 事件不允许订阅：仅匹配类型级订阅
+		predicates = append(predicates, msgsubscriber.MsgTypeID(event.Edges.MsgType.ID))
+	}
 
 	subs, err := u.DB.MsgSubscriber.Query().Where(predicates...).
 		Select(msgsubscriber.FieldOrgRoleID, msgsubscriber.FieldUserID, msgsubscriber.FieldExclude).
