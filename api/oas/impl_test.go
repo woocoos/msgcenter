@@ -663,7 +663,7 @@ func (s *serviceSuite) TestUserSubscribe() {
 		selector.Where(sqljson.ValueEQ(msgalert.FieldLabels, testsuite.SubEventName, sqljson.Path("alertname")))
 	}).All(schemax.SkipTenantPrivacy(context.Background()))
 	s.Require().NoError(err)
-	s.Require().Len(ss, 1)
+	s.Require().Len(ss, 3)
 }
 
 func (s *serviceSuite) TestWebhook() {
@@ -1041,4 +1041,92 @@ func (s *serviceSuite) TestUpdateNlog() {
 	})
 	s.Require().NoError(err)
 	s.Equal(http.StatusNotFound, gc4.Writer.Status())
+}
+
+// TestSubUsersCanSubs tests that when CanSubs=false on MsgEvent,
+// only type-level subscribers are returned (event-level subscribers are excluded).
+func (s *serviceSuite) TestSubUsersCanSubs() {
+	ctx := context.Background()
+
+	// Create a MsgType for testing
+	msgType := s.Client.MsgType.Create().
+		SetName("canSubsTestType").
+		SetStatus(typex.SimpleStatusActive).
+		SetCreatedBy(1).
+		SetAppID(1).
+		SetCategory("test").
+		SetCanSubs(true).
+		SetCanCustom(true).
+		SaveX(ctx)
+
+	// Create users for testing
+	user1 := s.Client.User.Create().SetPrincipalName("cansubs_user1").SetDisplayName("CanSubs User1").SaveX(ctx)
+	s.Client.UserAddr.Create().SetUserID(user1.ID).SetAddrType(useraddr.AddrTypeContact).SetEmail("cansubs1@test.com").SetIsDefault(true).SaveX(ctx)
+
+	user2 := s.Client.User.Create().SetPrincipalName("cansubs_user2").SetDisplayName("CanSubs User2").SaveX(ctx)
+	s.Client.UserAddr.Create().SetUserID(user2.ID).SetAddrType(useraddr.AddrTypeContact).SetEmail("cansubs2@test.com").SetIsDefault(true).SaveX(ctx)
+
+	user3 := s.Client.User.Create().SetPrincipalName("cansubs_user3").SetDisplayName("CanSubs User3").SaveX(ctx)
+	s.Client.UserAddr.Create().SetUserID(user3.ID).SetAddrType(useraddr.AddrTypeContact).SetEmail("cansubs3@test.com").SetIsDefault(true).SaveX(ctx)
+
+	// Create a type-level subscriber (user1 subscribes to the type)
+	s.Client.MsgSubscriber.Create().
+		SetMsgTypeID(msgType.ID).
+		SetTenantID(1).
+		SetUserID(user1.ID).
+		SetCreatedBy(1).
+		SaveX(ctx)
+
+	// Create an event-level subscriber (user2 subscribes to the specific event)
+	eventName := "canSubsTestEvent"
+	msgEvent := s.Client.MsgEvent.Create().
+		SetName(eventName).
+		SetMsgTypeID(msgType.ID).
+		SetStatus(typex.SimpleStatusActive).
+		SetCreatedBy(1).
+		SetModes("email").
+		SetCanSubs(false). // Initially disable event-level subscription
+		SaveX(ctx)
+
+	s.Client.MsgSubscriber.Create().
+		SetMsgEventID(msgEvent.ID).
+		SetTenantID(1).
+		SetUserID(user2.ID).
+		SetCreatedBy(1).
+		SaveX(ctx)
+
+	// Create the UserSubscribe service
+	subService := &service.UserSubscribe{DB: s.Client}
+
+	// Create an alert for the event
+	al := &alert.Alert{
+		Labels: label.LabelSet{
+			label.AlertNameLabel: eventName,
+			label.TenantLabel:    "1",
+		},
+	}
+
+	// Test 1: CanSubs=false - only type-level subscribers should be returned
+	users, err := subService.SubUsers(ctx, al)
+	s.Require().NoError(err)
+	s.Require().Len(users, 1, "when CanSubs=false, only type-level subscribers should be returned")
+	s.Equal(strconv.Itoa(user1.ID), users[0].UserID, "only user1 (type-level subscriber) should be returned")
+
+	// Test 2: CanSubs=true - both event-level and type-level subscribers should be returned
+	s.Client.MsgEvent.UpdateOne(msgEvent).SetUpdatedBy(1).SetCanSubs(true).SaveX(ctx)
+
+	users, err = subService.SubUsers(ctx, al)
+	s.Require().NoError(err)
+	s.Require().Len(users, 2, "when CanSubs=true, both event-level and type-level subscribers should be returned")
+
+	// Verify both users are returned (order may vary)
+	userIDs := make(map[string]bool)
+	for _, u := range users {
+		userIDs[u.UserID] = true
+	}
+	s.True(userIDs[strconv.Itoa(user1.ID)], "user1 (type-level) should be included")
+	s.True(userIDs[strconv.Itoa(user2.ID)], "user2 (event-level) should be included")
+
+	// user3 should never be returned (not subscribed)
+	s.False(userIDs[strconv.Itoa(user3.ID)], "user3 (not subscribed) should not be included")
 }
