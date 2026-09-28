@@ -11,29 +11,29 @@ import (
 	"github.com/woocoos/msgcenter/ent/predicate"
 
 	"github.com/woocoos/msgcenter/ent/internal"
-	"github.com/woocoos/msgcenter/ent/silence"
+	"github.com/woocoos/msgcenter/ent/orguser"
 )
 
-// SilenceDelete is the builder for deleting a Silence entity.
-type SilenceDelete struct {
+// OrgUserDelete is the builder for deleting a OrgUser entity.
+type OrgUserDelete struct {
 	config
 	hooks    []Hook
-	mutation *SilenceMutation
+	mutation *OrgUserMutation
 }
 
-// Where appends a list predicates to the SilenceDelete builder.
-func (_d *SilenceDelete) Where(ps ...predicate.Silence) *SilenceDelete {
+// Where appends a list predicates to the OrgUserDelete builder.
+func (_d *OrgUserDelete) Where(ps ...predicate.OrgUser) *OrgUserDelete {
 	_d.mutation.Where(ps...)
 	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (_d *SilenceDelete) Exec(ctx context.Context) (int, error) {
+func (_d *OrgUserDelete) Exec(ctx context.Context) (int, error) {
 	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_d *SilenceDelete) ExecX(ctx context.Context) int {
+func (_d *OrgUserDelete) ExecX(ctx context.Context) int {
 	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
@@ -41,9 +41,9 @@ func (_d *SilenceDelete) ExecX(ctx context.Context) int {
 	return n
 }
 
-func (_d *SilenceDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(silence.Table, sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt))
-	_spec.Node.Schema = _d.schemaConfig.Silence
+func (_d *OrgUserDelete) sqlExec(ctx context.Context) (int, error) {
+	_spec := sqlgraph.NewDeleteSpec(orguser.Table, sqlgraph.NewFieldSpec(orguser.FieldID, field.TypeInt))
+	_spec.Node.Schema = _d.schemaConfig.OrgUser
 	ctx = internal.NewSchemaConfigContext(ctx, _d.schemaConfig)
 	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -60,32 +60,32 @@ func (_d *SilenceDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// SilenceDeleteOne is the builder for deleting a single Silence entity.
-type SilenceDeleteOne struct {
-	_d *SilenceDelete
+// OrgUserDeleteOne is the builder for deleting a single OrgUser entity.
+type OrgUserDeleteOne struct {
+	_d *OrgUserDelete
 }
 
-// Where appends a list predicates to the SilenceDelete builder.
-func (_d *SilenceDeleteOne) Where(ps ...predicate.Silence) *SilenceDeleteOne {
+// Where appends a list predicates to the OrgUserDelete builder.
+func (_d *OrgUserDeleteOne) Where(ps ...predicate.OrgUser) *OrgUserDeleteOne {
 	_d._d.mutation.Where(ps...)
 	return _d
 }
 
 // Exec executes the deletion query.
-func (_d *SilenceDeleteOne) Exec(ctx context.Context) error {
+func (_d *OrgUserDeleteOne) Exec(ctx context.Context) error {
 	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
 	case n == 0:
-		return &NotFoundError{silence.Label}
+		return &NotFoundError{orguser.Label}
 	default:
 		return nil
 	}
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (_d *SilenceDeleteOne) ExecX(ctx context.Context) {
+func (_d *OrgUserDeleteOne) ExecX(ctx context.Context) {
 	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}

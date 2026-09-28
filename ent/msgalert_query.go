@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/msgcenter/ent/msgalert"
+	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/org"
@@ -24,17 +25,19 @@ import (
 // MsgAlertQuery is the builder for querying MsgAlert entities.
 type MsgAlertQuery struct {
 	config
-	ctx                 *QueryContext
-	order               []msgalert.OrderOption
-	inters              []Interceptor
-	predicates          []predicate.MsgAlert
-	withNlog            *NlogQuery
-	withOrg             *OrgQuery
-	withNlogAlerts      *NlogAlertQuery
-	modifiers           []func(*sql.Selector)
-	loadTotal           []func(context.Context, []*MsgAlert) error
-	withNamedNlog       map[string]*NlogQuery
-	withNamedNlogAlerts map[string]*NlogAlertQuery
+	ctx                  *QueryContext
+	order                []msgalert.OrderOption
+	inters               []Interceptor
+	predicates           []predicate.MsgAlert
+	withNlog             *NlogQuery
+	withOrg              *OrgQuery
+	withMsgInternal      *MsgInternalQuery
+	withNlogAlerts       *NlogAlertQuery
+	modifiers            []func(*sql.Selector)
+	loadTotal            []func(context.Context, []*MsgAlert) error
+	withNamedNlog        map[string]*NlogQuery
+	withNamedMsgInternal map[string]*MsgInternalQuery
+	withNamedNlogAlerts  map[string]*NlogAlertQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -115,6 +118,31 @@ func (_q *MsgAlertQuery) QueryOrg() *OrgQuery {
 		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.Org
 		step.Edge.Schema = schemaConfig.MsgAlert
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryMsgInternal chains the current query on the "msg_internal" edge.
+func (_q *MsgAlertQuery) QueryMsgInternal() *MsgInternalQuery {
+	query := (&MsgInternalClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msgalert.Table, msgalert.FieldID, selector),
+			sqlgraph.To(msginternal.Table, msginternal.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, msgalert.MsgInternalTable, msgalert.MsgInternalColumn),
+		)
+		schemaConfig := _q.schemaConfig
+		step.To.Schema = schemaConfig.MsgInternal
+		step.Edge.Schema = schemaConfig.MsgInternal
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
@@ -333,14 +361,15 @@ func (_q *MsgAlertQuery) Clone() *MsgAlertQuery {
 		return nil
 	}
 	return &MsgAlertQuery{
-		config:         _q.config,
-		ctx:            _q.ctx.Clone(),
-		order:          append([]msgalert.OrderOption{}, _q.order...),
-		inters:         append([]Interceptor{}, _q.inters...),
-		predicates:     append([]predicate.MsgAlert{}, _q.predicates...),
-		withNlog:       _q.withNlog.Clone(),
-		withOrg:        _q.withOrg.Clone(),
-		withNlogAlerts: _q.withNlogAlerts.Clone(),
+		config:          _q.config,
+		ctx:             _q.ctx.Clone(),
+		order:           append([]msgalert.OrderOption{}, _q.order...),
+		inters:          append([]Interceptor{}, _q.inters...),
+		predicates:      append([]predicate.MsgAlert{}, _q.predicates...),
+		withNlog:        _q.withNlog.Clone(),
+		withOrg:         _q.withOrg.Clone(),
+		withMsgInternal: _q.withMsgInternal.Clone(),
+		withNlogAlerts:  _q.withNlogAlerts.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -366,6 +395,17 @@ func (_q *MsgAlertQuery) WithOrg(opts ...func(*OrgQuery)) *MsgAlertQuery {
 		opt(query)
 	}
 	_q.withOrg = query
+	return _q
+}
+
+// WithMsgInternal tells the query-builder to eager-load the nodes that are connected to
+// the "msg_internal" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *MsgAlertQuery) WithMsgInternal(opts ...func(*MsgInternalQuery)) *MsgAlertQuery {
+	query := (&MsgInternalClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withMsgInternal = query
 	return _q
 }
 
@@ -458,9 +498,10 @@ func (_q *MsgAlertQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Msg
 	var (
 		nodes       = []*MsgAlert{}
 		_spec       = _q.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			_q.withNlog != nil,
 			_q.withOrg != nil,
+			_q.withMsgInternal != nil,
 			_q.withNlogAlerts != nil,
 		}
 	)
@@ -500,6 +541,13 @@ func (_q *MsgAlertQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Msg
 			return nil, err
 		}
 	}
+	if query := _q.withMsgInternal; query != nil {
+		if err := _q.loadMsgInternal(ctx, query, nodes,
+			func(n *MsgAlert) { n.Edges.MsgInternal = []*MsgInternal{} },
+			func(n *MsgAlert, e *MsgInternal) { n.Edges.MsgInternal = append(n.Edges.MsgInternal, e) }); err != nil {
+			return nil, err
+		}
+	}
 	if query := _q.withNlogAlerts; query != nil {
 		if err := _q.loadNlogAlerts(ctx, query, nodes,
 			func(n *MsgAlert) { n.Edges.NlogAlerts = []*NlogAlert{} },
@@ -511,6 +559,13 @@ func (_q *MsgAlertQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Msg
 		if err := _q.loadNlog(ctx, query, nodes,
 			func(n *MsgAlert) { n.appendNamedNlog(name) },
 			func(n *MsgAlert, e *Nlog) { n.appendNamedNlog(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range _q.withNamedMsgInternal {
+		if err := _q.loadMsgInternal(ctx, query, nodes,
+			func(n *MsgAlert) { n.appendNamedMsgInternal(name) },
+			func(n *MsgAlert, e *MsgInternal) { n.appendNamedMsgInternal(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -617,6 +672,36 @@ func (_q *MsgAlertQuery) loadOrg(ctx context.Context, query *OrgQuery, nodes []*
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (_q *MsgAlertQuery) loadMsgInternal(ctx context.Context, query *MsgInternalQuery, nodes []*MsgAlert, init func(*MsgAlert), assign func(*MsgAlert, *MsgInternal)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*MsgAlert)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(msginternal.FieldAlertID)
+	}
+	query.Where(predicate.MsgInternal(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(msgalert.MsgInternalColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AlertID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "alert_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }
@@ -754,6 +839,20 @@ func (_q *MsgAlertQuery) WithNamedNlog(name string, opts ...func(*NlogQuery)) *M
 		_q.withNamedNlog = make(map[string]*NlogQuery)
 	}
 	_q.withNamedNlog[name] = query
+	return _q
+}
+
+// WithNamedMsgInternal tells the query-builder to eager-load the nodes that are connected to the "msg_internal"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (_q *MsgAlertQuery) WithNamedMsgInternal(name string, opts ...func(*MsgInternalQuery)) *MsgAlertQuery {
+	query := (&MsgInternalClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if _q.withNamedMsgInternal == nil {
+		_q.withNamedMsgInternal = make(map[string]*MsgInternalQuery)
+	}
+	_q.withNamedMsgInternal[name] = query
 	return _q
 }
 

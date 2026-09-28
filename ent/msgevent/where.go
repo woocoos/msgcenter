@@ -98,6 +98,11 @@ func Modes(v string) predicate.MsgEvent {
 	return predicate.MsgEvent(sql.FieldEQ(FieldModes, v))
 }
 
+// CanSubs applies equality check predicate on the "can_subs" field. It's identical to CanSubsEQ.
+func CanSubs(v bool) predicate.MsgEvent {
+	return predicate.MsgEvent(sql.FieldEQ(FieldCanSubs, v))
+}
+
 // CreatedByEQ applies the EQ predicate on the "created_by" field.
 func CreatedByEQ(v int) predicate.MsgEvent {
 	return predicate.MsgEvent(sql.FieldEQ(FieldCreatedBy, v))
@@ -553,6 +558,26 @@ func ModesContainsFold(v string) predicate.MsgEvent {
 	return predicate.MsgEvent(sql.FieldContainsFold(FieldModes, v))
 }
 
+// CanSubsEQ applies the EQ predicate on the "can_subs" field.
+func CanSubsEQ(v bool) predicate.MsgEvent {
+	return predicate.MsgEvent(sql.FieldEQ(FieldCanSubs, v))
+}
+
+// CanSubsNEQ applies the NEQ predicate on the "can_subs" field.
+func CanSubsNEQ(v bool) predicate.MsgEvent {
+	return predicate.MsgEvent(sql.FieldNEQ(FieldCanSubs, v))
+}
+
+// CanSubsIsNil applies the IsNil predicate on the "can_subs" field.
+func CanSubsIsNil() predicate.MsgEvent {
+	return predicate.MsgEvent(sql.FieldIsNull(FieldCanSubs))
+}
+
+// CanSubsNotNil applies the NotNil predicate on the "can_subs" field.
+func CanSubsNotNil() predicate.MsgEvent {
+	return predicate.MsgEvent(sql.FieldNotNull(FieldCanSubs))
+}
+
 // HasMsgType applies the HasEdge predicate on the "msg_type" edge.
 func HasMsgType() predicate.MsgEvent {
 	return predicate.MsgEvent(func(s *sql.Selector) {
@@ -574,6 +599,35 @@ func HasMsgTypeWith(preds ...predicate.MsgType) predicate.MsgEvent {
 		schemaConfig := internal.SchemaConfigFromContext(s.Context())
 		step.To.Schema = schemaConfig.MsgType
 		step.Edge.Schema = schemaConfig.MsgEvent
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSubscribers applies the HasEdge predicate on the "subscribers" edge.
+func HasSubscribers() predicate.MsgEvent {
+	return predicate.MsgEvent(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, SubscribersTable, SubscribersColumn),
+		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgSubscriber
+		step.Edge.Schema = schemaConfig.MsgSubscriber
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSubscribersWith applies the HasEdge predicate on the "subscribers" edge with a given conditions (other predicates).
+func HasSubscribersWith(preds ...predicate.MsgSubscriber) predicate.MsgEvent {
+	return predicate.MsgEvent(func(s *sql.Selector) {
+		step := newSubscribersStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgSubscriber
+		step.Edge.Schema = schemaConfig.MsgSubscriber
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

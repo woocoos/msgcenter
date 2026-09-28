@@ -99,6 +99,20 @@ func (_c *MsgTemplateCreate) SetNillableTenantID(v *int) *MsgTemplateCreate {
 	return _c
 }
 
+// SetUserID sets the "user_id" field.
+func (_c *MsgTemplateCreate) SetUserID(v int) *MsgTemplateCreate {
+	_c.mutation.SetUserID(v)
+	return _c
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (_c *MsgTemplateCreate) SetNillableUserID(v *int) *MsgTemplateCreate {
+	if v != nil {
+		_c.SetUserID(*v)
+	}
+	return _c
+}
+
 // SetName sets the "name" field.
 func (_c *MsgTemplateCreate) SetName(v string) *MsgTemplateCreate {
 	_c.mutation.SetName(v)
@@ -421,6 +435,10 @@ func (_c *MsgTemplateCreate) createSpec() (*MsgTemplate, *sqlgraph.CreateSpec) {
 		_spec.SetField(msgtemplate.FieldTenantID, field.TypeInt, value)
 		_node.TenantID = value
 	}
+	if value, ok := _c.mutation.UserID(); ok {
+		_spec.SetField(msgtemplate.FieldUserID, field.TypeInt, value)
+		_node.UserID = value
+	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(msgtemplate.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -636,6 +654,30 @@ func (u *MsgTemplateUpsert) AddTenantID(v int) *MsgTemplateUpsert {
 // ClearTenantID clears the value of the "tenant_id" field.
 func (u *MsgTemplateUpsert) ClearTenantID() *MsgTemplateUpsert {
 	u.SetNull(msgtemplate.FieldTenantID)
+	return u
+}
+
+// SetUserID sets the "user_id" field.
+func (u *MsgTemplateUpsert) SetUserID(v int) *MsgTemplateUpsert {
+	u.Set(msgtemplate.FieldUserID, v)
+	return u
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *MsgTemplateUpsert) UpdateUserID() *MsgTemplateUpsert {
+	u.SetExcluded(msgtemplate.FieldUserID)
+	return u
+}
+
+// AddUserID adds v to the "user_id" field.
+func (u *MsgTemplateUpsert) AddUserID(v int) *MsgTemplateUpsert {
+	u.Add(msgtemplate.FieldUserID, v)
+	return u
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (u *MsgTemplateUpsert) ClearUserID() *MsgTemplateUpsert {
+	u.SetNull(msgtemplate.FieldUserID)
 	return u
 }
 
@@ -1018,6 +1060,34 @@ func (u *MsgTemplateUpsertOne) UpdateTenantID() *MsgTemplateUpsertOne {
 func (u *MsgTemplateUpsertOne) ClearTenantID() *MsgTemplateUpsertOne {
 	return u.Update(func(s *MsgTemplateUpsert) {
 		s.ClearTenantID()
+	})
+}
+
+// SetUserID sets the "user_id" field.
+func (u *MsgTemplateUpsertOne) SetUserID(v int) *MsgTemplateUpsertOne {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// AddUserID adds v to the "user_id" field.
+func (u *MsgTemplateUpsertOne) AddUserID(v int) *MsgTemplateUpsertOne {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.AddUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *MsgTemplateUpsertOne) UpdateUserID() *MsgTemplateUpsertOne {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (u *MsgTemplateUpsertOne) ClearUserID() *MsgTemplateUpsertOne {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.ClearUserID()
 	})
 }
 
@@ -1602,6 +1672,34 @@ func (u *MsgTemplateUpsertBulk) UpdateTenantID() *MsgTemplateUpsertBulk {
 func (u *MsgTemplateUpsertBulk) ClearTenantID() *MsgTemplateUpsertBulk {
 	return u.Update(func(s *MsgTemplateUpsert) {
 		s.ClearTenantID()
+	})
+}
+
+// SetUserID sets the "user_id" field.
+func (u *MsgTemplateUpsertBulk) SetUserID(v int) *MsgTemplateUpsertBulk {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.SetUserID(v)
+	})
+}
+
+// AddUserID adds v to the "user_id" field.
+func (u *MsgTemplateUpsertBulk) AddUserID(v int) *MsgTemplateUpsertBulk {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.AddUserID(v)
+	})
+}
+
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *MsgTemplateUpsertBulk) UpdateUserID() *MsgTemplateUpsertBulk {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.UpdateUserID()
+	})
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (u *MsgTemplateUpsertBulk) ClearUserID() *MsgTemplateUpsertBulk {
+	return u.Update(func(s *MsgTemplateUpsert) {
+		s.ClearUserID()
 	})
 }
 

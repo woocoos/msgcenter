@@ -13,6 +13,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
+	"github.com/woocoos/msgcenter/ent/msgsilence"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
@@ -20,10 +21,11 @@ import (
 	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/org"
 	"github.com/woocoos/msgcenter/ent/orgroleuser"
+	"github.com/woocoos/msgcenter/ent/orguser"
 	"github.com/woocoos/msgcenter/ent/predicate"
-	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
+	"github.com/woocoos/msgcenter/ent/userdevice"
 )
 
 // The Query interface represents an operation that queries a graph.
@@ -217,6 +219,33 @@ func (f TraverseMsgInternalTo) Traverse(ctx context.Context, q ent.Query) error 
 	return fmt.Errorf("unexpected query type %T. expect *ent.MsgInternalToQuery", q)
 }
 
+// The MsgSilenceFunc type is an adapter to allow the use of ordinary function as a Querier.
+type MsgSilenceFunc func(context.Context, *ent.MsgSilenceQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f MsgSilenceFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.MsgSilenceQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.MsgSilenceQuery", q)
+}
+
+// The TraverseMsgSilence type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseMsgSilence func(context.Context, *ent.MsgSilenceQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseMsgSilence) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseMsgSilence) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.MsgSilenceQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.MsgSilenceQuery", q)
+}
+
 // The MsgSubscriberFunc type is an adapter to allow the use of ordinary function as a Querier.
 type MsgSubscriberFunc func(context.Context, *ent.MsgSubscriberQuery) (ent.Value, error)
 
@@ -406,31 +435,31 @@ func (f TraverseOrgRoleUser) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.OrgRoleUserQuery", q)
 }
 
-// The SilenceFunc type is an adapter to allow the use of ordinary function as a Querier.
-type SilenceFunc func(context.Context, *ent.SilenceQuery) (ent.Value, error)
+// The OrgUserFunc type is an adapter to allow the use of ordinary function as a Querier.
+type OrgUserFunc func(context.Context, *ent.OrgUserQuery) (ent.Value, error)
 
 // Query calls f(ctx, q).
-func (f SilenceFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
-	if q, ok := q.(*ent.SilenceQuery); ok {
+func (f OrgUserFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.OrgUserQuery); ok {
 		return f(ctx, q)
 	}
-	return nil, fmt.Errorf("unexpected query type %T. expect *ent.SilenceQuery", q)
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.OrgUserQuery", q)
 }
 
-// The TraverseSilence type is an adapter to allow the use of ordinary function as Traverser.
-type TraverseSilence func(context.Context, *ent.SilenceQuery) error
+// The TraverseOrgUser type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseOrgUser func(context.Context, *ent.OrgUserQuery) error
 
 // Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
-func (f TraverseSilence) Intercept(next ent.Querier) ent.Querier {
+func (f TraverseOrgUser) Intercept(next ent.Querier) ent.Querier {
 	return next
 }
 
 // Traverse calls f(ctx, q).
-func (f TraverseSilence) Traverse(ctx context.Context, q ent.Query) error {
-	if q, ok := q.(*ent.SilenceQuery); ok {
+func (f TraverseOrgUser) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.OrgUserQuery); ok {
 		return f(ctx, q)
 	}
-	return fmt.Errorf("unexpected query type %T. expect *ent.SilenceQuery", q)
+	return fmt.Errorf("unexpected query type %T. expect *ent.OrgUserQuery", q)
 }
 
 // The UserFunc type is an adapter to allow the use of ordinary function as a Querier.
@@ -487,6 +516,33 @@ func (f TraverseUserAddr) Traverse(ctx context.Context, q ent.Query) error {
 	return fmt.Errorf("unexpected query type %T. expect *ent.UserAddrQuery", q)
 }
 
+// The UserDeviceFunc type is an adapter to allow the use of ordinary function as a Querier.
+type UserDeviceFunc func(context.Context, *ent.UserDeviceQuery) (ent.Value, error)
+
+// Query calls f(ctx, q).
+func (f UserDeviceFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
+	if q, ok := q.(*ent.UserDeviceQuery); ok {
+		return f(ctx, q)
+	}
+	return nil, fmt.Errorf("unexpected query type %T. expect *ent.UserDeviceQuery", q)
+}
+
+// The TraverseUserDevice type is an adapter to allow the use of ordinary function as Traverser.
+type TraverseUserDevice func(context.Context, *ent.UserDeviceQuery) error
+
+// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
+func (f TraverseUserDevice) Intercept(next ent.Querier) ent.Querier {
+	return next
+}
+
+// Traverse calls f(ctx, q).
+func (f TraverseUserDevice) Traverse(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.UserDeviceQuery); ok {
+		return f(ctx, q)
+	}
+	return fmt.Errorf("unexpected query type %T. expect *ent.UserDeviceQuery", q)
+}
+
 // NewQuery returns the generic Query interface for the given typed query.
 func NewQuery(q ent.Query) (Query, error) {
 	switch q := q.(type) {
@@ -500,6 +556,8 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.MsgInternalQuery, predicate.MsgInternal, msginternal.OrderOption]{typ: ent.TypeMsgInternal, tq: q}, nil
 	case *ent.MsgInternalToQuery:
 		return &query[*ent.MsgInternalToQuery, predicate.MsgInternalTo, msginternalto.OrderOption]{typ: ent.TypeMsgInternalTo, tq: q}, nil
+	case *ent.MsgSilenceQuery:
+		return &query[*ent.MsgSilenceQuery, predicate.MsgSilence, msgsilence.OrderOption]{typ: ent.TypeMsgSilence, tq: q}, nil
 	case *ent.MsgSubscriberQuery:
 		return &query[*ent.MsgSubscriberQuery, predicate.MsgSubscriber, msgsubscriber.OrderOption]{typ: ent.TypeMsgSubscriber, tq: q}, nil
 	case *ent.MsgTemplateQuery:
@@ -514,12 +572,14 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.OrgQuery, predicate.Org, org.OrderOption]{typ: ent.TypeOrg, tq: q}, nil
 	case *ent.OrgRoleUserQuery:
 		return &query[*ent.OrgRoleUserQuery, predicate.OrgRoleUser, orgroleuser.OrderOption]{typ: ent.TypeOrgRoleUser, tq: q}, nil
-	case *ent.SilenceQuery:
-		return &query[*ent.SilenceQuery, predicate.Silence, silence.OrderOption]{typ: ent.TypeSilence, tq: q}, nil
+	case *ent.OrgUserQuery:
+		return &query[*ent.OrgUserQuery, predicate.OrgUser, orguser.OrderOption]{typ: ent.TypeOrgUser, tq: q}, nil
 	case *ent.UserQuery:
 		return &query[*ent.UserQuery, predicate.User, user.OrderOption]{typ: ent.TypeUser, tq: q}, nil
 	case *ent.UserAddrQuery:
 		return &query[*ent.UserAddrQuery, predicate.UserAddr, useraddr.OrderOption]{typ: ent.TypeUserAddr, tq: q}, nil
+	case *ent.UserDeviceQuery:
+		return &query[*ent.UserDeviceQuery, predicate.UserDevice, userdevice.OrderOption]{typ: ent.TypeUserDevice, tq: q}, nil
 	default:
 		return nil, fmt.Errorf("unknown query type %T", q)
 	}

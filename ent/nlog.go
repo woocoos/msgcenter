@@ -36,6 +36,10 @@ type Nlog struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// 过期时间
 	ExpiresAt time.Time `json:"expires_at,omitempty"`
+	// 错误信息，有值表示未发送成功：如：邮件已发往邮件服务器，邮件服务器发送失败，记录其错误信息
+	ErrMsg string `json:"err_msg,omitempty"`
+	// 邮件消息ID，用于关联邮件发送回执
+	MessageID string `json:"message_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the NlogQuery when eager-loading is set.
 	Edges        NlogEdges `json:"edges"`
@@ -83,7 +87,7 @@ func (*Nlog) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case nlog.FieldID, nlog.FieldTenantID, nlog.FieldIdx:
 			values[i] = new(sql.NullInt64)
-		case nlog.FieldGroupKey, nlog.FieldReceiver, nlog.FieldReceiverType:
+		case nlog.FieldGroupKey, nlog.FieldReceiver, nlog.FieldReceiverType, nlog.FieldErrMsg, nlog.FieldMessageID:
 			values[i] = new(sql.NullString)
 		case nlog.FieldSendAt, nlog.FieldCreatedAt, nlog.FieldUpdatedAt, nlog.FieldExpiresAt:
 			values[i] = new(sql.NullTime)
@@ -162,6 +166,18 @@ func (_m *Nlog) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.ExpiresAt = value.Time
 			}
+		case nlog.FieldErrMsg:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field err_msg", values[i])
+			} else if value.Valid {
+				_m.ErrMsg = value.String
+			}
+		case nlog.FieldMessageID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field message_id", values[i])
+			} else if value.Valid {
+				_m.MessageID = value.String
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -234,6 +250,12 @@ func (_m *Nlog) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("expires_at=")
 	builder.WriteString(_m.ExpiresAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("err_msg=")
+	builder.WriteString(_m.ErrMsg)
+	builder.WriteString(", ")
+	builder.WriteString("message_id=")
+	builder.WriteString(_m.MessageID)
 	builder.WriteByte(')')
 	return builder.String()
 }

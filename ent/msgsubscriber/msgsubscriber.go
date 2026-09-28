@@ -25,6 +25,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldMsgTypeID holds the string denoting the msg_type_id field in the database.
 	FieldMsgTypeID = "msg_type_id"
+	// FieldMsgEventID holds the string denoting the msg_event_id field in the database.
+	FieldMsgEventID = "msg_event_id"
 	// FieldTenantID holds the string denoting the tenant_id field in the database.
 	FieldTenantID = "tenant_id"
 	// FieldUserID holds the string denoting the user_id field in the database.
@@ -35,6 +37,8 @@ const (
 	FieldExclude = "exclude"
 	// EdgeMsgType holds the string denoting the msg_type edge name in mutations.
 	EdgeMsgType = "msg_type"
+	// EdgeMsgEvent holds the string denoting the msg_event edge name in mutations.
+	EdgeMsgEvent = "msg_event"
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// Table holds the table name of the msgsubscriber in the database.
@@ -46,6 +50,13 @@ const (
 	MsgTypeInverseTable = "msg_type"
 	// MsgTypeColumn is the table column denoting the msg_type relation/edge.
 	MsgTypeColumn = "msg_type_id"
+	// MsgEventTable is the table that holds the msg_event relation/edge.
+	MsgEventTable = "msg_subscriber"
+	// MsgEventInverseTable is the table name for the MsgEvent entity.
+	// It exists in this package in order to avoid circular dependency with the "msgevent" package.
+	MsgEventInverseTable = "msg_event"
+	// MsgEventColumn is the table column denoting the msg_event relation/edge.
+	MsgEventColumn = "msg_event_id"
 	// UserTable is the table that holds the user relation/edge.
 	UserTable = "msg_subscriber"
 	// UserInverseTable is the table name for the User entity.
@@ -63,6 +74,7 @@ var Columns = []string{
 	FieldUpdatedBy,
 	FieldUpdatedAt,
 	FieldMsgTypeID,
+	FieldMsgEventID,
 	FieldTenantID,
 	FieldUserID,
 	FieldOrgRoleID,
@@ -125,6 +137,11 @@ func ByMsgTypeID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMsgTypeID, opts...).ToFunc()
 }
 
+// ByMsgEventID orders the results by the msg_event_id field.
+func ByMsgEventID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMsgEventID, opts...).ToFunc()
+}
+
 // ByTenantID orders the results by the tenant_id field.
 func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
@@ -152,6 +169,13 @@ func ByMsgTypeField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
+// ByMsgEventField orders the results by msg_event field.
+func ByMsgEventField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newMsgEventStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByUserField orders the results by user field.
 func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -163,6 +187,13 @@ func newMsgTypeStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MsgTypeInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, MsgTypeTable, MsgTypeColumn),
+	)
+}
+func newMsgEventStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(MsgEventInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, MsgEventTable, MsgEventColumn),
 	)
 }
 func newUserStep() *sqlgraph.Step {

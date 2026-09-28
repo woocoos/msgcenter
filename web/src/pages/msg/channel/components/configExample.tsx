@@ -32,6 +32,8 @@ emailConfigs:
     authIdentity: ""
     # the CRAM-MD5 secret
     authSecret: ""
+    # 写入追踪 header, 用于关联邮件发送回执与 Nlog
+    traceIdHeader: "X-User-Notify-TraceId"
 messageConfig:
   to: ""
   subject: ""
