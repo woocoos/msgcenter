@@ -10,6 +10,7 @@ import { definePageConfig } from "ice";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useResizableProTable, routeBreadcrumb } from "@/util/hook";
+import { getDate } from "@/util";
 
 const List = () => {
   const { t } = useTranslation(),
@@ -125,8 +126,12 @@ const List = () => {
           const table = { data: [] as MsgAlert[], success: true, total: 0 },
             where: MsgAlertWhereInput = {};
           where.tenantID = params.tenant?.id;
-          where.startsAt = params.startsAt;
-          where.endsAt = params.endsAt;
+          if (params.startsAt) {
+            where.startsAtGTE = getDate(params.startsAt, 'YYYY-MM-DDTHH:mm:ssZ');
+          }
+          if (params.endsAt) {
+            where.endsAtLTE = getDate(params.endsAt, 'YYYY-MM-DDTHH:mm:ssZ');
+          }
           where.stateIn = filter.status as MsgAlertAlertStatus[];
           const result = await getMsgAlertList({
             current: params.current,

@@ -65,7 +65,7 @@ const List = () => {
         {
           title: t('msg_type_category'), dataIndex: 'msgTypeCategory', width: 140,
           renderFormItem() {
-            return <DictSelect dictCode="MsgCategory" placeholder={t('please_enter_category')} />
+            return <DictSelect dictCode="MsgCategory" placeholder={t('please_enter_category')} allowClear />
           },
           render(text, record) {
             return <DictText dictCode="MsgCategory" value={record.msgType?.category} />

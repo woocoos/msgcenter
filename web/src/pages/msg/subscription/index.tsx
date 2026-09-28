@@ -68,7 +68,7 @@ const List = () => {
         {
           title: t('msg_type_category'), dataIndex: 'msgTypeCategory', hideInTable: true, width: 0,
           renderFormItem() {
-            return <DictSelect dictCode="MsgCategory" placeholder={t('please_enter_category')} />
+            return <DictSelect dictCode="MsgCategory" placeholder={t('please_enter_category')} allowClear />
           },
         },
         { title: t('receiving_user'), dataIndex: 'receiving_user', width: 200, search: false },
