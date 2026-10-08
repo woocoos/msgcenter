@@ -3569,7 +3569,7 @@ func (ec *executionContext) unmarshalInputUmengConfigInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"sendResolved", "apiURL", "apps", "productionMode"}
+	fieldsInOrder := [...]string{"sendResolved", "apiURL", "apps", "productionMode", "subject", "body", "defaultBizType"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3606,6 +3606,27 @@ func (ec *executionContext) unmarshalInputUmengConfigInput(ctx context.Context, 
 				return it, err
 			}
 			it.ProductionMode = data
+		case "subject":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subject"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Subject = data
+		case "body":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("body"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Body = data
+		case "defaultBizType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("defaultBizType"))
+			data, err := ec.unmarshalOString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DefaultBizType = data
 		}
 	}
 

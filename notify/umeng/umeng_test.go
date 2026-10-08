@@ -873,7 +873,7 @@ func TestIntegration_RealAPI_Android(t *testing.T) {
 		UpdatedAt: time.Now(),
 		Annotations: label.LabelSet{
 			"summary":               "msgcenter Android integration test",
-			MsgType:                 "msg_detail",
+			BizType:                 "msg_detail",
 			label.AlertIDAnnotation: "1",
 		},
 	}
@@ -923,7 +923,7 @@ func TestIntegration_RealAPI_IOS(t *testing.T) {
 		UpdatedAt: time.Now(),
 		Annotations: label.LabelSet{
 			"summary":               "msgcenter iOS integration test",
-			MsgType:                 "msg_detail",
+			BizType:                 "msg_detail",
 			label.AlertIDAnnotation: "1",
 		},
 	}

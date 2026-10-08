@@ -121,4 +121,7 @@ input UmengConfigInput {
     apiURL: String
     apps: UmengApps!
     productionMode: Boolean
+    subject: String
+    body: String
+    defaultBizType: String
 }

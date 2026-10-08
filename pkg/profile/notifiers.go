@@ -36,9 +36,10 @@ var (
 	}
 	// DefaultUmengConfig defines default values for Umeng Push configurations.
 	DefaultUmengConfig = UmengConfig{
-		SendResolved: false,
-		APIURL:       "https://msgapi.umeng.com/api/send",
-		Extras:       make(map[string]string),
+		SendResolved:   false,
+		APIURL:         "https://msgapi.umeng.com/api/send",
+		Extras:         make(map[string]string),
+		DefaultBizType: "msg_detail",
 	}
 )
 
@@ -316,6 +317,8 @@ type UmengConfig struct {
 	Body string `yaml:"body,omitempty" json:"body,omitempty"`
 	// key-values
 	Extras map[string]string `yaml:"extras,omitempty" json:"extras,omitempty"`
+	// Default business type, used for Umeng Push redirection.
+	DefaultBizType string `yaml:"defaultBizType,omitempty" json:"defaultBizType,omitempty"`
 }
 
 func (c *UmengConfig) Validate() error {

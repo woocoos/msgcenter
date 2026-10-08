@@ -88,8 +88,9 @@ func (u EventSubscribeStage) exec(ctx context.Context, alerts ...*alert.Alert) (
 		uls := make([]*alert.Alert, len(alerts))
 		for i, a := range alerts {
 			ac := a.Clone()
-			// flush 清空了 firing alert 副本的 EndsAt，从 mem.Alerts 取原始 alert 恢复时间字段，
-			// 避免 clone 以零值 EndsAt Put 回后永不 GC 且重复发送。
+			// flush 清空了副本 EndsAt。原始 alert 在 aggrGroup store 中，不在 mem.Alerts 中，
+			// 多个 receiver pipeline 并发执行此 stage，共享 mem.Alerts，Get 结果不可靠。
+			// 查找失败时用 now+5min 兜底，确保 clone 处于 firing 状态。
 			if ac.EndsAt.IsZero() || ac.StartsAt.IsZero() {
 				if orig, err := u.alerts.Get(a.Fingerprint()); err == nil {
 					if ac.StartsAt.IsZero() {
@@ -99,6 +100,13 @@ func (u EventSubscribeStage) exec(ctx context.Context, alerts ...*alert.Alert) (
 						ac.EndsAt = orig.EndsAt
 						ac.Timeout = orig.Timeout
 					}
+				}
+				// 兜底：Get 失败时确保 clone 有合法时间，避免零值 EndsAt 永不 resolved
+				if ac.EndsAt.IsZero() {
+					ac.EndsAt = time.Now().Add(5 * time.Minute)
+				}
+				if ac.StartsAt.IsZero() {
+					ac.StartsAt = time.Now()
 				}
 			}
 			ac.Labels[label.ToUserIDLabel] = uid

@@ -2505,6 +2505,7 @@ type UmengConfig {
   apiURL: String
   apps: UmengApps!
   body: String
+  defaultBizType: String
   productionMode: Boolean
   sendResolved: Boolean
   subject: String
@@ -2513,8 +2514,11 @@ type UmengConfig {
 input UmengConfigInput {
   apiURL: String
   apps: UmengApps!
+  body: String
+  defaultBizType: String
   productionMode: Boolean
   sendResolved: Boolean
+  subject: String
 }
 
 """
@@ -2697,6 +2701,7 @@ type WebhookConfig {
   headers: MapString
   maxAlerts: Int
   receiveType: String
+  secret: String
   sendResolved: Boolean
   subject: String
   timeout: Duration

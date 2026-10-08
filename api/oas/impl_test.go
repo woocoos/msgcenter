@@ -29,6 +29,7 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
+	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/useraddr"
 	"github.com/woocoos/msgcenter/notify/webhook"
 	"github.com/woocoos/msgcenter/pkg/alert"
@@ -801,6 +802,16 @@ func (s *serviceSuite) TestMessage() {
 	mist, err := mis[0].MsgInternalTo(schemax.SkipTenantPrivacy(context.Background()))
 	s.Require().NoError(err)
 	s.Len(mist, 2)
+
+	// 检查 Nlog 记录的 receiverType 是否正确设置
+	nlogs, err := s.Client.Nlog.Query().
+		Where(nlog.ReceiverTypeEQ(profile.ReceiverMessage)).
+		All(schemax.SkipTenantPrivacy(context.Background()))
+	s.Require().NoError(err)
+	s.GreaterOrEqual(len(nlogs), 1, "应该有至少一条 message 类型的 Nlog 记录")
+	for _, nlog := range nlogs {
+		s.Equal(profile.ReceiverMessage, nlog.ReceiverType, "Nlog 的 receiverType 应该是 message")
+	}
 }
 
 // TestUserLevelTemplate verifies that user-level templates take priority over tenant-level templates.

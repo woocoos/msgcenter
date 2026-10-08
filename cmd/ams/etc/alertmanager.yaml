@@ -35,9 +35,7 @@ receivers:
             appKey: "${UMENG_ANDROID_APP_KEY}"
             appMasterSecret: "${UMENG_ANDROID_APP_MASTER_SECRET}"
             platform: "android"
-inhibit_rules:
-  - source_match:
-      severity: "critical"
-    target_match:
-      severity: "warning"
-    equal: ["alertname", "dev", "instance"]
+inhibitRules:
+  - sourceMatchers: ['alertname="cstCertExpired"']
+    targetMatchers: ['alertname="cstCertExpired"']
+    equal: ["alertname"]

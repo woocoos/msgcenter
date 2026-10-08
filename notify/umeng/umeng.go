@@ -52,7 +52,7 @@ const (
 
 const (
 	// 推送的消息类型,用于App端识别业务实例
-	MsgType = "msg_detail"
+	BizType = "biz_type"
 )
 
 // Request is the Umeng Push API request body.
@@ -542,19 +542,24 @@ func (n *Notifier) buildRequestCommon(config *profile.UmengConfig, msg *Message,
 
 // extractExtraFields extracts extra fields from alert annotations.
 // Returns a map of extra fields to be included in the payload.
-func extractExtraFields(msg *Message) map[string]any {
+// If no alert has biz_type annotation, falls back to config.DefaultBizType.
+func extractExtraFields(config *profile.UmengConfig, msg *Message) map[string]any {
 	if msg == nil || msg.Data == nil {
 		return nil
 	}
 	extra := make(map[string]any)
 	for _, a := range msg.Data.Alerts {
-		if v, ok := a.Annotations[MsgType]; ok && v != "" {
+		if v, ok := a.Annotations[BizType]; ok && v != "" {
 			extra["type"] = v
 		}
 		// Extract alert database ID from annotation, use as "id" in extra
 		if v, ok := a.Annotations[label.AlertIDAnnotation]; ok && v != "" {
 			extra["id"] = v
 		}
+	}
+	// 如果 BizType 没有值，使用 config.DefaultBizType 作为默认值
+	if _, ok := extra["type"]; !ok && config != nil && config.DefaultBizType != "" {
+		extra["type"] = config.DefaultBizType
 	}
 	if len(extra) == 0 {
 		return nil
@@ -598,7 +603,7 @@ func (n *Notifier) buildRequestForAndroid(config *profile.UmengConfig, msg *Mess
 	}
 
 	// Add extra fields from annotations.
-	if extra := extractExtraFields(msg); extra != nil {
+	if extra := extractExtraFields(config, msg); extra != nil {
 		payload["extra"] = extra
 	}
 
@@ -635,7 +640,7 @@ func (n *Notifier) buildRequestForIOS(config *profile.UmengConfig, msg *Message,
 
 	// iOS does not have "extra" field like Android.
 	// Custom fields are added directly to payload root level (alongside "aps").
-	if extra := extractExtraFields(msg); extra != nil {
+	if extra := extractExtraFields(config, msg); extra != nil {
 		for k, v := range extra {
 			payload[k] = v
 		}
@@ -669,7 +674,7 @@ func (n *Notifier) buildRequestForHarmonyOS(config *profile.UmengConfig, msg *Me
 	}
 
 	// Add extra fields from annotations.
-	if extra := extractExtraFields(msg); extra != nil {
+	if extra := extractExtraFields(config, msg); extra != nil {
 		payload["extra"] = extra
 	}
 

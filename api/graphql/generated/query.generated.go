@@ -32,6 +32,7 @@ type UmengConfigResolver interface {
 }
 type WebhookConfigResolver interface {
 	ReceiveType(ctx context.Context, obj *profile.WebhookConfig) (*string, error)
+
 	URL(ctx context.Context, obj *profile.WebhookConfig) (*string, error)
 
 	MaxAlerts(ctx context.Context, obj *profile.WebhookConfig) (*int, error)
@@ -1799,6 +1800,8 @@ func (ec *executionContext) fieldContext_Receiver_webhookConfigs(_ context.Conte
 				return ec.fieldContext_WebhookConfig_sendResolved(ctx, field)
 			case "receiveType":
 				return ec.fieldContext_WebhookConfig_receiveType(ctx, field)
+			case "secret":
+				return ec.fieldContext_WebhookConfig_secret(ctx, field)
 			case "url":
 				return ec.fieldContext_WebhookConfig_url(ctx, field)
 			case "urlFile":
@@ -1868,6 +1871,8 @@ func (ec *executionContext) fieldContext_Receiver_umengConfigs(_ context.Context
 				return ec.fieldContext_UmengConfig_subject(ctx, field)
 			case "body":
 				return ec.fieldContext_UmengConfig_body(ctx, field)
+			case "defaultBizType":
+				return ec.fieldContext_UmengConfig_defaultBizType(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UmengConfig", field.Name)
 		},
@@ -2564,6 +2569,47 @@ func (ec *executionContext) fieldContext_UmengConfig_body(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _UmengConfig_defaultBizType(ctx context.Context, field graphql.CollectedField, obj *profile.UmengConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UmengConfig_defaultBizType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DefaultBizType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UmengConfig_defaultBizType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UmengConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _UserInfo_userID(ctx context.Context, field graphql.CollectedField, obj *model.UserInfo) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_UserInfo_userID(ctx, field)
 	if err != nil {
@@ -2803,6 +2849,47 @@ func (ec *executionContext) fieldContext_WebhookConfig_receiveType(_ context.Con
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WebhookConfig_secret(ctx context.Context, field graphql.CollectedField, obj *profile.WebhookConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_WebhookConfig_secret(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Secret, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_WebhookConfig_secret(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WebhookConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
@@ -3635,6 +3722,8 @@ func (ec *executionContext) _UmengConfig(ctx context.Context, sel ast.SelectionS
 			out.Values[i] = ec._UmengConfig_subject(ctx, field, obj)
 		case "body":
 			out.Values[i] = ec._UmengConfig_body(ctx, field, obj)
+		case "defaultBizType":
+			out.Values[i] = ec._UmengConfig_defaultBizType(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3746,6 +3835,8 @@ func (ec *executionContext) _WebhookConfig(ctx context.Context, sel ast.Selectio
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "secret":
+			out.Values[i] = ec._WebhookConfig_secret(ctx, field, obj)
 		case "url":
 			field := field
 

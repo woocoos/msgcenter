@@ -526,6 +526,7 @@ type ComplexityRoot struct {
 		APIURL         func(childComplexity int) int
 		Apps           func(childComplexity int) int
 		Body           func(childComplexity int) int
+		DefaultBizType func(childComplexity int) int
 		ProductionMode func(childComplexity int) int
 		SendResolved   func(childComplexity int) int
 		Subject        func(childComplexity int) int
@@ -550,6 +551,7 @@ type ComplexityRoot struct {
 		Headers      func(childComplexity int) int
 		MaxAlerts    func(childComplexity int) int
 		ReceiveType  func(childComplexity int) int
+		Secret       func(childComplexity int) int
 		SendResolved func(childComplexity int) int
 		Subject      func(childComplexity int) int
 		Timeout      func(childComplexity int) int
@@ -3155,6 +3157,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UmengConfig.Body(childComplexity), true
 
+	case "UmengConfig.defaultBizType":
+		if e.complexity.UmengConfig.DefaultBizType == nil {
+			break
+		}
+
+		return e.complexity.UmengConfig.DefaultBizType(childComplexity), true
+
 	case "UmengConfig.productionMode":
 		if e.complexity.UmengConfig.ProductionMode == nil {
 			break
@@ -3259,6 +3268,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.WebhookConfig.ReceiveType(childComplexity), true
+
+	case "WebhookConfig.secret":
+		if e.complexity.WebhookConfig.Secret == nil {
+			break
+		}
+
+		return e.complexity.WebhookConfig.Secret(childComplexity), true
 
 	case "WebhookConfig.sendResolved":
 		if e.complexity.WebhookConfig.SendResolved == nil {
@@ -6725,6 +6741,7 @@ type MessageConfig {
 type WebhookConfig {
     sendResolved: Boolean
     receiveType: String
+    secret: String
     url: String
     urlFile: String
     maxAlerts: Int
@@ -6741,6 +6758,7 @@ type UmengConfig {
     productionMode: Boolean
     subject: String
     body: String
+    defaultBizType: String
 }
 
 enum RouteStrType {
@@ -7059,6 +7077,9 @@ input UmengConfigInput {
     apiURL: String
     apps: UmengApps!
     productionMode: Boolean
+    subject: String
+    body: String
+    defaultBizType: String
 }`, BuiltIn: false},
 	{Name: "../subscription.graphql", Input: `type Subscription {
     # internal message
