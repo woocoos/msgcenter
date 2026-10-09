@@ -41,9 +41,9 @@ web:
                 withAuthorization: false
                 publicErrorMsg: "系统内部异常，请联系管理员"
                 appCode: "msg"
-                header: ## dev mode, remove in production, set the value in your .env.local
-                  X-Tenant-ID: ${TENANT}
-                  Authorization: "${AUTHORIZATION}"
+                middlewares:
+                  response:
+                    - accessLog:
 
 store:
   msgcenter:
