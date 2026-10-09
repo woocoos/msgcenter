@@ -10,6 +10,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/cenkalti/backoff/v4"
 	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/pkg/gds/timeinterval"
@@ -22,8 +25,6 @@ import (
 	"github.com/woocoos/msgcenter/service/provider"
 	"github.com/woocoos/msgcenter/service/silence"
 	"go.uber.org/zap"
-	"sync"
-	"time"
 )
 
 var logger = log.Component("notify")
@@ -223,8 +224,8 @@ type FanoutStage []Stage
 // It returns its input alerts and a combined error if one or more stages fail.
 func (fs FanoutStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.Context, []*alert.Alert, error) {
 	var (
-		wg  sync.WaitGroup
-		mtx sync.Mutex
+		wg   sync.WaitGroup
+		mtx  sync.Mutex
 		errs error
 	)
 	wg.Add(len(fs))
@@ -555,6 +556,15 @@ func (n SetNotifiesStage) Exec(ctx context.Context, alerts ...*alert.Alert) (con
 		return ctx, nil, errors.New("repeat interval missing")
 	}
 	expiry := 2 * repeat
+
+	// 检查是否有 alert 带有 skipStore label，设置到 context
+	// nflog 内存 entry 仍会创建（用于 DedupStage 去重），但 DB 写入会被跳过
+	for _, a := range alerts {
+		if _, ok := a.Labels[label.SkipStoreLabel]; ok {
+			ctx = WithSkipStore(ctx, true)
+			break
+		}
+	}
 
 	return ctx, alerts, n.nflog.Log(ctx, n.recv, gkey, firing, resolved, expiry)
 }

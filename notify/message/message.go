@@ -87,81 +87,124 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 	if config.To == "" {
 		return false, errors.New("to is empty")
 	}
+
+	// 检查是否有 alert 带有 skipStore label
+	skipStore := false
+	for _, a := range alerts {
+		if _, ok := a.Labels[label.SkipStoreLabel]; ok {
+			skipStore = true
+			break
+		}
+	}
+
 	var pushData = push.Data{
 		Topic: "message",
 	}
+
+	// 提前渲染模板（skipStore 和非 skipStore 共用）
+	var title, body, redirect string
+	var formatStr string
+	if config.Subject != "" {
+		title = tmpl(config.Subject)
+		if err != nil {
+			return false, fmt.Errorf("execute 'Title' template: %w", err)
+		}
+	}
+	if config.Text != "" {
+		body = tmpl(config.Text)
+		if err != nil {
+			return false, fmt.Errorf("execute 'context' template: %w", err)
+		}
+		formatStr = "text"
+	} else if config.HTML != "" {
+		body = tmpl(config.HTML)
+		if err != nil {
+			return false, fmt.Errorf("execute 'context' template: %w", err)
+		}
+		formatStr = "html"
+	}
+	if config.Redirect != "" {
+		redirect = tmpl(config.Redirect)
+	}
+	format := msgtemplate.Format(formatStr)
+
+	alertNameStr := data.CommonLabels[label.AlertNameLabel]
+
 	// db error ,don't try
 	err = ecx.WithTx(ctx, func(ctx context.Context) (ecx.Transactor, error) {
 		return n.client.Tx(ctx)
 	}, func(itx ecx.Transactor) error {
 		tx := itx.(*ent.Tx)
-		msg := tx.MsgInternal.Create().
-			SetCreatedBy(0).
-			SetCategory(config.Extras["category"]).
-			SetReceiverType(profile.ReceiverMessage)
-		if idStr := data.CommonAnnotations[label.AlertIDAnnotation]; idStr != "" {
-			if aid, err := strconv.Atoi(idStr); err == nil {
-				msg.SetAlertID(aid)
-			}
-		}
-		if config.Subject != "" {
-			msg.SetSubject(tmpl(config.Subject))
-			if err != nil {
-				return fmt.Errorf("execute 'Title' template: %w", err)
-			}
-		}
-		if config.Text != "" {
-			msg.SetBody(tmpl(config.Text))
-			if err != nil {
-				return fmt.Errorf("execute 'context' template: %w", err)
-			}
-			msg.SetFormat("text")
-		} else if config.HTML != "" {
-			msg.SetBody(tmpl(config.HTML))
-			if err != nil {
-				return fmt.Errorf("execute 'context' template: %w", err)
-			}
-			msg.SetFormat("html")
-		}
-		if config.Redirect != "" {
-			msg.SetRedirect(tmpl(config.Redirect))
-		}
-		msg.SetTenantID(tid)
 		nctx := schemax.SkipTenantPrivacy(ctx)
-		row, err := msg.Save(nctx)
-		if err != nil {
-			return err
-		}
 
-		alertNameStr := data.CommonLabels[label.AlertNameLabel]
-		pushData.Message = push.Message{
-			Title:   row.Subject,
-			Format:  msgtemplate.Format(row.Format),
-			Content: row.Body,
-			Extras: map[label.LabelName]string{
-				"action":    "internal",
-				"actionID":  strconv.Itoa(row.ID),
-				"alertName": alertNameStr,
-			},
-		}
-
-		msggtos := make([]*ent.MsgInternalToCreate, 0)
-		for _, uid := range strings.Split(config.To, ",") {
-			suid, err := strconv.Atoi(uid)
-			if err != nil {
-				logger.Error("invalid user id", zap.String("userID", uid))
-				continue
+		var rowID int
+		if !skipStore {
+			msg := tx.MsgInternal.Create().
+				SetCreatedBy(0).
+				SetCategory(config.Extras["category"]).
+				SetReceiverType(profile.ReceiverMessage).
+				SetSubject(title).
+				SetBody(body).
+				SetFormat(formatStr).
+				SetTenantID(tid)
+			if idStr := data.CommonAnnotations[label.AlertIDAnnotation]; idStr != "" {
+				if aid, err := strconv.Atoi(idStr); err == nil {
+					msg.SetAlertID(aid)
+				}
 			}
-			msggtos = append(msggtos,
-				tx.MsgInternalTo.Create().SetTenantID(tid).SetUserID(suid).SetMsgInternalID(row.ID),
-			)
-			pushData.Audience.UserIDs = append(pushData.Audience.UserIDs, suid)
-		}
-		if len(msggtos) > 0 {
-			_, err = tx.MsgInternalTo.CreateBulk(msggtos...).Save(nctx)
+			if redirect != "" {
+				msg.SetRedirect(redirect)
+			}
+			row, err := msg.Save(nctx)
 			if err != nil {
 				return err
 			}
+			rowID = row.ID
+
+			// 创建 MsgInternalTo 记录
+			msggtos := make([]*ent.MsgInternalToCreate, 0)
+			for _, uid := range strings.Split(config.To, ",") {
+				suid, err := strconv.Atoi(uid)
+				if err != nil {
+					logger.Error("invalid user id", zap.String("userID", uid))
+					continue
+				}
+				msggtos = append(msggtos,
+					tx.MsgInternalTo.Create().SetTenantID(tid).SetUserID(suid).SetMsgInternalID(row.ID),
+				)
+				pushData.Audience.UserIDs = append(pushData.Audience.UserIDs, suid)
+			}
+			if len(msggtos) > 0 {
+				_, err = tx.MsgInternalTo.CreateBulk(msggtos...).Save(nctx)
+				if err != nil {
+					return err
+				}
+			}
+		} else {
+			// skipStore 模式下只收集推送用户，不创建 DB 记录
+			for _, uid := range strings.Split(config.To, ",") {
+				suid, err := strconv.Atoi(uid)
+				if err != nil {
+					logger.Error("invalid user id", zap.String("userID", uid))
+					continue
+				}
+				pushData.Audience.UserIDs = append(pushData.Audience.UserIDs, suid)
+			}
+		}
+
+		// 构建推送消息（skipStore 和非 skipStore 共用）
+		extras := map[label.LabelName]string{
+			"action":    "internal",
+			"alertName": alertNameStr,
+		}
+		if rowID > 0 {
+			extras["actionID"] = strconv.Itoa(rowID)
+		}
+		pushData.Message = push.Message{
+			Title:   title,
+			Format:  format,
+			Content: body,
+			Extras:  extras,
 		}
 		return nil
 	})

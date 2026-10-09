@@ -84,15 +84,20 @@ func (u EventSubscribeStage) exec(ctx context.Context, alerts ...*alert.Alert) (
 		}
 	}
 
+	// 优化：统一时间基准，避免多次调用 time.Now() 导致时间不一致
+	now := time.Now()
+	fallbackEndsAt := now.Add(5 * time.Minute)
+
 	for _, uid := range userIDs {
 		uls := make([]*alert.Alert, len(alerts))
 		for i, a := range alerts {
 			ac := a.Clone()
 			// flush 清空了副本 EndsAt。原始 alert 在 aggrGroup store 中，不在 mem.Alerts 中，
 			// 多个 receiver pipeline 并发执行此 stage，共享 mem.Alerts，Get 结果不可靠。
-			// 查找失败时用 now+5min 兜底，确保 clone 处于 firing 状态。
+			// 查找失败或原始 alert 已 resolved 时用 now+5min 兜底，确保 clone 处于 firing 状态。
 			if ac.EndsAt.IsZero() || ac.StartsAt.IsZero() {
-				if orig, err := u.alerts.Get(a.Fingerprint()); err == nil {
+				if orig, err := u.alerts.Get(a.Fingerprint()); err == nil && !orig.Resolved() {
+					// 只使用未 resolved 的原始 alert 恢复时间
 					if ac.StartsAt.IsZero() {
 						ac.StartsAt = orig.StartsAt
 					}
@@ -101,12 +106,12 @@ func (u EventSubscribeStage) exec(ctx context.Context, alerts ...*alert.Alert) (
 						ac.Timeout = orig.Timeout
 					}
 				}
-				// 兜底：Get 失败时确保 clone 有合法时间，避免零值 EndsAt 永不 resolved
+				// 兜底：Get 失败或原始 alert 已 resolved 时，确保 clone 有合法时间
 				if ac.EndsAt.IsZero() {
-					ac.EndsAt = time.Now().Add(5 * time.Minute)
+					ac.EndsAt = fallbackEndsAt
 				}
 				if ac.StartsAt.IsZero() {
-					ac.StartsAt = time.Now()
+					ac.StartsAt = now
 				}
 			}
 			ac.Labels[label.ToUserIDLabel] = uid
@@ -119,7 +124,6 @@ func (u EventSubscribeStage) exec(ctx context.Context, alerts ...*alert.Alert) (
 	}
 
 	// 将原始 alert 标记为 resolved 放回 mem.Alerts，使 aggrGroup 停止重复 flush。
-	now := time.Now()
 	for _, a := range alerts {
 		resolved := a.Clone()
 		resolved.EndsAt = now

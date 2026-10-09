@@ -22,6 +22,8 @@ const (
 	ToUserIDLabel = "user"
 	// SkipSubscribeLabel indicates if the alert is from Event Subs or skip Event Subs.
 	SkipSubscribeLabel = "skipSub"
+	// SkipStoreLabel indicates if the alert should skip database storage (msg_alert, msg_internal, nlog).
+	SkipStoreLabel = "skipStore"
 	// SkipTempParamsLabel is the label name for the skip template params. Y/N
 	SkipTempParamsLabel = "skipTempParams"
 	// AppSetLabel is the label name for the target application set (business application name).

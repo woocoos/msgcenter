@@ -190,6 +190,14 @@ func (n *Notifier) saveToDB(ctx context.Context, config *profile.UmengConfig, ms
 	if n.db == nil {
 		return
 	}
+	// 如果任意 alert 带有 skipStore label，跳过数据库存储
+	if msg != nil && msg.Data != nil {
+		for _, a := range msg.Data.Alerts {
+			if _, ok := a.Labels[label.SkipStoreLabel]; ok {
+				return
+			}
+		}
+	}
 	ts, _ := notify.Tenant(ctx)
 	tid, err := strconv.Atoi(ts)
 	if err != nil {

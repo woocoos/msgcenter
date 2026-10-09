@@ -31,6 +31,10 @@ func (a *AlertCallback) PreStore(alert *alert.Alert, existing bool) error {
 	if existing {
 		return nil
 	}
+	// 如果 alert 带有 skipStore label，跳过数据库存储
+	if _, ok := alert.Labels[label.SkipStoreLabel]; ok {
+		return nil
+	}
 	fp := alert.Fingerprint().String()
 	c := a.db.MsgAlert.Create().SetLabels(&alert.Labels).SetAnnotations(&alert.Annotations).
 		SetStartsAt(alert.StartsAt).SetURL(alert.GeneratorURL).
@@ -164,6 +168,11 @@ func (n NlogCallback) updateAlerts(ctx context.Context, alerts []uint64, state a
 
 func (n NlogCallback) CreateLog(ctx context.Context, r *profile.ReceiverKey, gkey string,
 	firingAlerts, resolvedAlerts []uint64, expiresAt time.Time) (int, error) {
+	// 如果 skipStore=Y，跳过数据库写入，但返回成功让 nflog 内存 entry 正常创建
+	if notify.SkipStore(ctx) {
+		return 0, nil
+	}
+
 	var tenantID int
 	ts, _ := notify.Tenant(ctx)
 	if ts != "" {

@@ -23,6 +23,7 @@ const (
 	keyActiveTimeIntervals
 	keyTenant
 	keyMessageID
+	keySkipStore
 )
 
 // WithReceiverName populates a context with a receiver name.
@@ -150,5 +151,18 @@ func WithMessageID(ctx context.Context, id *string) context.Context {
 // MessageID extracts a message ID pointer from the context.
 func MessageID(ctx context.Context) *string {
 	v, _ := ctx.Value(keyMessageID).(*string)
+	return v
+}
+
+// WithSkipStore populates a context with a skipStore flag.
+// When true, database writes (msg_alert, msg_internal, nlog) are skipped,
+// but nflog memory entry is still created for deduplication.
+func WithSkipStore(ctx context.Context, skip bool) context.Context {
+	return context.WithValue(ctx, keySkipStore, skip)
+}
+
+// SkipStore extracts the skipStore flag from the context.
+func SkipStore(ctx context.Context) bool {
+	v, _ := ctx.Value(keySkipStore).(bool)
 	return v
 }
