@@ -7,7 +7,7 @@ import { useLeavePrompt } from '@knockout-js/layout';
 import StringRecord from '@/components/input/stringRecord';
 import { UserSelect } from '@knockout-js/org';
 import { parseGoTempKey } from '@/util';
-import { getFileRaw, parseStorageData } from '@knockout-js/api';
+import { getFileRaw, parseStorageData } from '@knockout-js/api/file';
 
 type ProFormData = {
   userID?: string;

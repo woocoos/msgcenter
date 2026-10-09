@@ -9,7 +9,7 @@ import { instanceName, setStsApi, userPermissions } from '@knockout-js/api';
 import { User } from '@knockout-js/api/ucenter';
 import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/requestInterceptor';
 import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/types";
-import { Result, message } from 'antd';
+import { Result } from 'antd';
 import { defineAppConfig, defineDataLoader } from 'ice';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import { getI18n, useTranslation } from 'react-i18next';
@@ -20,6 +20,7 @@ import { browserLanguage, getMenuAppActions } from './util';
 import { setLibraryName } from '@ice/stark-app';
 import { isInIcestark } from '@ice/stark-app';
 import { store as starkStore, event as starkEvent } from '@ice/stark-data';
+import { koMessage } from '@knockout-js/layout';
 
 const NODE_ENV = process.env.NODE_ENV ?? '',
   ICE_DEV_TOKEN = process.env.ICE_DEV_TOKEN ?? '',
@@ -154,9 +155,9 @@ export const urqlConfig = defineUrqlConfig([
         },
         error: (err, errstr) => {
           if (err.response.status === 403) {
-            message.error(getI18n().t("403"))
+            koMessage.error(getI18n().t("403"), 0)
           } else if (errstr) {
-            message.error(errstr)
+            koMessage.error(errstr, 0)
           }
           return false;
         },
@@ -268,9 +269,9 @@ export const requestConfig = defineRequestConfig({
     login: ICE_LOGIN_URL,
     error: (err, errstr) => {
       if (err?.['response']?.['status'] === 403) {
-        message.error(getI18n().t("403"))
+        koMessage.error(getI18n().t("403"), 0)
       } else if (errstr) {
-        message.error(errstr)
+        koMessage.error(errstr, 0)
       }
     }
   })

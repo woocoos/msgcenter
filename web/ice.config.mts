@@ -23,11 +23,12 @@ const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '',
 export default defineConfig(() => ({
   ssg: false,
   ssr: false,
+  dataLoader: false, // 禁用 data-loader，解决 @smithy 包的 async generator functions 转换问题
   minify,
   codeSplitting: false,//'page-vendors',
   devPublicPath: ICE_DEV_PUBLIC_PATH,
   publicPath: ICE_BUILD_PUBLIC_PATH,
-  compileDependencies: NODE_ENV === 'development' ? [] : true,
+  compileDependencies: NODE_ENV === 'development' ? false : true,
   hash: NODE_ENV === 'development' ? false : true,
   routes: {
     ignoreFiles: [

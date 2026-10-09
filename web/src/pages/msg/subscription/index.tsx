@@ -123,6 +123,7 @@ const List = () => {
           searchText: `${t('query')}`,
           resetText: `${t('reset')}`,
           labelWidth: 96,
+          searchGutter: [16, 16],
         }}
         rowKey={'id'}
         toolbar={{}}

@@ -148,7 +148,7 @@ const List = () => {
               <Space split={<Divider type="vertical" className="ko-divider-gray" />} size={0}>
                 <Typography.Link onClick={async () => {
                   const result = await getRenderMsgAlert(record.id, record.receiver);
-                  setModal({ show: true, srcDoc: result });
+                  setModal({ show: true, srcDoc: result ?? '' });
                 }}>
                   {t('view_content')}
                 </Typography.Link>
@@ -177,9 +177,9 @@ const List = () => {
           searchText: `${t('query')}`,
           resetText: `${t('reset')}`,
           labelWidth: 70,
+          searchGutter: [16, 16],
         }}
         rowKey={'id'}
-        toolbar={{}}
         scroll={{ x: tableWidth }}
         components={components}
         columns={finalColumns}
@@ -217,7 +217,7 @@ const List = () => {
         footer={null}
         width={800}
         onCancel={() => {
-          setModal({ show: false });
+          setModal({ show: false, srcDoc: '' });
         }}
       >
         <iframe style={{ width: '100%', height: '60vh', border: '0 none' }} srcDoc={modal.srcDoc} />
