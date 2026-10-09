@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
@@ -175,9 +176,44 @@ func (_u *MsgEventUpdate) SetNillableModes(v *string) *MsgEventUpdate {
 	return _u
 }
 
+// SetCanSubs sets the "can_subs" field.
+func (_u *MsgEventUpdate) SetCanSubs(v bool) *MsgEventUpdate {
+	_u.mutation.SetCanSubs(v)
+	return _u
+}
+
+// SetNillableCanSubs sets the "can_subs" field if the given value is not nil.
+func (_u *MsgEventUpdate) SetNillableCanSubs(v *bool) *MsgEventUpdate {
+	if v != nil {
+		_u.SetCanSubs(*v)
+	}
+	return _u
+}
+
+// ClearCanSubs clears the value of the "can_subs" field.
+func (_u *MsgEventUpdate) ClearCanSubs() *MsgEventUpdate {
+	_u.mutation.ClearCanSubs()
+	return _u
+}
+
 // SetMsgType sets the "msg_type" edge to the MsgType entity.
 func (_u *MsgEventUpdate) SetMsgType(v *MsgType) *MsgEventUpdate {
 	return _u.SetMsgTypeID(v.ID)
+}
+
+// AddSubscriberIDs adds the "subscribers" edge to the MsgSubscriber entity by IDs.
+func (_u *MsgEventUpdate) AddSubscriberIDs(ids ...int) *MsgEventUpdate {
+	_u.mutation.AddSubscriberIDs(ids...)
+	return _u
+}
+
+// AddSubscribers adds the "subscribers" edges to the MsgSubscriber entity.
+func (_u *MsgEventUpdate) AddSubscribers(v ...*MsgSubscriber) *MsgEventUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddSubscriberIDs(ids...)
 }
 
 // AddCustomerTemplateIDs adds the "customer_template" edge to the MsgTemplate entity by IDs.
@@ -204,6 +240,27 @@ func (_u *MsgEventUpdate) Mutation() *MsgEventMutation {
 func (_u *MsgEventUpdate) ClearMsgType() *MsgEventUpdate {
 	_u.mutation.ClearMsgType()
 	return _u
+}
+
+// ClearSubscribers clears all "subscribers" edges to the MsgSubscriber entity.
+func (_u *MsgEventUpdate) ClearSubscribers() *MsgEventUpdate {
+	_u.mutation.ClearSubscribers()
+	return _u
+}
+
+// RemoveSubscriberIDs removes the "subscribers" edge to MsgSubscriber entities by IDs.
+func (_u *MsgEventUpdate) RemoveSubscriberIDs(ids ...int) *MsgEventUpdate {
+	_u.mutation.RemoveSubscriberIDs(ids...)
+	return _u
+}
+
+// RemoveSubscribers removes "subscribers" edges to MsgSubscriber entities.
+func (_u *MsgEventUpdate) RemoveSubscribers(v ...*MsgSubscriber) *MsgEventUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveSubscriberIDs(ids...)
 }
 
 // ClearCustomerTemplate clears all "customer_template" edges to the MsgTemplate entity.
@@ -328,6 +385,12 @@ func (_u *MsgEventUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.Modes(); ok {
 		_spec.SetField(msgevent.FieldModes, field.TypeString, value)
 	}
+	if value, ok := _u.mutation.CanSubs(); ok {
+		_spec.SetField(msgevent.FieldCanSubs, field.TypeBool, value)
+	}
+	if _u.mutation.CanSubsCleared() {
+		_spec.ClearField(msgevent.FieldCanSubs, field.TypeBool)
+	}
 	if _u.mutation.MsgTypeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -354,6 +417,54 @@ func (_u *MsgEventUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			},
 		}
 		edge.Schema = _u.schemaConfig.MsgEvent
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.SubscribersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   msgevent.SubscribersTable,
+			Columns: []string{msgevent.SubscribersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgSubscriber
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedSubscribersIDs(); len(nodes) > 0 && !_u.mutation.SubscribersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   msgevent.SubscribersTable,
+			Columns: []string{msgevent.SubscribersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgSubscriber
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SubscribersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   msgevent.SubscribersTable,
+			Columns: []string{msgevent.SubscribersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -570,9 +681,44 @@ func (_u *MsgEventUpdateOne) SetNillableModes(v *string) *MsgEventUpdateOne {
 	return _u
 }
 
+// SetCanSubs sets the "can_subs" field.
+func (_u *MsgEventUpdateOne) SetCanSubs(v bool) *MsgEventUpdateOne {
+	_u.mutation.SetCanSubs(v)
+	return _u
+}
+
+// SetNillableCanSubs sets the "can_subs" field if the given value is not nil.
+func (_u *MsgEventUpdateOne) SetNillableCanSubs(v *bool) *MsgEventUpdateOne {
+	if v != nil {
+		_u.SetCanSubs(*v)
+	}
+	return _u
+}
+
+// ClearCanSubs clears the value of the "can_subs" field.
+func (_u *MsgEventUpdateOne) ClearCanSubs() *MsgEventUpdateOne {
+	_u.mutation.ClearCanSubs()
+	return _u
+}
+
 // SetMsgType sets the "msg_type" edge to the MsgType entity.
 func (_u *MsgEventUpdateOne) SetMsgType(v *MsgType) *MsgEventUpdateOne {
 	return _u.SetMsgTypeID(v.ID)
+}
+
+// AddSubscriberIDs adds the "subscribers" edge to the MsgSubscriber entity by IDs.
+func (_u *MsgEventUpdateOne) AddSubscriberIDs(ids ...int) *MsgEventUpdateOne {
+	_u.mutation.AddSubscriberIDs(ids...)
+	return _u
+}
+
+// AddSubscribers adds the "subscribers" edges to the MsgSubscriber entity.
+func (_u *MsgEventUpdateOne) AddSubscribers(v ...*MsgSubscriber) *MsgEventUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddSubscriberIDs(ids...)
 }
 
 // AddCustomerTemplateIDs adds the "customer_template" edge to the MsgTemplate entity by IDs.
@@ -599,6 +745,27 @@ func (_u *MsgEventUpdateOne) Mutation() *MsgEventMutation {
 func (_u *MsgEventUpdateOne) ClearMsgType() *MsgEventUpdateOne {
 	_u.mutation.ClearMsgType()
 	return _u
+}
+
+// ClearSubscribers clears all "subscribers" edges to the MsgSubscriber entity.
+func (_u *MsgEventUpdateOne) ClearSubscribers() *MsgEventUpdateOne {
+	_u.mutation.ClearSubscribers()
+	return _u
+}
+
+// RemoveSubscriberIDs removes the "subscribers" edge to MsgSubscriber entities by IDs.
+func (_u *MsgEventUpdateOne) RemoveSubscriberIDs(ids ...int) *MsgEventUpdateOne {
+	_u.mutation.RemoveSubscriberIDs(ids...)
+	return _u
+}
+
+// RemoveSubscribers removes "subscribers" edges to MsgSubscriber entities.
+func (_u *MsgEventUpdateOne) RemoveSubscribers(v ...*MsgSubscriber) *MsgEventUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveSubscriberIDs(ids...)
 }
 
 // ClearCustomerTemplate clears all "customer_template" edges to the MsgTemplate entity.
@@ -753,6 +920,12 @@ func (_u *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, err 
 	if value, ok := _u.mutation.Modes(); ok {
 		_spec.SetField(msgevent.FieldModes, field.TypeString, value)
 	}
+	if value, ok := _u.mutation.CanSubs(); ok {
+		_spec.SetField(msgevent.FieldCanSubs, field.TypeBool, value)
+	}
+	if _u.mutation.CanSubsCleared() {
+		_spec.ClearField(msgevent.FieldCanSubs, field.TypeBool)
+	}
 	if _u.mutation.MsgTypeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -779,6 +952,54 @@ func (_u *MsgEventUpdateOne) sqlSave(ctx context.Context) (_node *MsgEvent, err 
 			},
 		}
 		edge.Schema = _u.schemaConfig.MsgEvent
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.SubscribersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   msgevent.SubscribersTable,
+			Columns: []string{msgevent.SubscribersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgSubscriber
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedSubscribersIDs(); len(nodes) > 0 && !_u.mutation.SubscribersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   msgevent.SubscribersTable,
+			Columns: []string{msgevent.SubscribersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgSubscriber
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SubscribersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   msgevent.SubscribersTable,
+			Columns: []string{msgevent.SubscribersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgSubscriber
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}

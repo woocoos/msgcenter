@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/user"
@@ -78,6 +79,28 @@ func (_c *MsgSubscriberCreate) SetMsgTypeID(v int) *MsgSubscriberCreate {
 	return _c
 }
 
+// SetNillableMsgTypeID sets the "msg_type_id" field if the given value is not nil.
+func (_c *MsgSubscriberCreate) SetNillableMsgTypeID(v *int) *MsgSubscriberCreate {
+	if v != nil {
+		_c.SetMsgTypeID(*v)
+	}
+	return _c
+}
+
+// SetMsgEventID sets the "msg_event_id" field.
+func (_c *MsgSubscriberCreate) SetMsgEventID(v int) *MsgSubscriberCreate {
+	_c.mutation.SetMsgEventID(v)
+	return _c
+}
+
+// SetNillableMsgEventID sets the "msg_event_id" field if the given value is not nil.
+func (_c *MsgSubscriberCreate) SetNillableMsgEventID(v *int) *MsgSubscriberCreate {
+	if v != nil {
+		_c.SetMsgEventID(*v)
+	}
+	return _c
+}
+
 // SetTenantID sets the "tenant_id" field.
 func (_c *MsgSubscriberCreate) SetTenantID(v int) *MsgSubscriberCreate {
 	_c.mutation.SetTenantID(v)
@@ -135,6 +158,11 @@ func (_c *MsgSubscriberCreate) SetID(v int) *MsgSubscriberCreate {
 // SetMsgType sets the "msg_type" edge to the MsgType entity.
 func (_c *MsgSubscriberCreate) SetMsgType(v *MsgType) *MsgSubscriberCreate {
 	return _c.SetMsgTypeID(v.ID)
+}
+
+// SetMsgEvent sets the "msg_event" edge to the MsgEvent entity.
+func (_c *MsgSubscriberCreate) SetMsgEvent(v *MsgEvent) *MsgSubscriberCreate {
+	return _c.SetMsgEventID(v.ID)
 }
 
 // SetUser sets the "user" edge to the User entity.
@@ -201,14 +229,8 @@ func (_c *MsgSubscriberCreate) check() error {
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "MsgSubscriber.created_at"`)}
 	}
-	if _, ok := _c.mutation.MsgTypeID(); !ok {
-		return &ValidationError{Name: "msg_type_id", err: errors.New(`ent: missing required field "MsgSubscriber.msg_type_id"`)}
-	}
 	if _, ok := _c.mutation.TenantID(); !ok {
 		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "MsgSubscriber.tenant_id"`)}
-	}
-	if len(_c.mutation.MsgTypeIDs()) == 0 {
-		return &ValidationError{Name: "msg_type", err: errors.New(`ent: missing required edge "MsgSubscriber.msg_type"`)}
 	}
 	return nil
 }
@@ -288,6 +310,24 @@ func (_c *MsgSubscriberCreate) createSpec() (*MsgSubscriber, *sqlgraph.CreateSpe
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.MsgTypeID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.MsgEventIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   msgsubscriber.MsgEventTable,
+			Columns: []string{msgsubscriber.MsgEventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _c.schemaConfig.MsgSubscriber
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.MsgEventID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
@@ -411,6 +451,30 @@ func (u *MsgSubscriberUpsert) SetMsgTypeID(v int) *MsgSubscriberUpsert {
 // UpdateMsgTypeID sets the "msg_type_id" field to the value that was provided on create.
 func (u *MsgSubscriberUpsert) UpdateMsgTypeID() *MsgSubscriberUpsert {
 	u.SetExcluded(msgsubscriber.FieldMsgTypeID)
+	return u
+}
+
+// ClearMsgTypeID clears the value of the "msg_type_id" field.
+func (u *MsgSubscriberUpsert) ClearMsgTypeID() *MsgSubscriberUpsert {
+	u.SetNull(msgsubscriber.FieldMsgTypeID)
+	return u
+}
+
+// SetMsgEventID sets the "msg_event_id" field.
+func (u *MsgSubscriberUpsert) SetMsgEventID(v int) *MsgSubscriberUpsert {
+	u.Set(msgsubscriber.FieldMsgEventID, v)
+	return u
+}
+
+// UpdateMsgEventID sets the "msg_event_id" field to the value that was provided on create.
+func (u *MsgSubscriberUpsert) UpdateMsgEventID() *MsgSubscriberUpsert {
+	u.SetExcluded(msgsubscriber.FieldMsgEventID)
+	return u
+}
+
+// ClearMsgEventID clears the value of the "msg_event_id" field.
+func (u *MsgSubscriberUpsert) ClearMsgEventID() *MsgSubscriberUpsert {
+	u.SetNull(msgsubscriber.FieldMsgEventID)
 	return u
 }
 
@@ -606,6 +670,34 @@ func (u *MsgSubscriberUpsertOne) SetMsgTypeID(v int) *MsgSubscriberUpsertOne {
 func (u *MsgSubscriberUpsertOne) UpdateMsgTypeID() *MsgSubscriberUpsertOne {
 	return u.Update(func(s *MsgSubscriberUpsert) {
 		s.UpdateMsgTypeID()
+	})
+}
+
+// ClearMsgTypeID clears the value of the "msg_type_id" field.
+func (u *MsgSubscriberUpsertOne) ClearMsgTypeID() *MsgSubscriberUpsertOne {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.ClearMsgTypeID()
+	})
+}
+
+// SetMsgEventID sets the "msg_event_id" field.
+func (u *MsgSubscriberUpsertOne) SetMsgEventID(v int) *MsgSubscriberUpsertOne {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.SetMsgEventID(v)
+	})
+}
+
+// UpdateMsgEventID sets the "msg_event_id" field to the value that was provided on create.
+func (u *MsgSubscriberUpsertOne) UpdateMsgEventID() *MsgSubscriberUpsertOne {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.UpdateMsgEventID()
+	})
+}
+
+// ClearMsgEventID clears the value of the "msg_event_id" field.
+func (u *MsgSubscriberUpsertOne) ClearMsgEventID() *MsgSubscriberUpsertOne {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.ClearMsgEventID()
 	})
 }
 
@@ -980,6 +1072,34 @@ func (u *MsgSubscriberUpsertBulk) SetMsgTypeID(v int) *MsgSubscriberUpsertBulk {
 func (u *MsgSubscriberUpsertBulk) UpdateMsgTypeID() *MsgSubscriberUpsertBulk {
 	return u.Update(func(s *MsgSubscriberUpsert) {
 		s.UpdateMsgTypeID()
+	})
+}
+
+// ClearMsgTypeID clears the value of the "msg_type_id" field.
+func (u *MsgSubscriberUpsertBulk) ClearMsgTypeID() *MsgSubscriberUpsertBulk {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.ClearMsgTypeID()
+	})
+}
+
+// SetMsgEventID sets the "msg_event_id" field.
+func (u *MsgSubscriberUpsertBulk) SetMsgEventID(v int) *MsgSubscriberUpsertBulk {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.SetMsgEventID(v)
+	})
+}
+
+// UpdateMsgEventID sets the "msg_event_id" field to the value that was provided on create.
+func (u *MsgSubscriberUpsertBulk) UpdateMsgEventID() *MsgSubscriberUpsertBulk {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.UpdateMsgEventID()
+	})
+}
+
+// ClearMsgEventID clears the value of the "msg_event_id" field.
+func (u *MsgSubscriberUpsertBulk) ClearMsgEventID() *MsgSubscriberUpsertBulk {
+	return u.Update(func(s *MsgSubscriberUpsert) {
+		s.ClearMsgEventID()
 	})
 }
 

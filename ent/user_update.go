@@ -10,10 +10,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/woocoos/msgcenter/ent/msgsilence"
 	"github.com/woocoos/msgcenter/ent/predicate"
-	"github.com/woocoos/msgcenter/ent/silence"
 	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
+	"github.com/woocoos/msgcenter/ent/userdevice"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
@@ -59,14 +60,14 @@ func (_u *UserUpdate) SetNillableDisplayName(v *string) *UserUpdate {
 	return _u
 }
 
-// AddSilenceIDs adds the "silences" edge to the Silence entity by IDs.
+// AddSilenceIDs adds the "silences" edge to the MsgSilence entity by IDs.
 func (_u *UserUpdate) AddSilenceIDs(ids ...int) *UserUpdate {
 	_u.mutation.AddSilenceIDs(ids...)
 	return _u
 }
 
-// AddSilences adds the "silences" edges to the Silence entity.
-func (_u *UserUpdate) AddSilences(v ...*Silence) *UserUpdate {
+// AddSilences adds the "silences" edges to the MsgSilence entity.
+func (_u *UserUpdate) AddSilences(v ...*MsgSilence) *UserUpdate {
 	ids := make([]int, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
@@ -89,25 +90,40 @@ func (_u *UserUpdate) AddAddresses(v ...*UserAddr) *UserUpdate {
 	return _u.AddAddressIDs(ids...)
 }
 
+// AddDeviceIDs adds the "devices" edge to the UserDevice entity by IDs.
+func (_u *UserUpdate) AddDeviceIDs(ids ...int) *UserUpdate {
+	_u.mutation.AddDeviceIDs(ids...)
+	return _u
+}
+
+// AddDevices adds the "devices" edges to the UserDevice entity.
+func (_u *UserUpdate) AddDevices(v ...*UserDevice) *UserUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDeviceIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (_u *UserUpdate) Mutation() *UserMutation {
 	return _u.mutation
 }
 
-// ClearSilences clears all "silences" edges to the Silence entity.
+// ClearSilences clears all "silences" edges to the MsgSilence entity.
 func (_u *UserUpdate) ClearSilences() *UserUpdate {
 	_u.mutation.ClearSilences()
 	return _u
 }
 
-// RemoveSilenceIDs removes the "silences" edge to Silence entities by IDs.
+// RemoveSilenceIDs removes the "silences" edge to MsgSilence entities by IDs.
 func (_u *UserUpdate) RemoveSilenceIDs(ids ...int) *UserUpdate {
 	_u.mutation.RemoveSilenceIDs(ids...)
 	return _u
 }
 
-// RemoveSilences removes "silences" edges to Silence entities.
-func (_u *UserUpdate) RemoveSilences(v ...*Silence) *UserUpdate {
+// RemoveSilences removes "silences" edges to MsgSilence entities.
+func (_u *UserUpdate) RemoveSilences(v ...*MsgSilence) *UserUpdate {
 	ids := make([]int, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
@@ -134,6 +150,27 @@ func (_u *UserUpdate) RemoveAddresses(v ...*UserAddr) *UserUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveAddressIDs(ids...)
+}
+
+// ClearDevices clears all "devices" edges to the UserDevice entity.
+func (_u *UserUpdate) ClearDevices() *UserUpdate {
+	_u.mutation.ClearDevices()
+	return _u
+}
+
+// RemoveDeviceIDs removes the "devices" edge to UserDevice entities by IDs.
+func (_u *UserUpdate) RemoveDeviceIDs(ids ...int) *UserUpdate {
+	_u.mutation.RemoveDeviceIDs(ids...)
+	return _u
+}
+
+// RemoveDevices removes "devices" edges to UserDevice entities.
+func (_u *UserUpdate) RemoveDevices(v ...*UserDevice) *UserUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDeviceIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -186,10 +223,10 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{user.SilencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(msgsilence.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = _u.schemaConfig.Silence
+		edge.Schema = _u.schemaConfig.MsgSilence
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := _u.mutation.RemovedSilencesIDs(); len(nodes) > 0 && !_u.mutation.SilencesCleared() {
@@ -200,10 +237,10 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{user.SilencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(msgsilence.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = _u.schemaConfig.Silence
+		edge.Schema = _u.schemaConfig.MsgSilence
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -217,10 +254,10 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{user.SilencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(msgsilence.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = _u.schemaConfig.Silence
+		edge.Schema = _u.schemaConfig.MsgSilence
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -269,6 +306,54 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			},
 		}
 		edge.Schema = _u.schemaConfig.UserAddr
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DevicesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DevicesTable,
+			Columns: []string{user.DevicesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userdevice.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.UserDevice
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDevicesIDs(); len(nodes) > 0 && !_u.mutation.DevicesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DevicesTable,
+			Columns: []string{user.DevicesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userdevice.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.UserDevice
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DevicesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DevicesTable,
+			Columns: []string{user.DevicesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userdevice.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.UserDevice
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -324,14 +409,14 @@ func (_u *UserUpdateOne) SetNillableDisplayName(v *string) *UserUpdateOne {
 	return _u
 }
 
-// AddSilenceIDs adds the "silences" edge to the Silence entity by IDs.
+// AddSilenceIDs adds the "silences" edge to the MsgSilence entity by IDs.
 func (_u *UserUpdateOne) AddSilenceIDs(ids ...int) *UserUpdateOne {
 	_u.mutation.AddSilenceIDs(ids...)
 	return _u
 }
 
-// AddSilences adds the "silences" edges to the Silence entity.
-func (_u *UserUpdateOne) AddSilences(v ...*Silence) *UserUpdateOne {
+// AddSilences adds the "silences" edges to the MsgSilence entity.
+func (_u *UserUpdateOne) AddSilences(v ...*MsgSilence) *UserUpdateOne {
 	ids := make([]int, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
@@ -354,25 +439,40 @@ func (_u *UserUpdateOne) AddAddresses(v ...*UserAddr) *UserUpdateOne {
 	return _u.AddAddressIDs(ids...)
 }
 
+// AddDeviceIDs adds the "devices" edge to the UserDevice entity by IDs.
+func (_u *UserUpdateOne) AddDeviceIDs(ids ...int) *UserUpdateOne {
+	_u.mutation.AddDeviceIDs(ids...)
+	return _u
+}
+
+// AddDevices adds the "devices" edges to the UserDevice entity.
+func (_u *UserUpdateOne) AddDevices(v ...*UserDevice) *UserUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddDeviceIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (_u *UserUpdateOne) Mutation() *UserMutation {
 	return _u.mutation
 }
 
-// ClearSilences clears all "silences" edges to the Silence entity.
+// ClearSilences clears all "silences" edges to the MsgSilence entity.
 func (_u *UserUpdateOne) ClearSilences() *UserUpdateOne {
 	_u.mutation.ClearSilences()
 	return _u
 }
 
-// RemoveSilenceIDs removes the "silences" edge to Silence entities by IDs.
+// RemoveSilenceIDs removes the "silences" edge to MsgSilence entities by IDs.
 func (_u *UserUpdateOne) RemoveSilenceIDs(ids ...int) *UserUpdateOne {
 	_u.mutation.RemoveSilenceIDs(ids...)
 	return _u
 }
 
-// RemoveSilences removes "silences" edges to Silence entities.
-func (_u *UserUpdateOne) RemoveSilences(v ...*Silence) *UserUpdateOne {
+// RemoveSilences removes "silences" edges to MsgSilence entities.
+func (_u *UserUpdateOne) RemoveSilences(v ...*MsgSilence) *UserUpdateOne {
 	ids := make([]int, len(v))
 	for i := range v {
 		ids[i] = v[i].ID
@@ -399,6 +499,27 @@ func (_u *UserUpdateOne) RemoveAddresses(v ...*UserAddr) *UserUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveAddressIDs(ids...)
+}
+
+// ClearDevices clears all "devices" edges to the UserDevice entity.
+func (_u *UserUpdateOne) ClearDevices() *UserUpdateOne {
+	_u.mutation.ClearDevices()
+	return _u
+}
+
+// RemoveDeviceIDs removes the "devices" edge to UserDevice entities by IDs.
+func (_u *UserUpdateOne) RemoveDeviceIDs(ids ...int) *UserUpdateOne {
+	_u.mutation.RemoveDeviceIDs(ids...)
+	return _u
+}
+
+// RemoveDevices removes "devices" edges to UserDevice entities.
+func (_u *UserUpdateOne) RemoveDevices(v ...*UserDevice) *UserUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveDeviceIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -481,10 +602,10 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 			Columns: []string{user.SilencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(msgsilence.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = _u.schemaConfig.Silence
+		edge.Schema = _u.schemaConfig.MsgSilence
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := _u.mutation.RemovedSilencesIDs(); len(nodes) > 0 && !_u.mutation.SilencesCleared() {
@@ -495,10 +616,10 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 			Columns: []string{user.SilencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(msgsilence.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = _u.schemaConfig.Silence
+		edge.Schema = _u.schemaConfig.MsgSilence
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -512,10 +633,10 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 			Columns: []string{user.SilencesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(silence.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(msgsilence.FieldID, field.TypeInt),
 			},
 		}
-		edge.Schema = _u.schemaConfig.Silence
+		edge.Schema = _u.schemaConfig.MsgSilence
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -564,6 +685,54 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 			},
 		}
 		edge.Schema = _u.schemaConfig.UserAddr
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.DevicesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DevicesTable,
+			Columns: []string{user.DevicesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userdevice.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.UserDevice
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedDevicesIDs(); len(nodes) > 0 && !_u.mutation.DevicesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DevicesTable,
+			Columns: []string{user.DevicesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userdevice.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.UserDevice
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.DevicesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DevicesTable,
+			Columns: []string{user.DevicesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userdevice.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.UserDevice
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}

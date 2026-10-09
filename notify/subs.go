@@ -2,6 +2,9 @@ package notify
 
 import (
 	"context"
+	"strconv"
+	"time"
+
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/service/provider"
@@ -52,21 +55,82 @@ func (u EventSubscribeStage) exec(ctx context.Context, alerts ...*alert.Alert) (
 	if err != nil {
 		return ctx, alerts, err
 	}
-	if len(uis) == 0 {
+
+	// Collect user IDs from subscribers.
+	seen := make(map[string]struct{})
+	var userIDs []string
+	for _, ui := range uis {
+		if ui.UserID == "" {
+			continue
+		}
+		if _, ok := seen[ui.UserID]; !ok {
+			seen[ui.UserID] = struct{}{}
+			userIDs = append(userIDs, ui.UserID)
+		}
+	}
+
+	// 没有订阅用户，走正常流程
+	if len(userIDs) == 0 {
 		return ctx, alerts, nil
 	}
-	for _, ui := range uis {
-		// copy alerts
+
+	// Also extract user IDs from alert labels and merge (deduplicated).
+	labelUIDs, _ := label.UserIDsFromLabels(ga.Labels)
+	for _, id := range labelUIDs {
+		uid := strconv.Itoa(id)
+		if _, ok := seen[uid]; !ok {
+			seen[uid] = struct{}{}
+			userIDs = append(userIDs, uid)
+		}
+	}
+
+	// 优化：统一时间基准，避免多次调用 time.Now() 导致时间不一致
+	now := time.Now()
+	fallbackEndsAt := now.Add(5 * time.Minute)
+
+	for _, uid := range userIDs {
 		uls := make([]*alert.Alert, len(alerts))
 		for i, a := range alerts {
 			ac := a.Clone()
-			ac.Labels[label.ToUserIDLabel] = ui.UserID
+			// flush 清空了副本 EndsAt。原始 alert 在 aggrGroup store 中，不在 mem.Alerts 中，
+			// 多个 receiver pipeline 并发执行此 stage，共享 mem.Alerts，Get 结果不可靠。
+			// 查找失败或原始 alert 已 resolved 时用 now+5min 兜底，确保 clone 处于 firing 状态。
+			if ac.EndsAt.IsZero() || ac.StartsAt.IsZero() {
+				if orig, err := u.alerts.Get(a.Fingerprint()); err == nil && !orig.Resolved() {
+					// 只使用未 resolved 的原始 alert 恢复时间
+					if ac.StartsAt.IsZero() {
+						ac.StartsAt = orig.StartsAt
+					}
+					if ac.EndsAt.IsZero() {
+						ac.EndsAt = orig.EndsAt
+						ac.Timeout = orig.Timeout
+					}
+				}
+				// 兜底：Get 失败或原始 alert 已 resolved 时，确保 clone 有合法时间
+				if ac.EndsAt.IsZero() {
+					ac.EndsAt = fallbackEndsAt
+				}
+				if ac.StartsAt.IsZero() {
+					ac.StartsAt = now
+				}
+			}
+			ac.Labels[label.ToUserIDLabel] = uid
 			ac.Labels[label.SkipSubscribeLabel] = "Y"
 			uls[i] = ac
 		}
-		if err := u.alerts.Put(uls...); err != nil {
+		if err := u.alerts.Put(ctx, uls...); err != nil {
 			return ctx, nil, err
 		}
 	}
+
+	// 将原始 alert 标记为 resolved 放回 mem.Alerts，使 aggrGroup 停止重复 flush。
+	for _, a := range alerts {
+		resolved := a.Clone()
+		resolved.EndsAt = now
+		if err := u.alerts.Put(ctx, resolved); err != nil {
+			return ctx, nil, err
+		}
+	}
+
 	return ctx, nil, nil
 }

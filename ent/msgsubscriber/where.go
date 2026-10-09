@@ -82,6 +82,11 @@ func MsgTypeID(v int) predicate.MsgSubscriber {
 	return predicate.MsgSubscriber(sql.FieldEQ(FieldMsgTypeID, v))
 }
 
+// MsgEventID applies equality check predicate on the "msg_event_id" field. It's identical to MsgEventIDEQ.
+func MsgEventID(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldEQ(FieldMsgEventID, v))
+}
+
 // TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
 func TenantID(v int) predicate.MsgSubscriber {
 	return predicate.MsgSubscriber(sql.FieldEQ(FieldTenantID, v))
@@ -302,6 +307,46 @@ func MsgTypeIDNotIn(vs ...int) predicate.MsgSubscriber {
 	return predicate.MsgSubscriber(sql.FieldNotIn(FieldMsgTypeID, vs...))
 }
 
+// MsgTypeIDIsNil applies the IsNil predicate on the "msg_type_id" field.
+func MsgTypeIDIsNil() predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldIsNull(FieldMsgTypeID))
+}
+
+// MsgTypeIDNotNil applies the NotNil predicate on the "msg_type_id" field.
+func MsgTypeIDNotNil() predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldNotNull(FieldMsgTypeID))
+}
+
+// MsgEventIDEQ applies the EQ predicate on the "msg_event_id" field.
+func MsgEventIDEQ(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldEQ(FieldMsgEventID, v))
+}
+
+// MsgEventIDNEQ applies the NEQ predicate on the "msg_event_id" field.
+func MsgEventIDNEQ(v int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldNEQ(FieldMsgEventID, v))
+}
+
+// MsgEventIDIn applies the In predicate on the "msg_event_id" field.
+func MsgEventIDIn(vs ...int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldIn(FieldMsgEventID, vs...))
+}
+
+// MsgEventIDNotIn applies the NotIn predicate on the "msg_event_id" field.
+func MsgEventIDNotIn(vs ...int) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldNotIn(FieldMsgEventID, vs...))
+}
+
+// MsgEventIDIsNil applies the IsNil predicate on the "msg_event_id" field.
+func MsgEventIDIsNil() predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldIsNull(FieldMsgEventID))
+}
+
+// MsgEventIDNotNil applies the NotNil predicate on the "msg_event_id" field.
+func MsgEventIDNotNil() predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(sql.FieldNotNull(FieldMsgEventID))
+}
+
 // TenantIDEQ applies the EQ predicate on the "tenant_id" field.
 func TenantIDEQ(v int) predicate.MsgSubscriber {
 	return predicate.MsgSubscriber(sql.FieldEQ(FieldTenantID, v))
@@ -462,6 +507,35 @@ func HasMsgTypeWith(preds ...predicate.MsgType) predicate.MsgSubscriber {
 		step := newMsgTypeStep()
 		schemaConfig := internal.SchemaConfigFromContext(s.Context())
 		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgSubscriber
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasMsgEvent applies the HasEdge predicate on the "msg_event" edge.
+func HasMsgEvent() predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, MsgEventTable, MsgEventColumn),
+		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgEvent
+		step.Edge.Schema = schemaConfig.MsgSubscriber
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMsgEventWith applies the HasEdge predicate on the "msg_event" edge with a given conditions (other predicates).
+func HasMsgEventWith(preds ...predicate.MsgEvent) predicate.MsgSubscriber {
+	return predicate.MsgSubscriber(func(s *sql.Selector) {
+		step := newMsgEventStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgEvent
 		step.Edge.Schema = schemaConfig.MsgSubscriber
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

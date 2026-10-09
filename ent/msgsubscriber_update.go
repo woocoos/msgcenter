@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
@@ -90,6 +91,32 @@ func (_u *MsgSubscriberUpdate) SetNillableMsgTypeID(v *int) *MsgSubscriberUpdate
 	if v != nil {
 		_u.SetMsgTypeID(*v)
 	}
+	return _u
+}
+
+// ClearMsgTypeID clears the value of the "msg_type_id" field.
+func (_u *MsgSubscriberUpdate) ClearMsgTypeID() *MsgSubscriberUpdate {
+	_u.mutation.ClearMsgTypeID()
+	return _u
+}
+
+// SetMsgEventID sets the "msg_event_id" field.
+func (_u *MsgSubscriberUpdate) SetMsgEventID(v int) *MsgSubscriberUpdate {
+	_u.mutation.SetMsgEventID(v)
+	return _u
+}
+
+// SetNillableMsgEventID sets the "msg_event_id" field if the given value is not nil.
+func (_u *MsgSubscriberUpdate) SetNillableMsgEventID(v *int) *MsgSubscriberUpdate {
+	if v != nil {
+		_u.SetMsgEventID(*v)
+	}
+	return _u
+}
+
+// ClearMsgEventID clears the value of the "msg_event_id" field.
+func (_u *MsgSubscriberUpdate) ClearMsgEventID() *MsgSubscriberUpdate {
+	_u.mutation.ClearMsgEventID()
 	return _u
 }
 
@@ -186,6 +213,11 @@ func (_u *MsgSubscriberUpdate) SetMsgType(v *MsgType) *MsgSubscriberUpdate {
 	return _u.SetMsgTypeID(v.ID)
 }
 
+// SetMsgEvent sets the "msg_event" edge to the MsgEvent entity.
+func (_u *MsgSubscriberUpdate) SetMsgEvent(v *MsgEvent) *MsgSubscriberUpdate {
+	return _u.SetMsgEventID(v.ID)
+}
+
 // SetUser sets the "user" edge to the User entity.
 func (_u *MsgSubscriberUpdate) SetUser(v *User) *MsgSubscriberUpdate {
 	return _u.SetUserID(v.ID)
@@ -199,6 +231,12 @@ func (_u *MsgSubscriberUpdate) Mutation() *MsgSubscriberMutation {
 // ClearMsgType clears the "msg_type" edge to the MsgType entity.
 func (_u *MsgSubscriberUpdate) ClearMsgType() *MsgSubscriberUpdate {
 	_u.mutation.ClearMsgType()
+	return _u
+}
+
+// ClearMsgEvent clears the "msg_event" edge to the MsgEvent entity.
+func (_u *MsgSubscriberUpdate) ClearMsgEvent() *MsgSubscriberUpdate {
+	_u.mutation.ClearMsgEvent()
 	return _u
 }
 
@@ -235,18 +273,7 @@ func (_u *MsgSubscriberUpdate) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (_u *MsgSubscriberUpdate) check() error {
-	if _u.mutation.MsgTypeCleared() && len(_u.mutation.MsgTypeIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "MsgSubscriber.msg_type"`)
-	}
-	return nil
-}
-
 func (_u *MsgSubscriberUpdate) sqlSave(ctx context.Context) (_node int, err error) {
-	if err := _u.check(); err != nil {
-		return _node, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(msgsubscriber.Table, msgsubscriber.Columns, sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -314,6 +341,37 @@ func (_u *MsgSubscriberUpdate) sqlSave(ctx context.Context) (_node int, err erro
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgSubscriber
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.MsgEventCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   msgsubscriber.MsgEventTable,
+			Columns: []string{msgsubscriber.MsgEventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgSubscriber
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.MsgEventIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   msgsubscriber.MsgEventTable,
+			Columns: []string{msgsubscriber.MsgEventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
 		edge.Schema = _u.schemaConfig.MsgSubscriber
@@ -436,6 +494,32 @@ func (_u *MsgSubscriberUpdateOne) SetNillableMsgTypeID(v *int) *MsgSubscriberUpd
 	return _u
 }
 
+// ClearMsgTypeID clears the value of the "msg_type_id" field.
+func (_u *MsgSubscriberUpdateOne) ClearMsgTypeID() *MsgSubscriberUpdateOne {
+	_u.mutation.ClearMsgTypeID()
+	return _u
+}
+
+// SetMsgEventID sets the "msg_event_id" field.
+func (_u *MsgSubscriberUpdateOne) SetMsgEventID(v int) *MsgSubscriberUpdateOne {
+	_u.mutation.SetMsgEventID(v)
+	return _u
+}
+
+// SetNillableMsgEventID sets the "msg_event_id" field if the given value is not nil.
+func (_u *MsgSubscriberUpdateOne) SetNillableMsgEventID(v *int) *MsgSubscriberUpdateOne {
+	if v != nil {
+		_u.SetMsgEventID(*v)
+	}
+	return _u
+}
+
+// ClearMsgEventID clears the value of the "msg_event_id" field.
+func (_u *MsgSubscriberUpdateOne) ClearMsgEventID() *MsgSubscriberUpdateOne {
+	_u.mutation.ClearMsgEventID()
+	return _u
+}
+
 // SetTenantID sets the "tenant_id" field.
 func (_u *MsgSubscriberUpdateOne) SetTenantID(v int) *MsgSubscriberUpdateOne {
 	_u.mutation.ResetTenantID()
@@ -529,6 +613,11 @@ func (_u *MsgSubscriberUpdateOne) SetMsgType(v *MsgType) *MsgSubscriberUpdateOne
 	return _u.SetMsgTypeID(v.ID)
 }
 
+// SetMsgEvent sets the "msg_event" edge to the MsgEvent entity.
+func (_u *MsgSubscriberUpdateOne) SetMsgEvent(v *MsgEvent) *MsgSubscriberUpdateOne {
+	return _u.SetMsgEventID(v.ID)
+}
+
 // SetUser sets the "user" edge to the User entity.
 func (_u *MsgSubscriberUpdateOne) SetUser(v *User) *MsgSubscriberUpdateOne {
 	return _u.SetUserID(v.ID)
@@ -542,6 +631,12 @@ func (_u *MsgSubscriberUpdateOne) Mutation() *MsgSubscriberMutation {
 // ClearMsgType clears the "msg_type" edge to the MsgType entity.
 func (_u *MsgSubscriberUpdateOne) ClearMsgType() *MsgSubscriberUpdateOne {
 	_u.mutation.ClearMsgType()
+	return _u
+}
+
+// ClearMsgEvent clears the "msg_event" edge to the MsgEvent entity.
+func (_u *MsgSubscriberUpdateOne) ClearMsgEvent() *MsgSubscriberUpdateOne {
+	_u.mutation.ClearMsgEvent()
 	return _u
 }
 
@@ -591,18 +686,7 @@ func (_u *MsgSubscriberUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (_u *MsgSubscriberUpdateOne) check() error {
-	if _u.mutation.MsgTypeCleared() && len(_u.mutation.MsgTypeIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "MsgSubscriber.msg_type"`)
-	}
-	return nil
-}
-
 func (_u *MsgSubscriberUpdateOne) sqlSave(ctx context.Context) (_node *MsgSubscriber, err error) {
-	if err := _u.check(); err != nil {
-		return _node, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(msgsubscriber.Table, msgsubscriber.Columns, sqlgraph.NewFieldSpec(msgsubscriber.FieldID, field.TypeInt))
 	id, ok := _u.mutation.ID()
 	if !ok {
@@ -687,6 +771,37 @@ func (_u *MsgSubscriberUpdateOne) sqlSave(ctx context.Context) (_node *MsgSubscr
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(msgtype.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgSubscriber
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.MsgEventCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   msgsubscriber.MsgEventTable,
+			Columns: []string{msgsubscriber.MsgEventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgSubscriber
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.MsgEventIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   msgsubscriber.MsgEventTable,
+			Columns: []string{msgsubscriber.MsgEventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgevent.FieldID, field.TypeInt),
 			},
 		}
 		edge.Schema = _u.schemaConfig.MsgSubscriber

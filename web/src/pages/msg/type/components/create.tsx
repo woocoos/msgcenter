@@ -144,7 +144,7 @@ export default (props: {
           { required: true, message: `${t('please_enter_category')}` },
         ]}
       >
-        <DictSelect dictCode="MsgCategory" />
+        <DictSelect dictCode="MsgCategory" allowClear />
       </ProFormText>
       <ProFormText
         name="name"

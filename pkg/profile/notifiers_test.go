@@ -69,7 +69,7 @@ url: 'http://example.com'
 			name:   "Webhook URL is required",
 			cfgStr: ``,
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorContains(t, err, "url must be configured")
+				return assert.ErrorContains(t, err, "one of url or urlFile must be configured")
 			},
 		},
 		{

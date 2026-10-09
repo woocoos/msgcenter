@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"strconv"
+	"time"
+
 	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgalert"
@@ -12,8 +15,6 @@ import (
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service/provider/mem"
 	"go.uber.org/zap"
-	"strconv"
-	"time"
 )
 
 var (
@@ -28,6 +29,10 @@ type AlertCallback struct {
 
 func (a *AlertCallback) PreStore(alert *alert.Alert, existing bool) error {
 	if existing {
+		return nil
+	}
+	// 如果 alert 带有 skipStore label，跳过数据库存储
+	if _, ok := alert.Labels[label.SkipStoreLabel]; ok {
 		return nil
 	}
 	fp := alert.Fingerprint().String()
@@ -48,8 +53,17 @@ func (a *AlertCallback) PreStore(alert *alert.Alert, existing bool) error {
 	} else {
 		c.SetTenantID(0)
 	}
-	//id := alert.Fingerprint()
-	return c.Exec(schemax.SkipTenantPrivacy(context.Background()))
+	// Save and get the database ID
+	saved, err := c.Save(schemax.SkipTenantPrivacy(context.Background()))
+	if err != nil {
+		return err
+	}
+	// Store the ID in annotation for downstream consumers
+	if alert.Annotations == nil {
+		alert.Annotations = make(label.LabelSet)
+	}
+	alert.Annotations[label.AlertIDAnnotation] = strconv.Itoa(saved.ID)
+	return nil
 }
 
 func (a *AlertCallback) PostStore(alert *alert.Alert, existing bool) {
@@ -72,6 +86,10 @@ func (a *AlertCallback) PostDelete(alert *alert.Alert) {
 	if err != nil {
 		logger.Error("delete alert error", zap.Error(err))
 	}
+}
+
+// PostGC is N/A for Db
+func (a *AlertCallback) PostGC(fps []label.Fingerprint) {
 }
 
 type NlogCallback struct {
@@ -150,6 +168,11 @@ func (n NlogCallback) updateAlerts(ctx context.Context, alerts []uint64, state a
 
 func (n NlogCallback) CreateLog(ctx context.Context, r *profile.ReceiverKey, gkey string,
 	firingAlerts, resolvedAlerts []uint64, expiresAt time.Time) (int, error) {
+	// 如果 skipStore=Y，跳过数据库写入，但返回成功让 nflog 内存 entry 正常创建
+	if notify.SkipStore(ctx) {
+		return 0, nil
+	}
+
 	var tenantID int
 	ts, _ := notify.Tenant(ctx)
 	if ts != "" {
@@ -175,11 +198,17 @@ func (n NlogCallback) CreateLog(ctx context.Context, r *profile.ReceiverKey, gke
 		}
 		alertids = append(alertids, ids...)
 	}
-	row, err := n.db.Nlog.Create().SetTenantID(tenantID).SetReceiver(r.Name).
+	create := n.db.Nlog.Create().SetTenantID(tenantID).SetReceiver(r.Name).
 		SetGroupKey(gkey).SetReceiverType(profile.ReceiverType(r.Integration)).SetIdx(int(r.Index)).
 		SetExpiresAt(expiresAt).SetSendAt(time.Now()).
-		AddAlertIDs(alertids...).
-		Save(tctx)
+		AddAlertIDs(alertids...)
+
+	// 从 context 读取 email notifier 写入的 message_id
+	if ptr := notify.MessageID(ctx); ptr != nil && *ptr != "" {
+		create = create.SetMessageID(*ptr)
+	}
+
+	row, err := create.Save(tctx)
 
 	if err != nil {
 		return 0, err

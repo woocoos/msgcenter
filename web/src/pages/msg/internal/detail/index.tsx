@@ -1,20 +1,21 @@
 import { MsgInternalTo } from "@/generated/msgsrv/graphql";
 import { getMsgInternalToInfo, getUserMsgInternalList, markMsgRead } from "@/services/msgsrv/internal";
 import { getDate } from "@/util";
-import { PageContainer, ProCard, useToken } from "@ant-design/pro-components";
-import { Link, useSearchParams } from "@ice/runtime";
+import { ProCard } from "@ant-design/pro-components";
+import { useSearchParams } from "@ice/runtime";
 import { Divider, Empty, Typography } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./index.module.css";
 
-export default () => {
+const Detail = ({ id: propId, onRead }: { id?: string; onRead?: () => void }) => {
   const { t } = useTranslation(),
-    { token } = useToken(),
     iframeRef = useRef<HTMLIFrameElement>(null),
     [searchParams] = useSearchParams(),
     [loading, setLoading] = useState(false),
     [info, setInfo] = useState<MsgInternalTo>();
+
+  const id = propId || searchParams.get('toid') || searchParams.get('id') || '';
 
   const requestToData = async (id: string) => {
     setLoading(true)
@@ -40,14 +41,15 @@ export default () => {
   }
 
   useEffect(() => {
-    const toId = searchParams.get('toid'),
-      id = searchParams.get('id');
-    if (toId) {
-      requestToData(toId);
-    } else if (id) {
+    if (!id) return;
+    // 优先按 toId 查询
+    const isToId = propId || searchParams.get('toid');
+    if (isToId) {
+      requestToData(id);
+    } else {
       requestData(id);
     }
-  }, [searchParams])
+  }, [id])
 
   useEffect(() => {
     if (iframeRef.current && info) {
@@ -58,24 +60,13 @@ export default () => {
         iframeRef.current.style.height = `${(iframeDoc.body.scrollHeight ?? 0) + 60}px`
       }
       if (!info.readAt) {
-        markMsgRead([info.id], true)
+        markMsgRead([info.id], true);
+        onRead?.();
       }
     }
   }, [info])
 
-  return <PageContainer
-    header={{
-      title: `${t('station_msg_detail')}`,
-      style: { background: token.colorBgContainer },
-      breadcrumb: {
-        items: [
-          { title: t('msg_center') },
-          { title: <Link to={'/msg/internal'}>{t('station_msg')}</Link> },
-          { title: t('station_msg_detail') },
-        ],
-      },
-    }}
-  >
+  return (
     <ProCard loading={loading}>{
       info ? <div>
         <div style={{ textAlign: 'center' }}>
@@ -86,5 +77,7 @@ export default () => {
         <iframe ref={iframeRef} className={styles.iframe} />
       </div> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
     }</ProCard>
-  </PageContainer>
-}
+  );
+};
+
+export default Detail;

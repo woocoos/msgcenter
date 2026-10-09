@@ -1,9 +1,18 @@
+// Copyright 2023 woocoos
+//
+// Derived from Prometheus Alertmanager (https://github.com/prometheus/alertmanager).
+// Original Copyright 2016-2026 The Prometheus Authors.
+// Licensed under the Apache License 2.0.
+
 package notify
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/cenkalti/backoff/v4"
 	"github.com/tsingsun/woocoo"
 	"github.com/tsingsun/woocoo/pkg/gds/timeinterval"
@@ -16,8 +25,6 @@ import (
 	"github.com/woocoos/msgcenter/service/provider"
 	"github.com/woocoos/msgcenter/service/silence"
 	"go.uber.org/zap"
-	"sync"
-	"time"
 )
 
 var logger = log.Component("notify")
@@ -214,26 +221,29 @@ func (ms MultiStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.
 type FanoutStage []Stage
 
 // Exec attempts to execute all stages concurrently and discards the results.
-// It returns its input alerts and a types.MultiError if one or more stages fail.
+// It returns its input alerts and a combined error if one or more stages fail.
 func (fs FanoutStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.Context, []*alert.Alert, error) {
 	var (
-		wg sync.WaitGroup
-		me error
+		wg   sync.WaitGroup
+		mtx  sync.Mutex
+		errs error
 	)
 	wg.Add(len(fs))
 
 	for _, s := range fs {
 		go func(s Stage) {
 			if _, _, err := s.Exec(ctx, alerts...); err != nil {
-				me = errors.Join(me, err)
+				mtx.Lock()
+				errs = errors.Join(errs, err)
+				mtx.Unlock()
 			}
 			wg.Done()
 		}(s)
 	}
 	wg.Wait()
 
-	if me != nil {
-		return ctx, alerts, me
+	if errs != nil {
+		return ctx, alerts, errs
 	}
 	return ctx, alerts, nil
 }
@@ -254,7 +264,7 @@ func (n *MuteStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.C
 	for _, a := range alerts {
 		// TODO(fabxc): increment total alerts counter.
 		// Do not send the alert if muted.
-		if !n.muter.Mutes(a.Labels) {
+		if !n.muter.Mutes(ctx, a.Labels) {
 			filtered = append(filtered, a)
 		}
 		// TODO(fabxc): increment muted alerts counter if muted.
@@ -421,6 +431,10 @@ func (r RetryStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.C
 }
 
 func (r RetryStage) exec(ctx context.Context, alerts ...*alert.Alert) (context.Context, []*alert.Alert, error) {
+	// 注入 message_id 指针, 供 email notifier 写入, SetNotifiesStage 读取
+	var msgID string
+	ctx = WithMessageID(ctx, &msgID)
+
 	var sent []*alert.Alert
 
 	// If we shouldn't send notifications for resolved alerts, but there are only
@@ -542,6 +556,15 @@ func (n SetNotifiesStage) Exec(ctx context.Context, alerts ...*alert.Alert) (con
 		return ctx, nil, errors.New("repeat interval missing")
 	}
 	expiry := 2 * repeat
+
+	// 检查是否有 alert 带有 skipStore label，设置到 context
+	// nflog 内存 entry 仍会创建（用于 DedupStage 去重），但 DB 写入会被跳过
+	for _, a := range alerts {
+		if _, ok := a.Labels[label.SkipStoreLabel]; ok {
+			ctx = WithSkipStore(ctx, true)
+			break
+		}
+	}
 
 	return ctx, alerts, n.nflog.Log(ctx, n.recv, gkey, firing, resolved, expiry)
 }

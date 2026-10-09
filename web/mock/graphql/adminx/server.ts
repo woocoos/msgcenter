@@ -42,9 +42,9 @@ const schemaWithMocks = addMocksToSchema({
       permissions: relayStylePaginationMock(store),
     },
     Query: {
-      fileIdentitiesForOrg: () => [
-        store.get('OrgFileIdentity', 1),
-      ],
+      // fileIdentitiesForOrg: () => [
+      //   store.get('OrgFileIdentity', 1),
+      // ],
       appAccess: () => true,
       apps: relayStylePaginationMock(store),
       organizations: (_, { where }) => {

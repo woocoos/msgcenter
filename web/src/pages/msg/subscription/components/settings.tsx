@@ -4,10 +4,11 @@ import { CreateMsgSubscriberInput, MsgType } from '@/generated/msgsrv/graphql';
 import { DrawerForm } from '@ant-design/pro-components';
 import { createSub, delSub, getMsgTypeAndSubInfo } from '@/services/msgsrv/type';
 import { Radio, Skeleton, Space, Transfer, Typography, message } from 'antd';
-import { getOrgUserList, getOrgGroupList } from '@knockout-js/api';
+import { getOrgGroupList } from '@knockout-js/api';
 import store from '@/store';
 import { TransferItem } from 'antd/es/transfer';
 import { useLeavePrompt } from '@knockout-js/layout';
+import { getOrgUserList } from '@/services/adminx';
 
 type SubjectType = 'user' | 'exUser' | 'orgRole'
 
@@ -62,10 +63,11 @@ export default (props: {
         if (result?.totalCount) {
           result.edges?.forEach(item => {
             if (item?.node) {
+              const addressInfo = item.node.addresses?.find(address => address.email)
               data.push({
                 key: item.node.id,
                 name: item.node.displayName,
-                description: item.node.email || "",
+                description: addressInfo?.email || "",
               })
             }
           })
@@ -83,10 +85,11 @@ export default (props: {
         if (result?.totalCount) {
           result.edges?.forEach(item => {
             if (item?.node) {
+              const addressInfo = item.node.addresses?.find(address => address.email)
               data.push({
                 key: item.node.id,
                 name: item.node.displayName,
-                description: item.node.email || "",
+                description: addressInfo?.email || "",
               })
             }
           })
@@ -100,6 +103,9 @@ export default (props: {
         const result = await getOrgGroupList({
           current: 1,
           pageSize: 999,
+          where: {
+            orgID: userState.tenantId,
+          }
         })
         if (result?.totalCount) {
           result.edges?.forEach(item => {
@@ -125,9 +131,17 @@ export default (props: {
     onFinish = async () => {
       let isTrue = false;
       if (info) {
-        const oldKyes = info?.subscriberUsers?.map(item => item.userID as string) || [],
-          addKeys = targetKeys.filter(key => !oldKyes.includes(key)),
+        let oldKyes: string[] = [];
+        if (subject === 'user') {
+          oldKyes = info?.subscriberUsers?.map(item => item.userID as string) || [];
+        } else if (subject === 'exUser') {
+          oldKyes = info?.excludeSubscriberUsers?.map(item => item.userID as string) || [];
+        } else if (subject === 'orgRole') {
+          oldKyes = info?.subscriberRoles?.map(item => `${item.orgRoleID}`) || [];
+        }
+        const addKeys = targetKeys.filter(key => !oldKyes.includes(key)),
           delKeys = oldKyes.filter(key => !targetKeys.includes(key));
+
         setSaveLoading(true);
         if (addKeys.length) {
           const inputs = addKeys.map(key => {
@@ -164,10 +178,12 @@ export default (props: {
               id = info.subscriberRoles.find(item => `${item.orgRoleID}` == key)?.id as string
             }
             return id
-          })
-          const result = await delSub(ids);
-          if (result) {
-            isTrue = true;
+          }).filter(key => !!key)
+          if (ids.length) {
+            const result = await delSub(ids);
+            if (result) {
+              isTrue = true;
+            }
           }
         }
 
@@ -229,11 +245,18 @@ export default (props: {
             <div>
               <Transfer
                 oneWay
+                showSearch
                 dataSource={dataSource}
                 targetKeys={targetKeys}
                 onChange={(newKyes) => {
                   setSaveDisabled(false);
-                  setTargetKeys(newKyes);
+                  setTargetKeys(newKyes as string[]);
+                }}                
+                filterOption={(inputValue, option) => {
+                  const name = (option.name as string) || '';
+                  const desc = (option.description as string) || '';
+                  return name.toLowerCase().includes(inputValue.toLowerCase()) ||
+                    desc.toLowerCase().includes(inputValue.toLowerCase());
                 }}
                 render={(item) => {
                   return <div key={item.id}>

@@ -10,14 +10,14 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/woocoos/msgcenter/ent/silence"
+	"github.com/woocoos/msgcenter/ent/msgsilence"
 	"github.com/woocoos/msgcenter/ent/user"
-	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
+	"github.com/woocoos/msgcenter/service/silence"
 )
 
-// Silence is the model entity for the Silence schema.
-type Silence struct {
+// MsgSilence is the model entity for the MsgSilence schema.
+type MsgSilence struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
@@ -40,15 +40,15 @@ type Silence struct {
 	// 备注
 	Comments string `json:"comments,omitempty"`
 	// 状态
-	State alert.SilenceState `json:"state,omitempty"`
+	State silence.SilenceState `json:"state,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the SilenceQuery when eager-loading is set.
-	Edges        SilenceEdges `json:"edges"`
+	// The values are being populated by the MsgSilenceQuery when eager-loading is set.
+	Edges        MsgSilenceEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
-// SilenceEdges holds the relations/edges for other nodes in the graph.
-type SilenceEdges struct {
+// MsgSilenceEdges holds the relations/edges for other nodes in the graph.
+type MsgSilenceEdges struct {
 	// 创建人
 	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -60,7 +60,7 @@ type SilenceEdges struct {
 
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e SilenceEdges) UserOrErr() (*User, error) {
+func (e MsgSilenceEdges) UserOrErr() (*User, error) {
 	if e.User != nil {
 		return e.User, nil
 	} else if e.loadedTypes[0] {
@@ -70,17 +70,17 @@ func (e SilenceEdges) UserOrErr() (*User, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*Silence) scanValues(columns []string) ([]any, error) {
+func (*MsgSilence) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case silence.FieldMatchers:
+		case msgsilence.FieldMatchers:
 			values[i] = new([]byte)
-		case silence.FieldID, silence.FieldCreatedBy, silence.FieldUpdatedBy, silence.FieldTenantID:
+		case msgsilence.FieldID, msgsilence.FieldCreatedBy, msgsilence.FieldUpdatedBy, msgsilence.FieldTenantID:
 			values[i] = new(sql.NullInt64)
-		case silence.FieldComments, silence.FieldState:
+		case msgsilence.FieldComments, msgsilence.FieldState:
 			values[i] = new(sql.NullString)
-		case silence.FieldCreatedAt, silence.FieldUpdatedAt, silence.FieldStartsAt, silence.FieldEndsAt:
+		case msgsilence.FieldCreatedAt, msgsilence.FieldUpdatedAt, msgsilence.FieldStartsAt, msgsilence.FieldEndsAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -90,50 +90,50 @@ func (*Silence) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the Silence fields.
-func (_m *Silence) assignValues(columns []string, values []any) error {
+// to the MsgSilence fields.
+func (_m *MsgSilence) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case silence.FieldID:
+		case msgsilence.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = int(value.Int64)
-		case silence.FieldCreatedBy:
+		case msgsilence.FieldCreatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_by", values[i])
 			} else if value.Valid {
 				_m.CreatedBy = int(value.Int64)
 			}
-		case silence.FieldCreatedAt:
+		case msgsilence.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				_m.CreatedAt = value.Time
 			}
-		case silence.FieldUpdatedBy:
+		case msgsilence.FieldUpdatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
 			} else if value.Valid {
 				_m.UpdatedBy = int(value.Int64)
 			}
-		case silence.FieldUpdatedAt:
+		case msgsilence.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				_m.UpdatedAt = value.Time
 			}
-		case silence.FieldTenantID:
+		case msgsilence.FieldTenantID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
 			} else if value.Valid {
 				_m.TenantID = int(value.Int64)
 			}
-		case silence.FieldMatchers:
+		case msgsilence.FieldMatchers:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field matchers", values[i])
 			} else if value != nil && len(*value) > 0 {
@@ -141,29 +141,29 @@ func (_m *Silence) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field matchers: %w", err)
 				}
 			}
-		case silence.FieldStartsAt:
+		case msgsilence.FieldStartsAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field starts_at", values[i])
 			} else if value.Valid {
 				_m.StartsAt = value.Time
 			}
-		case silence.FieldEndsAt:
+		case msgsilence.FieldEndsAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field ends_at", values[i])
 			} else if value.Valid {
 				_m.EndsAt = value.Time
 			}
-		case silence.FieldComments:
+		case msgsilence.FieldComments:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field comments", values[i])
 			} else if value.Valid {
 				_m.Comments = value.String
 			}
-		case silence.FieldState:
+		case msgsilence.FieldState:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field state", values[i])
 			} else if value.Valid {
-				_m.State = alert.SilenceState(value.String)
+				_m.State = silence.SilenceState(value.String)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -172,39 +172,39 @@ func (_m *Silence) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the Silence.
+// Value returns the ent.Value that was dynamically selected and assigned to the MsgSilence.
 // This includes values selected through modifiers, order, etc.
-func (_m *Silence) Value(name string) (ent.Value, error) {
+func (_m *MsgSilence) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
 }
 
-// QueryUser queries the "user" edge of the Silence entity.
-func (_m *Silence) QueryUser() *UserQuery {
-	return NewSilenceClient(_m.config).QueryUser(_m)
+// QueryUser queries the "user" edge of the MsgSilence entity.
+func (_m *MsgSilence) QueryUser() *UserQuery {
+	return NewMsgSilenceClient(_m.config).QueryUser(_m)
 }
 
-// Update returns a builder for updating this Silence.
-// Note that you need to call Silence.Unwrap() before calling this method if this Silence
+// Update returns a builder for updating this MsgSilence.
+// Note that you need to call MsgSilence.Unwrap() before calling this method if this MsgSilence
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (_m *Silence) Update() *SilenceUpdateOne {
-	return NewSilenceClient(_m.config).UpdateOne(_m)
+func (_m *MsgSilence) Update() *MsgSilenceUpdateOne {
+	return NewMsgSilenceClient(_m.config).UpdateOne(_m)
 }
 
-// Unwrap unwraps the Silence entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the MsgSilence entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (_m *Silence) Unwrap() *Silence {
+func (_m *MsgSilence) Unwrap() *MsgSilence {
 	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: Silence is not a transactional entity")
+		panic("ent: MsgSilence is not a transactional entity")
 	}
 	_m.config.driver = _tx.drv
 	return _m
 }
 
 // String implements the fmt.Stringer.
-func (_m *Silence) String() string {
+func (_m *MsgSilence) String() string {
 	var builder strings.Builder
-	builder.WriteString("Silence(")
+	builder.WriteString("MsgSilence(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_by=")
 	builder.WriteString(fmt.Sprintf("%v", _m.CreatedBy))
@@ -239,5 +239,5 @@ func (_m *Silence) String() string {
 	return builder.String()
 }
 
-// Silences is a parsable slice of Silence.
-type Silences []*Silence
+// MsgSilences is a parsable slice of MsgSilence.
+type MsgSilences []*MsgSilence
