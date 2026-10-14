@@ -54,6 +54,7 @@ const List = () => {
           filters: true,
           valueEnum: EnumNlogReceiverType,
         },
+        { title: t('msg_log_errMsg'), dataIndex: 'errMsg', width: 200, search: false, ellipsis: true },
         // 占位列
         { search: false, hideInSetting: true },
       ],

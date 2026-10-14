@@ -180,6 +180,7 @@ export default {
     msg_log_groupKey: '分组键',
     msg_log_receiver: '接收组名称',
     msg_log_receiverType: '接收组类型',
+    msg_log_errMsg: '错误信息',
     msg_log: '消息日志',
     msg_log_list: '消息日志列表',
     msg_event_config_tip: '修改后请重新启用后生效',

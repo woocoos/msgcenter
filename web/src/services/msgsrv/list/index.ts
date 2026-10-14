@@ -68,7 +68,7 @@ const queryMsgAlertLogList = gql(/* GraphQL */`query msgAlertLogList($gid:GID!,$
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
-            id,sendAt,expiresAt,groupKey,receiver,receiverType
+            id,sendAt,expiresAt,groupKey,receiver,receiverType,errMsg
           }
         }
       }

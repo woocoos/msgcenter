@@ -177,6 +177,7 @@ export default {
     msg_log_groupKey: 'block key',
     msg_log_receiver: 'receiving group name',
     msg_log_receiverType: 'receiving group type',
+    msg_log_errMsg: 'error message',
     msg_log: 'message log',
     msg_log_list: 'Message log list',
     msg_event_config_tip: 'The modification takes effect after being enabled again',
