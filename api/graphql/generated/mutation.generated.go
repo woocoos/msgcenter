@@ -46,7 +46,7 @@ type MutationResolver interface {
 	MarkMsgInternalToReadOrUnRead(ctx context.Context, ids []int, read bool) (bool, error)
 	MarkMsgInternalToDeleted(ctx context.Context, ids []int) (bool, error)
 	TestSendEmailTpl(ctx context.Context, tplID int, email string, labels map[string]string, annotations map[string]string) (bool, error)
-	TestSendMessageTpl(ctx context.Context, tplID int, userID int, labels map[string]string, annotations map[string]string) (bool, error)
+	TestSendMessageTpl(ctx context.Context, tplID int, userID *int, labels map[string]string, annotations map[string]string) (bool, error)
 	RefreshTemplateParams(ctx context.Context) (bool, error)
 }
 
@@ -794,18 +794,18 @@ func (ec *executionContext) field_Mutation_testSendMessageTpl_argsTplID(
 func (ec *executionContext) field_Mutation_testSendMessageTpl_argsUserID(
 	ctx context.Context,
 	rawArgs map[string]any,
-) (int, error) {
+) (*int, error) {
 	if _, ok := rawArgs["userID"]; !ok {
-		var zeroVal int
+		var zeroVal *int
 		return zeroVal, nil
 	}
 
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
 	if tmp, ok := rawArgs["userID"]; ok {
-		return ec.unmarshalNID2int(ctx, tmp)
+		return ec.unmarshalOID2ᚖint(ctx, tmp)
 	}
 
-	var zeroVal int
+	var zeroVal *int
 	return zeroVal, nil
 }
 
@@ -3154,7 +3154,7 @@ func (ec *executionContext) _Mutation_testSendMessageTpl(ctx context.Context, fi
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().TestSendMessageTpl(rctx, fc.Args["tplID"].(int), fc.Args["userID"].(int), fc.Args["labels"].(map[string]string), fc.Args["annotations"].(map[string]string))
+		return ec.resolvers.Mutation().TestSendMessageTpl(rctx, fc.Args["tplID"].(int), fc.Args["userID"].(*int), fc.Args["labels"].(map[string]string), fc.Args["annotations"].(map[string]string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

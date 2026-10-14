@@ -575,7 +575,7 @@ func (r *mutationResolver) TestSendEmailTpl(ctx context.Context, tplID int, emai
 }
 
 // TestSendMessageTpl is the resolver for the testSendMessageTpl field.
-func (r *mutationResolver) TestSendMessageTpl(ctx context.Context, tplID int, userID int, labels map[string]string, annotations map[string]string) (bool, error) {
+func (r *mutationResolver) TestSendMessageTpl(ctx context.Context, tplID int, userID *int, labels map[string]string, annotations map[string]string) (bool, error) {
 	client := ent.FromContext(ctx)
 	temp, err := client.MsgTemplate.Query().Where(msgtemplate.ID(tplID)).WithEvent().Only(ctx)
 	if err != nil {
@@ -594,7 +594,9 @@ func (r *mutationResolver) TestSendMessageTpl(ctx context.Context, tplID int, us
 		"tenant":    strconv.Itoa(tid),
 		"skipSub":   "Y",
 		"timestamp": strconv.Itoa(int(time.Now().Unix())),
-		"user":      strconv.Itoa(userID),
+	}
+	if userID != nil {
+		defaultLabels["user"] = strconv.Itoa(*userID)
 	}
 	if labels == nil {
 		labels = map[string]string{}

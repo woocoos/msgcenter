@@ -157,7 +157,7 @@ const List = () => {
               }
               <Auth authKey={['testSendMessageTpl', 'testSendEmailTpl']} keyAndOr='or'>
                 {
-                  record.status === MsgTemplateSimpleStatus.Active && record.receiverType != MsgTemplateReceiverType.Webhook ? <Typography.Link
+                  record.status === MsgTemplateSimpleStatus.Active ? <Typography.Link
                     onClick={() => {
                       setModal({
                         open: true,

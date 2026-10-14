@@ -43,7 +43,7 @@ func (MsgInternal) Fields() []ent.Field {
 		field.Int(schemax.FieldTenantID).Immutable().Comment("租户ID"),
 		field.String("category").MaxLen(20).Comment("消息类型分类"),
 		field.String("subject").Comment("标题"),
-		field.String("body").Optional().Comment("消息体").Annotations(
+		field.Text("body").Optional().Comment("消息体").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
 		field.String("format").Comment("内容类型: html,txt"),
 		field.String("redirect").Optional().Comment("消息跳转"),

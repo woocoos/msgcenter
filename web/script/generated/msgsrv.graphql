@@ -2024,7 +2024,7 @@ type Mutation {
   """ 测试邮件模板 """
   testSendEmailTpl(annotations: MapString, email: String!, labels: MapString, tplID: ID!): Boolean!
   """ 测试站内信模板 """
-  testSendMessageTpl(annotations: MapString, labels: MapString, tplID: ID!, userID: ID!): Boolean!
+  testSendMessageTpl(annotations: MapString, labels: MapString, tplID: ID!, userID: ID): Boolean!
   """ 更新消息通道 """
   updateMsgChannel(id: ID!, input: UpdateMsgChannelInput!): MsgChannel!
   """ 更新消息事件 """

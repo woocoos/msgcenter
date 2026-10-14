@@ -126,12 +126,12 @@ export default (props: {
       {info?.receiverType === MsgTemplateReceiverType.Email ? <ProFormText
         name="email"
         label={t('receive_mail')}
-      /> : <ProFormText
+      /> : (info?.receiverType !== MsgTemplateReceiverType.Webhook ? <ProFormText
         name="userID"
         label={t('receiver')}
       >
         <UserSelect changeValue="id" />
-      </ProFormText>}
+      </ProFormText> : <></>)}
       <ProFormText name="labels" label={`labels ${t('argument')}`} tooltip={`${t('default_added')}：receiver、alertname、tenant、skipSub、timestamp`}>
         <StringRecord />
       </ProFormText>

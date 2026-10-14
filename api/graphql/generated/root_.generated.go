@@ -403,7 +403,7 @@ type ComplexityRoot struct {
 		MarkMsgInternalToReadOrUnRead func(childComplexity int, ids []int, read bool) int
 		RefreshTemplateParams         func(childComplexity int) int
 		TestSendEmailTpl              func(childComplexity int, tplID int, email string, labels map[string]string, annotations map[string]string) int
-		TestSendMessageTpl            func(childComplexity int, tplID int, userID int, labels map[string]string, annotations map[string]string) int
+		TestSendMessageTpl            func(childComplexity int, tplID int, userID *int, labels map[string]string, annotations map[string]string) int
 		UpdateMsgChannel              func(childComplexity int, id int, input ent.UpdateMsgChannelInput) int
 		UpdateMsgEvent                func(childComplexity int, id int, input ent.UpdateMsgEventInput) int
 		UpdateMsgSilence              func(childComplexity int, id int, input ent.UpdateMsgSilenceInput) int
@@ -2433,7 +2433,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.TestSendMessageTpl(childComplexity, args["tplID"].(int), args["userID"].(int), args["labels"].(map[string]string), args["annotations"].(map[string]string)), true
+		return e.complexity.Mutation.TestSendMessageTpl(childComplexity, args["tplID"].(int), args["userID"].(*int), args["labels"].(map[string]string), args["annotations"].(map[string]string)), true
 
 	case "Mutation.updateMsgChannel":
 		if e.complexity.Mutation.UpdateMsgChannel == nil {
@@ -7008,7 +7008,7 @@ extend type Query {
     """ 测试邮件模板 """
     testSendEmailTpl(tplID: ID!, email: String!, labels: MapString, annotations: MapString): Boolean!
     """ 测试站内信模板 """
-    testSendMessageTpl(tplID: ID!, userID: ID!, labels: MapString, annotations: MapString): Boolean!
+    testSendMessageTpl(tplID: ID!, userID: ID, labels: MapString, annotations: MapString): Boolean!
     """ 刷新消息模板参数 """
     refreshTemplateParams: Boolean!
 }

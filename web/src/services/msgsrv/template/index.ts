@@ -96,7 +96,7 @@ const mutationTestSendEmailTpl = gql(/* GraphQL */`mutation testSendEmailTpl($an
   testSendEmailTpl(annotations: $annotations, email: $email, labels:$labels, tplID: $tplID)
 }`);
 
-const mutationTestSendMessageTpl = gql(/* GraphQL */`mutation testSendMessageTpl($annotations: MapString, $userID: ID!, $labels: MapString, $tplID: ID!){
+const mutationTestSendMessageTpl = gql(/* GraphQL */`mutation testSendMessageTpl($annotations: MapString, $userID: ID, $labels: MapString, $tplID: ID!){
   testSendMessageTpl(annotations: $annotations, userID: $userID, labels:$labels, tplID: $tplID)
 }`);
 
@@ -272,12 +272,15 @@ export async function testSendEamil(tplID: string, email: string, labels?: Recor
  * @returns
  */
 export async function testSendMessage(tplID: string, userID: string, labels?: Record<string, string>, annotations?: Record<string, string>) {
-  const result = await mutation(mutationTestSendMessageTpl, {
+  let params = {
     tplID,
-    userID,
     labels,
     annotations,
-  })
+  }
+  if (userID){
+    params[userID] = userID
+  }
+  const result = await mutation(mutationTestSendMessageTpl, params)
   if (result.data?.testSendMessageTpl) {
     return result.data.testSendMessageTpl
   }
