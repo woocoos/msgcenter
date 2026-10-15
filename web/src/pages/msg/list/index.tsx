@@ -4,7 +4,8 @@ import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components"
 import { Link } from "@ice/runtime";
 import { OrgKind } from "@knockout-js/api/ucenter";
 import { KeepAlive } from "@knockout-js/layout";
-import { OrgSelect } from "@knockout-js/org";
+import { OrgSelect, UserSelect } from "@knockout-js/org";
+import InputMsgEvent from "@/pages/msg/query/components/inputMsgEvent";
 import { Divider, Space, Typography, Tag } from "antd";
 import { definePageConfig } from "ice";
 import { useRef, useState } from "react";
@@ -40,6 +41,18 @@ const List = () => {
           title: t('org'), dataIndex: 'tenant', width: 120, hideInTable: true,
           renderFormItem: () => {
             return <OrgSelect kind={OrgKind.Root} />
+          },
+        },
+        {
+          title: t('msg_event'), dataIndex: 'alertName', width: 120, hideInTable: true,
+          renderFormItem: () => {
+            return <InputMsgEvent />;
+          },
+        },
+        {
+          title: t('receiving_user'), dataIndex: 'user', width: 160, hideInTable: true,
+          renderFormItem: () => {
+            return <UserSelect />;
           },
         },
         {
@@ -137,6 +150,8 @@ const List = () => {
           const result = await getMsgAlertList({
             current: params.current,
             pageSize: params.pageSize,
+            alertName: params?.alertName?.name,
+            userID: params?.user?.id,
             where,
           });
           if (result?.totalCount) {

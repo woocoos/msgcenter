@@ -2368,7 +2368,7 @@ type Query {
   """解析过的消息列表"""
   formatMsgAlerts(after: Cursor, alertName: String, before: Cursor, first: Int, last: Int, orderBy: MsgAlertOrder, receiverType: MsgTemplateReceiverType, userID: String, where: MsgAlertWhereInput): FormatMsgAlertConnection!
   """消息列表"""
-  msgAlerts(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: MsgAlertOrder, where: MsgAlertWhereInput): MsgAlertConnection!
+  msgAlerts(after: Cursor, alertName: String, before: Cursor, first: Int, last: Int, orderBy: MsgAlertOrder, userID: String, where: MsgAlertWhereInput): MsgAlertConnection!
   """ 消息通道列表 """
   msgChannels(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: MsgChannelOrder, where: MsgChannelWhereInput): MsgChannelConnection!
   """ 消息事件列表 """

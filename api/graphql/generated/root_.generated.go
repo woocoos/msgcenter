@@ -478,7 +478,7 @@ type ComplexityRoot struct {
 		DeviceConnected                       func(childComplexity int, deviceID string) int
 		FormatMsgAlertMore                    func(childComplexity int, msgAlertID int) int
 		FormatMsgAlerts                       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, alertName *string, userID *string, receiverType *profile.ReceiverType, where *ent.MsgAlertWhereInput, orderBy *ent.MsgAlertOrder) int
-		MsgAlerts                             func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) int
+		MsgAlerts                             func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, alertName *string, userID *string, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) int
 		MsgChannels                           func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgChannelOrder, where *ent.MsgChannelWhereInput) int
 		MsgEvents                             func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) int
 		MsgInternalTos                        func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) int
@@ -2840,7 +2840,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.MsgAlerts(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.MsgAlertOrder), args["where"].(*ent.MsgAlertWhereInput)), true
+		return e.complexity.Query.MsgAlerts(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["alertName"].(*string), args["userID"].(*string), args["orderBy"].(*ent.MsgAlertOrder), args["where"].(*ent.MsgAlertWhereInput)), true
 
 	case "Query.msgChannels":
 		if e.complexity.Query.MsgChannels == nil {
@@ -6895,6 +6895,8 @@ extend type Query {
         first: Int
         before: Cursor
         last: Int
+        alertName: String
+        userID: String
         orderBy: MsgAlertOrder
         where: MsgAlertWhereInput
     ):MsgAlertConnection!

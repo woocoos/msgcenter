@@ -59,7 +59,7 @@ type QueryResolver interface {
 	MsgEvents(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgEventOrder, where *ent.MsgEventWhereInput) (*ent.MsgEventConnection, error)
 	MsgTemplates(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgTemplateOrder, where *ent.MsgTemplateWhereInput) (*ent.MsgTemplateConnection, error)
 	Silences(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgSilenceOrder, where *ent.MsgSilenceWhereInput) (*ent.MsgSilenceConnection, error)
-	MsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) (*ent.MsgAlertConnection, error)
+	MsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, alertName *string, userID *string, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) (*ent.MsgAlertConnection, error)
 	FormatMsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, alertName *string, userID *string, receiverType *profile.ReceiverType, where *ent.MsgAlertWhereInput, orderBy *ent.MsgAlertOrder) (*model.FormatMsgAlertConnection, error)
 	FormatMsgAlertMore(ctx context.Context, msgAlertID int) ([]*model.FormatMsgAlert, error)
 	RenderMsgAlert(ctx context.Context, msgAlertID int, receiver string) (*string, error)
@@ -710,16 +710,26 @@ func (ec *executionContext) field_Query_msgAlerts_args(ctx context.Context, rawA
 		return nil, err
 	}
 	args["last"] = arg3
-	arg4, err := ec.field_Query_msgAlerts_argsOrderBy(ctx, rawArgs)
+	arg4, err := ec.field_Query_msgAlerts_argsAlertName(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["orderBy"] = arg4
-	arg5, err := ec.field_Query_msgAlerts_argsWhere(ctx, rawArgs)
+	args["alertName"] = arg4
+	arg5, err := ec.field_Query_msgAlerts_argsUserID(ctx, rawArgs)
 	if err != nil {
 		return nil, err
 	}
-	args["where"] = arg5
+	args["userID"] = arg5
+	arg6, err := ec.field_Query_msgAlerts_argsOrderBy(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg6
+	arg7, err := ec.field_Query_msgAlerts_argsWhere(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg7
 	return args, nil
 }
 func (ec *executionContext) field_Query_msgAlerts_argsAfter(
@@ -791,6 +801,42 @@ func (ec *executionContext) field_Query_msgAlerts_argsLast(
 	}
 
 	var zeroVal *int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgAlerts_argsAlertName(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*string, error) {
+	if _, ok := rawArgs["alertName"]; !ok {
+		var zeroVal *string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("alertName"))
+	if tmp, ok := rawArgs["alertName"]; ok {
+		return ec.unmarshalOString2ᚖstring(ctx, tmp)
+	}
+
+	var zeroVal *string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_msgAlerts_argsUserID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*string, error) {
+	if _, ok := rawArgs["userID"]; !ok {
+		var zeroVal *string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("userID"))
+	if tmp, ok := rawArgs["userID"]; ok {
+		return ec.unmarshalOString2ᚖstring(ctx, tmp)
+	}
+
+	var zeroVal *string
 	return zeroVal, nil
 }
 
@@ -13538,7 +13584,7 @@ func (ec *executionContext) _Query_msgAlerts(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().MsgAlerts(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.MsgAlertOrder), fc.Args["where"].(*ent.MsgAlertWhereInput))
+		return ec.resolvers.Query().MsgAlerts(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["alertName"].(*string), fc.Args["userID"].(*string), fc.Args["orderBy"].(*ent.MsgAlertOrder), fc.Args["where"].(*ent.MsgAlertWhereInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

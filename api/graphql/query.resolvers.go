@@ -13,6 +13,8 @@ import (
 	"regexp"
 
 	"entgo.io/contrib/entgql"
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"github.com/woocoos/knockout-go/api/auth"
 	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/knockout-go/pkg/identity"
@@ -200,7 +202,7 @@ func (r *queryResolver) Silences(ctx context.Context, after *entgql.Cursor[int],
 }
 
 // MsgAlerts is the resolver for the msgAlerts field.
-func (r *queryResolver) MsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) (*ent.MsgAlertConnection, error) {
+func (r *queryResolver) MsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, alertName *string, userID *string, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) (*ent.MsgAlertConnection, error) {
 	tid, err := identity.TenantIDFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -210,7 +212,20 @@ func (r *queryResolver) MsgAlerts(ctx context.Context, after *entgql.Cursor[int]
 		return nil, err
 	}
 	// 查询所有子组织
-	return r.client.MsgAlert.Query().Where(msgalert.HasOrgWith(org.Or(org.PathContains(o.Path), org.Path(o.Path)))).
+	w := []predicate.MsgAlert{msgalert.HasOrgWith(org.Or(org.PathContains(o.Path), org.Path(o.Path)))}
+	if alertName != nil {
+		an := func(s *sql.Selector) {
+			s.Where(sqljson.ValueEQ(msgalert.FieldLabels, *alertName, sqljson.Path(label.AlertNameLabel)))
+		}
+		w = append(w, an)
+	}
+	if userID != nil {
+		usr := func(s *sql.Selector) {
+			s.Where(sqljson.ValueContains(msgalert.FieldLabels, userID, sqljson.Path(label.ToUserIDLabel)))
+		}
+		w = append(w, usr)
+	}
+	return r.client.MsgAlert.Query().Where(w...).
 		Paginate(schemax.SkipTenantPrivacy(ctx), after, first, before, last,
 			ent.WithMsgAlertOrder(orderBy),
 			ent.WithMsgAlertFilter(where.Filter))

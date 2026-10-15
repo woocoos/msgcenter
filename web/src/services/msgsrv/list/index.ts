@@ -27,8 +27,8 @@ export const EnumNlogReceiverType = {
   [NlogReceiverType.Umeng]: { text: 'umeng' },
 };
 
-const queryMsgAlertList = gql(/* GraphQL */`query msgAlertList($first: Int,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){
-  msgAlerts(first:$first,orderBy: $orderBy,where: $where){
+const queryMsgAlertList = gql(/* GraphQL */`query msgAlertList($first: Int,$alertName:String,$userID:String,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){
+  msgAlerts(first:$first,alertName: $alertName,userID: $userID,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -86,18 +86,27 @@ export async function getMsgAlertList(
   gather: {
     current?: number;
     pageSize?: number;
+    alertName?: string;
+    userID?: string;
     where?: MsgAlertWhereInput;
     orderBy?: MsgAlertOrder;
   }) {
-  const result = await paging(
-    queryMsgAlertList, {
+  const variables = {
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy ?? {
       direction: OrderDirection.Desc,
       field: MsgAlertOrderField.CreatedAt,
     },
-  }, gather.current || 1);
+  };
+  if (gather?.alertName) {
+    variables['alertName'] = gather?.alertName;
+  }
+  if (gather?.userID) {
+    variables['userID'] = gather?.userID;
+  }
+  const result = await paging(
+    queryMsgAlertList, variables, gather.current || 1);
 
   if (result.data?.msgAlerts) {
     return result.data.msgAlerts;
