@@ -263,7 +263,7 @@ func overrideMessageConfig(basedir, attdir string, client *ent.Client) notify.Cu
 			return err
 		}
 		ev, err := data.QueryEvent().WithMsgType(func(query *ent.MsgTypeQuery) {
-			query.Select(msgtype.FieldCategory)
+			query.Select(msgtype.FieldCategory, msgtype.FieldName)
 		}).Only(ctx)
 		if err != nil {
 			// must have
@@ -274,6 +274,7 @@ func overrideMessageConfig(basedir, attdir string, client *ent.Client) notify.Cu
 			return err
 		}
 		cfg.Extras["category"] = mt.Category
+		cfg.Extras["msgTypeName"] = mt.Name
 		cfg.Subject = data.Subject
 		if data.Format == msgtemplate.FormatHTML {
 			cfg.HTML = data.Body

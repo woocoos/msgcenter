@@ -197,6 +197,9 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 			"action":    "internal",
 			"alertName": alertNameStr,
 		}
+		if v, ok := config.Extras["msgTypeName"]; ok && v != "" {
+			extras["msgType"] = v
+		}
 		if rowID > 0 {
 			extras["actionID"] = strconv.Itoa(rowID)
 		}
