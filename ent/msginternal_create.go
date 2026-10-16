@@ -85,6 +85,20 @@ func (_c *MsgInternalCreate) SetCategory(v string) *MsgInternalCreate {
 	return _c
 }
 
+// SetMsgType sets the "msg_type" field.
+func (_c *MsgInternalCreate) SetMsgType(v string) *MsgInternalCreate {
+	_c.mutation.SetMsgType(v)
+	return _c
+}
+
+// SetNillableMsgType sets the "msg_type" field if the given value is not nil.
+func (_c *MsgInternalCreate) SetNillableMsgType(v *string) *MsgInternalCreate {
+	if v != nil {
+		_c.SetMsgType(*v)
+	}
+	return _c
+}
+
 // SetSubject sets the "subject" field.
 func (_c *MsgInternalCreate) SetSubject(v string) *MsgInternalCreate {
 	_c.mutation.SetSubject(v)
@@ -237,6 +251,11 @@ func (_c *MsgInternalCreate) check() error {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.category": %w`, err)}
 		}
 	}
+	if v, ok := _c.mutation.MsgType(); ok {
+		if err := msginternal.MsgTypeValidator(v); err != nil {
+			return &ValidationError{Name: "msg_type", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.msg_type": %w`, err)}
+		}
+	}
 	if _, ok := _c.mutation.Subject(); !ok {
 		return &ValidationError{Name: "subject", err: errors.New(`ent: missing required field "MsgInternal.subject"`)}
 	}
@@ -308,6 +327,10 @@ func (_c *MsgInternalCreate) createSpec() (*MsgInternal, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Category(); ok {
 		_spec.SetField(msginternal.FieldCategory, field.TypeString, value)
 		_node.Category = value
+	}
+	if value, ok := _c.mutation.MsgType(); ok {
+		_spec.SetField(msginternal.FieldMsgType, field.TypeString, value)
+		_node.MsgType = value
 	}
 	if value, ok := _c.mutation.Subject(); ok {
 		_spec.SetField(msginternal.FieldSubject, field.TypeString, value)
@@ -467,6 +490,24 @@ func (u *MsgInternalUpsert) SetCategory(v string) *MsgInternalUpsert {
 // UpdateCategory sets the "category" field to the value that was provided on create.
 func (u *MsgInternalUpsert) UpdateCategory() *MsgInternalUpsert {
 	u.SetExcluded(msginternal.FieldCategory)
+	return u
+}
+
+// SetMsgType sets the "msg_type" field.
+func (u *MsgInternalUpsert) SetMsgType(v string) *MsgInternalUpsert {
+	u.Set(msginternal.FieldMsgType, v)
+	return u
+}
+
+// UpdateMsgType sets the "msg_type" field to the value that was provided on create.
+func (u *MsgInternalUpsert) UpdateMsgType() *MsgInternalUpsert {
+	u.SetExcluded(msginternal.FieldMsgType)
+	return u
+}
+
+// ClearMsgType clears the value of the "msg_type" field.
+func (u *MsgInternalUpsert) ClearMsgType() *MsgInternalUpsert {
+	u.SetNull(msginternal.FieldMsgType)
 	return u
 }
 
@@ -677,6 +718,27 @@ func (u *MsgInternalUpsertOne) SetCategory(v string) *MsgInternalUpsertOne {
 func (u *MsgInternalUpsertOne) UpdateCategory() *MsgInternalUpsertOne {
 	return u.Update(func(s *MsgInternalUpsert) {
 		s.UpdateCategory()
+	})
+}
+
+// SetMsgType sets the "msg_type" field.
+func (u *MsgInternalUpsertOne) SetMsgType(v string) *MsgInternalUpsertOne {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.SetMsgType(v)
+	})
+}
+
+// UpdateMsgType sets the "msg_type" field to the value that was provided on create.
+func (u *MsgInternalUpsertOne) UpdateMsgType() *MsgInternalUpsertOne {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.UpdateMsgType()
+	})
+}
+
+// ClearMsgType clears the value of the "msg_type" field.
+func (u *MsgInternalUpsertOne) ClearMsgType() *MsgInternalUpsertOne {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.ClearMsgType()
 	})
 }
 
@@ -1068,6 +1130,27 @@ func (u *MsgInternalUpsertBulk) SetCategory(v string) *MsgInternalUpsertBulk {
 func (u *MsgInternalUpsertBulk) UpdateCategory() *MsgInternalUpsertBulk {
 	return u.Update(func(s *MsgInternalUpsert) {
 		s.UpdateCategory()
+	})
+}
+
+// SetMsgType sets the "msg_type" field.
+func (u *MsgInternalUpsertBulk) SetMsgType(v string) *MsgInternalUpsertBulk {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.SetMsgType(v)
+	})
+}
+
+// UpdateMsgType sets the "msg_type" field to the value that was provided on create.
+func (u *MsgInternalUpsertBulk) UpdateMsgType() *MsgInternalUpsertBulk {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.UpdateMsgType()
+	})
+}
+
+// ClearMsgType clears the value of the "msg_type" field.
+func (u *MsgInternalUpsertBulk) ClearMsgType() *MsgInternalUpsertBulk {
+	return u.Update(func(s *MsgInternalUpsert) {
+		s.ClearMsgType()
 	})
 }
 

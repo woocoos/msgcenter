@@ -124,6 +124,10 @@ func init() {
 	msginternalDescCategory := msginternalFields[1].Descriptor()
 	// msginternal.CategoryValidator is a validator for the "category" field. It is called by the builders before save.
 	msginternal.CategoryValidator = msginternalDescCategory.Validators[0].(func(string) error)
+	// msginternalDescMsgType is the schema descriptor for msg_type field.
+	msginternalDescMsgType := msginternalFields[2].Descriptor()
+	// msginternal.MsgTypeValidator is a validator for the "msg_type" field. It is called by the builders before save.
+	msginternal.MsgTypeValidator = msginternalDescMsgType.Validators[0].(func(string) error)
 	msginternaltoMixin := schema.MsgInternalTo{}.Mixin()
 	msginternaltoMixinHooks1 := msginternaltoMixin[1].Hooks()
 	msginternaltoMixinHooks2 := msginternaltoMixin[2].Hooks()

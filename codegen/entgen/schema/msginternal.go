@@ -42,6 +42,7 @@ func (MsgInternal) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int(schemax.FieldTenantID).Immutable().Comment("租户ID"),
 		field.String("category").MaxLen(20).Comment("消息类型分类"),
+		field.String("msg_type").MaxLen(45).Optional().Comment("消息类型名称"),
 		field.String("subject").Comment("标题"),
 		field.Text("body").Optional().Comment("消息体").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),

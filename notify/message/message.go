@@ -142,6 +142,7 @@ func (n *Notifier) Notify(ctx context.Context, alerts ...*alert.Alert) (retry bo
 			msg := tx.MsgInternal.Create().
 				SetCreatedBy(0).
 				SetCategory(config.Extras["category"]).
+				SetMsgType(config.Extras["msgTypeName"]).
 				SetReceiverType(profile.ReceiverMessage).
 				SetSubject(title).
 				SetBody(body).

@@ -226,6 +226,7 @@ type ComplexityRoot struct {
 		HasReadCounts func(childComplexity int) int
 		ID            func(childComplexity int) int
 		MsgInternalTo func(childComplexity int) int
+		MsgType       func(childComplexity int) int
 		ReceiverType  func(childComplexity int) int
 		Redirect      func(childComplexity int) int
 		Subject       func(childComplexity int) int
@@ -1414,6 +1415,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MsgInternal.MsgInternalTo(childComplexity), true
+
+	case "MsgInternal.msgType":
+		if e.complexity.MsgInternal.MsgType == nil {
+			break
+		}
+
+		return e.complexity.MsgInternal.MsgType(childComplexity), true
 
 	case "MsgInternal.receiverType":
 		if e.complexity.MsgInternal.ReceiverType == nil {
@@ -4470,6 +4478,10 @@ type MsgInternal implements Node {
   """
   category: String!
   """
+  消息类型名称
+  """
+  msgType: String
+  """
   标题
   """
   subject: String!
@@ -4810,6 +4822,24 @@ input MsgInternalWhereInput {
   categoryHasSuffix: String
   categoryEqualFold: String
   categoryContainsFold: String
+  """
+  msg_type field predicates
+  """
+  msgType: String
+  msgTypeNEQ: String
+  msgTypeIn: [String!]
+  msgTypeNotIn: [String!]
+  msgTypeGT: String
+  msgTypeGTE: String
+  msgTypeLT: String
+  msgTypeLTE: String
+  msgTypeContains: String
+  msgTypeHasPrefix: String
+  msgTypeHasSuffix: String
+  msgTypeIsNil: Boolean
+  msgTypeNotNil: Boolean
+  msgTypeEqualFold: String
+  msgTypeContainsFold: String
   """
   subject field predicates
   """

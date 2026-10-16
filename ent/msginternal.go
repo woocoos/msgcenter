@@ -31,6 +31,8 @@ type MsgInternal struct {
 	TenantID int `json:"tenant_id,omitempty"`
 	// 消息类型分类
 	Category string `json:"category,omitempty"`
+	// 消息类型名称
+	MsgType string `json:"msg_type,omitempty"`
 	// 标题
 	Subject string `json:"subject,omitempty"`
 	// 消息体
@@ -91,7 +93,7 @@ func (*MsgInternal) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case msginternal.FieldID, msginternal.FieldCreatedBy, msginternal.FieldUpdatedBy, msginternal.FieldTenantID, msginternal.FieldAlertID:
 			values[i] = new(sql.NullInt64)
-		case msginternal.FieldCategory, msginternal.FieldSubject, msginternal.FieldBody, msginternal.FieldFormat, msginternal.FieldRedirect, msginternal.FieldReceiverType:
+		case msginternal.FieldCategory, msginternal.FieldMsgType, msginternal.FieldSubject, msginternal.FieldBody, msginternal.FieldFormat, msginternal.FieldRedirect, msginternal.FieldReceiverType:
 			values[i] = new(sql.NullString)
 		case msginternal.FieldCreatedAt, msginternal.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -151,6 +153,12 @@ func (_m *MsgInternal) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field category", values[i])
 			} else if value.Valid {
 				_m.Category = value.String
+			}
+		case msginternal.FieldMsgType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field msg_type", values[i])
+			} else if value.Valid {
+				_m.MsgType = value.String
 			}
 		case msginternal.FieldSubject:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -251,6 +259,9 @@ func (_m *MsgInternal) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("category=")
 	builder.WriteString(_m.Category)
+	builder.WriteString(", ")
+	builder.WriteString("msg_type=")
+	builder.WriteString(_m.MsgType)
 	builder.WriteString(", ")
 	builder.WriteString("subject=")
 	builder.WriteString(_m.Subject)

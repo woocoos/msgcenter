@@ -1669,6 +1669,23 @@ type MsgInternalWhereInput struct {
 	CategoryEqualFold    *string  `json:"categoryEqualFold,omitempty"`
 	CategoryContainsFold *string  `json:"categoryContainsFold,omitempty"`
 
+	// "msg_type" field predicates.
+	MsgType             *string  `json:"msgType,omitempty"`
+	MsgTypeNEQ          *string  `json:"msgTypeNEQ,omitempty"`
+	MsgTypeIn           []string `json:"msgTypeIn,omitempty"`
+	MsgTypeNotIn        []string `json:"msgTypeNotIn,omitempty"`
+	MsgTypeGT           *string  `json:"msgTypeGT,omitempty"`
+	MsgTypeGTE          *string  `json:"msgTypeGTE,omitempty"`
+	MsgTypeLT           *string  `json:"msgTypeLT,omitempty"`
+	MsgTypeLTE          *string  `json:"msgTypeLTE,omitempty"`
+	MsgTypeContains     *string  `json:"msgTypeContains,omitempty"`
+	MsgTypeHasPrefix    *string  `json:"msgTypeHasPrefix,omitempty"`
+	MsgTypeHasSuffix    *string  `json:"msgTypeHasSuffix,omitempty"`
+	MsgTypeIsNil        bool     `json:"msgTypeIsNil,omitempty"`
+	MsgTypeNotNil       bool     `json:"msgTypeNotNil,omitempty"`
+	MsgTypeEqualFold    *string  `json:"msgTypeEqualFold,omitempty"`
+	MsgTypeContainsFold *string  `json:"msgTypeContainsFold,omitempty"`
+
 	// "subject" field predicates.
 	Subject             *string  `json:"subject,omitempty"`
 	SubjectNEQ          *string  `json:"subjectNEQ,omitempty"`
@@ -2004,6 +2021,51 @@ func (i *MsgInternalWhereInput) P() (predicate.MsgInternal, error) {
 	}
 	if i.CategoryContainsFold != nil {
 		predicates = append(predicates, msginternal.CategoryContainsFold(*i.CategoryContainsFold))
+	}
+	if i.MsgType != nil {
+		predicates = append(predicates, msginternal.MsgTypeEQ(*i.MsgType))
+	}
+	if i.MsgTypeNEQ != nil {
+		predicates = append(predicates, msginternal.MsgTypeNEQ(*i.MsgTypeNEQ))
+	}
+	if len(i.MsgTypeIn) > 0 {
+		predicates = append(predicates, msginternal.MsgTypeIn(i.MsgTypeIn...))
+	}
+	if len(i.MsgTypeNotIn) > 0 {
+		predicates = append(predicates, msginternal.MsgTypeNotIn(i.MsgTypeNotIn...))
+	}
+	if i.MsgTypeGT != nil {
+		predicates = append(predicates, msginternal.MsgTypeGT(*i.MsgTypeGT))
+	}
+	if i.MsgTypeGTE != nil {
+		predicates = append(predicates, msginternal.MsgTypeGTE(*i.MsgTypeGTE))
+	}
+	if i.MsgTypeLT != nil {
+		predicates = append(predicates, msginternal.MsgTypeLT(*i.MsgTypeLT))
+	}
+	if i.MsgTypeLTE != nil {
+		predicates = append(predicates, msginternal.MsgTypeLTE(*i.MsgTypeLTE))
+	}
+	if i.MsgTypeContains != nil {
+		predicates = append(predicates, msginternal.MsgTypeContains(*i.MsgTypeContains))
+	}
+	if i.MsgTypeHasPrefix != nil {
+		predicates = append(predicates, msginternal.MsgTypeHasPrefix(*i.MsgTypeHasPrefix))
+	}
+	if i.MsgTypeHasSuffix != nil {
+		predicates = append(predicates, msginternal.MsgTypeHasSuffix(*i.MsgTypeHasSuffix))
+	}
+	if i.MsgTypeIsNil {
+		predicates = append(predicates, msginternal.MsgTypeIsNil())
+	}
+	if i.MsgTypeNotNil {
+		predicates = append(predicates, msginternal.MsgTypeNotNil())
+	}
+	if i.MsgTypeEqualFold != nil {
+		predicates = append(predicates, msginternal.MsgTypeEqualFold(*i.MsgTypeEqualFold))
+	}
+	if i.MsgTypeContainsFold != nil {
+		predicates = append(predicates, msginternal.MsgTypeContainsFold(*i.MsgTypeContainsFold))
 	}
 	if i.Subject != nil {
 		predicates = append(predicates, msginternal.SubjectEQ(*i.Subject))

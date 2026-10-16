@@ -2993,6 +2993,8 @@ func (ec *executionContext) fieldContext_MsgAlert_msgInternal(_ context.Context,
 				return ec.fieldContext_MsgInternal_tenantID(ctx, field)
 			case "category":
 				return ec.fieldContext_MsgInternal_category(ctx, field)
+			case "msgType":
+				return ec.fieldContext_MsgInternal_msgType(ctx, field)
 			case "subject":
 				return ec.fieldContext_MsgInternal_subject(ctx, field)
 			case "body":
@@ -5697,6 +5699,47 @@ func (ec *executionContext) fieldContext_MsgInternal_category(_ context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _MsgInternal_msgType(ctx context.Context, field graphql.CollectedField, obj *ent.MsgInternal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MsgInternal_msgType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MsgType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MsgInternal_msgType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MsgInternal",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MsgInternal_subject(ctx context.Context, field graphql.CollectedField, obj *ent.MsgInternal) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MsgInternal_subject(ctx, field)
 	if err != nil {
@@ -6373,6 +6416,8 @@ func (ec *executionContext) fieldContext_MsgInternalEdge_node(_ context.Context,
 				return ec.fieldContext_MsgInternal_tenantID(ctx, field)
 			case "category":
 				return ec.fieldContext_MsgInternal_category(ctx, field)
+			case "msgType":
+				return ec.fieldContext_MsgInternal_msgType(ctx, field)
 			case "subject":
 				return ec.fieldContext_MsgInternal_subject(ctx, field)
 			case "body":
@@ -6799,6 +6844,8 @@ func (ec *executionContext) fieldContext_MsgInternalTo_msgInternal(_ context.Con
 				return ec.fieldContext_MsgInternal_tenantID(ctx, field)
 			case "category":
 				return ec.fieldContext_MsgInternal_category(ctx, field)
+			case "msgType":
+				return ec.fieldContext_MsgInternal_msgType(ctx, field)
 			case "subject":
 				return ec.fieldContext_MsgInternal_subject(ctx, field)
 			case "body":
@@ -17763,7 +17810,7 @@ func (ec *executionContext) unmarshalInputMsgInternalWhereInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "category", "categoryNEQ", "categoryIn", "categoryNotIn", "categoryGT", "categoryGTE", "categoryLT", "categoryLTE", "categoryContains", "categoryHasPrefix", "categoryHasSuffix", "categoryEqualFold", "categoryContainsFold", "subject", "subjectNEQ", "subjectIn", "subjectNotIn", "subjectGT", "subjectGTE", "subjectLT", "subjectLTE", "subjectContains", "subjectHasPrefix", "subjectHasSuffix", "subjectEqualFold", "subjectContainsFold", "format", "formatNEQ", "formatIn", "formatNotIn", "formatGT", "formatGTE", "formatLT", "formatLTE", "formatContains", "formatHasPrefix", "formatHasSuffix", "formatEqualFold", "formatContainsFold", "redirect", "redirectNEQ", "redirectIn", "redirectNotIn", "redirectGT", "redirectGTE", "redirectLT", "redirectLTE", "redirectContains", "redirectHasPrefix", "redirectHasSuffix", "redirectIsNil", "redirectNotNil", "redirectEqualFold", "redirectContainsFold", "receiverType", "receiverTypeNEQ", "receiverTypeIn", "receiverTypeNotIn", "alertID", "alertIDNEQ", "alertIDIn", "alertIDNotIn", "alertIDIsNil", "alertIDNotNil", "hasMsgInternalTo", "hasMsgInternalToWith", "hasAlert", "hasAlertWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "updatedBy", "updatedByNEQ", "updatedByIn", "updatedByNotIn", "updatedByGT", "updatedByGTE", "updatedByLT", "updatedByLTE", "updatedByIsNil", "updatedByNotNil", "updatedAt", "updatedAtNEQ", "updatedAtIn", "updatedAtNotIn", "updatedAtGT", "updatedAtGTE", "updatedAtLT", "updatedAtLTE", "updatedAtIsNil", "updatedAtNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "category", "categoryNEQ", "categoryIn", "categoryNotIn", "categoryGT", "categoryGTE", "categoryLT", "categoryLTE", "categoryContains", "categoryHasPrefix", "categoryHasSuffix", "categoryEqualFold", "categoryContainsFold", "msgType", "msgTypeNEQ", "msgTypeIn", "msgTypeNotIn", "msgTypeGT", "msgTypeGTE", "msgTypeLT", "msgTypeLTE", "msgTypeContains", "msgTypeHasPrefix", "msgTypeHasSuffix", "msgTypeIsNil", "msgTypeNotNil", "msgTypeEqualFold", "msgTypeContainsFold", "subject", "subjectNEQ", "subjectIn", "subjectNotIn", "subjectGT", "subjectGTE", "subjectLT", "subjectLTE", "subjectContains", "subjectHasPrefix", "subjectHasSuffix", "subjectEqualFold", "subjectContainsFold", "format", "formatNEQ", "formatIn", "formatNotIn", "formatGT", "formatGTE", "formatLT", "formatLTE", "formatContains", "formatHasPrefix", "formatHasSuffix", "formatEqualFold", "formatContainsFold", "redirect", "redirectNEQ", "redirectIn", "redirectNotIn", "redirectGT", "redirectGTE", "redirectLT", "redirectLTE", "redirectContains", "redirectHasPrefix", "redirectHasSuffix", "redirectIsNil", "redirectNotNil", "redirectEqualFold", "redirectContainsFold", "receiverType", "receiverTypeNEQ", "receiverTypeIn", "receiverTypeNotIn", "alertID", "alertIDNEQ", "alertIDIn", "alertIDNotIn", "alertIDIsNil", "alertIDNotNil", "hasMsgInternalTo", "hasMsgInternalToWith", "hasAlert", "hasAlertWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -18246,6 +18293,111 @@ func (ec *executionContext) unmarshalInputMsgInternalWhereInput(ctx context.Cont
 				return it, err
 			}
 			it.CategoryContainsFold = data
+		case "msgType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgType"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgType = data
+		case "msgTypeNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeNEQ = data
+		case "msgTypeIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeIn = data
+		case "msgTypeNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeNotIn = data
+		case "msgTypeGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeGT = data
+		case "msgTypeGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeGTE = data
+		case "msgTypeLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeLT = data
+		case "msgTypeLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeLTE = data
+		case "msgTypeContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeContains = data
+		case "msgTypeHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeHasPrefix = data
+		case "msgTypeHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeHasSuffix = data
+		case "msgTypeIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeIsNil = data
+		case "msgTypeNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeNotNil = data
+		case "msgTypeEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeEqualFold = data
+		case "msgTypeContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("msgTypeContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MsgTypeContainsFold = data
 		case "subject":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subject"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -24828,6 +24980,8 @@ func (ec *executionContext) _MsgInternal(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "msgType":
+			out.Values[i] = ec._MsgInternal_msgType(ctx, field, obj)
 		case "subject":
 			out.Values[i] = ec._MsgInternal_subject(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

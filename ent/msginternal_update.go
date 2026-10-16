@@ -94,6 +94,26 @@ func (_u *MsgInternalUpdate) SetNillableCategory(v *string) *MsgInternalUpdate {
 	return _u
 }
 
+// SetMsgType sets the "msg_type" field.
+func (_u *MsgInternalUpdate) SetMsgType(v string) *MsgInternalUpdate {
+	_u.mutation.SetMsgType(v)
+	return _u
+}
+
+// SetNillableMsgType sets the "msg_type" field if the given value is not nil.
+func (_u *MsgInternalUpdate) SetNillableMsgType(v *string) *MsgInternalUpdate {
+	if v != nil {
+		_u.SetMsgType(*v)
+	}
+	return _u
+}
+
+// ClearMsgType clears the value of the "msg_type" field.
+func (_u *MsgInternalUpdate) ClearMsgType() *MsgInternalUpdate {
+	_u.mutation.ClearMsgType()
+	return _u
+}
+
 // SetSubject sets the "subject" field.
 func (_u *MsgInternalUpdate) SetSubject(v string) *MsgInternalUpdate {
 	_u.mutation.SetSubject(v)
@@ -282,6 +302,11 @@ func (_u *MsgInternalUpdate) check() error {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.category": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.MsgType(); ok {
+		if err := msginternal.MsgTypeValidator(v); err != nil {
+			return &ValidationError{Name: "msg_type", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.msg_type": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.ReceiverType(); ok {
 		if err := msginternal.ReceiverTypeValidator(v); err != nil {
 			return &ValidationError{Name: "receiver_type", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.receiver_type": %w`, err)}
@@ -319,6 +344,12 @@ func (_u *MsgInternalUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	}
 	if value, ok := _u.mutation.Category(); ok {
 		_spec.SetField(msginternal.FieldCategory, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.MsgType(); ok {
+		_spec.SetField(msginternal.FieldMsgType, field.TypeString, value)
+	}
+	if _u.mutation.MsgTypeCleared() {
+		_spec.ClearField(msginternal.FieldMsgType, field.TypeString)
 	}
 	if value, ok := _u.mutation.Subject(); ok {
 		_spec.SetField(msginternal.FieldSubject, field.TypeString, value)
@@ -500,6 +531,26 @@ func (_u *MsgInternalUpdateOne) SetNillableCategory(v *string) *MsgInternalUpdat
 	if v != nil {
 		_u.SetCategory(*v)
 	}
+	return _u
+}
+
+// SetMsgType sets the "msg_type" field.
+func (_u *MsgInternalUpdateOne) SetMsgType(v string) *MsgInternalUpdateOne {
+	_u.mutation.SetMsgType(v)
+	return _u
+}
+
+// SetNillableMsgType sets the "msg_type" field if the given value is not nil.
+func (_u *MsgInternalUpdateOne) SetNillableMsgType(v *string) *MsgInternalUpdateOne {
+	if v != nil {
+		_u.SetMsgType(*v)
+	}
+	return _u
+}
+
+// ClearMsgType clears the value of the "msg_type" field.
+func (_u *MsgInternalUpdateOne) ClearMsgType() *MsgInternalUpdateOne {
+	_u.mutation.ClearMsgType()
 	return _u
 }
 
@@ -704,6 +755,11 @@ func (_u *MsgInternalUpdateOne) check() error {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.category": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.MsgType(); ok {
+		if err := msginternal.MsgTypeValidator(v); err != nil {
+			return &ValidationError{Name: "msg_type", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.msg_type": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.ReceiverType(); ok {
 		if err := msginternal.ReceiverTypeValidator(v); err != nil {
 			return &ValidationError{Name: "receiver_type", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.receiver_type": %w`, err)}
@@ -758,6 +814,12 @@ func (_u *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgInternal
 	}
 	if value, ok := _u.mutation.Category(); ok {
 		_spec.SetField(msginternal.FieldCategory, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.MsgType(); ok {
+		_spec.SetField(msginternal.FieldMsgType, field.TypeString, value)
+	}
+	if _u.mutation.MsgTypeCleared() {
+		_spec.ClearField(msginternal.FieldMsgType, field.TypeString)
 	}
 	if value, ok := _u.mutation.Subject(); ok {
 		_spec.SetField(msginternal.FieldSubject, field.TypeString, value)

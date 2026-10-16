@@ -3724,6 +3724,7 @@ type MsgInternalMutation struct {
 	tenant_id              *int
 	addtenant_id           *int
 	category               *string
+	msg_type               *string
 	subject                *string
 	body                   *string
 	format                 *string
@@ -4147,6 +4148,55 @@ func (m *MsgInternalMutation) ResetCategory() {
 	m.category = nil
 }
 
+// SetMsgType sets the "msg_type" field.
+func (m *MsgInternalMutation) SetMsgType(s string) {
+	m.msg_type = &s
+}
+
+// MsgType returns the value of the "msg_type" field in the mutation.
+func (m *MsgInternalMutation) MsgType() (r string, exists bool) {
+	v := m.msg_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMsgType returns the old "msg_type" field's value of the MsgInternal entity.
+// If the MsgInternal object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MsgInternalMutation) OldMsgType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMsgType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMsgType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMsgType: %w", err)
+	}
+	return oldValue.MsgType, nil
+}
+
+// ClearMsgType clears the value of the "msg_type" field.
+func (m *MsgInternalMutation) ClearMsgType() {
+	m.msg_type = nil
+	m.clearedFields[msginternal.FieldMsgType] = struct{}{}
+}
+
+// MsgTypeCleared returns if the "msg_type" field was cleared in this mutation.
+func (m *MsgInternalMutation) MsgTypeCleared() bool {
+	_, ok := m.clearedFields[msginternal.FieldMsgType]
+	return ok
+}
+
+// ResetMsgType resets all changes to the "msg_type" field.
+func (m *MsgInternalMutation) ResetMsgType() {
+	m.msg_type = nil
+	delete(m.clearedFields, msginternal.FieldMsgType)
+}
+
 // SetSubject sets the "subject" field.
 func (m *MsgInternalMutation) SetSubject(s string) {
 	m.subject = &s
@@ -4517,7 +4567,7 @@ func (m *MsgInternalMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MsgInternalMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.created_by != nil {
 		fields = append(fields, msginternal.FieldCreatedBy)
 	}
@@ -4535,6 +4585,9 @@ func (m *MsgInternalMutation) Fields() []string {
 	}
 	if m.category != nil {
 		fields = append(fields, msginternal.FieldCategory)
+	}
+	if m.msg_type != nil {
+		fields = append(fields, msginternal.FieldMsgType)
 	}
 	if m.subject != nil {
 		fields = append(fields, msginternal.FieldSubject)
@@ -4574,6 +4627,8 @@ func (m *MsgInternalMutation) Field(name string) (ent.Value, bool) {
 		return m.TenantID()
 	case msginternal.FieldCategory:
 		return m.Category()
+	case msginternal.FieldMsgType:
+		return m.MsgType()
 	case msginternal.FieldSubject:
 		return m.Subject()
 	case msginternal.FieldBody:
@@ -4607,6 +4662,8 @@ func (m *MsgInternalMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldTenantID(ctx)
 	case msginternal.FieldCategory:
 		return m.OldCategory(ctx)
+	case msginternal.FieldMsgType:
+		return m.OldMsgType(ctx)
 	case msginternal.FieldSubject:
 		return m.OldSubject(ctx)
 	case msginternal.FieldBody:
@@ -4669,6 +4726,13 @@ func (m *MsgInternalMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCategory(v)
+		return nil
+	case msginternal.FieldMsgType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMsgType(v)
 		return nil
 	case msginternal.FieldSubject:
 		v, ok := value.(string)
@@ -4787,6 +4851,9 @@ func (m *MsgInternalMutation) ClearedFields() []string {
 	if m.FieldCleared(msginternal.FieldUpdatedAt) {
 		fields = append(fields, msginternal.FieldUpdatedAt)
 	}
+	if m.FieldCleared(msginternal.FieldMsgType) {
+		fields = append(fields, msginternal.FieldMsgType)
+	}
 	if m.FieldCleared(msginternal.FieldBody) {
 		fields = append(fields, msginternal.FieldBody)
 	}
@@ -4815,6 +4882,9 @@ func (m *MsgInternalMutation) ClearField(name string) error {
 		return nil
 	case msginternal.FieldUpdatedAt:
 		m.ClearUpdatedAt()
+		return nil
+	case msginternal.FieldMsgType:
+		m.ClearMsgType()
 		return nil
 	case msginternal.FieldBody:
 		m.ClearBody()
@@ -4850,6 +4920,9 @@ func (m *MsgInternalMutation) ResetField(name string) error {
 		return nil
 	case msginternal.FieldCategory:
 		m.ResetCategory()
+		return nil
+	case msginternal.FieldMsgType:
+		m.ResetMsgType()
 		return nil
 	case msginternal.FieldSubject:
 		m.ResetSubject()

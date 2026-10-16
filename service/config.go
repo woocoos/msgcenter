@@ -229,7 +229,7 @@ func overrideUmengConfig(basedir, attdir string, client *ent.Client) notify.Cust
 			return err
 		}
 		ev, err := data.QueryEvent().WithMsgType(func(query *ent.MsgTypeQuery) {
-			query.Select(msgtype.FieldCategory)
+			query.Select(msgtype.FieldCategory, msgtype.FieldName)
 		}).Only(ctx)
 		if err != nil {
 			// must have
@@ -240,6 +240,7 @@ func overrideUmengConfig(basedir, attdir string, client *ent.Client) notify.Cust
 			return err
 		}
 		cfg.Extras["category"] = mt.Category
+		cfg.Extras["msgTypeName"] = mt.Name
 		cfg.Subject = data.Subject
 		cfg.Body = data.Body
 		return nil

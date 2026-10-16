@@ -88,6 +88,11 @@ func Category(v string) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldEQ(FieldCategory, v))
 }
 
+// MsgType applies equality check predicate on the "msg_type" field. It's identical to MsgTypeEQ.
+func MsgType(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldEQ(FieldMsgType, v))
+}
+
 // Subject applies equality check predicate on the "subject" field. It's identical to SubjectEQ.
 func Subject(v string) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldEQ(FieldSubject, v))
@@ -396,6 +401,81 @@ func CategoryEqualFold(v string) predicate.MsgInternal {
 // CategoryContainsFold applies the ContainsFold predicate on the "category" field.
 func CategoryContainsFold(v string) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldContainsFold(FieldCategory, v))
+}
+
+// MsgTypeEQ applies the EQ predicate on the "msg_type" field.
+func MsgTypeEQ(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldEQ(FieldMsgType, v))
+}
+
+// MsgTypeNEQ applies the NEQ predicate on the "msg_type" field.
+func MsgTypeNEQ(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNEQ(FieldMsgType, v))
+}
+
+// MsgTypeIn applies the In predicate on the "msg_type" field.
+func MsgTypeIn(vs ...string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldIn(FieldMsgType, vs...))
+}
+
+// MsgTypeNotIn applies the NotIn predicate on the "msg_type" field.
+func MsgTypeNotIn(vs ...string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNotIn(FieldMsgType, vs...))
+}
+
+// MsgTypeGT applies the GT predicate on the "msg_type" field.
+func MsgTypeGT(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldGT(FieldMsgType, v))
+}
+
+// MsgTypeGTE applies the GTE predicate on the "msg_type" field.
+func MsgTypeGTE(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldGTE(FieldMsgType, v))
+}
+
+// MsgTypeLT applies the LT predicate on the "msg_type" field.
+func MsgTypeLT(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldLT(FieldMsgType, v))
+}
+
+// MsgTypeLTE applies the LTE predicate on the "msg_type" field.
+func MsgTypeLTE(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldLTE(FieldMsgType, v))
+}
+
+// MsgTypeContains applies the Contains predicate on the "msg_type" field.
+func MsgTypeContains(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldContains(FieldMsgType, v))
+}
+
+// MsgTypeHasPrefix applies the HasPrefix predicate on the "msg_type" field.
+func MsgTypeHasPrefix(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldHasPrefix(FieldMsgType, v))
+}
+
+// MsgTypeHasSuffix applies the HasSuffix predicate on the "msg_type" field.
+func MsgTypeHasSuffix(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldHasSuffix(FieldMsgType, v))
+}
+
+// MsgTypeIsNil applies the IsNil predicate on the "msg_type" field.
+func MsgTypeIsNil() predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldIsNull(FieldMsgType))
+}
+
+// MsgTypeNotNil applies the NotNil predicate on the "msg_type" field.
+func MsgTypeNotNil() predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNotNull(FieldMsgType))
+}
+
+// MsgTypeEqualFold applies the EqualFold predicate on the "msg_type" field.
+func MsgTypeEqualFold(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldEqualFold(FieldMsgType, v))
+}
+
+// MsgTypeContainsFold applies the ContainsFold predicate on the "msg_type" field.
+func MsgTypeContainsFold(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldContainsFold(FieldMsgType, v))
 }
 
 // SubjectEQ applies the EQ predicate on the "subject" field.

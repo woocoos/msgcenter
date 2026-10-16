@@ -104,8 +104,9 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true},
 		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "category", Type: field.TypeString, Size: 20},
+		{Name: "msg_type", Type: field.TypeString, Nullable: true, Size: 45},
 		{Name: "subject", Type: field.TypeString},
-		{Name: "body", Type: field.TypeString, Nullable: true},
+		{Name: "body", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "format", Type: field.TypeString},
 		{Name: "redirect", Type: field.TypeString, Nullable: true},
 		{Name: "receiver_type", Type: field.TypeEnum, Enums: []string{"email", "message", "webhook", "umeng"}},
@@ -119,7 +120,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "msg_internal_msg_alert_msg_internal",
-				Columns:    []*schema.Column{MsgInternalColumns[12]},
+				Columns:    []*schema.Column{MsgInternalColumns[13]},
 				RefColumns: []*schema.Column{MsgAlertColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

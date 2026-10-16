@@ -30,6 +30,8 @@ const (
 	FieldTenantID = "tenant_id"
 	// FieldCategory holds the string denoting the category field in the database.
 	FieldCategory = "category"
+	// FieldMsgType holds the string denoting the msg_type field in the database.
+	FieldMsgType = "msg_type"
 	// FieldSubject holds the string denoting the subject field in the database.
 	FieldSubject = "subject"
 	// FieldBody holds the string denoting the body field in the database.
@@ -73,6 +75,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldTenantID,
 	FieldCategory,
+	FieldMsgType,
 	FieldSubject,
 	FieldBody,
 	FieldFormat,
@@ -103,6 +106,8 @@ var (
 	DefaultCreatedAt func() time.Time
 	// CategoryValidator is a validator for the "category" field. It is called by the builders before save.
 	CategoryValidator func(string) error
+	// MsgTypeValidator is a validator for the "msg_type" field. It is called by the builders before save.
+	MsgTypeValidator func(string) error
 )
 
 // ReceiverTypeValidator is a validator for the "receiver_type" field enum values. It is called by the builders before save.
@@ -151,6 +156,11 @@ func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
 // ByCategory orders the results by the category field.
 func ByCategory(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCategory, opts...).ToFunc()
+}
+
+// ByMsgType orders the results by the msg_type field.
+func ByMsgType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMsgType, opts...).ToFunc()
 }
 
 // BySubject orders the results by the subject field.

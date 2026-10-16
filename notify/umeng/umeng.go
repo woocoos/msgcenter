@@ -220,6 +220,7 @@ func (n *Notifier) saveToDB(ctx context.Context, config *profile.UmengConfig, ms
 			SetCreatedBy(0).
 			SetSubject(title).
 			SetCategory(config.Extras["category"]).
+			SetMsgType(config.Extras["msgTypeName"]).
 			SetBody(body).
 			SetFormat("text").
 			SetTenantID(tid).

@@ -775,6 +775,11 @@ func (_m *MsgInternalQuery) collectField(ctx context.Context, oneNode bool, opCt
 				selectedFields = append(selectedFields, msginternal.FieldCategory)
 				fieldSeen[msginternal.FieldCategory] = struct{}{}
 			}
+		case "msgType":
+			if _, ok := fieldSeen[msginternal.FieldMsgType]; !ok {
+				selectedFields = append(selectedFields, msginternal.FieldMsgType)
+				fieldSeen[msginternal.FieldMsgType] = struct{}{}
+			}
 		case "subject":
 			if _, ok := fieldSeen[msginternal.FieldSubject]; !ok {
 				selectedFields = append(selectedFields, msginternal.FieldSubject)
