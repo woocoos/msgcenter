@@ -272,13 +272,13 @@ export async function testSendEamil(tplID: string, email: string, labels?: Recor
  * @returns
  */
 export async function testSendMessage(tplID: string, userID: string, labels?: Record<string, string>, annotations?: Record<string, string>) {
-  let params = {
+  const params: Record<string, unknown> = {
     tplID,
     labels,
     annotations,
   }
-  if (userID){
-    params[userID] = userID
+  if (userID) {
+    params['userID'] = userID
   }
   const result = await mutation(mutationTestSendMessageTpl, params)
   if (result.data?.testSendMessageTpl) {
