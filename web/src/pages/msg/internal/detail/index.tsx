@@ -1,6 +1,6 @@
 import { MsgInternalTo } from "@/generated/msgsrv/graphql";
 import { getMsgInternalToInfo, getUserMsgInternalList, markMsgRead } from "@/services/msgsrv/internal";
-import { getDate } from "@/util";
+import { getDate, customTextToHtml } from "@/util";
 import { ProCard } from "@ant-design/pro-components";
 import { useSearchParams } from "@ice/runtime";
 import { Divider, Empty, Typography } from "antd";
@@ -70,7 +70,7 @@ const Detail = ({ id: propId, onRead }: { id?: string; onRead?: () => void }) =>
     <ProCard loading={loading}>{
       info ? <div>
         <div style={{ textAlign: 'center' }}>
-          <Typography.Title level={4} >{info.msgInternal.subject}</Typography.Title>
+          <Typography.Title level={4} dangerouslySetInnerHTML={{ __html: customTextToHtml(info.msgInternal.subject) }} />
           <Typography.Text >{getDate(info.createdAt, 'YYYY-MM-DD HH:mm:ss')}</Typography.Text>
         </div>
         <Divider />

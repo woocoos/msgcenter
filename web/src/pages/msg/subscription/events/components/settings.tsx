@@ -5,7 +5,8 @@ import { DrawerForm } from '@ant-design/pro-components';
 import { createSub, delSub } from '@/services/msgsrv/type';
 import { getMsgEventWithSubs } from '@/services/msgsrv/event';
 import { Radio, Skeleton, Space, Transfer, Typography, message } from 'antd';
-import { getOrgUserList, getOrgGroupList } from '@knockout-js/api';
+import { getOrgGroupList } from '@knockout-js/api';
+import { getOrgUserList } from '@/services/adminx';
 import store from '@/store';
 import { TransferItem } from 'antd/es/transfer';
 import { useLeavePrompt } from '@knockout-js/layout';
@@ -56,7 +57,7 @@ export default (props: {
     },
     getTransferData = async () => {
       const data: TransferItem[] = [], tkeys: string[] = [];
-      
+
       if ('user' === subject) {
         const result = await getOrgUserList(userState.tenantId, {
           current: 1,
@@ -65,10 +66,11 @@ export default (props: {
         if (result?.totalCount) {
           result.edges?.forEach(item => {
             if (item?.node) {
+              const addressInfo = item.node.addresses?.find(address => address.email)
               data.push({
                 key: item.node.id,
                 name: item.node.displayName,
-                description: item.node.email || "",
+                description: addressInfo?.email || "",
               })
             }
           })
@@ -86,10 +88,11 @@ export default (props: {
         if (result?.totalCount) {
           result.edges?.forEach(item => {
             if (item?.node) {
+              const addressInfo = item.node.addresses?.find(address => address.email)
               data.push({
                 key: item.node.id,
                 name: item.node.displayName,
-                description: item.node.email || "",
+                description: addressInfo?.email || "",
               })
             }
           })
@@ -103,6 +106,9 @@ export default (props: {
         const result = await getOrgGroupList({
           current: 1,
           pageSize: 999,
+          where: {
+            orgID: userState.tenantId,
+          }
         })
         if (result?.totalCount) {
           result.edges?.forEach(item => {
@@ -137,12 +143,12 @@ export default (props: {
         } else if (subject === 'orgRole') {
           oldKeys = info.subscriberRoles?.map(s => `${s.orgRoleID}`) || [];
         }
-        
+
         const addKeys = targetKeys.filter(key => !oldKeys.includes(key));
         const delKeys = oldKeys.filter(key => !targetKeys.includes(key));
-        
+
         setSaveLoading(true);
-        
+
         if (addKeys.length) {
           const inputs = addKeys.map(key => {
             const data: CreateMsgSubscriberInput = {
@@ -167,7 +173,7 @@ export default (props: {
             isTrue = true;
           }
         }
-        
+
         if (delKeys.length) {
           const ids = delKeys.map(key => {
             let sub;
@@ -180,7 +186,7 @@ export default (props: {
             }
             return sub?.id || '';
           }).filter(id => !!id);
-          
+
           if (ids.length) {
             const result = await delSub(ids);
             if (result) {
@@ -251,7 +257,7 @@ export default (props: {
                 targetKeys={targetKeys}
                 onChange={(newKeys) => {
                   setSaveDisabled(false);
-                  setTargetKeys(newKeys);
+                  setTargetKeys(newKeys as string[]);
                 }}
                 render={(item) => {
                   return <div key={item.id}>

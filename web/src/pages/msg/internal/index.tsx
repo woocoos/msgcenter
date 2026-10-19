@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./index.module.css";
 import { definePageConfig } from "ice";
-import { delDataSource } from "@/util";
+import { delDataSource, customTextToHtml } from "@/util";
 import { useResizableProTable, routeBreadcrumb } from "@/util/hook";
 import Detail from "@/pages/msg/internal/detail";
 
@@ -57,7 +57,9 @@ const List = () => {
         {
           title: t('subject'), dataIndex: 'subject', width: 260,
           renderText(text, record, index, action) {
-            return record.readAt ? record.msgInternal.subject : <Badge color="red" text={record.msgInternal.subject} />
+            const htmlSubject = customTextToHtml(record.msgInternal.subject);
+            const subjectNode = <span dangerouslySetInnerHTML={{ __html: htmlSubject }} />;
+            return record.readAt ? subjectNode : <Badge color="red" text={subjectNode} />
           },
         },
         {

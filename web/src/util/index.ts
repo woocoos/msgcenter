@@ -523,3 +523,40 @@ export function onMousedown(handle?: {
     mousedownStore.clickCount = 0;
   }
 }
+
+/**
+ * 将特定格式的文本转换为带颜色的 HTML
+ * 支持格式：[info](文本)、[warn](文本)、[error](文本)
+ * @param text 原始文本
+ * @param isRemoveColor 是否移除颜色（true 则只移除标记保留文本，false 则添加颜色 span）
+ * @returns 格式化后的 HTML 字符串
+ */
+export const customTextToHtml = (text: string, isRemoveColor = false): string => {
+  const colors: Record<string, string> = {
+    info: '#00c8ff',
+    warn: '#ff8030',
+    error: '#ff3030',
+  };
+  const tags = Object.keys(colors);
+
+  if (!text) return '';
+
+  let newText = text;
+  tags.forEach(tag => {
+    newText = newText.split(`[${tag}](`).map((str, index) => {
+      if (index > 0) {
+        const closeIdx = str.indexOf(')');
+        if (closeIdx > -1) {
+          if (isRemoveColor) {
+            return str.replace(')', '');
+          } else {
+            return `<span style="color:${colors[tag]}">${str.replace(')', '</span>')}`;
+          }
+        }
+      }
+      return str;
+    }).join('');
+  });
+
+  return newText;
+};
