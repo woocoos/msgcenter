@@ -27,6 +27,15 @@ const schemaAstConfig: CodegenConfig = {
  */
 const config: CodegenConfig = {
   generates: {
+    // adminx 项目
+    "src/generated/adminx/": {
+      preset: 'client',
+      presetConfig: {
+        gqlTagName: 'gql',
+      },
+      schema: "script/generated/adminx.graphql",
+      documents: "src/services/adminx/**/*.ts",
+    },
     // msgsrv 项目
     "src/generated/msgsrv/": {
       preset: 'client',
@@ -35,7 +44,7 @@ const config: CodegenConfig = {
       },
       schema: "script/generated/msgsrv.graphql",
       documents: "src/services/msgsrv/**/*.ts",
-    }
+    },
   },
   ignoreNoDocuments: true,
 }

@@ -37,6 +37,18 @@ func (_m *MsgAlert) Org(ctx context.Context) (*Org, error) {
 	return result, err
 }
 
+func (_m *MsgAlert) MsgInternal(ctx context.Context) (result []*MsgInternal, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = _m.NamedMsgInternal(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = _m.Edges.MsgInternalOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = _m.QueryMsgInternal().All(ctx)
+	}
+	return result, err
+}
+
 func (_m *MsgAlert) NlogAlerts(
 	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *NlogAlertOrder, where *NlogAlertWhereInput,
 ) (*NlogAlertConnection, error) {
@@ -45,7 +57,7 @@ func (_m *MsgAlert) NlogAlerts(
 		WithNlogAlertFilter(where.Filter),
 	}
 	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := _m.Edges.totalCount[2][alias]
+	totalCount, hasTotalCount := _m.Edges.totalCount[3][alias]
 	if nodes, err := _m.NamedNlogAlerts(alias); err == nil || hasTotalCount {
 		pager, err := newNlogAlertPager(opts, last != nil)
 		if err != nil {
@@ -62,6 +74,18 @@ func (_m *MsgEvent) MsgType(ctx context.Context) (*MsgType, error) {
 	result, err := _m.Edges.MsgTypeOrErr()
 	if IsNotLoaded(err) {
 		result, err = _m.QueryMsgType().Only(ctx)
+	}
+	return result, err
+}
+
+func (_m *MsgEvent) Subscribers(ctx context.Context) (result []*MsgSubscriber, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = _m.NamedSubscribers(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = _m.Edges.SubscribersOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = _m.QuerySubscribers().All(ctx)
 	}
 	return result, err
 }
@@ -90,6 +114,14 @@ func (_m *MsgInternal) MsgInternalTo(ctx context.Context) (result []*MsgInternal
 	return result, err
 }
 
+func (_m *MsgInternal) Alert(ctx context.Context) (*MsgAlert, error) {
+	result, err := _m.Edges.AlertOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryAlert().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (_m *MsgInternalTo) MsgInternal(ctx context.Context) (*MsgInternal, error) {
 	result, err := _m.Edges.MsgInternalOrErr()
 	if IsNotLoaded(err) {
@@ -106,12 +138,28 @@ func (_m *MsgInternalTo) User(ctx context.Context) (*User, error) {
 	return result, err
 }
 
+func (_m *MsgSilence) User(ctx context.Context) (*User, error) {
+	result, err := _m.Edges.UserOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryUser().Only(ctx)
+	}
+	return result, err
+}
+
 func (_m *MsgSubscriber) MsgType(ctx context.Context) (*MsgType, error) {
 	result, err := _m.Edges.MsgTypeOrErr()
 	if IsNotLoaded(err) {
 		result, err = _m.QueryMsgType().Only(ctx)
 	}
-	return result, err
+	return result, MaskNotFound(err)
+}
+
+func (_m *MsgSubscriber) MsgEvent(ctx context.Context) (*MsgEvent, error) {
+	result, err := _m.Edges.MsgEventOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryMsgEvent().Only(ctx)
+	}
+	return result, MaskNotFound(err)
 }
 
 func (_m *MsgSubscriber) User(ctx context.Context) (*User, error) {
@@ -206,7 +254,15 @@ func (_m *Org) MsgAlerts(ctx context.Context) (result []*MsgAlert, err error) {
 	return result, err
 }
 
-func (_m *Silence) User(ctx context.Context) (*User, error) {
+func (_m *OrgUser) Org(ctx context.Context) (*Org, error) {
+	result, err := _m.Edges.OrgOrErr()
+	if IsNotLoaded(err) {
+		result, err = _m.QueryOrg().Only(ctx)
+	}
+	return result, err
+}
+
+func (_m *OrgUser) User(ctx context.Context) (*User, error) {
 	result, err := _m.Edges.UserOrErr()
 	if IsNotLoaded(err) {
 		result, err = _m.QueryUser().Only(ctx)
@@ -214,7 +270,7 @@ func (_m *Silence) User(ctx context.Context) (*User, error) {
 	return result, err
 }
 
-func (_m *User) Silences(ctx context.Context) (result []*Silence, err error) {
+func (_m *User) Silences(ctx context.Context) (result []*MsgSilence, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = _m.NamedSilences(graphql.GetFieldContext(ctx).Field.Alias)
 	} else {

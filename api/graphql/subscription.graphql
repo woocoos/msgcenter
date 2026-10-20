@@ -25,3 +25,8 @@ type MessageFilter {
     userId: ID!
     deviceId:String!
 }
+
+extend type Query {
+    """查询设备是否已有活跃的WebSocket连接"""
+    deviceConnected(deviceId: String!): Boolean!
+}

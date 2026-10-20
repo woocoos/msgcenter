@@ -14,6 +14,7 @@ const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '',
   ICE_PROXY_ADMINX = process.env.ICE_PROXY_ADMINX ?? '',
   ICE_PROXY_AUTH = process.env.ICE_PROXY_AUTH ?? '',
   ICE_PROXY_MSGSRV = process.env.ICE_PROXY_MSGSRV ?? '',
+  ICE_PROXY_API = process.env.ICE_PROXY_API ?? '',
   ICE_API_ADMINX_PREFIX = process.env.ICE_API_ADMINX_PREFIX ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
   ICE_API_MSGSRV_PREFIX = process.env.ICE_API_MSGSRV_PREFIX ?? '',
@@ -22,11 +23,12 @@ const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '',
 export default defineConfig(() => ({
   ssg: false,
   ssr: false,
+  dataLoader: false, // 禁用 data-loader，解决 @smithy 包的 async generator functions 转换问题
   minify,
   codeSplitting: false,//'page-vendors',
   devPublicPath: ICE_DEV_PUBLIC_PATH,
   publicPath: ICE_BUILD_PUBLIC_PATH,
-  compileDependencies: NODE_ENV === 'development' ? [] : true,
+  compileDependencies: NODE_ENV === 'development' ? false : true,
   hash: NODE_ENV === 'development' ? false : true,
   routes: {
     ignoreFiles: [
@@ -56,17 +58,17 @@ export default defineConfig(() => ({
   ],
   proxy: {
     [`${ICE_API_MSGSRV_PREFIX}/`]: {
-      target: ICE_PROXY_MSGSRV,
+      target: ICE_PROXY_MSGSRV ? ICE_PROXY_MSGSRV : ICE_PROXY_API,
       changeOrigin: true,
       pathRewrite: { [`^${ICE_API_MSGSRV_PREFIX}/`]: '/' },
     },
     [`${ICE_API_ADMINX_PREFIX}/`]: {
-      target: ICE_PROXY_ADMINX,
+      target: ICE_PROXY_ADMINX ? ICE_PROXY_ADMINX : ICE_PROXY_API,
       changeOrigin: true,
       pathRewrite: { [`^${ICE_API_ADMINX_PREFIX}/`]: '/' },
     },
     [`${ICE_API_AUTH_PREFIX}/`]: {
-      target: ICE_PROXY_AUTH,
+      target: ICE_PROXY_AUTH ? ICE_PROXY_AUTH : ICE_PROXY_API,
       changeOrigin: true,
       pathRewrite: { [`^${ICE_API_AUTH_PREFIX}/`]: '/' },
     },

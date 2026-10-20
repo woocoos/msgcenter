@@ -203,19 +203,19 @@ func HasSilences() predicate.User {
 			sqlgraph.Edge(sqlgraph.O2M, false, SilencesTable, SilencesColumn),
 		)
 		schemaConfig := internal.SchemaConfigFromContext(s.Context())
-		step.To.Schema = schemaConfig.Silence
-		step.Edge.Schema = schemaConfig.Silence
+		step.To.Schema = schemaConfig.MsgSilence
+		step.Edge.Schema = schemaConfig.MsgSilence
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
 // HasSilencesWith applies the HasEdge predicate on the "silences" edge with a given conditions (other predicates).
-func HasSilencesWith(preds ...predicate.Silence) predicate.User {
+func HasSilencesWith(preds ...predicate.MsgSilence) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := newSilencesStep()
 		schemaConfig := internal.SchemaConfigFromContext(s.Context())
-		step.To.Schema = schemaConfig.Silence
-		step.Edge.Schema = schemaConfig.Silence
+		step.To.Schema = schemaConfig.MsgSilence
+		step.Edge.Schema = schemaConfig.MsgSilence
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -245,6 +245,35 @@ func HasAddressesWith(preds ...predicate.UserAddr) predicate.User {
 		schemaConfig := internal.SchemaConfigFromContext(s.Context())
 		step.To.Schema = schemaConfig.UserAddr
 		step.Edge.Schema = schemaConfig.UserAddr
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDevices applies the HasEdge predicate on the "devices" edge.
+func HasDevices() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, DevicesTable, DevicesColumn),
+		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.UserDevice
+		step.Edge.Schema = schemaConfig.UserDevice
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDevicesWith applies the HasEdge predicate on the "devices" edge with a given conditions (other predicates).
+func HasDevicesWith(preds ...predicate.UserDevice) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newDevicesStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.UserDevice
+		step.Edge.Schema = schemaConfig.UserDevice
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

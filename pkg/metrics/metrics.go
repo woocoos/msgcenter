@@ -165,9 +165,24 @@ func NewNotifyMetrics(reasons []string, r prometheus.Registerer) *NotifyMetrics 
 
 // DispatcherMetrics represents metrics associated to a dispatcher.
 type DispatcherMetrics struct {
-	AggrGroups            prometheus.Gauge
-	ProcessingDuration    prometheus.Summary
-	AggrGroupLimitReached prometheus.Counter
+	AggrGroups               prometheus.Gauge
+	ProcessingDuration       prometheus.Summary
+	AggrGroupLimitReached    prometheus.Counter
+	AggrGroupCreationRetries prometheus.Counter
+	AggrGroupCreationGivenUp prometheus.Counter
+}
+
+// NewNoopDispatcherMetrics returns a DispatcherMetrics whose counters,
+// gauges, and summaries silently discard observations. It is used when
+// no prometheus.Registerer is provided.
+func NewNoopDispatcherMetrics() *DispatcherMetrics {
+	return &DispatcherMetrics{
+		AggrGroups:               prometheus.NewGauge(prometheus.GaugeOpts{}),
+		ProcessingDuration:       prometheus.NewSummary(prometheus.SummaryOpts{}),
+		AggrGroupLimitReached:    prometheus.NewCounter(prometheus.CounterOpts{}),
+		AggrGroupCreationRetries: prometheus.NewCounter(prometheus.CounterOpts{}),
+		AggrGroupCreationGivenUp: prometheus.NewCounter(prometheus.CounterOpts{}),
+	}
 }
 
 // NewDispatcherMetrics returns a new registered DispatchMetrics.
@@ -191,6 +206,18 @@ func NewDispatcherMetrics(registerLimitMetrics bool, r prometheus.Registerer) *D
 				Help: "Number of times when dispatcher failed to create new aggregation group due to limit.",
 			},
 		),
+		AggrGroupCreationRetries: prometheus.NewCounter(
+			prometheus.CounterOpts{
+				Name: "msgcenter_dispatcher_aggregation_group_creation_retries_total",
+				Help: "Number of retries when creating aggregation groups due to CAS conflicts.",
+			},
+		),
+		AggrGroupCreationGivenUp: prometheus.NewCounter(
+			prometheus.CounterOpts{
+				Name: "msgcenter_dispatcher_aggregation_group_creation_given_up_total",
+				Help: "Number of times giving up on creating aggregation group after excessive retries.",
+			},
+		),
 	}
 
 	if r != nil {
@@ -198,6 +225,7 @@ func NewDispatcherMetrics(registerLimitMetrics bool, r prometheus.Registerer) *D
 		if registerLimitMetrics {
 			r.MustRegister(m.AggrGroupLimitReached)
 		}
+		r.MustRegister(m.AggrGroupCreationRetries, m.AggrGroupCreationGivenUp)
 	}
 
 	return m

@@ -30,22 +30,25 @@ type User struct {
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
 	// 静默
-	Silences []*Silence `json:"silences,omitempty"`
+	Silences []*MsgSilence `json:"silences,omitempty"`
 	// 用户联系信息
 	Addresses []*UserAddr `json:"addresses,omitempty"`
+	// 用户设备
+	Devices []*UserDevice `json:"devices,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
 	totalCount [1]map[string]int
 
-	namedSilences  map[string][]*Silence
+	namedSilences  map[string][]*MsgSilence
 	namedAddresses map[string][]*UserAddr
+	namedDevices   map[string][]*UserDevice
 }
 
 // SilencesOrErr returns the Silences value or an error if the edge
 // was not loaded in eager-loading.
-func (e UserEdges) SilencesOrErr() ([]*Silence, error) {
+func (e UserEdges) SilencesOrErr() ([]*MsgSilence, error) {
 	if e.loadedTypes[0] {
 		return e.Silences, nil
 	}
@@ -59,6 +62,15 @@ func (e UserEdges) AddressesOrErr() ([]*UserAddr, error) {
 		return e.Addresses, nil
 	}
 	return nil, &NotLoadedError{edge: "addresses"}
+}
+
+// DevicesOrErr returns the Devices value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) DevicesOrErr() ([]*UserDevice, error) {
+	if e.loadedTypes[2] {
+		return e.Devices, nil
+	}
+	return nil, &NotLoadedError{edge: "devices"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -117,13 +129,18 @@ func (_m *User) Value(name string) (ent.Value, error) {
 }
 
 // QuerySilences queries the "silences" edge of the User entity.
-func (_m *User) QuerySilences() *SilenceQuery {
+func (_m *User) QuerySilences() *MsgSilenceQuery {
 	return NewUserClient(_m.config).QuerySilences(_m)
 }
 
 // QueryAddresses queries the "addresses" edge of the User entity.
 func (_m *User) QueryAddresses() *UserAddrQuery {
 	return NewUserClient(_m.config).QueryAddresses(_m)
+}
+
+// QueryDevices queries the "devices" edge of the User entity.
+func (_m *User) QueryDevices() *UserDeviceQuery {
+	return NewUserClient(_m.config).QueryDevices(_m)
 }
 
 // Update returns a builder for updating this User.
@@ -160,7 +177,7 @@ func (_m *User) String() string {
 
 // NamedSilences returns the Silences named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (_m *User) NamedSilences(name string) ([]*Silence, error) {
+func (_m *User) NamedSilences(name string) ([]*MsgSilence, error) {
 	if _m.Edges.namedSilences == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
@@ -171,12 +188,12 @@ func (_m *User) NamedSilences(name string) ([]*Silence, error) {
 	return nodes, nil
 }
 
-func (_m *User) appendNamedSilences(name string, edges ...*Silence) {
+func (_m *User) appendNamedSilences(name string, edges ...*MsgSilence) {
 	if _m.Edges.namedSilences == nil {
-		_m.Edges.namedSilences = make(map[string][]*Silence)
+		_m.Edges.namedSilences = make(map[string][]*MsgSilence)
 	}
 	if len(edges) == 0 {
-		_m.Edges.namedSilences[name] = []*Silence{}
+		_m.Edges.namedSilences[name] = []*MsgSilence{}
 	} else {
 		_m.Edges.namedSilences[name] = append(_m.Edges.namedSilences[name], edges...)
 	}
@@ -203,6 +220,30 @@ func (_m *User) appendNamedAddresses(name string, edges ...*UserAddr) {
 		_m.Edges.namedAddresses[name] = []*UserAddr{}
 	} else {
 		_m.Edges.namedAddresses[name] = append(_m.Edges.namedAddresses[name], edges...)
+	}
+}
+
+// NamedDevices returns the Devices named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (_m *User) NamedDevices(name string) ([]*UserDevice, error) {
+	if _m.Edges.namedDevices == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := _m.Edges.namedDevices[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (_m *User) appendNamedDevices(name string, edges ...*UserDevice) {
+	if _m.Edges.namedDevices == nil {
+		_m.Edges.namedDevices = make(map[string][]*UserDevice)
+	}
+	if len(edges) == 0 {
+		_m.Edges.namedDevices[name] = []*UserDevice{}
+	} else {
+		_m.Edges.namedDevices[name] = append(_m.Edges.namedDevices[name], edges...)
 	}
 }
 

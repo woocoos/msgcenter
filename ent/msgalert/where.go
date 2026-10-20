@@ -571,6 +571,35 @@ func HasOrgWith(preds ...predicate.Org) predicate.MsgAlert {
 	})
 }
 
+// HasMsgInternal applies the HasEdge predicate on the "msg_internal" edge.
+func HasMsgInternal() predicate.MsgAlert {
+	return predicate.MsgAlert(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, MsgInternalTable, MsgInternalColumn),
+		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgInternal
+		step.Edge.Schema = schemaConfig.MsgInternal
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMsgInternalWith applies the HasEdge predicate on the "msg_internal" edge with a given conditions (other predicates).
+func HasMsgInternalWith(preds ...predicate.MsgInternal) predicate.MsgAlert {
+	return predicate.MsgAlert(func(s *sql.Selector) {
+		step := newMsgInternalStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgInternal
+		step.Edge.Schema = schemaConfig.MsgInternal
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasNlogAlerts applies the HasEdge predicate on the "nlog_alerts" edge.
 func HasNlogAlerts() predicate.MsgAlert {
 	return predicate.MsgAlert(func(s *sql.Selector) {

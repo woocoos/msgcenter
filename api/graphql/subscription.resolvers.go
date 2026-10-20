@@ -7,12 +7,40 @@ package graphql
 import (
 	"context"
 
+	"github.com/tsingsun/woocoo/contrib/gql"
+	"github.com/tsingsun/woocoo/web/handler"
+	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/generated"
 	"github.com/woocoos/msgcenter/api/graphql/model"
+	"go.uber.org/zap"
 )
+
+// DeviceConnected is the resolver for the deviceConnected field.
+func (r *queryResolver) DeviceConnected(ctx context.Context, deviceID string) (bool, error) {
+	if r.PubSub == nil {
+		return false, nil
+	}
+	return r.PubSub.HasDeviceConnection(deviceID), nil
+}
 
 // Message is the resolver for the Message field.
 func (r *subscriptionResolver) Message(ctx context.Context) (<-chan *model.Message, error) {
+	gctx, err := gql.FromIncomingContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ctxLog := handler.GetLogCarrierFromGinContext(gctx)
+	if ctxLog != nil {
+		if uid, _ := identity.UserIDFromContext(gctx); uid != 0 {
+			ctxLog.Fields = append(ctxLog.Fields, zap.Int("userId", uid))
+		}
+		if tid, _ := identity.TenantIDFromContext(gctx); tid != 0 {
+			ctxLog.Fields = append(ctxLog.Fields, zap.Int("tenantId", tid))
+		}
+		if deviceID := gctx.Request.Header.Get("X-Device-ID"); deviceID != "" {
+			ctxLog.Fields = append(ctxLog.Fields, zap.String("deviceId", deviceID))
+		}
+	}
 	return r.PubSub.Subscribe(ctx, string(SubTopicMessage))
 }
 

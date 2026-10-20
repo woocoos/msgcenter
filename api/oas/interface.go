@@ -55,6 +55,13 @@ type PushServer interface {
 	PostPush(*gin.Context, *PostPushRequest) error
 }
 
+// NlogServer is the server API for Nlog service.
+type NlogServer interface {
+	// UpdateNlog Update notification log fields by messageId or alertID+receiverType
+	// (POST /nlogs/update)
+	UpdateNlog(*gin.Context, *UpdateNlogRequest) error
+}
+
 type UnimplementedGeneralServer struct {
 }
 
@@ -112,5 +119,13 @@ type UnimplementedPushServer struct {
 
 func (UnimplementedPushServer) PostPush(c *gin.Context, req *PostPushRequest) (err error) {
 	err = fmt.Errorf("method PostPush not implemented")
+	return
+}
+
+type UnimplementedNlogServer struct {
+}
+
+func (UnimplementedNlogServer) UpdateNlog(c *gin.Context, req *UpdateNlogRequest) (err error) {
+	err = fmt.Errorf("method UpdateNlog not implemented")
 	return
 }

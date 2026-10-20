@@ -143,6 +143,33 @@ func (_u *MsgTemplateUpdate) ClearTenantID() *MsgTemplateUpdate {
 	return _u
 }
 
+// SetUserID sets the "user_id" field.
+func (_u *MsgTemplateUpdate) SetUserID(v int) *MsgTemplateUpdate {
+	_u.mutation.ResetUserID()
+	_u.mutation.SetUserID(v)
+	return _u
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (_u *MsgTemplateUpdate) SetNillableUserID(v *int) *MsgTemplateUpdate {
+	if v != nil {
+		_u.SetUserID(*v)
+	}
+	return _u
+}
+
+// AddUserID adds value to the "user_id" field.
+func (_u *MsgTemplateUpdate) AddUserID(v int) *MsgTemplateUpdate {
+	_u.mutation.AddUserID(v)
+	return _u
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (_u *MsgTemplateUpdate) ClearUserID() *MsgTemplateUpdate {
+	_u.mutation.ClearUserID()
+	return _u
+}
+
 // SetName sets the "name" field.
 func (_u *MsgTemplateUpdate) SetName(v string) *MsgTemplateUpdate {
 	_u.mutation.SetName(v)
@@ -502,6 +529,15 @@ func (_u *MsgTemplateUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	if _u.mutation.TenantIDCleared() {
 		_spec.ClearField(msgtemplate.FieldTenantID, field.TypeInt)
 	}
+	if value, ok := _u.mutation.UserID(); ok {
+		_spec.SetField(msgtemplate.FieldUserID, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedUserID(); ok {
+		_spec.AddField(msgtemplate.FieldUserID, field.TypeInt, value)
+	}
+	if _u.mutation.UserIDCleared() {
+		_spec.ClearField(msgtemplate.FieldUserID, field.TypeInt)
+	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(msgtemplate.FieldName, field.TypeString, value)
 	}
@@ -735,6 +771,33 @@ func (_u *MsgTemplateUpdateOne) AddTenantID(v int) *MsgTemplateUpdateOne {
 // ClearTenantID clears the value of the "tenant_id" field.
 func (_u *MsgTemplateUpdateOne) ClearTenantID() *MsgTemplateUpdateOne {
 	_u.mutation.ClearTenantID()
+	return _u
+}
+
+// SetUserID sets the "user_id" field.
+func (_u *MsgTemplateUpdateOne) SetUserID(v int) *MsgTemplateUpdateOne {
+	_u.mutation.ResetUserID()
+	_u.mutation.SetUserID(v)
+	return _u
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (_u *MsgTemplateUpdateOne) SetNillableUserID(v *int) *MsgTemplateUpdateOne {
+	if v != nil {
+		_u.SetUserID(*v)
+	}
+	return _u
+}
+
+// AddUserID adds value to the "user_id" field.
+func (_u *MsgTemplateUpdateOne) AddUserID(v int) *MsgTemplateUpdateOne {
+	_u.mutation.AddUserID(v)
+	return _u
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (_u *MsgTemplateUpdateOne) ClearUserID() *MsgTemplateUpdateOne {
+	_u.mutation.ClearUserID()
 	return _u
 }
 
@@ -1126,6 +1189,15 @@ func (_u *MsgTemplateUpdateOne) sqlSave(ctx context.Context) (_node *MsgTemplate
 	}
 	if _u.mutation.TenantIDCleared() {
 		_spec.ClearField(msgtemplate.FieldTenantID, field.TypeInt)
+	}
+	if value, ok := _u.mutation.UserID(); ok {
+		_spec.SetField(msgtemplate.FieldUserID, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedUserID(); ok {
+		_spec.AddField(msgtemplate.FieldUserID, field.TypeInt, value)
+	}
+	if _u.mutation.UserIDCleared() {
+		_spec.ClearField(msgtemplate.FieldUserID, field.TypeInt)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(msgtemplate.FieldName, field.TypeString, value)

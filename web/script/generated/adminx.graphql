@@ -3,9 +3,6 @@ schema {
   mutation: Mutation
 }
 
-"The @defer directive may be specified on a fragment spread to imply de-prioritization, that causes the fragment to be omitted in the initial response, and delivered as a subsequent response afterward. A query with @defer directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred delivered in a subsequent response. @include and @skip take precedence over @defer."
-directive @defer(if: Boolean = true, label: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
-
 directive @goField(forceResolver: Boolean, name: String, omittable: Boolean) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 
 directive @goModel(forceGenerate: Boolean, model: String, models: [String!]) on ENUM | INPUT_OBJECT | INTERFACE | OBJECT | SCALAR | UNION
@@ -58,8 +55,6 @@ type App implements Node {
   kind: AppKind!
   """应用图标地址"""
   logo: String
-  """图标,存储路规则：/{appcode}/{tid}/xxx"""
-  logoFileID: ID
   menus(
     """Returns the elements in the list that come after the specified cursor."""
     after: Cursor
@@ -96,6 +91,8 @@ type App implements Node {
   ): OrgConnection!
   """策略"""
   policies: [AppPolicy!]
+  """策略视图"""
+  policyViews: [AppPolicyView!]
   """回调地址"""
   redirectURI: String
   """refresh_token有效期"""
@@ -168,7 +165,7 @@ type AppActionEdge {
 }
 
 """AppActionKind is enum for the field kind"""
-enum AppActionKind {
+enum AppActionKind @goModel(model: "github.com/woocoos/knockout/ent/appaction.Kind") {
   function
   graphql
   restful
@@ -177,7 +174,7 @@ enum AppActionKind {
 }
 
 """AppActionMethod is enum for the field method"""
-enum AppActionMethod {
+enum AppActionMethod @goModel(model: "github.com/woocoos/knockout/ent/appaction.Method") {
   list
   read
   write
@@ -353,7 +350,7 @@ type AppDictItem implements Node {
   """名称"""
   name: String!
   org: Org
-  """组织ID,空为全局字典"""
+  """租户ID,空为全局字典"""
   orgID: ID
   """关联代码,由app_code和dict_code组成"""
   refCode: String!
@@ -378,7 +375,7 @@ enum AppDictItemOrderField {
 }
 
 """AppDictItemSimpleStatus is enum for the field status"""
-enum AppDictItemSimpleStatus {
+enum AppDictItemSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -621,7 +618,7 @@ type AppEdge {
 }
 
 """AppKind is enum for the field kind"""
-enum AppKind {
+enum AppKind @goModel(model: "github.com/woocoos/knockout/ent/app.Kind") {
   native
   server
   web
@@ -635,6 +632,7 @@ type AppMenu implements Node {
   app: App
   """所属应用"""
   appID: ID
+  children: [AppMenu!]
   """备注"""
   comments: String
   createdAt: Time!
@@ -647,10 +645,13 @@ type AppMenu implements Node {
   kind: AppMenuKind!
   """菜单名称"""
   name: String!
+  parent: AppMenu!
   """父级ID"""
-  parentID: Int!
+  parentID: ID!
   """菜单路由"""
   route: String
+  """状态"""
+  status: AppMenuSimpleStatus
   updatedAt: Time
   updatedBy: Int
 }
@@ -674,7 +675,7 @@ type AppMenuEdge {
 }
 
 """AppMenuKind is enum for the field kind"""
-enum AppMenuKind {
+enum AppMenuKind @goModel(model: "github.com/woocoos/knockout/ent/appmenu.Kind") {
   dir
   menu
 }
@@ -691,6 +692,14 @@ input AppMenuOrder {
 enum AppMenuOrderField {
   createdAt
   displaySort
+}
+
+"""AppMenuSimpleStatus is enum for the field status"""
+enum AppMenuSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
+  active
+  disabled
+  inactive
+  processing
 }
 
 """
@@ -730,6 +739,12 @@ input AppMenuWhereInput {
   """app edge predicates"""
   hasApp: Boolean
   hasAppWith: [AppWhereInput!]
+  """children edge predicates"""
+  hasChildren: Boolean
+  hasChildrenWith: [AppMenuWhereInput!]
+  """parent edge predicates"""
+  hasParent: Boolean
+  hasParentWith: [AppMenuWhereInput!]
   """icon field predicates"""
   icon: String
   iconContains: String
@@ -777,14 +792,10 @@ input AppMenuWhereInput {
   not: AppMenuWhereInput
   or: [AppMenuWhereInput!]
   """parent_id field predicates"""
-  parentID: Int
-  parentIDGT: Int
-  parentIDGTE: Int
-  parentIDIn: [Int!]
-  parentIDLT: Int
-  parentIDLTE: Int
-  parentIDNEQ: Int
-  parentIDNotIn: [Int!]
+  parentID: ID
+  parentIDIn: [ID!]
+  parentIDNEQ: ID
+  parentIDNotIn: [ID!]
   """route field predicates"""
   route: String
   routeContains: String
@@ -801,6 +812,13 @@ input AppMenuWhereInput {
   routeNEQ: String
   routeNotIn: [String!]
   routeNotNil: Boolean
+  """status field predicates"""
+  status: AppMenuSimpleStatus
+  statusIn: [AppMenuSimpleStatus!]
+  statusIsNil: Boolean
+  statusNEQ: AppMenuSimpleStatus
+  statusNotIn: [AppMenuSimpleStatus!]
+  statusNotNil: Boolean
   """updated_at field predicates"""
   updatedAt: Time
   updatedAtGT: Time
@@ -851,8 +869,14 @@ type AppPolicy implements Node {
   id: ID!
   """是否授权role"""
   isGrantAppRole(appRoleID: ID!): Boolean!
+  """分类：app-应用策略、view-策略视图"""
+  kind: AppPolicyKind!
   """策略名称"""
   name: String!
+  """策略授权的组织策略"""
+  orgPolicies: [OrgPolicy!]
+  """策略视图"""
+  policyViews: [AppPolicyView!]
   roles: [AppRole!]
   """策略规则"""
   rules: [PolicyRule]!
@@ -880,6 +904,12 @@ type AppPolicyEdge {
   node: AppPolicy
 }
 
+"""AppPolicyKind is enum for the field kind"""
+enum AppPolicyKind @goModel(model: "github.com/woocoos/knockout/ent/apppolicy.Kind") {
+  app
+  view
+}
+
 """Ordering options for AppPolicy connections"""
 input AppPolicyOrder {
   """The ordering direction."""
@@ -894,11 +924,206 @@ enum AppPolicyOrderField {
 }
 
 """AppPolicySimpleStatus is enum for the field status"""
-enum AppPolicySimpleStatus {
+enum AppPolicySimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
   processing
+}
+
+type AppPolicyView implements Node {
+  app: App
+  """所属应用"""
+  appID: ID
+  appPolicy: AppPolicy
+  children: [AppPolicyView!]
+  """描述"""
+  comments: String
+  createdAt: Time!
+  createdBy: Int!
+  displaySort: Int
+  id: ID!
+  """分类：dir-目录、policy-权限策略"""
+  kind: AppPolicyViewKind!
+  """名称"""
+  name: String!
+  parent: AppPolicyView!
+  """父级ID,0为顶级"""
+  parentID: ID!
+  """路径编码"""
+  path: String
+  """关联的应用策略"""
+  policyID: ID
+  updatedAt: Time
+  updatedBy: Int
+}
+
+"""A connection to a list of items."""
+type AppPolicyViewConnection {
+  """A list of edges."""
+  edges: [AppPolicyViewEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type AppPolicyViewEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+  """The item at the end of the edge."""
+  node: AppPolicyView
+}
+
+"""AppPolicyViewKind is enum for the field kind"""
+enum AppPolicyViewKind @goModel(model: "github.com/woocoos/knockout/ent/apppolicyview.Kind") {
+  dir
+  policy
+}
+
+"""Ordering options for AppPolicyView connections"""
+input AppPolicyViewOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order AppPolicyViews."""
+  field: AppPolicyViewOrderField!
+}
+
+"""Properties by which AppPolicyView connections can be ordered."""
+enum AppPolicyViewOrderField {
+  createdAt
+  displaySort
+}
+
+type AppPolicyViewOrgPolicy {
+  appPolicyView: AppPolicyView
+  orgPolicy: OrgPolicy
+}
+
+"""
+AppPolicyViewWhereInput is used for filtering AppPolicyView objects.
+Input was generated by ent.
+"""
+input AppPolicyViewWhereInput {
+  and: [AppPolicyViewWhereInput!]
+  """app_id field predicates"""
+  appID: ID
+  appIDIn: [ID!]
+  appIDIsNil: Boolean
+  appIDNEQ: ID
+  appIDNotIn: [ID!]
+  appIDNotNil: Boolean
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtIn: [Time!]
+  createdAtLT: Time
+  createdAtLTE: Time
+  createdAtNEQ: Time
+  createdAtNotIn: [Time!]
+  """created_by field predicates"""
+  createdBy: Int
+  createdByGT: Int
+  createdByGTE: Int
+  createdByIn: [Int!]
+  createdByLT: Int
+  createdByLTE: Int
+  createdByNEQ: Int
+  createdByNotIn: [Int!]
+  """app edge predicates"""
+  hasApp: Boolean
+  """app_policy edge predicates"""
+  hasAppPolicy: Boolean
+  hasAppPolicyWith: [AppPolicyWhereInput!]
+  hasAppWith: [AppWhereInput!]
+  """children edge predicates"""
+  hasChildren: Boolean
+  hasChildrenWith: [AppPolicyViewWhereInput!]
+  """parent edge predicates"""
+  hasParent: Boolean
+  hasParentWith: [AppPolicyViewWhereInput!]
+  """id field predicates"""
+  id: ID
+  idGT: ID
+  idGTE: ID
+  idIn: [ID!]
+  idLT: ID
+  idLTE: ID
+  idNEQ: ID
+  idNotIn: [ID!]
+  """kind field predicates"""
+  kind: AppPolicyViewKind
+  kindIn: [AppPolicyViewKind!]
+  kindNEQ: AppPolicyViewKind
+  kindNotIn: [AppPolicyViewKind!]
+  """name field predicates"""
+  name: String
+  nameContains: String
+  nameContainsFold: String
+  nameEqualFold: String
+  nameGT: String
+  nameGTE: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameIn: [String!]
+  nameLT: String
+  nameLTE: String
+  nameNEQ: String
+  nameNotIn: [String!]
+  not: AppPolicyViewWhereInput
+  or: [AppPolicyViewWhereInput!]
+  """parent_id field predicates"""
+  parentID: ID
+  parentIDIn: [ID!]
+  parentIDNEQ: ID
+  parentIDNotIn: [ID!]
+  """path field predicates"""
+  path: String
+  pathContains: String
+  pathContainsFold: String
+  pathEqualFold: String
+  pathGT: String
+  pathGTE: String
+  pathHasPrefix: String
+  pathHasSuffix: String
+  pathIn: [String!]
+  pathIsNil: Boolean
+  pathLT: String
+  pathLTE: String
+  pathNEQ: String
+  pathNotIn: [String!]
+  pathNotNil: Boolean
+  """policy_id field predicates"""
+  policyID: ID
+  policyIDIn: [ID!]
+  policyIDIsNil: Boolean
+  policyIDNEQ: ID
+  policyIDNotIn: [ID!]
+  policyIDNotNil: Boolean
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtIn: [Time!]
+  updatedAtIsNil: Boolean
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtNEQ: Time
+  updatedAtNotIn: [Time!]
+  updatedAtNotNil: Boolean
+  """updated_by field predicates"""
+  updatedBy: Int
+  updatedByGT: Int
+  updatedByGTE: Int
+  updatedByIn: [Int!]
+  updatedByIsNil: Boolean
+  updatedByLT: Int
+  updatedByLTE: Int
+  updatedByNEQ: Int
+  updatedByNotIn: [Int!]
+  updatedByNotNil: Boolean
 }
 
 """
@@ -957,6 +1182,12 @@ input AppPolicyWhereInput {
   hasAppRolePolicy: Boolean
   hasAppRolePolicyWith: [AppRolePolicyWhereInput!]
   hasAppWith: [AppWhereInput!]
+  """org_policies edge predicates"""
+  hasOrgPolicies: Boolean
+  hasOrgPoliciesWith: [OrgPolicyWhereInput!]
+  """policy_views edge predicates"""
+  hasPolicyViews: Boolean
+  hasPolicyViewsWith: [AppPolicyViewWhereInput!]
   """roles edge predicates"""
   hasRoles: Boolean
   hasRolesWith: [AppRoleWhereInput!]
@@ -969,6 +1200,11 @@ input AppPolicyWhereInput {
   idLTE: ID
   idNEQ: ID
   idNotIn: [ID!]
+  """kind field predicates"""
+  kind: AppPolicyKind
+  kindIn: [AppPolicyKind!]
+  kindNEQ: AppPolicyKind
+  kindNotIn: [AppPolicyKind!]
   """name field predicates"""
   name: String
   nameContains: String
@@ -1386,7 +1622,7 @@ input AppRoleWhereInput {
 }
 
 """AppSimpleStatus is enum for the field status"""
-enum AppSimpleStatus {
+enum AppSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -1494,6 +1730,9 @@ input AppWhereInput {
   """policies edge predicates"""
   hasPolicies: Boolean
   hasPoliciesWith: [AppPolicyWhereInput!]
+  """policy_views edge predicates"""
+  hasPolicyViews: Boolean
+  hasPolicyViewsWith: [AppPolicyViewWhereInput!]
   """resources edge predicates"""
   hasResources: Boolean
   hasResourcesWith: [AppResWhereInput!]
@@ -1514,17 +1753,6 @@ input AppWhereInput {
   kindIn: [AppKind!]
   kindNEQ: AppKind
   kindNotIn: [AppKind!]
-  """logo_file_id field predicates"""
-  logoFileID: ID
-  logoFileIDGT: ID
-  logoFileIDGTE: ID
-  logoFileIDIn: [ID!]
-  logoFileIDIsNil: Boolean
-  logoFileIDLT: ID
-  logoFileIDLTE: ID
-  logoFileIDNEQ: ID
-  logoFileIDNotIn: [ID!]
-  logoFileIDNotNil: Boolean
   """name field predicates"""
   name: String
   nameContains: String
@@ -1636,6 +1864,180 @@ input AssignRoleUserInput {
   userID: ID!
 }
 
+type Country implements Node {
+  """国家代码"""
+  code: String!
+  createdAt: Time!
+  createdBy: Int!
+  displaySort: Int
+  id: ID!
+  """国家中文名称"""
+  name: String
+  """国家英文名称"""
+  nameEn: String
+  """地区信息"""
+  regions: [Region!]
+  """状态"""
+  status: CountrySimpleStatus
+  updatedAt: Time
+  updatedBy: Int
+}
+
+"""A connection to a list of items."""
+type CountryConnection {
+  """A list of edges."""
+  edges: [CountryEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type CountryEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+  """The item at the end of the edge."""
+  node: Country
+}
+
+"""Ordering options for Country connections"""
+input CountryOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order Countries."""
+  field: CountryOrderField!
+}
+
+"""Properties by which Country connections can be ordered."""
+enum CountryOrderField {
+  createdAt
+  displaySort
+}
+
+"""CountrySimpleStatus is enum for the field status"""
+enum CountrySimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
+  active
+  disabled
+  inactive
+  processing
+}
+
+"""
+CountryWhereInput is used for filtering Country objects.
+Input was generated by ent.
+"""
+input CountryWhereInput {
+  and: [CountryWhereInput!]
+  """code field predicates"""
+  code: String
+  codeContains: String
+  codeContainsFold: String
+  codeEqualFold: String
+  codeGT: String
+  codeGTE: String
+  codeHasPrefix: String
+  codeHasSuffix: String
+  codeIn: [String!]
+  codeLT: String
+  codeLTE: String
+  codeNEQ: String
+  codeNotIn: [String!]
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtIn: [Time!]
+  createdAtLT: Time
+  createdAtLTE: Time
+  createdAtNEQ: Time
+  createdAtNotIn: [Time!]
+  """created_by field predicates"""
+  createdBy: Int
+  createdByGT: Int
+  createdByGTE: Int
+  createdByIn: [Int!]
+  createdByLT: Int
+  createdByLTE: Int
+  createdByNEQ: Int
+  createdByNotIn: [Int!]
+  """regions edge predicates"""
+  hasRegions: Boolean
+  hasRegionsWith: [RegionWhereInput!]
+  """id field predicates"""
+  id: ID
+  idGT: ID
+  idGTE: ID
+  idIn: [ID!]
+  idLT: ID
+  idLTE: ID
+  idNEQ: ID
+  idNotIn: [ID!]
+  """name field predicates"""
+  name: String
+  nameContains: String
+  nameContainsFold: String
+  """name_en field predicates"""
+  nameEn: String
+  nameEnContains: String
+  nameEnContainsFold: String
+  nameEnEqualFold: String
+  nameEnGT: String
+  nameEnGTE: String
+  nameEnHasPrefix: String
+  nameEnHasSuffix: String
+  nameEnIn: [String!]
+  nameEnIsNil: Boolean
+  nameEnLT: String
+  nameEnLTE: String
+  nameEnNEQ: String
+  nameEnNotIn: [String!]
+  nameEnNotNil: Boolean
+  nameEqualFold: String
+  nameGT: String
+  nameGTE: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameIn: [String!]
+  nameIsNil: Boolean
+  nameLT: String
+  nameLTE: String
+  nameNEQ: String
+  nameNotIn: [String!]
+  nameNotNil: Boolean
+  not: CountryWhereInput
+  or: [CountryWhereInput!]
+  """status field predicates"""
+  status: CountrySimpleStatus
+  statusIn: [CountrySimpleStatus!]
+  statusIsNil: Boolean
+  statusNEQ: CountrySimpleStatus
+  statusNotIn: [CountrySimpleStatus!]
+  statusNotNil: Boolean
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtIn: [Time!]
+  updatedAtIsNil: Boolean
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtNEQ: Time
+  updatedAtNotIn: [Time!]
+  updatedAtNotNil: Boolean
+  """updated_by field predicates"""
+  updatedBy: Int
+  updatedByGT: Int
+  updatedByGTE: Int
+  updatedByIn: [Int!]
+  updatedByIsNil: Boolean
+  updatedByLT: Int
+  updatedByLTE: Int
+  updatedByNEQ: Int
+  updatedByNotIn: [Int!]
+  updatedByNotNil: Boolean
+}
+
 """
 CreateAppActionInput is used for create AppAction object.
 Input was generated by ent.
@@ -1704,12 +2106,11 @@ input CreateAppInput {
   kind: AppKind!
   """应用图标地址"""
   logo: String
-  """图标,存储路规则：/{appcode}/{tid}/xxx"""
-  logoFileID: ID
   menuIDs: [ID!]
   """名称"""
   name: String!
   policyIDs: [ID!]
+  policyViewIDs: [ID!]
   """回调地址"""
   redirectURI: String
   """refresh_token有效期"""
@@ -1731,6 +2132,7 @@ Input was generated by ent.
 input CreateAppMenuInput {
   actionID: ID
   appID: ID
+  childIDs: [ID!]
   """备注"""
   comments: String
   """菜单图标"""
@@ -1739,10 +2141,11 @@ input CreateAppMenuInput {
   kind: AppMenuKind!
   """菜单名称"""
   name: String!
-  """父级ID"""
-  parentID: Int!
+  parentID: ID!
   """菜单路由"""
   route: String
+  """状态"""
+  status: AppMenuSimpleStatus
 }
 
 """
@@ -1755,13 +2158,34 @@ input CreateAppPolicyInput {
   autoGrant: Boolean
   """描述"""
   comments: String
+  """分类：app-应用策略、view-策略视图"""
+  kind: AppPolicyKind
   """策略名称"""
   name: String!
+  orgPolicyIDs: [ID!]
+  policyViewIDs: [ID!]
   roleIDs: [ID!]
   """策略规则"""
   rules: [PolicyRuleInput]!
   """状态"""
   status: AppPolicySimpleStatus
+}
+
+"""
+CreateAppPolicyViewInput is used for create AppPolicyView object.
+Input was generated by ent.
+"""
+input CreateAppPolicyViewInput {
+  appID: ID
+  appPolicyID: ID
+  childIDs: [ID!]
+  """描述"""
+  comments: String
+  """分类：dir-目录、policy-权限策略"""
+  kind: AppPolicyViewKind!
+  """名称"""
+  name: String!
+  parentID: ID!
 }
 
 """
@@ -1792,6 +2216,37 @@ input CreateAppRoleInput {
   editable: Boolean
   """角色名称"""
   name: String!
+}
+
+"""
+CreateCountryInput is used for create Country object.
+Input was generated by ent.
+"""
+input CreateCountryInput {
+  """国家代码"""
+  code: String!
+  """国家中文名称"""
+  name: String
+  """国家英文名称"""
+  nameEn: String
+  regionIDs: [ID!]
+  """状态"""
+  status: CountrySimpleStatus
+}
+
+"""
+CreateCurrencyInput is used for create Currency object.
+Input was generated by ent.
+"""
+input CreateCurrencyInput {
+  """代码"""
+  code: String!
+  """中文名称"""
+  name: String!
+  """货币符号"""
+  sign: String
+  """状态"""
+  status: CurrencySimpleStatus
 }
 
 """
@@ -1830,7 +2285,6 @@ input CreateFileSourceInput {
   endpoint: String!
   """是否禁止修改endpoint，如果是自定义域名设为true"""
   endpointImmutable: Boolean
-  fileIDs: [ID!]
   identityIDs: [ID!]
   """文件来源"""
   kind: FileSourceKind!
@@ -1861,9 +2315,15 @@ input CreateOrgInput {
   childIDs: [ID!]
   """国家或地区2字码"""
   countryCode: String
+  """自定义域名"""
+  customDomain: [String!]
   """默认域名"""
   domain: String
   fileIdentityIDs: [ID!]
+  """组织本位币"""
+  localCurrency: String
+  """组织图标"""
+  logo: OrgLogoInput
   """组织名称"""
   name: String!
   ownerID: ID
@@ -1878,6 +2338,7 @@ input CreateOrgInput {
   """时区"""
   timezone: String
   userIDs: [ID!]
+  userPasswordPolicyID: ID
 }
 
 """
@@ -1885,8 +2346,8 @@ CreateOrgPolicyInput is used for create OrgPolicy object.
 Input was generated by ent.
 """
 input CreateOrgPolicyInput {
-  """所属应用策略,如果是自定义应用策略,则为空"""
-  appPolicyID: Int
+  appID: ID
+  appPolicyID: ID
   """描述"""
   comments: String
   """策略名称"""
@@ -1922,6 +2383,8 @@ input CreateOrgUserInput {
   joinedAt: Time
   orgID: ID!
   userID: ID!
+  """用户类型，区分内部及外部用户"""
+  userType: OrgUserUserType
 }
 
 """
@@ -1953,6 +2416,113 @@ input CreatePermissionInput {
 }
 
 """
+CreateQuotaInput is used for create Quota object.
+Input was generated by ent.
+"""
+input CreateQuotaInput {
+  """过期时间"""
+  endAt: Time
+  """限制值"""
+  limit: Int!
+  quotaItemID: ID!
+  quotaOrgID: ID
+  quotaUserID: ID
+  """生效时间"""
+  startAt: Time
+}
+
+"""
+CreateQuotaItemInput is used for create QuotaItem object.
+Input was generated by ent.
+"""
+input CreateQuotaItemInput {
+  """是否启用"""
+  active: Boolean
+  """配额项代码,如: users,orgs"""
+  code: String!
+  """默认限制值"""
+  defaultLimit: Int
+  """描述"""
+  description: String
+  """配额项名称"""
+  name: String!
+  quotumIDs: [ID!]
+  """资源类型"""
+  resourceType: QuotaItemResourceType!
+  """单位,如: 个,MB,GB"""
+  unit: String
+}
+
+"""
+CreateRegionInput is used for create Region object.
+Input was generated by ent.
+"""
+input CreateRegionInput {
+  childIDs: [ID!]
+  countryID: ID
+  """地区中文名称"""
+  name: String
+  """地区英文名称"""
+  nameEn: String
+  parentID: ID
+  """编码"""
+  shortCode: String
+  """状态"""
+  status: RegionSimpleStatus
+  """邮政编码"""
+  zipCode: String
+}
+
+"""
+CreateUserAddrInput is used for create UserAddr object.
+Input was generated by ent.
+"""
+input CreateUserAddrInput {
+  """详细地址"""
+  addr: String
+  """邮箱"""
+  email: String
+  """传真"""
+  fax: String
+  """是否默认地址，类型为delivery时使用"""
+  isDefault: Boolean
+  """手机"""
+  mobile: String
+  """联系人名称"""
+  name: String
+  regionID: ID
+  """电话"""
+  tel: String
+  userID: ID
+  """邮编"""
+  zipCode: String
+}
+
+"""
+CreateUserDeviceInput is used for create UserDevice object.
+Input was generated by ent.
+"""
+input CreateUserDeviceInput {
+  """app版本"""
+  appVersion: String
+  """备注"""
+  comments: String
+  """设备型号"""
+  deviceModel: String
+  """设备名称"""
+  deviceName: String
+  """设备唯一ID"""
+  deviceUID: String!
+  """状态,可用或不可用及其他待确认状态"""
+  status: UserDeviceSimpleStatus
+  """系统名称"""
+  systemName: String
+  """系统版本"""
+  systemVersion: String
+  userID: ID
+}
+
+"""
 CreateUserIdentityInput is used for create UserIdentity object.
 Input was generated by ent.
 """
@@ -1973,22 +2543,30 @@ CreateUserInput is used for create User object.
 Input was generated by ent.
 """
 input CreateUserInput {
+  addressIDs: [ID!]
   """头像地址"""
   avatar: String
-  """头像,存储路规则：/{appcode}/{tid}/xxx"""
-  avatarFileID: ID
+  citizenshipID: ID
   """备注"""
   comments: String
+  """地址信息"""
+  contact: CreateUserAddrInput
   deviceIDs: [ID!]
   """显示名"""
   displayName: String!
-  """邮箱"""
-  email: String
+  """名字"""
+  firstName: String
+  """性别"""
+  gender: UserGender
   identityIDs: [ID!]
+  """语言"""
+  lang: String
+  """姓氏"""
+  lastName: String
   loginProfile: CreateUserLoginProfileInput
   loginProfileID: ID
-  """手机"""
-  mobile: String
+  """中间名"""
+  middleName: String
   oauthClientIDs: [ID!]
   """如指定密码则填入,否则由系统自动生成密码"""
   password: CreateUserPasswordInput
@@ -2030,6 +2608,193 @@ input CreateUserPasswordInput {
 }
 
 """
+CreateUserPasswordPolicyInput is used for create UserPasswordPolicy object.
+Input was generated by ent.
+"""
+input CreateUserPasswordPolicyInput {
+  """是否允许包含用户名"""
+  allowIncludeUserName: Boolean
+  """密码错误多少次出现验证码，最大5次，0代表不出现验证码"""
+  captchaTimes: Int
+  """最少包含的不同字符数，最多8个，0代表不限制"""
+  includeChar: Int
+  """必须包含的元素，异或：1-小写字母，2-大写字母，4-数字，8-符号"""
+  includeElement: Int
+  """有效天数，最大1095天，0代表不过期"""
+  invalidDay: Int
+  """过期后是否限制登录"""
+  invalidLoginLimit: Boolean
+  """密码最短长度，长度应在6-32位之间"""
+  length: Int
+  orgID: ID
+  """一小时内密码错误最多尝试次数，最大32次，0代表不限次数"""
+  retry: Int
+}
+
+type Currency implements Node {
+  """代码"""
+  code: String!
+  createdAt: Time!
+  createdBy: Int!
+  id: ID!
+  """中文名称"""
+  name: String!
+  """货币符号"""
+  sign: String
+  """状态"""
+  status: CurrencySimpleStatus!
+  updatedAt: Time
+  updatedBy: Int
+}
+
+"""A connection to a list of items."""
+type CurrencyConnection {
+  """A list of edges."""
+  edges: [CurrencyEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type CurrencyEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+  """The item at the end of the edge."""
+  node: Currency
+}
+
+"""Ordering options for Currency connections"""
+input CurrencyOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order Currencies."""
+  field: CurrencyOrderField!
+}
+
+"""Properties by which Currency connections can be ordered."""
+enum CurrencyOrderField {
+  createdAt
+}
+
+"""CurrencySimpleStatus is enum for the field status"""
+enum CurrencySimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
+  active
+  disabled
+  inactive
+  processing
+}
+
+"""
+CurrencyWhereInput is used for filtering Currency objects.
+Input was generated by ent.
+"""
+input CurrencyWhereInput {
+  and: [CurrencyWhereInput!]
+  """code field predicates"""
+  code: String
+  codeContains: String
+  codeContainsFold: String
+  codeEqualFold: String
+  codeGT: String
+  codeGTE: String
+  codeHasPrefix: String
+  codeHasSuffix: String
+  codeIn: [String!]
+  codeLT: String
+  codeLTE: String
+  codeNEQ: String
+  codeNotIn: [String!]
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtIn: [Time!]
+  createdAtLT: Time
+  createdAtLTE: Time
+  createdAtNEQ: Time
+  createdAtNotIn: [Time!]
+  """created_by field predicates"""
+  createdBy: Int
+  createdByGT: Int
+  createdByGTE: Int
+  createdByIn: [Int!]
+  createdByLT: Int
+  createdByLTE: Int
+  createdByNEQ: Int
+  createdByNotIn: [Int!]
+  """id field predicates"""
+  id: ID
+  idGT: ID
+  idGTE: ID
+  idIn: [ID!]
+  idLT: ID
+  idLTE: ID
+  idNEQ: ID
+  idNotIn: [ID!]
+  """name field predicates"""
+  name: String
+  nameContains: String
+  nameContainsFold: String
+  nameEqualFold: String
+  nameGT: String
+  nameGTE: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameIn: [String!]
+  nameLT: String
+  nameLTE: String
+  nameNEQ: String
+  nameNotIn: [String!]
+  not: CurrencyWhereInput
+  or: [CurrencyWhereInput!]
+  """sign field predicates"""
+  sign: String
+  signContains: String
+  signContainsFold: String
+  signEqualFold: String
+  signGT: String
+  signGTE: String
+  signHasPrefix: String
+  signHasSuffix: String
+  signIn: [String!]
+  signIsNil: Boolean
+  signLT: String
+  signLTE: String
+  signNEQ: String
+  signNotIn: [String!]
+  signNotNil: Boolean
+  """status field predicates"""
+  status: CurrencySimpleStatus
+  statusIn: [CurrencySimpleStatus!]
+  statusNEQ: CurrencySimpleStatus
+  statusNotIn: [CurrencySimpleStatus!]
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtIn: [Time!]
+  updatedAtIsNil: Boolean
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtNEQ: Time
+  updatedAtNotIn: [Time!]
+  updatedAtNotNil: Boolean
+  """updated_by field predicates"""
+  updatedBy: Int
+  updatedByGT: Int
+  updatedByGTE: Int
+  updatedByIn: [Int!]
+  updatedByIsNil: Boolean
+  updatedByLT: Int
+  updatedByLTE: Int
+  updatedByNEQ: Int
+  updatedByNotIn: [Int!]
+  updatedByNotNil: Boolean
+}
+
+"""
 Define a Relay Cursor type:
 https://relay.dev/graphql/connections.htm#sec-Cursor
 """
@@ -2041,53 +2806,9 @@ input EnableDirectoryInput {
   name: String!
 }
 
-type File implements Node {
-  createdAt: Time!
-  createdBy: Int!
-  id: ID!
-  """md5值"""
-  md5: String
-  """媒体类型，如：image/png"""
-  mineType: String
-  """文件名称"""
-  name: String!
-  """文件相对路径"""
-  path: String!
-  """文件大小，单位为B"""
-  size: Int
-  """文件来源"""
-  source: FileSource!
-  """文件来源"""
-  sourceID: ID!
-  """租户ID"""
-  tenantID: Int!
-  updatedAt: Time
-  updatedBy: Int
-}
-
-"""A connection to a list of items."""
-type FileConnection {
-  """A list of edges."""
-  edges: [FileEdge]
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
-  totalCount: Int!
-}
-
-"""An edge in a connection."""
-type FileEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor!
-  """The item at the end of the edge."""
-  node: File
-}
-
 type FileIdentity implements Node {
   """accesskey id"""
   accessKeyID: String!
-  """accesskey secret"""
-  accessKeySecret: String!
   """备注"""
   comments: String
   createdAt: Time!
@@ -2105,7 +2826,7 @@ type FileIdentity implements Node {
   """角色的资源名称(ARN)，用于STS"""
   roleArn: String!
   source: FileSource!
-  """组织ID"""
+  """租户ID"""
   tenantID: ID!
   updatedAt: Time
   updatedBy: Int
@@ -2127,6 +2848,23 @@ type FileIdentityEdge {
   cursor: Cursor!
   """The item at the end of the edge."""
   node: FileIdentity
+}
+
+"""内部调用fileIdentity"""
+type FileIdentityForApp implements Node {
+  accessKeyID: String!
+  accessKeySecret: String!
+  """STS令牌的有效期，默认3600s"""
+  durationSeconds: Int
+  id: ID!
+  """租户默认的凭证"""
+  isDefault: Boolean!
+  """指定返回的STS令牌的权限的策略"""
+  policy: String
+  """角色的资源名称(ARN)，用于STS"""
+  roleArn: String!
+  source: FileSource!
+  tenantID: ID!
 }
 
 """Ordering options for FileIdentity connections"""
@@ -2161,20 +2899,6 @@ input FileIdentityWhereInput {
   accessKeyIDLTE: String
   accessKeyIDNEQ: String
   accessKeyIDNotIn: [String!]
-  """access_key_secret field predicates"""
-  accessKeySecret: String
-  accessKeySecretContains: String
-  accessKeySecretContainsFold: String
-  accessKeySecretEqualFold: String
-  accessKeySecretGT: String
-  accessKeySecretGTE: String
-  accessKeySecretHasPrefix: String
-  accessKeySecretHasSuffix: String
-  accessKeySecretIn: [String!]
-  accessKeySecretLT: String
-  accessKeySecretLTE: String
-  accessKeySecretNEQ: String
-  accessKeySecretNotIn: [String!]
   and: [FileIdentityWhereInput!]
   """created_at field predicates"""
   createdAt: Time
@@ -2289,19 +3013,6 @@ input FileIdentityWhereInput {
   updatedByNotNil: Boolean
 }
 
-"""Ordering options for File connections"""
-input FileOrder {
-  """The ordering direction."""
-  direction: OrderDirection! = ASC
-  """The field by which to order Files."""
-  field: FileOrderField!
-}
-
-"""Properties by which File connections can be ordered."""
-enum FileOrderField {
-  createdAt
-}
-
 type FileSource implements Node {
   """文件存储空间"""
   bucket: String!
@@ -2315,22 +3026,6 @@ type FileSource implements Node {
   endpoint: String!
   """是否禁止修改endpoint，如果是自定义域名设为true"""
   endpointImmutable: Boolean!
-  files(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-    """Returns the first _n_ elements from the list."""
-    first: Int
-    """Returns the last _n_ elements from the list."""
-    last: Int
-    """Ordering options for Files returned from the connection."""
-    orderBy: FileOrder
-    """Filtering options for Files returned from the connection."""
-    where: FileWhereInput
-  ): FileConnection!
   id: ID!
   """文件来源"""
   kind: FileSourceKind!
@@ -2361,10 +3056,9 @@ type FileSourceEdge {
 }
 
 """FileSourceKind is enum for the field kind"""
-enum FileSourceKind {
+enum FileSourceKind @goModel(model: "github.com/woocoos/knockout/ent/filesource.Kind") {
   aliOSS
   awsS3
-  local
   minio
 }
 
@@ -2450,9 +3144,6 @@ input FileSourceWhereInput {
   endpointLTE: String
   endpointNEQ: String
   endpointNotIn: [String!]
-  """files edge predicates"""
-  hasFiles: Boolean
-  hasFilesWith: [FileWhereInput!]
   """identities edge predicates"""
   hasIdentities: Boolean
   hasIdentitiesWith: [FileIdentityWhereInput!]
@@ -2524,121 +3215,6 @@ input FileSourceWhereInput {
   updatedByNotNil: Boolean
 }
 
-"""
-FileWhereInput is used for filtering File objects.
-Input was generated by ent.
-"""
-input FileWhereInput {
-  and: [FileWhereInput!]
-  """created_at field predicates"""
-  createdAt: Time
-  createdAtGT: Time
-  createdAtGTE: Time
-  createdAtIn: [Time!]
-  createdAtLT: Time
-  createdAtLTE: Time
-  createdAtNEQ: Time
-  createdAtNotIn: [Time!]
-  """created_by field predicates"""
-  createdBy: Int
-  createdByGT: Int
-  createdByGTE: Int
-  createdByIn: [Int!]
-  createdByLT: Int
-  createdByLTE: Int
-  createdByNEQ: Int
-  createdByNotIn: [Int!]
-  """source edge predicates"""
-  hasSource: Boolean
-  hasSourceWith: [FileSourceWhereInput!]
-  """id field predicates"""
-  id: ID
-  idGT: ID
-  idGTE: ID
-  idIn: [ID!]
-  idLT: ID
-  idLTE: ID
-  idNEQ: ID
-  idNotIn: [ID!]
-  """name field predicates"""
-  name: String
-  nameContains: String
-  nameContainsFold: String
-  nameEqualFold: String
-  nameGT: String
-  nameGTE: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameIn: [String!]
-  nameLT: String
-  nameLTE: String
-  nameNEQ: String
-  nameNotIn: [String!]
-  not: FileWhereInput
-  or: [FileWhereInput!]
-  """path field predicates"""
-  path: String
-  pathContains: String
-  pathContainsFold: String
-  pathEqualFold: String
-  pathGT: String
-  pathGTE: String
-  pathHasPrefix: String
-  pathHasSuffix: String
-  pathIn: [String!]
-  pathLT: String
-  pathLTE: String
-  pathNEQ: String
-  pathNotIn: [String!]
-  """size field predicates"""
-  size: Int
-  sizeGT: Int
-  sizeGTE: Int
-  sizeIn: [Int!]
-  sizeIsNil: Boolean
-  sizeLT: Int
-  sizeLTE: Int
-  sizeNEQ: Int
-  sizeNotIn: [Int!]
-  sizeNotNil: Boolean
-  """source_id field predicates"""
-  sourceID: ID
-  sourceIDIn: [ID!]
-  sourceIDNEQ: ID
-  sourceIDNotIn: [ID!]
-  """tenant_id field predicates"""
-  tenantID: Int
-  tenantIDGT: Int
-  tenantIDGTE: Int
-  tenantIDIn: [Int!]
-  tenantIDLT: Int
-  tenantIDLTE: Int
-  tenantIDNEQ: Int
-  tenantIDNotIn: [Int!]
-  """updated_at field predicates"""
-  updatedAt: Time
-  updatedAtGT: Time
-  updatedAtGTE: Time
-  updatedAtIn: [Time!]
-  updatedAtIsNil: Boolean
-  updatedAtLT: Time
-  updatedAtLTE: Time
-  updatedAtNEQ: Time
-  updatedAtNotIn: [Time!]
-  updatedAtNotNil: Boolean
-  """updated_by field predicates"""
-  updatedBy: Int
-  updatedByGT: Int
-  updatedByGTE: Int
-  updatedByIn: [Int!]
-  updatedByIsNil: Boolean
-  updatedByLT: Int
-  updatedByLTE: Int
-  updatedByNEQ: Int
-  updatedByNotIn: [Int!]
-  updatedByNotNil: Boolean
-}
-
 """An object with a Global ID,for using in Noder interface."""
 scalar GID
 
@@ -2646,6 +3222,14 @@ input GrantInput {
   orgScope: ID!
   policyID: ID!
   principal: GID!
+}
+
+"""列表操作类型"""
+enum ListAction {
+  """下移"""
+  down
+  """上移"""
+  up
 }
 
 type Mfa {
@@ -2658,6 +3242,12 @@ type Mutation {
   allotOrganizationUser(input: CreateOrgUserInput!): Boolean!
   """角色添加策略"""
   assignAppRolePolicy(appID: ID!, policyIDs: [ID!], roleID: ID!): Boolean!
+  """应用角色添加策略视图权限"""
+  assignAppRolePolicyView(addAppPolicyIDs: [ID!], appID: ID!, rmAppPolicyIDs: [ID!], roleID: ID!): Boolean!
+  """组织角色添加策略视图权限"""
+  assignOrgRolePolicyView(addOrgPolicyIDs: [ID!], orgID: ID!, rmOrgPolicyIDs: [ID!], roleID: ID!): Boolean!
+  """组织用户添加策略视图权限"""
+  assignOrgUserPolicyView(addOrgPolicyIDs: [ID!], orgID: ID!, rmOrgPolicyIDs: [ID!], userID: ID!): Boolean!
   """分配应用,将自动分配应用下的所有资源"""
   assignOrganizationApp(appID: ID!, orgID: ID!): Boolean!
   """分配应用策略到组织"""
@@ -2666,8 +3256,12 @@ type Mutation {
   assignOrganizationAppRole(appRoleID: ID!, orgID: ID!): Boolean!
   """分配组用户"""
   assignRoleUser(input: AssignRoleUserInput!): Boolean!
+  """自动授权应用，系统开户、创建web交易用户使用"""
+  autoGrantApp(appCode: String!, orgID: ID!, userID: ID!): Boolean!
   """绑定用户凭证(管理端使用)"""
   bindUserIdentity(input: CreateUserIdentityInput!): UserIdentity
+  """更改组织用户类型"""
+  changeOrgUserType(orgID: ID!, userID: ID!, userType: OrgUserUserType!): Boolean!
   """用户修改自己的登录密码"""
   changePassword(newPwd: String!, oldPwd: String!): Boolean!
   """创建应用"""
@@ -2681,9 +3275,20 @@ type Mutation {
   """创建应用菜单"""
   createAppMenus(appID: ID!, input: [CreateAppMenuInput!]): [AppMenu]!
   """创建应用策略模板"""
-  createAppPolicy(appID: ID!, input: CreateAppPolicyInput!): AppPolicy
+  createAppPolicy(
+    appID: ID!
+    """策略视图id，有传就关联视图"""
+    appPolicyViewID: ID
+    input: CreateAppPolicyInput!
+  ): AppPolicy
+  """创建策略视图"""
+  createAppPolicyView(input: CreateAppPolicyViewInput!): AppPolicyView!
   """创建应用角色"""
   createAppRole(appID: ID!, input: CreateAppRoleInput!): AppRole
+  """创建国家"""
+  createCountry(input: CreateCountryInput!): Country
+  """创建货币"""
+  createCurrency(input: CreateCurrencyInput!): Currency
   """创建文件凭证"""
   createFileIdentity(input: CreateFileIdentityInput!): FileIdentity!
   """创建文件来源"""
@@ -2703,13 +3308,23 @@ type Mutation {
   """创建组织用户"""
   createOrganizationUser(
     input: CreateUserInput!
+    """用户类型"""
+    orgUserType: OrgUserUserType
     """根组织ID"""
     rootOrgID: ID!
   ): User
+  """设置配额"""
+  createQuota(input: CreateQuotaInput!): Quota!
+  """创建配额项"""
+  createQuotaItem(input: CreateQuotaItemInput!): QuotaItem!
+  """创建地区"""
+  createRegion(input: CreateRegionInput!): Region
   """创建角色或组"""
   createRole(input: CreateOrgRoleInput!): OrgRole
   """创建组织根节点(管理端使用)"""
   createRoot(input: CreateOrgInput!): Org
+  """设置密码策略"""
+  createUserPasswordPolicy(input: CreateUserPasswordPolicyInput!, orgID: ID!): UserPasswordPolicy
   """删除应用"""
   deleteApp(appID: ID!): Boolean!
   """删除应用操作"""
@@ -2722,8 +3337,14 @@ type Mutation {
   deleteAppMenu(menuID: ID!): Boolean!
   """删除应用策略模板"""
   deleteAppPolicy(policyID: ID!): Boolean!
+  """删除策略视图"""
+  deleteAppPolicyView(appPolicyViewID: ID!): Boolean!
   """删除应用角色"""
   deleteAppRole(roleID: ID!): Boolean!
+  """删除国家"""
+  deleteCountry(countryID: ID!): Boolean!
+  """删除货币"""
+  deleteCurrency(currencyID: ID!): Boolean!
   """删除文件凭证"""
   deleteFileIdentity(id: ID!): Boolean!
   """删除文件来源"""
@@ -2734,12 +3355,22 @@ type Mutation {
   deleteOrganization(orgID: ID!): Boolean!
   """删除组织策略"""
   deleteOrganizationPolicy(orgPolicyID: ID!): Boolean!
+  """删除配额"""
+  deleteQuota(id: ID!): Boolean!
+  """删除配额项"""
+  deleteQuotaItem(id: ID!): Boolean!
+  """删除地区"""
+  deleteRegion(regionID: ID!): Boolean!
   """删除角色或组"""
   deleteRole(roleID: ID!): Boolean!
   """删除用户"""
   deleteUser(userID: ID!): Boolean!
+  """删除用户设备"""
+  deleteUserDevice(deviceID: ID!, userID: ID!): Boolean!
   """删除用户凭证"""
   deleteUserIdentity(id: ID!): Boolean!
+  """删除密码策略"""
+  deleteUserPasswordPolicy: Boolean!
   """禁用MFA"""
   disableMFA(userID: ID!): Boolean!
   """禁用OauthClient"""
@@ -2750,12 +3381,24 @@ type Mutation {
   enableMFA(userID: ID!): Mfa!
   """启用OauthClient"""
   enableOauthClient(id: ID!): OauthClient!
+  """开启用户设备验证"""
+  enableVerifyUserDevice(deviceInfoInput: CreateUserDeviceInput!, enable: Boolean!, userID: ID!): Boolean!
   """授权"""
   grant(input: CreatePermissionInput!): Permission
   """移动节点"""
   moveAppDictItem(action: TreeAction!, sourceID: ID!, targetID: ID!): Boolean!
   """应用菜单位置调整，targetLocation: child, up, down"""
   moveAppMenu(action: TreeAction!, sourceID: ID!, targetID: ID!): Boolean!
+  """移动策略视图"""
+  moveAppPolicyView(action: TreeAction!, sourceID: ID!, targetID: ID!): Boolean!
+  """国家位置调整，action: child, up, down"""
+  moveCountry(
+    action: ListAction!
+    """要移动的节点组织ID"""
+    sourceID: ID!
+    """目标节点组织ID"""
+    targetId: ID!
+  ): Boolean!
   """组织位置调整，action: child, up, down"""
   moveOrganization(
     action: TreeAction!
@@ -2764,8 +3407,16 @@ type Mutation {
     """目标节点组织ID"""
     targetId: ID!
   ): Boolean!
+  """地区位置调整，action: child, up, down"""
+  moveRegion(
+    action: TreeAction!
+    """要移动的节点组织ID"""
+    sourceID: ID!
+    """目标节点组织ID"""
+    targetId: ID!
+  ): Boolean!
   """恢复用户"""
-  recoverOrgUser(pwdInput: CreateUserPasswordInput, pwdKind: UserLoginProfileSetKind!, userID: ID!, userInput: UpdateUserInput!): User!
+  recoverOrgUser(contact: UpdateUserAddrInput, pwdInput: CreateUserPasswordInput, pwdKind: UserLoginProfileSetKind!, userID: ID!, userInput: UpdateUserInput!): User!
   """从组织目录中移除用户"""
   removeOrganizationUser(
     """目标组织ID,可为根组织ID"""
@@ -2797,6 +3448,8 @@ type Mutation {
   sendMFAToUserByEmail(userID: ID!): Boolean!
   """设置默认凭证"""
   setDefaultFileIdentity(identityID: ID!, orgID: ID!): Boolean!
+  """同步角色权限策略到组织"""
+  syncAppRoleToOrg(appRoleID: ID!, orgID: ID!): Boolean!
   """更新应用"""
   updateApp(appID: ID!, input: UpdateAppInput!): App
   """更新应用操作"""
@@ -2809,10 +3462,16 @@ type Mutation {
   updateAppMenu(input: UpdateAppMenuInput!, menuID: ID!): AppMenu
   """更新应用策略模板"""
   updateAppPolicy(input: UpdateAppPolicyInput!, policyID: ID!): AppPolicy
+  """更新策略视图"""
+  updateAppPolicyView(appPolicyViewID: ID!, input: UpdateAppPolicyViewInput!): AppPolicyView!
   """修改资源名称"""
   updateAppRes(appResID: ID!, input: UpdateAppResInput!): AppRes
   """更新应用角色"""
   updateAppRole(input: UpdateAppRoleInput!, roleID: ID!): AppRole
+  """更新国家"""
+  updateCountry(countryID: ID!, input: UpdateCountryInput!): Country
+  """更新货币"""
+  updateCurrency(currencyID: ID!, input: UpdateCurrencyInput!): Currency
   """更新文件凭证"""
   updateFileIdentity(id: ID!, input: UpdateFileIdentityInput!): FileIdentity!
   """更新文件来源"""
@@ -2825,17 +3484,27 @@ type Mutation {
   updateOrganizationPolicy(input: UpdateOrgPolicyInput!, orgPolicyID: ID!): OrgPolicy
   """更新授权"""
   updatePermission(input: UpdatePermissionInput!, permissionID: ID!): Permission
+  """更新配额"""
+  updateQuota(id: ID!, input: UpdateQuotaInput!): Quota!
+  """更新配额项"""
+  updateQuotaItem(id: ID!, input: UpdateQuotaItemInput!): QuotaItem!
+  """更新地区"""
+  updateRegion(input: UpdateRegionInput!, regionID: ID!): Region
   """更新角色或组"""
   updateRole(input: UpdateOrgRoleInput!, roleID: ID!): OrgRole
   """更新用户"""
-  updateUser(input: UpdateUserInput!, userID: ID!): User
+  updateUser(contact: UpdateUserAddrInput, input: UpdateUserInput!, userID: ID!): User
+  """更新用户设备"""
+  updateUserDevice(deviceID: ID!, input: UpdateUserDeviceInput!): UserDevice!
+  """更新密码策略"""
+  updateUserPasswordPolicy(input: UpdateUserPasswordPolicyInput!, orgID: ID!): UserPasswordPolicy
 }
 
 """
 An object with an ID.
 Follows the [Relay Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm)
 """
-interface Node {
+interface Node @goModel(model: "github.com/woocoos/knockout/ent.Noder") {
   """The id of the object."""
   id: ID!
 }
@@ -2864,7 +3533,7 @@ type OauthClient implements Node {
 }
 
 """OauthClientGrantTypes is enum for the field grant_types"""
-enum OauthClientGrantTypes {
+enum OauthClientGrantTypes @goModel(model: "github.com/woocoos/knockout/ent/oauthclient.GrantTypes") {
   client_credentials
 }
 
@@ -2882,7 +3551,7 @@ enum OauthClientOrderField {
 }
 
 """OauthClientSimpleStatus is enum for the field status"""
-enum OauthClientSimpleStatus {
+enum OauthClientSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -2991,6 +3660,10 @@ enum OrderDirection {
 }
 
 type Org implements Node {
+  """获取顶级组织"""
+  TopOrg: Org
+  """组织的domain，如果没有设置，则会取最近的父组织的domain"""
+  actualDomain: String!
   apps(
     """Returns the elements in the list that come after the specified cursor."""
     after: Cursor
@@ -3014,6 +3687,8 @@ type Org implements Node {
   countryCode: String
   createdAt: Time!
   createdBy: Int!
+  """自定义域名"""
+  customDomain: [String!]
   deletedAt: Time
   displaySort: Int
   """默认域名"""
@@ -3025,8 +3700,14 @@ type Org implements Node {
   isAllowRevokeAppPolicy(appPolicyID: ID!): Boolean!
   """分类: 根节点,组织节点"""
   kind: OrgKind!
+  """组织本位币"""
+  localCurrency: String
+  """组织图标"""
+  logo: OrgLogo
   """组织名称"""
   name: String!
+  """组织下登录策略"""
+  orgQuota: [Quota!]
   """管理账户"""
   owner: User
   """管理账户ID,如果设置则该组织将升级为根组织"""
@@ -3076,6 +3757,8 @@ type Org implements Node {
   timezone: String
   updatedAt: Time
   updatedBy: Int
+  """组织下密码策略"""
+  userPasswordPolicy: UserPasswordPolicy
   users(
     """Returns the elements in the list that come after the specified cursor."""
     after: Cursor
@@ -3131,9 +3814,21 @@ type OrgFileIdentity {
 }
 
 """OrgKind is enum for the field kind"""
-enum OrgKind {
+enum OrgKind @goModel(model: "github.com/woocoos/knockout/ent/org.Kind") {
   org
   root
+}
+
+type OrgLogo {
+  favicon: String
+  logo: String
+  thumbLogo: String
+}
+
+input OrgLogoInput {
+  favicon: String
+  logo: String
+  thumbLogo: String
 }
 
 """Ordering options for Org connections"""
@@ -3151,8 +3846,10 @@ enum OrgOrderField {
 }
 
 type OrgPolicy implements Node {
+  app: App
+  appPolicy: AppPolicy
   """所属应用策略,如果是自定义应用策略,则为空"""
-  appPolicyID: Int
+  appPolicyID: ID
   """描述"""
   comments: String
   createdAt: Time!
@@ -3165,7 +3862,7 @@ type OrgPolicy implements Node {
   """策略名称"""
   name: String!
   org: Org
-  """组织ID"""
+  """租户ID"""
   orgID: ID
   permissions: [Permission!]
   """策略规则"""
@@ -3212,15 +3909,11 @@ Input was generated by ent.
 input OrgPolicyWhereInput {
   and: [OrgPolicyWhereInput!]
   """app_policy_id field predicates"""
-  appPolicyID: Int
-  appPolicyIDGT: Int
-  appPolicyIDGTE: Int
-  appPolicyIDIn: [Int!]
+  appPolicyID: ID
+  appPolicyIDIn: [ID!]
   appPolicyIDIsNil: Boolean
-  appPolicyIDLT: Int
-  appPolicyIDLTE: Int
-  appPolicyIDNEQ: Int
-  appPolicyIDNotIn: [Int!]
+  appPolicyIDNEQ: ID
+  appPolicyIDNotIn: [ID!]
   appPolicyIDNotNil: Boolean
   """comments field predicates"""
   comments: String
@@ -3256,6 +3949,12 @@ input OrgPolicyWhereInput {
   createdByLTE: Int
   createdByNEQ: Int
   createdByNotIn: [Int!]
+  """app edge predicates"""
+  hasApp: Boolean
+  """app_policy edge predicates"""
+  hasAppPolicy: Boolean
+  hasAppPolicyWith: [AppPolicyWhereInput!]
+  hasAppWith: [AppWhereInput!]
   """org edge predicates"""
   hasOrg: Boolean
   hasOrgWith: [OrgWhereInput!]
@@ -3332,7 +4031,7 @@ type OrgRole implements Node {
   kind: OrgRoleKind!
   """名称"""
   name: String!
-  """组织ID"""
+  """租户ID"""
   orgID: ID
   updatedAt: Time
   updatedBy: Int
@@ -3357,7 +4056,7 @@ type OrgRoleEdge {
 }
 
 """OrgRoleKind is enum for the field kind"""
-enum OrgRoleKind {
+enum OrgRoleKind @goModel(model: "github.com/woocoos/knockout/ent/orgrole.Kind") {
   group
   role
 }
@@ -3552,7 +4251,7 @@ input OrgRoleWhereInput {
 }
 
 """OrgSimpleStatus is enum for the field status"""
-enum OrgSimpleStatus {
+enum OrgSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -3581,7 +4280,7 @@ type OrgUserPreference implements Node {
   """用户最近访问菜单"""
   menuRecent: [ID!]
   org: Org!
-  """组织ID"""
+  """租户ID"""
   orgID: ID!
   updatedAt: Time
   updatedBy: Int
@@ -3703,6 +4402,12 @@ input OrgUserPreferenceWhereInput {
   userIDNotIn: [ID!]
 }
 
+"""OrgUserUserType is enum for the field user_type"""
+enum OrgUserUserType @goModel(model: "github.com/woocoos/knockout/ent/orguser.UserType") {
+  external
+  internal
+}
+
 """
 OrgUserWhereInput is used for filtering OrgUser objects.
 Input was generated by ent.
@@ -3783,6 +4488,11 @@ input OrgUserWhereInput {
   updatedByNEQ: Int
   updatedByNotIn: [Int!]
   updatedByNotNil: Boolean
+  """user_type field predicates"""
+  userType: OrgUserUserType
+  userTypeIn: [OrgUserUserType!]
+  userTypeNEQ: OrgUserUserType
+  userTypeNotIn: [OrgUserUserType!]
 }
 
 """
@@ -3877,6 +4587,9 @@ input OrgWhereInput {
   """file_identities edge predicates"""
   hasFileIdentities: Boolean
   hasFileIdentitiesWith: [FileIdentityWhereInput!]
+  """org_quota edge predicates"""
+  hasOrgQuota: Boolean
+  hasOrgQuotaWith: [QuotaWhereInput!]
   """org_user edge predicates"""
   hasOrgUser: Boolean
   hasOrgUserWith: [OrgUserWhereInput!]
@@ -3895,6 +4608,9 @@ input OrgWhereInput {
   """roles_and_groups edge predicates"""
   hasRolesAndGroups: Boolean
   hasRolesAndGroupsWith: [OrgRoleWhereInput!]
+  """user_password_policy edge predicates"""
+  hasUserPasswordPolicy: Boolean
+  hasUserPasswordPolicyWith: [UserPasswordPolicyWhereInput!]
   """users edge predicates"""
   hasUsers: Boolean
   hasUsersWith: [UserWhereInput!]
@@ -3912,6 +4628,22 @@ input OrgWhereInput {
   kindIn: [OrgKind!]
   kindNEQ: OrgKind
   kindNotIn: [OrgKind!]
+  """local_currency field predicates"""
+  localCurrency: String
+  localCurrencyContains: String
+  localCurrencyContainsFold: String
+  localCurrencyEqualFold: String
+  localCurrencyGT: String
+  localCurrencyGTE: String
+  localCurrencyHasPrefix: String
+  localCurrencyHasSuffix: String
+  localCurrencyIn: [String!]
+  localCurrencyIsNil: Boolean
+  localCurrencyLT: String
+  localCurrencyLTE: String
+  localCurrencyNEQ: String
+  localCurrencyNotIn: [String!]
+  localCurrencyNotNil: Boolean
   """name field predicates"""
   name: String
   nameContains: String
@@ -4027,7 +4759,7 @@ type Permission implements Node {
   """是否允许撤销：根用户授权及系统角色授权不允许撤销"""
   isAllowRevoke: Boolean!
   org: Org!
-  """授权的域根组织"""
+  """授权的租户"""
   orgID: ID!
   orgPolicy: OrgPolicy!
   """策略"""
@@ -4080,13 +4812,13 @@ enum PermissionOrderField {
 }
 
 """PermissionPrincipalKind is enum for the field principal_kind"""
-enum PermissionPrincipalKind {
+enum PermissionPrincipalKind @goModel(model: "github.com/woocoos/knockout/ent/permission.PrincipalKind") {
   role
   user
 }
 
 """PermissionSimpleStatus is enum for the field status"""
-enum PermissionSimpleStatus {
+enum PermissionSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -4244,6 +4976,8 @@ input PolicyRuleInput {
 type Query {
   """检测应用登录授权"""
   appAccess(appCode: String!): Boolean!
+  """检测应用登录授权,针对获取token处理"""
+  appAccessForToken(appCode: String!, clientID: String!, clientSecret: String!): Boolean!
   """根据ref_code获取数据字典,用于批量获取"""
   appDictByRefCode(
     """ref_code规则：<appCode:appDictCode>"""
@@ -4273,6 +5007,10 @@ type Query {
   ): AppDictConnection!
   """应用策略授权的组织列表"""
   appPolicyAssignedToOrgs(policyID: ID!, where: OrgWhereInput): [Org!]!
+  """应用策略视图"""
+  appPolicyView(appCode: String!): [AppPolicyView!]!
+  """应用策略视图角色选中项"""
+  appPolicyViewRoleAssigned(appRoleID: ID!): [AppPolicyView!]!
   """获取应用资源模板"""
   appResources(after: Cursor, appID: ID!, before: Cursor, first: Int, last: Int, orderBy: AppResOrder, where: AppResWhereInput): AppResConnection!
   """应用角色授权的组织列表"""
@@ -4299,6 +5037,45 @@ type Query {
     """appCode + ":" + action"""
     permission: String!
   ): Boolean!
+  """
+  检测权限 ko-proxy使用
+  @deprecated 未来将弃用.
+  """
+  checkPermissionByJwt(action: String!, appCode: String!, jwtStr: String!, orgID: ID!): Boolean!
+  """国家查询"""
+  countries(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: Cursor
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    """Ordering options for Countries returned from the connection."""
+    orderBy: CountryOrder
+    """Filtering options for Countries returned from the connection."""
+    where: CountryWhereInput
+  ): CountryConnection!
+  """货币查询"""
+  currencies(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: Cursor
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    """Ordering options for Currencies returned from the connection."""
+    orderBy: CurrencyOrder
+    """Filtering options for Currencies returned from the connection."""
+    where: CurrencyWhereInput
+  ): CurrencyConnection!
   """文件凭证"""
   fileIdentities(
     """Returns the elements in the list that come after the specified cursor."""
@@ -4316,8 +5093,10 @@ type Query {
     """Filtering options for FileIdentities returned from the connection."""
     where: FileIdentityWhereInput
   ): FileIdentityConnection!
-  """获取当前组织的文件凭证"""
-  fileIdentitiesForOrg: [OrgFileIdentity!]!
+  """获取文件凭证"""
+  fileIdentitiesForApp(where: FileIdentityWhereInput): [FileIdentityForApp!]!
+  """获取凭证AccessKeySecret"""
+  fileIdentityAccessKeySecret(id: ID!): String!
   """文件来源"""
   fileSources(
     """Returns the elements in the list that come after the specified cursor."""
@@ -4348,13 +5127,23 @@ type Query {
     ids: [GID!]!
   ): [Node]!
   """组织策略可授权的appActions"""
-  orgAppActions(appCode: String!): [AppAction!]!
+  orgAppActions(appCode: String!, orgID: ID!): [AppAction!]!
   """获取组织应用资源模板"""
   orgAppResources(after: Cursor, appID: ID!, before: Cursor, first: Int, last: Int, orderBy: AppResOrder, where: AppResWhereInput): AppResConnection!
+  """获取登录组织的文件凭证，登录组织未取到，则往上级组织获取"""
+  orgFileIdentities: [FileIdentity!]!
   """用户组"""
   orgGroups(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: OrgRoleOrder, where: OrgRoleWhereInput): OrgRoleConnection!
   """权限策略引用列表"""
   orgPolicyReferences(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: PermissionOrder, policyID: ID!, where: PermissionWhereInput): PermissionConnection!
+  """登录用户策略视图"""
+  orgPolicyView(appCode: String!, orgID: ID): [AppPolicyViewOrgPolicy!]!
+  """组织策略视图角色/用户组选中项，返回OrgPolicyIDs"""
+  orgPolicyViewRoleAssigned(appCode: String!, orgID: ID, orgRoleID: ID!): [ID!]!
+  """组织策略视图用户选择项，返回OrgPolicyIDs"""
+  orgPolicyViewUserAssigned(appCode: String!, orgID: ID, userID: ID!): [ID!]!
+  """组织策略视图，用户授权的角色/用户组选中项，返回OrgPolicyIDs"""
+  orgPolicyViewUserRoleAssigned(appCode: String!, orgID: ID!, userID: ID!): [ID!]!
   """组织回收站列表"""
   orgRecycleUsers(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection!
   """用户组组成员"""
@@ -4379,16 +5168,90 @@ type Query {
     """Filtering options for Orgs returned from the connection."""
     where: OrgWhereInput
   ): OrgConnection!
+  """获取父组织用户，如果是部门取所在组织用户，如果是组织取登录组织用户"""
+  parentOrgUsers(
+    after: Cursor
+    before: Cursor
+    first: Int
+    last: Int
+    orderBy: UserOrder
+    """组织ID或者部门ID"""
+    orgID: ID!
+    where: UserWhereInput
+  ): UserConnection!
+  """配额定义"""
+  quotaItems(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: Cursor
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    """Ordering options for QuotaItems returned from the connection."""
+    orderBy: QuotaItemOrder
+    """Filtering options for QuotaItems returned from the connection."""
+    where: QuotaItemWhereInput
+  ): QuotaItemConnection!
+  """配额管理"""
+  quotas(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: Cursor
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    """Ordering options for QuotaSlice returned from the connection."""
+    orderBy: QuotaOrder
+    """Filtering options for QuotaSlice returned from the connection."""
+    where: QuotaWhereInput
+  ): QuotaConnection!
+  """地区查询"""
+  regions(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: Cursor
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    """Ordering options for Regions returned from the connection."""
+    orderBy: RegionOrder
+    """Filtering options for Regions returned from the connection."""
+    where: RegionWhereInput
+  ): RegionConnection!
   """用户授权的应用列表"""
   userApps: [App!]!
   """用户继承用户组的权限策略"""
-  userExtendGroupPolicies(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: PermissionOrder, userID: ID!, where: PermissionWhereInput): PermissionConnection!
+  userExtendGroupPolicies(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: PermissionOrder, orgID: ID, userID: ID!, where: PermissionWhereInput): PermissionConnection!
+  """用户继承角色的权限策略"""
+  userExtendRolePolicies(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: PermissionOrder, orgID: ID, userID: ID!, where: PermissionWhereInput): PermissionConnection!
   """用户加入的用户组"""
-  userGroups(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: OrgRoleOrder, userID: ID!, where: OrgRoleWhereInput): OrgRoleConnection!
+  userGroups(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: OrgRoleOrder, orgID: ID, userID: ID!, where: OrgRoleWhereInput): OrgRoleConnection!
+  """成员列表"""
+  userMembers(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection!
   """用户菜单"""
   userMenus(appCode: String!): [AppMenu!]!
+  """查看用户mfa信息"""
+  userMfaInfo(orgID: ID!, userID: ID!): UserMfaInfo!
+  """用户在登录组织授权的组织角色"""
+  userOrgRoles(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: OrgRoleOrder, where: OrgRoleWhereInput): OrgRoleConnection!
+  """获取租户密码策略"""
+  userPasswordPolicy: UserPasswordPolicy
   """获取用户所有权限"""
   userPermissions(where: AppActionWhereInput): [AppAction!]!
+  """用户加入的角色"""
+  userRoles(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: OrgRoleOrder, orgID: ID, userID: ID!, where: OrgRoleWhereInput): OrgRoleConnection!
   """用户加入的root组织"""
   userRootOrgs: [Org!]!
   users(
@@ -4407,6 +5270,580 @@ type Query {
     """Filtering options for Users returned from the connection."""
     where: UserWhereInput
   ): UserConnection!
+  """获取登录用户的信息"""
+  viewer: User!
+}
+
+type Quota implements Node {
+  createdAt: Time!
+  createdBy: Int!
+  """过期时间"""
+  endAt: Time
+  id: ID!
+  """限制值"""
+  limit: Int!
+  """配额定义"""
+  quotaItem: QuotaItem!
+  """配额项ID"""
+  quotaItemID: ID!
+  """配额关联租户"""
+  quotaOrg: Org
+  """配额关联用户"""
+  quotaUser: User
+  """生效时间"""
+  startAt: Time
+  """租户ID,来源于root的组织ID."""
+  tenantID: ID
+  updatedAt: Time
+  updatedBy: Int
+  """已使用值"""
+  used: Int!
+  """来源于用户ID"""
+  userID: ID
+}
+
+"""A connection to a list of items."""
+type QuotaConnection {
+  """A list of edges."""
+  edges: [QuotaEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type QuotaEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+  """The item at the end of the edge."""
+  node: Quota
+}
+
+type QuotaItem implements Node {
+  """是否启用"""
+  active: Boolean!
+  """配额项代码,如: users,orgs"""
+  code: String!
+  createdAt: Time!
+  createdBy: Int!
+  """默认限制值"""
+  defaultLimit: Int
+  """描述"""
+  description: String
+  id: ID!
+  """配额项名称"""
+  name: String!
+  quota(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: Cursor
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    """Ordering options for QuotaSlice returned from the connection."""
+    orderBy: QuotaOrder
+    """Filtering options for QuotaSlice returned from the connection."""
+    where: QuotaWhereInput
+  ): QuotaConnection!
+  """资源类型"""
+  resourceType: QuotaItemResourceType!
+  """单位,如: 个,MB,GB"""
+  unit: String
+  updatedAt: Time
+  updatedBy: Int
+}
+
+"""A connection to a list of items."""
+type QuotaItemConnection {
+  """A list of edges."""
+  edges: [QuotaItemEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type QuotaItemEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+  """The item at the end of the edge."""
+  node: QuotaItem
+}
+
+"""Ordering options for QuotaItem connections"""
+input QuotaItemOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order QuotaItems."""
+  field: QuotaItemOrderField!
+}
+
+"""Properties by which QuotaItem connections can be ordered."""
+enum QuotaItemOrderField {
+  createdAt
+}
+
+"""QuotaItemResourceType is enum for the field resource_type"""
+enum QuotaItemResourceType @goModel(model: "github.com/woocoos/knockout/ent/quotaitem.ResourceType") {
+  network
+  number
+  storage
+}
+
+"""
+QuotaItemWhereInput is used for filtering QuotaItem objects.
+Input was generated by ent.
+"""
+input QuotaItemWhereInput {
+  """active field predicates"""
+  active: Boolean
+  activeNEQ: Boolean
+  and: [QuotaItemWhereInput!]
+  """code field predicates"""
+  code: String
+  codeContains: String
+  codeContainsFold: String
+  codeEqualFold: String
+  codeGT: String
+  codeGTE: String
+  codeHasPrefix: String
+  codeHasSuffix: String
+  codeIn: [String!]
+  codeLT: String
+  codeLTE: String
+  codeNEQ: String
+  codeNotIn: [String!]
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtIn: [Time!]
+  createdAtLT: Time
+  createdAtLTE: Time
+  createdAtNEQ: Time
+  createdAtNotIn: [Time!]
+  """created_by field predicates"""
+  createdBy: Int
+  createdByGT: Int
+  createdByGTE: Int
+  createdByIn: [Int!]
+  createdByLT: Int
+  createdByLTE: Int
+  createdByNEQ: Int
+  createdByNotIn: [Int!]
+  """default_limit field predicates"""
+  defaultLimit: Int
+  defaultLimitGT: Int
+  defaultLimitGTE: Int
+  defaultLimitIn: [Int!]
+  defaultLimitIsNil: Boolean
+  defaultLimitLT: Int
+  defaultLimitLTE: Int
+  defaultLimitNEQ: Int
+  defaultLimitNotIn: [Int!]
+  defaultLimitNotNil: Boolean
+  """quota edge predicates"""
+  hasQuota: Boolean
+  hasQuotaWith: [QuotaWhereInput!]
+  """id field predicates"""
+  id: ID
+  idGT: ID
+  idGTE: ID
+  idIn: [ID!]
+  idLT: ID
+  idLTE: ID
+  idNEQ: ID
+  idNotIn: [ID!]
+  """name field predicates"""
+  name: String
+  nameContains: String
+  nameContainsFold: String
+  nameEqualFold: String
+  nameGT: String
+  nameGTE: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameIn: [String!]
+  nameLT: String
+  nameLTE: String
+  nameNEQ: String
+  nameNotIn: [String!]
+  not: QuotaItemWhereInput
+  or: [QuotaItemWhereInput!]
+  """resource_type field predicates"""
+  resourceType: QuotaItemResourceType
+  resourceTypeIn: [QuotaItemResourceType!]
+  resourceTypeNEQ: QuotaItemResourceType
+  resourceTypeNotIn: [QuotaItemResourceType!]
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtIn: [Time!]
+  updatedAtIsNil: Boolean
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtNEQ: Time
+  updatedAtNotIn: [Time!]
+  updatedAtNotNil: Boolean
+  """updated_by field predicates"""
+  updatedBy: Int
+  updatedByGT: Int
+  updatedByGTE: Int
+  updatedByIn: [Int!]
+  updatedByIsNil: Boolean
+  updatedByLT: Int
+  updatedByLTE: Int
+  updatedByNEQ: Int
+  updatedByNotIn: [Int!]
+  updatedByNotNil: Boolean
+}
+
+"""Ordering options for Quota connections"""
+input QuotaOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order QuotaSlice."""
+  field: QuotaOrderField!
+}
+
+"""Properties by which Quota connections can be ordered."""
+enum QuotaOrderField {
+  createdAt
+}
+
+"""
+QuotaWhereInput is used for filtering Quota objects.
+Input was generated by ent.
+"""
+input QuotaWhereInput {
+  and: [QuotaWhereInput!]
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtIn: [Time!]
+  createdAtLT: Time
+  createdAtLTE: Time
+  createdAtNEQ: Time
+  createdAtNotIn: [Time!]
+  """created_by field predicates"""
+  createdBy: Int
+  createdByGT: Int
+  createdByGTE: Int
+  createdByIn: [Int!]
+  createdByLT: Int
+  createdByLTE: Int
+  createdByNEQ: Int
+  createdByNotIn: [Int!]
+  """end_at field predicates"""
+  endAt: Time
+  endAtGT: Time
+  endAtGTE: Time
+  endAtIn: [Time!]
+  endAtIsNil: Boolean
+  endAtLT: Time
+  endAtLTE: Time
+  endAtNEQ: Time
+  endAtNotIn: [Time!]
+  endAtNotNil: Boolean
+  """quota_item edge predicates"""
+  hasQuotaItem: Boolean
+  hasQuotaItemWith: [QuotaItemWhereInput!]
+  """quota_org edge predicates"""
+  hasQuotaOrg: Boolean
+  hasQuotaOrgWith: [OrgWhereInput!]
+  """quota_user edge predicates"""
+  hasQuotaUser: Boolean
+  hasQuotaUserWith: [UserWhereInput!]
+  """id field predicates"""
+  id: ID
+  idGT: ID
+  idGTE: ID
+  idIn: [ID!]
+  idLT: ID
+  idLTE: ID
+  idNEQ: ID
+  idNotIn: [ID!]
+  not: QuotaWhereInput
+  or: [QuotaWhereInput!]
+  """quota_item_id field predicates"""
+  quotaItemID: ID
+  quotaItemIDIn: [ID!]
+  quotaItemIDNEQ: ID
+  quotaItemIDNotIn: [ID!]
+  """start_at field predicates"""
+  startAt: Time
+  startAtGT: Time
+  startAtGTE: Time
+  startAtIn: [Time!]
+  startAtIsNil: Boolean
+  startAtLT: Time
+  startAtLTE: Time
+  startAtNEQ: Time
+  startAtNotIn: [Time!]
+  startAtNotNil: Boolean
+  """tenant_id field predicates"""
+  tenantID: ID
+  tenantIDIn: [ID!]
+  tenantIDIsNil: Boolean
+  tenantIDNEQ: ID
+  tenantIDNotIn: [ID!]
+  tenantIDNotNil: Boolean
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtIn: [Time!]
+  updatedAtIsNil: Boolean
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtNEQ: Time
+  updatedAtNotIn: [Time!]
+  updatedAtNotNil: Boolean
+  """updated_by field predicates"""
+  updatedBy: Int
+  updatedByGT: Int
+  updatedByGTE: Int
+  updatedByIn: [Int!]
+  updatedByIsNil: Boolean
+  updatedByLT: Int
+  updatedByLTE: Int
+  updatedByNEQ: Int
+  updatedByNotIn: [Int!]
+  updatedByNotNil: Boolean
+  """user_id field predicates"""
+  userID: ID
+  userIDIn: [ID!]
+  userIDIsNil: Boolean
+  userIDNEQ: ID
+  userIDNotIn: [ID!]
+  userIDNotNil: Boolean
+}
+
+type Region implements Node {
+  children: [Region!]
+  country: Country
+  """国家id"""
+  countryID: ID
+  createdAt: Time!
+  createdBy: Int!
+  displaySort: Int
+  id: ID!
+  """地区中文名称"""
+  name: String
+  """地区英文名称"""
+  nameEn: String
+  parent: Region
+  """父id，0为顶级"""
+  parentID: ID
+  """编码"""
+  shortCode: String
+  """状态"""
+  status: RegionSimpleStatus
+  updatedAt: Time
+  updatedBy: Int
+  """邮政编码"""
+  zipCode: String
+}
+
+"""A connection to a list of items."""
+type RegionConnection {
+  """A list of edges."""
+  edges: [RegionEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type RegionEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+  """The item at the end of the edge."""
+  node: Region
+}
+
+"""Ordering options for Region connections"""
+input RegionOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order Regions."""
+  field: RegionOrderField!
+}
+
+"""Properties by which Region connections can be ordered."""
+enum RegionOrderField {
+  createdAt
+  displaySort
+}
+
+"""RegionSimpleStatus is enum for the field status"""
+enum RegionSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
+  active
+  disabled
+  inactive
+  processing
+}
+
+"""
+RegionWhereInput is used for filtering Region objects.
+Input was generated by ent.
+"""
+input RegionWhereInput {
+  and: [RegionWhereInput!]
+  """country_id field predicates"""
+  countryID: ID
+  countryIDIn: [ID!]
+  countryIDIsNil: Boolean
+  countryIDNEQ: ID
+  countryIDNotIn: [ID!]
+  countryIDNotNil: Boolean
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtIn: [Time!]
+  createdAtLT: Time
+  createdAtLTE: Time
+  createdAtNEQ: Time
+  createdAtNotIn: [Time!]
+  """created_by field predicates"""
+  createdBy: Int
+  createdByGT: Int
+  createdByGTE: Int
+  createdByIn: [Int!]
+  createdByLT: Int
+  createdByLTE: Int
+  createdByNEQ: Int
+  createdByNotIn: [Int!]
+  """children edge predicates"""
+  hasChildren: Boolean
+  hasChildrenWith: [RegionWhereInput!]
+  """country edge predicates"""
+  hasCountry: Boolean
+  hasCountryWith: [CountryWhereInput!]
+  """parent edge predicates"""
+  hasParent: Boolean
+  hasParentWith: [RegionWhereInput!]
+  """id field predicates"""
+  id: ID
+  idGT: ID
+  idGTE: ID
+  idIn: [ID!]
+  idLT: ID
+  idLTE: ID
+  idNEQ: ID
+  idNotIn: [ID!]
+  """name field predicates"""
+  name: String
+  nameContains: String
+  nameContainsFold: String
+  """name_en field predicates"""
+  nameEn: String
+  nameEnContains: String
+  nameEnContainsFold: String
+  nameEnEqualFold: String
+  nameEnGT: String
+  nameEnGTE: String
+  nameEnHasPrefix: String
+  nameEnHasSuffix: String
+  nameEnIn: [String!]
+  nameEnIsNil: Boolean
+  nameEnLT: String
+  nameEnLTE: String
+  nameEnNEQ: String
+  nameEnNotIn: [String!]
+  nameEnNotNil: Boolean
+  nameEqualFold: String
+  nameGT: String
+  nameGTE: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameIn: [String!]
+  nameIsNil: Boolean
+  nameLT: String
+  nameLTE: String
+  nameNEQ: String
+  nameNotIn: [String!]
+  nameNotNil: Boolean
+  not: RegionWhereInput
+  or: [RegionWhereInput!]
+  """parent_id field predicates"""
+  parentID: ID
+  parentIDIn: [ID!]
+  parentIDIsNil: Boolean
+  parentIDNEQ: ID
+  parentIDNotIn: [ID!]
+  parentIDNotNil: Boolean
+  """short_code field predicates"""
+  shortCode: String
+  shortCodeContains: String
+  shortCodeContainsFold: String
+  shortCodeEqualFold: String
+  shortCodeGT: String
+  shortCodeGTE: String
+  shortCodeHasPrefix: String
+  shortCodeHasSuffix: String
+  shortCodeIn: [String!]
+  shortCodeIsNil: Boolean
+  shortCodeLT: String
+  shortCodeLTE: String
+  shortCodeNEQ: String
+  shortCodeNotIn: [String!]
+  shortCodeNotNil: Boolean
+  """status field predicates"""
+  status: RegionSimpleStatus
+  statusIn: [RegionSimpleStatus!]
+  statusIsNil: Boolean
+  statusNEQ: RegionSimpleStatus
+  statusNotIn: [RegionSimpleStatus!]
+  statusNotNil: Boolean
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtIn: [Time!]
+  updatedAtIsNil: Boolean
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtNEQ: Time
+  updatedAtNotIn: [Time!]
+  updatedAtNotNil: Boolean
+  """updated_by field predicates"""
+  updatedBy: Int
+  updatedByGT: Int
+  updatedByGTE: Int
+  updatedByIn: [Int!]
+  updatedByIsNil: Boolean
+  updatedByLT: Int
+  updatedByLTE: Int
+  updatedByNEQ: Int
+  updatedByNotIn: [Int!]
+  updatedByNotNil: Boolean
+  """zip_code field predicates"""
+  zipCode: String
+  zipCodeContains: String
+  zipCodeContainsFold: String
+  zipCodeEqualFold: String
+  zipCodeGT: String
+  zipCodeGTE: String
+  zipCodeHasPrefix: String
+  zipCodeHasSuffix: String
+  zipCodeIn: [String!]
+  zipCodeIsNil: Boolean
+  zipCodeLT: String
+  zipCodeLTE: String
+  zipCodeNEQ: String
+  zipCodeNotIn: [String!]
+  zipCodeNotNil: Boolean
 }
 
 """The builtin Time type"""
@@ -4480,6 +5917,7 @@ input UpdateAppInput {
   addDictIDs: [ID!]
   addMenuIDs: [ID!]
   addPolicyIDs: [ID!]
+  addPolicyViewIDs: [ID!]
   addResourceIDs: [ID!]
   addRoleIDs: [ID!]
   """应用ID"""
@@ -4492,9 +5930,9 @@ input UpdateAppInput {
   clearComments: Boolean
   clearDicts: Boolean
   clearLogo: Boolean
-  clearLogoFileID: Boolean
   clearMenus: Boolean
   clearPolicies: Boolean
+  clearPolicyViews: Boolean
   clearRedirectURI: Boolean
   clearRefreshTokenValidity: Boolean
   clearResources: Boolean
@@ -4508,8 +5946,6 @@ input UpdateAppInput {
   kind: AppKind
   """应用图标地址"""
   logo: String
-  """图标,存储路规则：/{appcode}/{tid}/xxx"""
-  logoFileID: ID
   """名称"""
   name: String
   """回调地址"""
@@ -4520,6 +5956,7 @@ input UpdateAppInput {
   removeDictIDs: [ID!]
   removeMenuIDs: [ID!]
   removePolicyIDs: [ID!]
+  removePolicyViewIDs: [ID!]
   removeResourceIDs: [ID!]
   removeRoleIDs: [ID!]
   """权限范围"""
@@ -4536,10 +5973,13 @@ Input was generated by ent.
 """
 input UpdateAppMenuInput {
   actionID: ID
+  addChildIDs: [ID!]
   clearAction: Boolean
+  clearChildren: Boolean
   clearComments: Boolean
   clearIcon: Boolean
   clearRoute: Boolean
+  clearStatus: Boolean
   """备注"""
   comments: String
   """菜单图标"""
@@ -4548,10 +5988,12 @@ input UpdateAppMenuInput {
   kind: AppMenuKind
   """菜单名称"""
   name: String
-  """父级ID"""
-  parentID: Int
+  parentID: ID
+  removeChildIDs: [ID!]
   """菜单路由"""
   route: String
+  """状态"""
+  status: AppMenuSimpleStatus
 }
 
 """
@@ -4559,22 +6001,50 @@ UpdateAppPolicyInput is used for update AppPolicy object.
 Input was generated by ent.
 """
 input UpdateAppPolicyInput {
+  addOrgPolicyIDs: [ID!]
+  addPolicyViewIDs: [ID!]
   addRoleIDs: [ID!]
   appendRules: [PolicyRuleInput]
   """标识是否自动授予到账户"""
   autoGrant: Boolean
   clearComments: Boolean
+  clearOrgPolicies: Boolean
+  clearPolicyViews: Boolean
   clearRoles: Boolean
   clearStatus: Boolean
   """描述"""
   comments: String
+  """分类：app-应用策略、view-策略视图"""
+  kind: AppPolicyKind
   """策略名称"""
   name: String
+  removeOrgPolicyIDs: [ID!]
+  removePolicyViewIDs: [ID!]
   removeRoleIDs: [ID!]
   """策略规则"""
   rules: [PolicyRuleInput]
   """状态"""
   status: AppPolicySimpleStatus
+}
+
+"""
+UpdateAppPolicyViewInput is used for update AppPolicyView object.
+Input was generated by ent.
+"""
+input UpdateAppPolicyViewInput {
+  addChildIDs: [ID!]
+  appPolicyID: ID
+  clearAppPolicy: Boolean
+  clearChildren: Boolean
+  clearComments: Boolean
+  """描述"""
+  comments: String
+  """分类：dir-目录、policy-权限策略"""
+  kind: AppPolicyViewKind
+  """名称"""
+  name: String
+  parentID: ID
+  removeChildIDs: [ID!]
 }
 
 """
@@ -4603,6 +6073,43 @@ input UpdateAppRoleInput {
 }
 
 """
+UpdateCountryInput is used for update Country object.
+Input was generated by ent.
+"""
+input UpdateCountryInput {
+  addRegionIDs: [ID!]
+  clearName: Boolean
+  clearNameEn: Boolean
+  clearRegions: Boolean
+  clearStatus: Boolean
+  """国家代码"""
+  code: String
+  """国家中文名称"""
+  name: String
+  """国家英文名称"""
+  nameEn: String
+  removeRegionIDs: [ID!]
+  """状态"""
+  status: CountrySimpleStatus
+}
+
+"""
+UpdateCurrencyInput is used for update Currency object.
+Input was generated by ent.
+"""
+input UpdateCurrencyInput {
+  clearSign: Boolean
+  """代码"""
+  code: String
+  """中文名称"""
+  name: String
+  """货币符号"""
+  sign: String
+  """状态"""
+  status: CurrencySimpleStatus
+}
+
+"""
 UpdateFileIdentityInput is used for update FileIdentity object.
 Input was generated by ent.
 """
@@ -4618,7 +6125,6 @@ input UpdateFileIdentityInput {
   comments: String
   """STS令牌的有效期，默认3600s"""
   durationSeconds: Int
-  orgID: ID
   """指定返回的STS令牌的权限的策略"""
   policy: String
   """角色的资源名称(ARN)，用于STS"""
@@ -4631,14 +6137,12 @@ UpdateFileSourceInput is used for update FileSource object.
 Input was generated by ent.
 """
 input UpdateFileSourceInput {
-  addFileIDs: [ID!]
   addIdentityIDs: [ID!]
   """文件存储空间"""
   bucket: String
   """文件存储空间地址，用于匹配url"""
   bucketURL: String
   clearComments: Boolean
-  clearFiles: Boolean
   clearIdentities: Boolean
   """备注"""
   comments: String
@@ -4650,7 +6154,6 @@ input UpdateFileSourceInput {
   kind: FileSourceKind
   """地域，数据存储的物理位置"""
   region: String
-  removeFileIDs: [ID!]
   removeIdentityIDs: [ID!]
   """sts服务的访问域名"""
   stsEndpoint: String
@@ -4680,11 +6183,15 @@ input UpdateOrgInput {
   addPolicyIDs: [ID!]
   addRolesAndGroupIDs: [ID!]
   addUserIDs: [ID!]
+  appendCustomDomain: [String!]
   clearApps: Boolean
   clearChildren: Boolean
   clearCountryCode: Boolean
+  clearCustomDomain: Boolean
   clearDomain: Boolean
   clearFileIdentities: Boolean
+  clearLocalCurrency: Boolean
+  clearLogo: Boolean
   clearOwner: Boolean
   clearPermissions: Boolean
   clearPolicies: Boolean
@@ -4692,11 +6199,18 @@ input UpdateOrgInput {
   clearRolesAndGroups: Boolean
   clearStatus: Boolean
   clearTimezone: Boolean
+  clearUserPasswordPolicy: Boolean
   clearUsers: Boolean
   """国家或地区2字码"""
   countryCode: String
+  """自定义域名"""
+  customDomain: [String!]
   """默认域名"""
   domain: String
+  """组织本位币"""
+  localCurrency: String
+  """组织图标"""
+  logo: OrgLogoInput
   """组织名称"""
   name: String
   ownerID: ID
@@ -4714,6 +6228,7 @@ input UpdateOrgInput {
   status: OrgSimpleStatus
   """时区"""
   timezone: String
+  userPasswordPolicyID: ID
 }
 
 """
@@ -4722,10 +6237,11 @@ Input was generated by ent.
 """
 input UpdateOrgPolicyInput {
   addPermissionIDs: [ID!]
-  """所属应用策略,如果是自定义应用策略,则为空"""
-  appPolicyID: Int
+  appID: ID
+  appPolicyID: ID
   appendRules: [PolicyRuleInput]
-  clearAppPolicyID: Boolean
+  clearApp: Boolean
+  clearAppPolicy: Boolean
   clearComments: Boolean
   clearPermissions: Boolean
   """描述"""
@@ -4762,6 +6278,8 @@ input UpdateOrgUserInput {
   joinedAt: Time
   orgID: ID
   userID: ID
+  """用户类型，区分内部及外部用户"""
+  userType: OrgUserUserType
 }
 
 """
@@ -4796,6 +6314,144 @@ input UpdatePermissionInput {
 }
 
 """
+UpdateQuotaInput is used for update Quota object.
+Input was generated by ent.
+"""
+input UpdateQuotaInput {
+  clearEndAt: Boolean
+  clearQuotaOrg: Boolean
+  clearQuotaUser: Boolean
+  clearStartAt: Boolean
+  """过期时间"""
+  endAt: Time
+  """限制值"""
+  limit: Int
+  quotaItemID: ID
+  quotaOrgID: ID
+  quotaUserID: ID
+  """生效时间"""
+  startAt: Time
+}
+
+"""
+UpdateQuotaItemInput is used for update QuotaItem object.
+Input was generated by ent.
+"""
+input UpdateQuotaItemInput {
+  """是否启用"""
+  active: Boolean
+  addQuotumIDs: [ID!]
+  clearDefaultLimit: Boolean
+  clearDescription: Boolean
+  clearQuota: Boolean
+  clearUnit: Boolean
+  """配额项代码,如: users,orgs"""
+  code: String
+  """默认限制值"""
+  defaultLimit: Int
+  """描述"""
+  description: String
+  """配额项名称"""
+  name: String
+  removeQuotumIDs: [ID!]
+  """资源类型"""
+  resourceType: QuotaItemResourceType
+  """单位,如: 个,MB,GB"""
+  unit: String
+}
+
+"""
+UpdateRegionInput is used for update Region object.
+Input was generated by ent.
+"""
+input UpdateRegionInput {
+  addChildIDs: [ID!]
+  clearChildren: Boolean
+  clearCountry: Boolean
+  clearName: Boolean
+  clearNameEn: Boolean
+  clearParent: Boolean
+  clearShortCode: Boolean
+  clearStatus: Boolean
+  clearZipCode: Boolean
+  countryID: ID
+  """地区中文名称"""
+  name: String
+  """地区英文名称"""
+  nameEn: String
+  parentID: ID
+  removeChildIDs: [ID!]
+  """编码"""
+  shortCode: String
+  """状态"""
+  status: RegionSimpleStatus
+  """邮政编码"""
+  zipCode: String
+}
+
+"""
+UpdateUserAddrInput is used for update UserAddr object.
+Input was generated by ent.
+"""
+input UpdateUserAddrInput {
+  """详细地址"""
+  addr: String
+  clearAddr: Boolean
+  clearEmail: Boolean
+  clearFax: Boolean
+  clearMobile: Boolean
+  clearName: Boolean
+  clearRegion: Boolean
+  clearTel: Boolean
+  clearZipCode: Boolean
+  """邮箱"""
+  email: String
+  """传真"""
+  fax: String
+  """是否默认地址，类型为delivery时使用"""
+  isDefault: Boolean
+  """手机"""
+  mobile: String
+  """联系人名称"""
+  name: String
+  regionID: ID
+  """电话"""
+  tel: String
+  """邮编"""
+  zipCode: String
+}
+
+"""
+UpdateUserDeviceInput is used for update UserDevice object.
+Input was generated by ent.
+"""
+input UpdateUserDeviceInput {
+  """app版本"""
+  appVersion: String
+  clearAppVersion: Boolean
+  clearComments: Boolean
+  clearDeviceModel: Boolean
+  clearDeviceName: Boolean
+  clearStatus: Boolean
+  clearSystemName: Boolean
+  clearSystemVersion: Boolean
+  """备注"""
+  comments: String
+  """设备型号"""
+  deviceModel: String
+  """设备名称"""
+  deviceName: String
+  """设备唯一ID"""
+  deviceUID: String
+  """状态,可用或不可用及其他待确认状态"""
+  status: UserDeviceSimpleStatus
+  """系统名称"""
+  systemName: String
+  """系统版本"""
+  systemVersion: String
+}
+
+"""
 UpdateUserIdentityInput is used for update UserIdentity object.
 Input was generated by ent.
 """
@@ -4820,21 +6476,28 @@ Input was generated by ent.
 input UpdateUserInput {
   """头像地址"""
   avatar: String
-  """头像,存储路规则：/{appcode}/{tid}/xxx"""
-  avatarFileID: ID
+  citizenshipID: ID
   clearAvatar: Boolean
-  clearAvatarFileID: Boolean
+  clearCitizenship: Boolean
   clearComments: Boolean
-  clearEmail: Boolean
-  clearMobile: Boolean
+  clearFirstName: Boolean
+  clearLang: Boolean
+  clearLastName: Boolean
+  clearMiddleName: Boolean
   """备注"""
   comments: String
   """显示名"""
   displayName: String
-  """邮箱"""
-  email: String
-  """手机"""
-  mobile: String
+  """名字"""
+  firstName: String
+  """性别"""
+  gender: UserGender
+  """语言"""
+  lang: String
+  """姓氏"""
+  lastName: String
+  """中间名"""
+  middleName: String
   """登陆名称"""
   principalName: String
 }
@@ -4871,24 +6534,77 @@ input UpdateUserPasswordInput {
   status: UserPasswordSimpleStatus
 }
 
+"""
+UpdateUserPasswordPolicyInput is used for update UserPasswordPolicy object.
+Input was generated by ent.
+"""
+input UpdateUserPasswordPolicyInput {
+  """是否允许包含用户名"""
+  allowIncludeUserName: Boolean
+  """密码错误多少次出现验证码，最大5次，0代表不出现验证码"""
+  captchaTimes: Int
+  clearAllowIncludeUserName: Boolean
+  clearCaptchaTimes: Boolean
+  clearIncludeChar: Boolean
+  clearIncludeElement: Boolean
+  clearInvalidDay: Boolean
+  clearInvalidLoginLimit: Boolean
+  clearLength: Boolean
+  clearRetry: Boolean
+  """最少包含的不同字符数，最多8个，0代表不限制"""
+  includeChar: Int
+  """必须包含的元素，异或：1-小写字母，2-大写字母，4-数字，8-符号"""
+  includeElement: Int
+  """有效天数，最大1095天，0代表不过期"""
+  invalidDay: Int
+  """过期后是否限制登录"""
+  invalidLoginLimit: Boolean
+  """密码最短长度，长度应在6-32位之间"""
+  length: Int
+  """一小时内密码错误最多尝试次数，最大32次，0代表不限次数"""
+  retry: Int
+}
+
 type User implements Node {
+  """用户联系信息"""
+  addresses: [UserAddr!]
   """头像地址"""
   avatar: String
-  """头像,存储路规则：/{appcode}/{tid}/xxx"""
-  avatarFileID: ID
+  """国籍信息"""
+  citizenship: Country
+  """国籍"""
+  citizenshipID: ID
   """备注"""
   comments: String
+  """地址信息"""
+  contact: UserAddr
   createdAt: Time!
   createdBy: Int!
   """创建类型,邀请，注册,手工创建"""
   creationType: UserCreationType!
   deletedAt: Time
-  """用户设备"""
-  devices: [UserDevice!]
+  devices(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: Cursor
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    """Ordering options for UserDevices returned from the connection."""
+    orderBy: UserDeviceOrder
+    """Filtering options for UserDevices returned from the connection."""
+    where: UserDeviceWhereInput
+  ): UserDeviceConnection!
   """显示名"""
   displayName: String!
-  """邮箱"""
-  email: String
+  """名字"""
+  firstName: String
+  """性别"""
+  gender: UserGender!
   id: ID!
   """用户身份标识"""
   identities: [UserIdentity!]
@@ -4896,12 +6612,18 @@ type User implements Node {
   isAllowRevokeRole(orgRoleID: ID!): Boolean!
   """是否分配role"""
   isAssignOrgRole(orgRoleID: ID!): Boolean!
+  """语言"""
+  lang: String
+  """姓氏"""
+  lastName: String
   """登陆设置"""
   loginProfile: UserLoginProfile
-  """手机"""
-  mobile: String
+  """中间名"""
+  middleName: String
   """用户AccessKey"""
   oauthClients: [OauthClient!]
+  """组织用户类型"""
+  orgUserType(orgID: ID!): OrgUserUserType!
   permissions(
     """Returns the elements in the list that come after the specified cursor."""
     after: Cursor
@@ -4926,8 +6648,260 @@ type User implements Node {
   status: UserSimpleStatus
   updatedAt: Time
   updatedBy: Int
+  """用户配额"""
+  userQuota: [Quota!]
   """用户类型"""
   userType: UserUserType!
+}
+
+type UserAddr implements Node {
+  """详细地址"""
+  addr: String
+  """地址类型，contact：基本信息，delivery：收货地址"""
+  addrType: UserAddrAddrType!
+  createdAt: Time!
+  createdBy: Int!
+  """邮箱"""
+  email: String
+  """传真"""
+  fax: String
+  id: ID!
+  """是否默认地址，类型为delivery时使用"""
+  isDefault: Boolean!
+  """手机"""
+  mobile: String
+  """联系人名称"""
+  name: String
+  """地区信息"""
+  region: Region
+  """地址地区：市"""
+  regionID: ID
+  """电话"""
+  tel: String
+  updatedAt: Time
+  updatedBy: Int
+  user: User
+  userID: ID
+  """邮编"""
+  zipCode: String
+}
+
+"""UserAddrAddrType is enum for the field addr_type"""
+enum UserAddrAddrType @goModel(model: "github.com/woocoos/knockout/ent/useraddr.AddrType") {
+  contact
+  delivery
+}
+
+"""Ordering options for UserAddr connections"""
+input UserAddrOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order UserAddrs."""
+  field: UserAddrOrderField!
+}
+
+"""Properties by which UserAddr connections can be ordered."""
+enum UserAddrOrderField {
+  createdAt
+}
+
+"""
+UserAddrWhereInput is used for filtering UserAddr objects.
+Input was generated by ent.
+"""
+input UserAddrWhereInput {
+  """addr field predicates"""
+  addr: String
+  addrContains: String
+  addrContainsFold: String
+  addrEqualFold: String
+  addrGT: String
+  addrGTE: String
+  addrHasPrefix: String
+  addrHasSuffix: String
+  addrIn: [String!]
+  addrIsNil: Boolean
+  addrLT: String
+  addrLTE: String
+  addrNEQ: String
+  addrNotIn: [String!]
+  addrNotNil: Boolean
+  """addr_type field predicates"""
+  addrType: UserAddrAddrType
+  addrTypeIn: [UserAddrAddrType!]
+  addrTypeNEQ: UserAddrAddrType
+  addrTypeNotIn: [UserAddrAddrType!]
+  and: [UserAddrWhereInput!]
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtIn: [Time!]
+  createdAtLT: Time
+  createdAtLTE: Time
+  createdAtNEQ: Time
+  createdAtNotIn: [Time!]
+  """created_by field predicates"""
+  createdBy: Int
+  createdByGT: Int
+  createdByGTE: Int
+  createdByIn: [Int!]
+  createdByLT: Int
+  createdByLTE: Int
+  createdByNEQ: Int
+  createdByNotIn: [Int!]
+  """email field predicates"""
+  email: String
+  emailContains: String
+  emailContainsFold: String
+  emailEqualFold: String
+  emailGT: String
+  emailGTE: String
+  emailHasPrefix: String
+  emailHasSuffix: String
+  emailIn: [String!]
+  emailIsNil: Boolean
+  emailLT: String
+  emailLTE: String
+  emailNEQ: String
+  emailNotIn: [String!]
+  emailNotNil: Boolean
+  """fax field predicates"""
+  fax: String
+  faxContains: String
+  faxContainsFold: String
+  faxEqualFold: String
+  faxGT: String
+  faxGTE: String
+  faxHasPrefix: String
+  faxHasSuffix: String
+  faxIn: [String!]
+  faxIsNil: Boolean
+  faxLT: String
+  faxLTE: String
+  faxNEQ: String
+  faxNotIn: [String!]
+  faxNotNil: Boolean
+  """region edge predicates"""
+  hasRegion: Boolean
+  hasRegionWith: [RegionWhereInput!]
+  """user edge predicates"""
+  hasUser: Boolean
+  hasUserWith: [UserWhereInput!]
+  """id field predicates"""
+  id: ID
+  idGT: ID
+  idGTE: ID
+  idIn: [ID!]
+  idLT: ID
+  idLTE: ID
+  idNEQ: ID
+  idNotIn: [ID!]
+  """is_default field predicates"""
+  isDefault: Boolean
+  isDefaultNEQ: Boolean
+  """mobile field predicates"""
+  mobile: String
+  mobileContains: String
+  mobileContainsFold: String
+  mobileEqualFold: String
+  mobileGT: String
+  mobileGTE: String
+  mobileHasPrefix: String
+  mobileHasSuffix: String
+  mobileIn: [String!]
+  mobileIsNil: Boolean
+  mobileLT: String
+  mobileLTE: String
+  mobileNEQ: String
+  mobileNotIn: [String!]
+  mobileNotNil: Boolean
+  """name field predicates"""
+  name: String
+  nameContains: String
+  nameContainsFold: String
+  nameEqualFold: String
+  nameGT: String
+  nameGTE: String
+  nameHasPrefix: String
+  nameHasSuffix: String
+  nameIn: [String!]
+  nameIsNil: Boolean
+  nameLT: String
+  nameLTE: String
+  nameNEQ: String
+  nameNotIn: [String!]
+  nameNotNil: Boolean
+  not: UserAddrWhereInput
+  or: [UserAddrWhereInput!]
+  """region_id field predicates"""
+  regionID: ID
+  regionIDIn: [ID!]
+  regionIDIsNil: Boolean
+  regionIDNEQ: ID
+  regionIDNotIn: [ID!]
+  regionIDNotNil: Boolean
+  """tel field predicates"""
+  tel: String
+  telContains: String
+  telContainsFold: String
+  telEqualFold: String
+  telGT: String
+  telGTE: String
+  telHasPrefix: String
+  telHasSuffix: String
+  telIn: [String!]
+  telIsNil: Boolean
+  telLT: String
+  telLTE: String
+  telNEQ: String
+  telNotIn: [String!]
+  telNotNil: Boolean
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtIn: [Time!]
+  updatedAtIsNil: Boolean
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtNEQ: Time
+  updatedAtNotIn: [Time!]
+  updatedAtNotNil: Boolean
+  """updated_by field predicates"""
+  updatedBy: Int
+  updatedByGT: Int
+  updatedByGTE: Int
+  updatedByIn: [Int!]
+  updatedByIsNil: Boolean
+  updatedByLT: Int
+  updatedByLTE: Int
+  updatedByNEQ: Int
+  updatedByNotIn: [Int!]
+  updatedByNotNil: Boolean
+  """user_id field predicates"""
+  userID: ID
+  userIDIn: [ID!]
+  userIDIsNil: Boolean
+  userIDNEQ: ID
+  userIDNotIn: [ID!]
+  userIDNotNil: Boolean
+  """zip_code field predicates"""
+  zipCode: String
+  zipCodeContains: String
+  zipCodeContainsFold: String
+  zipCodeEqualFold: String
+  zipCodeGT: String
+  zipCodeGTE: String
+  zipCodeHasPrefix: String
+  zipCodeHasSuffix: String
+  zipCodeIn: [String!]
+  zipCodeIsNil: Boolean
+  zipCodeLT: String
+  zipCodeLTE: String
+  zipCodeNEQ: String
+  zipCodeNotIn: [String!]
+  zipCodeNotNil: Boolean
 }
 
 """A connection to a list of items."""
@@ -4941,31 +6915,54 @@ type UserConnection {
 }
 
 """UserCreationType is enum for the field creation_type"""
-enum UserCreationType {
+enum UserCreationType @goModel(model: "github.com/woocoos/knockout/ent/user.CreationType") {
   invitation
   manual
   register
 }
 
 type UserDevice implements Node {
+  """app版本"""
   appVersion: String
   """备注"""
   comments: String
   createdAt: Time!
   createdBy: Int!
+  """设备型号"""
   deviceModel: String
+  """设备名称"""
   deviceName: String
   """设备唯一ID"""
   deviceUID: String!
   id: ID!
   """状态,可用或不可用及其他待确认状态"""
   status: UserDeviceSimpleStatus
+  """系统名称"""
   systemName: String
+  """系统版本"""
   systemVersion: String
   updatedAt: Time
   updatedBy: Int
   user: User
   userID: ID
+}
+
+"""A connection to a list of items."""
+type UserDeviceConnection {
+  """A list of edges."""
+  edges: [UserDeviceEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type UserDeviceEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+  """The item at the end of the edge."""
+  node: UserDevice
 }
 
 """Ordering options for UserDevice connections"""
@@ -4982,7 +6979,7 @@ enum UserDeviceOrderField {
 }
 
 """UserDeviceSimpleStatus is enum for the field status"""
-enum UserDeviceSimpleStatus {
+enum UserDeviceSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -5167,6 +7164,13 @@ type UserEdge {
   node: User
 }
 
+"""UserGender is enum for the field gender"""
+enum UserGender @goModel(model: "github.com/woocoos/knockout/ent/user.Gender") {
+  female
+  male
+  privacy
+}
+
 type UserIdentity implements Node {
   """用户名、邮箱、手机、unionid、qq"""
   code: String
@@ -5186,7 +7190,7 @@ type UserIdentity implements Node {
 }
 
 """UserIdentityKind is enum for the field kind"""
-enum UserIdentityKind {
+enum UserIdentityKind @goModel(model: "github.com/woocoos/knockout/ent/useridentity.Kind") {
   email
   name
   phone
@@ -5208,7 +7212,7 @@ enum UserIdentityOrderField {
 }
 
 """UserIdentitySimpleStatus is enum for the field status"""
-enum UserIdentitySimpleStatus {
+enum UserIdentitySimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -5367,14 +7371,14 @@ enum UserLoginProfileOrderField {
 }
 
 """UserLoginProfileSetKind is enum for the field set_kind"""
-enum UserLoginProfileSetKind {
+enum UserLoginProfileSetKind @goModel(model: "github.com/woocoos/knockout/ent/userloginprofile.SetKind") {
   auto
   customer
   keep
 }
 
 """UserLoginProfileSimpleStatus is enum for the field mfa_status"""
-enum UserLoginProfileSimpleStatus {
+enum UserLoginProfileSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -5480,6 +7484,18 @@ input UserLoginProfileWhereInput {
   verifyDeviceNEQ: Boolean
 }
 
+"""查看用户mfa信息"""
+type UserMfaInfo {
+  """用户账号"""
+  accountName: String!
+  """是否启用mfa"""
+  mfaEnabled: Boolean!
+  """二维码"""
+  qrCodeUri: String!
+  """秘钥"""
+  secret: String!
+}
+
 """Ordering options for User connections"""
 input UserOrder {
   """The ordering direction."""
@@ -5520,13 +7536,198 @@ enum UserPasswordOrderField {
   createdAt
 }
 
+type UserPasswordPolicy implements Node {
+  """是否允许包含用户名"""
+  allowIncludeUserName: Boolean
+  """密码错误多少次出现验证码，最大5次，0代表不出现验证码"""
+  captchaTimes: Int
+  createdAt: Time!
+  createdBy: Int!
+  id: ID!
+  """最少包含的不同字符数，最多8个，0代表不限制"""
+  includeChar: Int
+  """必须包含的元素，异或：1-小写字母，2-大写字母，4-数字，8-符号"""
+  includeElement: Int
+  """有效天数，最大1095天，0代表不过期"""
+  invalidDay: Int
+  """过期后是否限制登录"""
+  invalidLoginLimit: Boolean
+  """密码最短长度，长度应在6-32位之间"""
+  length: Int
+  org: Org
+  """一小时内密码错误最多尝试次数，最大32次，0代表不限次数"""
+  retry: Int
+  """租户id"""
+  tenantID: ID
+  updatedAt: Time
+  updatedBy: Int
+}
+
+"""Ordering options for UserPasswordPolicy connections"""
+input UserPasswordPolicyOrder {
+  """The ordering direction."""
+  direction: OrderDirection! = ASC
+  """The field by which to order UserPasswordPolicies."""
+  field: UserPasswordPolicyOrderField!
+}
+
+"""Properties by which UserPasswordPolicy connections can be ordered."""
+enum UserPasswordPolicyOrderField {
+  createdAt
+}
+
+"""
+UserPasswordPolicyWhereInput is used for filtering UserPasswordPolicy objects.
+Input was generated by ent.
+"""
+input UserPasswordPolicyWhereInput {
+  """allow_include_user_name field predicates"""
+  allowIncludeUserName: Boolean
+  allowIncludeUserNameIsNil: Boolean
+  allowIncludeUserNameNEQ: Boolean
+  allowIncludeUserNameNotNil: Boolean
+  and: [UserPasswordPolicyWhereInput!]
+  """captcha_times field predicates"""
+  captchaTimes: Int
+  captchaTimesGT: Int
+  captchaTimesGTE: Int
+  captchaTimesIn: [Int!]
+  captchaTimesIsNil: Boolean
+  captchaTimesLT: Int
+  captchaTimesLTE: Int
+  captchaTimesNEQ: Int
+  captchaTimesNotIn: [Int!]
+  captchaTimesNotNil: Boolean
+  """created_at field predicates"""
+  createdAt: Time
+  createdAtGT: Time
+  createdAtGTE: Time
+  createdAtIn: [Time!]
+  createdAtLT: Time
+  createdAtLTE: Time
+  createdAtNEQ: Time
+  createdAtNotIn: [Time!]
+  """created_by field predicates"""
+  createdBy: Int
+  createdByGT: Int
+  createdByGTE: Int
+  createdByIn: [Int!]
+  createdByLT: Int
+  createdByLTE: Int
+  createdByNEQ: Int
+  createdByNotIn: [Int!]
+  """org edge predicates"""
+  hasOrg: Boolean
+  hasOrgWith: [OrgWhereInput!]
+  """id field predicates"""
+  id: ID
+  idGT: ID
+  idGTE: ID
+  idIn: [ID!]
+  idLT: ID
+  idLTE: ID
+  idNEQ: ID
+  idNotIn: [ID!]
+  """include_char field predicates"""
+  includeChar: Int
+  includeCharGT: Int
+  includeCharGTE: Int
+  includeCharIn: [Int!]
+  includeCharIsNil: Boolean
+  includeCharLT: Int
+  includeCharLTE: Int
+  includeCharNEQ: Int
+  includeCharNotIn: [Int!]
+  includeCharNotNil: Boolean
+  """include_element field predicates"""
+  includeElement: Int
+  includeElementGT: Int
+  includeElementGTE: Int
+  includeElementIn: [Int!]
+  includeElementIsNil: Boolean
+  includeElementLT: Int
+  includeElementLTE: Int
+  includeElementNEQ: Int
+  includeElementNotIn: [Int!]
+  includeElementNotNil: Boolean
+  """invalid_day field predicates"""
+  invalidDay: Int
+  invalidDayGT: Int
+  invalidDayGTE: Int
+  invalidDayIn: [Int!]
+  invalidDayIsNil: Boolean
+  invalidDayLT: Int
+  invalidDayLTE: Int
+  invalidDayNEQ: Int
+  invalidDayNotIn: [Int!]
+  invalidDayNotNil: Boolean
+  """invalid_login_limit field predicates"""
+  invalidLoginLimit: Boolean
+  invalidLoginLimitIsNil: Boolean
+  invalidLoginLimitNEQ: Boolean
+  invalidLoginLimitNotNil: Boolean
+  """length field predicates"""
+  length: Int
+  lengthGT: Int
+  lengthGTE: Int
+  lengthIn: [Int!]
+  lengthIsNil: Boolean
+  lengthLT: Int
+  lengthLTE: Int
+  lengthNEQ: Int
+  lengthNotIn: [Int!]
+  lengthNotNil: Boolean
+  not: UserPasswordPolicyWhereInput
+  or: [UserPasswordPolicyWhereInput!]
+  """retry field predicates"""
+  retry: Int
+  retryGT: Int
+  retryGTE: Int
+  retryIn: [Int!]
+  retryIsNil: Boolean
+  retryLT: Int
+  retryLTE: Int
+  retryNEQ: Int
+  retryNotIn: [Int!]
+  retryNotNil: Boolean
+  """tenant_id field predicates"""
+  tenantID: ID
+  tenantIDIn: [ID!]
+  tenantIDIsNil: Boolean
+  tenantIDNEQ: ID
+  tenantIDNotIn: [ID!]
+  tenantIDNotNil: Boolean
+  """updated_at field predicates"""
+  updatedAt: Time
+  updatedAtGT: Time
+  updatedAtGTE: Time
+  updatedAtIn: [Time!]
+  updatedAtIsNil: Boolean
+  updatedAtLT: Time
+  updatedAtLTE: Time
+  updatedAtNEQ: Time
+  updatedAtNotIn: [Time!]
+  updatedAtNotNil: Boolean
+  """updated_by field predicates"""
+  updatedBy: Int
+  updatedByGT: Int
+  updatedByGTE: Int
+  updatedByIn: [Int!]
+  updatedByIsNil: Boolean
+  updatedByLT: Int
+  updatedByLTE: Int
+  updatedByNEQ: Int
+  updatedByNotIn: [Int!]
+  updatedByNotNil: Boolean
+}
+
 """UserPasswordScene is enum for the field scene"""
-enum UserPasswordScene {
+enum UserPasswordScene @goModel(model: "github.com/woocoos/knockout/ent/userpassword.Scene") {
   login
 }
 
 """UserPasswordSimpleStatus is enum for the field status"""
-enum UserPasswordSimpleStatus {
+enum UserPasswordSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -5615,7 +7816,7 @@ input UserPasswordWhereInput {
 }
 
 """UserSimpleStatus is enum for the field status"""
-enum UserSimpleStatus {
+enum UserSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -5623,7 +7824,7 @@ enum UserSimpleStatus {
 }
 
 """UserUserType is enum for the field user_type"""
-enum UserUserType {
+enum UserUserType @goModel(model: "github.com/woocoos/knockout/ent/user.UserType") {
   account
   member
 }
@@ -5634,6 +7835,13 @@ Input was generated by ent.
 """
 input UserWhereInput {
   and: [UserWhereInput!]
+  """citizenship_id field predicates"""
+  citizenshipID: ID
+  citizenshipIDIn: [ID!]
+  citizenshipIDIsNil: Boolean
+  citizenshipIDNEQ: ID
+  citizenshipIDNotIn: [ID!]
+  citizenshipIDNotNil: Boolean
   """created_at field predicates"""
   createdAt: Time
   createdAtGT: Time
@@ -5682,22 +7890,33 @@ input UserWhereInput {
   displayNameLTE: String
   displayNameNEQ: String
   displayNameNotIn: [String!]
-  """email field predicates"""
-  email: String
-  emailContains: String
-  emailContainsFold: String
-  emailEqualFold: String
-  emailGT: String
-  emailGTE: String
-  emailHasPrefix: String
-  emailHasSuffix: String
-  emailIn: [String!]
-  emailIsNil: Boolean
-  emailLT: String
-  emailLTE: String
-  emailNEQ: String
-  emailNotIn: [String!]
-  emailNotNil: Boolean
+  """first_name field predicates"""
+  firstName: String
+  firstNameContains: String
+  firstNameContainsFold: String
+  firstNameEqualFold: String
+  firstNameGT: String
+  firstNameGTE: String
+  firstNameHasPrefix: String
+  firstNameHasSuffix: String
+  firstNameIn: [String!]
+  firstNameIsNil: Boolean
+  firstNameLT: String
+  firstNameLTE: String
+  firstNameNEQ: String
+  firstNameNotIn: [String!]
+  firstNameNotNil: Boolean
+  """gender field predicates"""
+  gender: UserGender
+  genderIn: [UserGender!]
+  genderNEQ: UserGender
+  genderNotIn: [UserGender!]
+  """addresses edge predicates"""
+  hasAddresses: Boolean
+  hasAddressesWith: [UserAddrWhereInput!]
+  """citizenship edge predicates"""
+  hasCitizenship: Boolean
+  hasCitizenshipWith: [CountryWhereInput!]
   """devices edge predicates"""
   hasDevices: Boolean
   hasDevicesWith: [UserDeviceWhereInput!]
@@ -5716,6 +7935,9 @@ input UserWhereInput {
   """permissions edge predicates"""
   hasPermissions: Boolean
   hasPermissionsWith: [PermissionWhereInput!]
+  """user_quota edge predicates"""
+  hasUserQuota: Boolean
+  hasUserQuotaWith: [QuotaWhereInput!]
   """id field predicates"""
   id: ID
   idGT: ID
@@ -5725,22 +7947,54 @@ input UserWhereInput {
   idLTE: ID
   idNEQ: ID
   idNotIn: [ID!]
-  """mobile field predicates"""
-  mobile: String
-  mobileContains: String
-  mobileContainsFold: String
-  mobileEqualFold: String
-  mobileGT: String
-  mobileGTE: String
-  mobileHasPrefix: String
-  mobileHasSuffix: String
-  mobileIn: [String!]
-  mobileIsNil: Boolean
-  mobileLT: String
-  mobileLTE: String
-  mobileNEQ: String
-  mobileNotIn: [String!]
-  mobileNotNil: Boolean
+  """lang field predicates"""
+  lang: String
+  langContains: String
+  langContainsFold: String
+  langEqualFold: String
+  langGT: String
+  langGTE: String
+  langHasPrefix: String
+  langHasSuffix: String
+  langIn: [String!]
+  langIsNil: Boolean
+  langLT: String
+  langLTE: String
+  langNEQ: String
+  langNotIn: [String!]
+  langNotNil: Boolean
+  """last_name field predicates"""
+  lastName: String
+  lastNameContains: String
+  lastNameContainsFold: String
+  lastNameEqualFold: String
+  lastNameGT: String
+  lastNameGTE: String
+  lastNameHasPrefix: String
+  lastNameHasSuffix: String
+  lastNameIn: [String!]
+  lastNameIsNil: Boolean
+  lastNameLT: String
+  lastNameLTE: String
+  lastNameNEQ: String
+  lastNameNotIn: [String!]
+  lastNameNotNil: Boolean
+  """middle_name field predicates"""
+  middleName: String
+  middleNameContains: String
+  middleNameContainsFold: String
+  middleNameEqualFold: String
+  middleNameGT: String
+  middleNameGTE: String
+  middleNameHasPrefix: String
+  middleNameHasSuffix: String
+  middleNameIn: [String!]
+  middleNameIsNil: Boolean
+  middleNameLT: String
+  middleNameLTE: String
+  middleNameNEQ: String
+  middleNameNotIn: [String!]
+  middleNameNotNil: Boolean
   not: UserWhereInput
   or: [UserWhereInput!]
   """principal_name field predicates"""

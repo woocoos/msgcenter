@@ -36,14 +36,6 @@ func (_c *MsgChannelCreate) SetCreatedAt(v time.Time) *MsgChannelCreate {
 	return _c
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (_c *MsgChannelCreate) SetNillableCreatedAt(v *time.Time) *MsgChannelCreate {
-	if v != nil {
-		_c.SetCreatedAt(*v)
-	}
-	return _c
-}
-
 // SetUpdatedBy sets the "updated_by" field.
 func (_c *MsgChannelCreate) SetUpdatedBy(v int) *MsgChannelCreate {
 	_c.mutation.SetUpdatedBy(v)
@@ -167,13 +159,6 @@ func (_c *MsgChannelCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *MsgChannelCreate) defaults() error {
-	if _, ok := _c.mutation.CreatedAt(); !ok {
-		if msgchannel.DefaultCreatedAt == nil {
-			return fmt.Errorf("ent: uninitialized msgchannel.DefaultCreatedAt (forgotten import ent/runtime?)")
-		}
-		v := msgchannel.DefaultCreatedAt()
-		_c.mutation.SetCreatedAt(v)
-	}
 	if _, ok := _c.mutation.Status(); !ok {
 		v := msgchannel.DefaultStatus
 		_c.mutation.SetStatus(v)

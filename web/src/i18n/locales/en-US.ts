@@ -153,8 +153,10 @@ export default {
     msg_temp_to: 'addressee',
     msg_temp_from: 'addresser',
     msg_temp_format: 'Main body',
+    msg_temp_user_tip: 'After specifying the user ID, this template will only be effective for that user. If the ID is left blank, it will be a tenant-level template.',
     msg_temp_format_tip: 'The body can contain the template syntax for go template',
     attachments_tip: 'Attachments are fixed documents, and variables in attachments are not supported for the time being',
+    please_enter_attachment_names: 'Enter attachment names, press Enter to add',
     click_drag_upload: 'Click or drag the file to upload',
     receiving_user: 'Receiving user',
     receiving_type: 'receiving type',
@@ -175,6 +177,7 @@ export default {
     msg_log_groupKey: 'block key',
     msg_log_receiver: 'receiving group name',
     msg_log_receiverType: 'receiving group type',
+    msg_log_errMsg: 'error message',
     msg_log: 'message log',
     msg_log_list: 'Message log list',
     msg_event_config_tip: 'The modification takes effect after being enabled again',
@@ -192,6 +195,8 @@ export default {
     view_content: 'view content',
     more_message: 'more message',
     query_message: 'query message',
+    previous: 'Previous',
+    next: 'Next',
 
     // 创建
     create_msg_type: 'Create message type',
@@ -213,6 +218,8 @@ export default {
     msg_template_list: 'Message event template list',
     msg_subscription_list: 'Message subscription list',
     silence_msg_list: 'Silent message list',
+    event_subscription_list: 'Message event subscription list',
+    event_subscription: 'Event subscription',
     // 详情
 
     // 必填提示

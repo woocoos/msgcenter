@@ -4,7 +4,6 @@ package msgchannel
 
 import (
 	"fmt"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -74,8 +73,6 @@ func ValidColumn(column string) bool {
 //	import _ "github.com/woocoos/msgcenter/ent/runtime"
 var (
 	Hooks [3]ent.Hook
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 )
@@ -83,7 +80,7 @@ var (
 // ReceiverTypeValidator is a validator for the "receiver_type" field enum values. It is called by the builders before save.
 func ReceiverTypeValidator(rt profile.ReceiverType) error {
 	switch rt.String() {
-	case "email", "message", "webhook":
+	case "email", "message", "webhook", "umeng":
 		return nil
 	default:
 		return fmt.Errorf("msgchannel: invalid enum value for receiver_type field: %q", rt)

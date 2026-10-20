@@ -2,11 +2,12 @@ package profile
 
 import (
 	stdjson "encoding/json"
+	"testing"
+
 	"github.com/knadh/koanf/parsers/json"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/tsingsun/woocoo/pkg/conf"
-	"testing"
 )
 
 func TestReceiver(t *testing.T) {
@@ -200,19 +201,20 @@ receivers:
 				return assert.ErrorContains(t, err, "cannot have wildcard group_by (`...`) and other other labels at the same time")
 			},
 		},
-		{
-			name: "GroupBy invalid label",
-			cfgStr: `
-route:
-  groupBy: ['-invalid-']
-  receiver: team-X
-receivers:
-- name: 'team-X'
-`,
-			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorContains(t, err, "invalid label name \"-invalid-\" in group_by list")
-			},
-		},
+		// 由于labels改为utf8.ValidString()验证，该用例不成立，先注释
+		//		{
+		//			name: "GroupBy invalid label",
+		//			cfgStr: `
+		//route:
+		//  groupBy: ['-invalid-']
+		//  receiver: team-X
+		//receivers:
+		//- name: 'team-X'
+		//`,
+		//			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
+		//				return assert.ErrorContains(t, err, "invalid label name \"-invalid-\" in group_by list")
+		//			},
+		//		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
