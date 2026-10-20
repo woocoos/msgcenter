@@ -545,7 +545,7 @@ func (r *mutationResolver) TestSendEmailTpl(ctx context.Context, tplID int, emai
 		"receiver":  temp.Edges.Event.Route.Receiver,
 		"alertname": temp.Edges.Event.Name,
 		"tenant":    strconv.Itoa(tid),
-		"skipSub":   "Y",
+		"skipSub":   "1",
 		"timestamp": strconv.Itoa(int(time.Now().Unix())),
 	}
 	if labels == nil {
@@ -592,7 +592,7 @@ func (r *mutationResolver) TestSendMessageTpl(ctx context.Context, tplID int, us
 		"receiver":  temp.Edges.Event.Route.Receiver,
 		"alertname": temp.Edges.Event.Name,
 		"tenant":    strconv.Itoa(tid),
-		"skipSub":   "Y",
+		"skipSub":   "1",
 		"timestamp": strconv.Itoa(int(time.Now().Unix())),
 	}
 	if userID != nil {

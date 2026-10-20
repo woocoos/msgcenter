@@ -131,8 +131,8 @@ func (u EventSubscribeStage) exec(ctx context.Context, alerts ...*alert.Alert) (
 				}
 			}
 			ac.Labels[label.ToUserIDLabel] = uid
-			ac.Labels[label.SkipSubscribeLabel] = "Y"
-			ac.Labels[label.SubscribeCloneLabel] = "Y"
+			ac.Labels[label.SkipSubscribeLabel] = "1"
+			ac.Labels[label.SubscribeCloneLabel] = "1"
 			uls[i] = ac
 		}
 		if err := u.alerts.Put(ctx, uls...); err != nil {

@@ -102,7 +102,7 @@ func (m *mockNLogCallback) CreateLog(ctx context.Context, r *profile.ReceiverKey
 
 func (m *mockNLogCallback) EvictLog(ctx context.Context, ids []string) {}
 
-// TestSetNotifiesStage_SkipStore 验证 skipStore=Y 时：
+// TestSetNotifiesStage_SkipStore 验证 skipStore=1 时：
 // 1. NLogCallback.CreateLog 仍被调用（用于创建内存 entry）
 // 2. 内存 entry 正常创建（DedupStage 可以查询到）
 // 3. 数据库写入由 CreateLog 内部根据 context 中的 skipStore 标志决定是否跳过
@@ -143,8 +143,8 @@ func TestSetNotifiesStage_SkipStore(t *testing.T) {
 		recv:  recv,
 	}
 
-	// 测试 1: skipStore=Y 时，CreateLog 仍被调用，内存 entry 正常创建
-	t.Run("skipStore=Y creates memory entry", func(t *testing.T) {
+	// 测试 1: skipStore=1 时，CreateLog 仍被调用，内存 entry 正常创建
+	t.Run("skipStore=1 creates memory entry", func(t *testing.T) {
 		callback.createLogCalled.Store(0)
 
 		ctx := context.Background()
@@ -156,7 +156,7 @@ func TestSetNotifiesStage_SkipStore(t *testing.T) {
 		alerts := []*alert.Alert{
 			{
 				Labels: label.LabelSet{
-					label.SkipStoreLabel: "Y",
+					label.SkipStoreLabel: "1",
 				},
 			},
 		}
@@ -173,7 +173,7 @@ func TestSetNotifiesStage_SkipStore(t *testing.T) {
 		require.Len(t, entries, 1, "memory entry should be created")
 
 		// 验证 entry 的 ID 为 0（因为 skipStore 时 CreateLog 返回 0）
-		assert.Equal(t, 0, entries[0].ID, "entry ID should be 0 when skipStore=Y")
+		assert.Equal(t, 0, entries[0].ID, "entry ID should be 0 when skipStore=1")
 		assert.Equal(t, gkey, entries[0].GroupKey)
 		assert.Equal(t, firingAlerts, entries[0].FiringAlerts)
 	})

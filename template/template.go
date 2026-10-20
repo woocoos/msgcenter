@@ -317,7 +317,7 @@ func (t *Template) Data(recv string, groupLabels label.LabelSet, alerts ...*aler
 // AppendTempParams appends template params to the alerts.
 func (t *Template) AppendTempParams(data *Data) {
 	// 判断是否忽略模板参数
-	if data.CommonLabels[label.SkipTempParamsLabel] == "Y" {
+	if data.CommonLabels[label.SkipTempParamsLabel] == "1" {
 		return
 	}
 	// 判断是否传递租户id

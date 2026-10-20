@@ -168,7 +168,7 @@ func (n NlogCallback) updateAlerts(ctx context.Context, alerts []uint64, state a
 
 func (n NlogCallback) CreateLog(ctx context.Context, r *profile.ReceiverKey, gkey string,
 	firingAlerts, resolvedAlerts []uint64, expiresAt time.Time) (int, error) {
-	// 如果 skipStore=Y，跳过数据库写入，但返回成功让 nflog 内存 entry 正常创建
+	// 如果 skipStore=1，跳过数据库写入，但返回成功让 nflog 内存 entry 正常创建
 	if notify.SkipStore(ctx) {
 		return 0, nil
 	}

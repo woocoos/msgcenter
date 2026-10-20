@@ -63,7 +63,7 @@ func TestEventSubscribeStage_CloneEndsAtFallback(t *testing.T) {
 		Labels: label.LabelSet{
 			label.AlertNameLabel:     "test-alert",
 			label.TenantLabel:        "1000",
-			label.SkipSubscribeLabel: "Y", // 跳过订阅检查
+			label.SkipSubscribeLabel: "1", // 跳过订阅检查
 		},
 		Annotations: label.LabelSet{},
 		StartsAt:    time.Time{}, // 零值，模拟 flush 清空
@@ -315,8 +315,8 @@ func TestEventSubscribeStage_PerUserFalse_InterceptSubClone(t *testing.T) {
 		label.AlertNameLabel:      "test-alert",
 		label.TenantLabel:         "1000",
 		label.ToUserIDLabel:       "101106",
-		label.SkipSubscribeLabel:  "Y",
-		label.SubscribeCloneLabel: "Y",
+		label.SkipSubscribeLabel:  "1",
+		label.SubscribeCloneLabel: "1",
 	})
 	_, got, err := stage.Exec(ctx, clone)
 	require.NoError(t, err)
@@ -327,7 +327,7 @@ func TestEventSubscribeStage_PerUserFalse_InterceptSubClone(t *testing.T) {
 	external := newAlert(label.LabelSet{
 		label.AlertNameLabel:     "test-alert",
 		label.TenantLabel:        "1000",
-		label.SkipSubscribeLabel: "Y",
+		label.SkipSubscribeLabel: "1",
 	})
 	_, got, err = stage.Exec(ctx, external)
 	require.NoError(t, err)
