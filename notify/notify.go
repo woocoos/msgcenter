@@ -96,6 +96,17 @@ func (i *Integration) String() string {
 	return fmt.Sprintf("%s[%d]", i.name, i.idx)
 }
 
+// PerUserFanout is an optional capability interface for Notifier implementations
+// that deliver one notification per subscriber (e.g. message, umeng, email),
+// relying on the per-user clones created by EventSubscribeStage.
+// Notifiers without this interface are treated as per-user fan-out (default true).
+// A channel without a user concept (e.g. webhook) returns false: EventSubscribeStage
+// then passes the original alerts through and intercepts clone re-dispatches,
+// so the channel is notified exactly once per event.
+type PerUserFanout interface {
+	PerUserFanout() bool
+}
+
 // A Stage processes alerts under the constraints of the given context.
 type Stage interface {
 	Exec(ctx context.Context, alerts ...*alert.Alert) (context.Context, []*alert.Alert, error)
@@ -160,7 +171,11 @@ func createReceiverStage(
 		var s MultiStage
 		s = append(s, NewWaitStage(wait))
 		s = append(s, NewDedupStage(&integrations[i], notificationLog, recv))
-		s = append(s, NewEventSubscribeStage(alerts, subscriber))
+		es := NewEventSubscribeStage(alerts, subscriber)
+		if puf, ok := integrations[i].notifier.(PerUserFanout); ok {
+			es.perUser = puf.PerUserFanout()
+		}
+		s = append(s, es)
 		s = append(s, NewRetryStage(integrations[i], name))
 		s = append(s, NewSetNotifiesStage(notificationLog, recv))
 

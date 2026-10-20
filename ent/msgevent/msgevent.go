@@ -4,7 +4,6 @@ package msgevent
 
 import (
 	"fmt"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -104,8 +103,6 @@ func ValidColumn(column string) bool {
 //	import _ "github.com/woocoos/msgcenter/ent/runtime"
 var (
 	Hooks [5]ent.Hook
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 	// DefaultCanSubs holds the default value on creation for the "can_subs" field.

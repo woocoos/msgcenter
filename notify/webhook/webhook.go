@@ -72,6 +72,13 @@ func (n *Notifier) SendResolved() bool {
 	return n.config.SendResolved
 }
 
+// PerUserFanout implements notify.PerUserFanout. Webhook is a channel-level
+// notification without a user concept: a subscribed event must trigger exactly
+// one webhook call (the original alert), not one per subscriber clone.
+func (n *Notifier) PerUserFanout() bool {
+	return false
+}
+
 // CustomConfig returns a custom config for the notifier.
 func (n *Notifier) CustomConfig(ctx context.Context) (*profile.WebhookConfig, error) {
 	if n.customTplFunc == nil {

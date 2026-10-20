@@ -283,3 +283,64 @@ func TestEventSubscribeStage_CloneEndsAtFallbackWhenResolved(t *testing.T) {
 	t.Logf("resolved original EndsAt: %v (should NOT be used)", resolvedEndsAt)
 	t.Logf("clone EndsAt: %v (fallback to now+5min)", clone.EndsAt)
 }
+
+// TestEventSubscribeStage_PerUserFalse_InterceptSubClone 测试非按用户渠道（perUser=false，
+// 如 webhook）时，带 SubCloneLabel 的订阅 clone 在此被拦截（返回空 alerts 且不触发订阅展开）；
+// 外部自带 skipSub 的消息与原始 alert 照常通过（渠道对每个事件只发送一次）。
+func TestEventSubscribeStage_PerUserFalse_InterceptSubClone(t *testing.T) {
+	t.Parallel()
+
+	now := time.Now()
+	newAlert := func(labels label.LabelSet) *alert.Alert {
+		return &alert.Alert{
+			Labels:      labels,
+			Annotations: label.LabelSet{},
+			StartsAt:    now,
+			EndsAt:      now.Add(5 * time.Minute),
+			UpdatedAt:   now,
+		}
+	}
+
+	mock := &mockAlerts{}
+	subscriber := &mockSubscriber{
+		users: []UserInfo{{UserID: "101106", Name: "Test User"}},
+	}
+	stage := NewEventSubscribeStage(mock, subscriber)
+	stage.perUser = false
+
+	ctx := context.Background()
+
+	// 订阅 clone（subClone 标记）：拦截（返回空 alerts），且不触发订阅展开（无 Put）
+	clone := newAlert(label.LabelSet{
+		label.AlertNameLabel:      "test-alert",
+		label.TenantLabel:         "1000",
+		label.ToUserIDLabel:       "101106",
+		label.SkipSubscribeLabel:  "Y",
+		label.SubscribeCloneLabel: "Y",
+	})
+	_, got, err := stage.Exec(ctx, clone)
+	require.NoError(t, err)
+	assert.Empty(t, got)
+	assert.Empty(t, mock.putAlerts)
+
+	// 外部自带 skipSub 的消息（无 subClone）：不受影响，照常通过
+	external := newAlert(label.LabelSet{
+		label.AlertNameLabel:     "test-alert",
+		label.TenantLabel:        "1000",
+		label.SkipSubscribeLabel: "Y",
+	})
+	_, got, err = stage.Exec(ctx, external)
+	require.NoError(t, err)
+	assert.Equal(t, []*alert.Alert{external}, got)
+	assert.Empty(t, mock.putAlerts)
+
+	// 原始 alert（无任何标记）：照常通过
+	original := newAlert(label.LabelSet{
+		label.AlertNameLabel: "test-alert",
+		label.TenantLabel:    "1000",
+	})
+	_, got, err = stage.Exec(ctx, original)
+	require.NoError(t, err)
+	assert.Equal(t, []*alert.Alert{original}, got)
+	assert.Empty(t, mock.putAlerts)
+}

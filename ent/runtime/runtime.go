@@ -51,14 +51,8 @@ func init() {
 	msgchannel.Hooks[0] = msgchannelMixinHooks1[0]
 	msgchannel.Hooks[1] = msgchannelMixinHooks2[0]
 	msgchannel.Hooks[2] = msgchannelHooks[0]
-	msgchannelMixinFields1 := msgchannelMixin[1].Fields()
-	_ = msgchannelMixinFields1
 	msgchannelFields := schema.MsgChannel{}.Fields()
 	_ = msgchannelFields
-	// msgchannelDescCreatedAt is the schema descriptor for created_at field.
-	msgchannelDescCreatedAt := msgchannelMixinFields1[1].Descriptor()
-	// msgchannel.DefaultCreatedAt holds the default value on creation for the created_at field.
-	msgchannel.DefaultCreatedAt = msgchannelDescCreatedAt.Default.(func() time.Time)
 	// msgchannelDescName is the schema descriptor for name field.
 	msgchannelDescName := msgchannelFields[0].Descriptor()
 	// msgchannel.NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -72,14 +66,8 @@ func init() {
 	msgevent.Hooks[2] = msgeventHooks[0]
 	msgevent.Hooks[3] = msgeventHooks[1]
 	msgevent.Hooks[4] = msgeventHooks[2]
-	msgeventMixinFields1 := msgeventMixin[1].Fields()
-	_ = msgeventMixinFields1
 	msgeventFields := schema.MsgEvent{}.Fields()
 	_ = msgeventFields
-	// msgeventDescCreatedAt is the schema descriptor for created_at field.
-	msgeventDescCreatedAt := msgeventMixinFields1[1].Descriptor()
-	// msgevent.DefaultCreatedAt holds the default value on creation for the created_at field.
-	msgevent.DefaultCreatedAt = msgeventDescCreatedAt.Default.(func() time.Time)
 	// msgeventDescName is the schema descriptor for name field.
 	msgeventDescName := msgeventFields[1].Descriptor()
 	// msgevent.NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -112,14 +100,8 @@ func init() {
 	msginternal.Hooks[2] = msginternalMixinHooks3[0]
 	msginternalMixinInters1 := msginternalMixin[1].Interceptors()
 	msginternal.Interceptors[0] = msginternalMixinInters1[0]
-	msginternalMixinFields2 := msginternalMixin[2].Fields()
-	_ = msginternalMixinFields2
 	msginternalFields := schema.MsgInternal{}.Fields()
 	_ = msginternalFields
-	// msginternalDescCreatedAt is the schema descriptor for created_at field.
-	msginternalDescCreatedAt := msginternalMixinFields2[1].Descriptor()
-	// msginternal.DefaultCreatedAt holds the default value on creation for the created_at field.
-	msginternal.DefaultCreatedAt = msginternalDescCreatedAt.Default.(func() time.Time)
 	// msginternalDescCategory is the schema descriptor for category field.
 	msginternalDescCategory := msginternalFields[1].Descriptor()
 	// msginternal.CategoryValidator is a validator for the "category" field. It is called by the builders before save.
@@ -152,14 +134,8 @@ func init() {
 	msgsilence.Interceptors[0] = msgsilenceMixinInters2[0]
 	msgsilenceMixinFields0 := msgsilenceMixin[0].Fields()
 	_ = msgsilenceMixinFields0
-	msgsilenceMixinFields1 := msgsilenceMixin[1].Fields()
-	_ = msgsilenceMixinFields1
 	msgsilenceFields := schema.MsgSilence{}.Fields()
 	_ = msgsilenceFields
-	// msgsilenceDescCreatedAt is the schema descriptor for created_at field.
-	msgsilenceDescCreatedAt := msgsilenceMixinFields1[1].Descriptor()
-	// msgsilence.DefaultCreatedAt holds the default value on creation for the created_at field.
-	msgsilence.DefaultCreatedAt = msgsilenceDescCreatedAt.Default.(func() time.Time)
 	// msgsilenceDescID is the schema descriptor for id field.
 	msgsilenceDescID := msgsilenceMixinFields0[0].Descriptor()
 	// msgsilence.DefaultID holds the default value on creation for the id field.
@@ -171,14 +147,8 @@ func init() {
 	msgsubscriber.Hooks[0] = msgsubscriberMixinHooks1[0]
 	msgsubscriber.Hooks[1] = msgsubscriberMixinHooks2[0]
 	msgsubscriber.Hooks[2] = msgsubscriberHooks[0]
-	msgsubscriberMixinFields1 := msgsubscriberMixin[1].Fields()
-	_ = msgsubscriberMixinFields1
 	msgsubscriberFields := schema.MsgSubscriber{}.Fields()
 	_ = msgsubscriberFields
-	// msgsubscriberDescCreatedAt is the schema descriptor for created_at field.
-	msgsubscriberDescCreatedAt := msgsubscriberMixinFields1[1].Descriptor()
-	// msgsubscriber.DefaultCreatedAt holds the default value on creation for the created_at field.
-	msgsubscriber.DefaultCreatedAt = msgsubscriberDescCreatedAt.Default.(func() time.Time)
 	// msgsubscriberDescExclude is the schema descriptor for exclude field.
 	msgsubscriberDescExclude := msgsubscriberFields[5].Descriptor()
 	// msgsubscriber.DefaultExclude holds the default value on creation for the exclude field.
@@ -188,14 +158,8 @@ func init() {
 	msgtemplateMixinHooks2 := msgtemplateMixin[2].Hooks()
 	msgtemplate.Hooks[0] = msgtemplateMixinHooks1[0]
 	msgtemplate.Hooks[1] = msgtemplateMixinHooks2[0]
-	msgtemplateMixinFields1 := msgtemplateMixin[1].Fields()
-	_ = msgtemplateMixinFields1
 	msgtemplateFields := schema.MsgTemplate{}.Fields()
 	_ = msgtemplateFields
-	// msgtemplateDescCreatedAt is the schema descriptor for created_at field.
-	msgtemplateDescCreatedAt := msgtemplateMixinFields1[1].Descriptor()
-	// msgtemplate.DefaultCreatedAt holds the default value on creation for the created_at field.
-	msgtemplate.DefaultCreatedAt = msgtemplateDescCreatedAt.Default.(func() time.Time)
 	// msgtemplateDescName is the schema descriptor for name field.
 	msgtemplateDescName := msgtemplateFields[4].Descriptor()
 	// msgtemplate.NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -207,14 +171,8 @@ func init() {
 	msgtype.Hooks[0] = msgtypeMixinHooks1[0]
 	msgtype.Hooks[1] = msgtypeMixinHooks2[0]
 	msgtype.Hooks[2] = msgtypeHooks[0]
-	msgtypeMixinFields1 := msgtypeMixin[1].Fields()
-	_ = msgtypeMixinFields1
 	msgtypeFields := schema.MsgType{}.Fields()
 	_ = msgtypeFields
-	// msgtypeDescCreatedAt is the schema descriptor for created_at field.
-	msgtypeDescCreatedAt := msgtypeMixinFields1[1].Descriptor()
-	// msgtype.DefaultCreatedAt holds the default value on creation for the created_at field.
-	msgtype.DefaultCreatedAt = msgtypeDescCreatedAt.Default.(func() time.Time)
 	// msgtypeDescCategory is the schema descriptor for category field.
 	msgtypeDescCategory := msgtypeFields[1].Descriptor()
 	// msgtype.CategoryValidator is a validator for the "category" field. It is called by the builders before save.

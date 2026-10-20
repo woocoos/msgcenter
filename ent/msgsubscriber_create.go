@@ -37,14 +37,6 @@ func (_c *MsgSubscriberCreate) SetCreatedAt(v time.Time) *MsgSubscriberCreate {
 	return _c
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (_c *MsgSubscriberCreate) SetNillableCreatedAt(v *time.Time) *MsgSubscriberCreate {
-	if v != nil {
-		_c.SetCreatedAt(*v)
-	}
-	return _c
-}
-
 // SetUpdatedBy sets the "updated_by" field.
 func (_c *MsgSubscriberCreate) SetUpdatedBy(v int) *MsgSubscriberCreate {
 	_c.mutation.SetUpdatedBy(v)
@@ -207,13 +199,6 @@ func (_c *MsgSubscriberCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *MsgSubscriberCreate) defaults() error {
-	if _, ok := _c.mutation.CreatedAt(); !ok {
-		if msgsubscriber.DefaultCreatedAt == nil {
-			return fmt.Errorf("ent: uninitialized msgsubscriber.DefaultCreatedAt (forgotten import ent/runtime?)")
-		}
-		v := msgsubscriber.DefaultCreatedAt()
-		_c.mutation.SetCreatedAt(v)
-	}
 	if _, ok := _c.mutation.Exclude(); !ok {
 		v := msgsubscriber.DefaultExclude
 		_c.mutation.SetExclude(v)

@@ -28,12 +28,18 @@ type Subscriber interface {
 type EventSubscribeStage struct {
 	alerts provider.Alerts
 	Subs   Subscriber
+	// perUser indicates whether the channel fans out one notification per subscriber
+	// (relying on the per-user clones created here). When false (e.g. webhook), the
+	// original alerts pass through and clone re-dispatches are intercepted, so the
+	// channel is notified exactly once per event.
+	perUser bool
 }
 
 func NewEventSubscribeStage(alerts provider.Alerts, subs Subscriber) *EventSubscribeStage {
 	return &EventSubscribeStage{
-		alerts: alerts,
-		Subs:   subs,
+		alerts:  alerts,
+		Subs:    subs,
+		perUser: true,
 	}
 }
 
@@ -41,6 +47,16 @@ func NewEventSubscribeStage(alerts provider.Alerts, subs Subscriber) *EventSubsc
 // If the alert has a label "to", it will be used as the recipient.means the alert will be sent to the user.
 // Need to not handle subscribing.
 func (u EventSubscribeStage) Exec(ctx context.Context, alerts ...*alert.Alert) (context.Context, []*alert.Alert, error) {
+	if !u.perUser {
+		// 非按用户渠道（如 webhook）：只拦截订阅流程产生的 clone（subClone 标记），
+		// 避免每个订阅者的 clone 重复触发发送；外部自带 skipSub 的消息不受影响，照常发送一次。
+		for _, a := range alerts {
+			if _, ok := a.Labels[label.SubscribeCloneLabel]; ok {
+				return ctx, nil, nil
+			}
+		}
+		return ctx, alerts, nil
+	}
 	for _, a := range alerts {
 		if _, ok := a.Labels[label.SkipSubscribeLabel]; ok {
 			return ctx, alerts, nil
@@ -116,6 +132,7 @@ func (u EventSubscribeStage) exec(ctx context.Context, alerts ...*alert.Alert) (
 			}
 			ac.Labels[label.ToUserIDLabel] = uid
 			ac.Labels[label.SkipSubscribeLabel] = "Y"
+			ac.Labels[label.SubscribeCloneLabel] = "Y"
 			uls[i] = ac
 		}
 		if err := u.alerts.Put(ctx, uls...); err != nil {

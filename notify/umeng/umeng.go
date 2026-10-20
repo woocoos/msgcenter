@@ -93,6 +93,9 @@ type Message struct {
 	TruncatedAlerts uint64   `json:"truncatedAlerts"`
 	DeviceTokens    []string `json:"deviceTokens,omitempty"`
 	UserIDs         []string `json:"userIDs,omitempty"`
+	// InternalID is the MsgInternal row created by saveToDB for this notification.
+	// Carried so the push payload extras can reference the in-app message record.
+	InternalID int `json:"-"`
 }
 
 // Notifier sends notifications via Umeng Push API.
@@ -236,6 +239,7 @@ func (n *Notifier) saveToDB(ctx context.Context, config *profile.UmengConfig, ms
 		if err != nil {
 			return err
 		}
+		msg.InternalID = row.ID
 
 		if len(userIDs) > 0 {
 			tos := make([]*ent.MsgInternalToCreate, 0, len(userIDs))
@@ -561,10 +565,11 @@ func extractExtraFields(config *profile.UmengConfig, msg *Message) map[string]an
 		if v, ok := a.Annotations[BizType]; ok && v != "" {
 			extra["type"] = v
 		}
-		// Extract alert database ID from annotation, use as "id" in extra
-		if v, ok := a.Annotations[label.AlertIDAnnotation]; ok && v != "" {
-			extra["id"] = v
-		}
+	}
+	// 站内信记录 id（saveToDB 创建的 MsgInternal），App 端据此跳转消息详情；
+	// skipStore 或落库失败时无记录，extra 中不带 id。
+	if msg.InternalID > 0 {
+		extra["id"] = strconv.Itoa(msg.InternalID)
 	}
 	// 如果 BizType 没有值，使用 config.DefaultBizType 作为默认值
 	if _, ok := extra["type"]; !ok && config != nil && config.DefaultBizType != "" {
@@ -867,6 +872,7 @@ func (n *Notifier) filterMessageForDevices(msg *Message, deviceTokens []string) 
 		GroupKey:        msg.GroupKey,
 		TruncatedAlerts: msg.TruncatedAlerts,
 		DeviceTokens:    deviceTokens,
+		InternalID:      msg.InternalID,
 	}
 }
 
@@ -877,6 +883,7 @@ func (n *Notifier) filterMessageForUsers(msg *Message, userIDs []string) *Messag
 		GroupKey:        msg.GroupKey,
 		TruncatedAlerts: msg.TruncatedAlerts,
 		UserIDs:         userIDs,
+		InternalID:      msg.InternalID,
 	}
 }
 

@@ -37,14 +37,6 @@ func (_c *MsgSilenceCreate) SetCreatedAt(v time.Time) *MsgSilenceCreate {
 	return _c
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (_c *MsgSilenceCreate) SetNillableCreatedAt(v *time.Time) *MsgSilenceCreate {
-	if v != nil {
-		_c.SetCreatedAt(*v)
-	}
-	return _c
-}
-
 // SetUpdatedBy sets the "updated_by" field.
 func (_c *MsgSilenceCreate) SetUpdatedBy(v int) *MsgSilenceCreate {
 	_c.mutation.SetUpdatedBy(v)
@@ -187,13 +179,6 @@ func (_c *MsgSilenceCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *MsgSilenceCreate) defaults() error {
-	if _, ok := _c.mutation.CreatedAt(); !ok {
-		if msgsilence.DefaultCreatedAt == nil {
-			return fmt.Errorf("ent: uninitialized msgsilence.DefaultCreatedAt (forgotten import ent/runtime?)")
-		}
-		v := msgsilence.DefaultCreatedAt()
-		_c.mutation.SetCreatedAt(v)
-	}
 	if _, ok := _c.mutation.State(); !ok {
 		v := msgsilence.DefaultState
 		_c.mutation.SetState(v)

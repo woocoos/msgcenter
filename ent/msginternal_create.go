@@ -37,14 +37,6 @@ func (_c *MsgInternalCreate) SetCreatedAt(v time.Time) *MsgInternalCreate {
 	return _c
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (_c *MsgInternalCreate) SetNillableCreatedAt(v *time.Time) *MsgInternalCreate {
-	if v != nil {
-		_c.SetCreatedAt(*v)
-	}
-	return _c
-}
-
 // SetUpdatedBy sets the "updated_by" field.
 func (_c *MsgInternalCreate) SetUpdatedBy(v int) *MsgInternalCreate {
 	_c.mutation.SetUpdatedBy(v)
@@ -192,9 +184,6 @@ func (_c *MsgInternalCreate) Mutation() *MsgInternalMutation {
 
 // Save creates the MsgInternal in the database.
 func (_c *MsgInternalCreate) Save(ctx context.Context) (*MsgInternal, error) {
-	if err := _c.defaults(); err != nil {
-		return nil, err
-	}
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -218,18 +207,6 @@ func (_c *MsgInternalCreate) ExecX(ctx context.Context) {
 	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
-}
-
-// defaults sets the default values of the builder before save.
-func (_c *MsgInternalCreate) defaults() error {
-	if _, ok := _c.mutation.CreatedAt(); !ok {
-		if msginternal.DefaultCreatedAt == nil {
-			return fmt.Errorf("ent: uninitialized msginternal.DefaultCreatedAt (forgotten import ent/runtime?)")
-		}
-		v := msginternal.DefaultCreatedAt()
-		_c.mutation.SetCreatedAt(v)
-	}
-	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -899,7 +876,6 @@ func (_c *MsgInternalCreateBulk) Save(ctx context.Context) ([]*MsgInternal, erro
 	for i := range _c.builders {
 		func(i int, root context.Context) {
 			builder := _c.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MsgInternalMutation)
 				if !ok {

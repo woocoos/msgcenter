@@ -39,14 +39,6 @@ func (_c *MsgEventCreate) SetCreatedAt(v time.Time) *MsgEventCreate {
 	return _c
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (_c *MsgEventCreate) SetNillableCreatedAt(v *time.Time) *MsgEventCreate {
-	if v != nil {
-		_c.SetCreatedAt(*v)
-	}
-	return _c
-}
-
 // SetUpdatedBy sets the "updated_by" field.
 func (_c *MsgEventCreate) SetUpdatedBy(v int) *MsgEventCreate {
 	_c.mutation.SetUpdatedBy(v)
@@ -219,13 +211,6 @@ func (_c *MsgEventCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *MsgEventCreate) defaults() error {
-	if _, ok := _c.mutation.CreatedAt(); !ok {
-		if msgevent.DefaultCreatedAt == nil {
-			return fmt.Errorf("ent: uninitialized msgevent.DefaultCreatedAt (forgotten import ent/runtime?)")
-		}
-		v := msgevent.DefaultCreatedAt()
-		_c.mutation.SetCreatedAt(v)
-	}
 	if _, ok := _c.mutation.Status(); !ok {
 		v := msgevent.DefaultStatus
 		_c.mutation.SetStatus(v)

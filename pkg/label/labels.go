@@ -22,6 +22,10 @@ const (
 	ToUserIDLabel = "user"
 	// SkipSubscribeLabel indicates if the alert is from Event Subs or skip Event Subs.
 	SkipSubscribeLabel = "skipSub"
+	// SubscribeCloneLabel indicates the alert is a per-user clone created by EventSubscribeStage.
+	// Channels without per-user fan-out (e.g. webhook) use it to intercept clone re-dispatch,
+	// while external alerts carrying skipSub still pass through.
+	SubscribeCloneLabel = "subClone"
 	// SkipStoreLabel indicates if the alert should skip database storage (msg_alert, msg_internal, nlog).
 	SkipStoreLabel = "skipStore"
 	// SkipTempParamsLabel is the label name for the skip template params. Y/N

@@ -68,6 +68,7 @@ func (c *MessageConfig) UnmarshalJSON(bytes []byte) error {
 
 func (c *MessageConfig) Clone() *MessageConfig {
 	cc := *c
+	cc.Extras = CopyMap(c.Extras)
 	return &cc
 }
 
