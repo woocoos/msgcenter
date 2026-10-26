@@ -34,6 +34,8 @@ const List = () => {
     [detailModal, setDetailModal] = useState<{ show: boolean; id: string; key: number }>({
       show: false, id: '', key: 0,
     }),
+    // 标题列宽度：监听 dataSource 变化后实测最长 subject 得出，范围 [260, 800]
+    [subjectWidth, setSubjectWidth] = useState(260),
     // 可调整列宽的 ProTable
     { columns: finalColumns, components, tableWidth } = useResizableProTable<MsgInternalTo>(() => ({
       columns: [
@@ -55,10 +57,17 @@ const List = () => {
           },
         },
         {
-          title: t('subject'), dataIndex: 'subject', width: 260,
-          renderText(text, record, index, action) {
-            const htmlSubject = customTextToHtml(record.msgInternal.subject);
-            const subjectNode = <span dangerouslySetInnerHTML={{ __html: htmlSubject }} />;
+          title: t('subject'), dataIndex: 'subject', width: subjectWidth,
+          render(_, record) {
+            const subject = record.msgInternal.subject;
+            const formattedSubject = customTextToHtml(subject);
+            const subjectNode = <span
+              style={{ cursor: 'pointer' }}
+              dangerouslySetInnerHTML={{ __html: formattedSubject }}
+              onClick={() => {
+                setDetailModal({ show: true, id: record.id, key: Date.now() });
+              }}
+            />;
             return record.readAt ? subjectNode : <Badge color="red" text={subjectNode} />
           },
         },
@@ -112,7 +121,7 @@ const List = () => {
           },
         },
       ],
-    }), []);
+    }), [subjectWidth]);
 
   const requestCategory = async () => {
     let allNum = 0;
@@ -146,6 +155,25 @@ const List = () => {
   useEffect(() => {
     requestCategory();
   }, [])
+
+  // 监听 dataSource 变化，动态测量最长 subject 计算标题列宽（+50px 余量，范围 [260, 800]）
+  useEffect(() => {
+    if (!dataSource.length) {
+      return;
+    }
+    const ruler = document.createElement('div');
+    ruler.style.cssText = 'position:fixed;top:-9999px;left:0;visibility:hidden;white-space:nowrap;font-size:14px;';
+    document.body.appendChild(ruler);
+    let max = 0;
+    dataSource.forEach((item) => {
+      ruler.innerHTML = customTextToHtml(item.msgInternal.subject);
+      max = Math.max(max, ruler.offsetWidth);
+    });
+    document.body.removeChild(ruler);
+    if (max > 0) {
+      setSubjectWidth(Math.min(800, Math.max(260, Math.ceil(max) + 50)));
+    }
+  }, [dataSource]);
 
   return (
     <>
@@ -309,7 +337,10 @@ const List = () => {
             key={detailModal.key}
             id={detailModal.id}
             onRead={() => {
-              proTableRef.current?.reload();
+              // 已读回调：本地更新 readAt，避免 reload 刷新整个表格
+              setDataSource(dataSource.map(item => item.id === detailModal.id
+                ? { ...item, readAt: item.readAt ?? new Date().toISOString() } as MsgInternalTo
+                : item));
               requestCategory();
             }}
           />
