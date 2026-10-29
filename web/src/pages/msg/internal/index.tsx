@@ -293,7 +293,8 @@ const List = () => {
         title={t('station_msg_detail')}
         open={detailModal.show}
         destroyOnHidden
-        width={1100}
+        centered
+        width={900}
         onCancel={() => {
           setDetailModal({ show: false, id: '', key: 0 });
         }}

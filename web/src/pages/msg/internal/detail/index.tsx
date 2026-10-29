@@ -52,25 +52,56 @@ const Detail = ({ id: propId, onRead }: { id?: string; onRead?: () => void }) =>
   }, [id])
 
   useEffect(() => {
-    if (iframeRef.current && info) {
-      const iframeDoc = iframeRef.current.contentWindow?.document || iframeRef.current.contentDocument;
+     const iframeEl = iframeRef.current;
+    let cleanup: (() => void) | undefined;
+    if (iframeEl && info) {
+      const iframeDoc = iframeEl.contentWindow?.document || iframeEl.contentDocument;
       if (iframeDoc) {
         const body = info.msgInternal.body ?? '';
+        iframeDoc.open();
         iframeDoc.write(info.msgInternal.format === 'html' ? body : `<pre style="white-space: pre-wrap;word-wrap: break-word;">${body}</pre>`);
-        iframeRef.current.style.height = `${(iframeDoc.body.scrollHeight ?? 0) + 60}px`
-      }
-      if (!info.readAt) {
-        markMsgRead([info.id], true);
-        onRead?.();
+        iframeDoc.close();
+        // iframe 高度跟随内容自适应，封顶 60vh，超出部分由 iframe 内部滚动，避免弹窗超出屏幕
+        const resizeHeight = () => {
+          // 先把高度归零再测量：iframe 内 body.scrollHeight 恒 >= iframe 视口高度，直接测量会形成自引用
+          const prev = iframeEl.style.height;
+          iframeEl.style.height = '0px';
+          const contentHeight = iframeDoc.body?.scrollHeight ?? 0;
+          iframeEl.style.height = contentHeight > 0
+            ? `${Math.min(contentHeight + 16, Math.floor(window.innerHeight * 0.6))}px`
+            : prev;
+        };
+        // 通过 rAF 延迟到下一帧执行，避免 ResizeObserver 循环报错
+        let rafId = 0;
+        const scheduleResize = () => {
+          cancelAnimationFrame(rafId);
+          rafId = requestAnimationFrame(resizeHeight);
+        };
+        resizeHeight();
+        // 内容中图片等资源加载完成会改变高度，通过 ResizeObserver 自动修正
+        const observer = new ResizeObserver(scheduleResize);
+        observer.observe(iframeDoc.body);
+        cleanup = () => {
+          cancelAnimationFrame(rafId);
+          observer.disconnect();
+        };
       }
     }
+    if (info && !info.readAt) {
+      markMsgRead([info.id], true);
+      onRead?.();
+    }
+    return cleanup;
   }, [info])
 
   return (
     <ProCard loading={loading}>{
       info ? <div>
         <div style={{ textAlign: 'center' }}>
-          <Typography.Title level={4} dangerouslySetInnerHTML={{ __html: customTextToHtml(info.msgInternal.subject) }} />
+          {/* Typography.Title 内部会注入 children，与 dangerouslySetInnerHTML 冲突，故将 HTML 放到内层元素 */}
+          <Typography.Title level={4}>
+            <span dangerouslySetInnerHTML={{ __html: customTextToHtml(info.msgInternal.subject) }} />
+          </Typography.Title>
           <Typography.Text >{getDate(info.createdAt, 'YYYY-MM-DD HH:mm:ss')}</Typography.Text>
         </div>
         <Divider />
