@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/woocoos/msgcenter/ent/msgalert"
+	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
 	"github.com/woocoos/msgcenter/ent/org"
@@ -185,6 +186,21 @@ func (_c *MsgAlertCreate) SetOrgID(id int) *MsgAlertCreate {
 // SetOrg sets the "org" edge to the Org entity.
 func (_c *MsgAlertCreate) SetOrg(v *Org) *MsgAlertCreate {
 	return _c.SetOrgID(v.ID)
+}
+
+// AddMsgInternalIDs adds the "msg_internal" edge to the MsgInternal entity by IDs.
+func (_c *MsgAlertCreate) AddMsgInternalIDs(ids ...int) *MsgAlertCreate {
+	_c.mutation.AddMsgInternalIDs(ids...)
+	return _c
+}
+
+// AddMsgInternal adds the "msg_internal" edges to the MsgInternal entity.
+func (_c *MsgAlertCreate) AddMsgInternal(v ...*MsgInternal) *MsgAlertCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddMsgInternalIDs(ids...)
 }
 
 // AddNlogAlertIDs adds the "nlog_alerts" edge to the NlogAlert entity by IDs.
@@ -417,6 +433,23 @@ func (_c *MsgAlertCreate) createSpec() (*MsgAlert, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.TenantID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.MsgInternalIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   msgalert.MsgInternalTable,
+			Columns: []string{msgalert.MsgInternalColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msginternal.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _c.schemaConfig.MsgInternal
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.NlogAlertsIDs(); len(nodes) > 0 {

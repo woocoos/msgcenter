@@ -5,10 +5,6 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"github.com/woocoos/knockout-go/api"
-	"github.com/woocoos/knockout-go/api/auth"
-	"github.com/woocoos/msgcenter/pkg/alert"
-	"github.com/woocoos/msgcenter/pkg/label"
 	tmplhtml "html/template"
 	"io/fs"
 	"net/url"
@@ -19,6 +15,11 @@ import (
 	"strings"
 	tmpltext "text/template"
 	"text/template/parse"
+
+	"github.com/woocoos/knockout-go/api"
+	"github.com/woocoos/knockout-go/api/auth"
+	"github.com/woocoos/msgcenter/pkg/alert"
+	"github.com/woocoos/msgcenter/pkg/label"
 )
 
 var (
@@ -208,7 +209,7 @@ func MustParse(t *Template, err error) *Template {
 }
 
 // ExecuteTextString needs a meaningful doc comment (TODO(fabxc)).
-func (t *Template) ExecuteTextString(text string, data interface{}) (string, error) {
+func (t *Template) ExecuteTextString(text string, data any) (string, error) {
 	if text == "" {
 		return "", nil
 	}
@@ -226,7 +227,7 @@ func (t *Template) ExecuteTextString(text string, data interface{}) (string, err
 }
 
 // ExecuteHTMLString needs a meaningful doc comment (TODO(fabxc)).
-func (t *Template) ExecuteHTMLString(html string, data interface{}) (string, error) {
+func (t *Template) ExecuteHTMLString(html string, data any) (string, error) {
 	if html == "" {
 		return "", nil
 	}
@@ -313,10 +314,14 @@ func (t *Template) Data(recv string, groupLabels label.LabelSet, alerts ...*aler
 	return data
 }
 
+// skipTempParams 判断消息是否跳过模板参数注入（skipTempParams=1 时跳过）。
+func skipTempParams(data *Data) bool {
+	return data.CommonLabels[label.SkipTempParamsLabel] == "1"
+}
+
 // AppendTempParams appends template params to the alerts.
 func (t *Template) AppendTempParams(data *Data) {
-	// 判断是否忽略模板参数
-	if data.CommonLabels[label.SkipTempParamsLabel] == "Y" {
+	if skipTempParams(data) {
 		return
 	}
 	// 判断是否传递租户id

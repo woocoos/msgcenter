@@ -34,6 +34,8 @@ type FormatMsgAlert struct {
 	Users []*UserInfo `json:"users,omitempty"`
 	// 是否存在多条消息
 	HasMultiMsg bool `json:"hasMultiMsg"`
+	// 所有匹配路由的receiver名称，逗号分隔
+	Modes *string `json:"modes,omitempty"`
 	// 消息状态
 	State     alert.AlertStatus `json:"state"`
 	CreatedAt time.Time         `json:"createdAt"`

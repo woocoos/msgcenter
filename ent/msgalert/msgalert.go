@@ -46,6 +46,8 @@ const (
 	EdgeNlog = "nlog"
 	// EdgeOrg holds the string denoting the org edge name in mutations.
 	EdgeOrg = "org"
+	// EdgeMsgInternal holds the string denoting the msg_internal edge name in mutations.
+	EdgeMsgInternal = "msg_internal"
 	// EdgeNlogAlerts holds the string denoting the nlog_alerts edge name in mutations.
 	EdgeNlogAlerts = "nlog_alerts"
 	// Table holds the table name of the msgalert in the database.
@@ -62,6 +64,13 @@ const (
 	OrgInverseTable = "org"
 	// OrgColumn is the table column denoting the org relation/edge.
 	OrgColumn = "tenant_id"
+	// MsgInternalTable is the table that holds the msg_internal relation/edge.
+	MsgInternalTable = "msg_internal"
+	// MsgInternalInverseTable is the table name for the MsgInternal entity.
+	// It exists in this package in order to avoid circular dependency with the "msginternal" package.
+	MsgInternalInverseTable = "msg_internal"
+	// MsgInternalColumn is the table column denoting the msg_internal relation/edge.
+	MsgInternalColumn = "alert_id"
 	// NlogAlertsTable is the table that holds the nlog_alerts relation/edge.
 	NlogAlertsTable = "msg_nlog_alert"
 	// NlogAlertsInverseTable is the table name for the NlogAlert entity.
@@ -211,6 +220,20 @@ func ByOrgField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
+// ByMsgInternalCount orders the results by msg_internal count.
+func ByMsgInternalCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newMsgInternalStep(), opts...)
+	}
+}
+
+// ByMsgInternal orders the results by msg_internal terms.
+func ByMsgInternal(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newMsgInternalStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByNlogAlertsCount orders the results by nlog_alerts count.
 func ByNlogAlertsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -236,6 +259,13 @@ func newOrgStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(OrgInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, OrgTable, OrgColumn),
+	)
+}
+func newMsgInternalStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(MsgInternalInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, MsgInternalTable, MsgInternalColumn),
 	)
 }
 func newNlogAlertsStep() *sqlgraph.Step {

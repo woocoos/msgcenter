@@ -112,26 +112,33 @@ export const initStoreData = (store: IMockStore) => {
 
   // User
   store.set('User', 1, {
-    id: 1, displayName: 'admin', userType: "account", email: "admin@woocoo.com",
+    id: 1, displayName: 'admin', userType: "account",
+    addresses: [{ email: "admin@woocoo.com", }],
     loginProfile: { mfaEnabled: false }
   })
   store.set('User', 2, {
-    id: 2, displayName: 'user2', userType: "account", email: "user2@woocoo.com",
+    id: 2, displayName: 'user2', userType: "account",
+    addresses: [{ email: "user2@woocoo.com", }],
   })
   store.set('User', 3, {
-    id: 3, displayName: 'user3', email: "user3@woocoo.com",
+    id: 3, displayName: 'user3',
+    addresses: [{ email: "user3@woocoo.com", }],
   })
   store.set('User', 4, {
-    id: 4, displayName: 'user4', email: "user4@woocoo.com",
+    id: 4, displayName: 'user4',
+    addresses: [{ email: "user4@woocoo.com", }],
   })
   store.set('User', 5, {
-    id: 5, displayName: 'user5', email: "user5@woocoo.com",
+    id: 5, displayName: 'user5',
+    addresses: [{ email: "user5@woocoo.com", }],
   })
   store.set('User', 6, {
-    id: 6, displayName: 'user6', email: "user6@woocoo.com",
+    id: 6, displayName: 'user6',
+    addresses: [{ email: "user6@woocoo.com", }],
   })
   store.set('User', 7, {
-    id: 7, displayName: 'user7', email: "user7@woocoo.com",
+    id: 7, displayName: 'user7',
+    addresses: [{ email: "user7@woocoo.com", }],
   })
 
   // app

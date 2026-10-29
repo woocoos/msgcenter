@@ -11,16 +11,14 @@ import (
 	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
+	"github.com/woocoos/msgcenter/ent/msgsilence"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/nlog"
 	"github.com/woocoos/msgcenter/ent/nlogalert"
-	"github.com/woocoos/msgcenter/ent/org"
-	"github.com/woocoos/msgcenter/ent/orgroleuser"
-	"github.com/woocoos/msgcenter/ent/silence"
-	"github.com/woocoos/msgcenter/ent/user"
 	"github.com/woocoos/msgcenter/ent/useraddr"
+	"github.com/woocoos/msgcenter/ent/userdevice"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -53,14 +51,8 @@ func init() {
 	msgchannel.Hooks[0] = msgchannelMixinHooks1[0]
 	msgchannel.Hooks[1] = msgchannelMixinHooks2[0]
 	msgchannel.Hooks[2] = msgchannelHooks[0]
-	msgchannelMixinFields1 := msgchannelMixin[1].Fields()
-	_ = msgchannelMixinFields1
 	msgchannelFields := schema.MsgChannel{}.Fields()
 	_ = msgchannelFields
-	// msgchannelDescCreatedAt is the schema descriptor for created_at field.
-	msgchannelDescCreatedAt := msgchannelMixinFields1[1].Descriptor()
-	// msgchannel.DefaultCreatedAt holds the default value on creation for the created_at field.
-	msgchannel.DefaultCreatedAt = msgchannelDescCreatedAt.Default.(func() time.Time)
 	// msgchannelDescName is the schema descriptor for name field.
 	msgchannelDescName := msgchannelFields[0].Descriptor()
 	// msgchannel.NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -74,14 +66,8 @@ func init() {
 	msgevent.Hooks[2] = msgeventHooks[0]
 	msgevent.Hooks[3] = msgeventHooks[1]
 	msgevent.Hooks[4] = msgeventHooks[2]
-	msgeventMixinFields1 := msgeventMixin[1].Fields()
-	_ = msgeventMixinFields1
 	msgeventFields := schema.MsgEvent{}.Fields()
 	_ = msgeventFields
-	// msgeventDescCreatedAt is the schema descriptor for created_at field.
-	msgeventDescCreatedAt := msgeventMixinFields1[1].Descriptor()
-	// msgevent.DefaultCreatedAt holds the default value on creation for the created_at field.
-	msgevent.DefaultCreatedAt = msgeventDescCreatedAt.Default.(func() time.Time)
 	// msgeventDescName is the schema descriptor for name field.
 	msgeventDescName := msgeventFields[1].Descriptor()
 	// msgevent.NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -101,6 +87,10 @@ func init() {
 			return nil
 		}
 	}()
+	// msgeventDescCanSubs is the schema descriptor for can_subs field.
+	msgeventDescCanSubs := msgeventFields[6].Descriptor()
+	// msgevent.DefaultCanSubs holds the default value on creation for the can_subs field.
+	msgevent.DefaultCanSubs = msgeventDescCanSubs.Default.(bool)
 	msginternalMixin := schema.MsgInternal{}.Mixin()
 	msginternalMixinHooks1 := msginternalMixin[1].Hooks()
 	msginternalMixinHooks2 := msginternalMixin[2].Hooks()
@@ -110,18 +100,16 @@ func init() {
 	msginternal.Hooks[2] = msginternalMixinHooks3[0]
 	msginternalMixinInters1 := msginternalMixin[1].Interceptors()
 	msginternal.Interceptors[0] = msginternalMixinInters1[0]
-	msginternalMixinFields2 := msginternalMixin[2].Fields()
-	_ = msginternalMixinFields2
 	msginternalFields := schema.MsgInternal{}.Fields()
 	_ = msginternalFields
-	// msginternalDescCreatedAt is the schema descriptor for created_at field.
-	msginternalDescCreatedAt := msginternalMixinFields2[1].Descriptor()
-	// msginternal.DefaultCreatedAt holds the default value on creation for the created_at field.
-	msginternal.DefaultCreatedAt = msginternalDescCreatedAt.Default.(func() time.Time)
 	// msginternalDescCategory is the schema descriptor for category field.
 	msginternalDescCategory := msginternalFields[1].Descriptor()
 	// msginternal.CategoryValidator is a validator for the "category" field. It is called by the builders before save.
 	msginternal.CategoryValidator = msginternalDescCategory.Validators[0].(func(string) error)
+	// msginternalDescMsgType is the schema descriptor for msg_type field.
+	msginternalDescMsgType := msginternalFields[2].Descriptor()
+	// msginternal.MsgTypeValidator is a validator for the "msg_type" field. It is called by the builders before save.
+	msginternal.MsgTypeValidator = msginternalDescMsgType.Validators[0].(func(string) error)
 	msginternaltoMixin := schema.MsgInternalTo{}.Mixin()
 	msginternaltoMixinHooks1 := msginternaltoMixin[1].Hooks()
 	msginternaltoMixinHooks2 := msginternaltoMixin[2].Hooks()
@@ -135,6 +123,23 @@ func init() {
 	msginternaltoDescCreatedAt := msginternaltoFields[5].Descriptor()
 	// msginternalto.DefaultCreatedAt holds the default value on creation for the created_at field.
 	msginternalto.DefaultCreatedAt = msginternaltoDescCreatedAt.Default.(func() time.Time)
+	msgsilenceMixin := schema.MsgSilence{}.Mixin()
+	msgsilenceMixinHooks1 := msgsilenceMixin[1].Hooks()
+	msgsilenceMixinHooks2 := msgsilenceMixin[2].Hooks()
+	msgsilenceMixinHooks3 := msgsilenceMixin[3].Hooks()
+	msgsilence.Hooks[0] = msgsilenceMixinHooks1[0]
+	msgsilence.Hooks[1] = msgsilenceMixinHooks2[0]
+	msgsilence.Hooks[2] = msgsilenceMixinHooks3[0]
+	msgsilenceMixinInters2 := msgsilenceMixin[2].Interceptors()
+	msgsilence.Interceptors[0] = msgsilenceMixinInters2[0]
+	msgsilenceMixinFields0 := msgsilenceMixin[0].Fields()
+	_ = msgsilenceMixinFields0
+	msgsilenceFields := schema.MsgSilence{}.Fields()
+	_ = msgsilenceFields
+	// msgsilenceDescID is the schema descriptor for id field.
+	msgsilenceDescID := msgsilenceMixinFields0[0].Descriptor()
+	// msgsilence.DefaultID holds the default value on creation for the id field.
+	msgsilence.DefaultID = msgsilenceDescID.Default.(func() int)
 	msgsubscriberMixin := schema.MsgSubscriber{}.Mixin()
 	msgsubscriberMixinHooks1 := msgsubscriberMixin[1].Hooks()
 	msgsubscriberMixinHooks2 := msgsubscriberMixin[2].Hooks()
@@ -142,16 +147,10 @@ func init() {
 	msgsubscriber.Hooks[0] = msgsubscriberMixinHooks1[0]
 	msgsubscriber.Hooks[1] = msgsubscriberMixinHooks2[0]
 	msgsubscriber.Hooks[2] = msgsubscriberHooks[0]
-	msgsubscriberMixinFields1 := msgsubscriberMixin[1].Fields()
-	_ = msgsubscriberMixinFields1
 	msgsubscriberFields := schema.MsgSubscriber{}.Fields()
 	_ = msgsubscriberFields
-	// msgsubscriberDescCreatedAt is the schema descriptor for created_at field.
-	msgsubscriberDescCreatedAt := msgsubscriberMixinFields1[1].Descriptor()
-	// msgsubscriber.DefaultCreatedAt holds the default value on creation for the created_at field.
-	msgsubscriber.DefaultCreatedAt = msgsubscriberDescCreatedAt.Default.(func() time.Time)
 	// msgsubscriberDescExclude is the schema descriptor for exclude field.
-	msgsubscriberDescExclude := msgsubscriberFields[4].Descriptor()
+	msgsubscriberDescExclude := msgsubscriberFields[5].Descriptor()
 	// msgsubscriber.DefaultExclude holds the default value on creation for the exclude field.
 	msgsubscriber.DefaultExclude = msgsubscriberDescExclude.Default.(bool)
 	msgtemplateMixin := schema.MsgTemplate{}.Mixin()
@@ -159,16 +158,10 @@ func init() {
 	msgtemplateMixinHooks2 := msgtemplateMixin[2].Hooks()
 	msgtemplate.Hooks[0] = msgtemplateMixinHooks1[0]
 	msgtemplate.Hooks[1] = msgtemplateMixinHooks2[0]
-	msgtemplateMixinFields1 := msgtemplateMixin[1].Fields()
-	_ = msgtemplateMixinFields1
 	msgtemplateFields := schema.MsgTemplate{}.Fields()
 	_ = msgtemplateFields
-	// msgtemplateDescCreatedAt is the schema descriptor for created_at field.
-	msgtemplateDescCreatedAt := msgtemplateMixinFields1[1].Descriptor()
-	// msgtemplate.DefaultCreatedAt holds the default value on creation for the created_at field.
-	msgtemplate.DefaultCreatedAt = msgtemplateDescCreatedAt.Default.(func() time.Time)
 	// msgtemplateDescName is the schema descriptor for name field.
-	msgtemplateDescName := msgtemplateFields[3].Descriptor()
+	msgtemplateDescName := msgtemplateFields[4].Descriptor()
 	// msgtemplate.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	msgtemplate.NameValidator = msgtemplateDescName.Validators[0].(func(string) error)
 	msgtypeMixin := schema.MsgType{}.Mixin()
@@ -178,14 +171,8 @@ func init() {
 	msgtype.Hooks[0] = msgtypeMixinHooks1[0]
 	msgtype.Hooks[1] = msgtypeMixinHooks2[0]
 	msgtype.Hooks[2] = msgtypeHooks[0]
-	msgtypeMixinFields1 := msgtypeMixin[1].Fields()
-	_ = msgtypeMixinFields1
 	msgtypeFields := schema.MsgType{}.Fields()
 	_ = msgtypeFields
-	// msgtypeDescCreatedAt is the schema descriptor for created_at field.
-	msgtypeDescCreatedAt := msgtypeMixinFields1[1].Descriptor()
-	// msgtype.DefaultCreatedAt holds the default value on creation for the created_at field.
-	msgtype.DefaultCreatedAt = msgtypeDescCreatedAt.Default.(func() time.Time)
 	// msgtypeDescCategory is the schema descriptor for category field.
 	msgtypeDescCategory := msgtypeFields[1].Descriptor()
 	// msgtype.CategoryValidator is a validator for the "category" field. It is called by the builders before save.
@@ -221,37 +208,6 @@ func init() {
 	nlogalertDescCreatedAt := nlogalertFields[2].Descriptor()
 	// nlogalert.DefaultCreatedAt holds the default value on creation for the created_at field.
 	nlogalert.DefaultCreatedAt = nlogalertDescCreatedAt.Default.(func() time.Time)
-	orgHooks := schema.Org{}.Hooks()
-	org.Hooks[0] = orgHooks[0]
-	orgroleuserHooks := schema.OrgRoleUser{}.Hooks()
-	orgroleuser.Hooks[0] = orgroleuserHooks[0]
-	silenceMixin := schema.Silence{}.Mixin()
-	silenceMixinHooks1 := silenceMixin[1].Hooks()
-	silenceMixinHooks2 := silenceMixin[2].Hooks()
-	silenceMixinHooks3 := silenceMixin[3].Hooks()
-	silence.Hooks[0] = silenceMixinHooks1[0]
-	silence.Hooks[1] = silenceMixinHooks2[0]
-	silence.Hooks[2] = silenceMixinHooks3[0]
-	silenceMixinInters2 := silenceMixin[2].Interceptors()
-	silence.Interceptors[0] = silenceMixinInters2[0]
-	silenceMixinFields0 := silenceMixin[0].Fields()
-	_ = silenceMixinFields0
-	silenceMixinFields1 := silenceMixin[1].Fields()
-	_ = silenceMixinFields1
-	silenceFields := schema.Silence{}.Fields()
-	_ = silenceFields
-	// silenceDescCreatedAt is the schema descriptor for created_at field.
-	silenceDescCreatedAt := silenceMixinFields1[1].Descriptor()
-	// silence.DefaultCreatedAt holds the default value on creation for the created_at field.
-	silence.DefaultCreatedAt = silenceDescCreatedAt.Default.(func() time.Time)
-	// silenceDescID is the schema descriptor for id field.
-	silenceDescID := silenceMixinFields0[0].Descriptor()
-	// silence.DefaultID holds the default value on creation for the id field.
-	silence.DefaultID = silenceDescID.Default.(func() int)
-	userHooks := schema.User{}.Hooks()
-	user.Hooks[0] = userHooks[0]
-	useraddrHooks := schema.UserAddr{}.Hooks()
-	useraddr.Hooks[0] = useraddrHooks[0]
 	useraddrFields := schema.UserAddr{}.Fields()
 	_ = useraddrFields
 	// useraddrDescEmail is the schema descriptor for email field.
@@ -282,6 +238,32 @@ func init() {
 	useraddrDescIsDefault := useraddrFields[11].Descriptor()
 	// useraddr.DefaultIsDefault holds the default value on creation for the is_default field.
 	useraddr.DefaultIsDefault = useraddrDescIsDefault.Default.(bool)
+	userdeviceFields := schema.UserDevice{}.Fields()
+	_ = userdeviceFields
+	// userdeviceDescDeviceUID is the schema descriptor for device_uid field.
+	userdeviceDescDeviceUID := userdeviceFields[2].Descriptor()
+	// userdevice.DeviceUIDValidator is a validator for the "device_uid" field. It is called by the builders before save.
+	userdevice.DeviceUIDValidator = userdeviceDescDeviceUID.Validators[0].(func(string) error)
+	// userdeviceDescDeviceName is the schema descriptor for device_name field.
+	userdeviceDescDeviceName := userdeviceFields[3].Descriptor()
+	// userdevice.DeviceNameValidator is a validator for the "device_name" field. It is called by the builders before save.
+	userdevice.DeviceNameValidator = userdeviceDescDeviceName.Validators[0].(func(string) error)
+	// userdeviceDescSystemName is the schema descriptor for system_name field.
+	userdeviceDescSystemName := userdeviceFields[4].Descriptor()
+	// userdevice.SystemNameValidator is a validator for the "system_name" field. It is called by the builders before save.
+	userdevice.SystemNameValidator = userdeviceDescSystemName.Validators[0].(func(string) error)
+	// userdeviceDescSystemVersion is the schema descriptor for system_version field.
+	userdeviceDescSystemVersion := userdeviceFields[5].Descriptor()
+	// userdevice.SystemVersionValidator is a validator for the "system_version" field. It is called by the builders before save.
+	userdevice.SystemVersionValidator = userdeviceDescSystemVersion.Validators[0].(func(string) error)
+	// userdeviceDescAppVersion is the schema descriptor for app_version field.
+	userdeviceDescAppVersion := userdeviceFields[6].Descriptor()
+	// userdevice.AppVersionValidator is a validator for the "app_version" field. It is called by the builders before save.
+	userdevice.AppVersionValidator = userdeviceDescAppVersion.Validators[0].(func(string) error)
+	// userdeviceDescDeviceModel is the schema descriptor for device_model field.
+	userdeviceDescDeviceModel := userdeviceFields[7].Descriptor()
+	// userdevice.DeviceModelValidator is a validator for the "device_model" field. It is called by the builders before save.
+	userdevice.DeviceModelValidator = userdeviceDescDeviceModel.Validators[0].(func(string) error)
 }
 
 const (

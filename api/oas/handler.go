@@ -40,6 +40,11 @@ func RegisterPushHandlers(router *gin.RouterGroup, si PushServer) {
 	router.POST("/push", wrapPostPush(si))
 }
 
+// RegisterNlogHandlers creates http.Handler with routing matching OpenAPI spec.
+func RegisterNlogHandlers(router *gin.RouterGroup, si NlogServer) {
+	router.POST("/nlogs/update", wrapUpdateNlog(si))
+}
+
 func wrapGetStatus(si GeneralServer) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		resp, err := si.GetStatus(c)
@@ -177,6 +182,21 @@ func wrapPostPush(si PushServer) func(c *gin.Context) {
 			return
 		}
 		err := si.PostPush(c, &req)
+		if err != nil {
+			c.Error(err)
+			return
+		}
+	}
+}
+
+func wrapUpdateNlog(si NlogServer) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var req UpdateNlogRequest
+		if err := c.ShouldBind(&req); err != nil {
+			handler.AbortWithError(c, http.StatusBadRequest, err)
+			return
+		}
+		err := si.UpdateNlog(c, &req)
 		if err != nil {
 			c.Error(err)
 			return

@@ -8,6 +8,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/woocoos/msgcenter/ent/predicate"
+	"github.com/woocoos/msgcenter/pkg/profile"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
@@ -87,6 +88,11 @@ func Category(v string) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldEQ(FieldCategory, v))
 }
 
+// MsgType applies equality check predicate on the "msg_type" field. It's identical to MsgTypeEQ.
+func MsgType(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldEQ(FieldMsgType, v))
+}
+
 // Subject applies equality check predicate on the "subject" field. It's identical to SubjectEQ.
 func Subject(v string) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldEQ(FieldSubject, v))
@@ -105,6 +111,11 @@ func Format(v string) predicate.MsgInternal {
 // Redirect applies equality check predicate on the "redirect" field. It's identical to RedirectEQ.
 func Redirect(v string) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldEQ(FieldRedirect, v))
+}
+
+// AlertID applies equality check predicate on the "alert_id" field. It's identical to AlertIDEQ.
+func AlertID(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldEQ(FieldAlertID, v))
 }
 
 // CreatedByEQ applies the EQ predicate on the "created_by" field.
@@ -392,6 +403,81 @@ func CategoryContainsFold(v string) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldContainsFold(FieldCategory, v))
 }
 
+// MsgTypeEQ applies the EQ predicate on the "msg_type" field.
+func MsgTypeEQ(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldEQ(FieldMsgType, v))
+}
+
+// MsgTypeNEQ applies the NEQ predicate on the "msg_type" field.
+func MsgTypeNEQ(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNEQ(FieldMsgType, v))
+}
+
+// MsgTypeIn applies the In predicate on the "msg_type" field.
+func MsgTypeIn(vs ...string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldIn(FieldMsgType, vs...))
+}
+
+// MsgTypeNotIn applies the NotIn predicate on the "msg_type" field.
+func MsgTypeNotIn(vs ...string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNotIn(FieldMsgType, vs...))
+}
+
+// MsgTypeGT applies the GT predicate on the "msg_type" field.
+func MsgTypeGT(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldGT(FieldMsgType, v))
+}
+
+// MsgTypeGTE applies the GTE predicate on the "msg_type" field.
+func MsgTypeGTE(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldGTE(FieldMsgType, v))
+}
+
+// MsgTypeLT applies the LT predicate on the "msg_type" field.
+func MsgTypeLT(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldLT(FieldMsgType, v))
+}
+
+// MsgTypeLTE applies the LTE predicate on the "msg_type" field.
+func MsgTypeLTE(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldLTE(FieldMsgType, v))
+}
+
+// MsgTypeContains applies the Contains predicate on the "msg_type" field.
+func MsgTypeContains(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldContains(FieldMsgType, v))
+}
+
+// MsgTypeHasPrefix applies the HasPrefix predicate on the "msg_type" field.
+func MsgTypeHasPrefix(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldHasPrefix(FieldMsgType, v))
+}
+
+// MsgTypeHasSuffix applies the HasSuffix predicate on the "msg_type" field.
+func MsgTypeHasSuffix(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldHasSuffix(FieldMsgType, v))
+}
+
+// MsgTypeIsNil applies the IsNil predicate on the "msg_type" field.
+func MsgTypeIsNil() predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldIsNull(FieldMsgType))
+}
+
+// MsgTypeNotNil applies the NotNil predicate on the "msg_type" field.
+func MsgTypeNotNil() predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNotNull(FieldMsgType))
+}
+
+// MsgTypeEqualFold applies the EqualFold predicate on the "msg_type" field.
+func MsgTypeEqualFold(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldEqualFold(FieldMsgType, v))
+}
+
+// MsgTypeContainsFold applies the ContainsFold predicate on the "msg_type" field.
+func MsgTypeContainsFold(v string) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldContainsFold(FieldMsgType, v))
+}
+
 // SubjectEQ applies the EQ predicate on the "subject" field.
 func SubjectEQ(v string) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldEQ(FieldSubject, v))
@@ -672,6 +758,66 @@ func RedirectContainsFold(v string) predicate.MsgInternal {
 	return predicate.MsgInternal(sql.FieldContainsFold(FieldRedirect, v))
 }
 
+// ReceiverTypeEQ applies the EQ predicate on the "receiver_type" field.
+func ReceiverTypeEQ(v profile.ReceiverType) predicate.MsgInternal {
+	vc := v
+	return predicate.MsgInternal(sql.FieldEQ(FieldReceiverType, vc))
+}
+
+// ReceiverTypeNEQ applies the NEQ predicate on the "receiver_type" field.
+func ReceiverTypeNEQ(v profile.ReceiverType) predicate.MsgInternal {
+	vc := v
+	return predicate.MsgInternal(sql.FieldNEQ(FieldReceiverType, vc))
+}
+
+// ReceiverTypeIn applies the In predicate on the "receiver_type" field.
+func ReceiverTypeIn(vs ...profile.ReceiverType) predicate.MsgInternal {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MsgInternal(sql.FieldIn(FieldReceiverType, v...))
+}
+
+// ReceiverTypeNotIn applies the NotIn predicate on the "receiver_type" field.
+func ReceiverTypeNotIn(vs ...profile.ReceiverType) predicate.MsgInternal {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MsgInternal(sql.FieldNotIn(FieldReceiverType, v...))
+}
+
+// AlertIDEQ applies the EQ predicate on the "alert_id" field.
+func AlertIDEQ(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldEQ(FieldAlertID, v))
+}
+
+// AlertIDNEQ applies the NEQ predicate on the "alert_id" field.
+func AlertIDNEQ(v int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNEQ(FieldAlertID, v))
+}
+
+// AlertIDIn applies the In predicate on the "alert_id" field.
+func AlertIDIn(vs ...int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldIn(FieldAlertID, vs...))
+}
+
+// AlertIDNotIn applies the NotIn predicate on the "alert_id" field.
+func AlertIDNotIn(vs ...int) predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNotIn(FieldAlertID, vs...))
+}
+
+// AlertIDIsNil applies the IsNil predicate on the "alert_id" field.
+func AlertIDIsNil() predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldIsNull(FieldAlertID))
+}
+
+// AlertIDNotNil applies the NotNil predicate on the "alert_id" field.
+func AlertIDNotNil() predicate.MsgInternal {
+	return predicate.MsgInternal(sql.FieldNotNull(FieldAlertID))
+}
+
 // HasMsgInternalTo applies the HasEdge predicate on the "msg_internal_to" edge.
 func HasMsgInternalTo() predicate.MsgInternal {
 	return predicate.MsgInternal(func(s *sql.Selector) {
@@ -693,6 +839,35 @@ func HasMsgInternalToWith(preds ...predicate.MsgInternalTo) predicate.MsgInterna
 		schemaConfig := internal.SchemaConfigFromContext(s.Context())
 		step.To.Schema = schemaConfig.MsgInternalTo
 		step.Edge.Schema = schemaConfig.MsgInternalTo
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAlert applies the HasEdge predicate on the "alert" edge.
+func HasAlert() predicate.MsgInternal {
+	return predicate.MsgInternal(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, AlertTable, AlertColumn),
+		)
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgAlert
+		step.Edge.Schema = schemaConfig.MsgInternal
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAlertWith applies the HasEdge predicate on the "alert" edge with a given conditions (other predicates).
+func HasAlertWith(preds ...predicate.MsgAlert) predicate.MsgInternal {
+	return predicate.MsgInternal(func(s *sql.Selector) {
+		step := newAlertStep()
+		schemaConfig := internal.SchemaConfigFromContext(s.Context())
+		step.To.Schema = schemaConfig.MsgAlert
+		step.Edge.Schema = schemaConfig.MsgInternal
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

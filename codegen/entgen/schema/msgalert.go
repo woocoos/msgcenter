@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"time"
+
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
@@ -14,7 +16,6 @@ import (
 	"github.com/woocoos/msgcenter/pkg/alert"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/version"
-	"time"
 )
 
 // MsgAlert holds the schema definition for the MsgAlert entity.
@@ -67,6 +68,7 @@ func (MsgAlert) Edges() []ent.Edge {
 		edge.From("nlog", Nlog.Type).Ref("alerts").Through("nlog_alerts", NlogAlert.Type).
 			Annotations(entgql.RelayConnection()).Comment("消息日志"),
 		edge.From("org", Org.Type).Ref("msg_alerts").Field(schemax.FieldTenantID).Required().Unique().Immutable(),
+		edge.To("msg_internal", MsgInternal.Type),
 	}
 }
 

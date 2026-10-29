@@ -9,7 +9,9 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msginternal"
+	"github.com/woocoos/msgcenter/pkg/profile"
 )
 
 // MsgInternal is the model entity for the MsgInternal schema.
@@ -29,6 +31,8 @@ type MsgInternal struct {
 	TenantID int `json:"tenant_id,omitempty"`
 	// 消息类型分类
 	Category string `json:"category,omitempty"`
+	// 消息类型名称
+	MsgType string `json:"msg_type,omitempty"`
 	// 标题
 	Subject string `json:"subject,omitempty"`
 	// 消息体
@@ -37,6 +41,10 @@ type MsgInternal struct {
 	Format string `json:"format,omitempty"`
 	// 消息跳转
 	Redirect string `json:"redirect,omitempty"`
+	// 消息模式:站内信,app推送,邮件,短信,微信等
+	ReceiverType profile.ReceiverType `json:"receiver_type,omitempty"`
+	// 消息ID
+	AlertID int `json:"alert_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MsgInternalQuery when eager-loading is set.
 	Edges        MsgInternalEdges `json:"edges"`
@@ -47,11 +55,13 @@ type MsgInternal struct {
 type MsgInternalEdges struct {
 	// MsgInternalTo holds the value of the msg_internal_to edge.
 	MsgInternalTo []*MsgInternalTo `json:"msg_internal_to,omitempty"`
+	// Alert holds the value of the alert edge.
+	Alert *MsgAlert `json:"alert,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [2]map[string]int
 
 	namedMsgInternalTo map[string][]*MsgInternalTo
 }
@@ -65,14 +75,25 @@ func (e MsgInternalEdges) MsgInternalToOrErr() ([]*MsgInternalTo, error) {
 	return nil, &NotLoadedError{edge: "msg_internal_to"}
 }
 
+// AlertOrErr returns the Alert value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MsgInternalEdges) AlertOrErr() (*MsgAlert, error) {
+	if e.Alert != nil {
+		return e.Alert, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: msgalert.Label}
+	}
+	return nil, &NotLoadedError{edge: "alert"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*MsgInternal) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case msginternal.FieldID, msginternal.FieldCreatedBy, msginternal.FieldUpdatedBy, msginternal.FieldTenantID:
+		case msginternal.FieldID, msginternal.FieldCreatedBy, msginternal.FieldUpdatedBy, msginternal.FieldTenantID, msginternal.FieldAlertID:
 			values[i] = new(sql.NullInt64)
-		case msginternal.FieldCategory, msginternal.FieldSubject, msginternal.FieldBody, msginternal.FieldFormat, msginternal.FieldRedirect:
+		case msginternal.FieldCategory, msginternal.FieldMsgType, msginternal.FieldSubject, msginternal.FieldBody, msginternal.FieldFormat, msginternal.FieldRedirect, msginternal.FieldReceiverType:
 			values[i] = new(sql.NullString)
 		case msginternal.FieldCreatedAt, msginternal.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -133,6 +154,12 @@ func (_m *MsgInternal) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Category = value.String
 			}
+		case msginternal.FieldMsgType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field msg_type", values[i])
+			} else if value.Valid {
+				_m.MsgType = value.String
+			}
 		case msginternal.FieldSubject:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field subject", values[i])
@@ -157,6 +184,18 @@ func (_m *MsgInternal) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Redirect = value.String
 			}
+		case msginternal.FieldReceiverType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field receiver_type", values[i])
+			} else if value.Valid {
+				_m.ReceiverType = profile.ReceiverType(value.String)
+			}
+		case msginternal.FieldAlertID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field alert_id", values[i])
+			} else if value.Valid {
+				_m.AlertID = int(value.Int64)
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -173,6 +212,11 @@ func (_m *MsgInternal) Value(name string) (ent.Value, error) {
 // QueryMsgInternalTo queries the "msg_internal_to" edge of the MsgInternal entity.
 func (_m *MsgInternal) QueryMsgInternalTo() *MsgInternalToQuery {
 	return NewMsgInternalClient(_m.config).QueryMsgInternalTo(_m)
+}
+
+// QueryAlert queries the "alert" edge of the MsgInternal entity.
+func (_m *MsgInternal) QueryAlert() *MsgAlertQuery {
+	return NewMsgInternalClient(_m.config).QueryAlert(_m)
 }
 
 // Update returns a builder for updating this MsgInternal.
@@ -216,6 +260,9 @@ func (_m *MsgInternal) String() string {
 	builder.WriteString("category=")
 	builder.WriteString(_m.Category)
 	builder.WriteString(", ")
+	builder.WriteString("msg_type=")
+	builder.WriteString(_m.MsgType)
+	builder.WriteString(", ")
 	builder.WriteString("subject=")
 	builder.WriteString(_m.Subject)
 	builder.WriteString(", ")
@@ -227,6 +274,12 @@ func (_m *MsgInternal) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("redirect=")
 	builder.WriteString(_m.Redirect)
+	builder.WriteString(", ")
+	builder.WriteString("receiver_type=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ReceiverType))
+	builder.WriteString(", ")
+	builder.WriteString("alert_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.AlertID))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -3,15 +3,15 @@ import { DrawerForm, ProFormInstance, ProFormRadio, ProFormText, ProFormTextArea
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CreateMsgTemplateInput, MsgEvent, MsgTemplate, MsgTemplateFormat, MsgTemplateReceiverType, UpdateMsgTemplateInput } from '@/generated/msgsrv/graphql';
-import { EnumMsgTemplateFormat, createMsgTemplate, getMsgTemplateInfo, updateMsgTemplate,getMsgTemplateDefine } from '@/services/msgsrv/template';
+import { EnumMsgTemplateFormat, createMsgTemplate, getMsgTemplateInfo, updateMsgTemplate, getMsgTemplateDefine } from '@/services/msgsrv/template';
 import InputMultiple from '@/components/input/multiple';
 import { UploadMultiple, UploadTemp, useLeavePrompt } from '@knockout-js/layout';
-import { OrgSelect } from '@knockout-js/org';
+import { OrgSelect, UserSelect } from '@knockout-js/org';
 import { getOrg } from '@knockout-js/api';
 import { Org, OrgKind } from '@knockout-js/api/ucenter';
 import store from '@/store';
-import { Button, Col, Row, Space,Modal } from 'antd';
-import {TemplateType} from '../../event'
+import { Button, Col, Row, Space, Modal, message } from 'antd';
+import { TemplateType } from '../../event';
 
 type ProFormData = {
   name: string;
@@ -25,6 +25,8 @@ type ProFormData = {
   body?: string;
   tpl?: string;
   attachments?: string[];
+  attachmentNames?: string;
+  userID?: string;
 };
 
 export default (props: {
@@ -33,7 +35,8 @@ export default (props: {
   type: string | null;
   id?: string | null;
   msgEvent: MsgEvent;
-  receiverType: MsgTemplateReceiverType
+  receiverType: MsgTemplateReceiverType;
+  readonly?: boolean;
   onClose: (isSuccess?: boolean, newInfo?: MsgTemplate) => void;
 }) => {
   const { t } = useTranslation(),
@@ -47,7 +50,7 @@ export default (props: {
     [saveDisabled, setSaveDisabled] = useState(true),
     iframeRef = useRef<HTMLIFrameElement>(null),
     [modal, setModal] = useState<{
-      show: boolean,
+      show: boolean;
     }>({
       show: false,
     });
@@ -90,6 +93,8 @@ export default (props: {
           initData.body = result.body || undefined;
           initData.tpl = result.tpl || undefined;
           initData.attachments = result.attachments || undefined;
+          initData.attachmentNames = result.attachments?.join(',') || undefined;
+          initData.userID = Number(result.userID) > 0 ? `${result.userID}` : undefined;
         }
       }
       setShowCc(!!initData.cc)
@@ -113,18 +118,26 @@ export default (props: {
         tpl: values.tpl,
         comments: values.comments,
       }
-      if (props.type === TemplateType.customer){
+      if (props.type === TemplateType.customer) {
         input.tenantID = userState.tenantId;
+        if (values.userID) {
+          input.userID = values.userID;
+        }
       }
 
       if (props.receiverType === MsgTemplateReceiverType.Email) {
-        input.attachments = values.attachments;
+        if (props.type === TemplateType.default) {
+          input.attachments = values.attachmentNames
+            ? values.attachmentNames.split(',').map(s => s.trim()).filter(Boolean)
+            : undefined;
+        } else {
+          input.attachments = values.attachments;
+        }
         input.cc = showCc ? values.cc : undefined;
         input.bcc = showBcc ? values.bcc : undefined;
         input.to = values.to;
         input.from = values.from;
       }
-
       const result = props.id
         ? await updateMsgTemplate(props.id, updateFormat(input, info || {}))
         : await createMsgTemplate(input as CreateMsgTemplateInput);
@@ -143,7 +156,8 @@ export default (props: {
         destroyOnClose: true,
         maskClosable: false,
       }}
-      submitter={{
+      disabled={props.readonly}
+      submitter={props.readonly ? false : {
         searchConfig: {
           submitText: t('submit'),
           resetText: t('cancel'),
@@ -155,7 +169,6 @@ export default (props: {
       }}
       title={props.title}
       open={props?.open}
-      onReset={getRequest}
       request={getRequest}
       onValuesChange={onValuesChange}
       onFinish={onFinish}
@@ -174,6 +187,15 @@ export default (props: {
         label={t('description')}
         placeholder={`${t('please_enter_description')}`}
       />
+      {props.type === TemplateType.customer ? (
+        <ProFormText
+          name="userID"
+          label={t('user')}
+          tooltip={t('msg_temp_user_tip')}
+        >
+          <UserSelect changeValue="id" />
+        </ProFormText>
+      ) : null}
       <ProFormText
         name="subject"
         label={t('subject')}
@@ -186,23 +208,23 @@ export default (props: {
         name="to"
         label={t('msg_temp_to')}
       >
-        <InputMultiple decollator="," placeholder={`${t('please_enter_msg_temp_to')}`} />
+        <InputMultiple disabled={props.readonly} decollator="," placeholder={`${t('please_enter_msg_temp_to')}`} />
       </ProFormText>
       <ProFormText
         x-if={props.receiverType === MsgTemplateReceiverType.Email && showCc}
         name="cc"
         label={t('msg_temp_cc')}
       >
-        <InputMultiple decollator="," placeholder={`${t('please_enter_msg_temp_cc')}`} />
+        <InputMultiple disabled={props.readonly} decollator="," placeholder={`${t('please_enter_msg_temp_cc')}`} />
       </ProFormText>
       <ProFormText
         x-if={props.receiverType === MsgTemplateReceiverType.Email && showBcc}
         name="bcc"
         label={t('msg_temp_bcc')}
       >
-        <InputMultiple decollator="," placeholder={`${t('please_enter_msg_temp_bcc')}`} />
+        <InputMultiple disabled={props.readonly} decollator="," placeholder={`${t('please_enter_msg_temp_bcc')}`} />
       </ProFormText>
-      <div x-if={props.receiverType === MsgTemplateReceiverType.Email}>
+      <div x-if={props.receiverType === MsgTemplateReceiverType.Email && !props.readonly}>
         <Space>
           <a onClick={() => {
             formRef.current?.setFieldValue('cc', undefined);
@@ -220,7 +242,7 @@ export default (props: {
         name="from"
         label={t('msg_temp_from')}
       >
-        <InputMultiple decollator="," placeholder={`${t('please_enter_msg_temp_from')}`} />
+        <InputMultiple disabled={props.readonly} decollator="," placeholder={`${t('please_enter_msg_temp_from')}`} />
       </ProFormText>
       <ProFormRadio.Group
         name="format"
@@ -257,22 +279,52 @@ export default (props: {
           directory={`${userState.tenantId}/msg/att`}
         />
       </ProFormText>
-      <a x-if={props.type === TemplateType.default} onClick={async () => {
-        let format = formRef.current?.getFieldValue('format') || '',body = formRef.current?.getFieldValue('body') || '';
-        if (format == '' || body == '') {
-          return
-        }
-        const result = await getMsgTemplateDefine(format, body)
-        setModal({ show: true })
-        setTimeout(()=>{
-          if (iframeRef.current?.contentWindow) {
-            iframeRef.current.contentWindow.document.write(`<pre>${result}</pre>`)
-          } else if (iframeRef.current?.contentDocument) {
-            iframeRef.current.contentDocument.write(`<pre>${result}</pre>`)
+      <Space x-if={props.type === TemplateType.default}>
+        <a onClick={async () => {
+          let format = formRef.current?.getFieldValue('format') || '', body = formRef.current?.getFieldValue('body') || '';
+          if (format == '' || body == '') {
+            return
           }
-        },200)
-      }}
-      >{t('temp_viewer')}</a>
+          const result = await getMsgTemplateDefine(format, body)
+          setModal({ show: true })
+          setTimeout(() => {
+            if (iframeRef.current?.contentWindow) {
+              iframeRef.current.contentWindow.document.write(`<pre>${result}</pre>`)
+            } else if (iframeRef.current?.contentDocument) {
+              iframeRef.current.contentDocument.write(`<pre>${result}</pre>`)
+            }
+          }, 200)
+        }}
+        >{t('temp_viewer')}</a>
+        <a onClick={async () => {
+          let format = formRef.current?.getFieldValue('format') || '', body = formRef.current?.getFieldValue('body') || '';
+          if (format == '' || body == '') {
+            return
+          }
+          const result = await getMsgTemplateDefine(format, body)
+          if (result) {
+            const blob = new Blob([result], { type: 'text/plain;charset=utf-8' })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `${formRef.current?.getFieldValue('name') || 'template'}.tmpl`
+            a.click()
+            URL.revokeObjectURL(url)
+          } else {
+            message.warning(t('format_error'))
+          }
+        }}
+        >{t('temp_down')}</a>
+      </Space>
+      <div style={{ height: '20px' }} />
+      <ProFormText
+        x-if={props.receiverType === MsgTemplateReceiverType.Email && props.type === TemplateType.default}
+        name="attachmentNames"
+        label={t('attachments')}
+        tooltip={t('attachments_tip')}
+      >
+        <InputMultiple disabled={props.readonly} decollator="," placeholder={t('please_enter_attachment_names')} />
+      </ProFormText>
       <Modal
         title={t('temp_viewer')}
         open={modal.show}
@@ -283,7 +335,7 @@ export default (props: {
           setModal({ show: false })
         }}
       >
-        <iframe style={{width: '100%',height: '60vh',border: '0 none'}} ref={iframeRef}></iframe>
+        <iframe style={{ width: '100%', height: '60vh', border: '0 none' }} ref={iframeRef}></iframe>
       </Modal>
     </DrawerForm>
   );

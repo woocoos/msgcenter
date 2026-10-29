@@ -1,7 +1,6 @@
 package schema
 
 import (
-	"context"
 	"entgo.io/contrib/entgql"
 	"entgo.io/contrib/entproto"
 	"entgo.io/ent"
@@ -9,8 +8,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"errors"
-	"github.com/woocoos/msgcenter/ent/hook"
+	"github.com/woocoos/knockout-go/ent/schemax/typex"
 )
 
 // User holds the schema definition for the User entity.
@@ -36,29 +34,11 @@ func (User) Fields() []ent.Field {
 	}
 }
 
-func readonlyHook() ent.Hook {
-	return hook.On(func(next ent.Mutator) ent.Mutator {
-		return ent.MutateFunc(func(ctx context.Context, mutation ent.Mutation) (ent.Value, error) {
-			if mutation.Op().Is(ent.OpCreate) {
-				// notice: for test,if run in production,should return error
-				return next.Mutate(ctx, mutation)
-			}
-			return nil, errors.New("not implemented")
-		})
-	}, ent.OpCreate|ent.OpUpdate|ent.OpDelete)
-}
-
-// Hooks of the User.
-func (User) Hooks() []ent.Hook {
-	return []ent.Hook{
-		readonlyHook(),
-	}
-}
-
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("silences", Silence.Type).Comment("静默"),
+		edge.To("silences", MsgSilence.Type).Comment("静默"),
 		edge.To("addresses", UserAddr.Type).Comment("用户联系信息"),
+		edge.To("devices", UserDevice.Type).Comment("用户设备"),
 	}
 }
 
@@ -86,16 +66,38 @@ func (Org) Fields() []ent.Field {
 	}
 }
 
-// Hooks of the Org.
-func (Org) Hooks() []ent.Hook {
-	return []ent.Hook{
-		readonlyHook(),
-	}
-}
-
 func (Org) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("msg_alerts", MsgAlert.Type).Comment("消息列表"),
+	}
+}
+
+// OrgUser holds the schema definition for the Org entity.
+type OrgUser struct {
+	ent.Schema
+}
+
+// Annotations of the OrgUser.
+func (OrgUser) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entsql.Annotation{Table: "org_user"},
+		entgql.Skip(entgql.SkipEnumField, entgql.SkipOrderField, entgql.SkipWhereInput, entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput),
+	}
+}
+
+// Fields of the OrgUser.
+func (OrgUser) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("id").Comment("组织ID"),
+		field.Int("org_id").Comment("组织ID"),
+		field.Int("user_id").Comment("用户ID"),
+	}
+}
+
+func (OrgUser) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("org", Org.Type).Unique().Required().Field("org_id"),
+		edge.To("user", User.Type).Unique().Required().Field("user_id"),
 	}
 }
 
@@ -117,12 +119,6 @@ func (OrgRoleUser) Fields() []ent.Field {
 		field.Int("org_user_id").Comment("组织用户ID"),
 		field.Int("org_id").Comment("组织ID"),
 		field.Int("user_id").Comment("用户ID"),
-	}
-}
-
-func (OrgRoleUser) Hooks() []ent.Hook {
-	return []ent.Hook{
-		readonlyHook(),
 	}
 }
 
@@ -167,8 +163,39 @@ func (UserAddr) Edges() []ent.Edge {
 	}
 }
 
-func (UserAddr) Hooks() []ent.Hook {
-	return []ent.Hook{
-		readonlyHook(),
+// UserDevice holds the schema definition for the UserDevice entity.
+type UserDevice struct {
+	ent.Schema
+}
+
+// Annotations
+//
+// 用户信息暂时不需要通过直接的数据操作,因此未接入gql mutation
+func (UserDevice) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entsql.Annotation{Table: "user_device"},
+		entgql.Skip(),
+	}
+}
+
+// Fields of the UserDevice.
+func (UserDevice) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("id").Comment("ID"),
+		field.Int("user_id").Optional().Immutable(),
+		field.String("device_uid").MaxLen(64).Comment("设备唯一ID"),
+		field.String("device_name").MaxLen(45).Optional().Comment("设备名称"),
+		field.String("system_name").MaxLen(45).Optional().Comment("系统名称"),
+		field.String("system_version").MaxLen(45).Optional().Comment("系统版本"),
+		field.String("app_version").MaxLen(45).Optional().Comment("app版本"),
+		field.String("device_model").MaxLen(45).Optional().Comment("设备型号"),
+		field.Enum("status").GoType(typex.SimpleStatus("")).Optional().Comment("状态,可用或不可用及其他待确认状态"),
+	}
+}
+
+// Edges of the UserDevice.
+func (UserDevice) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.From("user", User.Type).Ref("devices").Unique().Immutable().Field("user_id"),
 	}
 }

@@ -9,17 +9,18 @@ import { instanceName, setStsApi, userPermissions } from '@knockout-js/api';
 import { User } from '@knockout-js/api/ucenter';
 import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/requestInterceptor';
 import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/types";
-import { Result, message } from 'antd';
+import { Result } from 'antd';
 import { defineAppConfig, defineDataLoader } from 'ice';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
-import { useTranslation } from 'react-i18next';
+import { getI18n, useTranslation } from 'react-i18next';
 import { Message } from './generated/msgsrv/graphql';
 import { logout } from './services/auth';
-import { parseSpm } from './services/auth/noStore';
+import { initFillI18n, parseSpm } from './services/auth/noStore';
 import { browserLanguage, getMenuAppActions } from './util';
 import { setLibraryName } from '@ice/stark-app';
 import { isInIcestark } from '@ice/stark-app';
 import { store as starkStore, event as starkEvent } from '@ice/stark-data';
+import { koMessage } from '@knockout-js/layout';
 
 const NODE_ENV = process.env.NODE_ENV ?? '',
   ICE_DEV_TOKEN = process.env.ICE_DEV_TOKEN ?? '',
@@ -126,6 +127,7 @@ export const urqlConfig = defineUrqlConfig([
     exchangeOpt: {
       authOpts: {
         store: {
+          getI18n: () => getI18n(),
           getState: () => {
             const userState = store.getModelState('user')
             let token = userState.token ? userState.token : getItem<string>('token') as string,
@@ -152,10 +154,15 @@ export const urqlConfig = defineUrqlConfig([
           }
         },
         error: (err, errstr) => {
-          if (errstr) {
-            message.error(errstr)
+          if (err.response.status === 403) {
+            koMessage.error(getI18n().t("403"), 0)
+          } else if (errstr) {
+            koMessage.error(errstr, 0)
           }
           return false;
+        },
+        errTraceId: {
+          isShow: true
         },
         beforeRefreshTime: 5 * 60 * 1000,
         headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
@@ -196,6 +203,7 @@ export const authConfig = defineAuthConfig(async (appData) => {
     token = starkStore.get('token') ?? iceStore?.user?.token
     tenantId = iceStore?.user?.tenantId
   }
+  await initFillI18n()
   // 判断路由权限
   if (token && tenantId) {
     const result = await userPermissions(ICE_APP_CODE, {
@@ -242,6 +250,7 @@ export const storeConfig = defineStoreConfig(async (appData) => {
 export const requestConfig = defineRequestConfig({
   interceptors: requestInterceptor({
     store: {
+      getI18n: () => getI18n(),
       getState: () => {
         let token = getItem<string>('token') as string,
           tenantId = getItem<string>('tenantId') as string;
@@ -258,9 +267,11 @@ export const requestConfig = defineRequestConfig({
     },
     headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
     login: ICE_LOGIN_URL,
-    error: (err, str) => {
-      if (str) {
-        message.error(str)
+    error: (err, errstr) => {
+      if (err?.['response']?.['status'] === 403) {
+        koMessage.error(getI18n().t("403"), 0)
+      } else if (errstr) {
+        koMessage.error(errstr, 0)
       }
     }
   })
