@@ -27,8 +27,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime"
 	"net/mail"
 	"net/smtp"
+	"os"
+	"path/filepath"
 
 	"github.com/jordan-wright/email"
 )
@@ -166,12 +169,24 @@ func (e *Email) SetHTML(body string) *Email {
 // AttachFile attaches the file to the email, and returns the filename of the attachment.
 // Caller can use filename as content id to reference the attachment in the email body.
 func (e *Email) AttachFile(filename string) (*email.Attachment, error) {
-	return e.e.AttachFile(filename)
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	ct := mime.TypeByExtension(filepath.Ext(filename))
+	basename := filepath.Base(filename)
+	return e.Attach(f, basename, ct)
 }
 
 // Attach attaches data from an io.Reader as an email attachment.
 // contentType may be empty, in which case "application/octet-stream" is used.
 func (e *Email) Attach(r io.Reader, filename string, contentType string) (*email.Attachment, error) {
+	// The upstream library concatenates the raw filename into Content-Disposition,
+	// which garbles non-ASCII (e.g. Chinese) names on receivers. Encode it as an
+	// RFC 2047 encoded-word so clients can decode the original name.
+	filename = mime.QEncoding.Encode("utf-8", filename)
 	return e.e.Attach(r, filename, contentType)
 }
 

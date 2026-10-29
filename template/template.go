@@ -314,10 +314,14 @@ func (t *Template) Data(recv string, groupLabels label.LabelSet, alerts ...*aler
 	return data
 }
 
+// skipTempParams 判断消息是否跳过模板参数注入（skipTempParams=1 时跳过）。
+func skipTempParams(data *Data) bool {
+	return data.CommonLabels[label.SkipTempParamsLabel] == "1"
+}
+
 // AppendTempParams appends template params to the alerts.
 func (t *Template) AppendTempParams(data *Data) {
-	// 判断是否忽略模板参数
-	if data.CommonLabels[label.SkipTempParamsLabel] == "1" {
+	if skipTempParams(data) {
 		return
 	}
 	// 判断是否传递租户id
