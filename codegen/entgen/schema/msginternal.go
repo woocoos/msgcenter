@@ -10,6 +10,7 @@ import (
 	"github.com/woocoos/knockout-go/ent/schemax"
 	gen "github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/intercept"
+	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/version"
 )
 
@@ -41,11 +42,15 @@ func (MsgInternal) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int(schemax.FieldTenantID).Immutable().Comment("租户ID"),
 		field.String("category").MaxLen(20).Comment("消息类型分类"),
+		field.String("msg_type").MaxLen(45).Optional().Comment("消息类型名称"),
 		field.String("subject").Comment("标题"),
-		field.String("body").Optional().Comment("消息体").Annotations(
+		field.Text("body").Optional().Comment("消息体").Annotations(
 			entgql.Skip(entgql.SkipWhereInput)),
 		field.String("format").Comment("内容类型: html,txt"),
 		field.String("redirect").Optional().Comment("消息跳转"),
+		field.Enum("receiver_type").Comment("消息模式:站内信,app推送,邮件,短信,微信等").
+			GoType(profile.ReceiverType("")),
+		field.Int("alert_id").Optional().Comment("消息ID"),
 	}
 }
 
@@ -53,5 +58,7 @@ func (MsgInternal) Fields() []ent.Field {
 func (MsgInternal) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("msg_internal_to", MsgInternalTo.Type),
+		edge.From("alert", MsgAlert.Type).Ref("msg_internal").Unique().
+			Field("alert_id"),
 	}
 }

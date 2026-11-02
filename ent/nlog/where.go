@@ -98,6 +98,16 @@ func ExpiresAt(v time.Time) predicate.Nlog {
 	return predicate.Nlog(sql.FieldEQ(FieldExpiresAt, v))
 }
 
+// ErrMsg applies equality check predicate on the "err_msg" field. It's identical to ErrMsgEQ.
+func ErrMsg(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldEQ(FieldErrMsg, v))
+}
+
+// MessageID applies equality check predicate on the "message_id" field. It's identical to MessageIDEQ.
+func MessageID(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldEQ(FieldMessageID, v))
+}
+
 // TenantIDEQ applies the EQ predicate on the "tenant_id" field.
 func TenantIDEQ(v int) predicate.Nlog {
 	return predicate.Nlog(sql.FieldEQ(FieldTenantID, v))
@@ -506,6 +516,156 @@ func ExpiresAtLT(v time.Time) predicate.Nlog {
 // ExpiresAtLTE applies the LTE predicate on the "expires_at" field.
 func ExpiresAtLTE(v time.Time) predicate.Nlog {
 	return predicate.Nlog(sql.FieldLTE(FieldExpiresAt, v))
+}
+
+// ErrMsgEQ applies the EQ predicate on the "err_msg" field.
+func ErrMsgEQ(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldEQ(FieldErrMsg, v))
+}
+
+// ErrMsgNEQ applies the NEQ predicate on the "err_msg" field.
+func ErrMsgNEQ(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldNEQ(FieldErrMsg, v))
+}
+
+// ErrMsgIn applies the In predicate on the "err_msg" field.
+func ErrMsgIn(vs ...string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldIn(FieldErrMsg, vs...))
+}
+
+// ErrMsgNotIn applies the NotIn predicate on the "err_msg" field.
+func ErrMsgNotIn(vs ...string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldNotIn(FieldErrMsg, vs...))
+}
+
+// ErrMsgGT applies the GT predicate on the "err_msg" field.
+func ErrMsgGT(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldGT(FieldErrMsg, v))
+}
+
+// ErrMsgGTE applies the GTE predicate on the "err_msg" field.
+func ErrMsgGTE(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldGTE(FieldErrMsg, v))
+}
+
+// ErrMsgLT applies the LT predicate on the "err_msg" field.
+func ErrMsgLT(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldLT(FieldErrMsg, v))
+}
+
+// ErrMsgLTE applies the LTE predicate on the "err_msg" field.
+func ErrMsgLTE(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldLTE(FieldErrMsg, v))
+}
+
+// ErrMsgContains applies the Contains predicate on the "err_msg" field.
+func ErrMsgContains(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldContains(FieldErrMsg, v))
+}
+
+// ErrMsgHasPrefix applies the HasPrefix predicate on the "err_msg" field.
+func ErrMsgHasPrefix(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldHasPrefix(FieldErrMsg, v))
+}
+
+// ErrMsgHasSuffix applies the HasSuffix predicate on the "err_msg" field.
+func ErrMsgHasSuffix(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldHasSuffix(FieldErrMsg, v))
+}
+
+// ErrMsgIsNil applies the IsNil predicate on the "err_msg" field.
+func ErrMsgIsNil() predicate.Nlog {
+	return predicate.Nlog(sql.FieldIsNull(FieldErrMsg))
+}
+
+// ErrMsgNotNil applies the NotNil predicate on the "err_msg" field.
+func ErrMsgNotNil() predicate.Nlog {
+	return predicate.Nlog(sql.FieldNotNull(FieldErrMsg))
+}
+
+// ErrMsgEqualFold applies the EqualFold predicate on the "err_msg" field.
+func ErrMsgEqualFold(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldEqualFold(FieldErrMsg, v))
+}
+
+// ErrMsgContainsFold applies the ContainsFold predicate on the "err_msg" field.
+func ErrMsgContainsFold(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldContainsFold(FieldErrMsg, v))
+}
+
+// MessageIDEQ applies the EQ predicate on the "message_id" field.
+func MessageIDEQ(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldEQ(FieldMessageID, v))
+}
+
+// MessageIDNEQ applies the NEQ predicate on the "message_id" field.
+func MessageIDNEQ(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldNEQ(FieldMessageID, v))
+}
+
+// MessageIDIn applies the In predicate on the "message_id" field.
+func MessageIDIn(vs ...string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldIn(FieldMessageID, vs...))
+}
+
+// MessageIDNotIn applies the NotIn predicate on the "message_id" field.
+func MessageIDNotIn(vs ...string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldNotIn(FieldMessageID, vs...))
+}
+
+// MessageIDGT applies the GT predicate on the "message_id" field.
+func MessageIDGT(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldGT(FieldMessageID, v))
+}
+
+// MessageIDGTE applies the GTE predicate on the "message_id" field.
+func MessageIDGTE(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldGTE(FieldMessageID, v))
+}
+
+// MessageIDLT applies the LT predicate on the "message_id" field.
+func MessageIDLT(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldLT(FieldMessageID, v))
+}
+
+// MessageIDLTE applies the LTE predicate on the "message_id" field.
+func MessageIDLTE(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldLTE(FieldMessageID, v))
+}
+
+// MessageIDContains applies the Contains predicate on the "message_id" field.
+func MessageIDContains(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldContains(FieldMessageID, v))
+}
+
+// MessageIDHasPrefix applies the HasPrefix predicate on the "message_id" field.
+func MessageIDHasPrefix(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldHasPrefix(FieldMessageID, v))
+}
+
+// MessageIDHasSuffix applies the HasSuffix predicate on the "message_id" field.
+func MessageIDHasSuffix(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldHasSuffix(FieldMessageID, v))
+}
+
+// MessageIDIsNil applies the IsNil predicate on the "message_id" field.
+func MessageIDIsNil() predicate.Nlog {
+	return predicate.Nlog(sql.FieldIsNull(FieldMessageID))
+}
+
+// MessageIDNotNil applies the NotNil predicate on the "message_id" field.
+func MessageIDNotNil() predicate.Nlog {
+	return predicate.Nlog(sql.FieldNotNull(FieldMessageID))
+}
+
+// MessageIDEqualFold applies the EqualFold predicate on the "message_id" field.
+func MessageIDEqualFold(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldEqualFold(FieldMessageID, v))
+}
+
+// MessageIDContainsFold applies the ContainsFold predicate on the "message_id" field.
+func MessageIDContainsFold(v string) predicate.Nlog {
+	return predicate.Nlog(sql.FieldContainsFold(FieldMessageID, v))
 }
 
 // HasAlerts applies the HasEdge predicate on the "alerts" edge.

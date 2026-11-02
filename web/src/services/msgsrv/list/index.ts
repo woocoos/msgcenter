@@ -1,11 +1,13 @@
 import { gql } from '@/generated/msgsrv';
 import {
+  MsgAlertAlertStatus,
   MsgAlertOrder,
   MsgAlertOrderField,
   MsgAlertWhereInput,
   MsgTemplateReceiverType,
   NlogOrder,
   NlogOrderField,
+  NlogReceiverType,
   NlogWhereInput,
   OrderDirection,
 } from '@/generated/msgsrv/graphql';
@@ -13,19 +15,20 @@ import { gid } from '@knockout-js/api';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request';
 
 export const EnumMsgAlertStatus = {
-  firing: { text: 'firing', status: 'success' },
-  none: { text: 'none', status: 'default' },
-  resolved: { text: 'resolved', status: 'processing' },
+  [MsgAlertAlertStatus.Firing]: { text: 'firing', tagColor: '#30c880' },
+  [MsgAlertAlertStatus.None]: { text: 'none', tagColor: '#dcdee1' },
+  [MsgAlertAlertStatus.Resolved]: { text: 'resolved', tagColor: '#00C8FF' },
 };
 
 export const EnumNlogReceiverType = {
-  email: { text: 'email' },
-  message: { text: 'message' },
-  webhook: { text: 'webhook' },
+  [NlogReceiverType.Email]: { text: 'email' },
+  [NlogReceiverType.Message]: { text: 'message' },
+  [NlogReceiverType.Webhook]: { text: 'webhook' },
+  [NlogReceiverType.Umeng]: { text: 'umeng' },
 };
 
-const queryMsgAlertList = gql(/* GraphQL */`query msgAlertList($first: Int,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){
-  msgAlerts(first:$first,orderBy: $orderBy,where: $where){
+const queryMsgAlertList = gql(/* GraphQL */`query msgAlertList($first: Int,$alertName:String,$userID:String,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){
+  msgAlerts(first:$first,alertName: $alertName,userID: $userID,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -40,7 +43,7 @@ const queryFormatMsgAlertList = gql(/* GraphQL */`query formatMsgAlerts($first: 
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
-        id,startsAt,endsAt,tenantID,state,msgEventComments,msgChannelComments,msgTemplateTitle,receiverType,users{name,email},state,receiver,hasMultiMsg,
+        id,startsAt,endsAt,tenantID,state,msgEventComments,msgChannelComments,msgTemplateTitle,receiverType,users{name,email},state,receiver,hasMultiMsg,modes
       }
     }
   }
@@ -48,7 +51,7 @@ const queryFormatMsgAlertList = gql(/* GraphQL */`query formatMsgAlerts($first: 
 
 const queryFormatMsgAlertMoreList = gql(/* GraphQL */`query formatMsgAlertMore($msgAlertID:ID!){
   formatMsgAlertMore(msgAlertID: $msgAlertID){
-    id,startsAt,endsAt,tenantID,state,msgEventComments,msgChannelComments,msgTemplateTitle,receiverType,users{name,email},state,receiver,hasMultiMsg,
+    id,startsAt,endsAt,tenantID,state,msgEventComments,msgChannelComments,msgTemplateTitle,receiverType,users{name,email},state,receiver,hasMultiMsg,modes
   }
 }`);
 
@@ -65,7 +68,7 @@ const queryMsgAlertLogList = gql(/* GraphQL */`query msgAlertLogList($gid:GID!,$
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
-            id,sendAt,expiresAt,groupKey,receiver,receiverType
+            id,sendAt,expiresAt,groupKey,receiver,receiverType,errMsg
           }
         }
       }
@@ -83,18 +86,27 @@ export async function getMsgAlertList(
   gather: {
     current?: number;
     pageSize?: number;
+    alertName?: string;
+    userID?: string;
     where?: MsgAlertWhereInput;
     orderBy?: MsgAlertOrder;
   }) {
-  const result = await paging(
-    queryMsgAlertList, {
+  const variables = {
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy ?? {
       direction: OrderDirection.Desc,
       field: MsgAlertOrderField.CreatedAt,
     },
-  }, gather.current || 1);
+  };
+  if (gather?.alertName) {
+    variables['alertName'] = gather?.alertName;
+  }
+  if (gather?.userID) {
+    variables['userID'] = gather?.userID;
+  }
+  const result = await paging(
+    queryMsgAlertList, variables, gather.current || 1);
 
   if (result.data?.msgAlerts) {
     return result.data.msgAlerts;
@@ -148,10 +160,10 @@ export async function getFormatMsgAlertList(
  * @param msgAlertID
  * @returns
  */
-export async function getFormatMsgAlertMore(msgAlertID: string | null) {
+export async function getFormatMsgAlertMore(msgAlertID: string) {
   const result = await query(queryFormatMsgAlertMoreList, {
-      msgAlertID,
-    });
+    msgAlertID,
+  });
   if (result.data?.formatMsgAlertMore) {
     return result.data.formatMsgAlertMore;
   }
@@ -164,7 +176,7 @@ export async function getFormatMsgAlertMore(msgAlertID: string | null) {
  * @param receiver
  * @returns
  */
-export async function getRenderMsgAlert(msgAlertID: string, receiver: string | undefined) {
+export async function getRenderMsgAlert(msgAlertID: string, receiver: string) {
   const result = await query(queryRenderMsgAlert, {
     msgAlertID, receiver,
   });

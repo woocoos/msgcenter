@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/woocoos/msgcenter/ent/msgevent"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtype"
 	"github.com/woocoos/msgcenter/ent/predicate"
@@ -22,14 +23,15 @@ import (
 // MsgSubscriberQuery is the builder for querying MsgSubscriber entities.
 type MsgSubscriberQuery struct {
 	config
-	ctx         *QueryContext
-	order       []msgsubscriber.OrderOption
-	inters      []Interceptor
-	predicates  []predicate.MsgSubscriber
-	withMsgType *MsgTypeQuery
-	withUser    *UserQuery
-	modifiers   []func(*sql.Selector)
-	loadTotal   []func(context.Context, []*MsgSubscriber) error
+	ctx          *QueryContext
+	order        []msgsubscriber.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.MsgSubscriber
+	withMsgType  *MsgTypeQuery
+	withMsgEvent *MsgEventQuery
+	withUser     *UserQuery
+	modifiers    []func(*sql.Selector)
+	loadTotal    []func(context.Context, []*MsgSubscriber) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -84,6 +86,31 @@ func (_q *MsgSubscriberQuery) QueryMsgType() *MsgTypeQuery {
 		)
 		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.MsgType
+		step.Edge.Schema = schemaConfig.MsgSubscriber
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryMsgEvent chains the current query on the "msg_event" edge.
+func (_q *MsgSubscriberQuery) QueryMsgEvent() *MsgEventQuery {
+	query := (&MsgEventClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msgsubscriber.Table, msgsubscriber.FieldID, selector),
+			sqlgraph.To(msgevent.Table, msgevent.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, msgsubscriber.MsgEventTable, msgsubscriber.MsgEventColumn),
+		)
+		schemaConfig := _q.schemaConfig
+		step.To.Schema = schemaConfig.MsgEvent
 		step.Edge.Schema = schemaConfig.MsgSubscriber
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -303,13 +330,14 @@ func (_q *MsgSubscriberQuery) Clone() *MsgSubscriberQuery {
 		return nil
 	}
 	return &MsgSubscriberQuery{
-		config:      _q.config,
-		ctx:         _q.ctx.Clone(),
-		order:       append([]msgsubscriber.OrderOption{}, _q.order...),
-		inters:      append([]Interceptor{}, _q.inters...),
-		predicates:  append([]predicate.MsgSubscriber{}, _q.predicates...),
-		withMsgType: _q.withMsgType.Clone(),
-		withUser:    _q.withUser.Clone(),
+		config:       _q.config,
+		ctx:          _q.ctx.Clone(),
+		order:        append([]msgsubscriber.OrderOption{}, _q.order...),
+		inters:       append([]Interceptor{}, _q.inters...),
+		predicates:   append([]predicate.MsgSubscriber{}, _q.predicates...),
+		withMsgType:  _q.withMsgType.Clone(),
+		withMsgEvent: _q.withMsgEvent.Clone(),
+		withUser:     _q.withUser.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -324,6 +352,17 @@ func (_q *MsgSubscriberQuery) WithMsgType(opts ...func(*MsgTypeQuery)) *MsgSubsc
 		opt(query)
 	}
 	_q.withMsgType = query
+	return _q
+}
+
+// WithMsgEvent tells the query-builder to eager-load the nodes that are connected to
+// the "msg_event" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *MsgSubscriberQuery) WithMsgEvent(opts ...func(*MsgEventQuery)) *MsgSubscriberQuery {
+	query := (&MsgEventClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withMsgEvent = query
 	return _q
 }
 
@@ -416,8 +455,9 @@ func (_q *MsgSubscriberQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	var (
 		nodes       = []*MsgSubscriber{}
 		_spec       = _q.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			_q.withMsgType != nil,
+			_q.withMsgEvent != nil,
 			_q.withUser != nil,
 		}
 	)
@@ -447,6 +487,12 @@ func (_q *MsgSubscriberQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	if query := _q.withMsgType; query != nil {
 		if err := _q.loadMsgType(ctx, query, nodes, nil,
 			func(n *MsgSubscriber, e *MsgType) { n.Edges.MsgType = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withMsgEvent; query != nil {
+		if err := _q.loadMsgEvent(ctx, query, nodes, nil,
+			func(n *MsgSubscriber, e *MsgEvent) { n.Edges.MsgEvent = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -486,6 +532,35 @@ func (_q *MsgSubscriberQuery) loadMsgType(ctx context.Context, query *MsgTypeQue
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "msg_type_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (_q *MsgSubscriberQuery) loadMsgEvent(ctx context.Context, query *MsgEventQuery, nodes []*MsgSubscriber, init func(*MsgSubscriber), assign func(*MsgSubscriber, *MsgEvent)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*MsgSubscriber)
+	for i := range nodes {
+		fk := nodes[i].MsgEventID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(msgevent.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "msg_event_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -555,6 +630,9 @@ func (_q *MsgSubscriberQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if _q.withMsgType != nil {
 			_spec.Node.AddColumnOnce(msgsubscriber.FieldMsgTypeID)
+		}
+		if _q.withMsgEvent != nil {
+			_spec.Node.AddColumnOnce(msgsubscriber.FieldMsgEventID)
 		}
 		if _q.withUser != nil {
 			_spec.Node.AddColumnOnce(msgsubscriber.FieldUserID)

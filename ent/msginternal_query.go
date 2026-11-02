@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/predicate"
@@ -27,6 +28,7 @@ type MsgInternalQuery struct {
 	inters                 []Interceptor
 	predicates             []predicate.MsgInternal
 	withMsgInternalTo      *MsgInternalToQuery
+	withAlert              *MsgAlertQuery
 	modifiers              []func(*sql.Selector)
 	loadTotal              []func(context.Context, []*MsgInternal) error
 	withNamedMsgInternalTo map[string]*MsgInternalToQuery
@@ -85,6 +87,31 @@ func (_q *MsgInternalQuery) QueryMsgInternalTo() *MsgInternalToQuery {
 		schemaConfig := _q.schemaConfig
 		step.To.Schema = schemaConfig.MsgInternalTo
 		step.Edge.Schema = schemaConfig.MsgInternalTo
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAlert chains the current query on the "alert" edge.
+func (_q *MsgInternalQuery) QueryAlert() *MsgAlertQuery {
+	query := (&MsgAlertClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(msginternal.Table, msginternal.FieldID, selector),
+			sqlgraph.To(msgalert.Table, msgalert.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, msginternal.AlertTable, msginternal.AlertColumn),
+		)
+		schemaConfig := _q.schemaConfig
+		step.To.Schema = schemaConfig.MsgAlert
+		step.Edge.Schema = schemaConfig.MsgInternal
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
@@ -284,6 +311,7 @@ func (_q *MsgInternalQuery) Clone() *MsgInternalQuery {
 		inters:            append([]Interceptor{}, _q.inters...),
 		predicates:        append([]predicate.MsgInternal{}, _q.predicates...),
 		withMsgInternalTo: _q.withMsgInternalTo.Clone(),
+		withAlert:         _q.withAlert.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -298,6 +326,17 @@ func (_q *MsgInternalQuery) WithMsgInternalTo(opts ...func(*MsgInternalToQuery))
 		opt(query)
 	}
 	_q.withMsgInternalTo = query
+	return _q
+}
+
+// WithAlert tells the query-builder to eager-load the nodes that are connected to
+// the "alert" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *MsgInternalQuery) WithAlert(opts ...func(*MsgAlertQuery)) *MsgInternalQuery {
+	query := (&MsgAlertClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withAlert = query
 	return _q
 }
 
@@ -379,8 +418,9 @@ func (_q *MsgInternalQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	var (
 		nodes       = []*MsgInternal{}
 		_spec       = _q.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			_q.withMsgInternalTo != nil,
+			_q.withAlert != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -410,6 +450,12 @@ func (_q *MsgInternalQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 		if err := _q.loadMsgInternalTo(ctx, query, nodes,
 			func(n *MsgInternal) { n.Edges.MsgInternalTo = []*MsgInternalTo{} },
 			func(n *MsgInternal, e *MsgInternalTo) { n.Edges.MsgInternalTo = append(n.Edges.MsgInternalTo, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withAlert; query != nil {
+		if err := _q.loadAlert(ctx, query, nodes, nil,
+			func(n *MsgInternal, e *MsgAlert) { n.Edges.Alert = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -458,6 +504,35 @@ func (_q *MsgInternalQuery) loadMsgInternalTo(ctx context.Context, query *MsgInt
 	}
 	return nil
 }
+func (_q *MsgInternalQuery) loadAlert(ctx context.Context, query *MsgAlertQuery, nodes []*MsgInternal, init func(*MsgInternal), assign func(*MsgInternal, *MsgAlert)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*MsgInternal)
+	for i := range nodes {
+		fk := nodes[i].AlertID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(msgalert.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "alert_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
 func (_q *MsgInternalQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
@@ -488,6 +563,9 @@ func (_q *MsgInternalQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != msginternal.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if _q.withAlert != nil {
+			_spec.Node.AddColumnOnce(msginternal.FieldAlertID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

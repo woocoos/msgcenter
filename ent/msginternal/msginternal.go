@@ -3,11 +3,13 @@
 package msginternal
 
 import (
-	"time"
+	"fmt"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/woocoos/msgcenter/pkg/profile"
 )
 
 const (
@@ -27,6 +29,8 @@ const (
 	FieldTenantID = "tenant_id"
 	// FieldCategory holds the string denoting the category field in the database.
 	FieldCategory = "category"
+	// FieldMsgType holds the string denoting the msg_type field in the database.
+	FieldMsgType = "msg_type"
 	// FieldSubject holds the string denoting the subject field in the database.
 	FieldSubject = "subject"
 	// FieldBody holds the string denoting the body field in the database.
@@ -35,8 +39,14 @@ const (
 	FieldFormat = "format"
 	// FieldRedirect holds the string denoting the redirect field in the database.
 	FieldRedirect = "redirect"
+	// FieldReceiverType holds the string denoting the receiver_type field in the database.
+	FieldReceiverType = "receiver_type"
+	// FieldAlertID holds the string denoting the alert_id field in the database.
+	FieldAlertID = "alert_id"
 	// EdgeMsgInternalTo holds the string denoting the msg_internal_to edge name in mutations.
 	EdgeMsgInternalTo = "msg_internal_to"
+	// EdgeAlert holds the string denoting the alert edge name in mutations.
+	EdgeAlert = "alert"
 	// Table holds the table name of the msginternal in the database.
 	Table = "msg_internal"
 	// MsgInternalToTable is the table that holds the msg_internal_to relation/edge.
@@ -46,6 +56,13 @@ const (
 	MsgInternalToInverseTable = "msg_internal_to"
 	// MsgInternalToColumn is the table column denoting the msg_internal_to relation/edge.
 	MsgInternalToColumn = "msg_internal_id"
+	// AlertTable is the table that holds the alert relation/edge.
+	AlertTable = "msg_internal"
+	// AlertInverseTable is the table name for the MsgAlert entity.
+	// It exists in this package in order to avoid circular dependency with the "msgalert" package.
+	AlertInverseTable = "msg_alert"
+	// AlertColumn is the table column denoting the alert relation/edge.
+	AlertColumn = "alert_id"
 )
 
 // Columns holds all SQL columns for msginternal fields.
@@ -57,10 +74,13 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldTenantID,
 	FieldCategory,
+	FieldMsgType,
 	FieldSubject,
 	FieldBody,
 	FieldFormat,
 	FieldRedirect,
+	FieldReceiverType,
+	FieldAlertID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -81,11 +101,21 @@ func ValidColumn(column string) bool {
 var (
 	Hooks        [3]ent.Hook
 	Interceptors [1]ent.Interceptor
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
 	// CategoryValidator is a validator for the "category" field. It is called by the builders before save.
 	CategoryValidator func(string) error
+	// MsgTypeValidator is a validator for the "msg_type" field. It is called by the builders before save.
+	MsgTypeValidator func(string) error
 )
+
+// ReceiverTypeValidator is a validator for the "receiver_type" field enum values. It is called by the builders before save.
+func ReceiverTypeValidator(rt profile.ReceiverType) error {
+	switch rt.String() {
+	case "email", "message", "webhook", "umeng":
+		return nil
+	default:
+		return fmt.Errorf("msginternal: invalid enum value for receiver_type field: %q", rt)
+	}
+}
 
 // OrderOption defines the ordering options for the MsgInternal queries.
 type OrderOption func(*sql.Selector)
@@ -125,6 +155,11 @@ func ByCategory(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCategory, opts...).ToFunc()
 }
 
+// ByMsgType orders the results by the msg_type field.
+func ByMsgType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMsgType, opts...).ToFunc()
+}
+
 // BySubject orders the results by the subject field.
 func BySubject(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSubject, opts...).ToFunc()
@@ -145,6 +180,16 @@ func ByRedirect(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRedirect, opts...).ToFunc()
 }
 
+// ByReceiverType orders the results by the receiver_type field.
+func ByReceiverType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldReceiverType, opts...).ToFunc()
+}
+
+// ByAlertID orders the results by the alert_id field.
+func ByAlertID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAlertID, opts...).ToFunc()
+}
+
 // ByMsgInternalToCount orders the results by msg_internal_to count.
 func ByMsgInternalToCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -158,6 +203,13 @@ func ByMsgInternalTo(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newMsgInternalToStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByAlertField orders the results by alert field.
+func ByAlertField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAlertStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newMsgInternalToStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -165,3 +217,17 @@ func newMsgInternalToStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, MsgInternalToTable, MsgInternalToColumn),
 	)
 }
+func newAlertStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AlertInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, AlertTable, AlertColumn),
+	)
+}
+
+var (
+	// profile.ReceiverType must implement graphql.Marshaler.
+	_ graphql.Marshaler = (*profile.ReceiverType)(nil)
+	// profile.ReceiverType must implement graphql.Unmarshaler.
+	_ graphql.Unmarshaler = (*profile.ReceiverType)(nil)
+)

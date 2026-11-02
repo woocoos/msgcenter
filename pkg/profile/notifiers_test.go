@@ -69,7 +69,7 @@ url: 'http://example.com'
 			name:   "Webhook URL is required",
 			cfgStr: ``,
 			wantErr: func(t assert.TestingT, err error, i ...interface{}) bool {
-				return assert.ErrorContains(t, err, "url must be configured")
+				return assert.ErrorContains(t, err, "one of url or urlFile must be configured")
 			},
 		},
 		{
@@ -164,4 +164,22 @@ func TestWebhookConfig_UnmarshalJSON(t *testing.T) {
 			tt.wantErr(t, err, got)
 		})
 	}
+}
+
+// TestMessageConfigClone_DeepCopyExtras 测试 Clone 深拷贝 Extras。
+// 浅拷贝会与原配置共享底层 map——并发 Notify 时 overrideMessageConfig 对 Extras 的
+// 写入相互竞争（fatal: concurrent map writes），且基础配置被写入污染、并发串数据。
+func TestMessageConfigClone_DeepCopyExtras(t *testing.T) {
+	cfg := &MessageConfig{Extras: map[string]string{"category": "cat"}}
+
+	clone := cfg.Clone()
+
+	// 对 clone 的 Extras 写入不得影响原配置（map 必须独立）
+	clone.Extras["msgTypeName"] = "type1"
+	assert.Empty(t, cfg.Extras["msgTypeName"], "clone must not share the Extras map with the original")
+	assert.Equal(t, "cat", clone.Extras["category"], "existing Extras entries must be copied to the clone")
+
+	// 对原配置的 Extras 写入也不得影响 clone（双向隔离）
+	cfg.Extras["category"] = "cat2"
+	assert.Equal(t, "cat", clone.Extras["category"], "clone Extras must be independent of the original")
 }

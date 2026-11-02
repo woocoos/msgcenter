@@ -10,7 +10,7 @@ import { Layout, useLeavePrompt } from '@knockout-js/layout';
 import { getAppDeployConfig, logout, urlSpm } from '@/services/auth';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import { createFromIconfontCN } from '@ant-design/icons';
-import { getStorageUrl } from '@knockout-js/api';
+import { getStorageUrl } from '@knockout-js/api/file';
 import FloatMsg, { WsMsgViewActions } from '../floatMsg';
 import { MsgDropdownRef } from '@knockout-js/layout/esm/components/msg-dropdown';
 

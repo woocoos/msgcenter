@@ -36,7 +36,7 @@ export default (props: {
           return <DictText dictCode="MsgCategory" value={record.category} />
         },
         renderFormItem() {
-          return <DictSelect dictCode="MsgCategory" placeholder={t('please_enter_category')} />
+          return <DictSelect dictCode="MsgCategory" placeholder={t('please_enter_category')} allowClear />
         },
       },
       { title: t('name'), dataIndex: 'name', width: 120 },

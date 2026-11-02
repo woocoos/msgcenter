@@ -4,15 +4,17 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"net/url"
+	"path/filepath"
+	"strconv"
+	"strings"
+
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/woocoos/knockout-go/api"
 	"github.com/woocoos/knockout-go/api/fs"
 	"github.com/woocoos/knockout-go/api/fs/alioss"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
-	urlx "net/url"
-	"path/filepath"
-	"strconv"
 )
 
 func NewSDK(cfg *conf.Configuration, db *ent.Client) (*api.SDK, error) {
@@ -40,15 +42,56 @@ func NewSDK(cfg *conf.Configuration, db *ent.Client) (*api.SDK, error) {
 }
 
 // DefaultFilePath 存储默认文件路径
-func DefaultFilePath(tenantID int, url, baseDir, dataDir string) (string, error) {
-	u, err := urlx.Parse(url)
+func DefaultFilePath(tenantID int, rawURL, baseDir, dataDir string) (string, error) {
+	u, err := url.Parse(rawURL)
 	if err != nil {
 		return "", err
 	}
 	ext := filepath.Ext(u.Path)
-	fileName := MD5String([]byte(url)) + ext
+	fileName := MD5String([]byte(rawURL)) + ext
 	localPath := filepath.Join(baseDir, strconv.Itoa(tenantID), dataDir, fileName)
 	return localPath, nil
+}
+
+// ResolveMountPath resolves a remote storage URL to a local mount path.
+// If the URL matches a registered provider's BucketUrl, it looks up the bucket
+// in mountPaths and returns the local path as {mountPath}/{objectKey}.
+// Returns empty string and false if no matching mount path is found.
+func ResolveMountPath(sdk *api.SDK, mountPaths map[string]string, tenantID, rawURL string) (string, bool) {
+	if len(mountPaths) == 0 || sdk == nil {
+		return "", false
+	}
+	provider, err := sdk.Fs().GetProviderByBizKey(tenantID)
+	if err != nil {
+		return "", false
+	}
+	pcfg := provider.ProviderConfig()
+	bucketURL := pcfg.BucketUrl
+	if bucketURL == "" {
+		return "", false
+	}
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return "", false
+	}
+	bu, err := url.Parse(bucketURL)
+	if err != nil {
+		return "", false
+	}
+	// Match scheme and host to determine if the URL belongs to this bucket.
+	if !strings.EqualFold(u.Scheme, bu.Scheme) || !strings.EqualFold(u.Host, bu.Host) {
+		return "", false
+	}
+	// Look up mount path by bucket name.
+	mountPath, ok := mountPaths[pcfg.Bucket]
+	if !ok || mountPath == "" {
+		return "", false
+	}
+	objectKey, err := provider.ParseUrlKey(rawURL)
+	if err != nil || objectKey == "" {
+		return "", false
+	}
+	return filepath.Join(mountPath, objectKey), true
 }
 
 // MD5String 计算md5

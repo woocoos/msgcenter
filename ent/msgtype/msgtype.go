@@ -4,7 +4,6 @@ package msgtype
 
 import (
 	"fmt"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -95,8 +94,6 @@ func ValidColumn(column string) bool {
 //	import _ "github.com/woocoos/msgcenter/ent/runtime"
 var (
 	Hooks [3]ent.Hook
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
 	// CategoryValidator is a validator for the "category" field. It is called by the builders before save.
 	CategoryValidator func(string) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.

@@ -1,4 +1,9 @@
 projects:
+  adminx:
+    schema: "web/script/generated/adminx.graphql"
+    documents:
+      - "web/src/services/adminx/**/*.ts"
+      - "web/script/generated/adminx.graphql"
   msgsrv:
     schema: "web/script/generated/msgsrv.graphql"
     documents:

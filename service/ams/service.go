@@ -2,10 +2,14 @@ package ams
 
 import (
 	"context"
+	"fmt"
+	"strconv"
+	"strings"
+
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqljson"
-	"fmt"
+	"github.com/tsingsun/woocoo/pkg/log"
 	"github.com/woocoos/knockout-go/ent/schemax"
 	"github.com/woocoos/knockout-go/pkg/identity"
 	"github.com/woocoos/msgcenter/api/graphql/model"
@@ -25,9 +29,10 @@ import (
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service"
-	"strconv"
-	"strings"
+	"go.uber.org/zap"
 )
+
+var logger = log.Component("ams")
 
 type Option func(*Service)
 
@@ -54,6 +59,65 @@ func WithAlertManager(am *service.AlertManager) Option {
 	return func(r *Service) {
 		r.am = am
 	}
+}
+
+// formatContext 持有批量预查询的数据，避免重复查询
+type formatContext struct {
+	channelComments map[string]string // receiver -> comments
+	eventComments   map[string]string // alertName -> comments
+	userMap         map[int]*model.UserInfo
+}
+
+// buildFormatContext 批量查询通道备注、事件备注、用户信息
+func (s *Service) buildFormatContext(ctx context.Context, tid int, receivers []string, alertNames []string, userIDs []int) *formatContext {
+	fc := &formatContext{
+		channelComments: make(map[string]string),
+		eventComments:   make(map[string]string),
+		userMap:         make(map[int]*model.UserInfo),
+	}
+	// 批量查询通道备注
+	if len(receivers) > 0 {
+		channels, _ := s.client.MsgChannel.Query().Where(
+			msgchannel.NameIn(receivers...), msgchannel.TenantID(tid),
+		).All(ctx)
+		for _, ch := range channels {
+			if ch.Comments != "" {
+				fc.channelComments[ch.Name] = ch.Comments
+			}
+		}
+	}
+	// 批量查询事件备注
+	if len(alertNames) > 0 {
+		events, _ := s.client.MsgEvent.Query().Where(
+			msgevent.NameIn(alertNames...),
+		).All(ctx)
+		for _, e := range events {
+			if e.Comments != "" {
+				fc.eventComments[e.Name] = e.Comments
+			}
+		}
+	}
+	// 批量查询用户信息（含联系方式）
+	if len(userIDs) > 0 {
+		users, _ := s.client.User.Query().Where(user.IDIn(userIDs...)).
+			WithAddresses(func(q *ent.UserAddrQuery) {
+				q.Where(useraddr.AddrTypeEQ(useraddr.AddrTypeContact))
+			}).
+			All(ctx)
+		for _, u := range users {
+			uid := strconv.Itoa(u.ID)
+			info := &model.UserInfo{
+				Name:   &u.DisplayName,
+				UserID: &uid,
+			}
+			if len(u.Edges.Addresses) > 0 {
+				info.Email = &u.Edges.Addresses[0].Email
+				info.Mobile = &u.Edges.Addresses[0].Mobile
+			}
+			fc.userMap[u.ID] = info
+		}
+	}
+	return fc
 }
 
 func (s *Service) FormatMsgAlerts(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, alertName *string, userID *string, receiverType *profile.ReceiverType, orderBy *ent.MsgAlertOrder, where *ent.MsgAlertWhereInput) (*model.FormatMsgAlertConnection, error) {
@@ -92,63 +156,97 @@ func (s *Service) FormatMsgAlerts(ctx context.Context, after *entgql.Cursor[int]
 	if err != nil {
 		return nil, err
 	}
-	formatMsgAlerts := make([]*model.FormatMsgAlertEdge, 0)
-	// 遍历消息列表，转换成格式化消息列表
-	for _, msgAlert := range msgAlerts.Edges {
-		if msgAlert.Node.Labels == nil {
+	// 第一遍：匹配路由，收集 receivers、alertNames、userIDs 去重
+	type alertRoute struct {
+		edge      *ent.MsgAlertEdge
+		routes    []*dispatch.Route
+		receivers []string
+		alertName string
+		userIDs   []int
+	}
+	items := make([]alertRoute, 0, len(msgAlerts.Edges))
+	receiverSet := make(map[string]struct{})
+	alertNameSet := make(map[string]struct{})
+	userIDSet := make(map[int]struct{})
+	for _, edge := range msgAlerts.Edges {
+		if edge.Node.Labels == nil {
 			continue
 		}
-		labels := *msgAlert.Node.Labels
-		// 获取路由
+		labels := *edge.Node.Labels
 		rs := s.am.Route.Match(labels)
 		if len(rs) == 0 {
 			continue
 		}
-		hasMultiMsg := false
-		if len(rs) > 1 {
-			hasMultiMsg = true
+		receivers := make([]string, len(rs))
+		for i, r := range rs {
+			receivers[i] = r.RouteOpts.Receiver
+			receiverSet[receivers[i]] = struct{}{}
 		}
-		route := rs[0]
-		formatMsgAlert, err := s.formatMsgAlert(ctx, msgAlert.Node, route)
+		alertName := labels[label.LabelName(label.AlertNameLabel)]
+		alertNameSet[alertName] = struct{}{}
+		uids, _ := label.UserIDsFromLabels(labels)
+		item := alertRoute{edge: edge, routes: rs, receivers: receivers, alertName: alertName, userIDs: uids}
+		for _, uid := range uids {
+			userIDSet[uid] = struct{}{}
+		}
+		items = append(items, item)
+	}
+	// 批量查询
+	receivers := make([]string, 0, len(receiverSet))
+	for r := range receiverSet {
+		receivers = append(receivers, r)
+	}
+	alertNames := make([]string, 0, len(alertNameSet))
+	for n := range alertNameSet {
+		alertNames = append(alertNames, n)
+	}
+	allUIDs := make([]int, 0, len(userIDSet))
+	for uid := range userIDSet {
+		allUIDs = append(allUIDs, uid)
+	}
+	fc := s.buildFormatContext(ctx, tid, receivers, alertNames, allUIDs)
+	// 第二遍：构建结果
+	edges := make([]*model.FormatMsgAlertEdge, 0, len(items))
+	for _, item := range items {
+		fa, err := s.renderMsgAlert(ctx, item.edge.Node, item.routes[0], fc, item.userIDs)
 		if err != nil {
 			return nil, err
 		}
-		if formatMsgAlert != nil {
-			formatMsgAlert.HasMultiMsg = hasMultiMsg
+		if fa == nil {
+			continue
 		}
-		formatMsgAlerts = append(formatMsgAlerts, &model.FormatMsgAlertEdge{
-			Cursor: msgAlert.Cursor,
-			Node:   formatMsgAlert,
-		})
+		fa.HasMultiMsg = len(item.routes) > 1
+		fa.Modes = ptr(strings.Join(item.receivers, ","))
+		// 聚合所有路由的通道备注
+		if comments := collectComments(item.receivers, fc.channelComments); comments != "" {
+			fa.MsgChannelComments = ptr(comments)
+		}
+		edges = append(edges, &model.FormatMsgAlertEdge{Cursor: item.edge.Cursor, Node: fa})
 	}
 	return &model.FormatMsgAlertConnection{
-		Edges:      formatMsgAlerts,
+		Edges:      edges,
 		PageInfo:   &msgAlerts.PageInfo,
 		TotalCount: msgAlerts.TotalCount,
 	}, nil
 }
 
-func (s *Service) formatMsgAlert(ctx context.Context, msgAlert *ent.MsgAlert, route *dispatch.Route) (*model.FormatMsgAlert, error) {
+func (s *Service) renderMsgAlert(ctx context.Context, msgAlert *ent.MsgAlert, route *dispatch.Route, fc *formatContext, userIDs []int) (*model.FormatMsgAlert, error) {
 	if msgAlert.Labels == nil {
 		return nil, nil
 	}
 	labels := *msgAlert.Labels
-	tid, err := identity.TenantIDFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-	msgChannelComments := ""
 	msgTemplateTitle := ""
 	a := s.convertMsgAlert(msgAlert)
 	// 获取模板信息
 	routeOpt := route.RouteOpts
 	msgTemp, err := s.findMsgTemplate(ctx, routeOpt.Receiver, a)
 	if err != nil {
-		return nil, err
+		logger.Error("not find msg template", zap.Error(err), zap.Int("alertID", msgAlert.ID))
+		return nil, nil
 	}
 	// 模板标题
 	if msgTemp != nil {
-		data := notify.GetTemplateData(ctx, s.am.Coordinator.Template, []*alert.Alert{&a})
+		data := s.am.Coordinator.Template.Data("", nil, []*alert.Alert{&a}...)
 		msgTemplateTitle, err = s.am.Coordinator.Template.ExecuteHTMLString(msgTemp.Subject, data)
 		if err != nil {
 			return nil, err
@@ -156,52 +254,15 @@ func (s *Service) formatMsgAlert(ctx context.Context, msgAlert *ent.MsgAlert, ro
 	} else {
 		return nil, nil
 	}
-	// 获取消息通道描述
-	msgChannel, err := s.client.MsgChannel.Query().Where(
-		msgchannel.Name(routeOpt.Receiver), msgchannel.TenantID(tid),
-	).Only(ctx)
-	if err != nil && !ent.IsNotFound(err) {
-		return nil, err
-	}
-	if msgChannel != nil {
-		msgChannelComments = msgChannel.Comments
-	}
-	// 消息事件
+	// 从预查询的 map 中获取备注
 	alertName := labels[label.LabelName(label.AlertNameLabel)]
-	msgEvent, err := s.client.MsgEvent.Query().Where(
-		msgevent.Name(alertName),
-	).Only(ctx)
-	if err != nil && !ent.IsNotFound(err) {
-		return nil, err
-	}
-	msgEventComments := ""
-	if msgEvent != nil {
-		msgEventComments = msgEvent.Comments
-	}
-	// 判断消息是否订阅
-	users := make([]*model.UserInfo, 0)
-	// 取消息体的user
-	uids, err := service.UserIDsFromLabels(labels)
-	if err != nil {
-		return nil, err
-	}
-	if uids != nil {
-		us, err := s.client.User.Query().Where(user.IDIn(uids...)).All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, u := range us {
-			addr, err := u.QueryAddresses().Where(useraddr.AddrTypeEQ(useraddr.AddrTypeContact)).Only(ctx)
-			if err != nil {
-				return nil, err
-			}
-			uid := strconv.Itoa(u.ID)
-			users = append(users, &model.UserInfo{
-				Name:   &u.DisplayName,
-				Email:  &addr.Email,
-				Mobile: &addr.Mobile,
-				UserID: &uid,
-			})
+	msgEventComments := fc.eventComments[alertName]
+	msgChannelComments := fc.channelComments[routeOpt.Receiver]
+	// 从预查询的 userMap 中获取用户信息
+	users := make([]*model.UserInfo, 0, len(userIDs))
+	for _, uid := range userIDs {
+		if info, ok := fc.userMap[uid]; ok {
+			users = append(users, info)
 		}
 	}
 	if len(users) == 0 {
@@ -222,8 +283,8 @@ func (s *Service) formatMsgAlert(ctx context.Context, msgAlert *ent.MsgAlert, ro
 		State:              msgAlert.State,
 		ReceiverType:       msgTemp.ReceiverType,
 		Receiver:           routeOpt.Receiver,
-		MsgEventComments:   &msgEventComments,
-		MsgChannelComments: &msgChannelComments,
+		MsgEventComments:   ptr(msgEventComments),
+		MsgChannelComments: ptr(msgChannelComments),
 		MsgTemplateTitle:   &msgTemplateTitle,
 		Users:              users,
 	}, nil
@@ -243,19 +304,24 @@ func (s *Service) convertMsgAlert(msgAlert *ent.MsgAlert) alert.Alert {
 func (s *Service) findMsgTemplate(ctx context.Context, receiver string, a alert.Alert) (*ent.MsgTemplate, error) {
 	var msgTemp *ent.MsgTemplate
 	var err error
+	var rt profile.ReceiverType
 	if strings.HasPrefix(receiver, profile.ReceiverWebhook.String()) {
 		// webhook
-		msgTemp, err = s.am.Coordinator.FindTemplate(ctx, s.client, profile.ReceiverWebhook, a.Labels)
+		rt = profile.ReceiverWebhook
 	} else if strings.HasPrefix(receiver, profile.ReceiverEmail.String()) {
 		// email
-		msgTemp, err = s.am.Coordinator.FindTemplate(ctx, s.client, profile.ReceiverEmail, a.Labels)
+		rt = profile.ReceiverEmail
 	} else if strings.HasPrefix(receiver, profile.ReceiverMessage.String()) {
 		// message
-		msgTemp, err = s.am.Coordinator.FindTemplate(ctx, s.client, profile.ReceiverMessage, a.Labels)
+		rt = profile.ReceiverMessage
+	} else if strings.HasPrefix(receiver, profile.ReceiverUmeng.String()) {
+		// umeng
+		rt = profile.ReceiverUmeng
 	} else {
 		// unknown
 		return nil, fmt.Errorf("unknown receiver")
 	}
+	msgTemp, err = s.am.Coordinator.FindTemplate(ctx, s.client, rt, a.Labels)
 	if err != nil {
 		return nil, err
 	}
@@ -271,15 +337,27 @@ func (s *Service) FormatMsgAlertMore(ctx context.Context, msgAlertID int) ([]*mo
 		return nil, nil
 	}
 	labels := *ma.Labels
-	msgAlerts := make([]*model.FormatMsgAlert, 0)
+	alertName := labels[label.LabelName(label.AlertNameLabel)]
 	// 获取路由
 	rs := s.am.Route.Match(labels)
+	receivers := make([]string, len(rs))
+	for i, r := range rs {
+		receivers[i] = r.RouteOpts.Receiver
+	}
+	userIDs, _ := label.UserIDsFromLabels(labels)
+	tid, _ := identity.TenantIDFromContext(ctx)
+	// 批量查询
+	fc := s.buildFormatContext(ctx, tid, receivers, []string{alertName}, userIDs)
+	msgAlerts := make([]*model.FormatMsgAlert, 0, len(rs))
 	for _, route := range rs {
-		formatMsgAlert, err := s.formatMsgAlert(ctx, ma, route)
+		fa, err := s.renderMsgAlert(ctx, ma, route, fc, userIDs)
 		if err != nil {
 			return nil, err
 		}
-		msgAlerts = append(msgAlerts, formatMsgAlert)
+		if fa == nil {
+			continue
+		}
+		msgAlerts = append(msgAlerts, fa)
 	}
 	return msgAlerts, nil
 }
@@ -304,4 +382,16 @@ func (s *Service) RenderMsgAlert(ctx context.Context, msgAlertID int, receiver s
 		return nil, fmt.Errorf("unknown format: %s", msgTemp.Format)
 	}
 	return &tplStr, nil
+}
+
+func ptr(s string) *string { return &s }
+
+func collectComments(receivers []string, m map[string]string) string {
+	comments := make([]string, 0, len(receivers))
+	for _, r := range receivers {
+		if c, ok := m[r]; ok {
+			comments = append(comments, c)
+		}
+	}
+	return strings.Join(comments, ",")
 }

@@ -2,19 +2,19 @@ package main
 
 import (
 	"context"
+
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/woocoos/knockout-go/ent/clientx"
 	"github.com/woocoos/knockout-go/pkg/fmterr"
 	"github.com/woocoos/knockout-go/pkg/koapp"
 	"github.com/woocoos/msgcenter/api/graphql"
 	"github.com/woocoos/msgcenter/api/oas"
 	"github.com/woocoos/msgcenter/cmd/internal/ams"
+	_ "github.com/woocoos/msgcenter/ent/runtime"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/metrics"
 	"github.com/woocoos/msgcenter/pkg/profile"
 	"github.com/woocoos/msgcenter/service"
-
-	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/woocoos/msgcenter/ent/runtime"
 )
 
 func main() {
@@ -27,9 +27,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer func() {
-		am.Stop()
-	}()
+	defer am.Stop()
 
 	// 初始化错误处理
 	if err := fmterr.InitErrorHandler(cnf.Sub("errors")); err != nil {
@@ -52,8 +50,9 @@ func main() {
 			return err
 		}
 		api.Update(cfg, func(labels label.LabelSet) {
-			am.Inhibitor.Mutes(labels)
-			am.Silencer.Mutes(labels)
+			ctx := context.Background()
+			am.Inhibitor.Load().Mutes(ctx, labels)
+			am.Silencer.Mutes(ctx, labels)
 		})
 		return nil
 	})

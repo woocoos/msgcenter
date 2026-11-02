@@ -11,8 +11,8 @@ includeFiles:
   - "etc/local.yaml"
 
 jwt: &jwt
-  signingMethod: "RS256"
-  signingKey: "file:///Volumes/QEELYN/GIT/woocoo/msgcenter/cmd/ams/etc/rsa_pub.pem"
+  signingMethod: "HS256"
+  signingKey: "secret"
 
 web:
   server:
@@ -32,19 +32,18 @@ web:
                 message: "系统内部异常，请联系管理员"
       - alertmanager:
           basePath: "/api/v2"
+          # OAS 对于内部可先不启用jwt,只使用default定义的中间件
           middlewares:
       - graphql:
           basePath: "/graphql"
           middlewares:
+            - tenant:
+            - jwt: *jwt
             - graphql:
                 group: "/graphql"
                 withAuthorization: false
                 publicErrorMsg: "系统内部异常，请联系管理员"
                 appCode: "msg"
-                middlewares:
-                  operation:
-                    - tenant:
-                    - jwt: *jwt
 
 ui:
   staticDir: "../../web/build"
@@ -83,19 +82,28 @@ alertManager:
     # 如果指定租户，则只能访问指定租户的配置
     tenants: [ 1,2,3 ]
     file: etc/alertmanager.yaml
-  storage:
-    path: data
+  # bucket 挂载路径映射：key 为 bucket 名称，value 为容器内挂载路径
+  mountPaths:
+    mybucket: "/mnt/oss/mybucket"
   data:
     retention: 120h
     maintenanceInterval: 15m
   alerts:
+    # Interval between alert GC. Default 30m
     gcInterval: 30m
+    # Maximum number of alerts per alertname. If negative or zero, no limit is set.
+    # Default 0
+    perAlertnameLimit: 0
   template:
     baseDir: "files" # 相对于程序运行目录
     dataDir: "tpl" # 模板正式路径
     attachmentDir: "att" # 附件存储路径
     tempParamsFile: etc/tempparams.yaml # 全局模板参数文件
-
+  dispatch:
+    # Interval between maintenance of aggregation groups in the dispatcher. default 30s
+    maintenanceInterval: 30s
+    # Minimum amount of time to wait before dispatching alerts. This option should be synced with value of --rules.alert.resend-delay on Prometheus. default 0.
+    startDelay: 0s
 prometheus:
   server:
     addr: 127.0.0.1:9093

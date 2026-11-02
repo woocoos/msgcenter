@@ -4,7 +4,6 @@ package msgevent
 
 import (
 	"fmt"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -38,8 +37,12 @@ const (
 	FieldRoute = "route"
 	// FieldModes holds the string denoting the modes field in the database.
 	FieldModes = "modes"
+	// FieldCanSubs holds the string denoting the can_subs field in the database.
+	FieldCanSubs = "can_subs"
 	// EdgeMsgType holds the string denoting the msg_type edge name in mutations.
 	EdgeMsgType = "msg_type"
+	// EdgeSubscribers holds the string denoting the subscribers edge name in mutations.
+	EdgeSubscribers = "subscribers"
 	// EdgeCustomerTemplate holds the string denoting the customer_template edge name in mutations.
 	EdgeCustomerTemplate = "customer_template"
 	// Table holds the table name of the msgevent in the database.
@@ -51,6 +54,13 @@ const (
 	MsgTypeInverseTable = "msg_type"
 	// MsgTypeColumn is the table column denoting the msg_type relation/edge.
 	MsgTypeColumn = "msg_type_id"
+	// SubscribersTable is the table that holds the subscribers relation/edge.
+	SubscribersTable = "msg_subscriber"
+	// SubscribersInverseTable is the table name for the MsgSubscriber entity.
+	// It exists in this package in order to avoid circular dependency with the "msgsubscriber" package.
+	SubscribersInverseTable = "msg_subscriber"
+	// SubscribersColumn is the table column denoting the subscribers relation/edge.
+	SubscribersColumn = "msg_event_id"
 	// CustomerTemplateTable is the table that holds the customer_template relation/edge.
 	CustomerTemplateTable = "msg_template"
 	// CustomerTemplateInverseTable is the table name for the MsgTemplate entity.
@@ -73,6 +83,7 @@ var Columns = []string{
 	FieldComments,
 	FieldRoute,
 	FieldModes,
+	FieldCanSubs,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -92,10 +103,10 @@ func ValidColumn(column string) bool {
 //	import _ "github.com/woocoos/msgcenter/ent/runtime"
 var (
 	Hooks [5]ent.Hook
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// DefaultCanSubs holds the default value on creation for the "can_subs" field.
+	DefaultCanSubs bool
 )
 
 const DefaultStatus typex.SimpleStatus = "inactive"
@@ -163,10 +174,29 @@ func ByModes(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldModes, opts...).ToFunc()
 }
 
+// ByCanSubs orders the results by the can_subs field.
+func ByCanSubs(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCanSubs, opts...).ToFunc()
+}
+
 // ByMsgTypeField orders the results by msg_type field.
 func ByMsgTypeField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newMsgTypeStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// BySubscribersCount orders the results by subscribers count.
+func BySubscribersCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSubscribersStep(), opts...)
+	}
+}
+
+// BySubscribers orders the results by subscribers terms.
+func BySubscribers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubscribersStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -188,6 +218,13 @@ func newMsgTypeStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MsgTypeInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, MsgTypeTable, MsgTypeColumn),
+	)
+}
+func newSubscribersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubscribersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SubscribersTable, SubscribersColumn),
 	)
 }
 func newCustomerTemplateStep() *sqlgraph.Step {

@@ -40,7 +40,8 @@ func (MsgTemplate) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("msg_type_id").Comment("应用消息类型ID"),
 		field.Int("msg_event_id").Comment("消息事件ID"),
-		field.Int("tenant_id").Optional().Comment("组织ID").Annotations(entgql.Type("ID")),
+		field.Int("tenant_id").Optional().Comment("租户ID").Annotations(entgql.Type("ID")),
+		field.Int("user_id").Optional().Comment("用户ID，为空表示租户级或全局模板").Annotations(entgql.Type("ID")),
 		field.String("name").MaxLen(45).Comment("消息模板名称"),
 		field.Enum("status").GoType(typex.SimpleStatus("")).Default(typex.SimpleStatusInactive.String()).
 			Optional().Comment("状态").Annotations(entgql.Skip(entgql.SkipMutationCreateInput, entgql.SkipMutationUpdateInput)),

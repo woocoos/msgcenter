@@ -44,6 +44,12 @@ func (_m *MsgInternalTo) GlobalID(context.Context) (string, error) {
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
+// GlobalID returns the global identifier for the given MsgSilence node.
+func (_m *MsgSilence) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("MsgSilence:%d", _m.ID)
+	return base64.StdEncoding.EncodeToString([]byte(id)), nil
+}
+
 // GlobalID returns the global identifier for the given MsgSubscriber node.
 func (_m *MsgSubscriber) GlobalID(context.Context) (string, error) {
 	id := fmt.Sprintf("MsgSubscriber:%d", _m.ID)
@@ -80,9 +86,9 @@ func (_m *Org) GlobalID(context.Context) (string, error) {
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
-// GlobalID returns the global identifier for the given Silence node.
-func (_m *Silence) GlobalID(context.Context) (string, error) {
-	id := fmt.Sprintf("Silence:%d", _m.ID)
+// GlobalID returns the global identifier for the given OrgUser node.
+func (_m *OrgUser) GlobalID(context.Context) (string, error) {
+	id := fmt.Sprintf("OrgUser:%d", _m.ID)
 	return base64.StdEncoding.EncodeToString([]byte(id)), nil
 }
 
@@ -103,6 +109,7 @@ func FromGlobalID(s string) (*ResolvedGlobal, error) {
 	if len(tid) != 2 {
 		return nil, fmt.Errorf("invalid global identifier format %q", b)
 	}
+
 	return &ResolvedGlobal{Type: tid[0], ID: tid[1]}, nil
 }
 
@@ -119,6 +126,8 @@ func GlobalID(tp, id string) (string, error) {
 		break
 	case "MsgInternalTo":
 		break
+	case "MsgSilence":
+		break
 	case "MsgSubscriber":
 		break
 	case "MsgTemplate":
@@ -131,7 +140,7 @@ func GlobalID(tp, id string) (string, error) {
 		break
 	case "Org":
 		break
-	case "Silence":
+	case "OrgUser":
 		break
 	case "User":
 		break

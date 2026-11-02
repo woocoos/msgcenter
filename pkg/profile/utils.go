@@ -3,14 +3,15 @@ package profile
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"net"
+	"net/url"
+
 	kfjson "github.com/knadh/koanf/parsers/json"
 	"github.com/knadh/koanf/providers/rawbytes"
 	"github.com/knadh/koanf/v2"
 	"github.com/tsingsun/woocoo/pkg/conf"
 	"github.com/tsingsun/woocoo/pkg/gds/timeinterval"
-	"io"
-	"net"
-	"net/url"
 )
 
 // NewJsonParse returns a new Koanf instance with the JSON parser loaded.
@@ -34,7 +35,7 @@ func (h *HostPort) UnmarshalText(in []byte) (err error) {
 	return err
 }
 
-func (h *HostPort) UnmarshalGQL(v interface{}) (err error) {
+func (h *HostPort) UnmarshalGQL(v any) (err error) {
 	hp, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("invalid type %T, expect string", v)

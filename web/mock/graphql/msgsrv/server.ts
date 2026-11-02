@@ -78,7 +78,7 @@ const schemaWithMocks = addMocksToSchema({
       }
     },
     Mutation: {
-      createSilence(_, { input }) {
+      createMsgSilence(_, { input }) {
         input.id = `${Date.now()}`;
         store.set('Silence', input.id, input)
         return addListTemp(
@@ -87,11 +87,11 @@ const schemaWithMocks = addMocksToSchema({
           store.get('Silence', input.id) as Ref
         );
       },
-      updateSilence(_, { id, input }) {
+      updateMsgSilence(_, { id, input }) {
         store.set('Silence', id, input)
         return store.get('Silence', id)
       },
-      deleteSilence(_, { id }) {
+      deleteMsgSilence(_, { id }) {
         delListTemp(
           store,
           store.get('Query', 'ROOT', 'silences') as Ref,

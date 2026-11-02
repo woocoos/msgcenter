@@ -1,12 +1,13 @@
 import { gql } from "@/generated/msgsrv";
-import { CreateMsgEventInput, MsgEventOrder, MsgEventOrderField, MsgEventWhereInput, OrderDirection, RouteStrType, UpdateMsgEventInput } from "@/generated/msgsrv/graphql";
+import { CreateMsgEventInput, MsgEventOrder, MsgEventOrderField, MsgEventSimpleStatus, MsgEventWhereInput, OrderDirection, RouteStrType, UpdateMsgEventInput } from "@/generated/msgsrv/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 export const EnumMsgEventStatus = {
-  active: { text: 'active', status: 'success' },
-  inactive: { text: 'inactive', status: 'default' },
-  processing: { text: 'processing', status: 'warning' },
+  [MsgEventSimpleStatus.Active]: { text: '生效', tagColor: '#30c880' },
+  [MsgEventSimpleStatus.Inactive]: { text: '未生效', tagColor: '#dcdee1' },
+  [MsgEventSimpleStatus.Processing]: { text: '处理中', tagColor: '#00C8FF' },
+  [MsgEventSimpleStatus.Disabled]: { text: '禁用', tagColor: '#ff3030' },
 };
 
 const queryMsgEventList = gql(/* GraphQL */`query msgEventList($first: Int,$orderBy:MsgEventOrder,$where:MsgEventWhereInput){
@@ -14,7 +15,7 @@ const queryMsgEventList = gql(/* GraphQL */`query msgEventList($first: Int,$orde
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
-        id,name,comments,status,createdAt,msgTypeID,modes
+        id,name,comments,status,createdAt,msgTypeID,modes,canSubs
         msgType{
           id,category,appID,name
         }
@@ -28,7 +29,7 @@ const queryMsgEventInfo = gql(/* GraphQL */`query MsgEventInfo($gid:GID!){
   node(id: $gid){
     id
     ... on MsgEvent{
-      id,name,comments,status,createdAt,msgTypeID,modes
+      id,name,comments,status,createdAt,msgTypeID,modes,canSubs
       msgType{
         id,category,appID,name
       }
@@ -40,7 +41,7 @@ const queryMsgEventInfoRoute = gql(/* GraphQL */`query MsgEventInfoRoute($gid:GI
   node(id: $gid){
     id
     ... on MsgEvent{
-      id,name,comments,status,createdAt,msgTypeID,modes,routeStr(type:$type)
+      id,name,comments,status,createdAt,msgTypeID,modes,canSubs,routeStr(type:$type)
       msgType{
         id,category,appID,name
       }
@@ -51,7 +52,7 @@ const queryMsgEventInfoRoute = gql(/* GraphQL */`query MsgEventInfoRoute($gid:GI
 
 const mutationCreateMsgEvent = gql(/* GraphQL */`mutation createMsgEvent($input: CreateMsgEventInput!){
   createMsgEvent(input: $input){
-    id,name,comments,status,createdAt,msgTypeID,modes
+    id,name,comments,status,createdAt,msgTypeID,modes,canSubs
     msgType{
       id,category,appID,name
     }
@@ -60,7 +61,7 @@ const mutationCreateMsgEvent = gql(/* GraphQL */`mutation createMsgEvent($input:
 
 const mutationUpdateMsgEvent = gql(/* GraphQL */`mutation updateMsgEvent($id:ID!,$input: UpdateMsgEventInput!){
   updateMsgEvent(id:$id,input: $input){
-    id,name,comments,status,createdAt,msgTypeID,modes
+    id,name,comments,status,createdAt,msgTypeID,modes,canSubs
     msgType{
       id,category,appID,name
     }
@@ -85,6 +86,70 @@ const mutationDisableMsgEvent = gql(/* GraphQL */`mutation disableMsgEvent($id:I
     id,name,comments,status,createdAt,msgTypeID,modes
     msgType{
       id,category,appID,name
+    }
+  }
+}`);
+
+// 事件订阅列表查询（包含订阅者信息）
+const queryMsgEventListWithSubs = gql(/* GraphQL */`query msgEventListWithSubs($first: Int,$orderBy:MsgEventOrder,$where:MsgEventWhereInput){
+  msgEvents(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,name,comments,status,createdAt,msgTypeID,modes,canSubs
+        msgType{
+          id,category,appID,name
+        }
+        subscriberUsers{
+          id
+          userID
+          orgRoleID
+          exclude
+        }
+        subscriberRoles{
+          id
+          userID
+          orgRoleID
+          exclude
+        }
+        excludeSubscriberUsers{
+          id
+          userID
+          orgRoleID
+          exclude
+        }
+      }
+    }
+  }
+}`);
+
+// 事件详情（包含订阅者信息）
+const queryMsgEventWithSubs = gql(/* GraphQL */`query msgEventWithSubs($gid:GID!){
+  node(id: $gid){
+    id
+    ... on MsgEvent{
+      id,name,comments,status,createdAt,msgTypeID,modes,canSubs
+      msgType{
+        id,category,appID,name
+      }
+      subscriberUsers{
+        id
+        userID
+        orgRoleID
+        exclude
+      }
+      subscriberRoles{
+        id
+        userID
+        orgRoleID
+        exclude
+      }
+      excludeSubscriberUsers{
+        id
+        userID
+        orgRoleID
+        exclude
+      }
     }
   }
 }`);
@@ -222,6 +287,49 @@ export async function enableMsgEvent(msgEventId: string) {
   })
   if (result.data?.enableMsgEvent.id) {
     return result.data.enableMsgEvent
+  }
+  return null
+}
+
+/**
+ * 获取消息事件列表（包含订阅者信息，用于事件订阅页面）
+ * @param gather
+ * @returns
+ */
+export async function getMsgEventListWithSubs(
+  gather: {
+    current?: number;
+    pageSize?: number;
+    where?: MsgEventWhereInput;
+    orderBy?: MsgEventOrder;
+  }) {
+  const result = await paging(
+    queryMsgEventListWithSubs, {
+    first: gather.pageSize || 999,
+    where: gather.where,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: MsgEventOrderField.CreatedAt
+    },
+  }, gather.current || 1);
+
+  if (result.data?.msgEvents) {
+    return result.data.msgEvents;
+  }
+  return null;
+}
+
+/**
+ * 获取消息事件详情（包含订阅者信息）
+ * @param msgEventId
+ * @returns
+ */
+export async function getMsgEventWithSubs(msgEventId: string) {
+  const result = await query(queryMsgEventWithSubs, {
+    gid: gid('MsgEvent', msgEventId)
+  })
+  if (result.data?.node?.__typename === 'MsgEvent') {
+    return result.data.node
   }
   return null
 }

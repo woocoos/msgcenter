@@ -41,6 +41,8 @@ type MsgEvent struct {
 	Route *profile.Route `json:"route,omitempty"`
 	// 根据route配置对应的以,分隔的mode列表
 	Modes string `json:"modes,omitempty"`
+	// 是否可订阅
+	CanSubs bool `json:"can_subs,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MsgEventQuery when eager-loading is set.
 	Edges        MsgEventEdges `json:"edges"`
@@ -51,14 +53,17 @@ type MsgEvent struct {
 type MsgEventEdges struct {
 	// 消息类型
 	MsgType *MsgType `json:"msg_type,omitempty"`
+	// 订阅者
+	Subscribers []*MsgSubscriber `json:"subscribers,omitempty"`
 	// 自定义的消息模板
 	CustomerTemplate []*MsgTemplate `json:"customer_template,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [3]map[string]int
 
+	namedSubscribers      map[string][]*MsgSubscriber
 	namedCustomerTemplate map[string][]*MsgTemplate
 }
 
@@ -73,10 +78,19 @@ func (e MsgEventEdges) MsgTypeOrErr() (*MsgType, error) {
 	return nil, &NotLoadedError{edge: "msg_type"}
 }
 
+// SubscribersOrErr returns the Subscribers value or an error if the edge
+// was not loaded in eager-loading.
+func (e MsgEventEdges) SubscribersOrErr() ([]*MsgSubscriber, error) {
+	if e.loadedTypes[1] {
+		return e.Subscribers, nil
+	}
+	return nil, &NotLoadedError{edge: "subscribers"}
+}
+
 // CustomerTemplateOrErr returns the CustomerTemplate value or an error if the edge
 // was not loaded in eager-loading.
 func (e MsgEventEdges) CustomerTemplateOrErr() ([]*MsgTemplate, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.CustomerTemplate, nil
 	}
 	return nil, &NotLoadedError{edge: "customer_template"}
@@ -89,6 +103,8 @@ func (*MsgEvent) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case msgevent.FieldRoute:
 			values[i] = new([]byte)
+		case msgevent.FieldCanSubs:
+			values[i] = new(sql.NullBool)
 		case msgevent.FieldID, msgevent.FieldCreatedBy, msgevent.FieldUpdatedBy, msgevent.FieldMsgTypeID:
 			values[i] = new(sql.NullInt64)
 		case msgevent.FieldName, msgevent.FieldStatus, msgevent.FieldComments, msgevent.FieldModes:
@@ -178,6 +194,12 @@ func (_m *MsgEvent) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Modes = value.String
 			}
+		case msgevent.FieldCanSubs:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field can_subs", values[i])
+			} else if value.Valid {
+				_m.CanSubs = value.Bool
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -194,6 +216,11 @@ func (_m *MsgEvent) Value(name string) (ent.Value, error) {
 // QueryMsgType queries the "msg_type" edge of the MsgEvent entity.
 func (_m *MsgEvent) QueryMsgType() *MsgTypeQuery {
 	return NewMsgEventClient(_m.config).QueryMsgType(_m)
+}
+
+// QuerySubscribers queries the "subscribers" edge of the MsgEvent entity.
+func (_m *MsgEvent) QuerySubscribers() *MsgSubscriberQuery {
+	return NewMsgEventClient(_m.config).QuerySubscribers(_m)
 }
 
 // QueryCustomerTemplate queries the "customer_template" edge of the MsgEvent entity.
@@ -253,8 +280,35 @@ func (_m *MsgEvent) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("modes=")
 	builder.WriteString(_m.Modes)
+	builder.WriteString(", ")
+	builder.WriteString("can_subs=")
+	builder.WriteString(fmt.Sprintf("%v", _m.CanSubs))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// NamedSubscribers returns the Subscribers named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (_m *MsgEvent) NamedSubscribers(name string) ([]*MsgSubscriber, error) {
+	if _m.Edges.namedSubscribers == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := _m.Edges.namedSubscribers[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (_m *MsgEvent) appendNamedSubscribers(name string, edges ...*MsgSubscriber) {
+	if _m.Edges.namedSubscribers == nil {
+		_m.Edges.namedSubscribers = make(map[string][]*MsgSubscriber)
+	}
+	if len(edges) == 0 {
+		_m.Edges.namedSubscribers[name] = []*MsgSubscriber{}
+	} else {
+		_m.Edges.namedSubscribers[name] = append(_m.Edges.namedSubscribers[name], edges...)
+	}
 }
 
 // NamedCustomerTemplate returns the CustomerTemplate named value or an error if the edge was not

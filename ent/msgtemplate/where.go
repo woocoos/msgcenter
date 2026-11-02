@@ -94,6 +94,11 @@ func TenantID(v int) predicate.MsgTemplate {
 	return predicate.MsgTemplate(sql.FieldEQ(FieldTenantID, v))
 }
 
+// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
+func UserID(v int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldEQ(FieldUserID, v))
+}
+
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.MsgTemplate {
 	return predicate.MsgTemplate(sql.FieldEQ(FieldName, v))
@@ -427,6 +432,56 @@ func TenantIDIsNil() predicate.MsgTemplate {
 // TenantIDNotNil applies the NotNil predicate on the "tenant_id" field.
 func TenantIDNotNil() predicate.MsgTemplate {
 	return predicate.MsgTemplate(sql.FieldNotNull(FieldTenantID))
+}
+
+// UserIDEQ applies the EQ predicate on the "user_id" field.
+func UserIDEQ(v int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldEQ(FieldUserID, v))
+}
+
+// UserIDNEQ applies the NEQ predicate on the "user_id" field.
+func UserIDNEQ(v int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldNEQ(FieldUserID, v))
+}
+
+// UserIDIn applies the In predicate on the "user_id" field.
+func UserIDIn(vs ...int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldIn(FieldUserID, vs...))
+}
+
+// UserIDNotIn applies the NotIn predicate on the "user_id" field.
+func UserIDNotIn(vs ...int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldNotIn(FieldUserID, vs...))
+}
+
+// UserIDGT applies the GT predicate on the "user_id" field.
+func UserIDGT(v int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldGT(FieldUserID, v))
+}
+
+// UserIDGTE applies the GTE predicate on the "user_id" field.
+func UserIDGTE(v int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldGTE(FieldUserID, v))
+}
+
+// UserIDLT applies the LT predicate on the "user_id" field.
+func UserIDLT(v int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldLT(FieldUserID, v))
+}
+
+// UserIDLTE applies the LTE predicate on the "user_id" field.
+func UserIDLTE(v int) predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldLTE(FieldUserID, v))
+}
+
+// UserIDIsNil applies the IsNil predicate on the "user_id" field.
+func UserIDIsNil() predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldIsNull(FieldUserID))
+}
+
+// UserIDNotNil applies the NotNil predicate on the "user_id" field.
+func UserIDNotNil() predicate.MsgTemplate {
+	return predicate.MsgTemplate(sql.FieldNotNull(FieldUserID))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.

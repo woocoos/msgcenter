@@ -11,9 +11,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/woocoos/msgcenter/ent/msgalert"
 	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/predicate"
+	"github.com/woocoos/msgcenter/pkg/profile"
 
 	"github.com/woocoos/msgcenter/ent/internal"
 )
@@ -92,6 +94,26 @@ func (_u *MsgInternalUpdate) SetNillableCategory(v *string) *MsgInternalUpdate {
 	return _u
 }
 
+// SetMsgType sets the "msg_type" field.
+func (_u *MsgInternalUpdate) SetMsgType(v string) *MsgInternalUpdate {
+	_u.mutation.SetMsgType(v)
+	return _u
+}
+
+// SetNillableMsgType sets the "msg_type" field if the given value is not nil.
+func (_u *MsgInternalUpdate) SetNillableMsgType(v *string) *MsgInternalUpdate {
+	if v != nil {
+		_u.SetMsgType(*v)
+	}
+	return _u
+}
+
+// ClearMsgType clears the value of the "msg_type" field.
+func (_u *MsgInternalUpdate) ClearMsgType() *MsgInternalUpdate {
+	_u.mutation.ClearMsgType()
+	return _u
+}
+
 // SetSubject sets the "subject" field.
 func (_u *MsgInternalUpdate) SetSubject(v string) *MsgInternalUpdate {
 	_u.mutation.SetSubject(v)
@@ -160,6 +182,40 @@ func (_u *MsgInternalUpdate) ClearRedirect() *MsgInternalUpdate {
 	return _u
 }
 
+// SetReceiverType sets the "receiver_type" field.
+func (_u *MsgInternalUpdate) SetReceiverType(v profile.ReceiverType) *MsgInternalUpdate {
+	_u.mutation.SetReceiverType(v)
+	return _u
+}
+
+// SetNillableReceiverType sets the "receiver_type" field if the given value is not nil.
+func (_u *MsgInternalUpdate) SetNillableReceiverType(v *profile.ReceiverType) *MsgInternalUpdate {
+	if v != nil {
+		_u.SetReceiverType(*v)
+	}
+	return _u
+}
+
+// SetAlertID sets the "alert_id" field.
+func (_u *MsgInternalUpdate) SetAlertID(v int) *MsgInternalUpdate {
+	_u.mutation.SetAlertID(v)
+	return _u
+}
+
+// SetNillableAlertID sets the "alert_id" field if the given value is not nil.
+func (_u *MsgInternalUpdate) SetNillableAlertID(v *int) *MsgInternalUpdate {
+	if v != nil {
+		_u.SetAlertID(*v)
+	}
+	return _u
+}
+
+// ClearAlertID clears the value of the "alert_id" field.
+func (_u *MsgInternalUpdate) ClearAlertID() *MsgInternalUpdate {
+	_u.mutation.ClearAlertID()
+	return _u
+}
+
 // AddMsgInternalToIDs adds the "msg_internal_to" edge to the MsgInternalTo entity by IDs.
 func (_u *MsgInternalUpdate) AddMsgInternalToIDs(ids ...int) *MsgInternalUpdate {
 	_u.mutation.AddMsgInternalToIDs(ids...)
@@ -173,6 +229,11 @@ func (_u *MsgInternalUpdate) AddMsgInternalTo(v ...*MsgInternalTo) *MsgInternalU
 		ids[i] = v[i].ID
 	}
 	return _u.AddMsgInternalToIDs(ids...)
+}
+
+// SetAlert sets the "alert" edge to the MsgAlert entity.
+func (_u *MsgInternalUpdate) SetAlert(v *MsgAlert) *MsgInternalUpdate {
+	return _u.SetAlertID(v.ID)
 }
 
 // Mutation returns the MsgInternalMutation object of the builder.
@@ -199,6 +260,12 @@ func (_u *MsgInternalUpdate) RemoveMsgInternalTo(v ...*MsgInternalTo) *MsgIntern
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveMsgInternalToIDs(ids...)
+}
+
+// ClearAlert clears the "alert" edge to the MsgAlert entity.
+func (_u *MsgInternalUpdate) ClearAlert() *MsgInternalUpdate {
+	_u.mutation.ClearAlert()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -235,6 +302,16 @@ func (_u *MsgInternalUpdate) check() error {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.category": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.MsgType(); ok {
+		if err := msginternal.MsgTypeValidator(v); err != nil {
+			return &ValidationError{Name: "msg_type", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.msg_type": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.ReceiverType(); ok {
+		if err := msginternal.ReceiverTypeValidator(v); err != nil {
+			return &ValidationError{Name: "receiver_type", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.receiver_type": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -268,6 +345,12 @@ func (_u *MsgInternalUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	if value, ok := _u.mutation.Category(); ok {
 		_spec.SetField(msginternal.FieldCategory, field.TypeString, value)
 	}
+	if value, ok := _u.mutation.MsgType(); ok {
+		_spec.SetField(msginternal.FieldMsgType, field.TypeString, value)
+	}
+	if _u.mutation.MsgTypeCleared() {
+		_spec.ClearField(msginternal.FieldMsgType, field.TypeString)
+	}
 	if value, ok := _u.mutation.Subject(); ok {
 		_spec.SetField(msginternal.FieldSubject, field.TypeString, value)
 	}
@@ -285,6 +368,9 @@ func (_u *MsgInternalUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	}
 	if _u.mutation.RedirectCleared() {
 		_spec.ClearField(msginternal.FieldRedirect, field.TypeString)
+	}
+	if value, ok := _u.mutation.ReceiverType(); ok {
+		_spec.SetField(msginternal.FieldReceiverType, field.TypeEnum, value)
 	}
 	if _u.mutation.MsgInternalToCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -329,6 +415,37 @@ func (_u *MsgInternalUpdate) sqlSave(ctx context.Context) (_node int, err error)
 			},
 		}
 		edge.Schema = _u.schemaConfig.MsgInternalTo
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.AlertCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   msginternal.AlertTable,
+			Columns: []string{msginternal.AlertColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgInternal
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.AlertIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   msginternal.AlertTable,
+			Columns: []string{msginternal.AlertColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgInternal
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
@@ -417,6 +534,26 @@ func (_u *MsgInternalUpdateOne) SetNillableCategory(v *string) *MsgInternalUpdat
 	return _u
 }
 
+// SetMsgType sets the "msg_type" field.
+func (_u *MsgInternalUpdateOne) SetMsgType(v string) *MsgInternalUpdateOne {
+	_u.mutation.SetMsgType(v)
+	return _u
+}
+
+// SetNillableMsgType sets the "msg_type" field if the given value is not nil.
+func (_u *MsgInternalUpdateOne) SetNillableMsgType(v *string) *MsgInternalUpdateOne {
+	if v != nil {
+		_u.SetMsgType(*v)
+	}
+	return _u
+}
+
+// ClearMsgType clears the value of the "msg_type" field.
+func (_u *MsgInternalUpdateOne) ClearMsgType() *MsgInternalUpdateOne {
+	_u.mutation.ClearMsgType()
+	return _u
+}
+
 // SetSubject sets the "subject" field.
 func (_u *MsgInternalUpdateOne) SetSubject(v string) *MsgInternalUpdateOne {
 	_u.mutation.SetSubject(v)
@@ -485,6 +622,40 @@ func (_u *MsgInternalUpdateOne) ClearRedirect() *MsgInternalUpdateOne {
 	return _u
 }
 
+// SetReceiverType sets the "receiver_type" field.
+func (_u *MsgInternalUpdateOne) SetReceiverType(v profile.ReceiverType) *MsgInternalUpdateOne {
+	_u.mutation.SetReceiverType(v)
+	return _u
+}
+
+// SetNillableReceiverType sets the "receiver_type" field if the given value is not nil.
+func (_u *MsgInternalUpdateOne) SetNillableReceiverType(v *profile.ReceiverType) *MsgInternalUpdateOne {
+	if v != nil {
+		_u.SetReceiverType(*v)
+	}
+	return _u
+}
+
+// SetAlertID sets the "alert_id" field.
+func (_u *MsgInternalUpdateOne) SetAlertID(v int) *MsgInternalUpdateOne {
+	_u.mutation.SetAlertID(v)
+	return _u
+}
+
+// SetNillableAlertID sets the "alert_id" field if the given value is not nil.
+func (_u *MsgInternalUpdateOne) SetNillableAlertID(v *int) *MsgInternalUpdateOne {
+	if v != nil {
+		_u.SetAlertID(*v)
+	}
+	return _u
+}
+
+// ClearAlertID clears the value of the "alert_id" field.
+func (_u *MsgInternalUpdateOne) ClearAlertID() *MsgInternalUpdateOne {
+	_u.mutation.ClearAlertID()
+	return _u
+}
+
 // AddMsgInternalToIDs adds the "msg_internal_to" edge to the MsgInternalTo entity by IDs.
 func (_u *MsgInternalUpdateOne) AddMsgInternalToIDs(ids ...int) *MsgInternalUpdateOne {
 	_u.mutation.AddMsgInternalToIDs(ids...)
@@ -498,6 +669,11 @@ func (_u *MsgInternalUpdateOne) AddMsgInternalTo(v ...*MsgInternalTo) *MsgIntern
 		ids[i] = v[i].ID
 	}
 	return _u.AddMsgInternalToIDs(ids...)
+}
+
+// SetAlert sets the "alert" edge to the MsgAlert entity.
+func (_u *MsgInternalUpdateOne) SetAlert(v *MsgAlert) *MsgInternalUpdateOne {
+	return _u.SetAlertID(v.ID)
 }
 
 // Mutation returns the MsgInternalMutation object of the builder.
@@ -524,6 +700,12 @@ func (_u *MsgInternalUpdateOne) RemoveMsgInternalTo(v ...*MsgInternalTo) *MsgInt
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveMsgInternalToIDs(ids...)
+}
+
+// ClearAlert clears the "alert" edge to the MsgAlert entity.
+func (_u *MsgInternalUpdateOne) ClearAlert() *MsgInternalUpdateOne {
+	_u.mutation.ClearAlert()
+	return _u
 }
 
 // Where appends a list predicates to the MsgInternalUpdate builder.
@@ -571,6 +753,16 @@ func (_u *MsgInternalUpdateOne) check() error {
 	if v, ok := _u.mutation.Category(); ok {
 		if err := msginternal.CategoryValidator(v); err != nil {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.category": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.MsgType(); ok {
+		if err := msginternal.MsgTypeValidator(v); err != nil {
+			return &ValidationError{Name: "msg_type", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.msg_type": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.ReceiverType(); ok {
+		if err := msginternal.ReceiverTypeValidator(v); err != nil {
+			return &ValidationError{Name: "receiver_type", err: fmt.Errorf(`ent: validator failed for field "MsgInternal.receiver_type": %w`, err)}
 		}
 	}
 	return nil
@@ -623,6 +815,12 @@ func (_u *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgInternal
 	if value, ok := _u.mutation.Category(); ok {
 		_spec.SetField(msginternal.FieldCategory, field.TypeString, value)
 	}
+	if value, ok := _u.mutation.MsgType(); ok {
+		_spec.SetField(msginternal.FieldMsgType, field.TypeString, value)
+	}
+	if _u.mutation.MsgTypeCleared() {
+		_spec.ClearField(msginternal.FieldMsgType, field.TypeString)
+	}
 	if value, ok := _u.mutation.Subject(); ok {
 		_spec.SetField(msginternal.FieldSubject, field.TypeString, value)
 	}
@@ -640,6 +838,9 @@ func (_u *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgInternal
 	}
 	if _u.mutation.RedirectCleared() {
 		_spec.ClearField(msginternal.FieldRedirect, field.TypeString)
+	}
+	if value, ok := _u.mutation.ReceiverType(); ok {
+		_spec.SetField(msginternal.FieldReceiverType, field.TypeEnum, value)
 	}
 	if _u.mutation.MsgInternalToCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -684,6 +885,37 @@ func (_u *MsgInternalUpdateOne) sqlSave(ctx context.Context) (_node *MsgInternal
 			},
 		}
 		edge.Schema = _u.schemaConfig.MsgInternalTo
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.AlertCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   msginternal.AlertTable,
+			Columns: []string{msginternal.AlertColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgInternal
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.AlertIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   msginternal.AlertTable,
+			Columns: []string{msginternal.AlertColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(msgalert.FieldID, field.TypeInt),
+			},
+		}
+		edge.Schema = _u.schemaConfig.MsgInternal
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}

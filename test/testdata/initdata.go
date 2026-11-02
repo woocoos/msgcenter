@@ -3,12 +3,13 @@ package main
 import (
 	"context"
 	"flag"
+	"log"
+
 	"github.com/woocoos/knockout-go/ent/schemax/typex"
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
 	"github.com/woocoos/msgcenter/pkg/label"
 	"github.com/woocoos/msgcenter/pkg/profile"
-	"log"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/woocoos/msgcenter/ent/runtime"
@@ -76,7 +77,7 @@ func initmsg(tx *ent.Tx) {
 		}).SaveX(ctx)
 	tx.MsgTemplate.Create().SetMsgTypeID(1).SetEventID(1).SetTenantID(1).SetName(alterPassWordEventName).SetCreatedBy(1).
 		SetStatus(typex.SimpleStatusActive).SetFormat(msgtemplate.FormatTxt).SetReceiverType(profile.ReceiverEmail).SetTo(`{{ template "email.to" . }}`).
-		SetSubject(`{{ with .CommonAnnotations }}{{.uid}}{{end}}密码到期提醒`).SetCc(`{{ template "email.cc" . }}`).
+		SetSubject(`{{ with .CommonAnnotations }}{{.summary}}密码到期提醒{{.text}}{{end}}`).SetCc(`{{ template "email.cc" . }}`).
 		SetBcc(`{{ template "email.bcc" . }}`).SetFrom(`custom <test@localhost>`).
 		SetBody(`{{ template "1.alterpwd.txt" . }}`).SetAttachments([]string{"msg/att/1/alterpwd.tmpl"}).
 		SetTpl("msg/tpl/data/1/alterpwd.tmpl").SaveX(ctx)

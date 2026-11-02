@@ -1,28 +1,30 @@
+// Copyright 2023 woocoos
+//
+// Derived from Prometheus Alertmanager (https://github.com/prometheus/alertmanager).
+// Original Copyright 2016-2026 The Prometheus Authors.
+// Licensed under the Apache License 2.0.
+
 package store
 
 import (
 	"context"
 	"errors"
-	"github.com/woocoos/msgcenter/pkg/alert"
-	"github.com/woocoos/msgcenter/pkg/label"
 	"sync"
 	"time"
+
+	"github.com/woocoos/msgcenter/pkg/alert"
+	"github.com/woocoos/msgcenter/pkg/label"
+	"github.com/woocoos/msgcenter/pkg/limit"
 )
+
+// ErrLimited is returned if a Store has reached the per-alert limit.
+var ErrLimited = errors.New("alert limited")
 
 // ErrNotFound is returned if a Store cannot find the Alert.
 var ErrNotFound = errors.New("alert not found")
 
-type Option func(alerts *Alerts)
-
-// WithGCInterval sets the GC interval. The interval must be greater than 1 minute;
-func WithGCInterval(interval time.Duration) Option {
-	return func(a *Alerts) {
-		if a.gcInterval < time.Minute {
-			a.gcInterval = time.Minute
-		}
-		a.gcInterval = interval
-	}
-}
+// ErrDestroyed is returned if a Store has been destroyed.
+var ErrDestroyed = errors.New("alert store destroyed")
 
 // Alerts provides lock-coordinated to an in-memory map of alerts, keyed by
 // their fingerprint. Resolved alerts are removed from the map based on
@@ -30,21 +32,31 @@ func WithGCInterval(interval time.Duration) Option {
 // resolved alerts that have been removed.
 type Alerts struct {
 	sync.Mutex
-	c          map[label.Fingerprint]*alert.Alert
-	cb         func([]*alert.Alert)
-	gcInterval time.Duration
+	alerts        map[label.Fingerprint]*alert.Alert
+	gcCallback    func([]*alert.Alert)
+	limits        map[string]*limit.Bucket[label.Fingerprint]
+	perAlertLimit int
+	destroyed     bool
 }
 
 // NewAlerts returns a new Alerts struct.
-func NewAlerts(opts ...Option) *Alerts {
+func NewAlerts() *Alerts {
 	a := &Alerts{
-		c:          make(map[label.Fingerprint]*alert.Alert),
-		cb:         func(_ []*alert.Alert) {},
-		gcInterval: time.Minute * 30,
+		alerts:     make(map[label.Fingerprint]*alert.Alert),
+		gcCallback: func(_ []*alert.Alert) {},
 	}
-	for _, opt := range opts {
-		opt(a)
-	}
+
+	return a
+}
+
+// WithPerAlertLimit sets the per-alert limit for the Alerts struct.
+func (a *Alerts) WithPerAlertLimit(lim int) *Alerts {
+	a.Lock()
+	defer a.Unlock()
+
+	a.limits = make(map[string]*limit.Bucket[label.Fingerprint])
+	a.perAlertLimit = lim
+
 	return a
 }
 
@@ -53,38 +65,60 @@ func (a *Alerts) SetGCCallback(cb func([]*alert.Alert)) {
 	a.Lock()
 	defer a.Unlock()
 
-	a.cb = cb
+	a.gcCallback = cb
 }
 
-func (a *Alerts) Start(ctx context.Context) error {
-	t := time.NewTicker(a.gcInterval)
+func (a *Alerts) Run(ctx context.Context, interval time.Duration) {
+	t := time.NewTicker(interval)
 	defer t.Stop()
 	for {
 		select {
 		case <-ctx.Done():
-			return nil
+			return
 		case <-t.C:
-			a.gc()
+			a.GC()
 		}
 	}
 }
 
-func (a *Alerts) Stop(ctx context.Context) error {
-	return nil
+func (a *Alerts) GC() (deleted []*alert.Alert) {
+	// Remove stale alert limit buckets.
+	a.gcLimitBuckets()
+
+	// Delete resolved alerts.
+	deleted = a.gcAlerts()
+
+	// Execute GC callback if needed.
+	if len(deleted) > 0 {
+		a.gcCallback(deleted)
+	}
+
+	return deleted
 }
 
-func (a *Alerts) gc() {
+// gcAlerts deletes resolved alerts and returns a copy of them.
+func (a *Alerts) gcAlerts() (deleted []*alert.Alert) {
+	a.Lock()
+	defer a.Unlock()
+	for fp, alert := range a.alerts {
+		if alert.Resolved() {
+			deleted = append(deleted, alert)
+			delete(a.alerts, fp)
+		}
+	}
+	return deleted
+}
+
+// gcLimitBuckets removes stale alert limit buckets.
+func (a *Alerts) gcLimitBuckets() {
 	a.Lock()
 	defer a.Unlock()
 
-	var resolved []*alert.Alert
-	for fp, c := range a.c {
-		if c.Resolved() {
-			delete(a.c, fp)
-			resolved = append(resolved, c)
+	for alertName, bucket := range a.limits {
+		if bucket.IsStale() {
+			delete(a.limits, alertName)
 		}
 	}
-	a.cb(resolved)
 }
 
 // Get returns the Alert with the matching fingerprint, or an error if it is
@@ -93,7 +127,7 @@ func (a *Alerts) Get(fp label.Fingerprint) (*alert.Alert, error) {
 	a.Lock()
 	defer a.Unlock()
 
-	alert, prs := a.c[fp]
+	alert, prs := a.alerts[fp]
 	if !prs {
 		return nil, ErrNotFound
 	}
@@ -105,16 +139,45 @@ func (a *Alerts) Set(alert *alert.Alert) error {
 	a.Lock()
 	defer a.Unlock()
 
-	a.c[alert.Fingerprint()] = alert
+	if a.destroyed {
+		return ErrDestroyed
+	}
+	fp := alert.Fingerprint()
+	name := alert.Name()
+
+	// Apply per alert limits if necessary
+	if a.perAlertLimit > 0 {
+		bucket, ok := a.limits[name]
+		if !ok {
+			bucket = limit.NewBucket[label.Fingerprint](a.perAlertLimit)
+			a.limits[name] = bucket
+		}
+		if !bucket.Upsert(fp, alert.EndsAt) {
+			return ErrLimited
+		}
+	}
+
+	a.alerts[fp] = alert
 	return nil
 }
 
-// Delete removes the Alert with the matching fingerprint from the store.
-func (a *Alerts) Delete(fp label.Fingerprint) error {
+// DeleteIfNotModified deletes the slice of Alerts from the store if not
+// modified.
+func (a *Alerts) DeleteIfNotModified(alerts alert.Alerts, destroyIfEmpty bool) error {
 	a.Lock()
 	defer a.Unlock()
+	for _, alert := range alerts {
+		fp := alert.Fingerprint()
+		if other, ok := a.alerts[fp]; ok && alert.UpdatedAt.Equal(other.UpdatedAt) {
+			delete(a.alerts, fp)
+		}
+	}
 
-	delete(a.c, fp)
+	// If the store is now empty, mark it as destroyed
+	if len(a.alerts) == 0 && destroyIfEmpty {
+		a.destroyed = true
+	}
+
 	return nil
 }
 
@@ -123,8 +186,8 @@ func (a *Alerts) List() []*alert.Alert {
 	a.Lock()
 	defer a.Unlock()
 
-	als := make([]*alert.Alert, 0, len(a.c))
-	for _, alert := range a.c {
+	als := make([]*alert.Alert, 0, len(a.alerts))
+	for _, alert := range a.alerts {
 		als = append(als, alert)
 	}
 
@@ -136,19 +199,20 @@ func (a *Alerts) Empty() bool {
 	a.Lock()
 	defer a.Unlock()
 
-	return len(a.c) == 0
+	return len(a.alerts) == 0
 }
 
-// DeleteIfNotModified deletes the slice of Alerts from the store if not
-// modified.
-func (a *Alerts) DeleteIfNotModified(alerts alert.Alerts) error {
+func (a *Alerts) Destroyed() bool {
 	a.Lock()
 	defer a.Unlock()
-	for _, al := range alerts {
-		fp := al.Fingerprint()
-		if other, ok := a.c[fp]; ok && al.UpdatedAt == other.UpdatedAt {
-			delete(a.c, fp)
-		}
-	}
-	return nil
+
+	return a.destroyed
+}
+
+// Len returns the number of alerts in the store.
+func (a *Alerts) Len() int {
+	a.Lock()
+	defer a.Unlock()
+
+	return len(a.alerts)
 }

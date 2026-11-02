@@ -16,7 +16,11 @@ export default (props: InputMultipleProps) => {
   const [value, setValue] = useState<string>();
 
   useEffect(() => {
-    setTags(props.value?.split(props.decollator) || [])
+    if (props.value) {
+      setTags(props.value?.split(props.decollator))
+    } else {
+      setTags([])
+    }
   }, [props.value])
 
   return <Input
@@ -26,12 +30,12 @@ export default (props: InputMultipleProps) => {
         closable={props.disabled ? false : true}
         onClose={(e) => {
           e.preventDefault();
-          setTags(tags.filter((_tag, idx) => idx != index))
+          props.onChange?.(tags.filter((_tag, idx) => idx != index).join(props.decollator));
         }}
       >{item}</Tag>)
     }</div>}
     value={value}
-    placeholder={props.placeholder}
+    placeholder={props.disabled ? '' : props.placeholder}
     onChange={(event) => {
       setValue(event.target.value);
     }} onPressEnter={(event) => {

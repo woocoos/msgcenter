@@ -156,8 +156,10 @@ export default {
     msg_temp_to: '收件人',
     msg_temp_from: '发件人',
     msg_temp_format: '正文',
+    msg_temp_user_tip: '指定用户ID后，该模板仅对该用户生效，为空则为租户级模板',
     msg_temp_format_tip: '正文可包含go template的模板语法',
     attachments_tip: '附件为固定文档，暂时不支持附件中的变量',
+    please_enter_attachment_names: '请输入附件名称，回车添加',
     click_drag_upload: '点击或拖拽文件上传',
     receiving_user: '接收用户',
     receiving_type: '接收方式',
@@ -178,6 +180,7 @@ export default {
     msg_log_groupKey: '分组键',
     msg_log_receiver: '接收组名称',
     msg_log_receiverType: '接收组类型',
+    msg_log_errMsg: '错误信息',
     msg_log: '消息日志',
     msg_log_list: '消息日志列表',
     msg_event_config_tip: '修改后请重新启用后生效',
@@ -195,6 +198,8 @@ export default {
     view_content: '查看内容',
     more_message: '更多消息',
     query_message: '消息查询',
+    previous: '上一条',
+    next: '下一条',
 
     // 创建
     create_msg_type: '创建消息类型',
@@ -216,6 +221,8 @@ export default {
     msg_template_list: '消息模板列表',
     msg_subscription_list: '消息订阅列表',
     silence_msg_list: '静默消息列表',
+    event_subscription_list: '事件订阅列表',
+    event_subscription: '事件订阅',
     // 详情
 
     // 必填

@@ -13,10 +13,9 @@
 # Test binary, built with `go test -c`
 *.test
 test/tmp
+api/oas/tmp
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
-cmd/msgsrv/data/
-cmd/ams/files
 
 *.idea/
 .run
@@ -27,4 +26,10 @@ cmd/ams/files
 # Go workspace file
 go.work*
 
+# AI
+.qwen
+.claude
+
 # misc
+cmd/msgsrv/data/
+cmd/ams/files
