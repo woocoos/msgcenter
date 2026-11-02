@@ -177,6 +177,25 @@ func (s *resolverSuite) TestMessageHandler() {
 		s.Require().NoError(err)
 		s.Require().True(has)
 	})
+	s.Run("MarkAllMessageReadWithReceiverType", func() {
+		ctx := s.NewTestCtx()
+		umeng := profile.ReceiverUmeng
+		suc, err := s.mr.MarkMsgInternalAllToRead(ctx, &umeng)
+		s.Require().NoError(err)
+		s.Require().True(suc)
+		num, err := s.qr.UserUnreadMsgInternals(ctx)
+		s.Require().NoError(err)
+		s.Require().Equal(1, num)
+	})
+	s.Run("MarkAllMessageRead", func() {
+		ctx := s.NewTestCtx()
+		suc, err := s.mr.MarkMsgInternalAllToRead(ctx, nil)
+		s.Require().NoError(err)
+		s.Require().True(suc)
+		num, err := s.qr.UserUnreadMsgInternals(ctx)
+		s.Require().NoError(err)
+		s.Require().Equal(0, num)
+	})
 }
 
 func (s *resolverSuite) TestMsgTemplateDefineByName() {

@@ -49,6 +49,8 @@ type Mutation {
     markMsgInternalToReadOrUnRead(ids: [ID!]!, read: Boolean!): Boolean!
     """ 删除站内信消息 """
     markMsgInternalToDeleted(ids: [ID!]!): Boolean!
+    """ 设置用户全部站内信消息已读，receiverType为空时标记全部渠道 """
+    markMsgInternalAllToRead(receiverType: MsgInternalReceiverType): Boolean!
     """ 测试邮件模板 """
     testSendEmailTpl(tplID: ID!, email: String!, labels: MapString, annotations: MapString): Boolean!
     """ 测试站内信模板 """

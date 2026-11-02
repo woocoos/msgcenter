@@ -400,6 +400,7 @@ type ComplexityRoot struct {
 		EnableMsgChannel              func(childComplexity int, id int) int
 		EnableMsgEvent                func(childComplexity int, id int) int
 		EnableMsgTemplate             func(childComplexity int, id int) int
+		MarkMsgInternalAllToRead      func(childComplexity int, receiverType *profile.ReceiverType) int
 		MarkMsgInternalToDeleted      func(childComplexity int, ids []int) int
 		MarkMsgInternalToReadOrUnRead func(childComplexity int, ids []int, read bool) int
 		RefreshTemplateParams         func(childComplexity int) int
@@ -2387,6 +2388,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.EnableMsgTemplate(childComplexity, args["id"].(int)), true
+
+	case "Mutation.markMsgInternalAllToRead":
+		if e.complexity.Mutation.MarkMsgInternalAllToRead == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_markMsgInternalAllToRead_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MarkMsgInternalAllToRead(childComplexity, args["receiverType"].(*profile.ReceiverType)), true
 
 	case "Mutation.markMsgInternalToDeleted":
 		if e.complexity.Mutation.MarkMsgInternalToDeleted == nil {
@@ -7037,6 +7050,8 @@ extend type Query {
     markMsgInternalToReadOrUnRead(ids: [ID!]!, read: Boolean!): Boolean!
     """ 删除站内信消息 """
     markMsgInternalToDeleted(ids: [ID!]!): Boolean!
+    """ 设置用户全部站内信消息已读，receiverType为空时标记全部渠道 """
+    markMsgInternalAllToRead(receiverType: MsgInternalReceiverType): Boolean!
     """ 测试邮件模板 """
     testSendEmailTpl(tplID: ID!, email: String!, labels: MapString, annotations: MapString): Boolean!
     """ 测试站内信模板 """

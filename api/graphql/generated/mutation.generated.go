@@ -45,6 +45,7 @@ type MutationResolver interface {
 	DeleteMsgSilence(ctx context.Context, id int) (bool, error)
 	MarkMsgInternalToReadOrUnRead(ctx context.Context, ids []int, read bool) (bool, error)
 	MarkMsgInternalToDeleted(ctx context.Context, ids []int) (bool, error)
+	MarkMsgInternalAllToRead(ctx context.Context, receiverType *profile.ReceiverType) (bool, error)
 	TestSendEmailTpl(ctx context.Context, tplID int, email string, labels map[string]string, annotations map[string]string) (bool, error)
 	TestSendMessageTpl(ctx context.Context, tplID int, userID *int, labels map[string]string, annotations map[string]string) (bool, error)
 	RefreshTemplateParams(ctx context.Context) (bool, error)
@@ -569,6 +570,34 @@ func (ec *executionContext) field_Mutation_enableMsgTemplate_argsID(
 	}
 
 	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_markMsgInternalAllToRead_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_markMsgInternalAllToRead_argsReceiverType(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["receiverType"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_markMsgInternalAllToRead_argsReceiverType(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*profile.ReceiverType, error) {
+	if _, ok := rawArgs["receiverType"]; !ok {
+		var zeroVal *profile.ReceiverType
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverType"))
+	if tmp, ok := rawArgs["receiverType"]; ok {
+		return ec.unmarshalOMsgInternalReceiverType2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverType(ctx, tmp)
+	}
+
+	var zeroVal *profile.ReceiverType
 	return zeroVal, nil
 }
 
@@ -3085,6 +3114,61 @@ func (ec *executionContext) fieldContext_Mutation_markMsgInternalToDeleted(ctx c
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_markMsgInternalAllToRead(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_markMsgInternalAllToRead(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().MarkMsgInternalAllToRead(rctx, fc.Args["receiverType"].(*profile.ReceiverType))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_markMsgInternalAllToRead(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_markMsgInternalAllToRead_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_testSendEmailTpl(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_testSendEmailTpl(ctx, field)
 	if err != nil {
@@ -3927,6 +4011,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "markMsgInternalToDeleted":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_markMsgInternalToDeleted(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "markMsgInternalAllToRead":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_markMsgInternalAllToRead(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
