@@ -560,3 +560,25 @@ export const customTextToHtml = (text: string, isRemoveColor = false): string =>
 
   return newText;
 };
+
+/**
+ * 门户通知中心 postMessage 清理协议（协议文档见 admin-portal docs/msgcenter-postmessage-protocol.md）
+ * 站内信执行「已读」「全部已读」成功后调用，通知门户清理通知中心/近期消息区域展示
+ * 兼容 icestark 微前端（同 window）、iframe、window.open 三种嵌入方式
+ * @param action 'remove' 按 actionID 批量移除（actionID 为消息的 msgInternal.id）；'readAll' 清空全部
+ * @param actionIDs action 为 'remove' 时必填
+ */
+export const notifyMsgCenterPortal = (action: 'remove' | 'readAll', actionIDs?: string[]) => {
+  const targets = [
+    window,
+    window.parent !== window ? window.parent : null,
+    window.opener,
+  ].filter((t): t is Window => !!t);
+  targets.forEach((t) => {
+    t.postMessage({
+      source: 'msgcenter-portal',
+      action,
+      actionIDs,
+    }, '*');
+  });
+};

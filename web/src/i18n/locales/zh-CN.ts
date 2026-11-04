@@ -190,6 +190,8 @@ export default {
     hidd_bcc: '删除密送',
     show_bcc: '添加密送',
     mark_read: '标记已读',
+    all_read: '全部已读',
+    all_read_description: '将全部消息标记为已读，操作后不可恢复。是否继续？',
     unread_msg: '未读消息',
     read_msg: '已读消息',
     station_msg_detail: '站内消息详情',

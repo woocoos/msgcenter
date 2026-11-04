@@ -1,6 +1,6 @@
 import { MsgInternalTo } from "@/generated/msgsrv/graphql";
 import { getMsgInternalToInfo, getUserMsgInternalList, markMsgRead } from "@/services/msgsrv/internal";
-import { getDate, customTextToHtml } from "@/util";
+import { getDate, customTextToHtml, notifyMsgCenterPortal } from "@/util";
 import { ProCard } from "@ant-design/pro-components";
 import { useSearchParams } from "@ice/runtime";
 import { Divider, Empty, Typography } from "antd";
@@ -52,7 +52,7 @@ const Detail = ({ id: propId, onRead }: { id?: string; onRead?: () => void }) =>
   }, [id])
 
   useEffect(() => {
-     const iframeEl = iframeRef.current;
+    const iframeEl = iframeRef.current;
     let cleanup: (() => void) | undefined;
     if (iframeEl && info) {
       const iframeDoc = iframeEl.contentWindow?.document || iframeEl.contentDocument;
@@ -88,8 +88,13 @@ const Detail = ({ id: propId, onRead }: { id?: string; onRead?: () => void }) =>
       }
     }
     if (info && !info.readAt) {
-      markMsgRead([info.id], true);
-      onRead?.();
+      markMsgRead([info.id], true).then((result) => {
+        // 已读成功后才更新本地状态并通知门户通知中心清理该消息（actionID 为 msgInternal.id）
+        if (result) {
+          onRead?.();
+          notifyMsgCenterPortal('remove', [info.msgInternal.id]);
+        }
+      });
     }
     return cleanup;
   }, [info])

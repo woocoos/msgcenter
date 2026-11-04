@@ -36,10 +36,12 @@ type Documents = {
     "query userMsgInternalList($first: Int,$orderBy: MsgInternalToOrder,$where:MsgInternalToWhereInput){\n  userMsgInternalTos(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,msgInternalID,createdAt,deleteAt,readAt,userID\n        msgInternal{\n          id,tenantID,createdBy,createdAt,subject,body,format,redirect,category\n        }\n      }\n    }\n  }\n}": typeof types.UserMsgInternalListDocument,
     "query msgInternalInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgInternal{\n      id,tenantID,createdBy,createdAt,subject,body,format,redirect,category\n    }\n  }\n}": typeof types.MsgInternalInfoDocument,
     "query userMsgCategory{\n  userSubMsgCategory\n}": typeof types.UserMsgCategoryDocument,
-    "query userMsgCategoryNum($categories:[String!]!){\n  userUnreadMsgInternalsFromMsgCategory(categories:$categories)\n}": typeof types.UserMsgCategoryNumDocument,
+    "query userMsgCategoryNum($categories:[String!]!,$receiverType:MsgInternalReceiverType){\n  userUnreadMsgInternalsFromMsgCategory(categories:$categories,receiverType:$receiverType)\n}": typeof types.UserMsgCategoryNumDocument,
+    "query userUnreadMsgInternalNum($receiverType:MsgInternalReceiverType){\n  userUnreadMsgInternals(receiverType:$receiverType)\n}": typeof types.UserUnreadMsgInternalNumDocument,
     "query msgInternalToInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgInternalTo{\n      id,msgInternalID,createdAt,deleteAt,readAt,userID\n      msgInternal{\n        id,tenantID,createdBy,createdAt,subject,body,format,redirect,category\n      }\n    }\n  }\n}": typeof types.MsgInternalToInfoDocument,
     "mutation markMsgRead($ids:[ID!]!,$read:Boolean!){\n  markMsgInternalToReadOrUnRead(ids:$ids,read:$read)\n}": typeof types.MarkMsgReadDocument,
     "mutation delMarkMsg($ids:[ID!]!){\n  markMsgInternalToDeleted(ids:$ids)\n}": typeof types.DelMarkMsgDocument,
+    "mutation markMsgInternalAllToRead($receiverType:MsgInternalReceiverType){\n  markMsgInternalAllToRead(receiverType:$receiverType)\n}": typeof types.MarkMsgInternalAllToReadDocument,
     "subscription subMsg{\n  message{\n    content,extras,format,sendAt,title,url\n  }\n}": typeof types.SubMsgDocument,
     "query msgAlertList($first: Int,$alertName:String,$userID:String,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){\n  msgAlerts(first:$first,alertName: $alertName,userID: $userID,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,startsAt,endsAt,labels,annotations,state,timeout\n      }\n    }\n  }\n}": typeof types.MsgAlertListDocument,
     "query formatMsgAlerts($first: Int,$alertName:String,$userID:String,$receiverType:MsgTemplateReceiverType,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){\n  formatMsgAlerts(first:$first,alertName: $alertName,userID: $userID,receiverType: $receiverType,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,startsAt,endsAt,tenantID,state,msgEventComments,msgChannelComments,msgTemplateTitle,receiverType,users{name,email},state,receiver,hasMultiMsg,modes\n      }\n    }\n  }\n}": typeof types.FormatMsgAlertsDocument,
@@ -96,10 +98,12 @@ const documents: Documents = {
     "query userMsgInternalList($first: Int,$orderBy: MsgInternalToOrder,$where:MsgInternalToWhereInput){\n  userMsgInternalTos(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,msgInternalID,createdAt,deleteAt,readAt,userID\n        msgInternal{\n          id,tenantID,createdBy,createdAt,subject,body,format,redirect,category\n        }\n      }\n    }\n  }\n}": types.UserMsgInternalListDocument,
     "query msgInternalInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgInternal{\n      id,tenantID,createdBy,createdAt,subject,body,format,redirect,category\n    }\n  }\n}": types.MsgInternalInfoDocument,
     "query userMsgCategory{\n  userSubMsgCategory\n}": types.UserMsgCategoryDocument,
-    "query userMsgCategoryNum($categories:[String!]!){\n  userUnreadMsgInternalsFromMsgCategory(categories:$categories)\n}": types.UserMsgCategoryNumDocument,
+    "query userMsgCategoryNum($categories:[String!]!,$receiverType:MsgInternalReceiverType){\n  userUnreadMsgInternalsFromMsgCategory(categories:$categories,receiverType:$receiverType)\n}": types.UserMsgCategoryNumDocument,
+    "query userUnreadMsgInternalNum($receiverType:MsgInternalReceiverType){\n  userUnreadMsgInternals(receiverType:$receiverType)\n}": types.UserUnreadMsgInternalNumDocument,
     "query msgInternalToInfo($gid:GID!){\n  node(id: $gid){\n    id\n    ... on MsgInternalTo{\n      id,msgInternalID,createdAt,deleteAt,readAt,userID\n      msgInternal{\n        id,tenantID,createdBy,createdAt,subject,body,format,redirect,category\n      }\n    }\n  }\n}": types.MsgInternalToInfoDocument,
     "mutation markMsgRead($ids:[ID!]!,$read:Boolean!){\n  markMsgInternalToReadOrUnRead(ids:$ids,read:$read)\n}": types.MarkMsgReadDocument,
     "mutation delMarkMsg($ids:[ID!]!){\n  markMsgInternalToDeleted(ids:$ids)\n}": types.DelMarkMsgDocument,
+    "mutation markMsgInternalAllToRead($receiverType:MsgInternalReceiverType){\n  markMsgInternalAllToRead(receiverType:$receiverType)\n}": types.MarkMsgInternalAllToReadDocument,
     "subscription subMsg{\n  message{\n    content,extras,format,sendAt,title,url\n  }\n}": types.SubMsgDocument,
     "query msgAlertList($first: Int,$alertName:String,$userID:String,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){\n  msgAlerts(first:$first,alertName: $alertName,userID: $userID,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,startsAt,endsAt,labels,annotations,state,timeout\n      }\n    }\n  }\n}": types.MsgAlertListDocument,
     "query formatMsgAlerts($first: Int,$alertName:String,$userID:String,$receiverType:MsgTemplateReceiverType,$orderBy:MsgAlertOrder,$where:MsgAlertWhereInput){\n  formatMsgAlerts(first:$first,alertName: $alertName,userID: $userID,receiverType: $receiverType,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,startsAt,endsAt,tenantID,state,msgEventComments,msgChannelComments,msgTemplateTitle,receiverType,users{name,email},state,receiver,hasMultiMsg,modes\n      }\n    }\n  }\n}": types.FormatMsgAlertsDocument,
@@ -239,7 +243,11 @@ export function gql(source: "query userMsgCategory{\n  userSubMsgCategory\n}"): 
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query userMsgCategoryNum($categories:[String!]!){\n  userUnreadMsgInternalsFromMsgCategory(categories:$categories)\n}"): (typeof documents)["query userMsgCategoryNum($categories:[String!]!){\n  userUnreadMsgInternalsFromMsgCategory(categories:$categories)\n}"];
+export function gql(source: "query userMsgCategoryNum($categories:[String!]!,$receiverType:MsgInternalReceiverType){\n  userUnreadMsgInternalsFromMsgCategory(categories:$categories,receiverType:$receiverType)\n}"): (typeof documents)["query userMsgCategoryNum($categories:[String!]!,$receiverType:MsgInternalReceiverType){\n  userUnreadMsgInternalsFromMsgCategory(categories:$categories,receiverType:$receiverType)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query userUnreadMsgInternalNum($receiverType:MsgInternalReceiverType){\n  userUnreadMsgInternals(receiverType:$receiverType)\n}"): (typeof documents)["query userUnreadMsgInternalNum($receiverType:MsgInternalReceiverType){\n  userUnreadMsgInternals(receiverType:$receiverType)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -252,6 +260,10 @@ export function gql(source: "mutation markMsgRead($ids:[ID!]!,$read:Boolean!){\n
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation delMarkMsg($ids:[ID!]!){\n  markMsgInternalToDeleted(ids:$ids)\n}"): (typeof documents)["mutation delMarkMsg($ids:[ID!]!){\n  markMsgInternalToDeleted(ids:$ids)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation markMsgInternalAllToRead($receiverType:MsgInternalReceiverType){\n  markMsgInternalAllToRead(receiverType:$receiverType)\n}"): (typeof documents)["mutation markMsgInternalAllToRead($receiverType:MsgInternalReceiverType){\n  markMsgInternalAllToRead(receiverType:$receiverType)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
