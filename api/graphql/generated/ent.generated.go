@@ -65,8 +65,8 @@ type QueryResolver interface {
 	RenderMsgAlert(ctx context.Context, msgAlertID int, receiver string) (*string, error)
 	UserMsgInternalTos(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) (*ent.MsgInternalToConnection, error)
 	UserSubMsgCategory(ctx context.Context) ([]string, error)
-	UserUnreadMsgInternalsFromMsgCategory(ctx context.Context, categories []string) ([]int, error)
-	UserUnreadMsgInternals(ctx context.Context) (int, error)
+	UserUnreadMsgInternalsFromMsgCategory(ctx context.Context, categories []string, receiverType *profile.ReceiverType) ([]int, error)
+	UserUnreadMsgInternals(ctx context.Context, receiverType *profile.ReceiverType) (int, error)
 	MsgTemplateDefineByName(ctx context.Context, format msgtemplate.Format, body string) (string, error)
 	AppPushMsgs(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalOrder, where *ent.MsgInternalWhereInput) (*ent.MsgInternalConnection, error)
 	AppUnreadPushMsgs(ctx context.Context) (int, error)
@@ -2237,6 +2237,11 @@ func (ec *executionContext) field_Query_userUnreadMsgInternalsFromMsgCategory_ar
 		return nil, err
 	}
 	args["categories"] = arg0
+	arg1, err := ec.field_Query_userUnreadMsgInternalsFromMsgCategory_argsReceiverType(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["receiverType"] = arg1
 	return args, nil
 }
 func (ec *executionContext) field_Query_userUnreadMsgInternalsFromMsgCategory_argsCategories(
@@ -2254,6 +2259,52 @@ func (ec *executionContext) field_Query_userUnreadMsgInternalsFromMsgCategory_ar
 	}
 
 	var zeroVal []string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_userUnreadMsgInternalsFromMsgCategory_argsReceiverType(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*profile.ReceiverType, error) {
+	if _, ok := rawArgs["receiverType"]; !ok {
+		var zeroVal *profile.ReceiverType
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverType"))
+	if tmp, ok := rawArgs["receiverType"]; ok {
+		return ec.unmarshalOMsgInternalReceiverType2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverType(ctx, tmp)
+	}
+
+	var zeroVal *profile.ReceiverType
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_userUnreadMsgInternals_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_userUnreadMsgInternals_argsReceiverType(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["receiverType"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_userUnreadMsgInternals_argsReceiverType(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*profile.ReceiverType, error) {
+	if _, ok := rawArgs["receiverType"]; !ok {
+		var zeroVal *profile.ReceiverType
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverType"))
+	if tmp, ok := rawArgs["receiverType"]; ok {
+		return ec.unmarshalOMsgInternalReceiverType2ᚖgithubᚗcomᚋwoocoosᚋmsgcenterᚋpkgᚋprofileᚐReceiverType(ctx, tmp)
+	}
+
+	var zeroVal *profile.ReceiverType
 	return zeroVal, nil
 }
 
@@ -13998,7 +14049,7 @@ func (ec *executionContext) _Query_userUnreadMsgInternalsFromMsgCategory(ctx con
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().UserUnreadMsgInternalsFromMsgCategory(rctx, fc.Args["categories"].([]string))
+		return ec.resolvers.Query().UserUnreadMsgInternalsFromMsgCategory(rctx, fc.Args["categories"].([]string), fc.Args["receiverType"].(*profile.ReceiverType))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14053,7 +14104,7 @@ func (ec *executionContext) _Query_userUnreadMsgInternals(ctx context.Context, f
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().UserUnreadMsgInternals(rctx)
+		return ec.resolvers.Query().UserUnreadMsgInternals(rctx, fc.Args["receiverType"].(*profile.ReceiverType))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14070,7 +14121,7 @@ func (ec *executionContext) _Query_userUnreadMsgInternals(ctx context.Context, f
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_userUnreadMsgInternals(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_userUnreadMsgInternals(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -14079,6 +14130,17 @@ func (ec *executionContext) fieldContext_Query_userUnreadMsgInternals(_ context.
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_userUnreadMsgInternals_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }

@@ -1,6 +1,6 @@
 .tableTabs :global {
   .ant-pro-table-list-toolbar-left {
-    width: calc(100% - 300px);
+    width: calc(100% - 430px);
   }
 
   .ant-pro-table-list-toolbar-left>div {

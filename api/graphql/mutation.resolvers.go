@@ -20,6 +20,7 @@ import (
 	"github.com/woocoos/msgcenter/ent"
 	"github.com/woocoos/msgcenter/ent/msgchannel"
 	"github.com/woocoos/msgcenter/ent/msgevent"
+	"github.com/woocoos/msgcenter/ent/msginternal"
 	"github.com/woocoos/msgcenter/ent/msginternalto"
 	"github.com/woocoos/msgcenter/ent/msgsubscriber"
 	"github.com/woocoos/msgcenter/ent/msgtemplate"
@@ -524,6 +525,26 @@ func (r *mutationResolver) MarkMsgInternalToDeleted(ctx context.Context, ids []i
 	err = ent.FromContext(ctx).MsgInternalTo.Update().Where(
 		msginternalto.IDIn(ids...), msginternalto.UserID(uid), msginternalto.TenantID(tid),
 	).SetDeleteAt(time.Now()).Exec(ctx)
+	return err == nil, err
+}
+
+// MarkMsgInternalAllToRead is the resolver for the markMsgInternalAllToRead field.
+func (r *mutationResolver) MarkMsgInternalAllToRead(ctx context.Context, receiverType *profile.ReceiverType) (bool, error) {
+	uid, err := identity.UserIDFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	tid, err := identity.TenantIDFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	predicates := []predicate.MsgInternalTo{
+		msginternalto.UserID(uid), msginternalto.TenantID(tid), msginternalto.ReadAtIsNil(),
+	}
+	if receiverType != nil {
+		predicates = append(predicates, msginternalto.HasMsgInternalWith(msginternal.ReceiverTypeEQ(*receiverType)))
+	}
+	err = ent.FromContext(ctx).MsgInternalTo.Update().Where(predicates...).SetReadAt(time.Now()).Exec(ctx)
 	return err == nil, err
 }
 

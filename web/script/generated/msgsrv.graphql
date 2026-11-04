@@ -870,6 +870,8 @@ type MsgInternal implements Node {
   hasReadCounts: Int!
   id: ID!
   msgInternalTo: [MsgInternalTo!]
+  """消息类型名称"""
+  msgType: String
   """消息模式:站内信,app推送,邮件,短信,微信等"""
   receiverType: MsgInternalReceiverType!
   """消息跳转"""
@@ -1117,6 +1119,22 @@ input MsgInternalWhereInput {
   idLTE: ID
   idNEQ: ID
   idNotIn: [ID!]
+  """msg_type field predicates"""
+  msgType: String
+  msgTypeContains: String
+  msgTypeContainsFold: String
+  msgTypeEqualFold: String
+  msgTypeGT: String
+  msgTypeGTE: String
+  msgTypeHasPrefix: String
+  msgTypeHasSuffix: String
+  msgTypeIn: [String!]
+  msgTypeIsNil: Boolean
+  msgTypeLT: String
+  msgTypeLTE: String
+  msgTypeNEQ: String
+  msgTypeNotIn: [String!]
+  msgTypeNotNil: Boolean
   not: MsgInternalWhereInput
   or: [MsgInternalWhereInput!]
   """receiver_type field predicates"""
@@ -2015,6 +2033,8 @@ type Mutation {
   enableMsgEvent(id: ID!): MsgEvent!
   """ 启用消息模板 """
   enableMsgTemplate(id: ID!): MsgTemplate!
+  """ 设置用户全部站内信消息已读，receiverType为空时标记全部渠道 """
+  markMsgInternalAllToRead(receiverType: MsgInternalReceiverType): Boolean!
   """ 删除站内信消息 """
   markMsgInternalToDeleted(ids: [ID!]!): Boolean!
   """ 设置站内信消息已读未读 """
@@ -2438,10 +2458,10 @@ type Query {
   userMsgInternalTos(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: MsgInternalToOrder, where: MsgInternalToWhereInput): MsgInternalToConnection!
   """用户订阅的消息分类"""
   userSubMsgCategory: [String!]!
-  """用户站内信总未读数"""
-  userUnreadMsgInternals: Int!
-  """消息分类站内信未读数"""
-  userUnreadMsgInternalsFromMsgCategory(categories: [String!]!): [Int!]!
+  """用户站内信总未读数，receiverType为空时统计全部渠道"""
+  userUnreadMsgInternals(receiverType: MsgInternalReceiverType): Int!
+  """消息分类站内信未读数，receiverType为空时统计全部渠道"""
+  userUnreadMsgInternalsFromMsgCategory(categories: [String!]!, receiverType: MsgInternalReceiverType): [Int!]!
 }
 
 type Receiver {

@@ -187,6 +187,8 @@ export default {
     hidd_bcc: 'Delete BCC',
     show_bcc: 'Add BCC',
     mark_read: 'Mark read',
+    all_read: 'All read',
+    all_read_description: 'Mark all messages as read. This action cannot be undone. Are you sure you want to continue',
     unread_msg: 'Unread message',
     read_msg: 'Read message',
     station_msg_detail: 'Site message details',

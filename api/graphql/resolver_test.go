@@ -148,13 +148,17 @@ func (s *resolverSuite) TestUserSubMsgCategory() {
 func (s *resolverSuite) TestMessageHandler() {
 	s.Run("UserUnreadMessages", func() {
 		ctx := s.NewTestCtx()
-		num, err := s.qr.UserUnreadMsgInternals(ctx)
+		num, err := s.qr.UserUnreadMsgInternals(ctx, nil)
 		s.Require().NoError(err)
 		s.Require().Equal(2, num)
+		umeng := profile.ReceiverUmeng
+		num, err = s.qr.UserUnreadMsgInternals(ctx, &umeng)
+		s.Require().NoError(err)
+		s.Require().Equal(0, num)
 	})
 	s.Run("UserUnreadMessagesFromMsgCategory", func() {
 		ctx := s.NewTestCtx()
-		nums, err := s.qr.UserUnreadMsgInternalsFromMsgCategory(ctx, []string{"订阅类型"})
+		nums, err := s.qr.UserUnreadMsgInternalsFromMsgCategory(ctx, []string{"订阅类型"}, nil)
 		s.Require().NoError(err)
 		s.Require().NotEmpty(nums)
 		s.Require().Equal(2, nums[0])
@@ -176,6 +180,25 @@ func (s *resolverSuite) TestMessageHandler() {
 		has, err := s.Client.MsgInternalTo.Query().Where(msginternalto.IDIn(2), msginternalto.DeleteAtNotNil()).Exist(ctx)
 		s.Require().NoError(err)
 		s.Require().True(has)
+	})
+	s.Run("MarkAllMessageReadWithReceiverType", func() {
+		ctx := s.NewTestCtx()
+		umeng := profile.ReceiverUmeng
+		suc, err := s.mr.MarkMsgInternalAllToRead(ctx, &umeng)
+		s.Require().NoError(err)
+		s.Require().True(suc)
+		num, err := s.qr.UserUnreadMsgInternals(ctx, nil)
+		s.Require().NoError(err)
+		s.Require().Equal(1, num)
+	})
+	s.Run("MarkAllMessageRead", func() {
+		ctx := s.NewTestCtx()
+		suc, err := s.mr.MarkMsgInternalAllToRead(ctx, nil)
+		s.Require().NoError(err)
+		s.Require().True(suc)
+		num, err := s.qr.UserUnreadMsgInternals(ctx, nil)
+		s.Require().NoError(err)
+		s.Require().Equal(0, num)
 	})
 }
 

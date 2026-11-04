@@ -1,6 +1,6 @@
 import Auth from "@/components/auth";
-import { MsgInternalTo, MsgInternalToWhereInput } from "@/generated/msgsrv/graphql";
-import { delMarkMsg, getUserMsgCategory, getUserMsgCategoryNum, getUserMsgInternalList, markMsgRead } from "@/services/msgsrv/internal";
+import { MsgInternalReceiverType, MsgInternalTo, MsgInternalToWhereInput } from "@/generated/msgsrv/graphql";
+import { delMarkMsg, getUserMsgCategory, getUserMsgCategoryNum, getUserMsgInternalList, markMsgInternalAllToRead, markMsgRead } from "@/services/msgsrv/internal";
 import { DownOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { ActionType, PageContainer, ProTable } from "@ant-design/pro-components";
 import { KeepAlive, Modal } from "@knockout-js/layout";
@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import styles from "./index.module.css";
 import { definePageConfig } from "ice";
-import { delDataSource, customTextToHtml } from "@/util";
+import { delDataSource, customTextToHtml, notifyMsgCenterPortal } from "@/util";
 import { useResizableProTable, routeBreadcrumb } from "@/util/hook";
 import Detail from "@/pages/msg/internal/detail";
 
@@ -129,7 +129,7 @@ const List = () => {
     const cResult = await getUserMsgCategory();
 
     if (Array.isArray(cResult)) {
-      const numResult = await getUserMsgCategoryNum(cResult);
+      const numResult = await getUserMsgCategoryNum(cResult, MsgInternalReceiverType.Message);
       if (Array.isArray(numResult)) {
         for (let i = 0; i < cResult.length; i++) {
           const curNum = numResult[i] ?? 0;
@@ -237,6 +237,10 @@ const List = () => {
                 if (selectedRowKeys.length) {
                   const result = await markMsgRead(selectedRowKeys, true);
                   if (result) {
+                    // 通知门户通知中心清理对应消息（actionID 为 msgInternal.id）
+                    notifyMsgCenterPortal('remove', dataSource
+                      .filter(item => selectedRowKeys.includes(item.id))
+                      .map(item => item.msgInternal.id));
                     proTableRef.current?.reload();
                     await requestCategory();
                     message.success(t('submit_success'));
@@ -245,7 +249,24 @@ const List = () => {
                   message.warning(t('please_select_data'))
                 }
               }}>{t('mark_read')}</Button>
-            </Auth>
+            </Auth>,
+            <Popconfirm
+              key="all-read"
+              title={t('all_read')}
+              description={t('all_read_description')}
+              onConfirm={async () => {
+                const result = await markMsgInternalAllToRead(MsgInternalReceiverType.Message);
+                if (result) {
+                  // 通知门户通知中心清空全部消息展示
+                  notifyMsgCenterPortal('readAll');
+                  proTableRef.current?.reload();
+                  await requestCategory();
+                  message.success(t('submit_success'));
+                }
+              }}
+            >
+              <Button>{t('all_read')}</Button>
+            </Popconfirm>
           ],
         }}
         scroll={{ x: tableWidth }}
@@ -255,11 +276,15 @@ const List = () => {
         dataSource={dataSource}
         request={async (params, sort, filter) => {
           const table = { data: [] as MsgInternalTo[], success: true, total: 0 },
-            where: MsgInternalToWhereInput = {};
+            where: MsgInternalToWhereInput = {
+              hasMsgInternalWith: [{
+                receiverType: MsgInternalReceiverType.Message
+              }]
+            };
           if (selectCategory != 'all') {
-            where.hasMsgInternalWith = [{
+            where.hasMsgInternalWith!.push({
               category: selectCategory
-            }]
+            })
           }
           if (selectItems === 'unread') {
             where.readAtIsNil = true;
