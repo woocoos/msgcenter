@@ -289,7 +289,7 @@ func (r *queryResolver) UserSubMsgCategory(ctx context.Context) ([]string, error
 }
 
 // UserUnreadMsgInternalsFromMsgCategory is the resolver for the userUnreadMsgInternalsFromMsgCategory field.
-func (r *queryResolver) UserUnreadMsgInternalsFromMsgCategory(ctx context.Context, categories []string) ([]int, error) {
+func (r *queryResolver) UserUnreadMsgInternalsFromMsgCategory(ctx context.Context, categories []string, receiverType *profile.ReceiverType) ([]int, error) {
 	tid, err := identity.TenantIDFromContext(ctx)
 	if err != nil {
 		return []int{}, err
@@ -300,8 +300,12 @@ func (r *queryResolver) UserUnreadMsgInternalsFromMsgCategory(ctx context.Contex
 	}
 	counts := make([]int, 0)
 	for _, v := range categories {
+		inner := []predicate.MsgInternal{msginternal.Category(v)}
+		if receiverType != nil {
+			inner = append(inner, msginternal.ReceiverTypeEQ(*receiverType))
+		}
 		count, err := r.client.MsgInternalTo.Query().Where(
-			msginternalto.UserID(uid), msginternalto.TenantID(tid), msginternalto.ReadAtIsNil(), msginternalto.HasMsgInternalWith(msginternal.Category(v)),
+			msginternalto.UserID(uid), msginternalto.TenantID(tid), msginternalto.ReadAtIsNil(), msginternalto.HasMsgInternalWith(inner...),
 		).Count(ctx)
 		if err != nil {
 			return []int{}, err
@@ -312,7 +316,7 @@ func (r *queryResolver) UserUnreadMsgInternalsFromMsgCategory(ctx context.Contex
 }
 
 // UserUnreadMsgInternals is the resolver for the userUnreadMsgInternals field.
-func (r *queryResolver) UserUnreadMsgInternals(ctx context.Context) (int, error) {
+func (r *queryResolver) UserUnreadMsgInternals(ctx context.Context, receiverType *profile.ReceiverType) (int, error) {
 	tid, err := identity.TenantIDFromContext(ctx)
 	if err != nil {
 		return 0, err
@@ -321,9 +325,13 @@ func (r *queryResolver) UserUnreadMsgInternals(ctx context.Context) (int, error)
 	if err != nil {
 		return 0, err
 	}
-	return r.client.MsgInternalTo.Query().Where(
+	predicates := []predicate.MsgInternalTo{
 		msginternalto.UserID(uid), msginternalto.TenantID(tid), msginternalto.ReadAtIsNil(),
-	).Count(ctx)
+	}
+	if receiverType != nil {
+		predicates = append(predicates, msginternalto.HasMsgInternalWith(msginternal.ReceiverTypeEQ(*receiverType)))
+	}
+	return r.client.MsgInternalTo.Query().Where(predicates...).Count(ctx)
 }
 
 // MsgTemplateDefineByName is the resolver for the msgTemplateDefineByName field.

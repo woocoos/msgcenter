@@ -495,8 +495,8 @@ type ComplexityRoot struct {
 		Silences                              func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgSilenceOrder, where *ent.MsgSilenceWhereInput) int
 		UserMsgInternalTos                    func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MsgInternalToOrder, where *ent.MsgInternalToWhereInput) int
 		UserSubMsgCategory                    func(childComplexity int) int
-		UserUnreadMsgInternals                func(childComplexity int) int
-		UserUnreadMsgInternalsFromMsgCategory func(childComplexity int, categories []string) int
+		UserUnreadMsgInternals                func(childComplexity int, receiverType *profile.ReceiverType) int
+		UserUnreadMsgInternalsFromMsgCategory func(childComplexity int, categories []string, receiverType *profile.ReceiverType) int
 	}
 
 	Receiver struct {
@@ -3031,7 +3031,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.UserUnreadMsgInternals(childComplexity), true
+		args, err := ec.field_Query_userUnreadMsgInternals_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.UserUnreadMsgInternals(childComplexity, args["receiverType"].(*profile.ReceiverType)), true
 
 	case "Query.userUnreadMsgInternalsFromMsgCategory":
 		if e.complexity.Query.UserUnreadMsgInternalsFromMsgCategory == nil {
@@ -3043,7 +3048,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.UserUnreadMsgInternalsFromMsgCategory(childComplexity, args["categories"].([]string)), true
+		return e.complexity.Query.UserUnreadMsgInternalsFromMsgCategory(childComplexity, args["categories"].([]string), args["receiverType"].(*profile.ReceiverType)), true
 
 	case "Receiver.emailConfigs":
 		if e.complexity.Receiver.EmailConfigs == nil {
@@ -6976,10 +6981,10 @@ extend type Query {
     ):MsgInternalToConnection!
     """用户订阅的消息分类"""
     userSubMsgCategory:[String!]!
-    """消息分类站内信未读数"""
-    userUnreadMsgInternalsFromMsgCategory(categories: [String!]!):[Int!]!
-    """用户站内信总未读数"""
-    userUnreadMsgInternals:Int!
+    """消息分类站内信未读数，receiverType为空时统计全部渠道"""
+    userUnreadMsgInternalsFromMsgCategory(categories: [String!]!, receiverType: MsgInternalReceiverType):[Int!]!
+    """用户站内信总未读数，receiverType为空时统计全部渠道"""
+    userUnreadMsgInternals(receiverType: MsgInternalReceiverType):Int!
     """根据模板名称获取模板数据"""
     msgTemplateDefineByName(
         """消息类型:文本,网页,需要结合mod确定支持的格式"""
